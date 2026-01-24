@@ -10,42 +10,30 @@ package eu.essi_lab.accessor.thunder;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import eu.essi_lab.cdk.harvest.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.net.utils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.apache.commons.net.ftp.*;
+import org.slf4j.*;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.slf4j.Logger;
-
-import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
-import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.utils.FTPDownloader;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.OriginalMetadata;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author roncella
@@ -53,35 +41,20 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 public class ThunderConnector extends HarvestedQueryConnector<ThunderConnectorSetting> {
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "ThunderConnector";
 
     /**
-     * SERVICE ENDPOINT: ftp://18.18.83.11/
-     * Thunder Metadata are collected in file named "isd-history.csv"
-     * The metadata columns are:
-     * USAF,"WBAN","STATION NAME","CTRY","STATE","ICAO","LAT","LON","ELEV(M)","BEGIN","END"
-     * METADATA FIELDS USED:
-     * - USAF - is the name of the data files in thunder_data_GSOD folder (e.g. USAF=370180 -> 370180.txt file)
-     * - STATION NAME - name of the station that collected thunder count
-     * - CTRY - is the country of the station
-     * - STATE -
-     * - ICAO -
-     * - LAT -
-     * - LON -
-     * - ELEV (M) -
-     * - BEGIN - start temporal extent
-     * - END - end temporal extent
-     * Thuder Data are collected in ASCII text format and the (38) colums are:
-     * 1: YEAR, 2: STATION CODE, 3-14: Monthly Average Temperature in Degrees C, starting from January
-     * 15-26: Standard Deviation of Monthly Temperature in Degrees C, starting from January
-     * 27-38: Monthly Thunder Day count, starting from January
-     * DATA FILEDS USED
-     * - Year
-     * - Station Code (if NaN ignore it, it is the name of the data file). E.g. file with name 007026.txt will have
-     * 007026 value as station code
-     * - Monthly Thunder Day count, starting from January
+     * SERVICE ENDPOINT: ftp://18.18.83.11/ Thunder Metadata are collected in file named "isd-history.csv" The metadata columns are:
+     * USAF,"WBAN","STATION NAME","CTRY","STATE","ICAO","LAT","LON","ELEV(M)","BEGIN","END" METADATA FIELDS USED: - USAF - is the name of
+     * the data files in thunder_data_GSOD folder (e.g. USAF=370180 -> 370180.txt file) - STATION NAME - name of the station that collected
+     * thunder count - CTRY - is the country of the station - STATE - - ICAO - - LAT - - LON - - ELEV (M) - - BEGIN - start temporal extent
+     * - END - end temporal extent Thuder Data are collected in ASCII text format and the (38) colums are: 1: YEAR, 2: STATION CODE, 3-14:
+     * Monthly Average Temperature in Degrees C, starting from January 15-26: Standard Deviation of Monthly Temperature in Degrees C,
+     * starting from January 27-38: Monthly Thunder Day count, starting from January DATA FILEDS USED - Year - Station Code (if NaN ignore
+     * it, it is the name of the data file). E.g. file with name 007026.txt will have 007026 value as station code - Monthly Thunder Day
+     * count, starting from January
      */
     private static final String THUNDER_STATION_ERROR = "Unable to find stations URL";
     private static final String THUNDER_PARSING_STATION_ERROR = "THUNDER_PARSING_STATION_ERROR";
@@ -315,9 +288,11 @@ public class ThunderConnector extends HarvestedQueryConnector<ThunderConnectorSe
 
 	String[] splitted = thunderUrl.split(FTP);
 
-	FTPClient ftpClient = new FTPClient();
+	FTPSClient ftpClient = new FTPSClient();
 
 	try {
+
+	    ftpClient.setEnabledProtocols(new String[] { "TLSv1.3" });
 
 	    ftpClient.connect(splitted[1], 21);
 	    ftpClient.login(USER, getFtpPassword());
