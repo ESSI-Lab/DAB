@@ -10,30 +10,26 @@ package eu.essi_lab.gssrv.conf.task.collection;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.HashSet;
+import eu.essi_lab.lib.net.utils.whos.*;
+import eu.essi_lab.lib.whos.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
 
-import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
-import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
-import eu.essi_lab.lib.whos.MQTTUtils;
-import eu.essi_lab.lib.whos.WIS2Level10Topic;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.MetadataElement;
+import java.util.*;
 
-public class ParameterCollectionCreator extends SourceCollectionCreator {
+class ParameterCollectionCreator extends SourceCollectionCreator {
 
     protected Queryable getGroupByQueryable() {
 	return MetadataElement.OBSERVED_PROPERTY_URI;

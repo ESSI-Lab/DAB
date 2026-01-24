@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf.task;
+package eu.essi_lab.gssrv.conf.task.collection;
 
 import java.util.EnumMap;
 
@@ -45,8 +45,6 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.gssrv.conf.task.collection.ParameterCollectionCreator;
-import eu.essi_lab.gssrv.conf.task.collection.SourceCollectionCreator;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;

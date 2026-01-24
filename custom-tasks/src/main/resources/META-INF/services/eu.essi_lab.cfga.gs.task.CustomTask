@@ -1,11 +1,7 @@
 eu.essi_lab.gssrv.conf.task.UsersViewerTask
-eu.essi_lab.gssrv.conf.task.IndexesSizeViewerTask
 eu.essi_lab.gssrv.conf.task.DeletedRecordsRemovalTask
-eu.essi_lab.gssrv.conf.task.MarkLogicCacheCleanerTask
-eu.essi_lab.gssrv.conf.task.DatabaseCacheStatusTask
 eu.essi_lab.gssrv.conf.task.DownloadTestTask
 eu.essi_lab.gssrv.conf.task.StatisticsTask
-eu.essi_lab.gssrv.conf.task.MarklogicFolderCleanerTask
 eu.essi_lab.gssrv.conf.task.GEOSSAccessedSourceTask
 eu.essi_lab.gssrv.conf.task.DataHarvesterTask
 eu.essi_lab.gssrv.conf.task.BasicDataHarvesterTask
@@ -13,7 +9,7 @@ eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask
 eu.essi_lab.gssrv.conf.task.PrivateIdEncoderTask
 eu.essi_lab.gssrv.conf.task.SchedulerJobDataChecker
 eu.essi_lab.gssrv.conf.task.AggregationIdentifiersTask
-eu.essi_lab.gssrv.conf.task.CollectionCreatorTask
+eu.essi_lab.gssrv.conf.task.collection.CollectionCreatorTask
 eu.essi_lab.gssrv.conf.task.bluecloud.BlueCloudReportTask
 eu.essi_lab.gssrv.conf.task.CorruptedBlobTriggersCleanerTask
 eu.essi_lab.gssrv.conf.task.WISMetadataTask

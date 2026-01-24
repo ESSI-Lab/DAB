@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf.task;
+package eu.essi_lab.gssrv.conf.task.collection;
 
 /*-
  * #%L
@@ -10,29 +10,25 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Collection;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.profiler.wis.*;
+import org.json.*;
+
 import java.util.Date;
 
-import org.apache.jena.atlas.json.JsonArray;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.profiler.wis.WISUtils;
-
-public class WISNotificationMessage {
+class WISNotificationMessage {
 
     private JSONObject json = null;
 
