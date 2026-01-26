@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.profiler.csw;
 
@@ -24,7 +24,8 @@ package eu.essi_lab.profiler.csw;
  * #L%
  */
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -32,7 +33,45 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 public class CSWProfilerSetting extends ProfilerSetting {
 
     /**
-     * 
+     * @author Fabrizio
+     */
+    public enum KeyValueOptionKeys implements LabeledEnum {
+
+	/**
+	 *
+	 */
+	USE_SEARCH_AFTER_OPTION("useSearchAfter"),
+
+	/**
+	 *
+	 */
+	SEARCH_AFTER_KEY_OPTION("searchAfterKey");
+
+	private String name;
+
+	/**
+	 * @param name
+	 */
+	private KeyValueOptionKeys(String name) {
+
+	    this.name = name;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return name;
+	}
+    }
+
+    /**
+     *
      */
     public CSWProfilerSetting() {
 

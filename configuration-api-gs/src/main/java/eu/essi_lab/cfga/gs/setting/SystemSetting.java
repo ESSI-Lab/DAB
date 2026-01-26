@@ -1,7 +1,16 @@
 package eu.essi_lab.cfga.gs.setting;
 
-import java.util.ArrayList;
-import java.util.List;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
+import eu.essi_lab.lib.utils.*;
+import org.json.*;
+
+import java.util.*;
 
 /*-
  * #%L
@@ -24,29 +33,6 @@ import java.util.List;
  * #L%
  */
 
-import java.util.Optional;
-
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.setting.ConfigurationObject;
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.database.UsersDatabaseSetting;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.cfga.setting.validation.Validator;
-import eu.essi_lab.lib.utils.LabeledEnum;
-
 /**
  * @author Fabrizio
  */
@@ -66,12 +52,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
      * @author Fabrizio
      */
     public enum KeyValueOptionKeys implements LabeledEnum {
-
-	/**
-	 * MarkLogic option
-	 */
-	COVERING_MODE("coveringMode"), //
-	ENABLE_FILTERED_TRAILING_WILDCARD_QUERIES("enableFilteredTrailingWildcardQueries"),
 
 	/**
 	 * SPARQL proxy endpoint and forced accept header
@@ -106,42 +86,30 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 * Health check options
 	 */
-	TASK_AGE_HEALTH_CHECK_METHOD_TRESHOLD("taskAgeHealthCheckMethodTreshold"), //
-	FREE_MEMORY_HEALTH_CHECK_METHOD_TRESHOLD("freeMemoryHealthCheckMethodTreshold"), //
 	SEND_HEALTH_CHECK_REPORT("sendHealthCheckReport"), //
 	PROFILER_HEALTH_CHECK_METHOD_ENABLED("profilerHealthCheckMethodEnabled"),
 
 	/**
 	 * DABStarter option
 	 */
-	SCHEDULER_START_DELAY("schedulerStartDelay"),
+	SCHEDULER_START_DELAY("schedulerStartDelay"),//
 
 	/**
 	 * Trust store options
 	 */
-	TRUST_STORE("trustStore"),
-	TRUST_STORE_PWD("trustStorePassword"),
-	TRUST_STORE_NAME("trustStoreName"),
-
-	/**
-	 * SOSConnector option
-	 */
-	SOS_100_PARALLEL_TASKS("sos100ParallelTasks"),
+	TRUST_STORE("trustStore"), //
+	TRUST_STORE_PWD("trustStorePassword"), //
+	TRUST_STORE_NAME("trustStoreName"),//
 
 	/**
 	 * Configurator option
 	 */
-	MULTIPLE_CONFIGURATION_TABS("multipleConfigurationTabs"),
+	MULTIPLE_CONFIGURATION_TABS("multipleConfigurationTabs"),//
 
 	/**
 	 * ConfigService option
 	 */
-	CONFIG_SERVICE_AUTHTOKEN("configServiceAuthToken"),
-
-	/**
-	 * XACMLAutorizer option
-	 */
-	DEV_MACHINE_AUTH("devMachineAuth"),
+	CONFIG_SERVICE_AUTHTOKEN("configServiceAuthToken"),//
 
 	/**
 	 *
@@ -177,7 +145,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public SystemSetting() {
 
@@ -277,7 +245,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	emailSetting.setIdentifier(EMAIL_SETTING_ID);
 
 	addSetting(emailSetting);
-	
+
 	//
 	// WMS Cache settings
 	//
@@ -321,8 +289,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	userdbSetting.enableCompactMode(false);
 	userdbSetting.setName("User database setting");
 	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_ID);
-	userdbSetting
-		.setDescription("If enabled and configured, this setting allows to retrieve users information from a specific database");
+	userdbSetting.setDescription(
+		"If enabled and configured, this setting allows to retrieve users information from a specific database");
 	userdbSetting.removeVolatileSettings();
 	userdbSetting.setSelectionMode(SelectionMode.UNSET);
 
@@ -385,9 +353,9 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	    return list.//
 		    stream().//
 		    flatMap(s -> s.getOptions().stream()). //
-		    anyMatch(o -> o.isRequired() && !o.getKey().equals("configFolder")
-			    && o.getOptionalValue().isEmpty() && o.getOptionalSelectedValue().isEmpty());
- 	}
+		    anyMatch(o -> o.isRequired() && !o.getKey().equals("configFolder") && o.getOptionalValue().isEmpty()
+		    && o.getOptionalSelectedValue().isEmpty());
+	}
     }
 
     /**
@@ -412,7 +380,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
 	public DescriptorProvider() {
 
@@ -423,7 +391,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	public TabContentDescriptor get() {
@@ -442,7 +409,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isHarvestingReportMailEnabled() {
 
@@ -460,7 +427,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isAugmentationReportMailEnabled() {
 
@@ -478,7 +445,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isDownloadReportMailEnabled() {
 
@@ -496,7 +463,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     }
 
     /**
-     * 
+     *
      */
     public boolean isErrorLogsReportEnabled() {
 
@@ -521,7 +488,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	return Optional.empty();
     }
-    
+
     //
     // WMS Cache
     //

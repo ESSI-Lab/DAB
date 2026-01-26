@@ -77,7 +77,7 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 public abstract class SensorThingsDownloader extends WMLDataDownloader {
 
     /**
-     * 
+     *
      */
     protected String linkage;
 
@@ -94,7 +94,7 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 	SystemQueryOptions options = SystemQueryOptions.//
 		get().//
 		// selects only stream phenomenonTime
-		select(new SelectOption("phenomenonTime"));
+			select(new SelectOption("phenomenonTime"));
 
 	return Optional.of(options);
     }
@@ -305,8 +305,8 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 		    if (parameters != null) {
 			Set<String> keys = parameters.keySet();
 			for (String key : keys) {
-			    String q = key + ":" + parameters.getString(key).replace(" ", "_");
-			    q = URLEncoder.encode(q, StandardCharsets.UTF_8);
+			    key = URLEncoder.encode(key, StandardCharsets.UTF_8);
+			    String q = key + ":" + URLEncoder.encode(parameters.getString(key).trim(), StandardCharsets.UTF_8);
 			    v.getQualifiers().add(q);
 			}
 		    }
@@ -318,7 +318,7 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 			if (dqStatus != null) {
 			    String code = dqStatus.optString("code");
 			    if (code != null) {
-				v.getQualifiers().add("qualityFlag:" + code);
+				v.getQualifiers().add("qualityFlag:" + URLEncoder.encode(code, StandardCharsets.UTF_8));
 			    }
 			}
 		    }

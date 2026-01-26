@@ -37,6 +37,8 @@ import java.util.UUID;
 
 import javax.ws.rs.core.UriInfo;
 
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -339,6 +341,7 @@ public class WISUtils {
 	    List<Concept> concepts = new ArrayList<Concept>();
 	    List<String> values = new ArrayList<String>();
 	    boolean uris = false;
+	    WHOSOntology ontology = new WHOSOntology();
 	    for (CharacterStringPropertyType keyType : keys) {
 		Object keyValue = keyType.getCharacterString().getValue();
 		if (keyValue instanceof AnchorType) {
@@ -348,6 +351,12 @@ public class WISUtils {
 		    String kid = null;
 		    if (href.contains("/")) {
 			kid = href.substring(href.lastIndexOf("/") + 1);
+		    }
+		    if (anchor.getTitle()==null || anchor.getTitle().isEmpty()) {
+			SKOSConcept c = ontology.getConcept(href);
+			if (c!=null){
+			    anchor.setTitle(c.getPreferredLabel("en"));
+			}
 		    }
 		    Concept concept = new Concept(kid, anchor.getTitle(), anchor.getHref());
 		    concepts.add(concept);
@@ -370,7 +379,7 @@ public class WISUtils {
 
 	properties.put("description", resource.getHarmonizedMetadata().getCoreMetadata().getAbstract());
 	properties.put("id", id);
-	properties.put("identifier", id);
+	//properties.put("identifier", id);
 	JSONObject lang = new JSONObject();
 	lang.put("code", "en");
 	properties.put("language", lang);
@@ -395,6 +404,12 @@ public class WISUtils {
 	    contact.put("roles", roles);
 	    contacts.put(contact);
 	}
+	JSONObject cnr = new JSONObject();
+	cnr.put("organization", "CNR-IIA");
+	JSONArray cnrRoles = new JSONArray();
+	cnrRoles.put("publisher");
+	cnr.put("roles", cnrRoles);
+	contacts.put(cnr);
 	properties.put("wmo:dataPolicy", "recommended");
 	if (resource.getSource().getUniqueIdentifier().equals("argentina-ina")) {
 	    String url = "https://creativecommons.org/licenses/by/4.0/";

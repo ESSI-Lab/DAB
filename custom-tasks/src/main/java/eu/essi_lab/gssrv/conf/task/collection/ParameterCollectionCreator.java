@@ -21,19 +21,15 @@ package eu.essi_lab.gssrv.conf.task.collection;
  * #L%
  */
 
-import java.util.HashSet;
+import eu.essi_lab.lib.net.utils.whos.*;
+import eu.essi_lab.lib.whos.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
 
-import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
-import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
-import eu.essi_lab.lib.whos.MQTTUtils;
-import eu.essi_lab.lib.whos.WIS2Level10Topic;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.MetadataElement;
+import java.util.*;
 
-public class ParameterCollectionCreator extends SourceCollectionCreator {
+class ParameterCollectionCreator extends SourceCollectionCreator {
 
     protected Queryable getGroupByQueryable() {
 	return MetadataElement.OBSERVED_PROPERTY_URI;

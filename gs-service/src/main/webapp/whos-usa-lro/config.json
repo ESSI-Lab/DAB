@@ -22,6 +22,10 @@
     "semanticSearch": true,    
     "semanticSearchValue":1,
     "ontology": "whos",
+    "ontologyBrowserUrl": "https://hydro.geodab.eu/ontology-browser/hydro-ontology.html?http://hydro.geodab.eu/hydro-ontology/concept/1",
+    "ontologyTreeUrl": "https://whos.geodab.eu/gs-service/sparql-navigator/whos",
+    "conceptBaseUrl": "http://hydro.geodab.eu/hydro-ontology/concept/",
+    "ontologyLabel": "WHOS ontology",
     "riverSearch": true
     
 }

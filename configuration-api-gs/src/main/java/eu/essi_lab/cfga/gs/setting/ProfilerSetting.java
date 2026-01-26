@@ -3,9 +3,6 @@
  */
 package eu.essi_lab.cfga.gs.setting;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -28,28 +25,21 @@ import java.util.stream.Collectors;
  */
 
 import com.vaadin.flow.component.grid.*;
-import com.vaadin.flow.data.provider.SortDirection;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOfflineItemHandler;
-import eu.essi_lab.cfga.gs.setting.menuitems.ProfilerStateOnlineItemHandler;
-import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
+import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.setting.menuitems.*;
+import eu.essi_lab.cfga.gui.components.grid.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
-import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.option.ValuesLoader;
-import eu.essi_lab.cfga.setting.KeyValueOptionDecorator;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.cfga.setting.validation.Validator;
-import eu.essi_lab.lib.utils.StreamUtils;
-import eu.essi_lab.messages.ResourceConsumer;
+import eu.essi_lab.cfga.gui.directive.Directive.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -63,10 +53,42 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     private static final String RESOURCE_CONSUMER_OPTION_KEY = "resourceConsumer";
 
     /**
+     * @author Fabrizio
+     */
+    public enum KeyValueOptionKeys implements LabeledEnum {
+
+	/**
+	 * Maximum number of threads used by the discovery result set mapper
+	 */
+	RSM_THREADS_COUNT_PROPERTY("rsmThreadsCount");
+
+	private String name;
+
+	/**
+	 * @param name
+	 */
+	private KeyValueOptionKeys(String name) {
+
+	    this.name = name;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return name;
+	}
+    }
+
+    /**
      *
      */
-    public static final String RSM_THREADS_COUNT_PROPERTY = "rsmThreadsCount";
-    public static final String DEFAULT_RSM_THREADS_COUNT = "10";
+    public static final int DEFAULT_RSM_THREADS_COUNT = 10;
 
     /**
      *
@@ -448,14 +470,23 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
     }
 
     /**
+     * <ol>
+     * <li>if the value of the key-value option {@link KeyValueOptionKeys#RSM_THREADS_COUNT_PROPERTY} is >= 0,
+     * returns an {@link Optional} with such value</li>
+     * <li>if the value of the key-value option {@link KeyValueOptionKeys#RSM_THREADS_COUNT_PROPERTY} is 0 or -1, then returns an
+     * empty {@link Optional} and the <i>DiscoveryResultSetMapper</i>
+     * will use a thread for each record in the result set</li>
+     * <li>if no value is specified, then returns {@link Optional#of(DEFAULT_RSM_THREADS_COUNT)}</li>
+     * </ol>
+     *
      * @return
      */
     public Optional<Integer> getResultSetMapperThreadsCount() {
 
-	int count = Integer.parseInt(getKeyValueOptions().//
-		map(o -> o.getProperty(RSM_THREADS_COUNT_PROPERTY, DEFAULT_RSM_THREADS_COUNT)).//
-		orElse(DEFAULT_RSM_THREADS_COUNT));
+	int count = readKeyValue(KeyValueOptionKeys.RSM_THREADS_COUNT_PROPERTY.getLabel()).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_RSM_THREADS_COUNT); //
 
-	return Optional.ofNullable(count == -1 ? null : count);
+	return Optional.ofNullable(count == -1 || count == 0 ? null : count);
     }
 }

@@ -30,6 +30,10 @@
 		<listener-class>eu.essi_lab.gssrv.servlet.ServletListener</listener-class>
 	</listener>
 
+	<!-- ===================== -->
+	<!--  SparqlProxy servlet  -->
+	<!-- ===================== -->
+
 	<servlet>
 		<servlet-name>SparqlProxy</servlet-name>
 		<servlet-class>eu.essi_lab.gssrv.servlet.SparqlProxyServlet</servlet-class>
@@ -39,7 +43,6 @@
 		<servlet-name>SparqlProxy</servlet-name>
 		<url-pattern>/yxorp</url-pattern>
 	</servlet-mapping>
-
 
 	<!-- ===================== -->
 	<!-- Authenticator servlet -->
@@ -90,10 +93,6 @@
 		<url-pattern>/services/essi/pubsub/*</url-pattern>
 	</servlet-mapping>
 
-
-
-
-
 	<!-- ===================== -->
 	<!-- Vaadin servlet -->
 	<!-- ===================== -->
@@ -121,15 +120,6 @@
 		<url-pattern>/configuration/*</url-pattern>
 	</servlet-mapping>
 
-	<!-- <filter>
-		<filter-name>RequestLoggingFilter</filter-name>
-		<filter-class>eu.essi_lab.gssrv.servlet.RequestLoggingFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>RequestLoggingFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping> -->
-	
 	<!-- ================================== -->
 	<!-- WMSCacheFilter -->
 	<!-- ================================== -->

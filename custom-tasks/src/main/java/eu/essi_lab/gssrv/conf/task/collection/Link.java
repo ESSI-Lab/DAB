@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf.task;
+package eu.essi_lab.gssrv.conf.task.collection;
 
 /*-
  * #%L
@@ -21,9 +21,9 @@ package eu.essi_lab.gssrv.conf.task;
  * #L%
  */
 
-import org.json.JSONObject;
+import org.json.*;
 
-public class Link {
+class Link {
     private String rel = null;
     private String type = null;
     private String href = null;

@@ -67,7 +67,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
 
-public class SourceCollectionCreator {
+class SourceCollectionCreator {
 
     public List<DatasetCollection> getCollections(String sourceId, String sourceDeployments) throws GSException {
 

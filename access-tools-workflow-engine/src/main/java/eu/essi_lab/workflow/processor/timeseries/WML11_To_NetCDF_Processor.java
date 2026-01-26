@@ -45,6 +45,7 @@ import java.util.TimeZone;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.apache.commons.io.IOUtils;
 import org.cuahsi.waterml._1.CensorCodeType;
 import org.cuahsi.waterml._1.GeogLocationType;
@@ -229,16 +230,20 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 		    List<String> qs = innerValue.getQualifiers();
 		    for (String q : qs) {
 			if (q != null && !q.isEmpty()) {
-			    q = URLDecoder.decode(q,StandardCharsets.UTF_8);
 			    String[] split = q.split(":");
-			    String qualifierName = split[0];
-			    String qualifierValue = split[1];
-			    List<String> qValues = qualifierValues.get(qualifierName);
-			    if (qValues == null) {
-				qValues = new ArrayList<String>();
-				qualifierValues.put(qualifierName, qValues);
+			    if (split.length == 2) {
+				String qualifierName =URLDecoder.decode(split[0], StandardCharsets.UTF_8);
+				String qualifierValue =URLDecoder.decode(split[1], StandardCharsets.UTF_8);
+				List<String> qValues = qualifierValues.get(qualifierName);
+				if (qValues == null) {
+				    qValues = new ArrayList<String>();
+				    qualifierValues.put(qualifierName, qValues);
+				}
+				qValues.add(qualifierValue);
+			    }else{
+				GSLoggerFactory.getLogger(getClass()				).error("Unexpected qualifier format");
 			    }
-			    qValues.add(qualifierValue);
+
 			}
 		    }
 		    BigDecimal decimalValue = innerValue.getValue();

@@ -634,7 +634,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName(), resolution8601);
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to parse value '{}': {}",resolution8601,e.getMessage());
 	}
     }
 

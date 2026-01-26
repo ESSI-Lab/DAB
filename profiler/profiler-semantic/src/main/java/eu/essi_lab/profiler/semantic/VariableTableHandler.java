@@ -27,13 +27,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.ServiceLoader;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -72,12 +67,14 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 public class VariableTableHandler implements WebRequestHandler, WebRequestValidator {
 
     /**
-     * 
+     *
      */
     private static final int DEFAULT_PAGE_SIZE = 1000;
 
     @Override
     public Response handle(WebRequest webRequest) throws GSException {
+
+	HashMap<String,TreeSet<String>> observedProperties = new HashMap<>();
 
 	Optional<String> optionalView = webRequest.extractViewId();
 
@@ -92,9 +89,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	SemanticCompletenessReport scr = new SemanticCompletenessReport();
 	HydroOntology ontology = null;
 	if (viewId.equals("his-central")) {
-	    scr.addConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/65", "Precipitation");
-	    scr.addConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/3", "Level");
-	    scr.addConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/76", "Flux, discharge");
+	    scr.addConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/65", "Precipitation");
+	    scr.addConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/3", "Level");
+	    scr.addConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/76", "Flux, discharge");
 	    ontology = new HISCentralOntology();
 	}
 
@@ -246,8 +243,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		info.setCountry(country);
 		info.setCountryISO3(countryISO3);
 
-		String csv = uniqueVariableCode + "\t" + protocol + "\t" + variableCode + "\t" + variableName + "\t" + variableDescription
-			+ "\t\n";
+		String csv = uniqueVariableCode + "\t" + protocol + "\t" + variableCode + "\t" + variableName + "\t" + variableDescription + "\t\n";
 		rows.add(new SimpleEntry<RowInfo, String>(info, csv));
 
 	    }
@@ -287,8 +283,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
 		    + "Begin:" + stats.getBegin() + "<br/>"//
 		    + "End:" + stats.getEnd() + "<br/>"//
-		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth()
-		    + "<br/>" //
+		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth() + "<br/>" //
 		    + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>"//
 		    + "</td></tr>" + "" //
 		    + "<tr>" + //
@@ -340,18 +335,32 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		public int compare(SimpleEntry<RowInfo, String> o1, SimpleEntry<RowInfo, String> o2) {
 		    String t1 = o1.getKey().getTimeseriesCount();
 		    String t2 = o2.getKey().getTimeseriesCount();
-		    return new Integer(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
+		    return Integer.valueOf(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
 		}
 	    });
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
+		TreeSet<String> props = observedProperties.get(s.getLabel());
+		if (props == null) {
+		    props = new TreeSet<>();
+		    observedProperties.put(s.getLabel(), props);
+		}
+		if (ri.getVariableURI()!=null) {
+		    if (ri.getVariableURI().startsWith(HISCentralOntology.HIS_CENTRAL_BASE_URI)){
+			props.add(ontology.getConcept(ri.getVariableURI()).getPreferredLabel("en"));
+		    }else{
+			props.add(ri.getVariableURI());
+		    }
+		}else{
+		    props.add(ri.getVariableName());
+		}
 		content += "<tr>" + //
-		// getRow(ri.getSiteCount()) + //
-		// getRow(ri.getAttributeCount()) + // 1
-		// getRow(ri.getTimeseriesCount()) + // 1
-		// getRow(ri.getBegin()) + //
-		// getRow(ri.getEnd()) + //
-		// getRow(ri.getWest() + "," + ri.getSouth() + "," + ri.getEast() + "," + ri.getNorth()) + // 1
+			// getRow(ri.getSiteCount()) + //
+			// getRow(ri.getAttributeCount()) + // 1
+			// getRow(ri.getTimeseriesCount()) + // 1
+			// getRow(ri.getBegin()) + //
+			// getRow(ri.getEnd()) + //
+			// getRow(ri.getWest() + "," + ri.getSouth() + "," + ri.getEast() + "," + ri.getNorth()) + // 1
 			getRow(ri.getUniqueVariableCode()) + //
 			getRow(ri.getVariableCode()) + //
 			getRow(ri.getVariableName()) + //
@@ -409,6 +418,19 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    }
 	    str += "</table>";
 	}
+
+	Set<String> sourceLabels = observedProperties.keySet();
+	str+="<table border='1px'>";
+	str+="<tr><th>Source</th><th>Observed properties</th></tr>";
+	for(String  sourceLabel:sourceLabels){
+	    String props = "";
+	    TreeSet<String> ps = observedProperties.get(sourceLabel);
+	    for(String p: ps){
+		props+=p+",";
+	    }
+	    str+="<tr><td>"+sourceLabel+"</td><td>"+props+"</td></tr>";
+	}
+	str+="</table>";
 
 	str += "</body></html>";
 

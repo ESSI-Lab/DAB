@@ -896,8 +896,7 @@ public class ConfigurationWrapper {
 	    if (prop != null) {
 
 		String[] s = prop.split(";");
-		adminUsers = new ArrayList<>();
-		adminUsers.addAll(Arrays.asList(s));
+		adminUsers = new ArrayList<>(Arrays.asList(s));
 	    }
 	}
 

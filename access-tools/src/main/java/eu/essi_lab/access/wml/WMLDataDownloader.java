@@ -34,6 +34,7 @@ import java.util.Optional;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.Duration;
 
+import eu.essi_lab.lib.net.utils.whos.*;
 import org.cuahsi.waterml._1.ContactInformationType;
 import org.cuahsi.waterml._1.LatLonPointType;
 import org.cuahsi.waterml._1.ObjectFactory;
@@ -60,11 +61,6 @@ import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.lib.net.utils.whos.HydroOntology;
-import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
-import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
-import eu.essi_lab.lib.net.utils.whos.WMOOntology;
-import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.BNHSProperty;
@@ -122,7 +118,13 @@ public abstract class WMLDataDownloader extends DataDownloader {
 
 		JAXBWML.getInstance().addVariableURI(variableInfo, uri);
 
-		HydroOntology ontology = new WHOSOntology();
+		HydroOntology ontology;
+
+		if (uri.startsWith(HISCentralOntology.HIS_CENTRAL_BASE_URI)) {
+		    ontology = new HISCentralOntology();
+		}else{
+		    ontology =new WHOSOntology();
+		}
 		SKOSConcept concept = ontology.getConcept(uri);
 		if (concept != null) {
 		    variableName = concept.getPreferredLabel("en");

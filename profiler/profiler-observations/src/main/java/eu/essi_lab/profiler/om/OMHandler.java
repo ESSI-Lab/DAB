@@ -1127,17 +1127,15 @@ public class OMHandler extends StreamingRequestHandler {
 				String qualifiersString = qualifiersAttribute.getValue();
 				if (qualifiersString != null && !qualifiersString.trim().isEmpty()) {
 				    try {
-					// URL decode the qualifiers string
-					String decodedQualifiers = URLDecoder.decode(qualifiersString, StandardCharsets.UTF_8.name());
 					// Qualifiers are space-separated key:value pairs
 					// Parse them into a map
-					String[] qualifierPairs = decodedQualifiers.split("\\s+");
+					String[] qualifierPairs = qualifiersString.split("\\s+");
 					for (String pair : qualifierPairs) {
 					    if (pair != null && !pair.trim().isEmpty()) {
 						int colonIndex = pair.indexOf(':');
 						if (colonIndex > 0 && colonIndex < pair.length() - 1) {
-						    String key = pair.substring(0, colonIndex);
-						    String qualifierValue = pair.substring(colonIndex + 1).replace("_"," ");
+						    String key = URLDecoder.decode(pair.substring(0, colonIndex),StandardCharsets.UTF_8);
+						    String qualifierValue = URLDecoder.decode(pair.substring(colonIndex + 1),StandardCharsets.UTF_8);
 						    qualifiers.put(key, qualifierValue);
 						} else {
 						    // If no colon, use the whole string as value with a default key

@@ -21,50 +21,26 @@ package eu.essi_lab.profiler.oaipmh.handler.discover;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.ResourceSelector.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.pdk.wrt.*;
+import eu.essi_lab.profiler.oaipmh.*;
+import eu.essi_lab.profiler.oaipmh.OAIPMHProfilerSetting.*;
+import eu.essi_lab.profiler.oaipmh.token.*;
 
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.SortedFields;
-import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.web.KeyValueParser;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.SortOrder;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.ESSILabProvider;
-import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.profiler.oaipmh.OAIPMHProfiler;
-import eu.essi_lab.profiler.oaipmh.OAIPMHProfilerSetting;
-import eu.essi_lab.profiler.oaipmh.OAIPMHRequestReader;
-import eu.essi_lab.profiler.oaipmh.OAIPMHRequestValidator;
-import eu.essi_lab.profiler.oaipmh.OAIPMRequestFilter;
-import eu.essi_lab.profiler.oaipmh.token.ResumptionToken;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -105,9 +81,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	    ResumptionToken resumptionToken = ResumptionToken.of(tokenValue);
 	    Optional<String> searchAfter = resumptionToken.getSearchAfter();
 
-	    if (searchAfter.isPresent()) {
-		refinedMessage.setSearchAfter(SearchAfter.of(searchAfter.get()));
-	    }
+	    searchAfter.ifPresent(s -> refinedMessage.setSearchAfter(SearchAfter.of(s)));
 	}
 
 	return refinedMessage;
@@ -299,7 +273,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
 	    if (!resultSet.getResultsList().isEmpty()) {
 
-		GSResource resource = resultSet.getResultsList().get(0);
+		GSResource resource = resultSet.getResultsList().getFirst();
 		Optional<String> ts = resource.getPropertyHandler().getResourceTimeStamp();
 
 		if (ts.isPresent()) {
@@ -333,29 +307,10 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
      */
     private int getPageSize() {
 
-	Optional<Properties> properties = getSetting().get().getKeyValueOptions();
-	int pageSize = getDefaultPageSize();
-	if (properties.isPresent()) {
-
-	    pageSize = Integer.valueOf(properties.get().getProperty("pageSize", String.valueOf(getDefaultPageSize())));
-	}
-
-	return pageSize;
-    }
-
-    /**
-     * @return
-     */
-    private boolean sortResults() {
-
-	Optional<Properties> properties = getSetting().get().getKeyValueOptions();
-	boolean sortResults = false;
-	if (properties.isPresent()) {
-
-	    sortResults = Boolean.valueOf(properties.get().getProperty("sortResults", "false"));
-	}
-
-	return sortResults;
+	return getSetting().get(). //
+		readKeyValue(KeyValueOptionKeys.PAGE_SIZE.getLabel()).//
+		map(Integer::parseInt).//
+		orElse(getDefaultPageSize());
     }
 
     /**
@@ -381,7 +336,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 	    List<String> ids = getHarvestedSourcesIds();
 
 	    if (ids.size() == 1) {
-		setBond = BondFactory.createSourceIdentifierBond(ids.get(0));
+		setBond = BondFactory.createSourceIdentifierBond(ids.getFirst());
 	    } else {
 		setBond = BondFactory.createOrBond();
 		for (String sourceId : ids) {
@@ -397,7 +352,7 @@ public class OAIPMHRequestTransformer extends DiscoveryRequestTransformer {
 
 	return ConfigurationWrapper.getHarvestedSources().//
 		stream().//
-		map(s -> s.getUniqueIdentifier()).//
+		map(GSSource::getUniqueIdentifier).//
 		collect(Collectors.toList());
     }
 

@@ -27,6 +27,10 @@
 	"semanticSearch": false,
 	"semanticOptions": true,
 	"enableBrowseGEMET": true,
+	"ontologyBrowserUrl": "../ontology-browser/gemet-ontology.html?http://www.eionet.europa.eu/gemet/gemetThesaurus",
+	"ontologyTreeUrl": "",
+	"conceptBaseUrl": "",
+	"ontologyLabel": "GEMET ontology",
 	
     "login": false
 }

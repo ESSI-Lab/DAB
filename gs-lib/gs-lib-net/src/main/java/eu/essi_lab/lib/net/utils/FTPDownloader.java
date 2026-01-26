@@ -21,27 +21,13 @@ package eu.essi_lab.lib.net.utils;
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.SocketException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.StringTokenizer;
+import eu.essi_lab.lib.utils.*;
+import org.apache.commons.net.ftp.*;
 
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPFileFilter;
-
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import java.io.*;
+import java.net.*;
+import java.nio.file.*;
+import java.util.*;
 
 /**
  * @author roncella
@@ -50,7 +36,7 @@ public class FTPDownloader implements Serializable {
 
     private Integer timeOut = 15000;
 
-    private FTPClient ftpClient;
+    private FTPSClient ftpClient;
 
     private String host;
 
@@ -145,8 +131,11 @@ public class FTPDownloader implements Serializable {
 	String user = "";
 	String pwd = "";
 
-	if (ftpClient == null)
-	    ftpClient = new FTPClient();
+	if (ftpClient == null) {
+	    ftpClient = new FTPSClient();
+	}
+
+	ftpClient.setEnabledProtocols(new String[] { "TLSv1.3" });
 
 	ftpClient.setConnectTimeout(0);
 
@@ -179,8 +168,11 @@ public class FTPDownloader implements Serializable {
 	String user = "anonymous";
 	String pwd = "";
 
-	if (ftpClient == null)
-	    ftpClient = new FTPClient();
+	if (ftpClient == null) {
+	    ftpClient = new FTPSClient();
+	}
+
+	ftpClient.setEnabledProtocols(new String[] { "TLSv1.3" });
 
 	ftpClient.setConnectTimeout(0);
 
@@ -280,14 +272,14 @@ public class FTPDownloader implements Serializable {
 
 		GSLoggerFactory.getLogger(getClass()).info("Completed pending command ENDED");
 	    }
-	    
+
 	    is.close();
 
 	    return localFile;
 
 	} catch (
 
-	IOException e) {
+		IOException e) {
 	    e.printStackTrace();
 	} finally {
 	    try {

@@ -582,7 +582,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			ResourceProperty.SOURCE_ID, //
 			sourceIds.size(), //
 			true, // binaries excluded
-			OpenSearchDatabase.debugQueries
+			OpenSearchDatabase.debugQueries//
 		);
 
 		List<String> incrementalSourceIds = ConfigurationWrapper.//

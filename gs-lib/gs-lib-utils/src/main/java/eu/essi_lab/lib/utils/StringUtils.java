@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.lib.utils;
 
@@ -24,21 +24,16 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.Normalizer;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.apache.commons.codec.binary.*;
 
-import org.apache.commons.codec.binary.Hex;
+import java.io.*;
+import java.net.*;
+import java.nio.*;
+import java.nio.charset.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.regex.*;
 
 /**
  * @author Fabrizio
@@ -46,14 +41,14 @@ import org.apache.commons.codec.binary.Hex;
 public class StringUtils {
 
     /**
-     * 
+     *
      */
     public static final String SHA1_IDENTIFIER = "SHA-1";
 
     public static final String SHA256_IDENTIFIER = "SHA-256";
 
     /**
-     * 
+     *
      */
     public static String format(int value) {
 
@@ -61,7 +56,7 @@ public class StringUtils {
     }
 
     /**
-     * 
+     *
      */
     public static String format(double value) {
 
@@ -102,11 +97,6 @@ public class StringUtils {
 	return new String(ret).toUpperCase();
     }
 
-    public static Long hashSHA1messageDigestLong(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
-
-	return hashMessageDigestLong(SHA1_IDENTIFIER, value);
-    }
-
     public static Long hashSHA256messageDigestLong(String value) throws NoSuchAlgorithmException, UnsupportedEncodingException {
 
 	return hashMessageDigestLong(SHA256_IDENTIFIER, value);
@@ -127,9 +117,9 @@ public class StringUtils {
      * @return
      * @throws NoSuchAlgorithmException
      */
-    public static String toUUID(String value){
+    public static String toUUID(String value) {
 
- 	try {
+	try {
 	    MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
 	    byte[] hash = digest.digest(value.getBytes(StandardCharsets.UTF_8));
@@ -151,7 +141,7 @@ public class StringUtils {
      * URL encodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for
      * the
      * standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
-     * 
+     *
      * @param string
      */
     public static String URLEncodeUTF8(String string) {
@@ -175,7 +165,7 @@ public class StringUtils {
      * URL decodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for
      * the
      * standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
-     * 
+     *
      * @param string
      */
     public static String URLDecodeUTF8(String string) {
@@ -190,7 +180,7 @@ public class StringUtils {
     /**
      * Encodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for the
      * standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
-     * 
+     *
      * @param string
      */
     public static String encodeUTF8(String string) {
@@ -201,7 +191,7 @@ public class StringUtils {
     /**
      * Decodes the provided string with UTF-8 using {@link StandardCharsets} defined as "Constant definitions for the
      * standard Charsets. These charsets are guaranteed to be available on every implementation of the Java platform".
-     * 
+     *
      * @param string
      */
     public static String decodeUTF8(String string) {
@@ -218,7 +208,7 @@ public class StringUtils {
      * Removes also the trailing non-breakable space (NBSP) discarding the ones inside the string (if any).<br>
      * Reference to this solution: https://stackoverflow.com/questions/28295504/how-to-trim-no-break-space-in-java
      * Removes also the BOM character https://stackoverflow.com/questions/21891578/removing-bom-characters-using-java
-     * 
+     *
      * @param string
      * @return
      */
@@ -229,7 +219,7 @@ public class StringUtils {
 
     /**
      * Returns true if the string is null or equals to "null"
-     * 
+     *
      * @param string
      * @return
      */
@@ -240,7 +230,7 @@ public class StringUtils {
 
     /**
      * Avoid the use of the '!' operator to negate the {@link #isNull(String)} method
-     * 
+     *
      * @param string
      * @return
      */
@@ -251,7 +241,7 @@ public class StringUtils {
 
     /**
      * Returns true if the string is <code>null</code> or {@link String#isEmpty()} returns true
-     * 
+     *
      * @param string
      * @return
      */
@@ -262,7 +252,7 @@ public class StringUtils {
 
     /**
      * Avoid the use of the '!' operator to negate the {@link #isEmpty(String)} method
-     * 
+     *
      * @param string
      * @return
      */
@@ -273,7 +263,7 @@ public class StringUtils {
 
     /**
      * Avoid the use of the '!' operator to negate the {@link String#isBlank()} method
-     * 
+     *
      * @param string
      * @return
      */
@@ -284,7 +274,7 @@ public class StringUtils {
 
     /**
      * Both methods {@link #isNotEmpty(String)} and {@link #isNotNull(String)} are applied
-     * 
+     *
      * @param string
      * @return
      */
@@ -295,7 +285,7 @@ public class StringUtils {
 
     /**
      * Both methods {@link #isNotBlank(String)} and {@link #isNotNull(String)} are applied
-     * 
+     *
      * @param string
      * @return
      */
@@ -307,7 +297,7 @@ public class StringUtils {
     /**
      * Returns <code>true</code> if the given <code>string</code> {@link #isNotNull(String)},
      * {@link #isNotEmpty(String)} and {@link #isNotBlank(String)}
-     * 
+     *
      * @param string
      * @return
      */
@@ -331,7 +321,7 @@ public class StringUtils {
     /**
      * Regular expression:<br>
      * ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
-     * 
+     *
      * @param value
      * @return
      */

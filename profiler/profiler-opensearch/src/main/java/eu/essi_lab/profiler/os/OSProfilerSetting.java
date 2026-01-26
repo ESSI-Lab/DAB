@@ -24,7 +24,8 @@ package eu.essi_lab.profiler.os;
  * #L%
  */
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -32,14 +33,56 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 public class OSProfilerSetting extends ProfilerSetting {
 
     /**
-     *
+     * @author Fabrizio
      */
-    public static final String OPEN_SEARCH_PROFILER_TYPE = "OpenSearch";
+    public enum KeyValueOptionKeys implements LabeledEnum {
+
+	COVERING_MODE_ENABLED("coveringMode"),//
+	COVERING_MODE_MAX_ITERATIONS("coveringModeMaxIterations"), //
+	COVERING_MODE_PARTITION_SIZE("coveringModePartitionSize"), //
+	COVERING_MODE_PAGE_SIZE("coveringModePageSize"), //
+	COVERING_MODE_COVERING_TRESHOLD("coveringModeCoveringTreshold"), //
+	COVERING_MODE_PRODUCT_TYPE("coveringModeProductType"), //
+	COVERING_MODE_VIEW_ONLY("coveringModeViewOnly"), //
+	COVERING_MODE_TEMPORAL_CONSTRAINT("coveringModeTemporalConstraint"),
+
+	EIFFEL_FORCE_API_DISCOVERY_OPTION("forceEiffelAPIDiscoveryOption"), //
+	EIFFEL_SORT_AND_FILTER_PARTITION_SIZE("eiffelSortAndFilterPartitionSize"), //
+	EIFFEL_SORT_AND_FILTER_API("eiffelSortAndFilterAPI"), //
+	EIFFEL_USE_FILTER_API_CACHE("eiffelUseFilterAPICache"), //
+	EIFFEL_USE_MERGED_IDS_CACHE("eiffelUseMergedIdsCache"), //
+	EIFFEL_API_MAX_SORT_IDENTIFIERS("eiffelAPIMaxSortIdentifiers"), //
+	EIFFEL_FILTER_AND_SORT_SPLIT_TRESHOLD("eiffelFilterAndSortSplitTreshold"),
+
+	MAX_RESULT_WINDOW_SIZE("maxResultWindowSize");
+
+	private String name;
+
+	/**
+	 * @param name
+	 */
+	private KeyValueOptionKeys(String name) {
+
+	    this.name = name;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return name;
+	}
+    }
 
     /**
      *
      */
-    public static final String MAX_RESULT_WINDOW_SIZE = "maxResultWindowSize";
+    public static final String OPEN_SEARCH_PROFILER_TYPE = "OpenSearch";
 
     /**
      *

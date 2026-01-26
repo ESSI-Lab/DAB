@@ -48,7 +48,7 @@ public class CORSDelegatorFilter implements Filter {
 
 	    Class<?> delegatedClass = Class.forName("org.apache.catalina.filters.CorsFilter");
 
-	    delegated = (Filter) delegatedClass.newInstance();
+	    delegated = (Filter) delegatedClass.getDeclaredConstructor().newInstance();
 
 	    delegated.init(arg0);
 
@@ -60,7 +60,7 @@ public class CORSDelegatorFilter implements Filter {
 
 		Class<?> delegatedClass = Class.forName("org.eclipse.jetty.servlets.CrossOriginFilter");
 
-		delegated = (Filter) delegatedClass.newInstance();
+		delegated = (Filter) delegatedClass.getDeclaredConstructor().newInstance();
 
 		delegated.init(arg0);
 

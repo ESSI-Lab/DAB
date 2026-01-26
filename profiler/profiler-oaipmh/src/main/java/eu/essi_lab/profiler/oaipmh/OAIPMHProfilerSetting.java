@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.profiler.oaipmh;
 
@@ -24,7 +24,8 @@ package eu.essi_lab.profiler.oaipmh;
  * #L%
  */
 
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -32,7 +33,40 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 public class OAIPMHProfilerSetting extends ProfilerSetting {
 
     /**
-     * 
+     * @author Fabrizio
+     */
+    public enum KeyValueOptionKeys implements LabeledEnum {
+
+	/**
+	 *
+	 */
+	PAGE_SIZE("pageSize");
+
+	private String name;
+
+	/**
+	 * @param name
+	 */
+	private KeyValueOptionKeys(String name) {
+
+	    this.name = name;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return name;
+	}
+    }
+
+    /**
+     *
      */
     public OAIPMHProfilerSetting() {
 

@@ -47,7 +47,7 @@ import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.profiler.os.OSParameters;
-import eu.essi_lab.profiler.os.OSProfiler.KeyValueOptionKeys;
+import eu.essi_lab.profiler.os.OSProfilerSetting.KeyValueOptionKeys;
 import eu.essi_lab.profiler.os.OSRequestParser;
 
 /**
@@ -200,7 +200,7 @@ public class EiffelDiscoveryHelper {
      */
     static boolean useEiffelFilterApiCache() {
 
-	return readBooleanOption(KeyValueOptionKeys.EIFFEL_USEFILTER_API_CACHE.getLabel(), DEFAULT_USE_EIFFEL_FILTER_API_CACHE);
+	return readBooleanOption(KeyValueOptionKeys.EIFFEL_USE_FILTER_API_CACHE.getLabel(), DEFAULT_USE_EIFFEL_FILTER_API_CACHE);
     }
 
     /**

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.marklogic.search.module;
 
@@ -24,27 +24,18 @@ package eu.essi_lab.api.database.marklogic.search.module;
  * #L%
  */
 
-import java.util.Optional;
-import java.util.Properties;
-
-import eu.essi_lab.api.database.marklogic.MarkLogicDatabase;
-import eu.essi_lab.api.database.marklogic.MarkLogicModuleQueryBuilder;
-import eu.essi_lab.api.database.marklogic.search.MarkLogicSearchBuilder;
-import eu.essi_lab.api.database.marklogic.search.MarkLogicSpatialQueryBuilder;
-import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSearchBuilder;
-import eu.essi_lab.api.database.marklogic.search.def.DefaultMarkLogicSpatialQueryBuilder;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.indexes.IndexedElements;
-import eu.essi_lab.lib.xml.QualifiedName;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.Queryable.ContentType;
-import eu.essi_lab.model.index.IndexedElement;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.api.database.marklogic.*;
+import eu.essi_lab.api.database.marklogic.search.*;
+import eu.essi_lab.api.database.marklogic.search.def.*;
+import eu.essi_lab.indexes.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.Queryable.*;
+import eu.essi_lab.model.index.*;
+import eu.essi_lab.model.resource.*;
 
 /**
  * @author Fabrizio
@@ -102,15 +93,6 @@ public class ModuleMarkLogicSearchBuilder extends DefaultMarkLogicSearchBuilder 
      * @return
      */
     private boolean isCoveringModeEnabled() {
-
-	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
-	if (keyValueOption.isPresent()) {
-
-	    Properties properties = keyValueOption.get();
-	    String option = properties.getProperty(KeyValueOptionKeys.COVERING_MODE.getLabel());
-
-	    return option != null && option.equals("enabled");
-	}
 
 	return false;
     }
