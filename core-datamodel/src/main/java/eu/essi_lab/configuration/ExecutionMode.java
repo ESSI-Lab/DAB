@@ -79,8 +79,6 @@ public enum ExecutionMode implements LabeledEnum {
      */
     public static final String GIPROJECT_EXECUTION_MODE_KEY = "EU_FLORA_ESSI_GI_PROJECT_EXECUTION";
 
-    public static final String SKIP_AUTHORIZATION_KEY = "DAB_SKIP_AUTHORIZATION";
-
     /**
      * 
      */
