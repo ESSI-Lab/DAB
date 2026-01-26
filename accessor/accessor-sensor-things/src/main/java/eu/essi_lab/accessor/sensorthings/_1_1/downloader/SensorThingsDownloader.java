@@ -115,6 +115,8 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 	mangler.setMangling(name);
 
 	String streamIdentifer = mangler.getStreamIdentifer();
+	String propertyKey = mangler.getPropertyKey();
+	String propertyValue = mangler.getPropertyValue();
 	Boolean quoteIds = Boolean.valueOf(mangler.getQuoteIdentifiers());
 
 	SensorThingsClient client = null;
@@ -126,18 +128,60 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 
 	Optional<SystemQueryOptions> options = getRemoteDescrptorsQueryOptions();
 
-	SensorThingsRequest request = FluentSensorThingsRequest.//
-		get().//
-		quoteIdentifiers(quoteIds).//
-		add(EntityRef.DATASTREAMS, streamIdentifer);
-
-	if (options.isPresent()) {
-
+	SensorThingsRequest request;
+	
+	// If propertyKey and propertyValue are present, use filter instead of ID
+	if (propertyKey != null && !propertyKey.isEmpty() && propertyValue != null && !propertyValue.isEmpty()) {
+	    
+	    // Build filter: properties/propertyKey eq 'propertyValue'
+	    String filter = "properties/" + propertyKey + " eq '" + propertyValue + "'";
+	    
+	    SystemQueryOptions filterOptions = SystemQueryOptions.get().filter(filter);
+	    
+	    // Merge with existing options if present
+	    if (options.isPresent()) {
+		SystemQueryOptions existingOptions = options.get();
+		if (existingOptions.getSelectOption().isPresent()) {
+		    filterOptions = filterOptions.select(existingOptions.getSelectOption().get());
+		}
+		if (existingOptions.getTop().isPresent()) {
+		    filterOptions = filterOptions.top(existingOptions.getTop().get());
+		}
+		if (existingOptions.getSkip().isPresent()) {
+		    filterOptions = filterOptions.skip(existingOptions.getSkip().get());
+		}
+		if (existingOptions.getOrderBy().isPresent()) {
+		    filterOptions = filterOptions.orderBy(existingOptions.getOrderBy().get());
+		}
+		if (existingOptions.isCountSet()) {
+		    filterOptions = filterOptions.count();
+		}
+		if (existingOptions.getExpandOptions().isPresent()) {
+		    filterOptions = filterOptions.expand(existingOptions.getExpandOptions().get());
+		}
+	    }
+	    
 	    request = FluentSensorThingsRequest.//
 		    get().//
 		    quoteIdentifiers(quoteIds).//
-		    add(EntityRef.DATASTREAMS, streamIdentifer).//
-		    with(options.get());
+		    add(EntityRef.DATASTREAMS).//
+		    with(filterOptions);
+	} else {
+	    
+	    // Use ID-based approach (existing logic)
+	    request = FluentSensorThingsRequest.//
+		    get().//
+		    quoteIdentifiers(quoteIds).//
+		    add(EntityRef.DATASTREAMS, streamIdentifer);
+
+	    if (options.isPresent()) {
+
+		request = FluentSensorThingsRequest.//
+			get().//
+			quoteIdentifiers(quoteIds).//
+			add(EntityRef.DATASTREAMS, streamIdentifer).//
+			with(options.get());
+	    }
 	}
 
 	Datastream stream = client.execute(request).//
@@ -169,6 +213,8 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 	mangler.setMangling(name);
 
 	String streamIdentifer = mangler.getStreamIdentifer();
+	String propertyKey = mangler.getPropertyKey();
+	String propertyValue = mangler.getPropertyValue();
 	Boolean quoteIds = Boolean.valueOf(mangler.getQuoteIdentifiers());
 
 	SensorThingsClient client = null;
@@ -200,9 +246,11 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
+	String phenomenonTimeFilter = "phenomenonTime ge " + begin + " and phenomenonTime le " + end;
+
 	SystemQueryOptions options = SystemQueryOptions.//
 		get().//
-		filter("phenomenonTime ge " + begin + " and phenomenonTime le " + end);
+		filter(phenomenonTimeFilter);
 
 	List<DataArrayResultItem> resultItems = new ArrayList<>();
 
@@ -210,13 +258,38 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 
 	do {
 
-	    SensorThingsRequest request = FluentSensorThingsRequest.//
-		    get().//
-		    quoteIdentifiers(quoteIds).//
-		    add(EntityRef.DATASTREAMS, streamIdentifer).//
-		    add(EntityRef.OBSERVATIONS).//
-		    setDataArrayResultFormat().//
-		    with(options);
+	    SensorThingsRequest request;
+	    
+	    // If propertyKey and propertyValue are present, query Observations directly with filter on Datastream properties
+	    if (propertyKey != null && !propertyKey.isEmpty() && propertyValue != null && !propertyValue.isEmpty()) {
+		
+		// Filter Observations by Datastream properties: Datastream/properties/key eq 'value'
+		String datastreamPropertyFilter = "Datastream/properties/" + propertyKey + " eq '" + propertyValue + "'";
+		// Combine with phenomenonTime filter
+		String combinedFilter = datastreamPropertyFilter + " and " + phenomenonTimeFilter;
+		
+		SystemQueryOptions requestOptions = SystemQueryOptions.//
+			get().//
+			filter(combinedFilter);
+		
+		// Query Observations collection directly with the combined filter
+		request = FluentSensorThingsRequest.//
+			get().//
+			quoteIdentifiers(quoteIds).//
+			add(EntityRef.OBSERVATIONS).//
+			setDataArrayResultFormat().//
+			with(requestOptions);
+	    } else {
+		
+		// Use ID-based approach (existing logic)
+		request = FluentSensorThingsRequest.//
+			get().//
+			quoteIdentifiers(quoteIds).//
+			add(EntityRef.DATASTREAMS, streamIdentifer).//
+			add(EntityRef.OBSERVATIONS).//
+			setDataArrayResultFormat().//
+			with(options);
+	    }
 
 	    DataArrayFormatResult result = client.//
 		    execute(request).//
