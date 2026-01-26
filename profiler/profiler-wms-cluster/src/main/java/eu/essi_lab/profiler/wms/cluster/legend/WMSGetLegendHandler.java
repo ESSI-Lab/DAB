@@ -263,12 +263,6 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 				label = label.substring(1);
 			    }
 			    label = label.trim();
-			    if (sourceId.equals("ita-sir-arpa-puglia")) {
-			    	label = "Puglia (ARPA)";
-			    }
-			    if (sourceId.equals("ita-sir-puglia")) {
-			    	label = "Puglia (Regione)";
-			    }
 			}
 			InfoLegend info = new InfoLegend(WMSGetMapHandler2.getRandomColorFromSourceId(sourceId, availability), label);
 			infos.add(info);
