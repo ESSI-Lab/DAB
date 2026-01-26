@@ -102,11 +102,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	TRUST_STORE_NAME("trustStoreName"),//
 
 	/**
-	 * SOSConnector option
-	 */
-	SOS_100_PARALLEL_TASKS("sos100ParallelTasks"),//
-
-	/**
 	 * Configurator option
 	 */
 	MULTIPLE_CONFIGURATION_TABS("multipleConfigurationTabs"),//

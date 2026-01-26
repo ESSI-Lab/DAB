@@ -10,51 +10,37 @@ package eu.essi_lab.accessor.sos._1_0_0;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import eu.essi_lab.accessor.sos.*;
+import eu.essi_lab.accessor.sos.SOSProperties.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.protocols.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.geotools.api.geometry.*;
+import org.xml.sax.*;
 
-import javax.xml.xpath.XPathExpressionException;
-
-import org.geotools.api.geometry.BoundingBox;
-import org.xml.sax.SAXException;
-
-import eu.essi_lab.accessor.sos.SOSProperties;
-import eu.essi_lab.accessor.sos.SOSProperties.SOSProperty;
-import eu.essi_lab.accessor.sos.SOSRequestBuilder;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ParallelTaskHandler;
-import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.OriginalMetadata;
+import javax.xml.xpath.*;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -62,9 +48,12 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "SOS 1.0.0 Connector";
+    private static final String PARALLEL_TASKS_KEY = "parallelTasks";
+    private static final int DEFAULT_PARALLEL_TASKS = 5;
+
     private SOSCapabilities capabilities;
     private List<SOSProcedure> procedures;
     private int observedPropertiesCount;
@@ -74,12 +63,11 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
     private int parallelTasks;
     private int errorsCount;
     private static final int MAX_ERRORS = 10;
-    private static final int DEFAULT_PARALLEL_TASKS = 3;
     private static final int ATTEMPTS = 30;
     private static final int RETRY_DELAY = 30;
 
     /**
-     * 
+     *
      */
     public SOSConnector() {
 
@@ -154,9 +142,10 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
 	    proceduresIndex = Integer.valueOf(resumptionToken);
 	}
 
-	ConfigurationWrapper.getSystemSettings().//
-		getKeyValueOptions().ifPresent(o -> parallelTasks = Integer.valueOf(//
-			o.getProperty(KeyValueOptionKeys.SOS_100_PARALLEL_TASKS.getLabel(), String.valueOf(DEFAULT_PARALLEL_TASKS))));
+	parallelTasks = getSetting(). //
+		readKeyValue(PARALLEL_TASKS_KEY).//
+		map(Integer::valueOf).//
+		orElse(DEFAULT_PARALLEL_TASKS);//
 
 	boolean exit = proceduresIndex + parallelTasks > procedures.size();
 
@@ -459,8 +448,8 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
 
 			    sosProperties.setProperty(SOSProperty.ELEVATION, elevation.map(v -> String.valueOf(v)).orElse(null));
 
-			    originatingOrganization
-				    .ifPresent(org -> sosProperties.setProperty(SOSProperty.SENSOR_ContactOwnerOrganization, org));
+			    originatingOrganization.ifPresent(
+				    org -> sosProperties.setProperty(SOSProperty.SENSOR_ContactOwnerOrganization, org));
 
 			    photoLink.ifPresent(ph -> sosProperties.setProperty(SOSProperty.SENSOR_DocumentationImage, ph));
 
@@ -530,8 +519,8 @@ public class SOSConnector extends eu.essi_lab.accessor.sos.SOSConnector {
     }
 
     /**
-     * This should be reimplemented. At the moment the only SOS 100 ggis.un-igrac.org/istsos
-     * has very huge capabilities, no way to use them in this method!
+     * This should be reimplemented. At the moment the only SOS 100 ggis.un-igrac.org/istsos has very huge capabilities, no way to use them
+     * in this method!
      */
     @Override
     public boolean supports(GSSource source) {
