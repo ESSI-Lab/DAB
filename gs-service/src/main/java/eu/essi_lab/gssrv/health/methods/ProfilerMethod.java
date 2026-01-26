@@ -43,7 +43,7 @@ public class ProfilerMethod implements GSPingMethod {
 	Optional<Properties> keyValueOption = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 	if (keyValueOption.isPresent()) {
 
-	    ping = Boolean.valueOf(keyValueOption.get().getOrDefault(KeyValueOptionKeys.PROFILER_HEALTH_CHECK_METHOD_ENABLED.getLabel(), "true").toString());
+	    ping = Boolean.parseBoolean(keyValueOption.get().getOrDefault(KeyValueOptionKeys.PROFILER_HEALTH_CHECK_METHOD_ENABLED.getLabel(), "true").toString());
 	}
 
 	if (RateLimiterFilter.everythingIsBlocked() && ping) {

@@ -122,7 +122,7 @@ public class SparqlProxyServlet extends HttpServlet {
 
 		String headerValue = request.getHeader(headerName);
 
-		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.toLowerCase().equals("accept")) {
+		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.equalsIgnoreCase("accept")) {
 
 		    headerValue = "application/sparql-results+json; charset=utf-8";
 		}
@@ -178,7 +178,7 @@ public class SparqlProxyServlet extends HttpServlet {
 	    String headerValue = String.join(",", entry.getValue());
 	    if (headerName != null && !headerValue.isEmpty()) {
 
-		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.toLowerCase().equals("content-type")) {
+		if (ConfigurationWrapper.forceSparqlProxyAcceptHeader() && headerName.equalsIgnoreCase("content-type")) {
 		    headerValue = "application/sparql-results+json; charset=utf-8";
 		}
 
