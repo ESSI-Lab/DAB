@@ -37,23 +37,27 @@ public class AvailableDiskSpaceChecker {
 	try {
 	    Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
 	    FileStore fileStore = Files.getFileStore(tempDir);
+
 	    long availableSpace = fileStore.getUsableSpace();
 	    long gb = getGB(availableSpace);
-	    System.out.println("Available space on temporary folder: " + gb + "GB");
+
+	    GSLoggerFactory.getLogger(AvailableDiskSpaceChecker.class).info("Available space on temporary folder: " + gb + "GB");
+
 	    if (gb < 5) {
+
 		GSLoggerFactory.getLogger(AvailableDiskSpaceChecker.class).error("Warning: the disk free space is below 5GB");
+
 		if (gb < 1) {
 		    ExecutionMode executionMode = ExecutionMode.get();
 		    String hostname = HostNamePropertyUtils.getHostNameProperty();
 		    String alarmMessage = "Error: the disk free space is below 1GB " + hostname + " (" + executionMode + ")";
 		    GSLoggerFactory.getLogger(AvailableDiskSpaceChecker.class).error(alarmMessage);
+
 		    ConfiguredSMTPClient.sendEmail(ConfiguredSMTPClient.MAIL_ALARM, "Disk space alert \n\n" + alarmMessage);
 		}
-	    } else {
-		GSLoggerFactory.getLogger(AvailableDiskSpaceChecker.class).info("Disk space available: " + gb + " GB [O.K.]");
 	    }
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(AvailableDiskSpaceChecker.class).error(e);
 	}
 
     }
