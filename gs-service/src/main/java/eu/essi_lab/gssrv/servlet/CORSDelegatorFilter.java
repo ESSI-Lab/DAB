@@ -83,6 +83,7 @@ public class CORSDelegatorFilter implements Filter {
     public void doFilter(ServletRequest arg0, ServletResponse arg1, FilterChain arg2) throws IOException, ServletException {
 
 	if (delegated != null) {
+	    GSLoggerFactory.getLogger(getClass()).info("CORS done");
 	    delegated.doFilter(arg0, arg1, arg2);
 	} else {
 	    arg2.doFilter(arg0, arg1);

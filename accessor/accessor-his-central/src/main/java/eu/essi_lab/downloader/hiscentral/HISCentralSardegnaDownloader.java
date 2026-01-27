@@ -87,7 +87,7 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 
     private static final String HISCENTRAL_SARDEGNA_DOWNLOAD_ERROR = "HISCENTRAL_SARDEGNA_DOWNLOAD_ERROR";
 
-    public static final String MISSING_VALUE = "-9999.0";
+    public static final String MISSING_VALUE = "-99.9";
 
     private HISCentralSardegnaConnector connector;
     private Downloader downloader;
