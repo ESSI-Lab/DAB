@@ -67,7 +67,6 @@ public class UserFinderFilter implements Filter {
 
 	WebRequest.setCurrentUser(user, httpRequest);
 
-	GSLoggerFactory.getLogger(getClass()).info("UFF done");
 	chain.doFilter(request, response);
     }
 

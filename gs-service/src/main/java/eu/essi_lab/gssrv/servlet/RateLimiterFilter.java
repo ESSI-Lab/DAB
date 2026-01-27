@@ -153,7 +153,6 @@ public class RateLimiterFilter implements Filter {
 		requestPath.contains("/worldcereal/") || //
 		setting.getComputationType() == ComputationType.DISABLED) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("RTF done");
 	    filterChain.doFilter(servletRequest, response);
 	    return;
 	}
