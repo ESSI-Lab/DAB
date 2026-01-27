@@ -84,13 +84,15 @@ public class HarvestingReportsHandler {
 
 	    StringBuilder builder = new StringBuilder();
 
+
 	    builder.append("Problems occurred during harvesting of source: " + gsSource.getLabel());
 	    builder.append("\n");
 	    builder.append("Source endpoint: " + gsSource.getEndpoint());
 	    builder.append("\n");
 	    builder.append("Source id: " + gsSource.getUniqueIdentifier());
 	    builder.append("\n\n");
-
+	    builder.append("Host: " + HostNamePropertyUtils.getHostNameProperty());
+	    builder.append("\n\n");
 	    if (!errorsReport.isEmpty()) {
 
 		builder.append(errorsReport.stream().collect(Collectors.joining("\n")));

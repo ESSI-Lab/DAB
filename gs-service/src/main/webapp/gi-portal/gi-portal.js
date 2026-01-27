@@ -1470,6 +1470,28 @@ export function initializePortal(config) {
 	// Initialize i18n (defaults to 'en', overridden by localStorage or config.language)
 	try { loadI18nSync(); } catch (e) { }
 
+	// Configure jQuery UI datepicker locale based on current language
+	if (window.jQuery && window.jQuery.datepicker && typeof window.jQuery.datepicker.setDefaults === 'function') {
+		if (lang() === 'it') {
+			window.jQuery.datepicker.setDefaults({
+				dateFormat: 'yy-mm-dd',
+				monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+				             'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
+				monthNamesShort: ['Gen','Feb','Mar','Apr','Mag','Giu',
+				                  'Lug','Ago','Set','Ott','Nov','Dic'],
+				dayNames: ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
+				dayNamesMin: ['Do','Lu','Ma','Me','Gi','Ve','Sa'],
+				firstDay: 1
+			});
+		} else {
+			// Ensure a consistent default for other languages (English)
+			window.jQuery.datepicker.setDefaults({
+				dateFormat: 'yy-mm-dd',
+				firstDay: 1
+			});
+		}
+	}
+
 	// Initialize login if enabled
 	initializeLogin(config);
 
