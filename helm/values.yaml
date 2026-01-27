@@ -38,8 +38,8 @@ dab:
   port: 8080
   replicas: 1
   env:
-    DAB_SKIP_AUTHORIZATION: "true"
-    EU_FLORA_ESSI_GI_PROJECT_EXECUTION: "mixed"
+    skipConfigAuthorization: "true"
+    executionMode: "mixed"
     JAVA_OPTS: "-Dfile.encoding=UTF-8 --add-opens java.xml/com.sun.org.apache.xerces.internal.jaxp.datatype=ALL-UNNAMED -DinitCaches=true -DcheckConfig=true -DinitIndexes=true"
   resources:
     requests:

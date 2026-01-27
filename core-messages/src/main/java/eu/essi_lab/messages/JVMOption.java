@@ -24,6 +24,7 @@ package eu.essi_lab.messages;
  * #L%
  */
 
+import eu.essi_lab.configuration.*;
 import eu.essi_lab.lib.utils.*;
 
 import java.util.*;
@@ -35,6 +36,16 @@ import java.util.stream.*;
  * @author Fabrizio
  */
 public enum JVMOption {
+
+    /**
+     * - String
+     */
+    CLUSTER(ClusterType.CLUSTER_TYPE_KEY, "Cluster: ", ClusterType.LOCAL.getLabel()),
+
+    /**
+     * - String
+     */
+    EXECUTION_MODE(ExecutionMode.EXECUTION_MODE_KEY, "Execution mode: ", ExecutionMode.MIXED.getLabel()),
 
     /**
      * - Boolean
@@ -56,7 +67,7 @@ public enum JVMOption {
     /**
      * - Boolean
      */
-    SKIP_HEALTH_CHECK("skip.healthcheck", "Health check at startup disabled", "Health check at startup enabled", false),
+    SKIP_HEALTH_CHECK("skipHealthcheck", "Health check at startup disabled", "Health check at startup enabled", false),
     /**
      * - String
      */
@@ -247,6 +258,11 @@ public enum JVMOption {
 	return Optional.ofNullable(ret);
     }
 
+    public static void main(String[] args) {
+
+	log();
+    }
+
     /**
      * @param javaOpt
      * @return
@@ -314,7 +330,7 @@ public enum JVMOption {
 		append("  Value").append(getSpaces("Valu", maxValueLength)).append("|").append("\n");//
 	builder.append("-".repeat(Math.max(0, trailing))).append("\n");
 
-	List.of(values()).forEach(option -> {
+	Stream.of(values()).sorted(Comparator.comparing(JVMOption::getOption)).forEach(option -> {
 
 	    Optional<String> value = JVMOption.getStringValue(option).map(v -> v.equals("-1") ? "Unlimited" : v);
 
