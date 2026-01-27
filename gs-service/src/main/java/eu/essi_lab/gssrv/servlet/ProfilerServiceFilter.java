@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * A filter which blocks the request and returns a 404 error code
@@ -55,7 +56,7 @@ public class ProfilerServiceFilter implements Filter {
 	Optional<Boolean> online = pathInfo == null ? Optional.empty() : ConfigurationWrapper.isProfilerOnline(pathInfo);
 
 	if (online.isEmpty() || online.get()) {
-
+	    GSLoggerFactory.getLogger(getClass()).info("PS done");
 	    filterChain.doFilter(request, response);
 
 	} else {

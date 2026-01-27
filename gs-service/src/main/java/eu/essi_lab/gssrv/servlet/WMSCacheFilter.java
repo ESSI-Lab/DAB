@@ -172,7 +172,7 @@ public class WMSCacheFilter implements Filter {
 	}
 
 	// NOT A WMS
-
+GSLoggerFactory.getLogger(getClass()).info("WMS Cache done");
 	filterChain.doFilter(servletRequest, servletResponse);
 	return;
 

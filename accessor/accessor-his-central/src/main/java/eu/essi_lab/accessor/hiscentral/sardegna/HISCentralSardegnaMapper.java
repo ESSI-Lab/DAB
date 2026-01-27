@@ -103,7 +103,6 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 
     /**
      * @param datasetInfo
-     * @param sensorInfo
      * @return
      */
     static OriginalMetadata create(JSONObject datasetInfo, HISCentralSardegnaVariable var, JSONObject metadataInfo) {
