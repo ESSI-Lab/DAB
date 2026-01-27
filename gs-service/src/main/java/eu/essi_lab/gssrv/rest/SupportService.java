@@ -844,11 +844,15 @@ public class SupportService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteUser(UpdateUserRequest request) {
+	GSLoggerFactory.getLogger(getClass()).info("Deleting user: " + request.getUserIdentifier());
 	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
 	LoginResponse loginResponse = getLoginResponse(loginRequest);
 	BasicResponse basicResponse = new BasicResponse();
 	if (loginResponse.isSuccess()) {
+	    GSLoggerFactory.getLogger(getClass()).info("Login o.k.: " + request.getApiKey());
+
 	    if (loginResponse.isAdmin()) {
+		GSLoggerFactory.getLogger(getClass()).info("Admin login o.k.: " + request.getApiKey());
 		basicResponse.setSuccess(true);
 
 		try {
@@ -861,14 +865,18 @@ public class SupportService {
 			}
 		    }
 		    if (targetUser == null) {
+			GSLoggerFactory.getLogger(getClass()).info("User not found: " + request.getUserIdentifier());
 			basicResponse.setSuccess(false);
 			basicResponse.setMessage("target user not found");
 			return Response.serverError().entity(basicResponse).build();
 		    }
+		    GSLoggerFactory.getLogger(getClass()).info("User found, will remove: " + request.getUserIdentifier());
 		    uf.getUsersWriter().removeUser(request.getUserIdentifier());
+		    GSLoggerFactory.getLogger(getClass()).info("Removed: " + request.getUserIdentifier());
 
 		    return Response.ok(basicResponse).build();
 		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error("Error removing user " + request.getUserIdentifier());
 		    GSLoggerFactory.getLogger(getClass()).error(e);
 		    basicResponse.setSuccess(false);
 		    basicResponse.setMessage("error retrieving users");
@@ -876,11 +884,13 @@ public class SupportService {
 		}
 
 	    } else {
+		GSLoggerFactory.getLogger(getClass()).info("Not an admin user: " + request.getApiKey());
 		basicResponse.setSuccess(false);
 		basicResponse.setMessage("not authorized");
 		return Response.serverError().entity(basicResponse).build();
 	    }
 	} else {
+	    GSLoggerFactory.getLogger(getClass()).info("Token not valid: " + request.getApiKey());
 	    basicResponse.setSuccess(false);
 	    basicResponse.setMessage("not authenticated");
 	    return Response.serverError().entity(basicResponse).build();
