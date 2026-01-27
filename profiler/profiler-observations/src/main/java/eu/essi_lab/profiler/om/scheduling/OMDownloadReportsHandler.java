@@ -71,7 +71,7 @@ public class OMDownloadReportsHandler {
 
 	builder.append("Download name: " + setting.getAsynchDownloadName() + "\n\n");
 
-	builder.append("Operation ID: " + setting.getOperationId());
+	builder.append("Operation ID: " + setting.getOperationId()+"\n\n");
 
 	try {
 	    String requestURL = setting.getRequestURL();
@@ -79,9 +79,12 @@ public class OMDownloadReportsHandler {
 	    KeyValueParser parser = new KeyValueParser(new URI(requestURL).toURL().getQuery());
 
 	    Optional<String> obsProperty = parser.getOptionalValue("observedProperty");
+
+	    String parameters = "";
+
 	    if (obsProperty.isPresent()) {
 
-		builder.append("\n\nObserved property: " + obsProperty.get());
+		parameters+= "Observed property: " + obsProperty.get()+"\n\n";
 	    }
 
 	    Optional<String> west = parser.getOptionalValue("west");
@@ -91,11 +94,11 @@ public class OMDownloadReportsHandler {
 
 	    if (west.isPresent() && south.isPresent() && east.isPresent() && north.isPresent()) {
 
-		builder.append("\n\nSpatial extent (south, west, north, east): ");
-		builder.append(south.get() + ", ");
-		builder.append(west.get() + ", ");
-		builder.append(north.get() + ", ");
-		builder.append(east.get());
+		parameters+="Spatial extent (south, west, north, east): \n";
+		parameters+=south.get() + ", \n";
+		parameters+=west.get() + ", \n";
+		parameters+=north.get() + ", \n";
+		parameters+=east.get()+"\n\n";
 	    }
 
 	    Optional<String> begin = parser.getOptionalValue("beginPosition");
@@ -103,22 +106,32 @@ public class OMDownloadReportsHandler {
 
 	    if (begin.isPresent()) {
 
-		builder.append("\n\nBegin time: " + begin.get());
+		parameters+="Begin time: " + begin.get()+"\n\n";
 	    }
 
 	    if (end.isPresent()) {
 
-		builder.append("\n\nEnd time: " + end.get());
+		parameters+="End time: " + end.get()+"\n\n";
 	    }
+
+	    if (parameters.isEmpty()) {
+		parameters = "No parameters!\n\n";
+	    }else{
+		parameters = "Parameters:\n\n"+parameters;
+	    }
+
+	    builder.append(parameters);
 
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(OMDownloadReportsHandler.class).error(e);
 	}
 
+
+
 	if (locator.isPresent()) {
 
-	    builder.append("\n\nZIP file: " + locator.get());
+	    builder.append("ZIP file: " + locator.get()+"\n\n");
 	}
 
 	if (toUser) {
@@ -128,7 +141,7 @@ public class OMDownloadReportsHandler {
 	} else {
 
 	    builder.append(
-		    "\n\nRequest parameters: " + setting.getRequestURL().substring(setting.getRequestURL().indexOf("?") + 1) + "\n\n");
+		    "Request parameters: " + setting.getRequestURL().substring(setting.getRequestURL().indexOf("?") + 1) + "\n\n");
 
 	    ConfiguredSMTPClient.sendEmail(subject, builder.toString());
 	}

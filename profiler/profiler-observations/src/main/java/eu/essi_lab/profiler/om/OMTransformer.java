@@ -1,5 +1,8 @@
 package eu.essi_lab.profiler.om;
 
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 
 /*-
@@ -190,6 +193,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 
 	String observedProperty = request.getParameterValue(APIParameters.OBSERVED_PROPERTY);
 	if (observedProperty != null) {
+	    observedProperty = URLDecoder.decode(observedProperty, StandardCharsets.UTF_8);
 	    String ontology = request.getParameterValue(APIParameters.ONTOLOGY);
 	    HydroOntology ho = null;
 	    if (ontology != null) {

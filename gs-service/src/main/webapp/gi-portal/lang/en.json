@@ -214,5 +214,21 @@
 	"clear_all_tooltip" : "Clear all search constraints",
 	"clear_all_title" : "Clear All Constraints",
 	"confirm_clear_all" : "Are you sure you want to clear all constraints?",
-	"confirm_clear_all_details" : "This will reset all search parameters including text, dates, spatial extent, sources, and filters."
+	"confirm_clear_all_details" : "This will reset all search parameters including text, dates, spatial extent, sources, and filters.",
+	"bulk_status_loading" : "Loading status of bulk downloads...",
+	"confirm_bulk_download_title" : "Confirm Bulk Download",
+	"bulk_download_initiate_message" : "This will initiate the bulk download of ${size} resources. The process may take some time, depending on the number of resources and current server load.",
+	"bulk_download_monitor_message" : "You can monitor the download status from your personal menu.",
+	"download_name_label" : "Download name:",
+	"download_name_placeholder" : "Enter a name for this download",
+	"select_data_format" : "Select data format:",
+	"email_notifications_label" : "Send me email notifications about the download status",
+	"status_completed" : "Completed",
+	"status_failed" : "Failed",
+	"status_canceled" : "Canceled",
+	"status_removed" : "Removed",
+	"status_in_progress" : "In Progress",
+	"status_pending" : "Pending",
+	"status_processing" : "Processing",
+	"status_started" : "Started"
 }

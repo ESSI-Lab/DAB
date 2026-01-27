@@ -245,8 +245,8 @@ public class DataDownloaderTool {
 
 			String baseName = foiTitle;
 
-			File logFile = new File(propertyDir, "log_"+baseName+".txt");
-			File dataFile = new File(propertyDir, "data_"+baseName+ extension);
+			File logFile = new File(propertyDir, baseName+"_"+id+"_log.txt");
+			File dataFile = new File(propertyDir, baseName+"_"+id+ "_data"+extension);
 
 			WebRequest get2 = WebRequest.createGET(downloadURL);
 

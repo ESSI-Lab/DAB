@@ -253,7 +253,23 @@
   "clear_all_tooltip": "Pulisci tutti i vincoli di ricerca",
   "clear_all_title": "Pulisci tutti i vincoli",
   "confirm_clear_all": "Sei sicuro di voler cancellare tutti i vincoli?",
-  "confirm_clear_all_details": "Questo azzererà tutti i parametri di ricerca inclusi testo, date, estensione spaziale, sorgenti e filtri."
+  "confirm_clear_all_details": "Questo azzererà tutti i parametri di ricerca inclusi testo, date, estensione spaziale, sorgenti e filtri.",
+  "bulk_status_loading": "Caricamento stato dei download in blocco...",
+  "confirm_bulk_download_title": "Conferma download in blocco",
+  "bulk_download_initiate_message": "Questo avvierà il download in blocco di ${size} risorse. Il processo potrebbe richiedere del tempo, a seconda del numero di risorse e del carico attuale del server.",
+  "bulk_download_monitor_message": "Puoi monitorare lo stato del download dal tuo menu personale.",
+  "download_name_label": "Nome download:",
+  "download_name_placeholder": "Inserisci un nome per questo download",
+  "select_data_format": "Seleziona formato dati:",
+  "email_notifications_label": "Inviami notifiche via email sullo stato del download",
+  "status_completed": "Completato",
+  "status_failed": "Fallito",
+  "status_canceled": "Annullato",
+  "status_removed": "Rimosso",
+  "status_in_progress": "In corso",
+  "status_pending": "In attesa",
+  "status_processing": "Elaborazione",
+  "status_started": "Avviato"
 }
 
 
