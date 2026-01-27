@@ -121,7 +121,7 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isInitialized() {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_CONFIG_AUTHORIZATION)) {
+	if (JVMOption.isEnabled(JVMOption.SKIP_CONFIG_AUTHORIZATION)) {
 
 	    return true;
 	}
@@ -166,7 +166,7 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isAuthorized() {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_CONFIG_AUTHORIZATION)) {
+	if (JVMOption.isEnabled(JVMOption.SKIP_CONFIG_AUTHORIZATION)) {
 
 	    return true;
 	}
