@@ -53,7 +53,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.JavaOptions;
+import eu.essi_lab.messages.JVMOption;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import software.amazon.awssdk.http.SdkHttpClient;
@@ -75,7 +75,7 @@ public class OpenSearchDatabase extends Database {
 
     static {
 
-	debugQueries = JavaOptions.isEnabled(JavaOptions.DEBUG_OPENSEARCH_QUERIES);
+	debugQueries = JVMOption.isEnabled(JVMOption.DEBUG_OPENSEARCH_QUERIES);
 
 	//
 	// set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the
@@ -183,7 +183,7 @@ public class OpenSearchDatabase extends Database {
 		//
 		//
 
-		if (JavaOptions.isEnabled(JavaOptions.INIT_OPENSEARCH_INDEXES)) {
+		if (JVMOption.isEnabled(JVMOption.INIT_OPENSEARCH_INDEXES)) {
 
 		    IndexMapping.initializeIndexes(client);
 		}
@@ -192,7 +192,7 @@ public class OpenSearchDatabase extends Database {
 		//
 		//
 
-		if (JavaOptions.isEnabled(JavaOptions.UPDATE_DATA_FOLDER_INDEX)) {
+		if (JVMOption.isEnabled(JVMOption.UPDATE_DATA_FOLDER_INDEX)) {
 
 		    DataFolderMapping mapping = DataFolderMapping.get();
 

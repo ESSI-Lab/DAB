@@ -7,12 +7,12 @@ import org.junit.*;
 /**
  * @author Fabrizio
  */
-public class JavaOptionsTest {
+public class AnonymousJVMOptionTest2 {
 
     static {
 
-	System.setProperty(JavaOptions.ANONYMOUS_PAGE_SIZE_LIMIT.getOption(), "3");
-	System.setProperty(JavaOptions.ANONYMOUS_OFFSET_LIMIT.getOption(), "-1");
+	System.setProperty(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT.getOption(), "3");
+	System.setProperty(JVMOption.ANONYMOUS_OFFSET_LIMIT.getOption(), "100");
     }
 
     /**
@@ -22,6 +22,7 @@ public class JavaOptionsTest {
     public void javaOptionsTest() {
 
 	Assert.assertEquals(3, AbstractPermissionPolicySet.ANONYMOUS_PAGE_SIZE_LIMIT);
-	Assert.assertEquals(Integer.MAX_VALUE, AbstractPermissionPolicySet.ANONYMOUS_OFFSET_LIMIT);
+
+	Assert.assertEquals(100, AbstractPermissionPolicySet.ANONYMOUS_OFFSET_LIMIT);
     }
 }

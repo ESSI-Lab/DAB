@@ -421,6 +421,7 @@ public class ConfigImporter extends VerticalLayout {
      */
     private boolean openSearchConfigExists(StorageInfo info, InputStream configStream) throws Exception {
 
+
 	OpenSearchDatabase database = new OpenSearchDatabase();
 	database.initialize(info);
 

@@ -5,6 +5,7 @@ package eu.essi_lab.test.authorization.authzforce.essi.rbac;
 
 import eu.essi_lab.authorization.*;
 import eu.essi_lab.authorization.pps.*;
+import eu.essi_lab.messages.*;
 import eu.essi_lab.messages.web.*;
 import eu.essi_lab.test.authorization.authzforce.*;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
@@ -41,9 +42,10 @@ public class Anonymous_Test extends XACMLTest {
     @Test
     public void javaOptionsDefaultValuesTest() {
 
-	Assert.assertEquals(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_OFFSET_LIMIT, AbstractPermissionPolicySet.ANONYMOUS_OFFSET_LIMIT);
+	Assert.assertEquals((int) JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get(),
+		AbstractPermissionPolicySet.ANONYMOUS_OFFSET_LIMIT);
 
-	Assert.assertEquals(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT,
+	Assert.assertEquals((int) JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get(),
 		AbstractPermissionPolicySet.ANONYMOUS_PAGE_SIZE_LIMIT);
     }
 
@@ -61,7 +63,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setOffset(1);
 
-	wrapper.setMaxRecords(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT + 1);
+	wrapper.setMaxRecords(JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get() + 1);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -82,7 +84,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("opensearch");
 
-	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT + 1);
+	wrapper.setOffset(JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get() + 1);
 
 	wrapper.setMaxRecords(1);
 
@@ -316,11 +318,11 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("oaipmh");
 
-	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT);
+	wrapper.setOffset(JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get());
 
-	wrapper.setMaxRecords(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);
+	wrapper.setMaxRecords(JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get());
 
-	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
+	wrapper.setViewIdentifier(VIEW_ID_MISSING_VALUE);
 
 	wrapper.setViewCreator(AbstractPermissionPolicySet.VIEW_CREATOR_MISSING_VALUE);
 
@@ -339,9 +341,9 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("oaipmh");
 
-	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT);
+	wrapper.setOffset(JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get());
 
-	wrapper.setMaxRecords(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);
+	wrapper.setMaxRecords(JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get());
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -368,7 +370,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setOffset(1);
 
-	wrapper.setMaxRecords(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT + 1);
+	wrapper.setMaxRecords(JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get() + 1);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -389,7 +391,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("wms");
 
-	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT + 1);
+	wrapper.setOffset(JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get() + 1);
 
 	wrapper.setMaxRecords(1);
 
@@ -577,9 +579,9 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setPath("timeseries-api");
 
-	wrapper.setOffset(DEFAULT_ANONYMOUS_OFFSET_LIMIT);
+	wrapper.setOffset(JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get());
 
-	wrapper.setMaxRecords(AbstractPermissionPolicySet.DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);
+	wrapper.setMaxRecords(JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get());
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
