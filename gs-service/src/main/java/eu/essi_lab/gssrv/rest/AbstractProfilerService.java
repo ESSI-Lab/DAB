@@ -80,7 +80,7 @@ public abstract class AbstractProfilerService {
 	@Override
 	public void configurationChanged(ConfigurationChangeEvent event) {
 
-	    if (event.getEventType() == ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED) {
+	    if (event.getEventType() == EventType.CONFIGURATION_AUTO_RELOADED) {
 
 		profilerSettings = ConfigurationWrapper.getProfilerSettings();
 	    }

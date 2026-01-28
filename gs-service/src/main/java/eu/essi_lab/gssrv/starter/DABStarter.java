@@ -70,6 +70,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent.*;
+import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED;
 
 /**
  * @author Fabrizio

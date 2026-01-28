@@ -10,30 +10,28 @@ package eu.essi_lab.cfga;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent;
-import eu.essi_lab.cfga.check.scheme.Scheme;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.source.FileSource;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import eu.essi_lab.cfga.ConfigurationChangeListener.*;
+import eu.essi_lab.cfga.check.scheme.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.source.*;
+import eu.essi_lab.lib.utils.*;
+import org.json.*;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -194,7 +192,7 @@ public class Configuration {
 
 	    list = source.list();
 
-	    dispatchEvent(ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED);
+	    dispatchEvent(ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED);
 
 	    return true;
 	}
@@ -436,7 +434,7 @@ public class Configuration {
 	this.list.add(setting.clone());
 	this.dirty = true;
 
-	dispatchEvent(setting, ConfigurationChangeEvent.SETTING_PUT);
+	dispatchEvent(setting, EventType.SETTING_PUT);
 
 	return true;
     }
@@ -467,7 +465,7 @@ public class Configuration {
 	this.list.add(setting.clone());
 	this.dirty = true;
 
-	dispatchEvent(setting, ConfigurationChangeEvent.SETTING_REPLACED);
+	dispatchEvent(setting, EventType.SETTING_REPLACED);
 
 	return true;
     }
@@ -535,7 +533,7 @@ public class Configuration {
 	    this.dirty = true;
 
 	    if (dispatchEvent) {
-		dispatchEvent(toRemove, ConfigurationChangeEvent.SETTING_REMOVED);
+		dispatchEvent(toRemove, EventType.SETTING_REMOVED);
 	    }
 
 	    return true;
@@ -552,7 +550,7 @@ public class Configuration {
 	this.list.clear();
 	this.dirty = true;
 
-	dispatchEvent(ConfigurationChangeEvent.CONFIGURATION_CLEARED);
+	dispatchEvent(EventType.CONFIGURATION_CLEARED);
     }
 
     /**
@@ -577,7 +575,7 @@ public class Configuration {
 	this.source.flush(this.list);
 	this.dirty = false;
 
-	dispatchEvent(ConfigurationChangeEvent.CONFIGURATION_FLUSHED);
+	dispatchEvent(EventType.CONFIGURATION_FLUSHED);
     }
 
     /**
@@ -689,7 +687,7 @@ public class Configuration {
      * @param setting
      * @param event
      */
-    private void dispatchEvent(List<Setting> settings, int event) {
+    private void dispatchEvent(List<Setting> settings, EventType event) {
 
 	this.listenerList.forEach(l -> l.configurationChanged(//
 		new ConfigurationChangeEvent(//
@@ -702,7 +700,7 @@ public class Configuration {
      * @param setting
      * @param event
      */
-    private void dispatchEvent(Setting setting, int event) {
+    private void dispatchEvent(Setting setting, EventType event) {
 
 	this.listenerList.forEach(l -> l.configurationChanged(//
 		new ConfigurationChangeEvent(//
@@ -714,7 +712,7 @@ public class Configuration {
     /**
      * @param event
      */
-    private void dispatchEvent(int event) {
+    private void dispatchEvent(EventType event) {
 
 	this.listenerList.forEach(l -> l.configurationChanged(//
 		new ConfigurationChangeEvent(//

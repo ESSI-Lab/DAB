@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -376,24 +376,12 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     public void configurationChanged(ConfigurationChangeEvent event) {
 
 	switch (event.getEventType()) {
-	case ConfigurationChangeEvent.SETTING_PUT:
-	    onSettingPut(event.getSettings());
-	    break;
-	case ConfigurationChangeEvent.SETTING_REPLACED:
-	    onSettingReplaced(event.getSettings());
-	    break;
-	case ConfigurationChangeEvent.SETTING_REMOVED:
-	    onSettingRemoved(event.getSettings());
-	    break;
-	case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
-	    onConfigurationCleared();
-	    break;
-	case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
-	    onConfigurationFlushed();
-	    break;
-	case ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED:
-	    onConfigurationAutoReloaded();
-	    break;
+	case EventType.SETTING_PUT -> onSettingPut(event.getSettings());
+	case EventType.SETTING_REPLACED -> onSettingReplaced(event.getSettings());
+	case EventType.SETTING_REMOVED -> onSettingRemoved(event.getSettings());
+	case EventType.CONFIGURATION_CLEARED -> onConfigurationCleared();
+	case EventType.CONFIGURATION_FLUSHED -> onConfigurationFlushed();
+	case EventType.CONFIGURATION_AUTO_RELOADED -> onConfigurationAutoReloaded();
 	}
     }
 
