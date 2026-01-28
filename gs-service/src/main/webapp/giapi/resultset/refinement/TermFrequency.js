@@ -238,7 +238,12 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
 		_onResponse._origin = 'termFrequency';
 
 		dabNode.discover(_onResponse, tf._cnstr, options, onStatus);
-		tf._cnstr.sources = tf._cnstr.source;
+
+		// Preserve existing sources selection from the main constraints when no term-frequency
+		// source filter is applied. Only override if a TF 'source' constraint has been built.
+		if (tf._cnstr.source) {
+			tf._cnstr.sources = tf._cnstr.source;
+		}
 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(tf._cnstr);
 

@@ -23,10 +23,14 @@ import java.net.URI;
  * #L%
  */
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGroup;
+import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.web.KeyValueParser;
 import eu.essi_lab.profiler.om.scheduling.OMSchedulerWorker.DownloadStatus;
@@ -82,15 +86,40 @@ public class OMDownloadReportsHandler {
 
 	    String parameters = "";
 
-	    if (obsProperty.isPresent()) {
+	    Optional<String> provider = parser.getOptionalValue("provider");
+	    if (provider.isPresent()) {
 
-		parameters+= "Observed property: " + obsProperty.get()+"\n\n";
+		parameters+="Provider/Source: " + provider.get()+"\n\n";
+	    }
+
+	    Optional<String> featureName = parser.getOptionalValue("featureName");
+	    if (featureName.isPresent()) {
+
+		parameters+="Station/Platform name: " + featureName.get()+"\n\n";
+	    }
+
+	    if (obsProperty.isPresent()) {
+		String uri = URLDecoder.decode(obsProperty.get(), StandardCharsets.UTF_8);
+		if (uri.contains(HISCentralOntology.HIS_CENTRAL_BASE_URI)){
+		    HISCentralOntology ontology = new HISCentralOntology();
+		    SKOSConcept concept = ontology.getConcept(uri);
+		    if (concept!=null){
+			uri = uri+" ("+concept.getPreferredLabel("en")+")";
+		    }
+		}
+		parameters+= "Observed property: " + uri +"\n\n";
 	    }
 
 	    Optional<String> west = parser.getOptionalValue("west");
 	    Optional<String> south = parser.getOptionalValue("south");
 	    Optional<String> east = parser.getOptionalValue("east");
 	    Optional<String> north = parser.getOptionalValue("north");
+
+	    Optional<String> predefinedLayer = parser.getOptionalValue("predefinedLayer");
+	    if (predefinedLayer.isPresent()) {
+
+		parameters+="Predefined spatial extent: " + predefinedLayer.get()+"\n\n";
+	    }
 
 	    if (west.isPresent() && south.isPresent() && east.isPresent() && north.isPresent()) {
 
@@ -113,6 +142,38 @@ public class OMDownloadReportsHandler {
 
 		parameters+="End time: " + end.get()+"\n\n";
 	    }
+
+	    Optional<String> aggregationDuration = parser.getOptionalValue("aggregationDuration");
+	    if (aggregationDuration.isPresent()) {
+
+		parameters+="Aggregation duration: " + aggregationDuration.get()+"\n\n";
+	    }
+
+	    Optional<String> intendedObservationSpacing = parser.getOptionalValue("intendedObservationSpacing");
+	    if (intendedObservationSpacing.isPresent()) {
+
+		parameters+="Intended observation spacing: " + intendedObservationSpacing.get()+"\n\n";
+	    }
+
+	    Optional<String> timeInterpolation = parser.getOptionalValue("timeInterpolation");
+	    if (timeInterpolation.isPresent()) {
+
+		parameters+="Time interpolation: " + timeInterpolation.get()+"\n\n";
+	    }
+
+	    Optional<String> ontology = parser.getOptionalValue("ontology");
+	    if (ontology.isPresent()) {
+
+		parameters+="Ontology: " + ontology.get()+"\n\n";
+	    }
+
+	    Optional<String> format = parser.getOptionalValue("format");
+	    if (format.isPresent()) {
+
+		parameters+="Format: " + format.get()+"\n\n";
+	    }
+
+
 
 	    if (parameters.isEmpty()) {
 		parameters = "No parameters!\n\n";
