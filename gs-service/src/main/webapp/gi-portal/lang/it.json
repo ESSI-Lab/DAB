@@ -128,7 +128,7 @@
   "united_nations": "Nazioni Unite",
   "overlays": "Layer principali",
   "results_layer_group": "Layer risultati",
-  
+
   "loc_help": "Nome di una località su cui limitare la ricerca. Es.: \"Italia\", \"U.S.A.\", \"Africa\"",
   "loc_label": "Località",
 
@@ -200,27 +200,23 @@
 
   "aggregationDuration_help": "Durata di aggregazione",
   "aggregationDuration_label": "Durata aggregazione",
-  
-  "select_interpolation_type": "Seleziona tipo di interpolazione",  
+
+  "select_interpolation_type": "Seleziona tipo di interpolazione",
   "select_observation_spacing": "Seleziona la risoluzione temporale",
   "select_aggregation_duration": "Seleziona la durata di aggregazione",
-  
+
   "semantic-search-text": "Ricerca semantica con traduzioni e corrispondenze più specifiche",
   "basic-text": "Ricerca di base per termine esatto",
   "ontology-search-help": "Ricerca esatta o ricerca semantica con supporto ontologico per traduzioni e termini più specifici.<br/>Controlla il browser dell’ontologia online per i termini disponibili:<br/>",
-  
+
   "select-from-ontology": "Seleziona un parametro dall'ontologia",
-  
+
   "observed-property-uri": "URI della proprietà osservata",
-  
-    "tf-format": "Formato",
-  "tf-source": "Sorgente",
+
+  "tf-format": "Formato",
   "tf-keyword": "Parola chiave",
   "tf-protocol": "Protocollo",
 
-  "tf-instrumentTitle": "Strumento",
-  "tf-organisationName": "Organizzazione",
-  "tf-attributeTitle": "Proprietà osservata",
   "tf-intendedObservationSpacing": "Risoluzione temporale",
   "tf-timeInterpolation": "Interpolazione temporale",
   "tf-aggregationDuration": "Durata di aggregazione",
