@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.model;
 
@@ -15,6 +15,8 @@ public class ClusterTypeTest {
 
     @Test
     public void test() {
+
+	Assert.assertEquals(ClusterType.LOCAL, ClusterType.get());
 
 	System.setProperty("cluster", "Test");
 	Assert.assertEquals(ClusterType.TEST, ClusterType.get());

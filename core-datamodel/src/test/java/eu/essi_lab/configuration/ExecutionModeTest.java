@@ -11,6 +11,8 @@ public class ExecutionModeTest {
     @Test
     public void test() {
 
+	Assert.assertEquals(ExecutionMode.MIXED, ExecutionMode.get());
+
 	Assert.assertFalse(ExecutionMode.decode(null).isPresent());
 
 	Assert.assertFalse(ExecutionMode.decode("").isPresent());
@@ -30,7 +32,7 @@ public class ExecutionModeTest {
 	Assert.assertTrue(ExecutionMode.decode("frontend").isPresent());
 
 	Assert.assertTrue(ExecutionMode.decode("fRontEnd").isPresent());
-	
+
 	Assert.assertTrue(ExecutionMode.decode("access").isPresent());
 
 	Assert.assertTrue(ExecutionMode.decode("Access").isPresent());

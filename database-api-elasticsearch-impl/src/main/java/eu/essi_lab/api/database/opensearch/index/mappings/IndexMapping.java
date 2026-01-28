@@ -29,7 +29,7 @@ import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.messages.JavaOptions;
+import eu.essi_lab.messages.JVMOption;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import jakarta.json.Json;
@@ -486,7 +486,7 @@ public abstract class IndexMapping {
 		index(mapping.getIndex(false)).//
 		mappings(typeMapping);
 
-	Optional<String> shards = JavaOptions.getValue(JavaOptions.NUMBER_OF_DATA_FOLDER_INDEX_SHARDS);
+	Optional<String> shards = JVMOption.getStringValue(JVMOption.NUMBER_OF_DATA_FOLDER_INDEX_SHARDS);
 
 	if (mapping.getIndex().equals(DataFolderMapping.get().getIndex()) && shards.isPresent()) {
 

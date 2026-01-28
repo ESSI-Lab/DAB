@@ -54,7 +54,7 @@ import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.JavaOptions;
+import eu.essi_lab.messages.JVMOption;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.bond.View;
@@ -89,7 +89,7 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
     @Override
     public boolean isAuthorized(RequestMessage message) throws GSException {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_REQUESTS_AUTHORIZATION)) {
+	if (JVMOption.isEnabled(JVMOption.SKIP_REQUESTS_AUTHORIZATION)) {
 
 	    return true;
 	}

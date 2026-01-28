@@ -82,11 +82,11 @@ import eu.essi_lab.ommdk.IResourceMapper;
 public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
     /**
-     * 
+     *
      */
     protected SensorThingsClient sensorThingsClient;
     /**
-     * 
+     *
      */
     protected Boolean quoteIdentifiers;
 
@@ -339,8 +339,21 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param sourceUrl
      */
     protected void addDistributionInfo(Datastream stream, CoreMetadata coreMetadata, String sourceUrl) {
-
 	SensorThingsMangler mangler = new SensorThingsMangler();
+
+	Optional<JSONObject> props = stream.getProperties();
+	String[] idProperties = new String[] { "datastreamId", "annalsDatastreamId" };
+	if (props.isPresent()) {
+	    for (String idProperty : idProperties) {
+		String propValue = props.get().optString(idProperty);
+		if (propValue != null) {
+		    mangler.setPropertyKey(idProperty);
+		    mangler.setPropertyValue(propValue);
+		}
+	    }
+
+	}
+
 	mangler.setStreamIdentifer(stream.getIdentifier().get());
 	mangler.setQuoteIdentifiers(quoteIdentifiers.toString());
 
@@ -838,9 +851,9 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	SensorThingsRequest sensorThingsRequest = createRequest().//
 		add(EntityRef.DATASTREAMS, streamId).//
 		with(SystemQueryOptions.get().expand(new ExpandOption(//
-			ExpandItem.get(EntityRef.THING, EntityRef.LOCATIONS), //
-			ExpandItem.get(EntityRef.SENSOR), //
-			ExpandItem.get(EntityRef.OBSERVED_PROPERTY))));
+		ExpandItem.get(EntityRef.THING, EntityRef.LOCATIONS), //
+		ExpandItem.get(EntityRef.SENSOR), //
+		ExpandItem.get(EntityRef.OBSERVED_PROPERTY))));
 
 	Optional<AddressableEntityResult<Datastream>> entityResponse;
 
@@ -869,10 +882,10 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	SensorThingsRequest sensorThingsRequest = createRequest().//
 		add(EntityRef.THINGS, thingId).//
 		with(SystemQueryOptions.get().expand(new ExpandOption(//
-			ExpandItem.get(EntityRef.LOCATIONS), //
-			ExpandItem.get(EntityRef.HISTORICAL_LOCATIONS), //
-			// only phenomenonTime is required
-			ExpandItem.get(EntityRef.DATASTREAMS, Operation.SELECT, "phenomenonTime"))));
+		ExpandItem.get(EntityRef.LOCATIONS), //
+		ExpandItem.get(EntityRef.HISTORICAL_LOCATIONS), //
+		// only phenomenonTime is required
+		ExpandItem.get(EntityRef.DATASTREAMS, Operation.SELECT, "phenomenonTime"))));
 
 	Optional<AddressableEntityResult<Thing>> entityResponse;
 

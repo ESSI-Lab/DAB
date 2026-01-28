@@ -10,22 +10,20 @@ package eu.essi_lab.cfga;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import eu.essi_lab.cfga.setting.*;
 
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -35,37 +33,40 @@ public interface ConfigurationChangeListener {
     /**
      * @author Fabrizio
      */
-    public class ConfigurationChangeEvent {
-	/**
-	 * 
-	 */
-	public static final int SETTING_PUT = 0;
-	/**
-	 * 
-	 */
-	public static final int SETTING_REMOVED = 1;
+    enum EventType {
 
 	/**
-	 * 
+	 *
 	 */
-	public static final int SETTING_REPLACED = 2;
-
+	SETTING_PUT,
 	/**
-	 * 
+	 *
 	 */
-	public static final int CONFIGURATION_CLEARED = 3;
-
+	SETTING_REMOVED,
 	/**
-	 * 
+	 *
 	 */
-	public static final int CONFIGURATION_FLUSHED = 4;
-
+	SETTING_REPLACED,
 	/**
-	 * 
+	 *
 	 */
-	public static final int CONFIGURATION_AUTO_RELOADED = 5;
+	CONFIGURATION_CLEARED,
+	/**
+	 *
+	 */
+	CONFIGURATION_FLUSHED,
+	/**
+	 *
+	 */
+	CONFIGURATION_AUTO_RELOADED;
+    }
 
-	private final int eventType;
+    /**
+     * @author Fabrizio
+     */
+    class ConfigurationChangeEvent {
+
+	private final EventType eventType;
 	private final Configuration configuration;
 	private final List<Setting> settings;
 
@@ -74,7 +75,7 @@ public interface ConfigurationChangeListener {
 	 * @param setting
 	 * @param eventType
 	 */
-	public ConfigurationChangeEvent(Configuration configuration, int eventType) {
+	public ConfigurationChangeEvent(Configuration configuration, EventType eventType) {
 
 	    this(configuration, List.of(), eventType);
 	}
@@ -84,7 +85,7 @@ public interface ConfigurationChangeListener {
 	 * @param setting
 	 * @param eventType
 	 */
-	public ConfigurationChangeEvent(Configuration configuration, Setting setting, int eventType) {
+	public ConfigurationChangeEvent(Configuration configuration, Setting setting, EventType eventType) {
 
 	    this(configuration, Collections.singletonList(setting), eventType);
 	}
@@ -94,7 +95,8 @@ public interface ConfigurationChangeListener {
 	 * @param setting
 	 * @param eventType
 	 */
-	public ConfigurationChangeEvent(Configuration configuration, List<Setting> settings, int eventType) {
+	public ConfigurationChangeEvent(Configuration configuration, List<Setting> settings, EventType eventType) {
+
 	    this.configuration = configuration;
 	    this.settings = settings;
 	    this.eventType = eventType;
@@ -119,7 +121,7 @@ public interface ConfigurationChangeListener {
 	/**
 	 * @return
 	 */
-	public int getEventType() {
+	public EventType getEventType() {
 
 	    return eventType;
 	}
@@ -129,5 +131,4 @@ public interface ConfigurationChangeListener {
      * @param eventType
      */
     void configurationChanged(ConfigurationChangeEvent event);
-
 }

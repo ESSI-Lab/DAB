@@ -13,12 +13,12 @@ package eu.essi_lab.authorization.pps;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -52,29 +52,12 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
     /**
      *
      */
-    public static final int DEFAULT_ANONYMOUS_OFFSET_LIMIT = Integer.MAX_VALUE;
+    public static final int ANONYMOUS_OFFSET_LIMIT = JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get();
 
     /**
      *
      */
-    public static final int DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT = 200;
-
-    /**
-     *
-     */
-    public static final int ANONYMOUS_OFFSET_LIMIT = //
-	    JavaOptions.getValue(JavaOptions.ANONYMOUS_OFFSET_LIMIT).//
-		    map(Integer::parseInt).//
-		    map(v -> v == -1 ? Integer.MAX_VALUE : v).//
-		    orElse(DEFAULT_ANONYMOUS_OFFSET_LIMIT);//
-
-    /**
-     *
-     */
-    public static final int ANONYMOUS_PAGE_SIZE_LIMIT = //
-	    JavaOptions.getValue(JavaOptions.ANONYMOUS_PAGE_SIZE_LIMIT).//
-		    map(Integer::parseInt).//
-		    orElse(DEFAULT_ANONYMOUS_PAGE_SIZE_LIMIT);//
+    public static final int ANONYMOUS_PAGE_SIZE_LIMIT = JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get();
 
     /**
      *

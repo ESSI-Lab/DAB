@@ -30,7 +30,13 @@ function loadI18nSync(lang) {
 		for (var j = 0; j < paths.length; j++) {
 			try {
 				var xhr = new XMLHttpRequest();
-				xhr.open('GET', paths[j], false);
+				var url = paths[j];
+				// Add cache-busting to ensure latest translations are loaded
+				// Use a version that changes when translations are updated
+				var separator = url.indexOf('?') === -1 ? '?' : '&';
+				url += separator + '_v=2.0'; // Increment this when adding new translation keys
+				xhr.open('GET', url, false);
+				xhr.setRequestHeader('Cache-Control', 'no-cache');
 				xhr.send(null);
 				if (xhr.status >= 200 && xhr.status < 300 && (xhr.responseText || '').trim().length > 0) {
 					return JSON.parse(xhr.responseText);
@@ -78,6 +84,26 @@ function t(key, vars) {
 	var cur = (i18n[i18n.current] || {});
 	var str = cur[key] || i18n.en[key] || key;
 	return interpolate(str, vars);
+}
+
+function translateStatus(status) {
+	// Map status values to translation keys
+	var statusMap = {
+		'Completed': 'status_completed',
+		'Failed': 'status_failed',
+		'Canceled': 'status_canceled',
+		'Removed': 'status_removed',
+		'In Progress': 'status_in_progress',
+		'Pending': 'status_pending',
+		'Processing': 'status_processing',
+		'Started': 'status_started'
+	};
+	var key = statusMap[status] || null;
+	if (key) {
+		return t(key);
+	}
+	// If no translation found, return original status
+	return status;
 }
 
 function lang() {
@@ -680,7 +706,7 @@ function initializeLogin(config) {
 			const fetchAndUpdateStatus = () => {
 				const statusContent = $('#status-content');
 				const refreshBtn = $('#bulk-download-refresh-btn');
-				statusContent.html('<p>Loading status of bulk downloads...</p>');
+				statusContent.html(`<p>${t('bulk_status_loading')}</p>`);
 
 				// Disable refresh button while loading
 				refreshBtn.prop('disabled', true);
@@ -808,7 +834,7 @@ function initializeLogin(config) {
 
 								// Status column
 								row.append($('<td>')
-									.text(item.status)
+									.text(translateStatus(item.status))
 									.css({
 										'width': '200px'
 									})
@@ -1469,6 +1495,28 @@ export function initializePortal(config) {
 
 	// Initialize i18n (defaults to 'en', overridden by localStorage or config.language)
 	try { loadI18nSync(); } catch (e) { }
+
+	// Configure jQuery UI datepicker locale based on current language
+	if (window.jQuery && window.jQuery.datepicker && typeof window.jQuery.datepicker.setDefaults === 'function') {
+		if (lang() === 'it') {
+			window.jQuery.datepicker.setDefaults({
+				dateFormat: 'yy-mm-dd',
+				monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
+				             'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
+				monthNamesShort: ['Gen','Feb','Mar','Apr','Mag','Giu',
+				                  'Lug','Ago','Set','Ott','Nov','Dic'],
+				dayNames: ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
+				dayNamesMin: ['Do','Lu','Ma','Me','Gi','Ve','Sa'],
+				firstDay: 1
+			});
+		} else {
+			// Ensure a consistent default for other languages (English)
+			window.jQuery.datepicker.setDefaults({
+				dateFormat: 'yy-mm-dd',
+				firstDay: 1
+			});
+		}
+	}
 
 	// Initialize login if enabled
 	initializeLogin(config);
@@ -3065,8 +3113,8 @@ export function initializePortal(config) {
 							const dialogContent = $('<div>');
 
 							// Add description paragraphs
-							dialogContent.append($('<p>').text(`This will initiate the bulk download of ${resultSet.size} resources. The process may take some time, depending on the number of resources and current server load.`));
-							dialogContent.append($('<p>').text('You can monitor the download status from your personal menu.'));
+							dialogContent.append($('<p>').text(t('bulk_download_initiate_message', { size: resultSet.size })));
+							dialogContent.append($('<p>').text(t('bulk_download_monitor_message')));
 
 							// Add download name input
 							const nameDiv = $('<div>').css({
@@ -3079,7 +3127,7 @@ export function initializePortal(config) {
 
 							nameDiv.append(
 								$('<label>')
-									.text('Download name:')
+									.text(t('download_name_label'))
 									.css({
 										'display': 'block',
 										'margin-bottom': '10px',
@@ -3098,7 +3146,7 @@ export function initializePortal(config) {
 									.attr({
 										'type': 'text',
 										'id': 'downloadName',
-										'placeholder': 'Enter a name for this download',
+										'placeholder': t('download_name_placeholder'),
 										'value': defaultName
 									})
 									.css({
@@ -3217,7 +3265,7 @@ export function initializePortal(config) {
 
 							formatDiv.append(
 								$('<label>')
-									.text('Select data format:')
+									.text(t('select_data_format'))
 									.css({
 										'display': 'block',
 										'margin-bottom': '10px',
@@ -3272,7 +3320,7 @@ export function initializePortal(config) {
 							notificationsDiv.append(
 								$('<label>')
 									.attr('for', 'emailNotifications')
-									.text('Send me email notifications about the download status')
+									.text(t('email_notifications_label'))
 									.css({
 										'font-size': '14px',
 										'color': '#2c3e50'
@@ -3283,7 +3331,7 @@ export function initializePortal(config) {
 
 							// Create and show dialog
 							dialogContent.dialog({
-								title: 'Confirm Bulk Download',
+								title: t('confirm_bulk_download_title'),
 								modal: true,
 								width: 400,
 								classes: {
@@ -3291,7 +3339,7 @@ export function initializePortal(config) {
 								},
 								buttons: [
 									{
-										text: "Proceed to download",
+										text: t('proceed_to_download'),
 										class: "login-button",
 										click: function() {
 											// Get the current constraints
@@ -3326,10 +3374,15 @@ export function initializePortal(config) {
 											}
 
 											// Add parameter constraint if it exists
+											// Note: Filter panel values (added later) will take precedence
 											if (constraints.kvp && Array.isArray(constraints.kvp)) {
 												const attributeTitleValue = constraints.kvp.find(kvp => kvp.key === 'attributeTitle');
 												if (attributeTitleValue) {
 													params.append('observedProperty', attributeTitleValue.value);
+												}
+												const platformTitleValue = constraints.kvp.find(kvp => kvp.key === 'platformTitle');
+												if (platformTitleValue) {
+													params.append('featureName', platformTitleValue.value);
 												}
 												const intendedObservationSpacingValue = constraints.kvp.find(kvp => kvp.key === 'intendedObservationSpacing');
 												if (intendedObservationSpacingValue) {
@@ -3343,6 +3396,80 @@ export function initializePortal(config) {
 												if (timeInterpolationValue) {
 													params.append('timeInterpolation', timeInterpolationValue.value);
 												}
+											}
+
+											// Add filters from filter panel (TermFrequencyWidget)
+											// These take precedence over constraints.kvp values
+											// Access checked items from global storage GIAPI.tfHelper.checkedItems
+											var getCheckedItems = function(target) {
+												// First try tfObject method
+												if (GIAPI && GIAPI.search && GIAPI.search.tfWidget && GIAPI.search.tfWidget.tfObject) {
+													if (typeof GIAPI.search.tfWidget.tfObject.checkedItems === 'function') {
+														try {
+															var items = GIAPI.search.tfWidget.tfObject.checkedItems(target);
+															if (items && Array.isArray(items) && items.length > 0) {
+																return items;
+															}
+														} catch (e) {
+															// Continue to fallback
+														}
+													}
+												}
+												// Fallback to global storage directly
+												if (GIAPI && GIAPI.tfHelper && GIAPI.tfHelper.checkedItems) {
+													var items = GIAPI.tfHelper.checkedItems[target];
+													if (items && Array.isArray(items) && items.length > 0) {
+														return items;
+													}
+												}
+												return null;
+											};
+											
+											// Get source filter (provider)
+											var sourceCheckedItems = getCheckedItems('source');
+											if (sourceCheckedItems && sourceCheckedItems.length > 0) {
+												// Extract source IDs from checked items
+												var sourceIds = sourceCheckedItems.map(function(item) {
+													return item.sourceId || item.term;
+												});
+												// Join multiple sources with comma
+												params.set('provider', sourceIds.join(','));
+											}
+											
+											// Get platformTitle filter (featureName/station)
+											var platformTitleCheckedItems = getCheckedItems('platformTitle');
+											if (platformTitleCheckedItems && platformTitleCheckedItems.length > 0) {
+												// Extract terms from checked items
+												var platformNames = platformTitleCheckedItems.map(function(item) {
+													return item.term;
+												});
+												// Join multiple stations with comma
+												params.set('featureName', platformNames.join(','));
+											}
+											
+											// Get attributeURI filter (observedProperty - this is a URI)
+											var attributeURICheckedItems = getCheckedItems('attributeURI');
+											var observedPropertyURICheckedItems = getCheckedItems('observedPropertyURI');
+											
+											// Combine both attributeURI and observedPropertyURI if they exist
+											var allObservedPropertyURIs = [];
+											if (attributeURICheckedItems && attributeURICheckedItems.length > 0) {
+												allObservedPropertyURIs = allObservedPropertyURIs.concat(
+													attributeURICheckedItems.map(function(item) {
+														return item.term;
+													})
+												);
+											}
+											if (observedPropertyURICheckedItems && observedPropertyURICheckedItems.length > 0) {
+												allObservedPropertyURIs = allObservedPropertyURIs.concat(
+													observedPropertyURICheckedItems.map(function(item) {
+														return item.term;
+													})
+												);
+											}
+											if (allObservedPropertyURIs.length > 0) {
+												// Join multiple URIs with comma
+												params.set('observedProperty', allObservedPropertyURIs.join(','));
 											}
 
 											// Add fixed parameters
@@ -3378,8 +3505,8 @@ export function initializePortal(config) {
 													if (data.message && !data.id) {
 														// This is an error response (e.g., permission denied)
 														GIAPI.UI_Utils.dialog('open', {
-															title: 'Error',
-															message: data.message || 'Failed to initiate bulk download. Please try again later.'
+															title: t('error_title'),
+															message: data.message || t('error_download_message')
 														});
 														return;
 													}
@@ -3387,8 +3514,8 @@ export function initializePortal(config) {
 													// Success response - should have an id field
 													// Show success message
 													GIAPI.UI_Utils.dialog('open', {
-														title: 'Download Started',
-														message: 'Your bulk download request has been initiated. You can monitor the download status from your personal menu later.'
+														title: t('download_started_title'),
+														message: t('download_started_message')
 													});
 
 													// Find any open status dialog and refresh it
@@ -3401,8 +3528,8 @@ export function initializePortal(config) {
 												.catch(error => {
 													// Show error message
 													GIAPI.UI_Utils.dialog('open', {
-														title: 'Error',
-														message: 'Failed to initiate bulk download. Please try again later.'
+														title: t('error_title'),
+														message: t('error_download_message')
 													});
 													console.error('Download error:', error);
 												});

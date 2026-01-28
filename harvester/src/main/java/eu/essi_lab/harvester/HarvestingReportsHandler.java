@@ -27,6 +27,7 @@ package eu.essi_lab.harvester;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -83,13 +84,15 @@ public class HarvestingReportsHandler {
 
 	    StringBuilder builder = new StringBuilder();
 
+
 	    builder.append("Problems occurred during harvesting of source: " + gsSource.getLabel());
 	    builder.append("\n");
 	    builder.append("Source endpoint: " + gsSource.getEndpoint());
 	    builder.append("\n");
 	    builder.append("Source id: " + gsSource.getUniqueIdentifier());
 	    builder.append("\n\n");
-
+	    builder.append("Host: " + HostNamePropertyUtils.getHostNameProperty());
+	    builder.append("\n\n");
 	    if (!errorsReport.isEmpty()) {
 
 		builder.append(errorsReport.stream().collect(Collectors.joining("\n")));
@@ -149,16 +152,22 @@ public class HarvestingReportsHandler {
 	if (Objects.nonNull(harvestingProperties)) {
 
 	    String startTime = harvestingProperties.getStartHarvestingTimestamp();
+	    Date sDate = ISO8601DateTimeUtils.parseISO8601ToDate(startTime).get();
 	    String endTime = harvestingProperties.getEndHarvestingTimestamp();
+	    Date eDate = ISO8601DateTimeUtils.parseISO8601ToDate(endTime).get();
+	    long ms = eDate.getTime() - sDate.getTime();
+	    Date expectedEnd = new Date(System.currentTimeMillis()+ms);
 	    int harvCount = harvestingProperties.getHarvestingCount();
 	    int resourcesCount = harvestingProperties.getResourcesCount();
 
 	    if (harvCount > 0) {
 		message += "Number of previous harvesting done #: " + harvCount + "\n";
 		message += "Last harvesting took: "+ ISO8601DateTimeUtils.humanDuration(startTime,endTime)+"\n";
+		message += "Expected end for this harvesting: " + ISO8601DateTimeUtils.getISO8601DateTime(expectedEnd) + "\n";
 		message += "Last harvesting start time: " + startTime + "\n";
 		message += "Last harvesting end time: " + endTime + "\n";
 		message += "Last harvesting resources #: " + resourcesCount + "\n";
+
 	    }else{
 		message += "This is the first harvesting of this source\n";
 	    }

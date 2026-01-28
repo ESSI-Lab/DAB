@@ -12,12 +12,12 @@ import java.io.ByteArrayOutputStream;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -165,8 +165,8 @@ public class OMHandler extends StreamingRequestHandler {
 	if (limit != null && offset != null && (limit + offset > OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE)) {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
-	    message.setError("Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE
-		    + " but was " + (limit + offset));
+	    message.setError(
+		    "Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE + " but was " + (limit + offset));
 	    message.setErrorCode("400");
 	}
 
@@ -209,7 +209,7 @@ public class OMHandler extends StreamingRequestHandler {
 	    View view = manager.getView(optView.get()).get();
 
 	    // only in this case permissions are checked
-	    if (view.getSourceDeployment()!=null&& view.getSourceDeployment().equals("his-central")){
+	    if (view.getSourceDeployment() != null && view.getSourceDeployment().equals("his-central")) {
 
 		if (!user.hasPermission("api")) {
 		    printErrorMessage(output, "The user has not correct permissions");
@@ -220,7 +220,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 		if (allowedViews == null || allowedViews.length == 0) {
 		    // all views are considered valid
-		}else{
+		} else {
 		    boolean found = false;
 		    for (String viewId : allowedViews) {
 			if (view.getId().equals(viewId)) {
@@ -228,15 +228,12 @@ public class OMHandler extends StreamingRequestHandler {
 			}
 		    }
 		    if (!found) {
-			printErrorMessage(output, "The user has not permissions to access this view: "+view.getId());
+			printErrorMessage(output, "The user has not permissions to access this view: " + view.getId());
 			return;
 		    }
 		}
 
-
-
 	    }
-
 
 	}
 
@@ -413,86 +410,86 @@ public class OMHandler extends StreamingRequestHandler {
 
 		String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 
-		if (asynchDownloadRequest || (includeValues != null && (includeValues.toLowerCase().equals("yes")
-			|| includeValues.toLowerCase().equals("true")))) {
+		if (asynchDownloadRequest || (includeValues != null && (includeValues.toLowerCase()
+			.equals("yes") || includeValues.toLowerCase().equals("true")))) {
 
-		    if (results.size() > 1) {
+		    if (asynchDownloadRequest) {
 
-			if (asynchDownloadRequest) {
+			Optional<String> emailProperty = user.getStringPropertyValue("email");
 
-			    Optional<String> emailProperty = user.getStringPropertyValue("email");
+			String email = null;
+			if (emailProperty.isPresent()) {
+			    email = emailProperty.get();
+			}
+			String operationId = email + ":" + UUID.randomUUID().toString();
 
-			    String email = null;
-			    if (emailProperty.isPresent()) {
-				email = emailProperty.get();
-			    }
-			    String operationId = email + ":" + UUID.randomUUID().toString();
+			S3TransferWrapper s3wrapper = null;
 
-			    S3TransferWrapper s3wrapper = null;
-
-			    if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
-
-			    } else {
-
-				s3wrapper = getS3TransferWrapper();
-			    }
-
-			    HttpServletRequest sr = webRequest.getServletRequest();
-
-			    StringBuilder requestURL = new StringBuilder(sr.getRequestURL().toString());
-			    String queryString = sr.getQueryString();
-
-			    if (queryString != null) {
-				requestURL.append('?').append(queryString);
-			    }
-
-			    SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
-			    Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
-			    Optional<String> view = webRequest.extractViewId();
-			    String bucket = null;
-			    if (view.isPresent()) {
-				bucket = view.get();
-			    }
-			    OMSchedulerSetting setting = new OMSchedulerSetting();
-			    setting.setBucket(bucket);
-			    setting.setPublicURL("https://" + bucket + ".s3.us-east-1.amazonaws.com");
-			    setting.setRequestURL(requestURL.toString());
-			    setting.setOperationId(operationId);
-			    setting.setEmail(email);
-			    String notifications = request.getParameterValue(APIParameters.E_MAIL_NOTIFICATIONS);
-			    if (notifications != null && !notifications.isEmpty()) {
-				setting.setEmailNotifications(notifications);
-			    }
-
-			    String asynchDownloadName = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME);
-
-			    if (asynchDownloadName==null || asynchDownloadName.isEmpty()){
-				GSLoggerFactory.getLogger(getClass()).info("Download name not given, assigning its id");
-				operationId = asynchDownloadName;
-			    }
-
-			    setting.setAsynchDownloadName(asynchDownloadName);
-
-			    scheduler.schedule(setting);
-
-			    JSONObject msg = new JSONObject();
-			    msg.put("id", operationId);
-			    msg.put("status", "Submitted");
-			    msg.put("downloadName", asynchDownloadName);
-			    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
-
-			    status(s3wrapper, bucket, operationId, msg);
-
-			    printJSON(output, msg);
-
-			    return;
+			if (getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
 
 			} else {
 
-			    printErrorMessage(output,
-				    "Requests to download more than one dataset should be handled through the asynchronous API methods");
-			    return;
+			    s3wrapper = getS3TransferWrapper();
 			}
+
+			HttpServletRequest sr = webRequest.getServletRequest();
+
+			StringBuilder requestURL = new StringBuilder(sr.getRequestURL().toString());
+			String queryString = sr.getQueryString();
+
+			if (queryString != null) {
+			    requestURL.append('?').append(queryString);
+			}
+
+			SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+			Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
+			Optional<String> view = webRequest.extractViewId();
+			String bucket = null;
+			if (view.isPresent()) {
+			    bucket = view.get();
+			}
+			OMSchedulerSetting setting = new OMSchedulerSetting();
+			setting.setBucket(bucket);
+			setting.setPublicURL("https://" + bucket + ".s3.us-east-1.amazonaws.com");
+			setting.setRequestURL(requestURL.toString());
+			setting.setOperationId(operationId);
+			setting.setEmail(email);
+			String notifications = request.getParameterValue(APIParameters.E_MAIL_NOTIFICATIONS);
+			if (notifications != null && !notifications.isEmpty()) {
+			    setting.setEmailNotifications(notifications);
+			}
+
+			String asynchDownloadName = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME);
+
+			if (asynchDownloadName == null || asynchDownloadName.isEmpty()) {
+			    GSLoggerFactory.getLogger(getClass()).info("Download name not given, assigning its id");
+			    operationId = asynchDownloadName;
+			}
+
+			setting.setAsynchDownloadName(asynchDownloadName);
+
+			scheduler.schedule(setting);
+
+			JSONObject msg = new JSONObject();
+			msg.put("id", operationId);
+			msg.put("status", "Submitted");
+			msg.put("downloadName", asynchDownloadName);
+			msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+
+			status(s3wrapper, bucket, operationId, msg);
+
+			printJSON(output, msg);
+
+			return;
+
+		    }
+		    // SYNCH part
+		    if (results.size() > 1) {
+
+			printErrorMessage(output,
+				"Requests to download more than one dataset should be handled through the asynchronous API methods");
+			return;
+
 		    }
 		}
 
@@ -693,7 +690,13 @@ public class OMHandler extends StreamingRequestHandler {
 
 	String resumptionToken = "";
 
-	if (searchAfter != null && searchAfter.getValues().isPresent() && !searchAfter.getValues().get().isEmpty()) {
+	if (searchAfter != null && searchAfter.getValues().
+
+		isPresent() && !searchAfter.getValues().
+
+		get().
+
+		isEmpty()) {
 	    for (Object v : searchAfter.getValues().get()) {
 		resumptionToken += v.toString() + ",";
 	    }
@@ -1119,7 +1122,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    if (nodataValue == null || !nodataValue.equals(value)) {
 				v = new BigDecimal(value);
 			    }
-			    
+
 			    // Read qualifiers from the qualifiers attribute (WaterML 1.1 format)
 			    Map<String, String> qualifiers = new HashMap<>();
 			    Attribute qualifiersAttribute = startElement.getAttributeByName(new QName("qualifiers"));
@@ -1134,8 +1137,9 @@ public class OMHandler extends StreamingRequestHandler {
 					    if (pair != null && !pair.trim().isEmpty()) {
 						int colonIndex = pair.indexOf(':');
 						if (colonIndex > 0 && colonIndex < pair.length() - 1) {
-						    String key = URLDecoder.decode(pair.substring(0, colonIndex),StandardCharsets.UTF_8);
-						    String qualifierValue = URLDecoder.decode(pair.substring(colonIndex + 1),StandardCharsets.UTF_8);
+						    String key = URLDecoder.decode(pair.substring(0, colonIndex), StandardCharsets.UTF_8);
+						    String qualifierValue = URLDecoder.decode(pair.substring(colonIndex + 1),
+							    StandardCharsets.UTF_8);
 						    qualifiers.put(key, qualifierValue);
 						} else {
 						    // If no colon, use the whole string as value with a default key

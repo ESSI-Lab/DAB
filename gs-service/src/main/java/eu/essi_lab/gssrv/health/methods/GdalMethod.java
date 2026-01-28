@@ -23,7 +23,7 @@ package eu.essi_lab.gssrv.health.methods;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
-import eu.essi_lab.messages.JavaOptions;
+import eu.essi_lab.messages.JVMOption;
 import eu.essi_lab.workflow.processor.grid.GDALConstants;
 
 /**
@@ -34,7 +34,7 @@ public class GdalMethod implements GSPingMethod {
     @Override
     public void ping() throws Exception {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_GDAL_TEST)) {
+	if (JVMOption.isEnabled(JVMOption.SKIP_GDAL_TEST)) {
 	    return;
 	}
 

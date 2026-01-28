@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.tabs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -82,12 +82,11 @@ public class VerticalTabs extends Tabs implements ComponentEventListener<Selecte
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 	switch (event.getEventType()) {
-	case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
-	case ConfigurationChangeEvent.SETTING_PUT:
-	case ConfigurationChangeEvent.SETTING_REMOVED:
-	case ConfigurationChangeEvent.SETTING_REPLACED:
-
-	    tabsToContent.values().forEach(tc -> tc.setRendered(false));
+	case EventType.CONFIGURATION_FLUSHED, //
+	     EventType.SETTING_PUT, //
+	     EventType.SETTING_REMOVED, //
+	     EventType.SETTING_REPLACED ->//
+		tabsToContent.values().forEach(tc -> tc.setRendered(false));
 	}
     }
 

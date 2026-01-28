@@ -29,6 +29,16 @@ import eu.essi_lab.lib.utils.KVPMangler;
 public class SensorThingsMangler extends KVPMangler {
 
     /**
+     *
+     */
+    private static final String PROPERTY_KEY = "propertyKey";
+
+    /**
+     *
+     */
+    private static final String PROPERTY_VALUE = "propertyValue";
+
+    /**
      * 
      */
     private static final String STREAM_IDENTIFIER = "streamId";
@@ -42,6 +52,34 @@ public class SensorThingsMangler extends KVPMangler {
      */
     public SensorThingsMangler() {
 	super(";");
+    }
+
+    /**
+     * @param key
+     */
+    public void setPropertyKey(String key) {
+	setParameter(PROPERTY_KEY, key);
+    }
+
+    /**
+     * @return
+     */
+    public String getPropertyKey() {
+	return getParameterValue(PROPERTY_KEY);
+    }
+
+    /**
+     * @param value
+     */
+    public void setPropertyValue(String value) {
+	setParameter(PROPERTY_VALUE, value);
+    }
+
+    /**
+     * @return
+     */
+    public String getPropertyValue() {
+	return getParameterValue(PROPERTY_VALUE);
     }
 
     /**

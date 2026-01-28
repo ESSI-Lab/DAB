@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -69,7 +69,8 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent.CONFIGURATION_AUTO_RELOADED;
+import static eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent.*;
+import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED;
 
 /**
  * @author Fabrizio
@@ -85,11 +86,6 @@ public class DABStarter implements ConfigurationChangeListener {
      *
      */
     public static boolean schedulerStartError;
-
-    /**
-     * In minutes
-     */
-    private static final int DEFAULT_SCHEDULER_START_DELAY = 15;
 
     /**
      *
@@ -125,13 +121,15 @@ public class DABStarter implements ConfigurationChangeListener {
 	//
 	RuntimeDelegate.setInstance(new org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl());
 
+	logJVMOptions();
+
 	initLocale();
 
 	initContext();
 
 	initConfig();
 
-	if (JavaOptions.isEnabled(JavaOptions.CHECK_CONFIG)) {
+	if (JVMOption.isEnabled(JVMOption.CHECK_CONFIG)) {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check STARTED");
 
@@ -200,12 +198,20 @@ public class DABStarter implements ConfigurationChangeListener {
 	    break;
 	}
 
-	if (JavaOptions.isEnabled(JavaOptions.INIT_CACHES)) {
+	if (JVMOption.isEnabled(JVMOption.INIT_CACHES)) {
 
 	    initCaches();
 	}
 
 	initDatabase();
+    }
+
+    /**
+     *
+     */
+    private void logJVMOptions() {
+
+	JVMOption.log();
     }
 
     @Override
@@ -245,7 +251,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    // 1) Retrieves the configuration.url parameter
 	    //
 
-	    Optional<String> optConfigURL = JavaOptions.getValue(JavaOptions.CONFIGURATION_URL);
+	    Optional<String> optConfigURL = JVMOption.getStringValue(JVMOption.CONFIGURATION_URL);
 
 	    String configURL;
 
@@ -296,7 +302,7 @@ public class DABStarter implements ConfigurationChangeListener {
 		//
 		String startupUri = split[0];
 
-		Optional<String> s3Endpoint = JavaOptions.getValue(JavaOptions.S3_ENDPOINT);
+		Optional<String> s3Endpoint = JVMOption.getStringValue(JVMOption.S3_ENDPOINT);
 
 		if (s3Endpoint.isPresent()) {
 
@@ -408,7 +414,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    //
 	    // set volatile DB according to the java option
 	    //
-	    if (JavaOptions.isEnabled(JavaOptions.FORCE_VOLATILE_DB)) {
+	    if (JVMOption.isEnabled(JVMOption.FORCE_VOLATILE_DB)) {
 
 		DatabaseSetting databaseSetting = configuration.get(//
 			SingletonSettingsId.DATABASE_SETTING.getLabel(), //
@@ -535,7 +541,7 @@ public class DABStarter implements ConfigurationChangeListener {
 		    }
 		}
 
-		Optional<File> path = JavaOptions.getValue(JavaOptions.LOCAL_PROD_CONFIG_PATH).map(File::new);
+		Optional<File> path = JVMOption.getStringValue(JVMOption.LOCAL_PROD_CONFIG_PATH).map(File::new);
 
 		configuration = path.isPresent() ? //
 			FileSource.switchSource(configuration, path.get()) : //
@@ -924,7 +930,7 @@ public class DABStarter implements ConfigurationChangeListener {
      */
     private void healthCheckTest() throws GSException {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_HEALTH_CHECK)) {
+	if (JVMOption.isEnabled(JVMOption.SKIP_HEALTH_CHECK)) {
 
 	    return;
 	}
@@ -1000,7 +1006,6 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
      * @throws GSException
      */
     private void initDatabase() throws GSException {
@@ -1015,13 +1020,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	Optional<Properties> keyValueOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 
-	int schedulerStartDelay = DEFAULT_SCHEDULER_START_DELAY;
-
-	if (keyValueOptions.isPresent()) {
-
-	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get()
-		    .getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
-	}
+	int schedulerStartDelay = JVMOption.getIntValue(JVMOption.SCHEDULER_START_DELAY).get();
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);
 

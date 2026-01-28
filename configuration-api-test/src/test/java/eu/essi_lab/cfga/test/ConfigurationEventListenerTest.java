@@ -29,22 +29,22 @@ public class ConfigurationEventListenerTest {
 	    public void configurationChanged(ConfigurationChangeEvent event) {
 
 		switch (event.getEventType()) {
-		case ConfigurationChangeEvent.SETTING_PUT:
-		    Assert.assertEquals("settingId", event.getSettings().get(0).getIdentifier());
+		case EventType.SETTING_PUT:
+		    Assert.assertEquals("settingId", event.getSettings().getFirst().getIdentifier());
 		    eventsCount++;
 		    break;
-		case ConfigurationChangeEvent.SETTING_REMOVED:
-		    Assert.assertEquals("settingId", event.getSettings().get(0).getIdentifier());
+		case EventType.SETTING_REMOVED:
+		    Assert.assertEquals("settingId", event.getSettings().getFirst().getIdentifier());
 		    eventsCount++;
 		    break;
-		case ConfigurationChangeEvent.SETTING_REPLACED:
-		    Assert.assertEquals("settingId", event.getSettings().get(0).getIdentifier());
+		case EventType.SETTING_REPLACED:
+		    Assert.assertEquals("settingId", event.getSettings().getFirst().getIdentifier());
 		    eventsCount++;
 		    break;
-		case ConfigurationChangeEvent.CONFIGURATION_CLEARED:
+		case EventType.CONFIGURATION_CLEARED:
 		    eventsCount++;
 		    break;
-		case ConfigurationChangeEvent.CONFIGURATION_FLUSHED:
+		case EventType.CONFIGURATION_FLUSHED:
 		    eventsCount++;
 		    break;
 		}

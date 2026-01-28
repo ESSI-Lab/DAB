@@ -6,7 +6,7 @@ import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
 import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchTest;
 import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.messages.JavaOptions;
+import eu.essi_lab.messages.JVMOption;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -81,9 +81,9 @@ public class OpenSearchDataFolderIndexUpdateComposedFieldsInternalTestIT extends
 
 	    clearIndexes();
 
-	    System.setProperty(JavaOptions.INIT_OPENSEARCH_INDEXES.getOption(), "true");
+	    System.setProperty(JVMOption.INIT_OPENSEARCH_INDEXES.getOption(), "true");
 
-	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
+	    System.setProperty(JVMOption.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
 
 	    OpenSearchDatabase dataBase = createDataBase();
 
@@ -148,9 +148,9 @@ public class OpenSearchDataFolderIndexUpdateComposedFieldsInternalTestIT extends
 
 	    clearIndexes();
 
-	    System.setProperty(JavaOptions.INIT_OPENSEARCH_INDEXES.getOption(), "true");
+	    System.setProperty(JVMOption.INIT_OPENSEARCH_INDEXES.getOption(), "true");
 
-	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
+	    System.setProperty(JVMOption.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
 
 	    OpenSearchDatabase dataBase = createDataBase();
 
@@ -215,9 +215,9 @@ public class OpenSearchDataFolderIndexUpdateComposedFieldsInternalTestIT extends
 
 	    clearIndexes();
 
-	    System.setProperty(JavaOptions.INIT_OPENSEARCH_INDEXES.getOption(), "true");
+	    System.setProperty(JVMOption.INIT_OPENSEARCH_INDEXES.getOption(), "true");
 
-	    System.setProperty(JavaOptions.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
+	    System.setProperty(JVMOption.UPDATE_DATA_FOLDER_INDEX.getOption(), "false");
 
 	    OpenSearchDatabase dataBase = createDataBase();
 

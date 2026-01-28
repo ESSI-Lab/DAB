@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -76,7 +76,6 @@ import java.util.*;
 @CssImport(value = "./styles/vaadin-text-area-no-margin-top.css", themeFor = "vaadin-text-area")
 @CssImport(value = "./styles/vaadin-text-field-no-border.css", themeFor = "vaadin-text-field")
 
-@SuppressWarnings("serial")
 public class GSConfigurationView extends ConfigurationView {
 
     static SettingLinkedList<SchedulerWorkerSetting> newWorkerSettingList;
@@ -89,7 +88,7 @@ public class GSConfigurationView extends ConfigurationView {
     static LinkedList<String> additionalRemovalInfo;
 
     /**
-     * 
+     *
      */
     public GSConfigurationView() {
 
@@ -121,13 +120,13 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isInitialized() {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_CONFIG_AUTHORIZATION)) {
+	if (JVMOption.isEnabled(JVMOption.SKIP_CONFIG_AUTHORIZATION)) {
 
 	    return true;
 	}
 
 	OAuthSetting setting = ConfigurationWrapper.getOAuthSetting();
-	
+
 	ValidationResponse response = setting.getValidator().get().validate(//
 		DABStarter.configuration, //
 		setting, //
@@ -166,7 +165,7 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isAuthorized() {
 
-	if (JavaOptions.isEnabled(JavaOptions.SKIP_CONFIG_AUTHORIZATION)) {
+	if (JVMOption.isEnabled(JVMOption.SKIP_CONFIG_AUTHORIZATION)) {
 
 	    return true;
 	}
@@ -177,14 +176,14 @@ public class GSConfigurationView extends ConfigurationView {
 
 	String requestURL = httpServletRequest.getRequestURL().toString();
 
-	GSUser user = null;
+	GSUser user;
 
 	try {
 	    user = UserFinder.findCurrentUser(httpServletRequest);
 
 	} catch (GSException e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getErrorInfoList().get(0).getErrorDescription(), e.getCause());
+	    GSLoggerFactory.getLogger(getClass()).error(e.getErrorInfoList().getFirst().getErrorDescription(), e.getCause());
 	    return false;
 	}
 
@@ -200,7 +199,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	Optional<String> adminId = ConfigurationWrapper.readAdminIdentifier();
 
-	if (!adminId.isPresent() || !adminId.get().equals(userId)) {
+	if (adminId.isEmpty() || !adminId.get().equals(userId)) {
 
 	    LoginDialog dialog = new LoginDialog(requestURL);
 
@@ -278,9 +277,9 @@ public class GSConfigurationView extends ConfigurationView {
 	super.configurationChanged(event);
 
 	switch (event.getEventType()) {
-	case ConfigurationChangeEvent.SETTING_PUT:
-	case ConfigurationChangeEvent.SETTING_REPLACED:
-	case ConfigurationChangeEvent.SETTING_REMOVED:
+	case EventType.SETTING_PUT, //
+	     EventType.SETTING_REPLACED,//
+	     EventType.SETTING_REMOVED -> {//
 
 	    Configuration clone = getConfiguration().clone();
 
@@ -289,6 +288,7 @@ public class GSConfigurationView extends ConfigurationView {
 	    boolean changes = !DABStarter.configuration.equals(clone);
 
 	    getSaveButton().setEnabled(changes);
+	}
 	}
     }
 
@@ -299,7 +299,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	super.onSettingPut(settings);
 
-	Setting setting = settings.get(0);
+	Setting setting = settings.getFirst();
 
 	putSettingList.add(setting);
 
@@ -324,7 +324,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	super.onSettingReplaced(settings);
 
-	Setting setting = settings.get(0);
+	Setting setting = settings.getFirst();
 
 	editedSettingList.add(setting);
 
@@ -352,7 +352,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	super.onSettingRemoved(settings);
 
-	Setting setting = settings.get(0);
+	Setting setting = settings.getFirst();
 
 	removedSettingList.add(setting);
 
@@ -471,30 +471,23 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
-     * This method is called every time the client window is loaded.<br>
-     * Returns a clone with disabled autoreload of the {@link DABStarter#configuration}. Changes applied to this
-     * configuration instance are
-     * not applied to the source configuration until this configuration is flushed and the source configuration performs
-     * the autoreload.<br>
-     * This avoid to apply intermediate configuration changes to the source configuration which is the core
-     * of the {@link ConfigurationWrapper}.<br>
-     * When this cloned configuration is flushed, the source configuration and all the other instances of the other
-     * suite nodes will apply the changes in maximum <i>autoreload-time</i>, that is currently set in 30 seconds.<br>
+     * This method is called every time the client window is loaded.<br> Returns a clone with disabled autoreload of the
+     * {@link DABStarter#configuration}. Changes applied to this configuration instance are not applied to the source configuration until
+     * this configuration is flushed and the source configuration performs the autoreload.<br> This avoid to apply intermediate
+     * configuration changes to the source configuration which is the core of the {@link ConfigurationWrapper}.<br> When this cloned
+     * configuration is flushed, the source configuration and all the other instances of the other suite nodes will apply the changes in
+     * maximum <i>autoreload-time</i>, that is currently set in 30 seconds.<br>
      * <br>
-     * The source event is read-only and has the autoreload enabled, so this is the only event that the configuration
-     * can dispatch. Because of this, in order to receive these events, this view should register itself as listener
-     * also to the source
-     * configuration (the registration to the this returned instance is done by the superclass).
-     * At the moment this is not done since not strictly required
+     * The source event is read-only and has the autoreload enabled, so this is the only event that the configuration can dispatch. Because
+     * of this, in order to receive these events, this view should register itself as listener also to the source configuration (the
+     * registration to the this returned instance is done by the superclass). At the moment this is not done since not strictly required
      */
     @Override
     protected Configuration initConfiguration() {
 
 	// GIPStarter.configuration.addChangeEventListener(this);
 
-	Configuration clone = DABStarter.configuration.clone();
-
-	return clone;
+	return DABStarter.configuration.clone();
     }
 
     @Override
@@ -515,7 +508,7 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
-     * 
+     *
      */
     void updateScheduler() {
 
@@ -607,7 +600,7 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
-     * 
+     *
      */
     void initLists() {
 
@@ -622,7 +615,7 @@ public class GSConfigurationView extends ConfigurationView {
 	removedSettingList = new SettingLinkedList<>();
 	editedSettingList = new SettingLinkedList<>();
 
-	additionalRemovalInfo = new LinkedList<String>();
+	additionalRemovalInfo = new LinkedList<>();
     }
 
     /**
@@ -646,10 +639,8 @@ public class GSConfigurationView extends ConfigurationView {
 	 */
 	private boolean notIn(S setting) {
 
-	    return !stream().//
-		    filter(s -> s.getIdentifier().equals(setting.getIdentifier())).//
-		    findFirst().//
-		    isPresent();
+	    return stream().//
+		    noneMatch(s -> s.getIdentifier().equals(setting.getIdentifier()));
 	}
     }
 }

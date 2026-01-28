@@ -172,7 +172,6 @@ public class WMSCacheFilter implements Filter {
 	}
 
 	// NOT A WMS
-
 	filterChain.doFilter(servletRequest, servletResponse);
 	return;
 

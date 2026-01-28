@@ -90,11 +90,6 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	PROFILER_HEALTH_CHECK_METHOD_ENABLED("profilerHealthCheckMethodEnabled"),
 
 	/**
-	 * DABStarter option
-	 */
-	SCHEDULER_START_DELAY("schedulerStartDelay"),//
-
-	/**
 	 * Trust store options
 	 */
 	TRUST_STORE("trustStore"), //

@@ -10,12 +10,12 @@ package eu.essi_lab.configuration;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -24,7 +24,7 @@ package eu.essi_lab.configuration;
 import java.util.Arrays;
 import java.util.Optional;
 
-import eu.essi_lab.lib.utils.LabeledEnum;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -42,8 +42,8 @@ public enum ExecutionMode implements LabeledEnum {
     BATCH("Batch"),
 
     /**
-     * This mode disables execution of incoming requests and enables execution of batch jobs of type bulk download and
-     * type single download jobs
+     * This mode disables execution of incoming requests and enables execution of batch jobs of type bulk download and type single download
+     * jobs
      */
     BULK("Bulk"),
 
@@ -61,11 +61,11 @@ public enum ExecutionMode implements LabeledEnum {
      */
     INTENSIVE("Intensive"),
     /**
-     * 
+     *
      */
     CONFIGURATION("Configuration"),
     /**
-     * 
+     *
      */
     LOCAL_PRODUCTION("Local Production"),
 
@@ -75,12 +75,12 @@ public enum ExecutionMode implements LabeledEnum {
     MIXED("Mixed");
 
     /**
-     * 
+     *
      */
-    public static final String GIPROJECT_EXECUTION_MODE_KEY = "EU_FLORA_ESSI_GI_PROJECT_EXECUTION";
+    public static final String EXECUTION_MODE_KEY = "executionMode";
 
     /**
-     * 
+     *
      */
     private String name;
 
@@ -107,26 +107,10 @@ public enum ExecutionMode implements LabeledEnum {
     /**
      * @return
      */
-    public static String readEnv() {
-
-	String execMode = System.getenv(GIPROJECT_EXECUTION_MODE_KEY);
-
-	if (execMode == null) {
-
-	    execMode = System.getProperty(GIPROJECT_EXECUTION_MODE_KEY);
-	}
-
-	return execMode;
-    }
-
-    /**
-     * @return
-     */
     public static ExecutionMode get() {
 
-	Optional<ExecutionMode> execmode = ExecutionMode.decode(readEnv());
-
-	return execmode.orElse(ExecutionMode.MIXED);
+	return ExecutionMode.decode(SystemPropertyReader.read(EXECUTION_MODE_KEY).orElse(null)).//
+		orElse(ExecutionMode.MIXED);
     }
 
     /**
@@ -135,8 +119,7 @@ public enum ExecutionMode implements LabeledEnum {
      */
     public static Optional<ExecutionMode> decode(String value) {
 
-	return Arrays.asList(values()).//
-		stream().//
+	return Arrays.stream(values()).//
 		filter(e -> e.name().equalsIgnoreCase(value)).//
 		findFirst();
     }
