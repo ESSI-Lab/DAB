@@ -87,11 +87,6 @@ public class DABStarter implements ConfigurationChangeListener {
     public static boolean schedulerStartError;
 
     /**
-     * In minutes
-     */
-    private static final int DEFAULT_SCHEDULER_START_DELAY = 15;
-
-    /**
      *
      */
     private final ExecutionMode mode;
@@ -1024,13 +1019,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	Optional<Properties> keyValueOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
 
-	int schedulerStartDelay = DEFAULT_SCHEDULER_START_DELAY;
-
-	if (keyValueOptions.isPresent()) {
-
-	    schedulerStartDelay = Integer.parseInt(keyValueOptions.get()
-		    .getProperty(KeyValueOptionKeys.SCHEDULER_START_DELAY.getLabel(), String.valueOf(DEFAULT_SCHEDULER_START_DELAY)));
-	}
+	int schedulerStartDelay = JVMOption.getIntValue(JVMOption.SCHEDULER_START_DELAY).get();
 
 	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduler will start in {} minutes", schedulerStartDelay);
 

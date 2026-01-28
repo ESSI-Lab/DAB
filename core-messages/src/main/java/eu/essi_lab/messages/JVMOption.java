@@ -48,6 +48,11 @@ public enum JVMOption {
     EXECUTION_MODE(ExecutionMode.EXECUTION_MODE_KEY, "Execution mode: ", ExecutionMode.MIXED.getLabel()),
 
     /**
+     * - Int (default: 5 minutes)
+     */
+    SCHEDULER_START_DELAY("schedulerStartDelay", "Scheduler start delay: ", 5),//
+
+    /**
      * - Boolean
      */
     FORCE_VOLATILE_DB("forceVolatileDB", "Forced usage of volatile DB", "Usage of volatile DB not forced", false),
