@@ -30,6 +30,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import eu.essi_lab.api.database.SourceStorage;
@@ -152,18 +153,26 @@ public class HarvestingReportsHandler {
 	if (Objects.nonNull(harvestingProperties)) {
 
 	    String startTime = harvestingProperties.getStartHarvestingTimestamp();
-	    Date sDate = ISO8601DateTimeUtils.parseISO8601ToDate(startTime).get();
+	    Optional<Date> sDate = ISO8601DateTimeUtils.parseISO8601ToDate(startTime);
 	    String endTime = harvestingProperties.getEndHarvestingTimestamp();
-	    Date eDate = ISO8601DateTimeUtils.parseISO8601ToDate(endTime).get();
-	    long ms = eDate.getTime() - sDate.getTime();
-	    Date expectedEnd = new Date(System.currentTimeMillis()+ms);
+	    Optional<Date> eDate = ISO8601DateTimeUtils.parseISO8601ToDate(endTime);
+	    Long ms = null;
+	    if (sDate.isPresent()&&eDate.isPresent()) {
+		ms = eDate.get().getTime() - sDate.get().getTime();
+	    }
+	    Date expectedEnd = null;
+	    if (ms!=null){
+		expectedEnd = new Date(System.currentTimeMillis()+ms);
+	    }
 	    int harvCount = harvestingProperties.getHarvestingCount();
 	    int resourcesCount = harvestingProperties.getResourcesCount();
 
 	    if (harvCount > 0) {
 		message += "Number of previous harvesting done #: " + harvCount + "\n";
 		message += "Last harvesting took: "+ ISO8601DateTimeUtils.humanDuration(startTime,endTime)+"\n";
-		message += "Expected end for this harvesting: " + ISO8601DateTimeUtils.getISO8601DateTime(expectedEnd) + "\n";
+		if (expectedEnd!=null) {
+		    message += "Expected end for this harvesting: " + ISO8601DateTimeUtils.getISO8601DateTime(expectedEnd) + "\n";
+		}
 		message += "Last harvesting start time: " + startTime + "\n";
 		message += "Last harvesting end time: " + endTime + "\n";
 		message += "Last harvesting resources #: " + resourcesCount + "\n";

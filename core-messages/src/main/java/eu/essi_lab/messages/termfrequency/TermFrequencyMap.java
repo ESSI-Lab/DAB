@@ -157,7 +157,19 @@ public class TermFrequencyMap extends DOMSerializer {
 	/**
 	 * 
 	 */
-	S3_TIMELINESS(MetadataElement.S3_TIMELINESS_EL_NAME);
+	S3_TIMELINESS(MetadataElement.S3_TIMELINESS_EL_NAME),
+	/**
+	 * 
+	 */
+	INTENDED_OBSERVATION_SPACING(MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME),
+	/**
+	 * 
+	 */
+	TIME_INTERPOLATION(MetadataElement.TIME_INTERPOLATION_EL_NAME),
+	/**
+	 * 
+	 */
+	AGGREGATION_DURATION(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME);
 
 	private final String name;
 
@@ -193,6 +205,9 @@ public class TermFrequencyMap extends DOMSerializer {
 		case MetadataElement.S3_INSTRUMENT_IDX_EL_NAME -> TermFrequencyTarget.S3_INSTRUMENT_IDX;
 		case MetadataElement.S3_PRODUCT_LEVEL_EL_NAME -> TermFrequencyTarget.S3_PRODUCT_LEVEL;
 		case MetadataElement.S3_TIMELINESS_EL_NAME -> TermFrequencyTarget.S3_TIMELINESS;
+		case MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME -> TermFrequencyTarget.INTENDED_OBSERVATION_SPACING;
+		case MetadataElement.TIME_INTERPOLATION_EL_NAME -> TermFrequencyTarget.TIME_INTERPOLATION;
+		case MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME -> TermFrequencyTarget.AGGREGATION_DURATION;
 		default -> null;
 	    };
 

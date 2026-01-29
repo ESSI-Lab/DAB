@@ -163,7 +163,11 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 
 	    if (statisticalFunction.equals("sum")) {
 		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
-	    } else {
+	    } else if (statisticalFunction.equals("accumulation")) {
+		dataset.getExtensionHandler().setTimeInterpolation("accumulation"); // TODO check data
+	    } else if (statisticalFunction.equals("maximum")) {
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
+	    }else {
 		dataset.getExtensionHandler().setTimeInterpolation(statisticalFunction);
 	    }
 	}

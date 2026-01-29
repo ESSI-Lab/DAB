@@ -125,6 +125,18 @@ public class TermFrequencyMapType {
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private final ArrayList<TermFrequencyItem> s3Timeliness;
 
+    @XmlElementWrapper(name = MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    private final ArrayList<TermFrequencyItem> intendedObservationSpacing;
+
+    @XmlElementWrapper(name = MetadataElement.TIME_INTERPOLATION_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    private final ArrayList<TermFrequencyItem> timeInterpolation;
+
+    @XmlElementWrapper(name = MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    private final ArrayList<TermFrequencyItem> aggregationDuration;
+
     @XmlElementWrapper(name = ResourceProperty.SSC_SCORE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     // this is required due to a possible bug of Jackson mapper
@@ -155,6 +167,9 @@ public class TermFrequencyMapType {
 	s3InstrumentIdx = new ArrayList<>();
 	s3ProductLevel = new ArrayList<>();
 	s3Timeliness = new ArrayList<>();
+	intendedObservationSpacing = new ArrayList<>();
+	timeInterpolation = new ArrayList<>();
+	aggregationDuration = new ArrayList<>();
     }
 
     @XmlTransient
@@ -190,6 +205,21 @@ public class TermFrequencyMapType {
     @XmlTransient
     public ArrayList<TermFrequencyItem> getSarPolCh() {
 	return sarPolCh;
+    }
+
+    @XmlTransient
+    public ArrayList<TermFrequencyItem> getIntendedObservationSpacing() {
+	return intendedObservationSpacing;
+    }
+
+    @XmlTransient
+    public ArrayList<TermFrequencyItem> getTimeInterpolation() {
+	return timeInterpolation;
+    }
+
+    @XmlTransient
+    public ArrayList<TermFrequencyItem> getAggregationDuration() {
+	return aggregationDuration;
     }
 
     @XmlTransient

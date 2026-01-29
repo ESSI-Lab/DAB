@@ -41,6 +41,8 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
@@ -161,13 +163,22 @@ public class OpenSearchUtils {
 		item.setTerm(term);
 		String decoded = term;
 
-		if (term.startsWith(HISCentralOntology.HIS_CENTRAL_BASE_URI)){
+		if (target.equals("observedPropertyURI")&& term.startsWith(HISCentralOntology.HIS_CENTRAL_BASE_URI)){
 		    HISCentralOntology ontology = new HISCentralOntology();
 		    SKOSConcept concept = ontology.getConcept(term);
 		    if (concept!=null){
 			decoded = concept.getPreferredLabel("en");
 			String italianLabel = concept.getPreferredLabel("it");
 			item.setAlternateDecodedTerm(italianLabel);
+			item.setAlternateDecodedTermLanguage("it");
+		    }
+		}
+		if (target.contains("Duration8601")){
+		    String decodedEn = formatISO8601DurationEn(term);
+		    String decodedIt = formatISO8601DurationIt(term);
+		    decoded = decodedEn;
+		    if (decodedIt != null && !decodedIt.isEmpty()) {
+			item.setAlternateDecodedTerm(decodedIt);
 			item.setAlternateDecodedTermLanguage("it");
 		    }
 		}
@@ -243,11 +254,218 @@ public class OpenSearchUtils {
 		case SSC_SCORE:
 		    mapType.getSSCScore().add(item);
 		    break;
+		case INTENDED_OBSERVATION_SPACING:
+		    mapType.getIntendedObservationSpacing().add(item);
+		    break;
+		case TIME_INTERPOLATION:
+		    mapType.getTimeInterpolation().add(item);
+		    break;
+		case AGGREGATION_DURATION:
+		    mapType.getAggregationDuration().add(item);
+		    break;
 		}
 	    }
 	});
 
 	return mapType;
+    }
+
+    private static final Pattern ISO8601_DURATION_PATTERN = Pattern
+	    .compile("^P(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?$");
+
+    private static String formatISO8601DurationEn(String iso8601Value) {
+
+	if (iso8601Value == null || !iso8601Value.startsWith("P")) {
+	    return iso8601Value;
+	}
+
+	// Common exact mappings
+	Map<String, String> mappings = Map.of(//
+		"P1Y", "yearly", //
+		"P1M", "monthly", //
+		"P1W", "weekly", //
+		"P1D", "daily", //
+		"PT1H", "hourly", //
+		"PT1M", "every minute");
+
+	if (mappings.containsKey(iso8601Value)) {
+	    return mappings.get(iso8601Value);
+	}
+
+	Matcher matcher = ISO8601_DURATION_PATTERN.matcher(iso8601Value);
+	if (!matcher.matches()) {
+	    return iso8601Value;
+	}
+
+	int years = parseIntOrZero(matcher.group(1));
+	int months = parseIntOrZero(matcher.group(2));
+	int days = parseIntOrZero(matcher.group(3));
+	int hours = parseIntOrZero(matcher.group(4));
+	int minutes = parseIntOrZero(matcher.group(5));
+	int seconds = parseIntOrZero(matcher.group(6));
+
+	boolean isTimeOnly = years == 0 && months == 0 && days == 0 && (hours > 0 || minutes > 0 || seconds > 0);
+	boolean isDateOnly = (years > 0 || months > 0 || days > 0) && hours == 0 && minutes == 0 && seconds == 0;
+	int componentCount = 0;
+	if (years > 0)
+	    componentCount++;
+	if (months > 0)
+	    componentCount++;
+	if (days > 0)
+	    componentCount++;
+	if (hours > 0)
+	    componentCount++;
+	if (minutes > 0)
+	    componentCount++;
+	if (seconds > 0)
+	    componentCount++;
+	boolean isSingleUnit = componentCount == 1;
+
+	if (isTimeOnly && isSingleUnit) {
+
+	    if (hours > 0) {
+		return hours == 1 ? "hourly" : "every " + hours + " hours";
+	    }
+	    if (minutes > 0) {
+		return minutes == 1 ? "every minute" : "every " + minutes + " minutes";
+	    }
+	    if (seconds > 0) {
+		return seconds == 1 ? "every second" : "every " + seconds + " seconds";
+	    }
+	} else if (isDateOnly && isSingleUnit) {
+
+	    if (years > 0) {
+		return years == 1 ? "yearly" : "every " + years + " years";
+	    }
+	    if (months > 0) {
+		return months == 1 ? "monthly" : "every " + months + " months";
+	    }
+	    if (days > 0) {
+		return days == 1 ? "daily" : "every " + days + " days";
+	    }
+	}
+
+	List<String> parts = new ArrayList<>();
+	if (years > 0) {
+	    parts.add(years == 1 ? "1 year" : years + " years");
+	}
+	if (months > 0) {
+	    parts.add(months == 1 ? "1 month" : months + " months");
+	}
+	if (days > 0) {
+	    parts.add(days == 1 ? "1 day" : days + " days");
+	}
+	if (hours > 0) {
+	    parts.add(hours == 1 ? "1 hour" : hours + " hours");
+	}
+	if (minutes > 0) {
+	    parts.add(minutes == 1 ? "1 minute" : minutes + " minutes");
+	}
+	if (seconds > 0) {
+	    parts.add(seconds == 1 ? "1 second" : seconds + " seconds");
+	}
+
+	return parts.isEmpty() ? iso8601Value : String.join(", ", parts);
+    }
+
+    private static String formatISO8601DurationIt(String iso8601Value) {
+
+	if (iso8601Value == null || !iso8601Value.startsWith("P")) {
+	    return iso8601Value;
+	}
+
+	// Common exact mappings
+	Map<String, String> mappings = Map.of(//
+		"P1Y", "annuale", //
+		"P1M", "mensile", //
+		"P1W", "settimanale", //
+		"P1D", "giornaliero", //
+		"PT1H", "orario", //
+		"PT1M", "ogni minuto");
+
+	if (mappings.containsKey(iso8601Value)) {
+	    return mappings.get(iso8601Value);
+	}
+
+	Matcher matcher = ISO8601_DURATION_PATTERN.matcher(iso8601Value);
+	if (!matcher.matches()) {
+	    return iso8601Value;
+	}
+
+	int years = parseIntOrZero(matcher.group(1));
+	int months = parseIntOrZero(matcher.group(2));
+	int days = parseIntOrZero(matcher.group(3));
+	int hours = parseIntOrZero(matcher.group(4));
+	int minutes = parseIntOrZero(matcher.group(5));
+	int seconds = parseIntOrZero(matcher.group(6));
+
+	boolean isTimeOnly = years == 0 && months == 0 && days == 0 && (hours > 0 || minutes > 0 || seconds > 0);
+	boolean isDateOnly = (years > 0 || months > 0 || days > 0) && hours == 0 && minutes == 0 && seconds == 0;
+	int componentCount = 0;
+	if (years > 0)
+	    componentCount++;
+	if (months > 0)
+	    componentCount++;
+	if (days > 0)
+	    componentCount++;
+	if (hours > 0)
+	    componentCount++;
+	if (minutes > 0)
+	    componentCount++;
+	if (seconds > 0)
+	    componentCount++;
+	boolean isSingleUnit = componentCount == 1;
+
+	if (isTimeOnly && isSingleUnit) {
+
+	    if (hours > 0) {
+		return hours == 1 ? "orario" : "ogni " + hours + " ore";
+	    }
+	    if (minutes > 0) {
+		return minutes == 1 ? "ogni minuto" : "ogni " + minutes + " minuti";
+	    }
+	    if (seconds > 0) {
+		return seconds == 1 ? "ogni secondo" : "ogni " + seconds + " secondi";
+	    }
+	} else if (isDateOnly && isSingleUnit) {
+
+	    if (years > 0) {
+		return years == 1 ? "annuale" : "ogni " + years + " anni";
+	    }
+	    if (months > 0) {
+		return months == 1 ? "mensile" : "ogni " + months + " mesi";
+	    }
+	    if (days > 0) {
+		return days == 1 ? "giornaliero" : "ogni " + days + " giorni";
+	    }
+	}
+
+	List<String> parts = new ArrayList<>();
+	if (years > 0) {
+	    parts.add(years == 1 ? "1 anno" : years + " anni");
+	}
+	if (months > 0) {
+	    parts.add(months == 1 ? "1 mese" : months + " mesi");
+	}
+	if (days > 0) {
+	    parts.add(days == 1 ? "1 giorno" : days + " giorni");
+	}
+	if (hours > 0) {
+	    parts.add(hours == 1 ? "1 ora" : hours + " ore");
+	}
+	if (minutes > 0) {
+	    parts.add(minutes == 1 ? "1 minuto" : minutes + " minuti");
+	}
+	if (seconds > 0) {
+	    parts.add(seconds == 1 ? "1 secondo" : seconds + " secondi");
+	}
+
+	return parts.isEmpty() ? iso8601Value : String.join(", ", parts);
+    }
+
+    private static int parseIntOrZero(String value) {
+
+	return value == null || value.isEmpty() ? 0 : Integer.parseInt(value);
     }
 
     /**

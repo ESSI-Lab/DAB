@@ -448,10 +448,14 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		query += 'to=' + ((constraints.when && constraints.when.to) || '') + '&';
 
-		if (constraints.sources) {
-			var value = constraints.sources;
-			query += 'sources=' + value + '&';
-
+		// Sources filter (can come from constraints.sources or constraints.source)
+		if (constraints.sources || constraints.source) {
+			var sourcesValue = constraints.sources || constraints.source;
+			// Handle both string and array values
+			if (Array.isArray(sourcesValue)) {
+				sourcesValue = sourcesValue.join(',');
+			}
+			query += 'sources=' + sourcesValue + '&';
 		}
 
 		if (constraints.observedPropertyURI) {
@@ -477,10 +481,13 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		}
 
-		if (constraints.sources) {
-			var sources = constraints.sources;
+		// Backward compatibility / redundancy: ensure sources are always passed
+		if (!constraints.sources && constraints.source) {
+			var sources = constraints.source;
+			if (Array.isArray(sources)) {
+				sources = sources.join(',');
+			}
 			query += 'sources=' + sources + '&';
-
 		}
 
 		if (constraints.attributeTitle) {

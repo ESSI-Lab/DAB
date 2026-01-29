@@ -81,7 +81,54 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
 		targets.push(p);
 	}
 
-	targets.sort();
+	// Preserve the order specified in options.termFrequency (e.g., from config.filters),
+	// falling back to alphabetical order for any targets not listed there.
+	if (options && typeof options.termFrequency === 'string') {
+		var configuredOrder = options.termFrequency.split(',').map(function(v) {
+			return v.trim();
+		}).filter(function(v) {
+			return v.length > 0;
+		});
+
+		// Helper to resolve the index of a target name in the configured order,
+		// handling aliases like attributeURI/observedPropertyURI.
+		var getIndexForTarget = function(name) {
+			var idx = configuredOrder.indexOf(name);
+			if (idx === -1) {
+				// Treat attributeURI and observedPropertyURI as synonyms for ordering,
+				// since the backend uses observedPropertyURI while configs may use attributeURI.
+				if (name === 'observedPropertyURI') {
+					idx = configuredOrder.indexOf('attributeURI');
+				} else if (name === 'attributeURI') {
+					idx = configuredOrder.indexOf('observedPropertyURI');
+				}
+			}
+			return idx;
+		};
+
+		targets.sort(function(a, b) {
+			var ia = getIndexForTarget(a);
+			var ib = getIndexForTarget(b);
+
+			if (ia === -1 && ib === -1) {
+				// Neither target is in the configured list: keep alphabetical order between them
+				return a.localeCompare(b);
+			}
+			if (ia === -1) {
+				// 'a' is not configured: it goes after any configured targets
+				return 1;
+			}
+			if (ib === -1) {
+				// 'b' is not configured: it goes after any configured targets
+				return -1;
+			}
+			// Both are configured: keep the order from config.filters/options.termFrequency
+			return ia - ib;
+		});
+	} else {
+		// Default behavior: alphabetical order
+		targets.sort();
+	}
 	
 	/**
 	 * Checks the {{#crossLink "TermFrequencyItem"}}term frequency items{{/crossLink}} of the given term frequency <code>target</code>. 
@@ -238,7 +285,12 @@ GIAPI.TermFrequency = function(dabNode, cnstr, options, onStatus, onResponse, te
 		_onResponse._origin = 'termFrequency';
 
 		dabNode.discover(_onResponse, tf._cnstr, options, onStatus);
-		tf._cnstr.sources = tf._cnstr.source;
+
+		// Preserve existing sources selection from the main constraints when no term-frequency
+		// source filter is applied. Only override if a TF 'source' constraint has been built.
+		if (tf._cnstr.source) {
+			tf._cnstr.sources = tf._cnstr.source;
+		}
 
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(tf._cnstr);
 

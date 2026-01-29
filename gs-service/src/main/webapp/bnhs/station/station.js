@@ -1225,14 +1225,23 @@ var createPlot = function(data, i) {
 		}
 	};
 
-	// Fetch data from OM API
+	// Fetch data from OM API using fetch without cookies (no JSESSIONID)
 	var url = buildOmApiUrl(timeseriesId, startTime, endTime);
 
-	$.ajax({
-		url: url,
-		type: 'GET',
-		dataType: 'json',
-		success: function(response) {
+	fetch(url, {
+		method: 'GET',
+		credentials: 'omit',
+		headers: {
+			'Accept': 'application/json'
+		}
+	})
+		.then(function(response) {
+			if (!response.ok) {
+				throw new Error('HTTP ' + response.status);
+			}
+			return response.json();
+		})
+		.then(function(response) {
 			try {
 				var members = response && response.member;
 				if (!members || !members.length) {
@@ -1254,13 +1263,12 @@ var createPlot = function(data, i) {
 				$container.html('<div style="padding: 20px; text-align: center; color: red;">' +
 					t('no_data_available') + '</div>');
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.error('Error loading OM API data:', textStatus, errorThrown);
+		})
+		.catch(function(error) {
+			console.error('Error loading OM API data:', error);
 			$container.html('<div style="padding: 20px; text-align: center; color: red;">' +
 				t('no_data_available') + '</div>');
-		}
-	});
+		});
 };
 
 var initDatePickers = function(data, i) {

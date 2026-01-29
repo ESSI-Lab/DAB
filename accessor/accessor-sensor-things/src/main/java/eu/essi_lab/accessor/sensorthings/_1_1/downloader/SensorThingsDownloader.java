@@ -136,9 +136,6 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 	    // Build filter: properties/propertyKey eq 'propertyValue'
 	    String filter = "properties/" + propertyKey.replace("'","''") + " eq '" + propertyValue.replace("'","''") + "'";
 
-	    filter = URLEncoder.encode(filter,StandardCharsets.UTF_8);
-
-	    
 	    SystemQueryOptions filterOptions = SystemQueryOptions.get().filter(filter);
 	    
 	    // Merge with existing options if present

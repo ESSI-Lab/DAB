@@ -301,9 +301,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    getHeader("Variable units") + //
 		    getHeader("Variable units URI") + //
 		    getHeader("Interpolation type") + //
-		    getHeader("Interpolation time support") + //
 		    getHeader("Aggregation period") + //
-		    getHeader("Time interval") + //
 		    getHeader("Intended observation spacing") + //
 		    getHeader("Time units") + //
 		    getHeader("Country") + //
@@ -369,9 +367,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 			getRow(ri.getVariableUnits()) + //
 			getRow(ri.getVariableUnitsURI(), ri.getVariableUnitsURI()) + //
 			getRow(ri.getInterpolation()) + //
-			getRow(ri.getInterpolationSupport()) + //
 			getRow(ri.getAggregationPeriod()) + //
-			getRow(ri.getInterval()) + //
 			getRow(ri.getIntendedObservationSpacing()) + //
 			getRow(ri.getInterpolationSupportUnits()) + //
 			getRow(ri.getCountry()) + //
