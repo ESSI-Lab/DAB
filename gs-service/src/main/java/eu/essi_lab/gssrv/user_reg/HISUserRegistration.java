@@ -51,6 +51,17 @@ public class HISUserRegistration {
     private List<String> validationMessages;
     private String registrationURI;
     private Date registrationDate;
+    private Integer maxDownloadSizeMB =null;
+
+    public Integer getMaxDownloadSizeMB() {
+	return maxDownloadSizeMB;
+    }
+
+    public void setMaxDownloadSizeMB(Integer maxDownloadSizeMB) {
+	this.maxDownloadSizeMB = maxDownloadSizeMB;
+    }
+
+
 
     /**
      * @param fname

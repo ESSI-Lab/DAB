@@ -1113,6 +1113,8 @@ function initializeLogin(config) {
 								}
 								// Store the actual value (IDs) in data attribute for editing
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}' data-prop-value='${value || ''}'>${displayValue}</span> <button class='edit-views-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
+							} else if (name === 'maxDownloadSizeMB') {
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-download-size-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							} else {
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							}
@@ -1125,6 +1127,10 @@ function initializeLogin(config) {
 						// Add 'Add Allowed Views' button if allowedViews property is missing
 						if (!('allowedViews' in propMap)) {
 							details += `<div style='margin-top:12px'><button id='add-allowed-views-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> Add Allowed Views</button></div>`;
+						}
+						// Add 'Add Download Size (MB)' button if maxDownloadSizeMB property is missing
+						if (!('maxDownloadSizeMB' in propMap)) {
+							details += `<div style='margin-top:12px'><button id='add-download-size-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_download_size_mb')}</button></div>`;
 						}
 						const detailsDialog = $('<div>').html(details).dialog({
 							title: t('details_title'),
@@ -1232,6 +1238,90 @@ function initializeLogin(config) {
 										alert('Error adding allowed views: ' + err);
 									});
 							});
+						});
+						// Helper: parse integer for maxDownloadSizeMB; returns number or null if invalid returns number or null if invalid
+						function parseDownloadSizeMB(input) {
+							if (input === null || input === undefined) return null;
+							const s = String(input).trim();
+							if (s === '') return null;
+							const n = parseInt(s, 10);
+							if (isNaN(n) || n < 0 || String(n) !== s) return null;
+							return n;
+						}
+						// Add handler for Add Download Size (MB) button
+						detailsDialog.on('click', '#add-download-size-btn', function() {
+							const raw = prompt(t('download_size_mb_prompt_add'), '');
+							const value = parseDownloadSizeMB(raw);
+							if (value === null) {
+								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
+								return;
+							}
+							const email = localStorage.getItem('userEmail');
+							const apiKey = localStorage.getItem('authToken');
+							const userIdentifier = user.identifier;
+							if (!email || !apiKey || !userIdentifier) {
+								alert(t('missing_credentials_or_id'));
+								return;
+							}
+							fetch('../services/support/updateUser', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadSizeMB', propertyValue: String(value) })
+							})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert(t('download_size_mb_added'));
+										detailsDialog.dialog('close');
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
+									} else {
+										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error adding download size: ' + err);
+								});
+						});
+						// Edit maxDownloadSizeMB handler
+						detailsDialog.on('click', '.edit-download-size-btn', function(e) {
+							e.preventDefault();
+							const propName = $(this).data('prop-name');
+							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
+							const oldValue = valueSpan.text();
+							const raw = prompt(t('download_size_mb_prompt_edit'), oldValue);
+							const newValue = parseDownloadSizeMB(raw);
+							if (newValue === null) {
+								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
+								return;
+							}
+							if (parseDownloadSizeMB(oldValue) === newValue) return;
+							const email = localStorage.getItem('userEmail');
+							const apiKey = localStorage.getItem('authToken');
+							const userIdentifier = user.identifier;
+							if (!email || !apiKey || !userIdentifier) {
+								alert(t('missing_credentials_or_id'));
+								return;
+							}
+							fetch('../services/support/updateUser', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadSizeMB', propertyValue: String(newValue) })
+							})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert(t('property_updated'));
+										detailsDialog.dialog('close');
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
+									} else {
+										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error updating download size: ' + err);
+								});
 						});
 						// Edit permissions handler
 						detailsDialog.on('click', '.edit-permissions-btn', function(e) {

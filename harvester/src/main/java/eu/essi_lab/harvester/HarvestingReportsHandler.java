@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.harvester;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.harvester;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -67,8 +67,8 @@ public class HarvestingReportsHandler {
     }
 
     /**
-    * 
-    */
+     *
+     */
     void sendErrorAndWarnMessageEmail() {
 
 	if (!enabled) {
@@ -85,7 +85,6 @@ public class HarvestingReportsHandler {
 
 	    StringBuilder builder = new StringBuilder();
 
-
 	    builder.append("Problems occurred during harvesting of source: " + gsSource.getLabel());
 	    builder.append("\n");
 	    builder.append("Source endpoint: " + gsSource.getEndpoint());
@@ -98,8 +97,7 @@ public class HarvestingReportsHandler {
 
 		builder.append(errorsReport.stream().collect(Collectors.joining("\n")));
 
-		String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
-			+ ConfiguredSMTPClient.MAIL_ERROR_SUBJECT;
+		String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT + ConfiguredSMTPClient.MAIL_ERROR_SUBJECT;
 
 		ConfiguredSMTPClient.sendEmail(subject, builder.toString());
 	    }
@@ -107,8 +105,7 @@ public class HarvestingReportsHandler {
 	    if (!warnReport.isEmpty()) {
 
 		builder.append(warnReport.stream().collect(Collectors.joining("\n")));
-		String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
-			+ ConfiguredSMTPClient.MAIL_WARNING_SUBJECT;
+		String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT + ConfiguredSMTPClient.MAIL_WARNING_SUBJECT;
 
 		ConfiguredSMTPClient.sendEmail(subject, builder.toString());
 	    }
@@ -140,8 +137,9 @@ public class HarvestingReportsHandler {
 	    return;
 	}
 
-	String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
-		+ (start ? "[STARTED]" : "[ENDED]");
+	String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT + (start
+		? "[STARTED]"
+		: "[ENDED]");
 
 	String message = "Label: " + source.getLabel() + "\n";
 	message += "Endpoint: " + source.getEndpoint() + "\n";
@@ -157,28 +155,32 @@ public class HarvestingReportsHandler {
 	    String endTime = harvestingProperties.getEndHarvestingTimestamp();
 	    Optional<Date> eDate = ISO8601DateTimeUtils.parseISO8601ToDate(endTime);
 	    Long ms = null;
-	    if (sDate.isPresent()&&eDate.isPresent()) {
+	    if (sDate.isPresent() && eDate.isPresent()) {
 		ms = eDate.get().getTime() - sDate.get().getTime();
 	    }
 	    Date expectedEnd = null;
-	    if (ms!=null){
-		expectedEnd = new Date(System.currentTimeMillis()+ms);
+	    if (ms != null) {
+		expectedEnd = new Date(System.currentTimeMillis() + ms);
 	    }
 	    int harvCount = harvestingProperties.getHarvestingCount();
 	    int resourcesCount = harvestingProperties.getResourcesCount();
 
+	    String reference = "This";
+	    if (start) {
+		reference = "Last";
+	    }
 	    if (harvCount > 0) {
 		message += "Number of previous harvesting done #: " + harvCount + "\n";
-		message += "Last harvesting took: "+ ISO8601DateTimeUtils.humanDuration(startTime,endTime)+"\n";
-		if (expectedEnd!=null) {
+		message += reference + " harvesting took: " + ISO8601DateTimeUtils.humanDuration(startTime, endTime) + "\n";
+		if (start && expectedEnd != null) {
 		    message += "Expected end for this harvesting: " + ISO8601DateTimeUtils.getISO8601DateTime(expectedEnd) + "\n";
 		}
-		message += "Last harvesting start time: " + startTime + "\n";
-		message += "Last harvesting end time: " + endTime + "\n";
-		message += "Last harvesting resources #: " + resourcesCount + "\n";
+		message += reference+" harvesting start time: " + startTime + "\n";
+		message += reference+" harvesting end time: " + endTime + "\n";
+		message += reference+" harvesting resources #: " + resourcesCount + "\n\n";
 
-	    }else{
-		message += "This is the first harvesting of this source\n";
+	    } else {
+		message += "This is the first harvesting of this source\n\n";
 	    }
 	}
 
@@ -358,7 +360,7 @@ public class HarvestingReportsHandler {
     }
 
     /**
-     * 
+     *
      */
     public static void enable() {
 

@@ -29,7 +29,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.SQLException;
 import java.util.Optional;
+import java.util.Properties;
 
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
@@ -75,6 +77,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	String asynchDownloadName = getSetting().getAsynchDownloadName();
 	String bucket = getSetting().getBucket();
 	String publicURL = getSetting().getPublicURL();
+	Integer maxDownloadSizeMB = getSetting().getMaxDownloadSizeMB();
 
 	String fname = asynchDownloadName + ".zip";
 
@@ -86,6 +89,15 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 	    s3wrapper = OMHandler.getS3TransferWrapper();
 	}
+
+
+	if (maxDownloadSizeMB==null){
+	    maxDownloadSizeMB = ConfigurationWrapper.getDefaultMaxDownloadSizeMB();
+	    if (maxDownloadSizeMB==null){
+		maxDownloadSizeMB = 10;
+	    }
+	}
+
 
 	File downloaded = downloader.download(s3wrapper, bucket, requestURL, operationId, asynchDownloadName);
 
