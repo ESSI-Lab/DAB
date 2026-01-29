@@ -213,10 +213,11 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 		    ColumnDescriptor.create("Deployment", 150, true, true, this::getDeployment), //
 
+		    ColumnDescriptor.create("Host", 150, true, true, (s) -> SchedulerSupport.getInstance().getJobHostName(s)), //
+
 		    ColumnDescriptor.create("Repeat count", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatCount(s)), //
 
 		    ColumnDescriptor.create("Repeat interval", 150, true, true, (s) -> SchedulerSupport.getInstance().getRepeatInterval(s)),
-		    //
 
 		    ColumnDescriptor.create("Status", 100, true, true, (s) -> SchedulerSupport.getInstance().getJobPhase(s), //
 
@@ -233,18 +234,6 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 
 		    ColumnDescriptor.create("Next fire time", 150, true, true, (s) -> SchedulerSupport.getInstance().getNextFireTime(s)), //
 
-		    // ColumnDescriptor.create("Size", true, true, (s) ->
-		    // SchedulerSupport.getInstance().getSize(s),
-		    //
-		    // (o1, o2) -> {
-		    //
-		    // String size1 = o1.get("Size");
-		    // String size2 = o2.get("Size");
-		    //
-		    // return Integer.valueOf(SchedulerJobStatus.parse(size1))
-		    // .compareTo(Integer.valueOf(SchedulerJobStatus.parse(size2)));
-		    // }),
-
 		    ColumnDescriptor.create("Info", true, true, false, (s) -> SchedulerSupport.getInstance().getAllMessages(s))//
 
 	    ), getItemsList(), Grid.SelectionMode.MULTI).//
@@ -252,7 +241,6 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		    reloadable(() -> SchedulerSupport.getInstance().update()).//
 
 		    build();
-
 	}
 
 	/**
