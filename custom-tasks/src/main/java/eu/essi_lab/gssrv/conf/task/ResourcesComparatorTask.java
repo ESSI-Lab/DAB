@@ -124,30 +124,25 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	// reading target comparison properties to override default ones
 	//
 
-	if (taskOptions.isPresent()) {
-
-	    //
-	    // Supported values:
-	    //
-	    // Keyword
-	    // Topic category
-	    // Online link
-	    // Spatial extent
-	    // Title
-	    // Abstract
-	    // Distribution format
-	    // Temporal extent begin
-	    // Temporal extent end
-	    // Online protocol
-	    //
-
-	    comparisonProperties = Arrays.asList(taskOptions.get().trim().strip().split("\n")).//
-		    stream().//
-		    map(v -> MetadataElement.optFromReadableName(v.trim().strip()).orElse(null)).//
-		    filter(Objects::nonNull).//
-		    collect(Collectors.toList());
-
-	}
+	//
+	// Supported values:
+	//
+	// Keyword
+	// Topic category
+	// Online link
+	// Spatial extent
+	// Title
+	// Abstract
+	// Distribution format
+	// Temporal extent begin
+	// Temporal extent end
+	// Online protocol
+	//
+	taskOptions.ifPresent(s -> //
+		comparisonProperties = Arrays.stream(s.trim().strip().split("\n")).//
+		map(v -> MetadataElement.optFromReadableName(v.trim().strip()).orElse(null)).//
+		filter(Objects::nonNull).//
+		collect(Collectors.toList()));
 
 	GSLoggerFactory.getLogger(getClass()).info("Selected comparison properties: {}", //
 		comparisonProperties.stream().//
@@ -166,7 +161,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	Optional<Boolean> consFolderSurvives = worker.consolidatedFolderSurvives();
 
-	if (consFolderSurvives.isEmpty() || (consFolderSurvives.isPresent() && consFolderSurvives.get() == false)) {
+	if (consFolderSurvives.isEmpty() || !consFolderSurvives.get()) {
 
 	    HarvestingStrategy strategy = worker.getStrategy();
 
@@ -201,7 +196,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // first full/selective harvesting, only new records added in the data-1 folder
 		    //
 
-		    data1Folder.listIdentifiers(IdentifierType.PUBLIC).forEach(id -> newRecords.add(id));
+		    newRecords.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
 
 		} else {
 
@@ -233,8 +228,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			    collect(Collectors.toList());
 
 		    List<String> commonIds = currIds.stream().//
-			    filter(id -> prevIds.contains(id)).//
-			    collect(Collectors.toList());
+			    filter(prevIds::contains).//
+			    toList();
 
 		    for (String id : commonIds) {
 
@@ -259,11 +254,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 				response.getProperties().forEach(prop -> {
 
-				    List<String> list = modifiedRecords.get(prop.getName());
-				    if (list == null) {
-					list = new ArrayList<>();
-					modifiedRecords.put(prop.getName(), list);
-				    }
+				    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
 
 				    list.add(id);
 				});
@@ -312,7 +303,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		resourceSelector.addIndex(MetadataElement.IDENTIFIER);
 
 		discoveryMessage.setResourceSelector(resourceSelector);
-		discoveryMessage.setSources(Arrays.asList(gsSource));
+		discoveryMessage.setSources(List.of(gsSource));
 		discoveryMessage.setUserBond(andBond);
 		discoveryMessage.setNormalizedBond(andBond);
 		discoveryMessage.setPermittedBond(andBond);
@@ -363,11 +354,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			response.getProperties().forEach(prop -> {
 
-			    List<String> list = modifiedRecords.get(prop.getName());
-			    if (list == null) {
-				list = new ArrayList<>();
-				modifiedRecords.put(prop.getName(), list);
-			    }
+			    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
 
 			    list.add(modified.getPublicId());
 			});
@@ -380,7 +367,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	}
 
 	log(status, "New records: " + newRecords.size());
-	log(status, "Modified records: " + modifiedRecords.values().stream().flatMap(l -> l.stream()).distinct().count());
+	log(status, "Modified records: " + modifiedRecords.values().stream().flatMap(Collection::stream).distinct().count());
 	log(status, "Deleted records: " + deletedRecords.size());
 
 	Optional<MessagePublisher> client = createClient();
@@ -508,7 +495,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    GSLoggerFactory.getLogger(getClass()).info("MQTT client created");
 
-		    return Optional.of(new MQTTPublisherHive(mqttHost, Integer.valueOf(mqttPort), mqttUser, mqttPwd));
+		    return Optional.of(new MQTTPublisherHive(mqttHost, Integer.parseInt(mqttPort), mqttUser, mqttPwd));
 		}
 
 		String kafkaHost = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_HOST.getLabel());
@@ -522,7 +509,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Kafka client created");
 
-		    KafkaClient client = new KafkaClient(kafkaHost, Integer.valueOf(kafkaPort));
+		    KafkaClient client = new KafkaClient(kafkaHost, Integer.parseInt(kafkaPort));
 
 		    //
 		    // security

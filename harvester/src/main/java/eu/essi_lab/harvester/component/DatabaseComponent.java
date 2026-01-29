@@ -125,9 +125,7 @@ public class DatabaseComponent extends HarvestingComponent {
 		    boolean isModified = getRequest().//
 			    getIncrementalModifiedResources().//
 			    stream().//
-			    filter(res -> res.getPrivateId().equals(resource.getPrivateId())).//
-			    findFirst().//
-			    isPresent();
+			    anyMatch(res -> res.getPrivateId().equals(resource.getPrivateId()));
 
 		    if (isModified) {
 			//
