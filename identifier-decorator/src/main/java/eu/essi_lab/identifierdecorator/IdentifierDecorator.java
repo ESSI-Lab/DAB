@@ -1,46 +1,18 @@
 package eu.essi_lab.identifierdecorator;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import eu.essi_lab.api.database.Database.IdentifierType;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.messages.HarvestingProperties;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.ResultsPriority;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.ResourceType;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -116,8 +88,8 @@ public class IdentifierDecorator {
 	String originalId = opOrig.orElse(UUID.randomUUID().toString());
 
 	if (!opOrig.isPresent())
-	    GSLoggerFactory.getLogger(getClass()).debug("Harvesting metadata without original id, generated random original id is {}",
-		    originalId);
+	    GSLoggerFactory.getLogger(getClass())
+		    .debug("Harvesting metadata without original id, generated random original id is {}", originalId);
 
 	boolean preserveIds = sourcePrioritySetting.preserveIdentifiers();
 
@@ -150,16 +122,17 @@ public class IdentifierDecorator {
 		//
 		// incremental harvesting after the first
 		//
-		if (duplicationCase == 3) {
+		if (duplicationCase == 3 && ConfigurationWrapper.getSystemSettings().//
+			readKeyValue(KeyValueOptionKeys.RESOURCES_COMPARATOR_TASK.getLabel()).//
+			map(Boolean::valueOf).orElse(false)) {
 
 		    //
 		    // set the existing resource as modified resource, before to be
 		    // replaced by the database component
 		    //
 		    request.addIncrementalModifiedResource(existingResource);
-		}
 
-		else if (duplicationCase > 0) {
+		} else if (duplicationCase > 0) {
 		    //
 		    // the source administrator should be warn since it means that the source
 		    // provides records with same identifier.
@@ -259,8 +232,8 @@ public class IdentifierDecorator {
 	    String newparentid = generatePersistentIdentifier(oldparentid, incomingResource.getSource().getUniqueIdentifier());
 
 	    incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(newparentid);
-	    GSLoggerFactory.getLogger(getClass()).debug("Updated parent identifier of {} from {} to {}", incomingResource.getPublicId(),
-		    oldparentid, newparentid);
+	    GSLoggerFactory.getLogger(getClass())
+		    .debug("Updated parent identifier of {} from {} to {}", incomingResource.getPublicId(), oldparentid, newparentid);
 	}
 
     }
@@ -274,8 +247,8 @@ public class IdentifierDecorator {
 
 	String parentid = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
 
-	boolean validParentId = parentid != null && !parentid.equalsIgnoreCase("")
-		&& !parentid.equalsIgnoreCase(resource.getSource().getUniqueIdentifier());
+	boolean validParentId = parentid != null && !parentid.equalsIgnoreCase("") && !parentid.equalsIgnoreCase(
+		resource.getSource().getUniqueIdentifier());
 
 	if (!validParentId)
 	    return false;
@@ -307,8 +280,9 @@ public class IdentifierDecorator {
 
 	String pid = generatePersistentIdentifier(originalid, source.getUniqueIdentifier());
 
-	GSLoggerFactory.getLogger(getClass()).debug("Created persistent identifier {} for resource with original id {} from source {} ({})",
-		pid, originalid, source.getUniqueIdentifier(), source.getLabel());
+	GSLoggerFactory.getLogger(getClass())
+		.debug("Created persistent identifier {} for resource with original id {} from source {} ({})", pid, originalid,
+			source.getUniqueIdentifier(), source.getLabel());
 
 	resource.setPrivateId(pid);
 	resource.setPublicId(pid);
@@ -356,7 +330,7 @@ public class IdentifierDecorator {
 
 	boolean sameOriginalId = Objects.nonNull(existingResource.getOriginalId()) //
 		&& existingResource.getOriginalId().//
-			equals(incomingResource.getOriginalId());
+		equals(incomingResource.getOriginalId());
 
 	//
 	// basic condition
