@@ -10,26 +10,24 @@ package eu.essi_lab.cfga.scheduler;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.util.Optional;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import org.json.*;
+import org.quartz.*;
 
-import org.json.JSONObject;
-import org.quartz.JobExecutionContext;
-
-import eu.essi_lab.messages.JobStatus;
+import java.text.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -37,7 +35,7 @@ import eu.essi_lab.messages.JobStatus;
 public class SchedulerJobStatus extends JobStatus {
 
     /**
-     * 
+     *
      */
     private static final DecimalFormat decimalFormat;
 
@@ -55,7 +53,7 @@ public class SchedulerJobStatus extends JobStatus {
     }
 
     /**
-     * 
+     *
      */
     private final JSONObject object;
 
@@ -83,6 +81,16 @@ public class SchedulerJobStatus extends JobStatus {
 
 	object.put("settingId", settingId);
 	object.put("workerClassName", workerClassName);
+
+	object.put("hostName", HostNamePropertyUtils.getHostNameProperty());
+    }
+
+    /**
+     * @return
+     */
+    public String getHostName() {
+
+	return object.getString("hostName");
     }
 
     /**
