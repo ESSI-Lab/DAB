@@ -27,6 +27,8 @@ package eu.essi_lab.profiler.om.scheduling;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,20 +69,8 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
-
-
-	String emailNotifications = getSetting().getEmailNotifications();
-	String email = null;
-		if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
-		    email = getSetting().getEmail();
-		    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(email));
-		}
-
-	OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
-
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
-	GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker STARTED, operation id {}",operationId);
 	String asynchDownloadName = getSetting().getAsynchDownloadName();
 	String bucket = getSetting().getBucket();
 	String publicURL = getSetting().getPublicURL();
@@ -98,7 +88,6 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    s3wrapper = OMHandler.getS3TransferWrapper();
 	}
 
-
 	if (maxDownloadSizeMB==null){
 	    maxDownloadSizeMB = ConfigurationWrapper.getDefaultMaxDownloadSizeMB();
 	    if (maxDownloadSizeMB==null){
@@ -112,12 +101,64 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    }
 	}
 
-
 	String resumptionToken = null;
 	BigDecimal totalDownloadedSoFarMB = BigDecimal.ZERO;
 	int partNumber = 0;
 	boolean done = false;
 	List<String> partLocators = new ArrayList<>();
+	boolean resuming = false;
+
+	if (s3wrapper != null) {
+	    File statusFile = null;
+	    try {
+		statusFile = File.createTempFile("om-status-", ".json");
+		if (s3wrapper.download(bucket, "data-downloads/" + operationId + "-status.json", statusFile)) {
+		    String content = new String(Files.readAllBytes(statusFile.toPath()), StandardCharsets.UTF_8);
+		    JSONObject saved = new JSONObject(content);
+		    String savedStatus = saved.optString("status", "");
+		    if ("PartCompleted".equals(savedStatus)) {
+			String token = saved.optString("resumptionToken", null);
+			if (token != null && !token.isEmpty()) {
+			    resuming = true;
+			    partNumber = saved.optInt("partNumber", 0);
+			    resumptionToken = token;
+			    if (saved.has("totalUncompressedSizeInMB")) {
+				Object o = saved.get("totalUncompressedSizeInMB");
+				if (o instanceof Number) {
+				    totalDownloadedSoFarMB = BigDecimal.valueOf(((Number) o).doubleValue());
+				} else if (o != null) {
+				    totalDownloadedSoFarMB = new BigDecimal(o.toString());
+				}
+			    }
+			    JSONArray locatorsArr = saved.optJSONArray("locators");
+			    if (locatorsArr != null) {
+				for (int i = 0; i < locatorsArr.length(); i++) {
+				    partLocators.add(locatorsArr.getString(i));
+				}
+			    }
+			    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker RESUMING from part {} for operation id {}", partNumber + 1, operationId);
+			}
+		    }
+		}
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).warn("Could not load status for resume check: {}", e.getMessage());
+	    } finally {
+		if (statusFile != null && statusFile.exists()) {
+		    statusFile.delete();
+		}
+	    }
+	}
+
+	String emailNotifications = getSetting().getEmailNotifications();
+	String email = null;
+	if (!resuming) {
+	    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker STARTED, operation id {}", operationId);
+	    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
+		email = getSetting().getEmail();
+		OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(email));
+	    }
+	    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+	}
 
 	while (!done) {
 
@@ -177,6 +218,9 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 			statusParams.put("fileCount", fileCount);
 			statusParams.put("sizeMb", partSizeStr);
 			msg.put("statusMessageParams", statusParams);
+			if (result.getResumptionToken() != null && !result.getResumptionToken().isEmpty()) {
+			    msg.put("resumptionToken", result.getResumptionToken());
+			}
 		    }
 		    msg.put("downloadName", asynchDownloadName);
 		    partLocators.add(locator);
