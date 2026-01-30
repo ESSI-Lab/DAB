@@ -88,9 +88,9 @@ public class SchedulerJobStatus extends JobStatus {
     /**
      * @return
      */
-    public String getHostName() {
+    public Optional<String> getHostName() {
 
-	return object.getString("hostName");
+	return Optional.ofNullable(object.optString("hostName", null));
     }
 
     /**
