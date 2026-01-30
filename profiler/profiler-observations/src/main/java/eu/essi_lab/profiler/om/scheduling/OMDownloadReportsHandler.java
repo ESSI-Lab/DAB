@@ -49,11 +49,17 @@ public class OMDownloadReportsHandler {
     /**
      * @param status
      * @param setting
+     * @param locator
+     * @param errorMessage optional message (e.g. when max download size reached)
+     * @param partDetails  optional part info (part number, size, final part, downloaded files)
+     * @param userMail
      */
     public static void sendEmail(//
 	    DownloadStatus status, //
 	    OMSchedulerSetting setting, //
 	    Optional<String> locator, //
+	    Optional<String> errorMessage, //
+	    Optional<String> partDetails, //
 	    Optional<String> userMail) {
 
 	boolean toUser = userMail.isPresent();
@@ -193,6 +199,14 @@ public class OMDownloadReportsHandler {
 	if (locator.isPresent()) {
 
 	    builder.append("ZIP file: " + locator.get()+"\n\n");
+	}
+
+	if (errorMessage.isPresent()) {
+	    builder.append("Message: " + errorMessage.get() + "\n\n");
+	}
+
+	if (partDetails.isPresent()) {
+	    builder.append(partDetails.get());
 	}
 
 	if (toUser) {

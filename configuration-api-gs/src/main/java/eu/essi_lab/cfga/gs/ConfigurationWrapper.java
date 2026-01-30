@@ -1058,4 +1058,21 @@ public class ConfigurationWrapper {
 	}
 	return null;
     }
+
+    public static Integer getDefaultMaxDownloadPartSizeMB() {
+        SystemSetting systemSettings = getSystemSettings();
+        Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+        if (keyValueOption.isPresent()) {
+            String dsm = keyValueOption.get().getProperty("defaultMaxDownloadPartSizeMB");
+            if (dsm!=null&&!dsm.isEmpty()) {
+            try {
+                int defaultMaxDownloadPartSizeMB = Integer.parseInt(dsm);
+                return  defaultMaxDownloadPartSizeMB;
+            }catch (Exception e){
+                GSLoggerFactory.getLogger(ConfigurationWrapper.class).error(e);
+            }
+            }
+        }
+        return null;
+        }
 }
