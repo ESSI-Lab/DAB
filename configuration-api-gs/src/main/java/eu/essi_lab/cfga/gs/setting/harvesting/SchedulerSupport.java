@@ -325,7 +325,7 @@ public class SchedulerSupport {
      */
     public synchronized String getJobHostName(Setting setting) {
 
-	return getJobStatus(setting).map(SchedulerJobStatus::getHostName).orElse("");
+	return getJobStatus(setting).flatMap(SchedulerJobStatus::getHostName).orElse("");
     }
 
     /**
