@@ -53,9 +53,14 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.auth.*;
 import eu.essi_lab.model.exceptions.*;
+import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
+import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.quartz.*;
 
 import javax.servlet.http.*;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -642,5 +647,11 @@ public class GSConfigurationView extends ConfigurationView {
 	    return stream().//
 		    noneMatch(s -> s.getIdentifier().equals(setting.getIdentifier()));
 	}
+    }
+
+    public static void main(String[] args) throws Exception {
+	Object object = JAXBContext.newInstance(SVServiceIdentificationType.class).createUnmarshaller()
+		.unmarshal(new File("/home/boldrini/Untitled2.xml"));
+	System.out.println(object);
     }
 }

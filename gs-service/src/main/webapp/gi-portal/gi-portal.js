@@ -1162,6 +1162,8 @@ function initializeLogin(config) {
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}' data-prop-value='${value || ''}'>${displayValue}</span> <button class='edit-views-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							} else if (name === 'maxDownloadSizeMB') {
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-download-size-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
+							} else if (name === 'maxDownloadPartSizeMB') {
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-download-part-size-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							} else {
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							}
@@ -1178,6 +1180,10 @@ function initializeLogin(config) {
 						// Add 'Add Download Size (MB)' button if maxDownloadSizeMB property is missing
 						if (!('maxDownloadSizeMB' in propMap)) {
 							details += `<div style='margin-top:12px'><button id='add-download-size-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_download_size_mb')}</button></div>`;
+						}
+						// Add 'Add Max Download Part Size (MB)' button if maxDownloadPartSizeMB property is missing
+						if (!('maxDownloadPartSizeMB' in propMap)) {
+							details += `<div style='margin-top:12px'><button id='add-download-part-size-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_download_part_size_mb')}</button></div>`;
 						}
 						const detailsDialog = $('<div>').html(details).dialog({
 							title: t('details_title'),
@@ -1286,7 +1292,7 @@ function initializeLogin(config) {
 									});
 							});
 						});
-						// Helper: parse integer for maxDownloadSizeMB; returns number or null if invalid returns number or null if invalid
+						// Helper: parse integer for MB properties; returns number or null if invalid
 						function parseDownloadSizeMB(input) {
 							if (input === null || input === undefined) return null;
 							const s = String(input).trim();
@@ -1368,6 +1374,81 @@ function initializeLogin(config) {
 								})
 								.catch(err => {
 									alert('Error updating download size: ' + err);
+								});
+						});
+						// Add handler for Add Download Part Size (MB) button
+						detailsDialog.on('click', '#add-download-part-size-btn', function() {
+							const raw = prompt(t('download_part_size_mb_prompt_add'), '');
+							const value = parseDownloadSizeMB(raw);
+							if (value === null) {
+								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
+								return;
+							}
+							const email = localStorage.getItem('userEmail');
+							const apiKey = localStorage.getItem('authToken');
+							const userIdentifier = user.identifier;
+							if (!email || !apiKey || !userIdentifier) {
+								alert(t('missing_credentials_or_id'));
+								return;
+							}
+							fetch('../services/support/updateUser', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadPartSizeMB', propertyValue: String(value) })
+							})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert(t('download_part_size_mb_added'));
+										detailsDialog.dialog('close');
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
+									} else {
+										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error adding download part size: ' + err);
+								});
+						});
+						// Edit maxDownloadPartSizeMB handler
+						detailsDialog.on('click', '.edit-download-part-size-btn', function(e) {
+							e.preventDefault();
+							const propName = $(this).data('prop-name');
+							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
+							const oldValue = valueSpan.text();
+							const raw = prompt(t('download_part_size_mb_prompt_edit'), oldValue);
+							const newValue = parseDownloadSizeMB(raw);
+							if (newValue === null) {
+								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
+								return;
+							}
+							if (parseDownloadSizeMB(oldValue) === newValue) return;
+							const email = localStorage.getItem('userEmail');
+							const apiKey = localStorage.getItem('authToken');
+							const userIdentifier = user.identifier;
+							if (!email || !apiKey || !userIdentifier) {
+								alert(t('missing_credentials_or_id'));
+								return;
+							}
+							fetch('../services/support/updateUser', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadPartSizeMB', propertyValue: String(newValue) })
+							})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert(t('property_updated'));
+										detailsDialog.dialog('close');
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
+									} else {
+										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error updating download part size: ' + err);
 								});
 						});
 						// Edit permissions handler

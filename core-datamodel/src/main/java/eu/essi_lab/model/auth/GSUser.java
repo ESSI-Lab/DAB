@@ -483,5 +483,18 @@ public class GSUser extends DOMSerializer implements Serializable {
 		.orElse(null);
     }
 
+    public Integer getMaxDownloadPartSizeMB() {
+
+	return getStringPropertyValue("maxDownloadPartSizeMB")
+		.map(s -> {
+		    try {
+			int n = Integer.parseInt(s.trim());
+			return n >= 0 ? n : null;
+		    } catch (NumberFormatException e) {
+			return null;
+		    }
+		})
+		.orElse(null);
+    }
 
 }

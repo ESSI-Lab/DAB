@@ -471,6 +471,10 @@ public class OMHandler extends StreamingRequestHandler {
 			if (mb != null) {
 			    setting.setMaxDownloadSizeMB(mb);
 			}
+			Integer partMb = user.getMaxDownloadPartSizeMB();
+			if (partMb != null) {
+			    setting.setMaxDownloadPartSizeMB(partMb);
+			}
 			scheduler.schedule(setting);
 
 			JSONObject msg = new JSONObject();
