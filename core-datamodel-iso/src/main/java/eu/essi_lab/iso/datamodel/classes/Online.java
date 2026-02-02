@@ -29,6 +29,7 @@ import javax.xml.bind.JAXBException;
 
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
+import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.CIOnLineFunctionCodePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
 import net.opengis.iso19139.gmd.v_20060504.URLPropertyType;
@@ -134,6 +135,35 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
 	return null;
     }
 
+    /**
+     * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@xlink:href,@xlink:title")
+     */
+    public void setProtocolAnchor(String href, String text) {
+
+	type.setProtocol(createAnchorPropertyType(href, text));
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:applicationProfile/gco:CharacterString")
+     */
+    public void setApplicationProfile(String value) {
+
+	type.setApplicationProfile(createCharacterStringPropertyType(value));
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:applicationProfile/gco:CharacterString")
+     */
+    public String getApplicationProfile() {
+
+	try {
+	    return ISOMetadata.getStringFromCharacterString(type.getApplicationProfile());
+	} catch (NullPointerException ex) {
+	}
+
+	return null;
+    }
+
     // --------------------------------------------------------
     //
     // Description
@@ -196,13 +226,29 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
     /**
      * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@*:href")
      */
-    public String getProtocolGmxAnchor() {
+    public String getProtocolGmxAnchorHref() {
 
 	try {
 	    JAXBElement<?> jaxbElement = type.getProtocol().getCharacterString();
 	    @SuppressWarnings("unchecked")
 	    JAXBElement<AnchorType> anchor = (JAXBElement<AnchorType>) jaxbElement;
 	    return anchor.getValue().getHref();
+	} catch (ClassCastException | NullPointerException ex) {
+	}
+
+	return null;
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:protocol/gmx:Anchor/@*:href")
+     */
+    public String getProtocolGmxAnchorTitle() {
+
+	try {
+	    JAXBElement<?> jaxbElement = type.getProtocol().getCharacterString();
+	    @SuppressWarnings("unchecked")
+	    JAXBElement<AnchorType> anchor = (JAXBElement<AnchorType>) jaxbElement;
+	    return anchor.getValue().getTitle();
 	} catch (ClassCastException | NullPointerException ex) {
 	}
 
@@ -234,6 +280,8 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
 
 	return null;
     }
+
+  
 
     public JAXBElement<CIOnlineResourceType> getElement() {
 

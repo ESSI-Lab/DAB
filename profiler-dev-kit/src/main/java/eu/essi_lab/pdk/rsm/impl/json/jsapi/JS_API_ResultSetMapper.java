@@ -21,62 +21,30 @@ package eu.essi_lab.pdk.rsm.impl.json.jsapi;
  * #L%
  */
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.TreeSet;
+import com.google.common.collect.*;
+import eu.essi_lab.access.compliance.*;
+import eu.essi_lab.access.compliance.DataComplianceTester.*;
+import eu.essi_lab.access.compliance.wrapper.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.data.*;
+import eu.essi_lab.pdk.rsm.*;
+import net.opengis.iso19139.gmx.v_20060504.*;
+import org.json.*;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.access.compliance.DataComplianceReport;
-import eu.essi_lab.access.compliance.DataComplianceTester.DataComplianceTest;
-import eu.essi_lab.access.compliance.wrapper.ReportsMetadataHandler;
-import eu.essi_lab.iso.datamodel.classes.Address;
-import eu.essi_lab.iso.datamodel.classes.BrowseGraphic;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.Contact;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
-import eu.essi_lab.iso.datamodel.classes.Format;
-import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.Identification;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
-import eu.essi_lab.iso.datamodel.classes.MIInstrument;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.iso.datamodel.classes.ServiceIdentification;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.xml.NameSpace;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.model.BrokeringStrategy;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.pluggable.ESSILabProvider;
-import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.ExtensionHandler;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.data.DataType;
-import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
-import eu.essi_lab.pdk.rsm.MappingSchema;
+import javax.ws.rs.core.*;
+import javax.xml.datatype.*;
+import java.net.*;
+import java.util.*;
 
 /**
- * Result set mapper implementation which maps the {@link GSResource}s according to a JSON schema encoding defined for
- * the <a href="http://api.eurogeoss-broker.eu/docs/index.html">JavaScript API</a>. The {@link #JS_API_MAPPING_SCHEMA}
- * has the following properties:
+ * Result set mapper implementation which maps the {@link GSResource}s according to a JSON schema encoding defined for the <a
+ * href="http://api.eurogeoss-broker.eu/docs/index.html">JavaScript API</a>. The {@link #JS_API_MAPPING_SCHEMA} has the following
+ * properties:
  * <ul>
  * <li>schema uri: {@link GSNameSpaceContext#GS_DATA_MODEL_SCHEMA_URI}</li>
  * <li>schema name: {@link GSNameSpaceContext#GS_DATA_MODEL_SCHEMA_NAME}</li>
@@ -85,7 +53,7 @@ import eu.essi_lab.pdk.rsm.MappingSchema;
  * <li>encoding version: {@value #JS_API_DATA_MODEL_ENCODING_NAME_VERSION}</li>
  * <li>encoding media type: {@link MediaType#APPLICATION_JSON}</li>
  * </ul>
- * 
+ *
  * @author Fabrizio
  */
 public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
@@ -104,6 +72,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
      * The {@link MappingSchema} schema of this mapper
      */
     public static final MappingSchema JS_API_MAPPING_SCHEMA = new MappingSchema();
+
     static {
 
 	JS_API_MAPPING_SCHEMA.setUri(NameSpace.GS_DATA_MODEL_SCHEMA_URI);
@@ -113,19 +82,6 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	JS_API_MAPPING_SCHEMA.setEncoding(JS_API_DATA_MODEL_ENCODING_NAME);
 	JS_API_MAPPING_SCHEMA.setEncodingVersion(JS_API_DATA_MODEL_ENCODING_NAME_VERSION);
 	JS_API_MAPPING_SCHEMA.setEncodingMediaType(MediaType.APPLICATION_JSON_TYPE);
-    }
-
-    private static final ArrayList<String> GEOSS_CATEGORIES = new ArrayList<String>();
-    static {
-	GEOSS_CATEGORIES.add("dataSetDataBase");
-	GEOSS_CATEGORIES.add("observingSystemSensorNetwork");
-	GEOSS_CATEGORIES.add("computationModel");
-	GEOSS_CATEGORIES.add("initiativeProgramme");
-	GEOSS_CATEGORIES.add("documentFileGraphic");
-	GEOSS_CATEGORIES.add("modelingDataProcessingCenter");
-	GEOSS_CATEGORIES.add("feedRSSAlert");
-	GEOSS_CATEGORIES.add("catalogRegistryMetadataCollection");
-	GEOSS_CATEGORIES.add("softwareApplication");
     }
 
     private static final String SOS_TAHMO_PROXY_PATH = "sos-tahmo-proxy";
@@ -151,7 +107,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    source.put("id", identifier);
 	    source.put("type", "composed");
 	    source.put("title", label);
-	    source.put("harvested", strategy == BrokeringStrategy.HARVESTED ? true : false);
+	    source.put("harvested", strategy == BrokeringStrategy.HARVESTED);
 
 	    // online
 	    JSONObject online = new JSONObject();
@@ -187,45 +143,117 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	JSONObject report = new JSONObject();
 
-	MIMetadata md_Metadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	MIMetadata mi_Metadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 
-	List<Identification> diList = Lists.newArrayList(md_Metadata.getDataIdentifications());
-	// if (res instanceof Catalog) {
-	// diList = md_Metadata.getServiceIdentificationList();
-	// } else {
-	// diList = md_Metadata.getDataIdentificationList();
-	// }
+	List<DataIdentification> diList = Lists.newArrayList(mi_Metadata.getDataIdentifications());
 
 	// ---
 	// id
 	// ---
-	String id = md_Metadata.getFileIdentifier();
-	// if (id == null) {
-	// id = res.getId();
-	// }
+
+	String id = mi_Metadata.getFileIdentifier();
+
 	report.put("id", id);
 
 	// ---
 	// type
 	// ---
 	if (resource instanceof DatasetCollection) {
+
 	    report.put("type", "composed");
+
 	} else {
+
 	    report.put("type", "simple");
 	}
 
 	// -----------------
 	// parent identifier
 	// -----------------
-	String parent = md_Metadata.getParentIdentifier();
+
+	String parent = mi_Metadata.getParentIdentifier();
+
 	if (parent != null) {
 	    report.put("parentId", parent);
 	}
 
 	// --------------------
-	// coverageDescription (API TO IMPLEMENT)
+	// hierarchy level code
 	// --------------------
-	CoverageDescription covDesc = md_Metadata.getCoverageDescription();
+
+	mi_Metadata.getHierarchyLevelScopeCodeListValues().forEachRemaining(value -> {
+
+	    report.put("hierarchyLevel", value);
+	});
+
+	// --------------------------
+	// raster mosaic
+	// --------------------------
+
+	resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> {
+
+	    report.put("rasterMosaic", mosaic);
+	});
+
+	// --------------------------------------------
+	// distributor and owner org.name from contacts
+	// --------------------------------------------
+
+	JSONArray ownerOrgNameArray = new JSONArray();
+	JSONArray distOrgNameArray = new JSONArray();
+
+	ArrayList<ResponsibleParty> contacts = Lists.newArrayList(mi_Metadata.getContacts());//
+
+	contacts.forEach(contact -> {
+
+	    handleOrgName(contact, ownerOrgNameArray, distOrgNameArray);
+	});
+
+	// -----------
+	// native EPSG
+	// -----------
+
+	JSONArray epsgArray = new JSONArray();
+
+	mi_Metadata.getReferenceSystemInfos().forEachRemaining(info -> {
+
+	    Optional<AnchorType> codeAnchorType = info.getCodeAnchorType();
+
+	    Optional<String> codeString = info.getCodeString();
+
+	    if (codeAnchorType.isPresent()) {
+
+		String label = codeAnchorType.get().getTitle();
+		String url = codeAnchorType.get().getHref();
+
+		JSONObject epsg = new JSONObject();
+
+		epsg.put("label", label);
+		epsg.put("url", url);
+
+		epsgArray.put(epsg);
+
+	    } else if (codeString.isPresent()) {
+
+		JSONObject epsg = new JSONObject();
+
+		epsg.put("label", codeString.get());
+
+		epsgArray.put(epsg);
+	    }
+	});
+
+	if (!epsgArray.isEmpty()) {
+
+	    report.put("nativeEPSG", epsgArray);
+	}
+
+	// --------------------
+	// coverageDescription
+	// --------------------
+
+	CoverageDescription covDesc = mi_Metadata.getCoverageDescription();
+
 	if (covDesc != null) {
 	    String coverageDescription = covDesc.getAttributeDescription();
 	    report.put("coverageDescription", coverageDescription);
@@ -243,17 +271,33 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    report.put("source", source);
 	}
 
-	Distribution distribution = md_Metadata.getDistribution();
+	Distribution distribution = mi_Metadata.getDistribution();
 
-	// -------
-	// format
-	// -------
 	if (distribution != null) {
+
+	    // ----------------------------
+	    // distributor parties org.name
+	    // ----------------------------
+
+	    distribution.getDistributorParties().forEach(party -> {
+
+		String name = party.getOrganisationName();
+		if (name != null && !name.isEmpty()) {
+
+		    report.put("distributorOrgName", name);
+		}
+	    });
+
+	    // -------
+	    // format
+	    // -------
+
 	    List<Format> formats = Lists.newArrayList(distribution.getFormats());
+
 	    if (!formats.isEmpty()) {
 		JSONArray array = new JSONArray();
 		for (Format format : formats) {
-		    if (format.getName() != null && !format.getName().equals("")) {
+		    if (format.getName() != null && !format.getName().isEmpty()) {
 			array.put(format.getName());
 		    }
 		}
@@ -263,8 +307,12 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // -------
 	    // online
 	    // -------
+
 	    List<Online> onlineList = Lists.newArrayList(distribution.getDistributionOnlines());
+
 	    onlineList.addAll(Lists.newArrayList(distribution.getDistributorOnlines()));
+
+	    onlineList.addAll(Lists.newArrayList(distribution.getExtendedDistributionOnlines()));
 
 	    if (!onlineList.isEmpty()) {
 
@@ -307,7 +355,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 		}
 
-		if (online.length() > 0) {
+		if (!online.isEmpty()) {
+
 		    report.put("online", online);
 		}
 	    }
@@ -316,196 +365,32 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	// -------------------------------------------
 	//
-	// Single value, from the first identification
+	// from the first data identification
 	//
 
 	if (!diList.isEmpty()) {
 
-	    Identification firstId = diList.get(0);
+	    DataIdentification firstId = diList.getFirst();
 
 	    // -----
 	    // title
 	    // -----
-	    String title = firstId.getCitationTitle();
-	    if (title != null && !title.equals("")) {
-		title = normalizeText(title);
-		report.put("title", title);
-	    } else {
-		report.put("title", "none");
-	    }
+
+	    String title = normalizeText(firstId.getCitationTitle()).orElse("none");
+
+	    report.put("title", title);
 
 	    // ---------------
 	    // alternate title
 	    // ---------------
-	    String alternateTitle = firstId.getCitationAlternateTitle();
-	    if (alternateTitle != null && !alternateTitle.equals("")) {
-		report.put("alternateTitle", alternateTitle);
-	    }
+
+	    normalizeText(firstId.getCitationAlternateTitle()).ifPresent(desc -> report.put("alternateTitle", desc));
 
 	    // -----------
 	    // description
 	    // -----------
-	    String description = firstId.getAbstract();
-	    if (description != null && !description.equals("")) {
-		description = normalizeText(description);
-		report.put("description", description);
-	    }
 
-	    // --------
-	    // updated
-	    // --------
-	    String revDate = firstId.getCitationRevisionDate();
-
-	    String revDateTime = null;
-	    XMLGregorianCalendar dateTime = firstId.getCitationRevisionDateTime();
-	    if (dateTime != null) {
-		revDateTime = dateTime.toString();
-	    }
-
-	    if (revDate != null || revDateTime != null) {
-		if (revDate != null) {
-		    report.put("update", revDate);
-		} else {
-		    report.put("update", revDateTime);
-		}
-	    }
-
-	    // --------
-	    // created
-	    // --------
-	    String crDate = firstId.getCitationCreationDate();
-
-	    String crDateTime = null;
-	    dateTime = firstId.getCitationCreationDateTime();
-	    if (dateTime != null) {
-		crDateTime = dateTime.toString();
-	    }
-
-	    String created = crDate != null ? crDate : crDateTime != null ? crDateTime : null;
-	    if (created != null) {
-		report.put("created", created);
-	    }
-
-	    // --------------------------
-	    // spatialRepresentationType
-	    // --------------------------
-	    if (firstId instanceof DataIdentification) {
-		DataIdentification dataId = (DataIdentification) firstId;
-		String spatialRepresentationType = dataId.getSpatialRepresentationTypeCodeListValue();
-		if (spatialRepresentationType != null) {
-		    report.put("spatialRepresentationType", spatialRepresentationType);
-		}
-	    }
-
-	    // --------------
-	    // dataAuthority (API TO IMPLEMENT)
-	    // --------------
-	    // String dataAuthority = firstId.getCitationMD_Authority();
-	    // if (dataAuthority != null) {
-	    // report.put("dataAuthority", dataAuthority);
-	    // }
-
-	    // ----------------
-	    // dataIdentifiers (API TO IMPLEMENT)
-	    // ----------------
-	    // String md_Code = firstId.getCitationMD_Code();
-	    // if (md_Code != null) {
-	    // JSONArray array = new JSONArray();
-	    // array.put(md_Code);
-	    // report.put("dataIdentifiers", array);
-	    // }
-
-	    // -------
-	    // service
-	    // -------
-	    if (firstId instanceof ServiceIdentification) {
-
-		JSONObject service = new JSONObject();
-
-		ServiceIdentification srv = (ServiceIdentification) firstId;
-
-		String srvTitle = srv.getCitationTitle();
-		if (srvTitle != null) {
-		    service.put("title", srvTitle);
-		}
-
-		String srvDesc = srv.getAbstract();
-		if (srvDesc != null) {
-		    service.put("description", srvDesc);
-		}
-
-		// (API TO IMPLEMENT)
-		// String srvType = srv.getServiceType();
-		// if (srvType != null) {
-		// service.put("type", srvType);
-		// }
-
-		// (API TO IMPLEMENT)
-		// String srvVersion = srv.getServiceTypeVersion();
-		// if (srvVersion != null) {
-		// service.put("version", srvVersion);
-		// }
-
-		// (API TO IMPLEMENT)
-		// String supInfo = srv.getSupplementalInformation();
-		// if (supInfo != null && supInfo.equals("DAB-SOURCE")) {
-		// service.put("dabSource", true);
-		// } else {
-		// service.put("dabSource", false);
-		// }
-
-		// (API TO IMPLEMENT)
-		// List<OperationMetadata> opList = Lists.newArrayList(srv.getOperationMetadatas());
-		// if (!opList.isEmpty()) {
-		// JSONArray operation = new JSONArray();
-		// for (OperationMetadata op : opList) {
-		//
-		// JSONObject opObject = new JSONObject();
-		//
-		// String opName = op.getOperationName();
-		// if (opName != null) {
-		// opObject.put("name", opName);
-		// }
-		//
-		// List<Binding> bindings = op.getBindings();
-		// if (!bindings.isEmpty()) {
-		// JSONArray binding = new JSONArray();
-		//
-		// for (Binding b : bindings) {
-		// binding.put(b.name());
-		// }
-		//
-		// if (binding.length() > 0) {
-		// opObject.put("binding", binding);
-		// }
-		// }
-		//
-		// onlineList = op.getOnlineResources();
-		// if (!onlineList.isEmpty()) {
-		//
-		// JSONArray online = new JSONArray();
-		//
-		// for (Online on : onlineList) {
-		// JSONObject obj = createOnline(on);
-		// if (obj != null) {
-		// online.put(obj);
-		// }
-		// }
-		//
-		// if (online.length() > 0) {
-		// opObject.put("online", online);
-		// }
-		// }
-		//
-		// operation.put(opObject);
-		// }
-		//
-		// if (operation.length() > 0) {
-		// service.put("operation", operation);
-		// }
-		// }
-
-	    }
+	    normalizeText(firstId.getAbstract()).ifPresent(desc -> report.put("description", desc));
 	}
 
 	// ---------------------------------------------
@@ -523,421 +408,469 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	JSONArray keywordTypeArray = new JSONArray();
 	JSONArray topicArray = new JSONArray();
 	JSONArray overviewArray = new JSONArray();
-	JSONArray geossCategoryArray = new JSONArray();
+	JSONArray spatialRepTypeArray = new JSONArray();
 
-	// -------
-	// ORIGINATOR ORGANIZATION IDENTIFIER
-	// -------
-	ExtensionHandler handler = resource.getExtensionHandler();
-	TreeSet<String> originatorOrganisationDescriptions = new TreeSet<>();
-	originatorOrganisationDescriptions.addAll(handler.getOriginatorOrganisationDescriptions());
-	JSONArray jsonOriginatorOrganisationDescription = new JSONArray();
-	for (String originatorOrganisationDescription : originatorOrganisationDescriptions) {
-	    if (originatorOrganisationDescription != null) {
-		jsonOriginatorOrganisationDescription.put(originatorOrganisationDescription);
+	JSONArray updatedArray = new JSONArray();
+	JSONArray createdArray = new JSONArray();
+	JSONArray expirationArray = new JSONArray();
+
+	for (DataIdentification identification : diList) {
+
+	    // --------------------------
+	    // spatialRepresentationType
+	    // --------------------------
+
+	    List<String> spatialRepTypeList = identification.getSpatialRepresentationTypeCodeListValueList();
+
+	    for (String code : spatialRepTypeList) {
+
+		normalizeText(code).ifPresent(type -> spatialRepTypeArray.put(type));
 	    }
-	}
-	if (jsonOriginatorOrganisationDescription.length() > 0) {
-	    report.put("origOrgDesc", jsonOriginatorOrganisationDescription);
-	}
-	Optional<String> themeCategoryOpt = handler.getThemeCategory();
 
-	if (themeCategoryOpt.isPresent()) {
-	    report.put("themeCategory", themeCategoryOpt.get());
-	}
+	    // -------
+	    // updated
+	    // -------
 
-	for (Identification identification : diList) {
+	    handleCitationDate(identification, updatedArray, Identification.REVISION);
+
+	    // ----------
+	    // expiration
+	    // ----------
+
+	    handleCitationDate(identification, expirationArray, Identification.EXPIRATION);
+
+	    // ----------
+	    // creation
+	    // ----------
+
+	    handleCitationDate(identification, createdArray, Identification.CREATION);
 
 	    // -------
 	    // rights
 	    // -------
+
 	    List<String> rights = Lists.newArrayList(identification.getLegalConstraintsAccessCodes());
 	    List<String> rights2 = Lists.newArrayList(identification.getLegalConstraintsUseLimitations());
+
 	    rights.addAll(rights2);
 
-	    if (!rights.isEmpty()) {
-		for (String r : rights) {
-		    rightsArray.put(r);
-		}
+	    for (String right : rights) {
+
+		normalizeText(right).ifPresent(rightsArray::put);
 	    }
 
-	    // -----------------------
-	    // author and contributor
-	    // -----------------------
+	    //
+	    //
+	    //
 
-	    if (identification instanceof DataIdentification) {
+	    Iterator<ResponsibleParty> pointOfContacts = identification.getPointOfContacts();
 
-		Iterator<ResponsibleParty> pointOfContacts = ((DataIdentification) identification).getPointOfContacts();
+	    List<ResponsibleParty> parties = identification.getCitedParty();
 
-		for (Iterator<ResponsibleParty> iterator = pointOfContacts; iterator.hasNext();) {
+	    pointOfContacts.forEachRemaining(parties::add);
 
-		    ResponsibleParty party = iterator.next();
-		    if (party != null) {
-			String orgName = party.getOrganisationName();
-			String posName = party.getPositionName();
-			String individualName = party.getIndividualName();
+	    for (ResponsibleParty party : parties) {
 
-			Contact contact = party.getContact();
-			JSONObject partyObj = new JSONObject();
-			if (orgName != null) {
-			    partyObj.put("orgName", orgName);
-			}
-			if (posName != null) {
-			    partyObj.put("posName", posName);
-			}
-			if (individualName != null) {
-			    partyObj.put("individualName", individualName);
-			}
-			if (contact != null) {
+		if (party != null) {
 
-			    Address address = contact.getAddress();
-			    if (address != null) {
-				String email = address.getElectronicMailAddress();
-				String city = address.getCity();
+		    // ------------------------------
+		    // distributor and owner org.name
+		    // ------------------------------
 
-				if (email != null) {
-				    partyObj.put("email", email);
-				}
-				if (city != null) {
-				    partyObj.put("city", city);
-				}
+		    handleOrgName(party, ownerOrgNameArray, distOrgNameArray);
+
+		    //
+		    //
+		    //
+
+		    // -----------------------
+		    // author and contributor
+		    // -----------------------
+
+		    String orgName = party.getOrganisationName();
+		    String posName = party.getPositionName();
+		    String individualName = party.getIndividualName();
+
+		    Contact contact = party.getContact();
+		    JSONObject partyObj = new JSONObject();
+
+		    if (orgName != null) {
+
+			partyObj.put("orgName", orgName);
+		    }
+
+		    if (posName != null) {
+
+			partyObj.put("posName", posName);
+		    }
+
+		    if (individualName != null) {
+
+			partyObj.put("individualName", individualName);
+		    }
+
+		    if (contact != null) {
+
+			Address address = contact.getAddress();
+
+			if (address != null) {
+
+			    String email = address.getElectronicMailAddress();
+			    String city = address.getCity();
+
+			    if (email != null) {
+				partyObj.put("email", email);
 			    }
-
-			    Online on = contact.getOnline();
-			    JSONArray onlineArray = new JSONArray();
-			    if (on != null) {
-				JSONObject online = createOnline(on, message);
-				onlineArray.put(online);
-			    }
-
-			    if (onlineArray.length() > 0) {
-				partyObj.put("online", onlineArray);
+			    if (city != null) {
+				partyObj.put("city", city);
 			    }
 			}
 
-			String value = party.getRoleCode();
-			if (value != null) {
-			    switch (value) {
-			    case "author":
-				authorsArray.put(partyObj);
-				break;
-			    case "contributor":
-				contributorsArray.put(partyObj);
-				break;
-			    }
+			Online on = contact.getOnline();
+			JSONArray onlineArray = new JSONArray();
+
+			if (on != null) {
+			    JSONObject online = createOnline(on, message);
+			    onlineArray.put(online);
+			}
+
+			if (!onlineArray.isEmpty()) {
+			    partyObj.put("online", onlineArray);
+			}
+		    }
+
+		    String value = party.getRoleCode();
+
+		    if (value != null) {
+			switch (value) {
+			case "author":
+			    authorsArray.put(partyObj);
+			    break;
+			case "contributor":
+			    contributorsArray.put(partyObj);
+			    break;
 			}
 		    }
 		}
 	    }
 
-	    // -----
-	    // where
-	    // -----
+	    // --------------
+	    // spatial extent
+	    // --------------
 
-	    if (identification instanceof DataIdentification) {
+	    List<GeographicBoundingBox> boundingBoxList = Lists.newArrayList(identification.getGeographicBoundingBoxes());
 
-		DataIdentification dataId = (DataIdentification) identification;
+	    for (GeographicBoundingBox bbox : boundingBoxList) {
 
-		List<GeographicBoundingBox> boundingBoxList = Lists.newArrayList(dataId.getGeographicBoundingBoxes());
-		if (!boundingBoxList.isEmpty()) {
+		Double south = bbox.getSouth();
+		Double west = bbox.getWest();
+		Double north = bbox.getNorth();
+		Double east = bbox.getEast();
 
-		    for (GeographicBoundingBox bbox : boundingBoxList) {
-			Double south = bbox.getSouth();
-			Double west = bbox.getWest();
-			Double north = bbox.getNorth();
-			Double east = bbox.getEast();
+		if (south != null && west != null && north != null && east != null) {
 
-			if (south != null && west != null && north != null && east != null) {
-			    JSONObject bboxObj = new JSONObject();
-			    bboxObj.put("south", south);
-			    bboxObj.put("west", west);
-			    bboxObj.put("north", north);
-			    bboxObj.put("east", east);
+		    JSONObject bboxObj = new JSONObject();
 
-			    whereArray.put(bboxObj);
-			}
-		    }
+		    bboxObj.put("south", south);
+		    bboxObj.put("west", west);
+		    bboxObj.put("north", north);
+		    bboxObj.put("east", east);
+
+		    whereArray.put(bboxObj);
 		}
 	    }
 
 	    // ---------------
-	    // verticalExtent
+	    // vertical extent
 	    // ---------------
-	    if (identification instanceof DataIdentification) {
 
-		DataIdentification dataId = (DataIdentification) identification;
-		List<VerticalExtent> verticalExtentList = Lists.newArrayList(dataId.getVerticalExtents());
+	    List<VerticalExtent> verticalExtentList = Lists.newArrayList(identification.getVerticalExtents());
 
-		if (!verticalExtentList.isEmpty()) {
+	    for (VerticalExtent extent : verticalExtentList) {
 
-		    for (VerticalExtent extent : verticalExtentList) {
+		Double max = extent.getMaximumValue();
+		Double min = extent.getMinimumValue();
 
-			Double max = extent.getMaximumValue();
-			Double min = extent.getMinimumValue();
+		if (max != null && min != null && !Double.isNaN(max) && !Double.isNaN(min)) {
+		    JSONObject ext = new JSONObject();
 
-			if (max != null && min != null && !Double.isNaN(max) && !Double.isNaN(min)) {
-			    JSONObject ext = new JSONObject();
+		    ext.put("min", min);
+		    ext.put("max", max);
 
-			    ext.put("min", min);
-			    ext.put("max", max);
-
-			    verticalExtentArray.put(ext);
-			}
-		    }
+		    verticalExtentArray.put(ext);
 		}
+
 	    }
 
-	    // -----
-	    // when
-	    // -----
+	    // ---------------
+	    // temporal extent
+	    // ---------------
 
-	    if (identification instanceof DataIdentification) {
+	    List<TemporalExtent> temporalExtentList = Lists.newArrayList(identification.getTemporalExtents());
 
-		DataIdentification dataId = (DataIdentification) identification;
+	    for (TemporalExtent temp : temporalExtentList) {
 
-		List<TemporalExtent> temporalExtentList = Lists.newArrayList(dataId.getTemporalExtents());
-		if (!temporalExtentList.isEmpty()) {
+		String beginPosition = temp.getBeginPosition();
+		String endPosition = temp.getEndPosition();
 
-		    for (TemporalExtent temp : temporalExtentList) {
+		addWhen(whenArray, beginPosition, endPosition);
 
-			String beginPosition = temp.getBeginPosition();
-			String endPosition = temp.getEndPosition();
-			addWhen(whenArray, beginPosition, endPosition);
+		String timeInstantBegin = temp.getTimeInstantBegin();
+		String timeInstantEnd = temp.getTimeInstantEnd();
 
-			String timeInstantBegin = temp.getTimeInstantBegin();
-			String timeInstantEnd = temp.getTimeInstantEnd();
-			addWhen(whenArray, timeInstantBegin, timeInstantEnd);
-		    }
-		}
+		addWhen(whenArray, timeInstantBegin, timeInstantEnd);
 	    }
 
 	    // --------
 	    // keyword
 	    // --------
+
 	    List<Keywords> keywordList = Lists.newArrayList(identification.getKeywords());
-	    if (!keywordList.isEmpty()) {
 
-		for (Keywords kwd : keywordList) {		    
-		    String type = kwd.getTypeCode();
-		    Iterator<String> keywords = kwd.getKeywords();
-		    while (keywords.hasNext()) {
-			String keyword = (String) keywords.next();
-			keywordArray.put(normalizeText(keyword));
-			keywordTypeArray.put(normalizeText(type));
-		    }
+	    for (Keywords kwd : keywordList) {
 
+		String type = kwd.getTypeCode();
+
+		normalizeText(type).ifPresent(keywordTypeArray::put);
+
+		Iterator<String> keywords = kwd.getKeywords();
+
+		while (keywords.hasNext()) {
+
+		    normalizeText(keywords.next()).ifPresent(keywordArray::put);
 		}
 	    }
 
 	    // ------
 	    // topic
 	    // ------
-	    List<String> topicList = new ArrayList<String>();
-	    if (identification instanceof DataIdentification) {
-		DataIdentification dataId = (DataIdentification) identification;
 
-		List<String> topicCategoryList = Lists.newArrayList(dataId.getTopicCategoriesStrings());
-		if (!topicCategoryList.isEmpty()) {
+	    List<String> topicCategoryList = Lists.newArrayList(identification.getTopicCategoriesStrings());
 
-		    for (String code : topicCategoryList) {
-			if (code != null) {
-			    topicList.add(code);
-			    topicArray.put(code);
-			}
-		    }
-		}
+	    for (String code : topicCategoryList) {
+
+		normalizeText(code).ifPresent(val -> topicArray.put(val));
 	    }
 
 	    // ---------
 	    // overview
 	    // ---------
-	    if (identification instanceof DataIdentification) {
 
-		DataIdentification dataId = (DataIdentification) identification;
+	    List<BrowseGraphic> graphicOverviewList = Lists.newArrayList(identification.getGraphicOverviews());
 
-		List<BrowseGraphic> graphicOverviewList = Lists.newArrayList(dataId.getGraphicOverviews());
+	    for (BrowseGraphic graphic : graphicOverviewList) {
 
-		if (!graphicOverviewList.isEmpty()) {
+		String fileName = graphic.getFileName();
 
-		    for (BrowseGraphic graphic : graphicOverviewList) {
-			String fileName = graphic.getFileName();
-			if (fileName != null) {
-			    overviewArray.put(fileName);
-			}
-		    }
-		}
-	    }
+		if (fileName != null) {
 
-	    // --------------
-	    // geossCategory
-	    // --------------
-	    if (!topicList.isEmpty()) {
-
-		for (String topic : topicList) {
-		    if (GEOSS_CATEGORIES.contains(topic)) {
-			geossCategoryArray.put(topic);
-		    } else {
-			geossCategoryArray.put("documentFileGraphic");
-		    }
+		    overviewArray.put(fileName);
 		}
 	    }
 	}
 
+	// ------------------------
+	// inserts updates dates
+	if (!updatedArray.isEmpty()) {
+
+	    report.put("updated", updatedArray);
+	}
+
+	// ------------------------
+	// inserts created dates
+	if (!createdArray.isEmpty()) {
+
+	    report.put("created", createdArray);
+	}
+
+	// ------------------------
+	// inserts expiration dates
+	if (!expirationArray.isEmpty()) {
+
+	    report.put("expiration", expirationArray);
+	}
+
+	// ------------------------
+	// inserts spatial rep.type
+	if (!spatialRepTypeArray.isEmpty()) {
+
+	    report.put("spatialRepresentationType", spatialRepTypeArray);
+	}
+
+	// --------------------------------
+	// inserts owner organisation names
+	if (!ownerOrgNameArray.isEmpty()) {
+
+	    report.put("ownerOrgName", ownerOrgNameArray);
+	}
+
+	// --------------------------------------
+	// inserts distributor organisation names
+	if (!distOrgNameArray.isEmpty()) {
+
+	    report.put("distributorOrgName", distOrgNameArray);
+	}
+
 	// ---------------
 	// inserts rights
-	if (rightsArray.length() > 0) {
+	if (!rightsArray.isEmpty()) {
+
 	    report.put("rights", rightsArray);
 	}
 
 	// ----------------
 	// inserts authors
-	if (authorsArray.length() > 0) {
+	if (!authorsArray.isEmpty()) {
+
 	    report.put("author", authorsArray);
 	}
 
 	// ---------------------
 	// inserts contributors
-	if (contributorsArray.length() > 0) {
+	if (!contributorsArray.isEmpty()) {
+
 	    report.put("contributors", contributorsArray);
 	}
 
 	// --------------
 	// inserts where
-	if (whereArray.length() > 0) {
+	if (!whereArray.isEmpty()) {
+
 	    report.put("where", whereArray);
 	}
 
 	// -----------------------
 	// inserts verticalExtent
-	if (verticalExtentArray.length() > 0) {
+	if (!verticalExtentArray.isEmpty()) {
+
 	    report.put("verticalExtent", verticalExtentArray);
 	}
 
 	// --------------
 	// inserts when
-	if (whenArray.length() > 0) {
+	if (!whenArray.isEmpty()) {
+
 	    report.put("when", whenArray);
 	}
 
 	// ----------------
 	// inserts keyword
-	if (keywordArray.length() > 0) {
+	if (!keywordArray.isEmpty()) {
+
 	    report.put("keyword", keywordArray);
 	}
-	if (keywordTypeArray.length() > 0) {
+
+	if (!keywordTypeArray.isEmpty()) {
+
 	    report.put("keyword_type", keywordTypeArray);
 	}
 
 	// --------------
 	// inserts topic
-	if (topicArray.length() > 0) {
+	if (!topicArray.isEmpty()) {
+
 	    report.put("topic", topicArray);
 	}
 
 	// -----------------
 	// inserts overview
-	if (overviewArray.length() > 0) {
-	    report.put("overview", overviewArray);
-	}
+	if (!overviewArray.isEmpty()) {
 
-	// ----------------------
-	// inserts geossCategory
-	if (geossCategoryArray.length() > 0) {
-	    report.put("geossCategory", geossCategoryArray);
+	    report.put("overview", overviewArray);
 	}
 
 	// --------------------
 	// attributeDescription
 	// --------------------
+
 	JSONArray attributeDescription = new JSONArray();
 	JSONArray attributeTitle = new JSONArray();
-	List<CoverageDescription> coverageDescriptions = Lists.newArrayList(md_Metadata.getCoverageDescriptions());
-	TreeSet<String> sortedAttributeDescriptions = new TreeSet<>();
-	TreeSet<String> sortedAttributeTitles = new TreeSet<>();
-//	for (CoverageDescription coverageDescription : coverageDescriptions) {
-//	    String attribute = coverageDescription.getAttributeDescription();
-//	    String title = coverageDescription.getAttributeTitle();
-//	    if (attribute != null) {
-//		sortedAttributeDescriptions.add(attribute);
-//	    }
-//	    if (title != null) {
-//		sortedAttributeTitles.add(title);
-//	    }
-//	}
-	
+
 	List<String> titles = resource.getIndexesMetadata().read(MetadataElement.ATTRIBUTE_TITLE);
-	sortedAttributeTitles.addAll(titles);
-	
+	TreeSet<String> sortedAttributeTitles = new TreeSet<>(titles);
+
 	List<String> descriptions = resource.getIndexesMetadata().read(MetadataElement.ATTRIBUTE_DESCRIPTION);
-	sortedAttributeDescriptions.addAll(descriptions);
-	
+	TreeSet<String> sortedAttributeDescriptions = new TreeSet<>(descriptions);
+
 	for (String sortedDescription : sortedAttributeDescriptions) {
+
 	    attributeDescription.put(sortedDescription);
 	}
-	if (attributeDescription.length() > 0) {
+
+	if (!attributeDescription.isEmpty()) {
+
 	    report.put("attributeDescription", attributeDescription);
 	}
 
 	for (String sortedTitle : sortedAttributeTitles) {
+
 	    attributeTitle.put(sortedTitle);
 	}
-	if (attributeTitle.length() > 0) {
+
+	if (!attributeTitle.isEmpty()) {
+
 	    report.put("attributeTitle", attributeTitle);
 	}
 
-	// --------------------
+	// ----------------------------------------
 	// platformDescription & platformIdentifier
-	// --------------------
-	List<MIPlatform> platformList = Lists.newArrayList(md_Metadata.getMIPlatforms());
+	// ----------------------------------------
+
+	List<MIPlatform> platformList = Lists.newArrayList(mi_Metadata.getMIPlatforms());
+
 	TreeSet<String> sortedPlatformDescriptions = new TreeSet<>();
 	TreeSet<String> sortedPlatformTitles = new TreeSet<>();
-	if (!platformList.isEmpty()) {
 
-	    // JSONArray platformIdentifier = new JSONArray();
+	if (!platformList.isEmpty()) {
 
 	    for (MIPlatform platform : platformList) {
 
 		String pDesc = platform.getDescription();
+
 		if (pDesc != null) {
+
 		    sortedPlatformDescriptions.add(pDesc);
 		}
+
 		Citation citation = platform.getCitation();
 		String pTitle = citation != null ? citation.getTitle() : null;
+
 		if (pTitle != null) {
 		    sortedPlatformTitles.add(pTitle);
 		}
-		// String pId = platform.getMDIdentifierCode();
-		// if (pId != null) {
-		// platformIdentifier.put(pId);
-		// }
 	    }
 	}
 
 	JSONArray platformDescription = new JSONArray();
+
 	for (String sortedDescription : sortedPlatformDescriptions) {
+
 	    platformDescription.put(sortedDescription);
 	}
 
-	if (platformDescription.length() > 0) {
+	if (!platformDescription.isEmpty()) {
+
 	    report.put("platformDescription", platformDescription);
 	}
 
 	JSONArray platformTitle = new JSONArray();
+
 	for (String sortedTitle : sortedPlatformTitles) {
+
 	    platformTitle.put(sortedTitle);
 	}
 
-	if (platformTitle.length() > 0) {
+	if (!platformTitle.isEmpty()) {
+
 	    report.put("platformTitle", platformTitle);
 	}
-	// if (platformIdentifier.length() > 0) {
-	// report.put("platformIdentifier", platformIdentifier);
-	// }
 
-	// ------------------
+	// --------------------------------------------
 	// instrumentDescription & instrumentIdentifier
-	// ------------------
-	List<MIInstrument> instrList = Lists.newArrayList(md_Metadata.getMIInstruments());
+	// --------------------------------------------
+
+	List<MIInstrument> instrList = Lists.newArrayList(mi_Metadata.getMIInstruments());
+
 	if (!instrList.isEmpty()) {
 
 	    JSONArray instrumentIdentifier = new JSONArray();
@@ -950,49 +883,137 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    for (MIInstrument instrument : instrList) {
 
 		String iDesc = instrument.getDescription();
+
 		if (iDesc != null) {
 		    sortedInstrumentDescriptions.add(iDesc);
 		}
+
 		String iTitle = instrument.getTitle();
+
 		if (iTitle != null) {
 		    sortedInstrumentTitles.add(iTitle);
 		}
-		// String iId = instrument.getMDIdentifierCode();
-		// if (iId != null) {
-		// instrumentIdentifier.put(iId);
-		// }
 	    }
 
 	    for (String sortedDescription : sortedInstrumentDescriptions) {
+
 		instrumentDescription.put(sortedDescription);
 	    }
 
-	    if (instrumentDescription.length() > 0) {
+	    if (!instrumentDescription.isEmpty()) {
+
 		report.put("instrumentDescription", instrumentDescription);
 	    }
 
 	    for (String sortedTitle : sortedInstrumentTitles) {
+
 		instrumentTitle.put(sortedTitle);
 	    }
 
-	    if (instrumentTitle.length() > 0) {
+	    if (!instrumentTitle.isEmpty()) {
+
 		report.put("instrumentTitle", instrumentTitle);
 	    }
-	    // if (instrumentIdentifier.length() > 0) {
-	    // report.put("instrumentIdentifier", instrumentIdentifier);
-	    // }
 	}
+
+	ExtensionHandler handler = resource.getExtensionHandler();
+
+	// -----------------------------------
+	// originator organisation description
+	// -----------------------------------
+
+	List<String> origOrgDesc = handler.getOriginatorOrganisationDescriptions();
+
+	JSONArray jsonOrigOrgDesc = new JSONArray();
+
+	for (String desc : origOrgDesc) {
+
+	    normalizeText(desc).ifPresent(jsonOrigOrgDesc::put);
+	}
+
+	if (!jsonOrigOrgDesc.isEmpty()) {
+
+	    report.put("origOrgDesc", jsonOrigOrgDesc);
+	}
+
+	// --------------
+	// theme category
+	// --------------
+
+	Optional<String> themeCategoryOpt = handler.getThemeCategory();
+
+	themeCategoryOpt.ifPresent(s -> report.put("themeCategory", s));
 
 	return report.toString();
     }
 
-    private String normalizeText(String text) {
-	if (text==null) {
-	    return "";
+    /**
+     * @param responsibleParty
+     * @param report
+     */
+    private void handleOrgName(ResponsibleParty responsibleParty, //
+	    JSONArray ownerOrgNameArray, //
+	    JSONArray distributionOrgNameArray) { //
+
+	String roleCode = responsibleParty.getRoleCode();
+
+	String orgName = responsibleParty.getOrganisationName();
+
+	if (orgName != null && !orgName.isEmpty() && roleCode != null) {
+
+	    if (roleCode.equals("owner")) {
+
+		ownerOrgNameArray.put(orgName);
+
+	    } else if (roleCode.equals("distributor")) {
+
+		distributionOrgNameArray.put(orgName);
+	    }
 	}
-	return text.trim().replaceAll("\\s+", " ");
     }
 
+    /**
+     * @param identification
+     * @param dateArray
+     * @param type
+     */
+    private void handleCitationDate(Identification identification, JSONArray dateArray, String type) {
+
+	String revDate = identification.getCitationDate(type);
+
+	if (revDate != null && !revDate.isEmpty()) {
+
+	    dateArray.put(revDate);
+
+	} else {
+
+	    XMLGregorianCalendar revDateTime = identification.getCitationDateTime(type);
+
+	    if (revDateTime != null) {
+
+		dateArray.put(revDateTime.toString());
+	    }
+	}
+    }
+
+    /**
+     * @param text
+     * @return
+     */
+    private Optional<String> normalizeText(String text) {
+
+	if (text == null || text.isEmpty()) {
+	    return Optional.empty();
+	}
+
+	return Optional.of(text.trim().strip().replaceAll("\\s+", " "));
+    }
+
+    /**
+     * @param when
+     * @param from
+     * @param to
+     */
     private void addWhen(JSONArray when, String from, String to) {
 
 	if (from != null || to != null) {
@@ -1007,11 +1028,20 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
+    /**
+     * @param time
+     * @return
+     */
     private String normalizeTime(String time) {
 
 	return time.contains("T") ? time : time + "T00:00:00";
     }
 
+    /**
+     * @param on
+     * @param message
+     * @return
+     */
     private JSONObject createOnline(Online on, DiscoveryMessage message) {
 
 	String url = on.getLinkage();
@@ -1023,6 +1053,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	JSONObject online = new JSONObject();
 	boolean addOnline = false;
+
 	if (url != null) {
 
 	    // filter old gi-axe urls
@@ -1042,7 +1073,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    URL checkURL = new URL(url);
 		    if (checkURL.getQuery() != null && !checkURL.getQuery().isEmpty()) {
 			String instanceBaseUrl = message.getWebRequest().getUriInfo().getBaseUri().toString();
-			String replaceUrl = instanceBaseUrl.endsWith("/") ? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
+			String replaceUrl = instanceBaseUrl.endsWith("/")
+				? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
 				: instanceBaseUrl + "/" + SOS_TAHMO_PROXY_PATH;
 			url = url.replace(SOS_TAHMO_URL, replaceUrl);
 		    }
@@ -1060,7 +1092,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		    URL checkURL = new URL(url);
 		    if (checkURL.getQuery() != null && !checkURL.getQuery().isEmpty()) {
 			String instanceBaseUrl = message.getWebRequest().getUriInfo().getBaseUri().toString();
-			String replaceUrl = instanceBaseUrl.endsWith("/") ? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
+			String replaceUrl = instanceBaseUrl.endsWith("/")
+				? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
 				: instanceBaseUrl + "/" + SOS_TAHMO_PROXY_PATH;
 			url = url.replace(SOS_TWIGA_URL, replaceUrl);
 		    }
@@ -1097,6 +1130,50 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		anchor = "direct";
 	    }
 	    online.put("accessType", anchor);
+	}
+
+	if (on instanceof EXT_Online extOnline) {
+
+	    String queryStringFragment = extOnline.getElementType().getQueryStringFragment();
+
+	    if (queryStringFragment != null && !queryStringFragment.isEmpty()) {
+
+		online.put("queryStringFragment", queryStringFragment);
+	    }
+
+	    String layerPk = extOnline.getElementType().getLayerPk();
+
+	    if (layerPk != null && !layerPk.isEmpty()) {
+
+		online.put("layerPk", layerPk);
+
+	    }
+
+	    boolean temporal = extOnline.getElementType().isTemporal();
+
+	    online.put("temporal", temporal);
+
+	    JSONObject layerStyle = new JSONObject();
+
+	    String layerStyleName = extOnline.getElementType().getLayerStyleName();
+
+	    if (layerStyleName != null && !layerStyleName.isEmpty()) {
+
+		layerStyle.put("name", layerStyleName);
+	    }
+
+	    String layerStyleWorkspace = extOnline.getElementType().getLayerStyleWorkspace();
+
+	    if (layerStyleWorkspace != null && !layerStyleWorkspace.isEmpty()) {
+
+		layerStyle.put("workspace", layerStyleWorkspace);
+	    }
+
+	    if (!layerStyle.keySet().isEmpty()) {
+
+		online.put("layerStyle", layerStyle);
+	    }
+
 	}
 
 	if (addOnline) {

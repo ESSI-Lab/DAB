@@ -114,6 +114,8 @@ public class DABStarter implements ConfigurationChangeListener {
      */
     public void start() throws GSException {
 
+
+
 	GSLoggerFactory.getLogger(getClass()).info("Cluster: {}", ClusterType.get().getLabel());
 
 	//

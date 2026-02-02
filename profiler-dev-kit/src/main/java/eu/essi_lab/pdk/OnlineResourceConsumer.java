@@ -65,7 +65,7 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 		    // second try: guessing from protocol encoded with OpenGIS IRI (e.g.: http://www.opengis.net/def/serviceType/ogc/wms)
 		    //
 
-		    String protocolGmxAnchor = online.getProtocolGmxAnchor();
+		    String protocolGmxAnchor = online.getProtocolGmxAnchorHref();
 
 		    linkage = fromProtocol(message, publicId, protocolGmxAnchor);
 

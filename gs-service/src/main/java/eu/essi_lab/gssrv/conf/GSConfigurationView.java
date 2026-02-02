@@ -56,6 +56,7 @@ import eu.essi_lab.model.exceptions.*;
 import org.quartz.*;
 
 import javax.servlet.http.*;
+import java.io.File;
 import java.util.*;
 
 /**
@@ -643,4 +644,8 @@ public class GSConfigurationView extends ConfigurationView {
 		    noneMatch(s -> s.getIdentifier().equals(setting.getIdentifier()));
 	}
     }
+
+	public static void main(String[] args) {
+System.out.println("pippo");
+	}
 }

@@ -21,32 +21,20 @@ package eu.essi_lab.iso.datamodel.classes;
  * #L%
  */
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.collect.*;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.jaxb.common.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+import net.opengis.iso19139.gmd.v_20060504.*;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.iso.datamodel.ISOMetadata;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import net.opengis.iso19139.gco.v_20060504.RealPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourcePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
-import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDDigitalTransferOptionsType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributionType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributorPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDDistributorType;
-import net.opengis.iso19139.gmd.v_20060504.MDFormatPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDFormatType;
+import javax.xml.bind.*;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * MD_Distribution
- * 
+ *
  * @author Fabrizio
  */
 public class Distribution extends ISOMetadata<MDDistributionType> {
@@ -70,9 +58,10 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     //
     // Format
     //
+
     /**
-     * @XPathDirective(target = "gmd:distributionFormat/*")
      * @return
+     * @XPathDirective(target = "gmd:distributionFormat/*")
      */
     public Iterator<Format> getFormats() {
 
@@ -100,9 +89,29 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     }
 
     /**
-     * @XPathDirective(target = ".", parent = "gmd:distributionFormat", before = "gmd:transferOptions", position =
-     *                        Position.LAST)
+     * @return
+     */
+    public List<ResponsibleParty> getDistributorParties() {
+
+	final ArrayList<ResponsibleParty> out = new ArrayList<>();
+
+	try {
+	    type.getDistributor().forEach(prop -> {
+
+		final CIResponsiblePartyType ciResponsibleParty = prop.getMDDistributor().getDistributorContact().getCIResponsibleParty();
+
+		out.add(new ResponsibleParty(ciResponsibleParty));
+	    });
+
+	} catch (Exception e) {
+	}
+
+	return out;
+    }
+
+    /**
      * @param format
+     * @XPathDirective(target = ".", parent = "gmd:distributionFormat", before = "gmd:transferOptions", position = Position.LAST)
      */
     public void addFormat(Format format) {
 
@@ -120,17 +129,43 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 	type.getDistributionFormat().clear();
     }
 
+    public List<EXT_Online> getExtOnlines() {
+
+	return null;
+    }
+
     // --------------------------------------------------------
     //
     // Online
     //
+
     /**
-     * @XPathDirective(target = ".//gmd:MD_DigitalTransferOptions/gmd:onLine/*")
      * @return
+     * @XPathDirective(target = ".//gmd:MD_DigitalTransferOptions/gmd:onLine/*")
      */
     public Iterator<Online> getDistributionOnlines() {
 
-	ArrayList<Online> out = new ArrayList<Online>();
+	return getDistributionOnlines_(false);
+    }
+
+    /**
+     * @return
+     */
+    public List<EXT_Online> getExtendedDistributionOnlines() {
+
+	return Lists.newArrayList(getDistributionOnlines_(true)). //
+		stream().//
+		map(on -> (EXT_Online) on).//
+		collect(Collectors.toList());//
+    }
+
+    /**
+     * @param extended
+     * @return
+     */
+    private Iterator<Online> getDistributionOnlines_(boolean extended) {
+
+	ArrayList<Online> out = new ArrayList<>();
 
 	// transferOptions
 	List<MDDigitalTransferOptionsPropertyType> transferOptions = type.getTransferOptions();
@@ -141,13 +176,22 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 	    if (mdDigitalTransferOptions != null) {
 		List<CIOnlineResourcePropertyType> onLine = mdDigitalTransferOptions.getOnLine();
 
-		// onLine
 		for (CIOnlineResourcePropertyType ciOnlineResourcePropertyType : onLine) {
 
-		    // onLine
 		    CIOnlineResourceType ciOnlineResource = ciOnlineResourcePropertyType.getCIOnlineResource();
-		    Online online = new Online(ciOnlineResource);
-		    out.add(online);
+
+		    if (extended && ciOnlineResource instanceof EXT_CIOnlineResourceType) {
+
+			EXT_Online online = new EXT_Online((EXT_CIOnlineResourceType) ciOnlineResource);
+
+			out.add(online);
+
+		    } else if (!extended && !(ciOnlineResource instanceof EXT_CIOnlineResourceType)) {
+
+			Online online = new Online(ciOnlineResource);
+
+			out.add(online);
+		    }
 		}
 	    }
 	}
@@ -163,6 +207,17 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 	return null;
     }
 
+    /**
+     * @return
+     */
+    public Optional<EXT_Online> getExtendedDistributionOnline() {
+	List<EXT_Online> list = getExtendedDistributionOnlines();
+	if (!list.isEmpty()) {
+	    return Optional.of(list.getFirst());
+	}
+	return Optional.empty();
+    }
+
     public Online getDistributionOnline(String identifier) {
 	List<Online> onlines = Lists.newArrayList(getDistributionOnlines());
 	for (Online online : onlines) {
@@ -174,9 +229,8 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     }
 
     /**
-     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position =
-     *                        Position.LAST)
      * @param onLine
+     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position = Position.LAST)
      */
     public void addDistributionOnline(Online onLine) {
 
@@ -185,10 +239,9 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     }
 
     /**
-     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position =
-     *                        Position.LAST)
      * @param onLine
      * @param transferSize
+     * @XPathDirective(target = "gmd:transferOptions/gmd:MD_DigitalTransferOptions", parent = "gmd:onLine", position = Position.LAST)
      */
     public void addDistributionOnline(Online onLine, Double transferSize) {
 
@@ -214,9 +267,10 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
     //
     // Distributor onlines
     //
+
     /**
-     * @XPathDirective(target = ".//gmd:distributorTransferOptions//gmd:MD_DigitalTransferOptions/gmd:onLine/*")
      * @return
+     * @XPathDirective(target = ".//gmd:distributorTransferOptions//gmd:MD_DigitalTransferOptions/gmd:onLine/*")
      */
     public Iterator<Online> getDistributorOnlines() {
 
@@ -279,6 +333,28 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 	distributor.clear();
     }
 
+    /**
+     * Adds a distributor contact (responsible party)
+     *
+     * @param contact
+     */
+    public void addDistributorContact(ResponsibleParty contact) {
+	List<MDDistributorPropertyType> distributor = type.getDistributor();
+	MDDistributorType mdDistributor = null;
+	if (!distributor.isEmpty()) {
+	    mdDistributor = distributor.get(0).getMDDistributor();
+	} else {
+	    mdDistributor = new MDDistributorType();
+	    MDDistributorPropertyType mdDistributorPropertyType = new MDDistributorPropertyType();
+	    mdDistributorPropertyType.setMDDistributor(mdDistributor);
+	    distributor.add(mdDistributorPropertyType);
+	}
+
+	CIResponsiblePartyPropertyType contactProperty = new CIResponsiblePartyPropertyType();
+	contactProperty.setCIResponsibleParty(contact.getElementType());
+	mdDistributor.setDistributorContact(contactProperty);
+    }
+
     private void addOnline(List<MDDigitalTransferOptionsPropertyType> transferOptions,
 	    CIOnlineResourcePropertyType ciOnlineResourcePropertyType, Double transferSize) {
 
@@ -303,7 +379,7 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 
     /**
      * Gets an iterator for the distribution transfer options
-     * 
+     *
      * @return
      */
     public Iterator<TransferOptions> getDistributionTransferOptions() {
@@ -319,7 +395,7 @@ public class Distribution extends ISOMetadata<MDDistributionType> {
 
     /**
      * Gets an iterator for the transfer options from all the distributors
-     * 
+     *
      * @return
      */
     public Iterator<TransferOptions> getDistributorTransferOptions() {

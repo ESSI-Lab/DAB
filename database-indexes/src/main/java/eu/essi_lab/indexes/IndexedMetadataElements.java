@@ -21,46 +21,20 @@ package eu.essi_lab.indexes;
  * #L%
  */
 
-import java.math.BigInteger;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.api.database.Database.DatabaseImpl;
-import eu.essi_lab.indexes.marklogic.MarkLogicIndexTypes;
-import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
-import eu.essi_lab.iso.datamodel.classes.Address;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.Contact;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
-import eu.essi_lab.iso.datamodel.classes.Dimension;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
-import eu.essi_lab.iso.datamodel.classes.Format;
-import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
-import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
-import eu.essi_lab.iso.datamodel.classes.MIInstrument;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.index.IndexedElement;
-import eu.essi_lab.model.index.IndexedElementInfo;
-import eu.essi_lab.model.index.IndexedMetadataElement;
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.indexes.marklogic.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.index.*;
 import eu.essi_lab.model.resource.*;
-import eu.essi_lab.model.resource.composed.ComposedElement;
-import eu.essi_lab.model.resource.worldcereal.WorldCerealItem;
-import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
-import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
+import eu.essi_lab.model.resource.worldcereal.*;
+import net.opengis.gml.v_3_2_0.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+
+import javax.xml.datatype.*;
+import java.math.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * This class groups all the available {@link IndexedMetadataElement}s
@@ -179,6 +153,23 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 	}
     };
+
+    public static final IndexedMetadataElement SPATIAL_REPRESENTATION_TYPE = new IndexedMetadataElement(
+	    MetadataElement.SPATIAL_REPRESENTATION_TYPE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	    miMetadata.getDataIdentifications().forEachRemaining(dataId -> {
+
+		String codeListValue = dataId.getSpatialRepresentationTypeCodeListValue();
+		if (checkStringValue(codeListValue)) {
+		    addValue(codeListValue);
+		}
+	    });
+	}
+    };
+
     public static final IndexedMetadataElement TITLE = new IndexedMetadataElement(MetadataElement.TITLE) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -194,6 +185,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 	}
     };
+
     public static final IndexedMetadataElement PARENT_IDENTIFIER = new IndexedMetadataElement(MetadataElement.PARENT_IDENTIFIER) {
 	@Override
 	public void defineValues(GSResource resource) {
@@ -510,24 +502,20 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
     };
 
     /**
-     *
      * @param el
      * @param resource
      * @param codeListValue
      */
     private static void defineCodeListValues(IndexedMetadataElement el, GSResource resource, String codeListValue) {
 
-	Iterator<DataIdentification> identifications = resource.
-			getHarmonizedMetadata().
-			getCoreMetadata().
-			getMIMetadata()
+	Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
 		.getDataIdentifications();
 
 	while (identifications.hasNext()) {
 
 	    DataIdentification next = identifications.next();
 
-	    String date = switch(codeListValue){
+	    String date = switch (codeListValue) {
 		case "revision" -> next.getCitationRevisionDate();
 		case "publication" -> next.getCitationPublicationDate();
 		case "creation" -> next.getCitationCreationDate();
@@ -540,7 +528,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    } else {
 
-		XMLGregorianCalendar dateTime = switch(codeListValue){
+		XMLGregorianCalendar dateTime = switch (codeListValue) {
 		    case "revision" -> next.getCitationRevisionDateTime();
 		    case "publication" -> next.getCitationPublicationDateTime();
 		    case "creation" -> next.getCitationCreationDateTime();
@@ -664,7 +652,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 
 	    addKeywordsURI(resource, null);
-
 	}
     };
 
@@ -688,23 +675,65 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    /**
+     *
+     */
+    public static final IndexedMetadataElement OWNER_ORGANISATION_NAME = new IndexedMetadataElement(//
+	    MetadataElement.OWNER_ORGANISATION_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    getPartyNamesByRoleCode(resource, "owner").forEach(this::addValue);
+	}
+    };
+
+    /**
+     *
+     */
+    public static final IndexedMetadataElement DIST_ORGANISATION_NAME = new IndexedMetadataElement(//
+	    MetadataElement.DISTRIBUTOR_ORGANISATION_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    getPartyNamesByRoleCode(resource, "distributor").forEach(this::addValue);
+	}
+    };
+
+    /**
+     * @param resource
+     * @param code
+     * @return
+     */
+    private static List<String> getPartyNamesByRoleCode(GSResource resource, String code) {
+
+	List<ResponsibleParty> parties = getAllParties(resource);
+
+	ArrayList<String> out = new ArrayList<>();
+
+	for (ResponsibleParty party : parties) {
+
+	    if (party != null) {
+		String roleCode = party.getRoleCode();
+		if (roleCode != null && roleCode.equals(code)) {
+		    String orgName = party.getOrganisationName();
+		    if (checkStringValue(orgName)) {
+			out.add(orgName);
+		    }
+		}
+	    }
+	}
+
+	return out;
+    }
+
     public static final IndexedMetadataElement ORGANISATION_NAME = new IndexedMetadataElement(MetadataElement.ORGANISATION_NAME) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
-
-	    Iterator<ResponsibleParty> contactIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getContacts();
-	    while (contactIterator != null && contactIterator.hasNext()) {
-		ResponsibleParty responsibleParty = (ResponsibleParty) contactIterator.next();
-		parties.add(responsibleParty);
-	    }
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+	    List<ResponsibleParty> parties = getAllParties(resource);
 
 	    for (ResponsibleParty party : parties) {
+
 		if (party != null) {
 		    String orgName = party.getOrganisationName();
 		    if (checkStringValue(orgName)) {
@@ -714,7 +743,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    }
 
 	    defineBNHSProperty(BNHSProperty.INSTITUTE, resource);
-
 	}
     };
 
@@ -722,20 +750,18 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
+	    List<ResponsibleParty> parties = getAllParties(resource);
 
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
 	    for (ResponsibleParty party : parties) {
 		if (party != null) {
+
 		    String role = party.getRoleCode();
+
 		    if (checkStringValue(role)) {
 			addValue(role);
 		    }
 		}
 	    }
-
 	}
     };
 
@@ -743,11 +769,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty());
-
-	    parties.addAll(resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getCitedParty());
+	    List<ResponsibleParty> parties = getAllParties(resource);
 
 	    for (ResponsibleParty party : parties) {
 		if (party != null) {
@@ -757,9 +779,43 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    }
 		}
 	    }
-
 	}
     };
+
+    /**
+     * @param resource
+     * @return
+     */
+    private static List<ResponsibleParty> getAllParties(GSResource resource) {
+
+	List<ResponsibleParty> parties = new ArrayList<ResponsibleParty>();
+
+	MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+
+	Iterator<ResponsibleParty> contacts = miMetadata.getContacts();//
+
+	while (contacts != null && contacts.hasNext()) {
+
+	    ResponsibleParty responsibleParty = contacts.next();
+
+	    parties.add(responsibleParty);
+	}
+
+	Iterator<DataIdentification> dataIds = miMetadata.getDataIdentifications();
+
+	while (dataIds != null && dataIds.hasNext()) {
+
+	    DataIdentification dataId = dataIds.next();
+
+	    parties.addAll(dataId.getCitedParty());
+
+	    dataId.getPointOfContacts().forEachRemaining(parties::add);
+	}
+
+	parties.addAll(miMetadata.getDistribution().getDistributorParties());
+
+	return parties;
+    }
 
     public static final IndexedMetadataElement ORIGINATOR_ORGANISATION_IDENTIFIER = new IndexedMetadataElement(
 	    MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER) {
@@ -767,8 +823,11 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 
 	    ExtensionHandler handler = resource.getExtensionHandler();
+
 	    List<String> identifiers = handler.getOriginatorOrganisationIdentifiers();
+
 	    for (String identifier : identifiers) {
+
 		if (checkStringValue(identifier)) {
 		    addValue(identifier);
 		}
@@ -782,17 +841,24 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    HashSet<String> names = new HashSet<>();
 
-	    List<ResponsibleParty> originators = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification()
-		    .getOriginatorParty();
+	    List<ResponsibleParty> originators = resource.getHarmonizedMetadata(). //
+		    getCoreMetadata().//
+		    getDataIdentification().//
+		    getOriginatorParty();//
+
 	    for (ResponsibleParty originator : originators) {
+
 		String orgName = originator.getOrganisationName();
+
 		if (checkStringValue(orgName)) {
 		    names.add(orgName);
 		}
 	    }
 
 	    ExtensionHandler handler = resource.getExtensionHandler();
+
 	    List<String> descriptions = handler.getOriginatorOrganisationDescriptions();
+
 	    for (String description : descriptions) {
 		if (checkStringValue(description)) {
 		    names.add(description);
@@ -2233,6 +2299,43 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
+	}
+    };
+
+    public static final IndexedMetadataElement RASTER_MOSAIC = new IndexedMetadataElement(MetadataElement.RASTER_MOSAIC) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> {
+
+		addValue(String.valueOf(mosaic));
+
+	    });
+	}
+    };
+
+    public static final IndexedMetadataElement METADATA_VERSION = new IndexedMetadataElement(MetadataElement.METADATA_VERSION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    resource.getExtensionHandler().getMetadataVersion().ifPresent(version -> {
+
+		addValue(version);
+
+	    });
+	}
+    };
+
+    public static final IndexedMetadataElement METADATA_ORIGINAL_VERSION = new IndexedMetadataElement(
+	    MetadataElement.METADATA_ORIGINAL_VERSION) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    resource.getExtensionHandler().getMetadataOriginalVersion().ifPresent(originalVersion -> {
+
+		addValue(originalVersion);
+
+	    });
 	}
     };
 
