@@ -90,6 +90,10 @@ function translateStatus(status) {
 	// Map status values to translation keys
 	var statusMap = {
 		'Completed': 'status_completed',
+		'CompletedWithLimit': 'status_completed_with_limit',
+		'PartCompleted': 'status_part_completed',
+		'PartInProgress': 'status_part_in_progress',
+		'InProgress': 'status_in_progress',
 		'Failed': 'status_failed',
 		'Canceled': 'status_canceled',
 		'Removed': 'status_removed',
@@ -104,6 +108,23 @@ function translateStatus(status) {
 	}
 	// If no translation found, return original status
 	return status;
+}
+
+/**
+ * Parse English status message to get translation key and params (for statuses written before statusMessageKey was added).
+ * @param {string} msg - statusMessage string
+ * @returns {{ key: string, params: object } | null}
+ */
+function parseStatusMessageForTranslation(msg) {
+	if (!msg || typeof msg !== 'string') return null;
+	var m;
+	m = msg.match(/^Part (\d+) ready: (\d+) files, ([\d.?]+) MB \(more parts in progress\)$/);
+	if (m) return { key: 'status_message_part_ready_more_in_progress', params: { part: m[1], fileCount: m[2], sizeMb: m[3] } };
+	m = msg.match(/^Part (\d+): (\d+) files, ([\d.?]+) MB(.*)$/);
+	if (m) return { key: 'status_message_part_in_progress', params: { part: m[1], fileCount: m[2], sizeMb: m[3], errorSuffix: m[4] || '' } };
+	m = msg.match(/^Downloading: (\d+) files, ([\d.?]+) MB(.*)$/);
+	if (m) return { key: 'status_message_downloading', params: { fileCount: m[1], sizeMb: m[2], errorSuffix: m[3] || '' } };
+	return null;
 }
 
 function lang() {
@@ -832,17 +853,32 @@ function initializeLogin(config) {
 									})
 								);
 
-								// Status column
+								// Status column: translate statusMessageKey+Params when present; fallback parse English statusMessage for translation
+								let statusText;
+								if (item.statusMessageKey && item.statusMessageParams && typeof item.statusMessageParams === 'object') {
+									statusText = t(item.statusMessageKey, item.statusMessageParams);
+								} else if (item.statusMessage != null && item.statusMessage !== '') {
+									const parsed = parseStatusMessageForTranslation(item.statusMessage);
+									statusText = parsed ? t(parsed.key, parsed.params) : item.statusMessage;
+								} else if (item.message != null && item.message !== '') {
+									statusText = item.message;
+								} else {
+									statusText = translateStatus(item.status);
+								}
 								row.append($('<td>')
-									.text(translateStatus(item.status))
+									.text(statusText)
+									.attr('title', statusText)
 									.css({
-										'width': '200px'
+										'width': '200px',
+										'white-space': 'normal',
+										'overflow': 'visible'
 									})
 								);
 
-								// Size column
+								// Size column: total uncompressed size in MB (fallback to sizeInMB for backward compatibility)
+								const sizeToShow = item.totalUncompressedSizeInMB != null ? item.totalUncompressedSizeInMB : item.sizeInMB;
 								row.append($('<td>')
-									.text(item.sizeInMB ? item.sizeInMB.toLocaleString(undefined, {
+									.text(sizeToShow != null ? sizeToShow.toLocaleString(undefined, {
 										minimumFractionDigits: 2,
 										maximumFractionDigits: 2
 									}) : '-')
@@ -854,20 +890,31 @@ function initializeLogin(config) {
 									})
 								);
 
-								// Download column
+								// Download column: list all parts when partNumber > 1 (infer from last locator)
 								const downloadCell = $('<td>').css({
 									'width': '100px',
-									'white-space': 'nowrap',
-									'overflow': 'hidden',
-									'text-overflow': 'ellipsis'
+									'min-width': '100px',
+									'white-space': 'normal',
+									'overflow': 'visible',
+									'vertical-align': 'top'
 								});
-								if (item.status === 'Completed' && item.locator) {
-									downloadCell.append(
-										$('<a>')
-											.attr('href', item.locator)
+								const showPartLinksStatuses = ['Completed', 'CompletedWithLimit', 'PartCompleted', 'PartInProgress'];
+								const locators = (item.locators && Array.isArray(item.locators) && item.locators.length > 0)
+									? item.locators
+									: (item.locator ? [item.locator] : []);
+								if (showPartLinksStatuses.includes(item.status) && locators.length > 0) {
+									locators.forEach((partUrl, idx) => {
+										const partNum = idx + 1;
+										const linkText = locators.length > 1 ? t('download_part_label', { n: partNum }) : t('download_single_label');
+										const linkTitle = locators.length > 1 ? t('download_part_link_title', { n: partNum }) : t('download_link_title');
+										const link = $('<a>')
+											.attr('href', partUrl)
 											.attr('target', '_blank')
-											.text('Download')
-									);
+											.attr('title', linkTitle + ': ' + partUrl)
+											.text(linkText)
+											.css('display', 'block');
+										downloadCell.append(link);
+									});
 								} else {
 									downloadCell.text('-');
 								}
@@ -880,11 +927,11 @@ function initializeLogin(config) {
 								});
 
 								// Show cancel button for active downloads
-								if (!['Completed', 'Failed', 'Canceled', 'Removed'].includes(item.status)) {
+								if (!['Completed', 'CompletedWithLimit', 'Failed', 'Canceled', 'Removed'].includes(item.status)) {
 									const cancelButton = $('<button>')
 										.addClass('cancel-button')
 										.html('<i class="fa fa-times"></i>')
-										.attr('title', 'Cancel download')
+										.attr('title', t('cancel_download_title'))
 										.css({
 											'padding': '2px 6px',
 											'min-width': 'unset',
@@ -895,7 +942,7 @@ function initializeLogin(config) {
 											'cursor': 'pointer'
 										})
 										.on('click', function() {
-											if (confirm('Are you sure you want to cancel this download?')) {
+											if (confirm(t('confirm_cancel_download'))) {
 												const authToken = localStorage.getItem('authToken');
 												fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads?id=${item.id}`, {
 													method: 'DELETE',
@@ -912,18 +959,18 @@ function initializeLogin(config) {
 													})
 													.catch(error => {
 														console.error('Error canceling download:', error);
-														alert('Failed to cancel download. Please try again.');
+														alert(t('cancel_download_failed'));
 													});
 											}
 										});
 									actionsCell.append(cancelButton);
 								}
 								// Show remove button for completed downloads
-								else if (item.status === 'Completed') {
+								else if (['Completed', 'CompletedWithLimit'].includes(item.status)) {
 									const removeButton = $('<button>')
 										.addClass('remove-button')
 										.html('<i class="fa fa-trash"></i>')
-										.attr('title', 'Remove')
+										.attr('title', t('remove_download_title'))
 										.css({
 											'padding': '2px 6px',
 											'min-width': 'unset',
@@ -934,7 +981,7 @@ function initializeLogin(config) {
 											'cursor': 'pointer'
 										})
 										.on('click', function() {
-											if (confirm('Are you sure you want to remove this completed download?')) {
+											if (confirm(t('confirm_remove_download'))) {
 												const authToken = localStorage.getItem('authToken');
 												fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads?id=${item.id}`, {
 													method: 'DELETE',
@@ -951,7 +998,7 @@ function initializeLogin(config) {
 													})
 													.catch(error => {
 														console.error('Error removing download:', error);
-														alert('Failed to remove download. Please try again.');
+														alert(t('remove_download_failed'));
 													});
 											}
 										});
@@ -1113,6 +1160,8 @@ function initializeLogin(config) {
 								}
 								// Store the actual value (IDs) in data attribute for editing
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}' data-prop-value='${value || ''}'>${displayValue}</span> <button class='edit-views-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
+							} else if (name === 'maxDownloadSizeMB') {
+								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-download-size-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							} else {
 								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
 							}
@@ -1125,6 +1174,10 @@ function initializeLogin(config) {
 						// Add 'Add Allowed Views' button if allowedViews property is missing
 						if (!('allowedViews' in propMap)) {
 							details += `<div style='margin-top:12px'><button id='add-allowed-views-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> Add Allowed Views</button></div>`;
+						}
+						// Add 'Add Download Size (MB)' button if maxDownloadSizeMB property is missing
+						if (!('maxDownloadSizeMB' in propMap)) {
+							details += `<div style='margin-top:12px'><button id='add-download-size-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_download_size_mb')}</button></div>`;
 						}
 						const detailsDialog = $('<div>').html(details).dialog({
 							title: t('details_title'),
@@ -1232,6 +1285,90 @@ function initializeLogin(config) {
 										alert('Error adding allowed views: ' + err);
 									});
 							});
+						});
+						// Helper: parse integer for maxDownloadSizeMB; returns number or null if invalid returns number or null if invalid
+						function parseDownloadSizeMB(input) {
+							if (input === null || input === undefined) return null;
+							const s = String(input).trim();
+							if (s === '') return null;
+							const n = parseInt(s, 10);
+							if (isNaN(n) || n < 0 || String(n) !== s) return null;
+							return n;
+						}
+						// Add handler for Add Download Size (MB) button
+						detailsDialog.on('click', '#add-download-size-btn', function() {
+							const raw = prompt(t('download_size_mb_prompt_add'), '');
+							const value = parseDownloadSizeMB(raw);
+							if (value === null) {
+								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
+								return;
+							}
+							const email = localStorage.getItem('userEmail');
+							const apiKey = localStorage.getItem('authToken');
+							const userIdentifier = user.identifier;
+							if (!email || !apiKey || !userIdentifier) {
+								alert(t('missing_credentials_or_id'));
+								return;
+							}
+							fetch('../services/support/updateUser', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadSizeMB', propertyValue: String(value) })
+							})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert(t('download_size_mb_added'));
+										detailsDialog.dialog('close');
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
+									} else {
+										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error adding download size: ' + err);
+								});
+						});
+						// Edit maxDownloadSizeMB handler
+						detailsDialog.on('click', '.edit-download-size-btn', function(e) {
+							e.preventDefault();
+							const propName = $(this).data('prop-name');
+							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
+							const oldValue = valueSpan.text();
+							const raw = prompt(t('download_size_mb_prompt_edit'), oldValue);
+							const newValue = parseDownloadSizeMB(raw);
+							if (newValue === null) {
+								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
+								return;
+							}
+							if (parseDownloadSizeMB(oldValue) === newValue) return;
+							const email = localStorage.getItem('userEmail');
+							const apiKey = localStorage.getItem('authToken');
+							const userIdentifier = user.identifier;
+							if (!email || !apiKey || !userIdentifier) {
+								alert(t('missing_credentials_or_id'));
+								return;
+							}
+							fetch('../services/support/updateUser', {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadSizeMB', propertyValue: String(newValue) })
+							})
+								.then(response => response.json())
+								.then(result => {
+									if (result.success) {
+										alert(t('property_updated'));
+										detailsDialog.dialog('close');
+										dialogContent.dialog('close');
+										document.getElementById('listUsersBtn').click();
+									} else {
+										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
+									}
+								})
+								.catch(err => {
+									alert('Error updating download size: ' + err);
+								});
 						});
 						// Edit permissions handler
 						detailsDialog.on('click', '.edit-permissions-btn', function(e) {

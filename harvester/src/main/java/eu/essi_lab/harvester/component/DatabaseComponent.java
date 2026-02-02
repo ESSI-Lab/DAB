@@ -21,18 +21,17 @@ package eu.essi_lab.harvester.component;
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.harvester.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
 
-import eu.essi_lab.api.database.Database.IdentifierType;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.harvester.HarvestingComponent;
-import eu.essi_lab.harvester.HarvestingComponentException;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -40,22 +39,22 @@ import eu.essi_lab.model.resource.GSResource;
 public class DatabaseComponent extends HarvestingComponent {
 
     /**
-    * 
-    */
+     *
+     */
     private static final int MAX_TRIES = 3;
     /**
-     * 
+     *
      */
     private static final long SLEEP_TIME = TimeUnit.MINUTES.toMillis(1);
 
     /**
-    * 
-    */
+     *
+     */
     private DatabaseWriter dBWriter;
     private DatabaseReader dBReader;
 
     /**
-     * 
+     *
      */
     public DatabaseComponent() {
     }
@@ -102,11 +101,16 @@ public class DatabaseComponent extends HarvestingComponent {
 
 			    for (GSResource gsResource : resources) {
 
-				//
-				// gathers the deleted resources to be eventually handled by
-				// the resources comparator task
-				//
-				getRequest().addIncrementalDeletedResource(gsResource);
+				if (ConfigurationWrapper.getSystemSettings(). //
+					readKeyValue(SystemSetting.KeyValueOptionKeys.RESOURCES_COMPARATOR_TASK.getLabel()).//
+					map(Boolean::valueOf).orElse(false)) {
+
+				    //
+				    // gathers the deleted resources to be eventually handled by
+				    // the resources comparator task
+				    //
+				    getRequest().addIncrementalDeletedResource(gsResource);
+				}
 
 				GSLoggerFactory.getLogger(getClass()).debug("Removing deleted dataset: {}", gsResource.toString());
 
@@ -125,9 +129,7 @@ public class DatabaseComponent extends HarvestingComponent {
 		    boolean isModified = getRequest().//
 			    getIncrementalModifiedResources().//
 			    stream().//
-			    filter(res -> res.getPrivateId().equals(resource.getPrivateId())).//
-			    findFirst().//
-			    isPresent();
+			    anyMatch(res -> res.getPrivateId().equals(resource.getPrivateId()));
 
 		    if (isModified) {
 			//

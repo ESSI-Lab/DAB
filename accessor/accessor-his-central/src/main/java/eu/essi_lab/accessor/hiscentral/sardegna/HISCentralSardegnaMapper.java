@@ -499,10 +499,12 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	     * INTERPOLATION
 	     */
 
-	    if (interp.toLowerCase().contains("cumulato")) {
-		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE_PREC);
+	    if (interp.toLowerCase().equals("istantaneo")) {
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
+	    }else if (interp.toLowerCase().contains("cumulato")) {
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
 	    } else {
-		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.INSTANT_TOTAL);
+		GSLoggerFactory.getLogger(getClass()).error("Unknown interpolation type: " + interp.toLowerCase()+" please add to the mapper!");
 	    }
 
 	    // String uom = sensorInfo.getJSONObject("observedProperty").getString("uom");

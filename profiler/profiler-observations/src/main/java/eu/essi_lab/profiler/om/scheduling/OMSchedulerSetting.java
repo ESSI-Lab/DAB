@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.om.scheduling;
  * #L%
  */
 
+import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
@@ -40,6 +41,8 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
     private static final String ASYNCH_DOWNLOAD_NAME_OPTION_KEY = "asynchDownloadName";
     private static final String BUCKET_OPTION_KEY = "bucket";
     private static final String PUBLIC_URL_OPTION_KEY = "publicURL";
+    private static final String MAX_DOWNLOAD_SIZE_MB_OPTION_KEY = "maxDownloadSizeMB";
+    private static final String MAX_DOWNLOAD_PART_SIZE_MB_OPTION_KEY = "maxDownloadPartSizeMB";
 
     /**
      * 
@@ -74,6 +77,16 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 		withKey(ASYNCH_DOWNLOAD_NAME_OPTION_KEY).//
 		build();
 	addOption(asynchDownloadNameOption);
+
+	Option<Integer> maxDownloadSizeMBOption = IntegerOptionBuilder.get().//
+		withKey(MAX_DOWNLOAD_SIZE_MB_OPTION_KEY).//
+		build();
+	addOption(maxDownloadSizeMBOption);
+
+	Option<Integer> maxDownloadPartSizeMBOption = IntegerOptionBuilder.get().//
+		withKey(MAX_DOWNLOAD_PART_SIZE_MB_OPTION_KEY).//
+		build();
+	addOption(maxDownloadPartSizeMBOption);
 
 	Option<String> bucketOption = StringOptionBuilder.get().//
 		withKey(BUCKET_OPTION_KEY).//
@@ -167,4 +180,25 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 
 	getOption(PUBLIC_URL_OPTION_KEY, String.class).get().setValue(name);
     }
+
+    public Integer getMaxDownloadSizeMB() {
+
+	return getOption(MAX_DOWNLOAD_SIZE_MB_OPTION_KEY, Integer.class).get().getValue();
+    }
+
+    public void setMaxDownloadSizeMB(Integer mb) {
+
+	getOption(MAX_DOWNLOAD_SIZE_MB_OPTION_KEY, Integer.class).get().setValue(mb);
+    }
+
+    public Integer getMaxDownloadPartSizeMB() {
+
+	return getOption(MAX_DOWNLOAD_PART_SIZE_MB_OPTION_KEY, Integer.class).get().getValue();
+    }
+
+    public void setMaxDownloadPartSizeMB(Integer mb) {
+
+	getOption(MAX_DOWNLOAD_PART_SIZE_MB_OPTION_KEY, Integer.class).get().setValue(mb);
+    }
+
 }

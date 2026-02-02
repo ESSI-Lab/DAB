@@ -259,7 +259,7 @@ public class GSUser extends DOMSerializer implements Serializable {
     }
 
     /**
-     * @param role
+     * @param enabled
      */
     public void setEnabled(boolean enabled) {
 
@@ -468,4 +468,20 @@ public class GSUser extends DOMSerializer implements Serializable {
 	return new String[] {};
 
     }
+
+    public Integer getMaxDownloadSizeMB() {
+
+	return getStringPropertyValue("maxDownloadSizeMB")
+		.map(s -> {
+		    try {
+			int n = Integer.parseInt(s.trim());
+			return n >= 0 ? n : null;
+		    } catch (NumberFormatException e) {
+			return null;
+		    }
+		})
+		.orElse(null);
+    }
+
+
 }

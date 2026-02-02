@@ -21,15 +21,13 @@ package eu.essi_lab.cfga.scheduler;
  * #L%
  */
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
-import java.util.Optional;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import org.json.*;
+import org.quartz.*;
 
-import org.json.JSONObject;
-import org.quartz.JobExecutionContext;
-
-import eu.essi_lab.messages.JobStatus;
+import java.text.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -37,7 +35,7 @@ import eu.essi_lab.messages.JobStatus;
 public class SchedulerJobStatus extends JobStatus {
 
     /**
-     * 
+     *
      */
     private static final DecimalFormat decimalFormat;
 
@@ -55,7 +53,7 @@ public class SchedulerJobStatus extends JobStatus {
     }
 
     /**
-     * 
+     *
      */
     private final JSONObject object;
 
@@ -83,6 +81,16 @@ public class SchedulerJobStatus extends JobStatus {
 
 	object.put("settingId", settingId);
 	object.put("workerClassName", workerClassName);
+
+	object.put("hostName", HostNamePropertyUtils.getHostNameProperty());
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getHostName() {
+
+	return Optional.ofNullable(object.optString("hostName", null));
     }
 
     /**

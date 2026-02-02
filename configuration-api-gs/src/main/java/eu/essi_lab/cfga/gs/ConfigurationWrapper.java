@@ -1042,4 +1042,37 @@ public class ConfigurationWrapper {
 	return Optional.of(manager);
     }
 
+    public static Integer getDefaultMaxDownloadSizeMB() {
+	SystemSetting systemSettings = getSystemSettings();
+	Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+	if (keyValueOption.isPresent()) {
+	    String dsm = keyValueOption.get().getProperty("defaultMaxDownloadSizeMB");
+	    if (dsm!=null&&!dsm.isEmpty()) {
+		try {
+		    int defaultMaxDownloadSizeMB = Integer.parseInt(dsm);
+		    return  defaultMaxDownloadSizeMB;
+		}catch (Exception e){
+		    GSLoggerFactory.getLogger(ConfigurationWrapper.class).error(e);
+		}
+	    }
+	}
+	return null;
+    }
+
+    public static Integer getDefaultMaxDownloadPartSizeMB() {
+        SystemSetting systemSettings = getSystemSettings();
+        Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+        if (keyValueOption.isPresent()) {
+            String dsm = keyValueOption.get().getProperty("defaultMaxDownloadPartSizeMB");
+            if (dsm!=null&&!dsm.isEmpty()) {
+            try {
+                int defaultMaxDownloadPartSizeMB = Integer.parseInt(dsm);
+                return  defaultMaxDownloadPartSizeMB;
+            }catch (Exception e){
+                GSLoggerFactory.getLogger(ConfigurationWrapper.class).error(e);
+            }
+            }
+        }
+        return null;
+        }
 }

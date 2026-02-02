@@ -156,7 +156,7 @@ public class DownloadsHandler extends StreamingRequestHandler {
 
 	for (JSONObject status: statuses){
 	    String stat = status.optString("status");
-	    if (stat!=null && stat.equals("Completed")) {
+	    if (stat != null && (stat.equals("Completed") || stat.equals("CompletedWithLimit"))) {
 		String ts = status.optString("timestamp");
 		if (ts!=null){
 		    Date completedDate = ISO8601DateTimeUtils.parseISO8601ToDate(ts).get();
@@ -205,11 +205,20 @@ public class DownloadsHandler extends StreamingRequestHandler {
 		String id = status.optString("id");
 		if (id != null && id.equals(operationId)) {
 		    String stat = status.optString("status");
-		    if (stat != null && stat.equals("Completed")) {
-			// delete result
+		    if (stat != null && (stat.equals("Completed") || stat.equals("CompletedWithLimit"))) {
+			// delete result: cancel flag, single zip (legacy), and all download parts
 			s3wrapper.deleteObject("his-central", "data-downloads/" + id + "-cancel");
 			s3wrapper.deleteObject("his-central", "data-downloads/" + id + ".zip");
+			String downloadName = status.optString("downloadName", "");
+			int partNumber = status.optInt("partNumber", 1);
+			if (downloadName != null && !downloadName.isEmpty()) {
+			    s3wrapper.deleteObject("his-central", "data-downloads/" + downloadName + ".zip");
+			    for (int p = 2; p <= partNumber; p++) {
+				s3wrapper.deleteObject("his-central", "data-downloads/" + downloadName + "_part" + p + ".zip");
+			    }
+			}
 			status.put("locator", "");
+			status.put("locators", new JSONArray());
 			status.put("status", "Removed");
 			OMHandler.status(s3wrapper, "his-central", id, status);
 		    } else {
