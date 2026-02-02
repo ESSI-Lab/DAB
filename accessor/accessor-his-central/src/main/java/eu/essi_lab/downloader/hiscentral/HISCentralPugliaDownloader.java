@@ -248,6 +248,9 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 		    if (date.isEmpty()) {
 			date = data.optString("data_giorno");
 		    }
+		    if (date.isEmpty()) {
+			date = data.optString("data_valore");
+		    }
 		    date = date.replaceFirst(" ", "T").trim();
 		    if (iso8601OutputFormat == null) {
 			if (date.contains("T")) {
