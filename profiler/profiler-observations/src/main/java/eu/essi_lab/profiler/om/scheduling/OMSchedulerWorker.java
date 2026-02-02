@@ -27,9 +27,16 @@ package eu.essi_lab.profiler.om.scheduling;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 
@@ -45,6 +52,7 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.om.DataDownloaderTool;
+import eu.essi_lab.profiler.om.DownloadPartResult;
 import eu.essi_lab.profiler.om.OMHandler;
 
 /**
@@ -55,26 +63,19 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
     static final String CONFIGURABLE_TYPE = "OMSchedulerWorker";
 
     public enum DownloadStatus {
-	STARTED, CANCELED, ENDED
+	STARTED, CANCELED, PART_ENDED, ENDED
     }
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
-
-	String emailNotifications = getSetting().getEmailNotifications();
-	String email = null;
-	if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
-	    email = getSetting().getEmail();
-	    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.of(email));
-	}
-
-	OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty());
 
 	String requestURL = getSetting().getRequestURL();
 	String operationId = getSetting().getOperationId();
 	String asynchDownloadName = getSetting().getAsynchDownloadName();
 	String bucket = getSetting().getBucket();
 	String publicURL = getSetting().getPublicURL();
+	Integer maxDownloadSizeMB = getSetting().getMaxDownloadSizeMB();
+	Integer maxDownloadPartSizeMB = getSetting().getMaxDownloadPartSizeMB();
 
 	String fname = asynchDownloadName + ".zip";
 
@@ -87,59 +88,187 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    s3wrapper = OMHandler.getS3TransferWrapper();
 	}
 
-	File downloaded = downloader.download(s3wrapper, bucket, requestURL, operationId, asynchDownloadName);
+	if (maxDownloadSizeMB==null){
+	    maxDownloadSizeMB = ConfigurationWrapper.getDefaultMaxDownloadSizeMB();
+	    if (maxDownloadSizeMB==null){
+		maxDownloadSizeMB = 10;
+	    }
+	}
+	if (maxDownloadPartSizeMB==null){
+	    maxDownloadPartSizeMB = ConfigurationWrapper.getDefaultMaxDownloadPartSizeMB();
+	    if (maxDownloadPartSizeMB==null){
+		maxDownloadPartSizeMB = 1;
+	    }
+	}
 
-	String locator = null;
+	String resumptionToken = null;
+	BigDecimal totalDownloadedSoFarMB = BigDecimal.ZERO;
+	int partNumber = 0;
+	boolean done = false;
+	List<String> partLocators = new ArrayList<>();
+	boolean resuming = false;
 
-	if (ConfigurationWrapper.getDownloadSetting().getDownloadStorage() == DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
-
-	} else {
-
-	    if (downloaded == null) {
-
-		JSONObject msg = new JSONObject();
-		msg.put("id", operationId);
-		msg.put("status", "Canceled");
-		msg.put("downloadName", asynchDownloadName);
-		msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
-
-		OMHandler.status(s3wrapper, bucket, operationId, msg);
-
-		if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
-		    email = getSetting().getEmail();
-		    OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.of(email));
+	if (s3wrapper != null) {
+	    File statusFile = null;
+	    try {
+		statusFile = File.createTempFile("om-status-", ".json");
+		if (s3wrapper.download(bucket, "data-downloads/" + operationId + "-status.json", statusFile)) {
+		    String content = new String(Files.readAllBytes(statusFile.toPath()), StandardCharsets.UTF_8);
+		    JSONObject saved = new JSONObject(content);
+		    String savedStatus = saved.optString("status", "");
+		    if ("PartCompleted".equals(savedStatus)) {
+			String token = saved.optString("resumptionToken", null);
+			if (token != null && !token.isEmpty()) {
+			    resuming = true;
+			    partNumber = saved.optInt("partNumber", 0);
+			    resumptionToken = token;
+			    if (saved.has("totalUncompressedSizeInMB")) {
+				Object o = saved.get("totalUncompressedSizeInMB");
+				if (o instanceof Number) {
+				    totalDownloadedSoFarMB = BigDecimal.valueOf(((Number) o).doubleValue());
+				} else if (o != null) {
+				    totalDownloadedSoFarMB = new BigDecimal(o.toString());
+				}
+			    }
+			    JSONArray locatorsArr = saved.optJSONArray("locators");
+			    if (locatorsArr != null) {
+				for (int i = 0; i < locatorsArr.length(); i++) {
+				    partLocators.add(locatorsArr.getString(i));
+				}
+			    }
+			    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker RESUMING from part {} for operation id {}", partNumber + 1, operationId);
+			}
+		    }
 		}
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).warn("Could not load status for resume check: {}", e.getMessage());
+	    } finally {
+		if (statusFile != null && statusFile.exists()) {
+		    statusFile.delete();
+		}
+	    }
+	}
 
-		OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty());
+	String emailNotifications = getSetting().getEmailNotifications();
+	String email = null;
+	if (!resuming) {
+	    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker STARTED, operation id {}", operationId);
+	    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
+		email = getSetting().getEmail();
+		OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(email));
+	    }
+	    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+	}
+
+	while (!done) {
+
+	    partNumber++;
+	    String partFname = partNumber == 1 ? fname : asynchDownloadName + "_part" + partNumber + ".zip";
+
+	    DownloadPartResult result = downloader.downloadPart(s3wrapper, bucket, requestURL, operationId, asynchDownloadName,
+		    maxDownloadSizeMB, maxDownloadPartSizeMB, resumptionToken, totalDownloadedSoFarMB, partNumber, partLocators);
+
+	    if (result == null || result.getPartFile() == null) {
+
+		if (ConfigurationWrapper.getDownloadSetting().getDownloadStorage() != DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+		    JSONObject msg = new JSONObject();
+		    msg.put("id", operationId);
+		    msg.put("status", "Canceled");
+		    msg.put("downloadName", asynchDownloadName);
+		    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+
+		    OMHandler.status(s3wrapper, bucket, operationId, msg);
+
+		    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
+			email = getSetting().getEmail();
+			OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(email));
+		    }
+
+		    OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+		}
+		done = true;
 
 	    } else {
 
-		s3wrapper.uploadFile(downloaded.getAbsolutePath(), bucket, "data-downloads/" + fname, "application/zip");
+		File partFile = result.getPartFile();
+		BigDecimal sizeInMB = result.getSizeInMB() != null ? result.getSizeInMB() : BigDecimal.ZERO;
+		BigDecimal partUncompressedMB = result.getUncompressedSizeInMB() != null ? result.getUncompressedSizeInMB() : sizeInMB;
+		totalDownloadedSoFarMB = totalDownloadedSoFarMB.add(partUncompressedMB);
 
-		long sizeInBytes = downloaded.length();
-		BigDecimal sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.UP);
+		if (ConfigurationWrapper.getDownloadSetting().getDownloadStorage() != DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
 
-		downloaded.delete();
+		    s3wrapper.uploadFile(partFile.getAbsolutePath(), bucket, "data-downloads/" + partFname, "application/zip");
 
-		locator = publicURL + "/data-downloads/" + fname;
-		JSONObject msg = new JSONObject();
-		msg.put("id", operationId);
-		msg.put("status", "Completed");
-		msg.put("downloadName", asynchDownloadName);
-		msg.put("locator", locator);
-		msg.put("sizeInMB", sizeInMB);
-		msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+		    String locator = publicURL + "/data-downloads/" + partFname;
+		    JSONObject msg = new JSONObject();
+		    msg.put("id", operationId);
+		    if (result.isFinalPart()) {
+			msg.put("status", result.isMaxSizeReached() ? "CompletedWithLimit" : "Completed");
+			if (result.isMaxSizeReached() && result.getErrorMessage() != null) {
+			    msg.put("message", result.getErrorMessage());
+			}
+		    } else {
+			int fileCount = result.getDownloadedFileNames() != null ? result.getDownloadedFileNames().size() : 0;
+			String partSizeStr = result.getUncompressedSizeInMB() != null ? result.getUncompressedSizeInMB().toString() : "?";
+			msg.put("status", "PartCompleted");
+			msg.put("statusMessage", "Part " + partNumber + " ready: " + fileCount + " files, " + partSizeStr + " MB (more parts in progress)");
+			msg.put("statusMessageKey", "status_message_part_ready_more_in_progress");
+			JSONObject statusParams = new JSONObject();
+			statusParams.put("part", partNumber);
+			statusParams.put("fileCount", fileCount);
+			statusParams.put("sizeMb", partSizeStr);
+			msg.put("statusMessageParams", statusParams);
+			if (result.getResumptionToken() != null && !result.getResumptionToken().isEmpty()) {
+			    msg.put("resumptionToken", result.getResumptionToken());
+			}
+		    }
+		    msg.put("downloadName", asynchDownloadName);
+		    partLocators.add(locator);
+		    msg.put("locators", new JSONArray(partLocators));
+		    msg.put("sizeInMB", sizeInMB);
+		    msg.put("totalUncompressedSizeInMB", totalDownloadedSoFarMB);
+		    msg.put("partNumber", partNumber);
+		    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 
-		OMHandler.status(s3wrapper, bucket, operationId, msg);
+		    OMHandler.status(s3wrapper, bucket, operationId, msg);
 
-		if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
-		    email = getSetting().getEmail();
-		    OMDownloadReportsHandler.sendEmail(DownloadStatus.ENDED, setting, Optional.of(locator), Optional.of(email));
+		    Optional<String> errorMsg = result.isMaxSizeReached() && result.getErrorMessage() != null
+			    ? Optional.of(result.getErrorMessage()) : Optional.empty();
+		    StringBuilder partDetailsBuilder = new StringBuilder();
+		    partDetailsBuilder.append("Part number: ").append(partNumber).append("\n");
+		    partDetailsBuilder.append("Part total size: ").append(result.getUncompressedSizeInMB()).append(" MB");
+		    if (result.getUncompressedSizeInMB() != null) {
+			partDetailsBuilder.append(" (compressed to ").append(sizeInMB).append(" MB)");
+		    }
+		    partDetailsBuilder.append("\n");
+		    partDetailsBuilder.append("Part is final: ").append(result.isFinalPart() ? "yes" : "no").append("\n");
+		    if (result.getDownloadedFileNames() != null && !result.getDownloadedFileNames().isEmpty()) {
+			partDetailsBuilder.append("Downloaded files:\n");
+			for (String fileName : result.getDownloadedFileNames()) {
+			    partDetailsBuilder.append("  ").append(fileName).append("\n");
+			}
+		    }
+		    partDetailsBuilder.append("\n");
+		    Optional<String> partDetails = Optional.of(partDetailsBuilder.toString());
+		    DownloadStatus stat = result.isFinalPart() ?DownloadStatus.ENDED:DownloadStatus.PART_ENDED;
+		    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
+			email = getSetting().getEmail();
+			OMDownloadReportsHandler.sendEmail(stat, setting, Optional.of(locator), errorMsg, partDetails, Optional.of(email));
+		    }
+
+		    OMDownloadReportsHandler.sendEmail(stat, setting, Optional.of(locator), errorMsg, partDetails, Optional.empty());
 		}
 
-		OMDownloadReportsHandler.sendEmail(DownloadStatus.ENDED, setting, Optional.of(locator), Optional.empty());
+		partFile.delete();
+
+		resumptionToken = result.getResumptionToken();
+		if (resumptionToken == null) {
+		    done = true;
+		}
 	    }
 	}
+
+	GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker ENDED, operation id {}",operationId);
     }
 
     @Override

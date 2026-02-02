@@ -56,6 +56,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.model.resource.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.json.JsonpSerializable;
@@ -89,11 +90,6 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMap.TermFrequencyTarget;
 import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.model.resource.ResourceType;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 
@@ -181,6 +177,15 @@ public class OpenSearchUtils {
 			item.setAlternateDecodedTerm(decodedIt);
 			item.setAlternateDecodedTermLanguage("it");
 		    }
+		}
+		if (target.toLowerCase().contains("interpolation")){
+		    InterpolationType interpolation = InterpolationType.decode(term);
+		    if (interpolation!=null){
+			decoded = interpolation.getLabel();
+			item.setAlternateDecodedTerm(interpolation.getLabelIt());
+			item.setAlternateDecodedTermLanguage("it");
+		    }
+
 		}
 
 		item.setDecodedTerm(decoded);

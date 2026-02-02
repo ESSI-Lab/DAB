@@ -33,7 +33,9 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -57,24 +59,56 @@ public class DataDownloaderTool {
     }
 
     /**
+     * Performs a full download with no size limits. For backward compatibility.
+     *
      * @param s3wrapper
-     * @param folder
-     * @param requestURL something like
-     *        "http://localhost:9090/gs-service/services/essi/token/my-token/view/his-central/om-api/observations?includeData=true&asynchDownload=true&observedProperty=precipitation&ontology=his-central&north=42.492&south=42.252&east=11.094&west=10.693&beginPosition=2024-01-01&endPosition=2025-01-01"
+     * @param bucket
+     * @param requestURL
      * @param operationId
-     * @param asynchDownloadName
+     * @param downloadName
+     * @return the zip file, or null if canceled
      */
     public File download(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId, String downloadName) {
+	DownloadPartResult result = downloadPart(s3wrapper, bucket, requestURL, operationId, downloadName,
+		Integer.MAX_VALUE, Integer.MAX_VALUE, null, BigDecimal.ZERO, 1, new ArrayList<>());
+	return result != null ? result.getPartFile() : null;
+    }
 
-	GSLoggerFactory.getLogger(getClass()).info("Started asynch download of {}", requestURL);
+    /**
+     * Performs a partial download. When current part size exceeds maxDownloadPartSizeMB, returns
+     * a part and resumption token. When total size would exceed maxDownloadSizeMB, returns the
+     * last part with maxSizeReached and error message. Caller publishes each part, sends
+     * notification, then continues with the resumption token until null.
+     *
+     * @param s3wrapper
+     * @param bucket
+     * @param requestURL
+     * @param operationId
+     * @param downloadName
+     * @param maxDownloadSizeMB    overall max size in MB (process ends when reached)
+     * @param maxDownloadPartSizeMB max size per part in MB (part returned and continued with token)
+     * @param resumptionTokenFromPreviousPart token from previous part, or null for first part
+     * @param totalDownloadedSoFarMB         sum of sizes of previous parts in MB
+     * @param currentPartNumber              part number being downloaded (1-based), for progress messages
+     * @param completedPartLocators         list of locators of completed parts (for progress UI), in order
+     * @return result with part file, optional resumption token, and maxSizeReached/errorMessage
+     */
+    public DownloadPartResult downloadPart(S3TransferWrapper s3wrapper, String bucket, String requestURL,
+	    String operationId, String downloadName, int maxDownloadSizeMB, int maxDownloadPartSizeMB,
+	    String resumptionTokenFromPreviousPart, BigDecimal totalDownloadedSoFarMB, int currentPartNumber,
+	    List<String> completedPartLocators) {
+
+	GSLoggerFactory.getLogger(getClass()).info("Started asynch download part of {}", requestURL);
 
 	try {
-	    JSONObject msg = new JSONObject();
-	    msg.put("id", operationId);
-	    msg.put("status", "Started");
-	    msg.put("downloadName", downloadName);
-	    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
-	    OMHandler.status(s3wrapper, bucket, operationId, msg);
+	    if (s3wrapper != null && resumptionTokenFromPreviousPart == null) {
+		JSONObject msg = new JSONObject();
+		msg.put("id", operationId);
+		msg.put("status", "Started");
+		msg.put("downloadName", downloadName);
+		msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+		OMHandler.status(s3wrapper, bucket, operationId, msg);
+	    }
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e);
@@ -86,22 +120,18 @@ public class DataDownloaderTool {
 	try {
 	    zipFile = File.createTempFile(getClass().getSimpleName(), ".zip");
 
-	    File tempDirFile = FileUtils.getTempDir(StringUtils.urlEncode(operationId), false);
+	    File tempDirFile = FileUtils.getTempDir(StringUtils.urlEncode(operationId) + "_" + System.currentTimeMillis(), false);
 
 	    tempPath = tempDirFile.toPath();
 
 	    if (tempDirFile.exists()) {
-
 		FileUtils.clearFolder(tempPath.toFile(), false);
-
 	    } else {
-
 		tempDirFile.mkdirs();
 	    }
-
 	} catch (IOException e) {
-
 	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return null;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Temporary directory created at: {}", tempPath.toAbsolutePath());
@@ -109,15 +139,14 @@ public class DataDownloaderTool {
 	File userRequestFile = new File(tempPath.toFile(), "log.txt");
 	Date dateStart = new Date();
 
-	// remove download parameters to find out base URL
-	requestURL = requestURL.replace("downloads?", "observations?");
-	requestURL = removeParameter(requestURL, "asynchDownload", "true");
-	requestURL = removeParameter(requestURL, "includeData", "true");
+	String baseRequestURL = requestURL.replace("downloads?", "observations?");
+	baseRequestURL = removeParameter(baseRequestURL, "asynchDownload", "true");
+	baseRequestURL = removeParameter(baseRequestURL, "includeData", "true");
 
 	URI uri;
 	String format = null;
 	try {
-	    uri = new URI(requestURL);
+	    uri = new URI(baseRequestURL);
 	    URIBuilder uriBuilder = new URIBuilder(uri);
 	    format = uriBuilder.getQueryParams().stream().filter(p -> p.getName().equals("format")).map(p -> p.getValue()).findFirst()
 		    .orElse(null);
@@ -127,17 +156,21 @@ public class DataDownloaderTool {
 	}
 
 	if (format != null) {
-	    requestURL = removeParameter(requestURL, "format", format);
-
+	    baseRequestURL = removeParameter(baseRequestURL, "format", format);
 	}
 
-	boolean firstLoop = true;
-	String resumptionToken = null;
+	boolean firstLoop = (resumptionTokenFromPreviousPart == null);
+	String resumptionToken = resumptionTokenFromPreviousPart;
 	int blocks = 0;
-
 	int resources = 0;
 	int errors = 0;
-	BigDecimal size = BigDecimal.ZERO;
+	BigDecimal currentPartSizeMB = BigDecimal.ZERO;
+	boolean partComplete = false;
+	boolean maxSizeReached = false;
+	String maxSizeErrorMessage = null;
+	List<String> downloadedFileNames = new ArrayList<>();
+	long last = System.currentTimeMillis();
+
 
 	while (firstLoop || resumptionToken != null) {
 
@@ -145,18 +178,14 @@ public class DataDownloaderTool {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Listing block {}", ++blocks);
 
-	    String listURL = requestURL;
-
+	    String listURL = addParameter(baseRequestURL, "limit", "1");
 	    if (resumptionToken != null) {
 		listURL = listURL + "&resumptionToken=" + resumptionToken;
 		listURL = listURL.replace("?&", "?");
 	    }
 
 	    OMHandler omHandler = new OMHandler();
-
 	    Optional<JSONObject> response = omHandler.getJSONResponse(WebRequest.createGET(listURL));
-
-	    long last = System.currentTimeMillis();
 
 	    if (response.isPresent()) {
 
@@ -168,6 +197,24 @@ public class DataDownloaderTool {
 		    resumptionToken = null;
 		}
 
+		// Look ahead: if next response would be empty and completed, treat current as last to avoid empty final part
+		if (resumptionToken != null) {
+		    String lookAheadURL = addParameter(baseRequestURL, "limit", "1");
+		    lookAheadURL = lookAheadURL + "&resumptionToken=" + resumptionToken;
+		    lookAheadURL = lookAheadURL.replace("?&", "?");
+		    Optional<JSONObject> lookAheadResponse = omHandler.getJSONResponse(WebRequest.createGET(lookAheadURL));
+		    if (lookAheadResponse.isPresent()) {
+			JSONObject nextJson = lookAheadResponse.get();
+			boolean nextCompleted = nextJson.optBoolean("completed", true);
+			JSONArray nextMembers = nextJson.optJSONArray("member");
+			boolean nextEmpty = (nextMembers == null || nextMembers.length() == 0);
+			if (nextCompleted && nextEmpty) {
+			    resumptionToken = null;
+			    GSLoggerFactory.getLogger(getClass()).info("Look ahead: next response empty and completed, treating current as last");
+			}
+		    }
+		}
+
 		if (json.has("member")) {
 
 		    JSONArray members = json.getJSONArray("member");
@@ -176,23 +223,22 @@ public class DataDownloaderTool {
 		    if (members.length() == 0) {
 			break;
 		    }
-		    // for each observation
+
 		    for (int i = 0; i < members.length(); i++) {
 			JSONObject member = members.getJSONObject(i);
 			String id = member.getString("id");
 			String observedPropertyTitle = id;
 			JSONObject observedProperty = member.optJSONObject("observedProperty");
-			if (observedProperty!=null){
-			    observedPropertyTitle = observedProperty.optString("title",observedPropertyTitle);
+			if (observedProperty != null) {
+			    observedPropertyTitle = observedProperty.optString("title", observedPropertyTitle);
 			}
 			String foiTitle = id;
 			JSONObject foi = member.optJSONObject("featureOfInterest");
-			if (foi!=null){
-			    foiTitle = foi.optString("title",foi.optString("href",foiTitle));
+			if (foi != null) {
+			    foiTitle = foi.optString("title", foi.optString("href", foiTitle));
 			}
 
 			String sourceId = "unknown";
-
 			JSONArray parameters = member.getJSONArray("parameter");
 			for (int j = 0; j < parameters.length(); j++) {
 			    JSONObject parameter = parameters.getJSONObject(j);
@@ -202,7 +248,7 @@ public class DataDownloaderTool {
 				sourceId = value;
 			    }
 			}
-			if (sourceId.equals("unknown")){
+			if (sourceId.equals("unknown")) {
 			    for (int j = 0; j < parameters.length(); j++) {
 				JSONObject parameter = parameters.getJSONObject(j);
 				String name = parameter.getString("name");
@@ -213,8 +259,7 @@ public class DataDownloaderTool {
 			    }
 			}
 
-			// download single observation URL
-			String downloadURL = requestURL;
+			String downloadURL = baseRequestURL;
 			downloadURL = addParameter(downloadURL, "observationIdentifier", id);
 			downloadURL = addParameter(downloadURL, "includeData", "true");
 			if (format != null) {
@@ -223,86 +268,104 @@ public class DataDownloaderTool {
 			downloadURL = removeParameter(downloadURL, "asynchDownloadName", format);
 			downloadURL = removeParameter(downloadURL, "eMailNotifications", format);
 
-			// write
 			File sourceDir = new File(tempPath.toFile(), sourceId);
-
 			if (!sourceDir.exists()) {
 			    sourceDir.mkdir();
 			}
-
 			File propertyDir = new File(sourceDir, observedPropertyTitle);
-
 			if (!propertyDir.exists()) {
 			    propertyDir.mkdir();
 			}
-
 
 			OMFormat oFormat = OMFormat.decode(format);
 			if (oFormat == null) {
 			    oFormat = OMFormat.JSON;
 			}
 			String extension = oFormat.getExtension();
-
 			String baseName = foiTitle;
-
-			File logFile = new File(propertyDir, baseName+"_"+id+"_log.txt");
-			File dataFile = new File(propertyDir, baseName+"_"+id+ "_data"+extension);
+			File logFile = new File(propertyDir, baseName + "_" + id + "_log.txt");
+			File dataFile = new File(propertyDir, baseName + "_" + id + "_data" + extension);
 
 			WebRequest get2 = WebRequest.createGET(downloadURL);
-
 			resources++;
 
 			try {
-
 			    omHandler.handle(new FileOutputStream(dataFile), get2);
-
 			    BigDecimal sizeInMB = null;
 			    if (dataFile.exists()) {
 				long sizeInBytes = dataFile.length();
 				sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.HALF_UP);
+				downloadedFileNames.add(tempPath.relativize(dataFile.toPath()).toString().replace("\\", "/"));
 			    } else {
 				sizeInMB = BigDecimal.ZERO;
 			    }
-			    size = size.add(sizeInMB);
+			    currentPartSizeMB = currentPartSizeMB.add(sizeInMB);
 
+			    if (totalDownloadedSoFarMB.add(currentPartSizeMB).compareTo(BigDecimal.valueOf(maxDownloadSizeMB)) >= 0) {
+				maxSizeReached = true;
+				maxSizeErrorMessage = "Maximum download size (" + maxDownloadSizeMB + " MB) reached. Download truncated.";
+				break;
+			    }
+			    if (currentPartSizeMB.compareTo(BigDecimal.valueOf(maxDownloadPartSizeMB)) >= 0) {
+				partComplete = true;
+				break;
+			    }
 			} catch (Exception e) {
 			    errors++;
 			    write("status: 500 \nexception " + e.getMessage(), logFile);
 			    GSLoggerFactory.getLogger(getClass()).error(e);
 			}
+
 			try {
 			    long current = System.currentTimeMillis();
 			    long elapsed = current - last;
-
-			    //
-
-			    String key = "data-downloads/" + operationId + "-cancel";
-			    HeadObjectResponse metadata = s3wrapper.getObjectMetadata(bucket, key);
-			    if (metadata != null) {
-				s3wrapper.deleteObject(bucket, key);
-				return null;
-			    }
-
-			    // gives status updates not before 5000 ms
-			    if (elapsed > 5000) {
-
-				last = current;
-
-				JSONObject msg = new JSONObject();
-				msg.put("id", operationId);
-				String errorInfo = "";
-				if (errors > 0) {
-				    errorInfo = " (" + errors + " of them failed)";
+			    if (s3wrapper != null) {
+				String key = "data-downloads/" + operationId + "-cancel";
+				HeadObjectResponse metadata = s3wrapper.getObjectMetadata(bucket, key);
+				if (metadata != null) {
+				    s3wrapper.deleteObject(bucket, key);
+				    try {
+					FileUtils.clearFolder(tempPath.toFile(), true);
+				    } catch (IOException e) {
+					GSLoggerFactory.getLogger(getClass()).error(e);
+				    }
+				    return new DownloadPartResult(null, null, false, null, null, null, false, new ArrayList<>());
 				}
-				msg.put("status", resources + " downloads" + errorInfo + ", " + size + "MB");
-				msg.put("downloadName", downloadName);
-				msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
-				OMHandler.status(s3wrapper, bucket, operationId, msg);
+				if (elapsed > 5000) {
+				    last = current;
+				    JSONObject msg = new JSONObject();
+				    msg.put("id", operationId);
+				    String errorInfo = errors > 0 ? " (" + errors + " failed)" : "";
+				    String progressDetail = resources + " files, " + currentPartSizeMB + " MB" + errorInfo;
+				    msg.put("status", currentPartNumber > 0 ? "PartInProgress" : "InProgress");
+				    msg.put("statusMessage", (currentPartNumber > 0 ? "Part " + currentPartNumber + ": " : "Downloading: ") + progressDetail);
+				    msg.put("statusMessageKey", currentPartNumber > 0 ? "status_message_part_in_progress" : "status_message_downloading");
+				    JSONObject statusParams = new JSONObject();
+				    statusParams.put("fileCount", resources);
+				    statusParams.put("sizeMb", currentPartSizeMB.toString());
+				    statusParams.put("errorSuffix", errorInfo);
+				    if (currentPartNumber > 0) {
+					statusParams.put("part", currentPartNumber);
+				    }
+				    msg.put("statusMessageParams", statusParams);
+				    msg.put("downloadName", downloadName);
+				    msg.put("partNumber", completedPartLocators != null ? completedPartLocators.size() : 0);
+				    if (completedPartLocators != null && !completedPartLocators.isEmpty()) {
+					msg.put("locators", new JSONArray(completedPartLocators));
+					msg.put("totalUncompressedSizeInMB", totalDownloadedSoFarMB);
+				    }
+				    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+				    OMHandler.status(s3wrapper, bucket, operationId, msg);
+				}
 			    }
 			} catch (Exception e) {
 			    e.printStackTrace();
 			    GSLoggerFactory.getLogger(getClass()).error(e);
 			}
+		    }
+
+		    if (partComplete || maxSizeReached) {
+			break;
 		    }
 		} else {
 		    break;
@@ -310,8 +373,18 @@ public class DataDownloaderTool {
 	    }
 	}
 
-	write("request: " + requestURL + "\ndate start: " + ISO8601DateTimeUtils.getISO8601DateTime(dateStart) + "\ndate end: "
-		+ ISO8601DateTimeUtils.getISO8601DateTime(), userRequestFile);
+	boolean isFinalPart = (maxSizeReached || resumptionToken == null);
+	StringBuilder logContent = new StringBuilder();
+	logContent.append("request: ").append(baseRequestURL).append("\n");
+	logContent.append("date start: ").append(ISO8601DateTimeUtils.getISO8601DateTime(dateStart)).append("\n");
+	logContent.append("date end: ").append(ISO8601DateTimeUtils.getISO8601DateTime()).append("\n\n");
+	logContent.append("Part total size: ").append(currentPartSizeMB).append(" MB\n");
+	logContent.append("Part is final: ").append(isFinalPart ? "yes" : "no").append("\n");
+	logContent.append("Downloaded files:\n");
+	for (String name : downloadedFileNames) {
+	    logContent.append("  ").append(name).append("\n");
+	}
+	write(logContent.toString(), userRequestFile);
 
 	try {
 	    GSLoggerFactory.getLogger(getClass()).info("Zipping folder {}", tempPath);
@@ -321,20 +394,19 @@ public class DataDownloaderTool {
 	}
 
 	try {
-
 	    GSLoggerFactory.getLogger(getClass()).info("Removing folder");
-
 	    FileUtils.clearFolder(tempPath.toFile(), true);
-
 	} catch (IOException e) {
-
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Ended asynch download of {} to file: {}", requestURL, zipFile.getAbsolutePath());
+	long sizeInBytes = zipFile.length();
+	BigDecimal sizeInMB = BigDecimal.valueOf(sizeInBytes).divide(BigDecimal.valueOf(1024 * 1024), 2, RoundingMode.UP);
 
-	return zipFile;
+	GSLoggerFactory.getLogger(getClass()).info("Ended asynch download part of {} to file: {}", requestURL, zipFile.getAbsolutePath());
 
+	String tokenToReturn = maxSizeReached ? null : resumptionToken;
+	return new DownloadPartResult(zipFile, tokenToReturn, maxSizeReached, maxSizeErrorMessage, sizeInMB, currentPartSizeMB, (tokenToReturn == null), downloadedFileNames);
     }
 
     /**

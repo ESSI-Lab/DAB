@@ -467,7 +467,10 @@ public class OMHandler extends StreamingRequestHandler {
 			}
 
 			setting.setAsynchDownloadName(asynchDownloadName);
-
+			Integer mb = user.getMaxDownloadSizeMB();
+			if (mb != null) {
+			    setting.setMaxDownloadSizeMB(mb);
+			}
 			scheduler.schedule(setting);
 
 			JSONObject msg = new JSONObject();
