@@ -21,30 +21,21 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * #L%
  */
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.JobStatus.*;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTimeZone;
-import org.json.JSONObject;
+import org.joda.time.*;
+import org.json.*;
 
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.scheduler.Scheduler;
-import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.JobStatus.JobPhase;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -52,32 +43,32 @@ import eu.essi_lab.messages.JobStatus.JobPhase;
 public class SchedulerSupport {
 
     /**
-     * 
+     *
      */
     private List<SchedulerJobStatus> statusList;
 
     /**
-     * 
+     *
      */
     private List<String> executingSettings;
 
     /**
-     * 
+     *
      */
     private HashMap<String, String> nextFireTimeMap;
 
     /**
-     * 
+     *
      */
     private DateTimeZone userDateTimeZone;
 
     /**
-     * 
+     *
      */
     private static final SchedulerSupport INSTANCE = new SchedulerSupport();
 
     /**
-     * 
+     *
      */
     private SchedulerSupport() {
 
@@ -96,7 +87,7 @@ public class SchedulerSupport {
     }
 
     /**
-     *	
+     *
      */
     public void updateDelayed() {
 
@@ -119,7 +110,7 @@ public class SchedulerSupport {
     }
 
     /**
-     * 
+     *
      */
     public void update() {
 
@@ -160,9 +151,9 @@ public class SchedulerSupport {
 			listScheduledSettings().//
 			stream().//
 			collect(Collectors.groupingBy(//
-				SchedulerWorkerSetting::getIdentifier, //
-				HashMap::new, //
-				Collectors.mapping(SchedulerWorkerSetting::getNextFireTime, Collectors.toList())));
+			SchedulerWorkerSetting::getIdentifier, //
+			HashMap::new, //
+			Collectors.mapping(SchedulerWorkerSetting::getNextFireTime, Collectors.toList())));
 
 		nextFireTimeMap = new HashMap<>();
 
@@ -332,6 +323,15 @@ public class SchedulerSupport {
      * @param setting
      * @return
      */
+    public synchronized String getJobHostName(Setting setting) {
+
+	return getJobStatus(setting).flatMap(SchedulerJobStatus::getHostName).orElse("");
+    }
+
+    /**
+     * @param setting
+     * @return
+     */
     public synchronized String getAllMessages(Setting setting) {
 
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
@@ -451,10 +451,10 @@ public class SchedulerSupport {
 
 	    String unit = scheduling.getJSONObject("repeatIntervalUnit").getJSONArray("values").get(0).toString().toLowerCase();
 	    return switch (unit) {
-	    case "days" -> intervalValue + " day/s";
-	    case "hours" -> intervalValue + " hour/s";
-	    case "minutes" -> intervalValue + " minute/s";
-	    default -> intervalValue+ " N/A";
+		case "days" -> intervalValue + " day/s";
+		case "hours" -> intervalValue + " hour/s";
+		case "minutes" -> intervalValue + " minute/s";
+		default -> intervalValue + " N/A";
 	    };
 	}
 
@@ -512,8 +512,9 @@ public class SchedulerSupport {
      */
     private String computeElapsedTime(String startTime, String endTime) {
 
-	long duration = ISO8601DateTimeUtils.parseISO8601ToDate(endTime).get().getTime()
-		- ISO8601DateTimeUtils.parseISO8601ToDate(startTime).get().getTime();
+	long duration =
+		ISO8601DateTimeUtils.parseISO8601ToDate(endTime).get().getTime() - ISO8601DateTimeUtils.parseISO8601ToDate(startTime).get()
+			.getTime();
 
 	long HH = TimeUnit.MILLISECONDS.toHours(duration);
 	long mm = TimeUnit.MILLISECONDS.toMinutes(duration) % 60;

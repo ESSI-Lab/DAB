@@ -54,6 +54,11 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     public enum KeyValueOptionKeys implements LabeledEnum {
 
 	/**
+	 * Must be "true" if the resources comparator task is used
+	 */
+	RESOURCES_COMPARATOR_TASK("resourcesComparatorTask"),
+
+	/**
 	 * SPARQL proxy endpoint and forced accept header
 	 */
 	SPARQL_PROXY_ENDPOINT("sparqlProxyEndpoint"), //
