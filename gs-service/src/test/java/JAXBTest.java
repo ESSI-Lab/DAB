@@ -1,4 +1,6 @@
 import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
+
+import java.io.File;
 import java.util.ServiceLoader;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBContextFactory;
@@ -23,5 +25,7 @@ public class JAXBTest {
 
 	JAXBWMS.getInstance().getMarshaller();
     }
+
+
 
 }
