@@ -61,6 +61,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String GEOMETRY = "geometry";
     private static final String CENTROID = "centroid";
     private static final String AREA = "area";
+    private static final String RASTER_MOSAIC = "rasterMosaic";
+    private static final String METADATA_VERSION = "metadataVersion";
+    private static final String METADATA_ORIGINAL_VERSION = "metadataOriginalVersion";
 
     private ExtendedMetadata metadata;
 
@@ -1026,7 +1029,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param themeCategory
+     *
      */
     public void setIsInSitu() {
 	try {
@@ -1201,7 +1204,41 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param scene
+     * @param modelSpecificFields
+     */
+    public void setModelSpecificFields(ModelSpecificFields modelSpecificFields) {
+
+	try {
+	    this.metadata.remove("//*:modelSpecificFields");
+	    this.metadata.add(modelSpecificFields.asDocument(true).getDocumentElement());
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<ModelSpecificFields> getModelSpecificFields() {
+
+	try {
+	    List<Node> list = this.metadata.get("//*:modelSpecificFields");
+	    if (!list.isEmpty()) {
+
+		Node node = list.get(0);
+		return Optional.of(ModelSpecificFields.create(node));
+	    }
+	} catch (XPathExpressionException | JAXBException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     *
      */
     public void setWorldCereal(WorldCerealMap map) {
 
@@ -1259,7 +1296,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param info
+     *
      */
     public void setIsNCFileCorrupted() {
 	try {
@@ -1343,11 +1380,111 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param info
+     * 
      */
     public void setAvailableGranules(String condition) {
 	try {
 	    this.metadata.add(AVAILABLE_GRANULES, condition);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+
+    /**
+     * @return
+     */
+    public Optional<Boolean> getRasterMosaic() {
+
+	try {
+	    if (this.metadata.getTextContent(RASTER_MOSAIC) == null) {
+
+		return Optional.empty();
+	    }
+
+	    return Optional.of(Boolean.valueOf(this.metadata.getTextContent(RASTER_MOSAIC)));
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param raster
+     */
+    public void setRasterMosaic(boolean raster) {
+	try {
+	    this.metadata.add(RASTER_MOSAIC, Boolean.toString(raster));
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getMetadataVersion() {
+
+	try {
+	    if (this.metadata.getTextContent(METADATA_VERSION) == null) {
+
+		return Optional.empty();
+	    }
+
+	    return Optional.of(this.metadata.getTextContent(METADATA_VERSION));
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param version
+     */
+    public void setMetadataVersion(String version) {
+	try {
+	    this.metadata.add(METADATA_VERSION, version);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getMetadataOriginalVersion() {
+
+	try {
+	    if (this.metadata.getTextContent(METADATA_ORIGINAL_VERSION) == null) {
+
+		return Optional.empty();
+	    }
+
+	    return Optional.of(this.metadata.getTextContent(METADATA_ORIGINAL_VERSION));
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param originalVersion
+     */
+    public void setMetadataOriginalVersion(String originalVersion) {
+	try {
+	    this.metadata.add(METADATA_ORIGINAL_VERSION, originalVersion);
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

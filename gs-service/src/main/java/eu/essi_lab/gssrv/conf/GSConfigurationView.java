@@ -648,10 +648,4 @@ public class GSConfigurationView extends ConfigurationView {
 		    noneMatch(s -> s.getIdentifier().equals(setting.getIdentifier()));
 	}
     }
-
-    public static void main(String[] args) throws Exception {
-	Object object = JAXBContext.newInstance(SVServiceIdentificationType.class).createUnmarshaller()
-		.unmarshal(new File("/home/boldrini/Untitled2.xml"));
-	System.out.println(object);
-    }
 }

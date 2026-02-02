@@ -21,50 +21,17 @@ package eu.essi_lab.iso.datamodel.classes;
  * #L%
  */
 
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.iso.datamodel.ISOMetadata;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
-import net.opengis.iso19139.gmd.v_20060504.AbstractEXGeographicExtentType;
-import net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CICitationType;
-import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.CIResponsiblePartyType;
-import net.opengis.iso19139.gmd.v_20060504.CIRoleCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.DSAssociationTypeCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXBoundingPolygonType;
-import net.opengis.iso19139.gmd.v_20060504.EXExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXExtentType;
-import net.opengis.iso19139.gmd.v_20060504.EXGeographicBoundingBoxType;
-import net.opengis.iso19139.gmd.v_20060504.EXGeographicDescriptionType;
-import net.opengis.iso19139.gmd.v_20060504.EXGeographicExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXTemporalExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXTemporalExtentType;
-import net.opengis.iso19139.gmd.v_20060504.EXVerticalExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXVerticalExtentType;
-import net.opengis.iso19139.gmd.v_20060504.MDAggregateInformationPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDAggregateInformationType;
-import net.opengis.iso19139.gmd.v_20060504.MDBrowseGraphicPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDCharacterSetCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDDataIdentificationType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierType;
-import net.opengis.iso19139.gmd.v_20060504.MDResolutionPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDSpatialRepresentationTypeCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
+import com.google.common.collect.*;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.jaxb.common.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
+
+import javax.xml.bind.*;
+import java.io.*;
+import java.math.*;
+import java.util.*;
 
 /**
  * MD_IDentification
@@ -98,9 +65,10 @@ public class DataIdentification extends Identification {
     //
     // topic category
     //
+
     /**
-     * @XPathDirective(target = ".//gmd:topicCategory")
      * @return
+     * @XPathDirective(target = ".//gmd:topicCategory")
      */
     public Iterator<MDTopicCategoryCodeType> getTopicCategories() {
 
@@ -152,9 +120,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = ".", after = "gmd:characterSet", position =
-     *                        Position.FIRST)
      * @param topic
+     * @XPathDirective(target = ".", after = "gmd:characterSet", position = Position.FIRST)
      */
     public void addTopicCategory(MDTopicCategoryCodeType topic) {
 
@@ -164,13 +131,40 @@ public class DataIdentification extends Identification {
 	getElementType().getTopicCategory().add(type);
     }
 
+    /**
+     * Convenience method to add topic category by string code
+     *
+     * @param topicCategoryString
+     */
+    public void addTopicCategory(String topicCategoryString) {
+	if (topicCategoryString == null || topicCategoryString.isEmpty()) {
+	    return;
+	}
+	// Try to find matching enum value
+	try {
+	    MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.fromValue(topicCategoryString.toLowerCase());
+	    addTopicCategory(topic);
+	} catch (Exception e) {
+	    // If enum conversion fails, try to match by name
+	    try {
+		MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.valueOf(topicCategoryString.toUpperCase());
+		addTopicCategory(topic);
+	    } catch (Exception e2) {
+		// If still fails, log warning and skip
+		eu.essi_lab.lib.utils.GSLoggerFactory.getLogger(getClass())
+			.warn("Could not convert topic category string to enum: " + topicCategoryString);
+	    }
+	}
+    }
+
     // --------------------------------------------------------
     //
     // resource languages
     //
+
     /**
-     * @XPathDirective(target = ".//gmd:language/gco:CharacterString")
      * @return
+     * @XPathDirective(target = ".//gmd:language/gco:CharacterString")
      */
     public Iterator<String> getLanguages() {
 
@@ -186,10 +180,9 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(create = "gmd:language/gco:CharacterString", target = ".",
-     *                        after = "gmd:spatialResolution", position =
-     *                        Position.FIRST)
      * @param language
+     * @XPathDirective(create = "gmd:language/gco:CharacterString", target = ".", after = "gmd:spatialResolution", position =
+     * Position.FIRST)
      */
     public void addLanguage(String language) {
 	if (language != null) {
@@ -198,9 +191,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(create = "gmd:language/gco:CharacterString", target = ".",
-     *                        after = "gmd:spatialResolution", position =
-     *                        Position.FIRST)
+     * @XPathDirective(create = "gmd:language/gco:CharacterString", target = ".", after = "gmd:spatialResolution", position =
+     * Position.FIRST)
      */
     public void clearLanguages() {
 
@@ -214,8 +206,8 @@ public class DataIdentification extends Identification {
     //
 
     /**
-     * @XPathDirective(target = "gmd:characterSet")
      * @param code
+     * @XPathDirective(target = "gmd:characterSet")
      */
     public void setCharacterSetCode(String code) {
 
@@ -232,8 +224,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "gmd:characterSet/gmd:MD_CharacterSetCode")
      * @return
+     * @XPathDirective(target = "gmd:characterSet/gmd:MD_CharacterSetCode")
      */
     public String getCharacterSetCode() {
 
@@ -249,10 +241,10 @@ public class DataIdentification extends Identification {
     //
     // Temporal extent
     //
+
     /**
-     * @XPathDirective(target =
-     *                        "./*:extent/gmd:EX_Extent/gmd:temporalElement//gmd:EX_TemporalExtent")
      * @return
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent/gmd:temporalElement//gmd:EX_TemporalExtent")
      */
     public Iterator<TemporalExtent> getTemporalExtents() {
 
@@ -284,11 +276,9 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent =
-     *                        "gmd:temporalElement", before =
-     *                        "*:extent/gmd:EX_Extent/gmd:verticalElement", position
-     *                        = Position.LAST)
      * @param extent
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent = "gmd:temporalElement", before =
+     * "*:extent/gmd:EX_Extent/gmd:verticalElement", position = Position.LAST)
      */
     public void addTemporalExtent(TemporalExtent extent) {
 
@@ -327,9 +317,10 @@ public class DataIdentification extends Identification {
     //
     // Bounding box
     //
+
     /**
      * Use bigdecimal method
-     * 
+     *
      * @param description
      * @param north
      * @param west
@@ -342,13 +333,12 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target =
-     *                        "./gmd:extent/gmd:EX_Extent/gmd:description/gco:CharacterString")
      * @param description
      * @param north
      * @param west
      * @param south
      * @param east
+     * @XPathDirective(target = "./gmd:extent/gmd:EX_Extent/gmd:description/gco:CharacterString")
      */
     public void addGeographicBoundingBox(String description, BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
 
@@ -382,9 +372,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent =
-     *                        "gmd:geographicElement", position = Position.FIRST)
      * @param bbox
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.FIRST)
      */
     public void addGeographicBoundingBox(GeographicBoundingBox bbox) {
 
@@ -394,7 +383,7 @@ public class DataIdentification extends Identification {
 
     /**
      * Use big decimal method
-     * 
+     *
      * @param north
      * @param west
      * @param south
@@ -438,9 +427,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target =
-     *                        "./*:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
      * @return
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
      */
     public Iterator<GeographicBoundingBox> getGeographicBoundingBoxes() {
 
@@ -453,8 +441,7 @@ public class DataIdentification extends Identification {
 		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
 		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
 
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType
-			    .getAbstractEXGeographicExtent();
+		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
 		    if (abstractEXGeographicExtent != null) {
 			AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
 			if (value instanceof EXGeographicBoundingBoxType) {
@@ -509,8 +496,7 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target =
-     *                        ".//*:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
+     * @XPathDirective(target = ".//*:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
      */
     public Iterator<String> getGeographicDescriptionCodes() {
 
@@ -522,8 +508,7 @@ public class DataIdentification extends Identification {
 		EXExtentType exExtent = exExtentPropertyType.getEXExtent();
 		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
 		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType
-			    .getAbstractEXGeographicExtent();
+		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
 		    AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
 		    if (value instanceof EXGeographicDescriptionType) {
 			EXGeographicDescriptionType type = (EXGeographicDescriptionType) value;
@@ -545,10 +530,10 @@ public class DataIdentification extends Identification {
     //
     // Vertical extent
     //
+
     /**
-     * @XPathDirective(target =
-     *                        "./gmd:extent/gmd:EX_Extent/gmd:verticalElement//gmd:EX_VerticalExtent")
      * @return
+     * @XPathDirective(target = "./gmd:extent/gmd:EX_Extent/gmd:verticalElement//gmd:EX_VerticalExtent")
      */
     public Iterator<VerticalExtent> getVerticalExtents() {
 	ArrayList<VerticalExtent> out = new ArrayList<VerticalExtent>();
@@ -583,9 +568,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./gmd:extent/gmd:EX_Extent", parent =
-     *                        "gmd:verticalElement", position = Position.LAST)
      * @param extent
+     * @XPathDirective(target = "./gmd:extent/gmd:EX_Extent", parent = "gmd:verticalElement", position = Position.LAST)
      */
     public void addVerticalExtent(VerticalExtent extent) {
 	EXVerticalExtentPropertyType exGeographicExtentPropertyType = new EXVerticalExtentPropertyType();
@@ -608,6 +592,25 @@ public class DataIdentification extends Identification {
 	addVerticalExtent(extent);
     }
 
+    /**
+     * Convenience method to add vertical extent with CRS
+     *
+     * @param min
+     * @param max
+     * @param crs
+     */
+    public void addVerticalExtent(double min, double max, String crs) {
+	VerticalExtent extent = new VerticalExtent();
+	extent.setMinimumValue(min);
+	extent.setMaximumValue(max);
+	if (crs != null && !crs.isEmpty()) {
+	    VerticalCRS verticalCRS = new VerticalCRS();
+	    // Set CRS identifier if needed
+	    extent.setVerticalCRS(verticalCRS);
+	}
+	addVerticalExtent(extent);
+    }
+
     public void clearExtents() {
 	getElementType().unsetExtent();
 
@@ -617,10 +620,10 @@ public class DataIdentification extends Identification {
     //
     // Bounding polygon
     //
+
     /**
-     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent =
-     *                        "gmd:geographicElement", position = Position.LAST)
      * @param polygon
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.LAST)
      */
     public void addBoundingPolygon(BoundingPolygon polygon) {
 	EXExtentPropertyType extentProperty = new EXExtentPropertyType();
@@ -636,9 +639,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent =
-     *                        "gmd:geographicElement", position = Position.LAST)
      * @return
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.LAST)
      */
     public Iterator<BoundingPolygon> getBoundingPolygons() {
 
@@ -646,9 +648,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent =
-     *                        "gmd:geographicElement", position = Position.LAST)
      * @return
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.LAST)
      */
     public List<BoundingPolygon> getBoundingPolygonsList() {
 	List<BoundingPolygon> ret = new ArrayList<>();
@@ -661,8 +662,7 @@ public class DataIdentification extends Identification {
 			List<EXGeographicExtentPropertyType> geographics = extent.getGeographicElement();
 			for (EXGeographicExtentPropertyType geographic : geographics) {
 			    if (geographic.isSetAbstractEXGeographicExtent()) {
-				JAXBElement<? extends AbstractEXGeographicExtentType> abstractGeo = geographic
-					.getAbstractEXGeographicExtent();
+				JAXBElement<? extends AbstractEXGeographicExtentType> abstractGeo = geographic.getAbstractEXGeographicExtent();
 				AbstractEXGeographicExtentType abstractExtent = abstractGeo.getValue();
 				if (abstractExtent instanceof EXBoundingPolygonType) {
 				    EXBoundingPolygonType polygonType = (EXBoundingPolygonType) abstractExtent;
@@ -682,9 +682,8 @@ public class DataIdentification extends Identification {
     // *****
 
     /**
-     * @XPathDirective(clear = "gmd:spatialRepresentationType", target = ".", after
-     *                       = "gmd:abstract", position = Position.FIRST)
      * @param spatialRepresentationTypeCode
+     * @XPathDirective(clear = "gmd:spatialRepresentationType", target = ".", after = "gmd:abstract", position = Position.FIRST)
      */
     public void setSpatialRepresentationType(String spatialRepresentationTypeCode) {
 	if (spatialRepresentationTypeCode == null) {
@@ -693,25 +692,51 @@ public class DataIdentification extends Identification {
 	}
 	List<MDSpatialRepresentationTypeCodePropertyType> spatialProperties = new ArrayList<>();
 	MDSpatialRepresentationTypeCodePropertyType spatialProperty = new MDSpatialRepresentationTypeCodePropertyType();
-	spatialProperty.setMDSpatialRepresentationTypeCode(createCodeListValueType(MD_SPATIAL_REPRESENTATION_TYPE_CODE_CODELIST,
-		spatialRepresentationTypeCode, ISO_19115_CODESPACE, spatialRepresentationTypeCode));
+	spatialProperty.setMDSpatialRepresentationTypeCode(
+		createCodeListValueType(MD_SPATIAL_REPRESENTATION_TYPE_CODE_CODELIST, spatialRepresentationTypeCode, ISO_19115_CODESPACE,
+			spatialRepresentationTypeCode));
 	spatialProperties.add(spatialProperty);
 	getElementType().setSpatialRepresentationType(spatialProperties);
     }
 
     /**
-     * @XPathDirective(target =
-     *                        "gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode/@codeListValue")
      * @return
+     * @XPathDirective(target = "gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode/@codeListValue")
      */
     public String getSpatialRepresentationTypeCodeListValue() {
-	if (getElementType().isSetSpatialRepresentationType()) {
-	    MDSpatialRepresentationTypeCodePropertyType spatialProperty = getElementType().getSpatialRepresentationType().get(0);
-	    if (spatialProperty.isSetMDSpatialRepresentationTypeCode()) {
-		return spatialProperty.getMDSpatialRepresentationTypeCode().getCodeListValue();
-	    }
+
+	List<String> list = getSpatialRepresentationTypeCodeListValueList();
+
+	if (!list.isEmpty()) {
+
+	    return list.get(0);
 	}
+
 	return null;
+    }
+
+    /**
+     * @return
+     */
+    public List<String> getSpatialRepresentationTypeCodeListValueList() {
+
+	ArrayList<String> out = new ArrayList<>();
+	try {
+	    if (getElementType().isSetSpatialRepresentationType()) {
+		List<MDSpatialRepresentationTypeCodePropertyType> spatialProperty = getElementType().getSpatialRepresentationType();
+		for (MDSpatialRepresentationTypeCodePropertyType type : spatialProperty) {
+		    if (type.isSetMDSpatialRepresentationTypeCode()) {
+			String codeListValue = type.getMDSpatialRepresentationTypeCode().getCodeListValue();
+			if (codeListValue != null && !codeListValue.isEmpty()) {
+			    out.add(codeListValue);
+			}
+		    }
+		}
+	    }
+	} catch (Exception e) {
+	}
+
+	return out;
     }
 
     /**
@@ -729,19 +754,17 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = ".", after = "gmd:citation gmd:abstract gmd:purpose
-     *                        gmd:credit gmd_status gmd:pointOfContact
-     *                        gmd:resourceMaintenance", position = Position.FIRST)
+     * @XPathDirective(target = ".", after = "gmd:citation gmd:abstract gmd:purpose gmd:credit gmd_status gmd:pointOfContact
+     * gmd:resourceMaintenance", position = Position.FIRST)
      */
     public void clearGraphicOverviews() {
 	getElementType().unsetGraphicOverview();
     }
 
     /**
-     * @XPathDirective(target = ".", after = "gmd:citation gmd:abstract gmd:purpose
-     *                        gmd:credit gmd_status gmd:pointOfContact
-     *                        gmd:resourceMaintenance", position = Position.FIRST)
      * @param browseGraphic
+     * @XPathDirective(target = ".", after = "gmd:citation gmd:abstract gmd:purpose gmd:credit gmd_status gmd:pointOfContact
+     * gmd:resourceMaintenance", position = Position.FIRST)
      */
     public void addGraphicOverview(BrowseGraphic browseGraphic) {
 	MDBrowseGraphicPropertyType browseGraphicProperty = new MDBrowseGraphicPropertyType();
@@ -750,8 +773,33 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
+     * Convenience method to add a browse graphic from URL and description
+     *
+     * @param url
+     * @param description
+     */
+    public void addBrowseGraphic(String url, String description) {
+	BrowseGraphic graphic = new BrowseGraphic();
+	graphic.setFileName(url);
+	if (description != null) {
+	    graphic.setFileDescription(description);
+	}
+	addGraphicOverview(graphic);
+    }
+
+    public void addBrowseGraphic(String url, String description, String fileType) {
+	BrowseGraphic graphic = new BrowseGraphic();
+	graphic.setFileName(url);
+	if (description != null) {
+	    graphic.setFileDescription(description);
+	}
+	graphic.setFileType(fileType);
+	addGraphicOverview(graphic);
+    }
+
+    /**
      * @return
+     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      */
     public Iterator<BrowseGraphic> getGraphicOverviews() {
 	List<MDBrowseGraphicPropertyType> overviews = getElementType().getGraphicOverview();
@@ -766,8 +814,8 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      * @return
+     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      */
     public BrowseGraphic getGraphicOverview() {
 	Iterator<BrowseGraphic> iterator = getGraphicOverviews();
@@ -780,6 +828,35 @@ public class DataIdentification extends Identification {
     public void setSpatialResolution(MDResolution resolution) {
 	clearSpatialResolution();
 	addSpatialResolution(resolution);
+    }
+
+    /**
+     * Convenience method to set spatial resolution from a distance value
+     *
+     * @param distance
+     */
+    public void setSpatialResolution(Double distance) {
+	if (distance == null || distance.isNaN()) {
+	    clearSpatialResolution();
+	    return;
+	}
+	MDResolution resolution = new MDResolution();
+	resolution.setDistance("m", distance);
+	setSpatialResolution(resolution);
+    }
+
+    /**
+     * Convenience method to set equivalent scale
+     *
+     * @param scale
+     */
+    public void setEquivalentScale(int scale) {
+	MDResolution resolution = getSpatialResolution();
+	if (resolution == null) {
+	    resolution = new MDResolution();
+	}
+	resolution.setEquivalentScale(java.math.BigInteger.valueOf(scale));
+	setSpatialResolution(resolution);
     }
 
     public void addSpatialResolution(MDResolution resolution) {

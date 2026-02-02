@@ -84,7 +84,7 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 	text += names;
 
 	TextArea textArea = new TextArea();
-	textArea.setHeight(375, Unit.PIXELS);
+	textArea.setHeight(365, Unit.PIXELS);
 	textArea.setValue(text);
 	textArea.setWidth(580, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");

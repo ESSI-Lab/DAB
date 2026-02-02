@@ -879,10 +879,16 @@
 			<artifactId>accessor-digital-globe</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-dataloggers</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-datahub</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 

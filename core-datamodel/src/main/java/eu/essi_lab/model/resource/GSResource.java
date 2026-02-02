@@ -45,6 +45,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 
+import eu.essi_lab.iso.datamodel.classes.*;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.w3c.dom.Node;
 
@@ -86,7 +87,7 @@ public abstract class GSResource extends DOMSerializer {
 
     static {
 	try {
-	    context = JAXBContext.newInstance(GSResource.class, ObjectFactory.class);
+	    context = JAXBContext.newInstance(GSResource.class, ObjectFactory.class, EXT_CIOnlineResourceType.class);
 	} catch (JAXBException e) {
 	    GSLoggerFactory.getLogger(GSResource.class).error("Fatal initialization error!");
 	    GSLoggerFactory.getLogger(GSResource.class).error(e.getMessage(), e);

@@ -21,14 +21,13 @@ package eu.essi_lab.model.resource;
  * #L%
  */
 
-import java.util.*;
-import java.util.stream.Collectors;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.index.*;
+import eu.essi_lab.model.resource.composed.*;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.index.IndexedElement;
-import eu.essi_lab.model.resource.composed.ComposedElement;
-import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * Enumeration of queryable {@link HarmonizedMetadata} element names
@@ -39,10 +38,10 @@ import eu.essi_lab.model.resource.composed.ComposedElementBuilder;
 public enum MetadataElement implements Queryable {
 
     /**
-    *
-    */
-   ORGANIZATION(OrganizationElementWrapper.build()),
-    
+     *
+     */
+    ORGANIZATION(OrganizationElementWrapper.build()),
+
     /**
      *
      */
@@ -82,13 +81,11 @@ public enum MetadataElement implements Queryable {
      *
      */
     ANY_TEXT("anyText", false),
-    //
 
     /**
      *
      */
     SUBJECT("subject"),
-    //
 
     /**
      *
@@ -296,6 +293,27 @@ public enum MetadataElement implements Queryable {
      *
      */
     BOUNDING_BOX("bbox", "Spatial extent", ContentType.SPATIAL),
+
+    /**
+     *
+     */
+    SPATIAL_REPRESENTATION_TYPE("spatialRepresentationType"),
+
+    /**
+     *
+     */
+    RASTER_MOSAIC("rasterMosaic", ContentType.BOOLEAN),
+
+    /**
+     *
+     */
+    METADATA_VERSION("metadataVersion"),
+
+    /**
+     *
+     */
+    METADATA_ORIGINAL_VERSION("metadataOriginalVersion"),
+
     /**
      *
      */
@@ -396,8 +414,16 @@ public enum MetadataElement implements Queryable {
      *
      */
     ORGANISATION_NAME(MetadataElement.ORGANISATION_NAME_EL_NAME),
-    
-    
+
+    /**
+     *
+     */
+    OWNER_ORGANISATION_NAME("ownerOrgName"),
+
+    /**
+     *
+     */
+    DISTRIBUTOR_ORGANISATION_NAME("distOrgName"),
 
     /**
      *

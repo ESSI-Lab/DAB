@@ -64,7 +64,7 @@ public abstract class DOMSerializer {
 	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	marshaller.marshal(getElement(), outputStream);
 
-	return outputStream.toString("UTF-8").trim();
+	return outputStream.toString(StandardCharsets.UTF_8).trim();
     }
 
     public InputStream asStream(boolean omitXMLdeclaration) throws JAXBException, UnsupportedEncodingException {

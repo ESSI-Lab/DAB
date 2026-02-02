@@ -1,15 +1,30 @@
 package eu.essi_lab.iso.datamodel.test;
 
-import org.junit.Assert;
-
-import eu.essi_lab.iso.datamodel.MetadataTest;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import net.opengis.iso19139.gmd.v_20060504.CIOnlineResourceType;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import net.opengis.iso19139.gmd.v_20060504.*;
+import org.junit.*;
 
 public class OnlineTest extends MetadataTest<Online, CIOnlineResourceType> {
 
     public OnlineTest() {
 	super(Online.class, CIOnlineResourceType.class);
+    }
+
+    @Test
+    public void anchorTest() {
+
+	Online online = new Online();
+
+	online.setDescriptionGmxAnchor("descriptionGmxAnchor");
+
+	online.setProtocolAnchor("protocolHrefGmxAnchor", "protocolValueGmxAnchor");
+
+	Assert.assertEquals("descriptionGmxAnchor", online.getDescriptionGmxAnchor());
+
+	Assert.assertEquals("protocolHrefGmxAnchor", online.getProtocolGmxAnchorHref());
+
+	Assert.assertEquals("protocolValueGmxAnchor", online.getProtocolGmxAnchorTitle());
     }
 
     @Override
@@ -25,12 +40,12 @@ public class OnlineTest extends MetadataTest<Online, CIOnlineResourceType> {
 
     @Override
     public void checkProperties(Online online) {
-	Assert.assertEquals(online.getName(), "name");
-	Assert.assertEquals(online.getProtocol(), "protocol");
-	Assert.assertEquals(online.getDescription(), "desc");
-	Assert.assertEquals(online.getLinkage(), "link");
-	Assert.assertEquals(online.getFunctionCode(), "download");
-	Assert.assertEquals(online.getIdentifier(), "id");
+	Assert.assertEquals("name", online.getName());
+	Assert.assertEquals("protocol", online.getProtocol());
+	Assert.assertEquals("desc", online.getDescription());
+	Assert.assertEquals("link", online.getLinkage());
+	Assert.assertEquals("download", online.getFunctionCode());
+	Assert.assertEquals("id", online.getIdentifier());
 
     }
 

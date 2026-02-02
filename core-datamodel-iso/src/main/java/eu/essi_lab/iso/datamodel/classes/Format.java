@@ -76,6 +76,16 @@ public class Format extends ISOMetadata<MDFormatType> {
     }
 
     /**
+     * Sets the format name as an anchor property type (with both URI and label).
+     * @XPathDirective(target = "gmd:name/gmx:Anchor/@xlink:href,@xlink:title")
+     * @param uri The URI/href for the anchor
+     * @param label The label/title for the anchor
+     */
+    public void setNameWithAnchor(String uri, String label) {
+	type.setName(createAnchorPropertyType(uri, label));
+    }
+
+    /**
      * @XPathDirective(target = "gmd:version/gco:CharacterString")
      * @param version
      */
@@ -92,6 +102,29 @@ public class Format extends ISOMetadata<MDFormatType> {
 
 	try {
 	    return ISOMetadata.getStringFromCharacterString(type.getVersion());
+	} catch (NullPointerException ex) {
+	}
+
+	return null;
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:specification/gco:CharacterString")
+     * @param specification
+     */
+    public void setSpecification(String specification) {
+
+	type.setSpecification(createCharacterStringPropertyType(specification));
+    }
+
+    /**
+     * @XPathDirective(target = "gmd:specification/gco:CharacterString")
+     * @return
+     */
+    public String getSpecification() {
+
+	try {
+	    return ISOMetadata.getStringFromCharacterString(type.getSpecification());
 	} catch (NullPointerException ex) {
 	}
 
