@@ -356,8 +356,8 @@ body {
 #results-tab {
 	flex: 1;
 	min-height: 0;
-	overflow-y: auto;
-	overflow-x: hidden;
+	overflow-y: auto !important;
+	overflow-x: hidden !important;
 	width: 100%;
 	margin: 0 !important;
 	padding: 0 !important;
@@ -381,15 +381,16 @@ body {
 	min-height: 0;
 }
 
-/* Only results tab should scroll, not its parent containers */
+/* Only results tab should scroll: constrain height and show scrollbar for overflow */
 #tabs-div .ui-tabs-panel#results-tab {
-	overflow-y: auto;
-	overflow-x: hidden;
+	overflow-y: auto !important;
+	overflow-x: hidden !important;
+	min-height: 0;
 }
 
-/* Ensure no other containers inside results tab create scrollbars */
+/* Allow results tab content to overflow so the panel scrolls (do not force overflow: visible on direct children) */
 #results-tab > * {
-	overflow: visible;
+	overflow-x: hidden;
 }
 
 #results-tab .resultset-layout-ul,
@@ -409,7 +410,7 @@ body {
 	text-align: center;
 	display: block;
 	background: #c0c0c0;
-	padding: 0px;
+	padding: 0 0 8px 0;
 	margin: 0;
 	flex-shrink: 0;
 	width: 100%;
@@ -472,11 +473,53 @@ body {
 
 /* -------------------------------- */
 /* sources tab                      */
-/*                                  */
+/* Override .ui-tabs-panel overflow so sources panel has no scrollbar and stays within screen */
+#tabs-div .ui-tabs-panel#sources-tab {
+	overflow: hidden !important;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
 #sources-tab {
-	overflow: auto;
+	overflow: hidden !important;
 	box-shadow: none;
 	background: rgb(221, 221, 221);
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+/* SourcesWidget creates an inner div with inline overflow-y: scroll and fixed height - override to remove scrollbar and constrain to panel */
+#sources-tab [style*="overflow-y"] {
+	overflow: hidden !important;
+	max-height: 100% !important;
+	height: 100% !important;
+}
+
+/* Constrain sources tab content wrapper so it doesn't extend off screen */
+#sources-tab > div {
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+#sources-tab > div table#wrapSourcesWidgetTable {
+	height: 100%;
+	min-height: 0;
+}
+
+#sources-tab > div table#wrapSourcesWidgetTable tbody tr:last-child td {
+	height: 100%;
+	vertical-align: top;
+}
+
+#sources-tab > div table#wrapSourcesWidgetTable tbody tr:last-child td > div {
+	overflow: hidden !important;
+	max-height: 100% !important;
+	height: 100% !important;
 }
 
 .sources-widget {
