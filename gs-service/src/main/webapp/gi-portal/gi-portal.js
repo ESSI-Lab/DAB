@@ -3531,7 +3531,7 @@ export function initializePortal(config) {
 								$('<input>').attr({
 									'type': 'checkbox',
 									'id': 'emailNotifications',
-									'checked': true
+									'checked': false
 								}).css('margin-right', '8px')
 							);
 
