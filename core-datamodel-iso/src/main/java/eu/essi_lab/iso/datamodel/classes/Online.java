@@ -281,6 +281,16 @@ public class Online extends ISOMetadata<CIOnlineResourceType> {
 	return null;
     }
 
+	public String getFunctionCodeURI() {
+
+		try {
+			return type.getFunction().getCIOnLineFunctionCode().getCodeList();
+		} catch (NullPointerException ex) {
+		}
+
+		return null;
+	}
+
   
 
     public JAXBElement<CIOnlineResourceType> getElement() {

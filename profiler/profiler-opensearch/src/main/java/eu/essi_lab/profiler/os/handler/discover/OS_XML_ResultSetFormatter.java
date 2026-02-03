@@ -63,7 +63,7 @@ import eu.essi_lab.profiler.os.OSRequestParser;
  * 
  * @author Fabrizio
  */
-public class OS_XML_ResultSetFormatter extends DiscoveryResultSetFormatter<String> {
+public class  OS_XML_ResultSetFormatter extends DiscoveryResultSetFormatter<String> {
 
     /**
      * The encoding name of {@link #OS_XML_FORMATTING_ENCODING}
