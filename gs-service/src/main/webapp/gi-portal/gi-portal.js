@@ -2417,18 +2417,23 @@ export function initializePortal(config) {
 			'overflow': 'hidden'
 		});
 		
-		// Move tabs, paginator, and results tab into left sidebar (in order: tabs, paginator, results tab)
+		// Move tabs and paginator into left sidebar (in order: tabs, paginator)
+		// Keep results-tab inside tabs-div so only the active tab panel is visible (results, filters, or sources)
 		var tabs = jQuery('#tabs-div');
 		var paginator = jQuery('#paginator-widget');
-		var resultsTab = jQuery('#results-tab');
 		var map = jQuery('#resMapWidget');
 		var stationInfo = jQuery('#stationInfo');
 		
-		// Add tabs first (at the top)
+		// Add tabs first (at the top) - contains results-tab, filters-tab, sources-tab panels
 		if (tabs.length) {
 			tabs.css({
 				'flex-shrink': '0',
-				'width': '100%'
+				'flex': '1',
+				'min-height': '0',
+				'width': '100%',
+				'display': 'flex',
+				'flex-direction': 'column',
+				'overflow': 'hidden'
 			});
 			leftSidebar.append(tabs);
 		}
@@ -2440,17 +2445,6 @@ export function initializePortal(config) {
 				'width': '100%'
 			});
 			leftSidebar.append(paginator);
-		}
-		
-		// Add results tab third (below paginator)
-		if (resultsTab.length) {
-			resultsTab.css({
-				'flex': '1',
-				'min-height': '0',
-				'width': '100%',
-				'overflow-y': 'auto'
-			});
-			leftSidebar.append(resultsTab);
 		}
 		
 		// Add left sidebar to wrapper
