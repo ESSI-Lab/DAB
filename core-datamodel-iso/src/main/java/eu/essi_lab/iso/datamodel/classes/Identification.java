@@ -1073,7 +1073,7 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
         return null;
     }
 
-    private CICitationType getFirstCitation() {
+    public CICitationType getFirstCitation() {
 
         CICitationPropertyType citation = type.getCitation();
         if (citation == null) {

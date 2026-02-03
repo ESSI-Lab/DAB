@@ -1,0 +1,218 @@
+{
+    "abstract": "Il presente documento fornisce un'analisi dettagliata del consumo di suolo in Italia per l'anno 2022, evidenziando le aree maggiormente interessate da fenomeni di urbanizzazione e trasformazione del territorio. Vengono presentati dati statistici, mappe tematiche e tendenze osservate, con l'obiettivo di supportare le politiche di pianificazione territoriale e gestione sostenibile delle risorse naturali.",
+    "bbox_4326": {
+        "east_bound_longitude": "15.892",
+        "north_bound_latitude": "38.167",
+        "south_bound_latitude": "38.055",
+        "west_bound_longitude": "15.758"
+    },
+    "bbox_native_epsg_gml_polygon": "1093222.384452345315367 4233539.465107622556388 1104998.453366933856159 4234408.290833427571 1104069.77282649744302 4246856.559968182817 1092311.991264782846 4245986.91919365339 1093222.384452345315 4233539.465107622556",
+    "character_set": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode",
+        "value": "utf8"
+    },
+    "conformity": [
+        {
+            "explanation": "Questo servizio non è conforme agli standard OGC per i dati geospaziali a causa di limitazioni nei formati di dati spaziali e del fatto che i servizi non sono allineati con i protocolli richiesti dall'OGC.",
+            "pass": "False",
+            "specification_publication_date": "2004-12-01",
+            "specification_title": "OGC Standards for Geographic Information"
+        },
+        {
+            "explanation": "Il servizio non è conforme agli standard INSPIRE per l'infrastruttura dei dati spaziali, in quanto manca della metadati e dei servizi dati necessari per soddisfare i criteri di interoperabilità dell'INSPIRE.",
+            "pass": "False",
+            "specification_publication_date": "2007-05-15",
+            "specification_title": "Direttiva INSPIRE 2007/2/EC"
+        },
+        {
+            "explanation": "Anche se questo servizio non è conforme agli standard OGC o INSPIRE, è conforme alla ISO 19115:2003, che fornisce metadati standardizzati per i dataset geospaziali e archivistici.",
+            "pass": "True",
+            "specification_publication_date": "2003-12-01",
+            "specification_title": "ISO 19115:2003 - Geographic Information - Metadata"
+        }
+    ],
+    "data_language": "it",
+    "dataset_location": "S3;output-data;SIM/cu_v1_6/ispra_2022_report_consumo_suolo_2025.pdf",
+    "date_of_next_update": "None",
+    "descriptive_keywords": [
+        {
+            "keywords": [
+                {
+                    "label": "environmental change",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2782"
+                },
+                {
+                    "label": "environmental monitoring",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2882"
+                },
+                {
+                    "label": "survey",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/8240"
+                }
+            ],
+            "thesaurus": {
+                "name": "GEMET - INSPIRE themes, version 1.0",
+                "publication_date": "2008-06-01",
+                "url": "https://www.eionet.europa.eu/gemet/it/inspire-themes"
+            }
+        },
+        {
+            "keywords": [
+                {"label": "change detection"},
+                {"label": "CU.V1.06"},
+                {"label": "open data"},
+                {"label": "SIM internal resource"}
+            ]
+        }
+    ],
+    "edition": "Version 2.1",
+    "edition_date": "2025-10-11T12:00:00Z",
+    "formats": [
+        {
+            "name": {
+                "label": "PDF",
+                "uri": "https://www.iana.org/assignments/media-types/application/pdf"
+            },
+            "version": "inapplicable"
+        }
+    ],
+    "graphic_overview": {
+        "description": "Anteprima del dataset",
+        "file_type": "PNG",
+        "url": "https://sim.gov.mase.it/path/to/metadata/preview.png"
+    },
+    "hierarchy_level": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+        "value": "document"
+    },
+    "identifier": "ispra_2022_report_consumo_suolo_2025-10-11_v2_1",
+    "lineage_source": [
+        {
+            "description": "La procedura utilizzata in questo paper è stata adottata per la produzione di questo dataset.",
+            "source_citation": {
+                "online_resource": [
+                    {"url": "https://doi.org/10.1007/s12145-019-00380-5"}
+                ],
+                "title": "Land Use and Land Cover Change Detection Using Remote Sensing Data: A Review"
+            }
+        }
+    ],
+    "lineage_statement": "Il documento è stato prodotto utilizzando dati satellitari Sentinel-2 preprocessati e classificati tramite algoritmi di machine learning per identificare le aree di consumo di suolo. Le procedure adottate sono descritte in dettaglio nelle sezioni successive.",
+    "metadata_language": "it",
+    "metadata_original_version": "ispra_2022_report_consumo_suolo_2025-10-11_v1",
+    "metadata_owner": {
+        "address": {"email": "sim@mase.gov.it"},
+        "link": "https://sim.mase.gov.it",
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "role": "pointOfContact"
+    },
+    "metadata_profile": {
+        "name": "Linee guida RNDT",
+        "version": "2.0"
+    },
+    "metadata_updated_at": "2025-10-11T12:00:00Z",
+    "metadata_version": "2.1",
+    "online_resources": [
+        {
+            "application_profile": {
+                "label": "download",
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download"
+            },
+            "description": {
+                "label": "accessPoint",
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint"
+            },
+            "function": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode",
+                "value": "download"
+            },
+            "name": "ispra_2022_report_consumo_suolo_2025.pdf",
+            "protocol": {
+                "label": "WWW:LINK-1.0-http--link",
+                "uri": "http://www.w3.org/TR/xlink/"
+            },
+            "source_auth_type": "NO_AUTH",
+            "url": "https://sim-dev.mase.gov.it/core/api/mastercatalog-cart-downloader/bucket/ispra_2022_report_consumo_suolo_2025.pdf"
+        }
+    ],
+    "parent_identifier": "v4_7_changedetection_series",
+    "point_of_contact": {
+        "address": {"email": "ispra@ispra.it"},
+        "link": "https://www.ispra.it",
+        "organization_name": "Istituto Superiore per la Protezione e la Ricerca Ambientale (ISPRA)",
+        "role": "pointOfContact"
+    },
+    "presentation_form": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode",
+        "value": "documentDigital"
+    },
+    "quality_scope": {
+        "scope_code": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+            "value": "document"
+        },
+        "scope_details": "Entire document"
+    },
+    "resource_author_id": "0a4af5a1-9ddd-485d-8bf4-b384b223510b",
+    "resource_constraints": {
+        "access_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "other_constraints": "http://publications.europa.eu/resource/authority/licence/IODL_2_0",
+        "security_classification": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode",
+            "value": "unclassified"
+        },
+        "security_note": "None",
+        "use_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "use_limitation": "IODL 2.0"
+    },
+    "resource_creation_date": "2025-10-11T12:00:00Z",
+    "resource_expiration_date": "2026-12-11T12:00:00Z",
+    "resource_owner": {
+        "address": {"email": "ispra@ispra.it"},
+        "link": "https://www.ispra.it",
+        "organization_name": "Istituto Superiore per la Protezione e la Ricerca Ambientale (ISPRA)",
+        "role": "owner"
+    },
+    "resource_provider": {
+        "address": {"email": "sim@mase.gov.it"},
+        "link": "https://sim.mase.gov.it/cu_v4_7",
+        "organization_name": "CU.V1.06 - Analisi ed estrazione dati della rete osservativa in situ e mobile",
+        "role": "resourceProvider"
+    },
+    "resource_publication_date": "2025-10-11T12:00:00Z",
+    "resource_revision_date": "2025-10-11T12:00:00Z",
+    "spatial_scope": {
+        "keywords": {
+            "label": "National",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national"
+        },
+        "thesaurus": {
+            "name": "Spatial scope",
+            "publication_date": "2019-05-22",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope"
+        }
+    },
+    "status": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode",
+        "value": "completed"
+    },
+    "temporal_extent": {
+        "end_date": "2022-10-11",
+        "start_date": "2021-10-10"
+    },
+    "title": "Report 2022 sul consumo di suolo nel territorio italiano - Versione 2.1",
+    "topic_categories": [
+        "environment",
+        "location"
+    ],
+    "update_frequency": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode",
+        "value": "notPlanned"
+    }
+}

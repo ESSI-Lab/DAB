@@ -10,19 +10,19 @@ package eu.essi_lab.lib.utils;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import java.util.Optional;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -355,16 +355,16 @@ public class GSLoggerFactory {
 
 	    if (listener != null) {
 
-		Executors.newCachedThreadPool().submit(() -> {
-		    try {
-
-			listener.errorOccurred(clazz, msg, Optional.of(t));
-		    } catch (Exception e) {
-
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-		    }
-		});
+		try (ExecutorService executor = Executors.newCachedThreadPool()) {
+		    executor.submit(() -> {
+			try {
+			    listener.errorOccurred(clazz, msg, Optional.of(t));
+			} catch (Exception e) {
+			    e.printStackTrace();
+			    logger.error(e.getMessage(), e);
+			}
+		    });
+		}
 	    }
 
 	    logger.error(msg, t);
@@ -377,16 +377,16 @@ public class GSLoggerFactory {
 
 	    if (listener != null) {
 
-		Executors.newCachedThreadPool().submit(() -> {
-		    try {
-
-			listener.errorOccurred(clazz, t.getMessage(), Optional.of(t));
-		    } catch (Exception e) {
-
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-		    }
-		});
+		try (ExecutorService executor = Executors.newCachedThreadPool()) {
+		    executor.submit(() -> {
+			try {
+			    listener.errorOccurred(clazz, t.getMessage(), Optional.of(t));
+			} catch (Exception e) {
+			    e.printStackTrace();
+			    logger.error(e.getMessage(), e);
+			}
+		    });
+		}
 	    }
 
 	    logger.error(t.getMessage(), t);
@@ -409,16 +409,16 @@ public class GSLoggerFactory {
 
 	    if (listener != null) {
 
-		Executors.newCachedThreadPool().submit(() -> {
-		    try {
-
-			listener.errorOccurred(clazz, msg, Optional.empty());
-		    } catch (Exception e) {
-
-			e.printStackTrace();
-			logger.error(e.getMessage(), e);
-		    }
-		});
+		try (ExecutorService executor = Executors.newCachedThreadPool()) {
+		    executor.submit(() -> {
+			try {
+			    listener.errorOccurred(clazz, msg, Optional.empty());
+			} catch (Exception e) {
+			    e.printStackTrace();
+			    logger.error(e.getMessage(), e);
+			}
+		    });
+		}
 	    }
 
 	    logger.error(msg);
@@ -485,7 +485,7 @@ public class GSLoggerFactory {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void traceMemoryUsage(String message) {
 
@@ -493,7 +493,7 @@ public class GSLoggerFactory {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public static int getFreeMemory() {
 
@@ -501,7 +501,7 @@ public class GSLoggerFactory {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public static int getUsedMemory() {
 
@@ -509,7 +509,7 @@ public class GSLoggerFactory {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public static int getTotalMemory() {
 

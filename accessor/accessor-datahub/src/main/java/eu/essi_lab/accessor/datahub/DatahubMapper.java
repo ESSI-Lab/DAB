@@ -171,10 +171,7 @@ public class DatahubMapper extends FileIdentifierMapper {
             mapServiceSpecificFields(json, coreMetadata);
         }
 
-        // Map dataset-specific fields
-        if ("dataset".equalsIgnoreCase(hierarchyLevel) || "series".equalsIgnoreCase(hierarchyLevel)) {
             mapDatasetSpecificFields(json, coreMetadata, resource);
-        }
 
         return resource;
     }
@@ -191,6 +188,7 @@ public class DatahubMapper extends FileIdentifierMapper {
             identifier = json.optString("id", null);
         }
         if (identifier != null) {
+            identifier = stripDataSuffix(identifier);
             coreMetadata.setIdentifier(identifier);
             coreMetadata.getMIMetadata().setFileIdentifier(identifier);
         }
@@ -406,7 +404,7 @@ public class DatahubMapper extends FileIdentifierMapper {
 
         String dateOfNextUpdate = json.optString("date_of_next_update", null);
         // Skip placeholder values like "None" or "null"
-        if (dateOfNextUpdate != null && !dateOfNextUpdate.isEmpty() && !"null".equalsIgnoreCase(dateOfNextUpdate) && !"none".equalsIgnoreCase(dateOfNextUpdate)) {
+        if (dateOfNextUpdate != null && !dateOfNextUpdate.isEmpty() && !"null".equalsIgnoreCase(dateOfNextUpdate)) {
             identification.setDateOfNextUpdate(dateOfNextUpdate);
         }
 
@@ -1250,14 +1248,7 @@ public class DatahubMapper extends FileIdentifierMapper {
                                 if (onlineResourceObj != null) {
                                     String url = onlineResourceObj.optString("url", null);
                                     if (url != null) {
-                                        // Create Online resource and add to citation
-                                        Online online = new Online();
-                                        online.setLinkage(url);
-
-                                        // TODO: Citation doesn't have a direct method to add online resources
-                                        // This may need to be added as an extension or handled differently
-                                        logger.debug(
-                                                "TODO: Add online resource to citation - Citation class doesn't support online resources directly");
+                                        citation.addIdentifier(url);
                                     }
                                 }
                             }
@@ -1917,8 +1908,13 @@ public class DatahubMapper extends FileIdentifierMapper {
         // Parent identifier
         String parentIdentifier = json.optString("parent_identifier", null);
         if (parentIdentifier != null) {
+            parentIdentifier = stripDataSuffix(parentIdentifier);
             coreMetadata.getMIMetadata().setParentIdentifier(parentIdentifier);
         }
+    }
+
+    private static String stripDataSuffix(String id) {
+       return id;
     }
 
     @Override

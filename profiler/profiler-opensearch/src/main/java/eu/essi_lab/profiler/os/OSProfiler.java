@@ -68,6 +68,8 @@ import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHandler;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelJsonMapper;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelRequestTransformer;
+import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonFormatter;
+import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonMapper;
 import eu.essi_lab.profiler.os.handler.srvinfo.NominatimQueryHandler;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSDescriptionDocumentHandler;
 import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
@@ -179,6 +181,13 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	    return Response.status(status).type(outputFormat).entity(jsonError.toString()).build();
 
+	case DatahubJsonMapper.DATAHUB_JSON_MEDIA_TYPE:
+
+	    JSONObject datahubError = new JSONObject();
+	    datahubError.put("error", message);
+
+	    return Response.status(status).type(DatahubJsonMapper.DATAHUB_JSON_MEDIA_TYPE).entity(datahubError.toString()).build();
+
 	case MediaType.APPLICATION_ATOM_XML:
 	case NameSpace.GS_DATA_MODEL_XML_MEDIA_TYPE:
 	default:
@@ -251,6 +260,13 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	    break;
 
+	case DatahubJsonMapper.DATAHUB_JSON_MEDIA_TYPE:
+
+	    mapper = new DatahubJsonMapper();
+	    formatter = new DatahubJsonFormatter();
+
+	    break;
+
 	case MediaType.APPLICATION_ATOM_XML:
 	default:
 
@@ -287,6 +303,9 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	if (outputFormat == null) {
 	    outputFormat = MediaType.APPLICATION_ATOM_XML;
+	} else {
+	    // Normalize media type: '+' in query string is often decoded as space (application/x-www-form-urlencoded)
+	    outputFormat = outputFormat.replace(" ", "+");
 	}
 
 	return outputFormat;
@@ -324,6 +343,15 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 	    object.put("reports", new JSONArray());
 
 	    out = object.toString();
+
+	    break;
+
+	case DatahubJsonMapper.DATAHUB_JSON_MEDIA_TYPE:
+
+	    JSONObject datahubValidationError = new JSONObject();
+	    datahubValidationError.put("error", error);
+
+	    out = datahubValidationError.toString();
 
 	    break;
 
