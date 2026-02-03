@@ -1,0 +1,441 @@
+{
+    "abstract": "Il dataset contiene i risultati dell’analisi di change detection finalizzata all’individuazione e classificazione delle aree potenzialmente interessate da presenza di amianto nel territorio comunale di Reggio Calabria. L'analisi comprende due immagini satellitari Sentinel-2 in data 2024-10-10 e 2025-10-05, mentre l'elaborazione è stata effettuata in data 2025-10-11.",
+    "bbox_4326": {
+        "east_bound_longitude": "15.892",
+        "north_bound_latitude": "38.167",
+        "south_bound_latitude": "38.055",
+        "west_bound_longitude": "15.758"
+    },
+    "bbox_native_epsg_gml_polygon": "1093222.384452345315367 4233539.465107622556388 1104998.453366933856159 4234408.290833427571 1104069.77282649744302 4246856.559968182817 1092311.991264782846 4245986.91919365339 1093222.384452345315 4233539.465107622556",
+    "character_set": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode",
+        "value": "utf8"
+    },
+    "conformity": [
+        {
+            "explanation": "Vedi specifiche",
+            "pass": "True",
+            "specification_publication_date": "2010-12-08",
+            "specification_title": "REGOLAMENTO (UE) N. 1089/2010 DELLA COMMISSIONE del 23 novembre 2010 recante attuazione della direttiva 2007/2/CE del Parlamento europeo e del Consiglio per quanto riguarda l'interoperabilità dei set di dati territoriali e dei servizi di dati territoriali"
+        }
+    ],
+    "data_language": "en",
+    "dataset_location": "S3;output-data;SIM/cu_v4_7/v4_7_changedetection_comunereggiocalabria_asbestos_20251011.tif",
+    "dataset_type": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode",
+        "value": "grid"
+    },
+    "date_of_next_update": "None",
+    "descriptive_keywords": [
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/7102"
+                },
+                {
+                    "label": "environmental change",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2782"
+                },
+                {
+                    "label": "environmental monitoring",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2882"
+                },
+                {
+                    "label": "survey",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/8240"
+                }
+            ],
+            "thesaurus": {
+                "name": "GEMET - INSPIRE themes, version 1.0",
+                "publication_date": "2008-06-01",
+                "url": "https://www.eionet.europa.eu/gemet/it/inspire-themes"
+            }
+        },
+        {
+            "keywords": [
+                {"label": "change detection"},
+                {"label": "CU.V4.07"},
+                {"label": "open data"},
+                {"label": "Sistema di Monitoraggio Integrato (SIM)"}
+            ]
+        }
+    ],
+    "edition": "Version 2",
+    "edition_date": "2021-10-11T12:00:00Z",
+    "formats": [
+        {
+            "name": {
+                "label": "GeoTIFF",
+                "uri": "http://inspire.ec.europa.eu/media-types/image/tiff"
+            },
+            "version": "inapplicable"
+        }
+    ],
+    "graphic_overview": {
+        "description": "Anteprima del dataset",
+        "file_type": "PNG",
+        "url": "https://sim.gov.mase.it/path/to/metadata/preview.png"
+    },
+    "hierarchy_level": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+        "value": "dataset"
+    },
+    "identifier": "v4_7_changedetection_comunereggiocalabria_asbestos_20251011",
+    "inspire_priority_dataset": {
+        "keywords": {
+            "label": "Establishments involving dangerous substances (SEVESO III Directive)",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset/EstablishmentsInvolvingDangerousSubstances-dir-2012-18"
+        },
+        "thesaurus": {
+            "name": "INSPIRE priority data set",
+            "publication_date": "2018-04-04",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset"
+        }
+    },
+    "lineage_process_step": [
+        {
+            "date": "2025-10-10T10:30:00Z",
+            "description": "Pre-processing delle immagini multispettrali per correzione radiometrica e atmosferica.",
+            "output": {
+                "description": "Immagini multispettrali correttamente calibrate per analisi successive.",
+                "source_citation": {
+                    "online_resource": [
+                        {"url": "https://example.org/preprocessed-data"}
+                    ],
+                    "title": "Dataset pre-processato"
+                }
+            },
+            "processing_information": {
+                "algorithm": {
+                    "citation": {
+                        "online_resource": [
+                            {"url": "https://sentinel.esa.int"}
+                        ],
+                        "title": "Sen2Cor Atmospheric Correction Algorithm"
+                    },
+                    "description": "Algoritmo di correzione atmosferica basato su modelli radiativi ESA Sen2Cor."
+                },
+                "documentation": [
+                    {
+                        "online_resource": [
+                            {"url": "https://step.esa.int/main/snap-supported-plugins/sen2cor/"}
+                        ],
+                        "title": "Sen2Cor Configuration and User Guide"
+                    }
+                ],
+                "id": "PROC_STEP_001",
+                "parameter": [
+                    {
+                        "description": "Livello di correzione applicato alle bande multispettrali.",
+                        "direction": "in",
+                        "name": "Atmospheric Correction Level",
+                        "optionality": "False",
+                        "repeatability": "False",
+                        "source": {
+                            "description": "Specifiche del processore Sen2Cor",
+                            "source_citation": {
+                                "online_resource": [
+                                    {"url": "https://step.esa.int"}
+                                ],
+                                "title": "Sen2Cor Algorithm Theoretical Basis"
+                            }
+                        },
+                        "value": "L2A",
+                        "value_type": {
+                            "label": "xsd:string",
+                            "url": "http://www.w3.org/2001/XMLSchema#string"
+                        }
+                    },
+                    {
+                        "description": "Risoluzione spaziale impostata per l'elaborazione.",
+                        "direction": "in",
+                        "name": "Target Resolution",
+                        "optionality": "False",
+                        "repeatability": "False",
+                        "source": {
+                            "description": "Parametri di configurazione SNAP",
+                            "source_citation": {
+                                "online_resource": [
+                                    {"url": "https://step.esa.int"}
+                                ],
+                                "title": "SNAP Processing Parameters"
+                            }
+                        },
+                        "value": "10",
+                        "value_type": {
+                            "label": "xsd:integer",
+                            "url": "http://www.w3.org/2001/XMLSchema#integer"
+                        }
+                    }
+                ],
+                "procedure_description": "Applicazione dei moduli Sen2Cor per la correzione atmosferica e normalizzazione radiometrica.",
+                "software_reference": {
+                    "online_resource": [
+                        {"url": "https://step.esa.int/main/download/snap-download/"}
+                    ],
+                    "title": "ESA SNAP Toolbox 9.0"
+                }
+            },
+            "processor": {
+                "individual_name": "Mario Rossi",
+                "organisation_name": "Agenzia Regionale per la Protezione Ambientale",
+                "role": "processor"
+            },
+            "rationale": "Garantire la comparabilità temporale delle immagini acquisite in date diverse.",
+            "report": {
+                "description": "Report generato automaticamente contenente log e parametri.",
+                "file_type": "PDF",
+                "name": "Rapporto di pre-processing"
+            },
+            "source": {
+                "description": "Scene multispettrali Sentinel-2 preprocessate",
+                "source_citation": {
+                    "online_resource": [
+                        {"url": "https://sentinel.esa.int/web/sentinel/user-guides/sentinel-2-msi"}
+                    ],
+                    "title": "Sentinel-2 User Guide"
+                }
+            }
+        },
+        {
+            "date": "2025-10-10T15:00:00Z",
+            "description": "Classificazione tematica tramite analisi multitemporale.",
+            "output": {
+                "description": "Mappa delle variazioni tematiche.",
+                "source_citation": {"title": "Classified dataset"}
+            },
+            "processing_information": {
+                "algorithm": {
+                    "citation": {
+                        "online_resource": [
+                            {"url": "https://doi.org/10.1023/A:1010933404324"}
+                        ],
+                        "title": "Breiman's Random Forests"
+                    },
+                    "description": "Classificatore basato su insiemi di alberi decisionali."
+                },
+                "documentation": [
+                    {
+                        "graphic_overview": "[]",
+                        "online_resource": [
+                            {"url": "https://scikit-learn.org/stable/modules/ensemble.html#forest"}
+                        ],
+                        "title": "Random Forest Algorithm Overview"
+                    }
+                ],
+                "id": "PROC_STEP_002",
+                "procedure_description": "Classificazione supervisionata tramite Random Forest.",
+                "run_time_parameters": "classifier=random_forest;n_estimators=200",
+                "software_reference": {
+                    "online_resource": [
+                        {"url": "https://semiautomaticclassificationmanual-v7.readthedocs.io/"}
+                    ],
+                    "title": "QGIS Semi-Automatic Classification Plugin"
+                }
+            },
+            "processor": {
+                "organisation_name": "Dipartimento di Scienze della Terra",
+                "role": "processor"
+            },
+            "rationale": "Identificare variazioni significative correlate a fenomeni di alterazione del suolo.",
+            "report": {
+                "description": "Descrizione delle classi ottenute e delle metriche di accuratezza.",
+                "file_type": "PDF",
+                "name": "Rapporto di classificazione"
+            },
+            "source": {
+                "description": "Dataset multispettrale pre-processato",
+                "source_citation": {
+                    "online_resource": [
+                        {"url": "https://example.org/preprocessed-data"}
+                    ],
+                    "title": "Dataset pre-processato"
+                }
+            }
+        }
+    ],
+    "lineage_source": [
+        {
+            "description": "La procedura utilizzata in questo paper è stata adottata per la produzione di questo dataset.",
+            "source_citation": {
+                "online_resource": [
+                    {"url": "https://doi.org/10.1007/s12145-019-00380-5"}
+                ],
+                "title": "Change detection techniques for remote sensing applications: a survey"
+            }
+        }
+    ],
+    "lineage_statement": "L’elaborazione si basa sul confronto di dati multispettrali/iper-spettrali acquisiti in date diverse e sull’applicazione di metodologie di telerilevamento e classificazione tematica. Il prodotto finale fornisce una mappa classificata che evidenzia le zone soggette a variazioni significative correlate a fenomeni di contaminazione o alterazione del suolo, supportando attività di monitoraggio ambientale, valutazioni di rischio e pianificazione degli interventi.",
+    "metadata_language": "it",
+    "metadata_original_version": "v4_7_changedetection_20251011_86e48f81-61eb-4433-a4e3-28343d87f74c",
+    "metadata_owner": {
+        "address": {"email": "sim@mase.gov.it"},
+        "link": "https://sim.mase.gov.it",
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "role": "pointOfContact"
+    },
+    "metadata_profile": {
+        "name": "ISO 19115-2 Geographic information — Metadata — Part 2: Extensions for imagery and gridded data",
+        "version": "ISO 19115-2:2019"
+    },
+    "metadata_updated_at": "2025-10-11T12:00:00Z",
+    "metadata_version": "2.0",
+    "native_epsg": {
+        "label": "WGS 84 / UTM zone 32N",
+        "url": "http://www.opengis.net/def/crs/EPSG/0/32632"
+    },
+    "online_resources": [
+        {
+            "application_profile": {
+                "label": "download",
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download"
+            },
+            "description": {
+                "label": "accessPoint",
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint"
+            },
+            "function": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode",
+                "value": "download"
+            },
+            "name": "v4_7_changedetection_comunereggiocalabria_asbestos_20251011",
+            "protocol": {
+                "label": "WWW:LINK-1.0-http--link",
+                "uri": "http://www.w3.org/TR/xlink/"
+            },
+            "source_auth_type": "NO_AUTH",
+            "url": "https://sim-dev.mase.gov.it/core/api/mastercatalog-cart-downloader/bucket/v4_7_changedetection_comunereggiocalabria_asbestos_20251011"
+        },
+        {
+            "application_profile": {
+                "label": "view",
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/view"
+            },
+            "description": {
+                "label": "accessPoint",
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint"
+            },
+            "function": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode",
+                "value": "view"
+            },
+            "layer_style": {
+                "name": "changedetection_asbestos",
+                "workspace": "v4_7"
+            },
+            "name": "v4_7:changedetection_comunereggiocalabria_asbestos_20251011",
+            "protocol": {
+                "label": "OGC:WMS",
+                "uri": "http://www.opengis.net/def/serviceType/ogc/wms"
+            },
+            "source_auth_type": "INTERNAL_GEOSERVER",
+            "temporal_wms": "False",
+            "url": "https://ext-gis-services.platform.sim-dev.mase.gov.it/v4_7/ows"
+        }
+    ],
+    "other_roles": [
+        {
+            "address": {"email": "sim@mase.gov.it"},
+            "link": "https://sim.mase.gov.it",
+            "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+            "role": "author"
+        }
+    ],
+    "parent_identifier": "v4_7_changedetection_series",
+    "point_of_contact": {
+        "address": {"email": "sim@mase.gov.it"},
+        "link": "https://sim.mase.gov.it",
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "role": "pointOfContact"
+    },
+    "positional_accuracy": {
+        "unit": "m",
+        "unit_system": "http://www.bipm.org/en/si",
+        "value": "5"
+    },
+    "presentation_form": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode",
+        "value": "mapDigital"
+    },
+    "quality_scope": {
+        "scope_code": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+            "value": "dataset"
+        },
+        "scope_details": "Entire dataset"
+    },
+    "raster_nodata_value": "-9999",
+    "resource_author_id": "0a4af5a1-9ddd-485d-8bf4-b384b223510b",
+    "resource_constraints": {
+        "access_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "other_constraints": "http://publications.europa.eu/resource/authority/licence/IODL_2_0",
+        "security_classification": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode",
+            "value": "unclassified"
+        },
+        "security_note": "None",
+        "use_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "use_limitation": "IODL 2.0"
+    },
+    "resource_creation_date": "2025-10-11T12:00:00Z",
+    "resource_expiration_date": "2025-12-11T12:00:00Z",
+    "resource_owner": {
+        "address": {"email": "sim@mase.gov.it"},
+        "link": "https://sim.mase.gov.it",
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "role": "owner"
+    },
+    "resource_provider": {
+        "address": {"email": "sim@mase.gov.it"},
+        "link": "https://sim.mase.gov.it/cu_v4_7",
+        "organization_name": "CU.V4.07 - Gestione illecita dei rifiuti",
+        "role": "resourceProvider"
+    },
+    "resource_publication_date": "2025-10-11T12:00:00Z",
+    "resource_revision_date": "2025-10-11T12:00:00Z",
+    "spatial_resolution": {
+        "uom": "http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m",
+        "value": "10"
+    },
+    "spatial_scope": {
+        "keywords": {
+            "label": "Local",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local"
+        },
+        "thesaurus": {
+            "name": "Spatial scope",
+            "publication_date": "2019-05-22",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope"
+        }
+    },
+    "status": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode",
+        "value": "completed"
+    },
+    "temporal_extent": {
+        "end_date": "2025-10-11",
+        "start_date": "2024-10-10"
+    },
+    "title": "Change Detection - Classificazione Amianto - comune di Reggio Calabria (2025-10-11)",
+    "topic_categories": [
+        "environment",
+        "location",
+        "imageryBaseMapsEarthCover"
+    ],
+    "update_frequency": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode",
+        "value": "notPlanned"
+    },
+    "vertical_extent": {
+        "crs": "http://www.opengis.net/def/crs/EPSG/0/5773",
+        "maximum_value": "100",
+        "minimum_value": "0"
+    }
+}

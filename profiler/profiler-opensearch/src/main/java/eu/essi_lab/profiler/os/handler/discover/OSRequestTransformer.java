@@ -44,6 +44,7 @@ import eu.essi_lab.profiler.os.*;
 import eu.essi_lab.profiler.os.OSProfilerSetting.*;
 import eu.essi_lab.profiler.os.handler.discover.covering.*;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.*;
+import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonMapper;
 import eu.essi_lab.profiler.os.handler.srvinfo.*;
 
 import javax.ws.rs.core.*;
@@ -69,6 +70,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	SUPPORTED_OUTPUT_FORMATS.add(MediaType.APPLICATION_JSON);
 	SUPPORTED_OUTPUT_FORMATS.add(MediaType.APPLICATION_ATOM_XML);
 	SUPPORTED_OUTPUT_FORMATS.add(NameSpace.GS_DATA_MODEL_XML_MEDIA_TYPE);
+	SUPPORTED_OUTPUT_FORMATS.add(DatahubJsonMapper.DATAHUB_JSON_MEDIA_TYPE);
     }
 
     /**
@@ -342,6 +344,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		if (outputFormat.equals("application/atom xml")) {
 		    outputFormat = MediaType.APPLICATION_ATOM_XML;
 		}
+
+		// Normalize media type: '+' in query string is often decoded as space (application/x-www-form-urlencoded)
+		outputFormat = outputFormat.replace(" ", "+");
 
 		boolean supported = false;
 

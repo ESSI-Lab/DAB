@@ -272,7 +272,7 @@ public class ISOMetadata<T> extends DOMSerializer {
 		CodeListValueType clvt = (CodeListValueType) value;
 		return clvt.getValue();
 	    } else {
-		return value.toString();
+		return null;
 	    }
 	}
 	return null;
