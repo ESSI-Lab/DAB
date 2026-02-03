@@ -441,6 +441,36 @@ GIAPI.Common_UINode = function(options) {
 			out += '<div style="margin-left:3px; display: inline-block;">' + xmlButton.div() + '</div>';
 		}
 
+		// -------------------------------------------------------
+		// zoom to resource button (only when resource has geographic bounds)
+		//
+		var where = node.report().where;
+		var bbox = null;
+		if (where) {
+			var w = Array.isArray(where) && where.length ? where[0] : where;
+			if (w && typeof w.west !== 'undefined' && typeof w.south !== 'undefined' && typeof w.east !== 'undefined' && typeof w.north !== 'undefined') {
+				bbox = { west: w.west, south: w.south, east: w.east, north: w.north };
+			}
+		}
+		if (bbox && typeof window.GIAPI !== 'undefined' && typeof window.GIAPI.zoomToBoundingBox === 'function') {
+			var zoomButton = GIAPI.FontAwesomeButton({
+				'width': 22,
+				'label': '',
+				'icon': 'fa-search-plus',
+				'attr': [{ 'name': 'title', 'value': __t("zoom_to_resource") }],
+				'handler': function() {
+					window.GIAPI.zoomToBoundingBox(bbox);
+					return false;
+				}
+			});
+			zoomButton.css('div', 'margin-left', '3px');
+			zoomButton.css('icon', 'font-size', '13px');
+			zoomButton.css('div', 'padding', '4px');
+			zoomButton.css('div', 'background', '#005aef');
+
+			out += '<div style="margin-left:3px; display: inline-block;">' + zoomButton.div() + '</div>';
+		}
+
 		var insertCR = false;
 
 		// -------------------------------------------------------

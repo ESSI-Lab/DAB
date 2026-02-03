@@ -1,1 +1,2 @@
 eu.essi_lab.profiler.os.handler.discover.OS_XML_ResultSetFormatter
+eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonFormatter

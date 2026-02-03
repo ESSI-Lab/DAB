@@ -348,14 +348,16 @@ GIAPI.TermFrequencyWidget = function(id, beforeRefine, afterRefine, options) {
 
 	// Helper function to get the appropriate term based on language.
 	// This function is used to display alternateDecodedTerm when language is Italian
-	// for targets that provide localized labels (e.g. observedPropertyURI, attributeURI, aggregationDuration).
+	// for targets that provide localized labels (e.g. observedPropertyURI, attributeURI, aggregationDuration, timeInterpolation).
 	var getDisplayTerm = function(item, targetName) {
-		// Only apply language-specific logic for observedPropertyURI, attributeURI,
-		// aggregationDuration and intendedObservationSpacing
-		if ((targetName === 'observedPropertyURI'
+		// Only apply language-specific logic for targets that can have alternateDecodedTerm (e.g. from ontology/backend)
+		var useAlternateLabel = (targetName === 'observedPropertyURI'
 				|| targetName === 'attributeURI'
 				|| targetName === 'aggregationDuration'
-				|| targetName === 'intendedObservationSpacing') && item) {
+				|| targetName === 'intendedObservationSpacing'
+				|| targetName === 'timeInterpolation'
+				|| targetName === 'time_Interpolation');
+		if (useAlternateLabel && item) {
 			var currentLang = 'en';
 			try {
 				if (typeof window.__lang === 'function') {

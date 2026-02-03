@@ -21,29 +21,18 @@ package eu.essi_lab.profiler.os;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Optional;
+import eu.essi_lab.lib.what3words.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.messages.bond.spatial.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.pdk.*;
+import eu.essi_lab.profiler.os.OSBox.*;
+import org.h2.util.*;
 
-import org.h2.util.StringUtils;
-
-import eu.essi_lab.lib.what3words.What3Words;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.spatial.SpatialEntity;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceType;
-import eu.essi_lab.model.resource.SA_ElementWrapper;
-import eu.essi_lab.pdk.BondUtils;
-import eu.essi_lab.profiler.os.OSBox.CardinalPoint;
+import java.util.*;
 
 public abstract class OSParameters {
-
 
     /**
      *
@@ -82,11 +71,61 @@ public abstract class OSParameters {
     /**
      *
      */
+    public static final OSParameter HIERARCHY_LEVEL = new OSParameter("hLevel", "string", null, "{gs:hLevel}") {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.HIERARCHY_LEVEL_CODE_LIST_VALUE);
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter SPATIAL_REPRESENTATION_TYPE = new OSParameter("spatialRepType", "string", null, "{gs:spatialRepType}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.SPATIAL_REPRESENTATION_TYPE);
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter RASTER_MOSAIC = new OSParameter("rasterMosaic", "string", null, "{gs:rasterMosaic}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if(value == null || value.isEmpty()){
+
+		return Optional.empty();
+	    }
+
+	    boolean parsed = Boolean.parseBoolean(value);
+
+	    Bond bond = BondFactory.createSimpleValueBond(MetadataElement.RASTER_MOSAIC, parsed);
+
+	    if (parsed) {
+
+		return Optional.of(bond);
+	    }
+
+	    return Optional.of(BondFactory.createOrBond( //
+		    bond, //
+		    BondFactory.createNotExistsSimpleValueBond(MetadataElement.RASTER_MOSAIC)));
+	}
+    };
+
+    /**
+     *
+     */
     public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}") {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readId(value, MetadataElement.PARENT_IDENTIFIER);
+	    return readMultiValues(value, MetadataElement.PARENT_IDENTIFIER);
 	}
     };
 
@@ -97,36 +136,9 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readId(value, MetadataElement.IDENTIFIER);
+	    return readMultiValues(value, MetadataElement.IDENTIFIER);
 	}
     };
-
-    /**
-     * @param idParam
-     * @param el
-     * @return
-     */
-    private static Optional<Bond> readId(String idParam, MetadataElement el) {
-
-	if (idParam == null || idParam.isEmpty()) {
-	    return Optional.empty();
-	}
-
-	String[] split = idParam.split(",");
-
-	if (split.length > 1) {
-	    LogicalBond orBond = BondFactory.createOrBond();
-
-	    for (String s : split) {
-		orBond.getOperands().add(//
-			BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, s));
-	    }
-
-	    return Optional.of(orBond);
-	}
-
-	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.EQUAL, el, idParam));
-    }
 
     /**
      *
@@ -201,7 +213,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return createBond(value, MetadataElement.KEYWORD);
+	    return createEqualBond(value, MetadataElement.KEYWORD);
 	}
     };
 
@@ -223,7 +235,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return createBond(value, MetadataElement.DISTRIBUTION_FORMAT);
+	    return createEqualBond(value, MetadataElement.DISTRIBUTION_FORMAT);
 	}
     };
 
@@ -234,7 +246,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return createBond(value, MetadataElement.ONLINE_PROTOCOL);
+	    return createEqualBond(value, MetadataElement.ONLINE_PROTOCOL);
 	}
     };
 
@@ -292,7 +304,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.INSTRUMENT_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.INSTRUMENT_IDENTIFIER);
 	}
     };
 
@@ -308,7 +320,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.INSTRUMENT_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.INSTRUMENT_DESCRIPTION);
 	}
     };
 
@@ -338,7 +350,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.PLATFORM_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.PLATFORM_IDENTIFIER);
 	}
     };
 
@@ -366,7 +378,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.TIME_RESOLUTION_DURATION_8601);
+	    return createEqualBond(value, MetadataElement.TIME_RESOLUTION_DURATION_8601);
 	}
     };
 
@@ -379,7 +391,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.TIME_AGGREGATION_DURATION_8601);
+	    return createEqualBond(value, MetadataElement.TIME_AGGREGATION_DURATION_8601);
 	}
     };
 
@@ -391,7 +403,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.TIME_INTERPOLATION);
+	    return createEqualBond(value, MetadataElement.TIME_INTERPOLATION);
 	}
     };
 
@@ -406,7 +418,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.PLATFORM_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.PLATFORM_DESCRIPTION);
 	}
     };
 
@@ -422,7 +434,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.ORIGINATOR_ORGANISATION_IDENTIFIER);
 	}
     };
 
@@ -438,7 +450,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
 	}
     };
 
@@ -453,7 +465,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.THEME_CATEGORY);
+	    return createEqualBond(value, MetadataElement.THEME_CATEGORY);
 	}
     };
 
@@ -464,11 +476,30 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
-		return Optional.empty();
-	    }
+	    return readMultiValues(value, MetadataElement.ORGANISATION_NAME);
+	}
+    };
 
-	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.ORGANISATION_NAME);
+    /**
+     *
+     */
+    public static final OSParameter OWNER_ORGANISATION_NAME = new OSParameter("ownerOrgName", "string", null, "{gs:ownerOrgName}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.OWNER_ORGANISATION_NAME);
+	}
+    };
+
+    /**
+     *
+     */
+    public static final OSParameter DIST_ORGANISATION_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}") {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.DISTRIBUTOR_ORGANISATION_NAME);
 	}
     };
 
@@ -488,7 +519,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ATTRIBUTE_IDENTIFIER);
+	    return createEqualBond(value, MetadataElement.ATTRIBUTE_IDENTIFIER);
 	}
     };
 
@@ -503,7 +534,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.ATTRIBUTE_DESCRIPTION);
+	    return createEqualBond(value, MetadataElement.ATTRIBUTE_DESCRIPTION);
 	}
     };
 
@@ -534,7 +565,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createBond(value, MetadataElement.OBSERVED_PROPERTY_URI);
+	    return createEqualBond(value, MetadataElement.OBSERVED_PROPERTY_URI);
 	}
     };
 
@@ -1468,8 +1499,40 @@ public abstract class OSParameters {
 		lon1 >= lon2 ? lon1 : lon2, relatedValues); // east
     }
 
-    private static Optional<Bond> createBond(String value, MetadataElement element) {
-	return BondUtils.createBond(BondOperator.EQUAL, value, element);
+    /**
+     * @param paramValue
+     * @param el
+     * @return
+     */
+    private static Optional<Bond> readMultiValues(String paramValue, MetadataElement el) {
+
+	if (paramValue == null || paramValue.isEmpty()) {
+	    return Optional.empty();
+	}
+
+	String[] split = paramValue.split(",");
+
+	if (split.length > 1) {
+	    LogicalBond orBond = BondFactory.createOrBond();
+
+	    for (String s : split) {
+		orBond.getOperands().add(//
+			BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, s));
+	    }
+
+	    return Optional.of(orBond);
+	}
+
+	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, paramValue));
     }
 
+    /**
+     * @param value
+     * @param element
+     * @return
+     */
+    private static Optional<Bond> createEqualBond(String value, MetadataElement element) {
+
+	return BondUtils.createBond(BondOperator.EQUAL, value, element);
+    }
 }

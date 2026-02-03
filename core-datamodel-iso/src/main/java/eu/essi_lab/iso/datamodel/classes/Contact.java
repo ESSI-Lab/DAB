@@ -216,4 +216,12 @@ public class Contact extends ISOMetadata<CIContactType> {
 	}
 	return null;
     }
+
+    /**
+     * Convenience method to set online resource (alias for setOnline)
+     * @param online
+     */
+    public void setOnlineResource(Online online) {
+	setOnline(online);
+    }
 }

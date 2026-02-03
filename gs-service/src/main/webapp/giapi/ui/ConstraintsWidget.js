@@ -1381,7 +1381,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 			ro = 'readonly';
 		}
 
-		textInput += '<input '+ ro + ' value="' + initValue + '" style="width: ' + width + '; cursor: ' + cursor + ';' + taxonFieldWidth + '" placeholder="' + label + '" value="' + sel + '" class="cnst-widget-input" id="' + id + '" autocomplete="new-password" type="text" ' + readOnly + '/>' + taxonDiv;
+		textInput += '<input autocomplete="one-time-code" '+ ro + ' value="' + initValue + '" style="width: ' + width + '; cursor: ' + cursor + ';' + taxonFieldWidth + '" placeholder="' + label + '" value="' + sel + '" class="cnst-widget-input" id="' + id + '" autocomplete="new-password" type="text" ' + readOnly + '/>' + taxonDiv;
 
 		if (id != _getId('what')) {
 			textInput += '</div>';

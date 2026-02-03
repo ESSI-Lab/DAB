@@ -396,7 +396,7 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 		
 		sourcesWidgetDiv += '<table style="width:100%" id="wrapSourcesWidgetTable">';
 
-		sourcesWidgetDiv += '<tr><td><input id="sourceNameSearchInput" style="margin-top: 5px; width: 99%;" placeholder="'+__t("enter_source_name")+'"></input></td></tr>';
+		sourcesWidgetDiv += '<tr><td><input name="sourceNameSearchInput" autocomplete="one-time-code" id="sourceNameSearchInput" style="margin-top: 5px; width: 99%;" placeholder="'+__t("enter_source_name")+'"></input></td></tr>';
 
 		sourcesWidgetDiv += '<tr><td><div style="overflow-y: scroll; '+options.width + options.height+'">';
 			

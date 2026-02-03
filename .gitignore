@@ -34,9 +34,12 @@ org.eclipse.jdt.core.prefs
 .settings
 .idea
 .idea/
+.idea.broken
+.idea.broken/
 *.iml
 *.iml
 .idea
 /.pydevproject
 /testm2repo/
 /repository/
+.idea.broken/compiler.xml

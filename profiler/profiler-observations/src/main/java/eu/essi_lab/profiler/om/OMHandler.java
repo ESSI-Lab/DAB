@@ -63,6 +63,7 @@ import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.opensearch.*;
 import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.views.DefaultViewManager;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -471,6 +472,10 @@ public class OMHandler extends StreamingRequestHandler {
 			if (mb != null) {
 			    setting.setMaxDownloadSizeMB(mb);
 			}
+			Integer partMb = user.getMaxDownloadPartSizeMB();
+			if (partMb != null) {
+			    setting.setMaxDownloadPartSizeMB(partMb);
+			}
 			scheduler.schedule(setting);
 
 			JSONObject msg = new JSONObject();
@@ -707,7 +712,12 @@ public class OMHandler extends StreamingRequestHandler {
 		resumptionToken = resumptionToken.substring(0, resumptionToken.length() - 1);
 	    }
 	}
-	resultWriter.writeFooter(resumptionToken);
+	Integer count = null;
+	CountSet countResponse = resultSet.getCountResponse();
+	if (countResponse != null) {
+	    count = countResponse.getCount();
+	}
+	resultWriter.writeFooter(resumptionToken,count);
 
 	writer.flush();
 	writer.close();

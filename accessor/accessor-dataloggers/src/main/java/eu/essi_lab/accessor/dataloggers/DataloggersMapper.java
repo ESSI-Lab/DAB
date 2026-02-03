@@ -25,16 +25,10 @@ import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 
+import eu.essi_lab.iso.datamodel.classes.*;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -135,6 +129,10 @@ public class DataloggersMapper extends FileIdentifierMapper {
 	    }
 	    if (dataproviderCod != null) {
 		coreMetadata.getMIMetadata().getDataIdentification().addKeyword(dataproviderCod);
+			ResponsibleParty party = new ResponsibleParty();
+			party.setOrganisationName(dataproviderCod);
+			party.setRoleCode("owner");
+			coreMetadata.getMIMetadata().getDataIdentification().addCitationResponsibleParty(party);
 	    }
 
 	    // Reference system

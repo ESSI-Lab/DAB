@@ -744,6 +744,17 @@ public class MDMetadata extends ISOMetadata<MDMetadataType> {
     }
 
     /**
+     * Convenience method to set a single contact (clears existing first)
+     * @param contact
+     */
+    public void setContact(ResponsibleParty contact) {
+	clearContacts();
+	if (contact != null) {
+	    addContact(contact);
+	}
+    }
+
+    /**
      * @return party responsible for the metadata information
      */
     /**
@@ -977,6 +988,13 @@ public class MDMetadata extends ISOMetadata<MDMetadataType> {
 	    ret.add(new DataQuality(dataQuality.getDQDataQuality()));
 	}
 	return ret.iterator();
+    }
+
+    /**
+     * Returns a DataQualityInfo wrapper providing convenience methods for managing data quality.
+     */
+    public DataQualityInfo getDataQualityInfo() {
+	return new DataQualityInfo(this);
     }
 
     DataQuality getDataQuality() {
