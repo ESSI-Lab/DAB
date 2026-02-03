@@ -10,35 +10,30 @@ package eu.essi_lab.lib.utils;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.ISOChronology;
+import org.joda.time.*;
+import org.joda.time.chrono.*;
+import org.joda.time.format.*;
 import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.*;
 import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.AbstractMap.SimpleEntry;
+import java.math.*;
+import java.text.*;
+import java.time.*;
+import java.time.format.*;
+import java.time.temporal.*;
+import java.util.AbstractMap.*;
 import java.util.*;
 
 public class ISO8601DateTimeUtils {
@@ -99,42 +94,54 @@ public class ISO8601DateTimeUtils {
 	return result.toString().trim();
     }
 
-    public static String normalizeISO8601Duration(String isoDuration) {
-	java.time.Duration d = java.time.Duration.parse(isoDuration);
+    /**
+     * @param isoDuration
+     * @return
+     */
+    public static String normalizeISO8601Duration(String isoDuration) throws DateTimeParseException {
 
-	long seconds = d.getSeconds();
+	try {
 
-	// days
-	if (seconds % 86400 == 0) {
-	    return "P" + (seconds / 86400) + "D";
+	    java.time.Duration d = java.time.Duration.parse(isoDuration);
+
+	    long seconds = d.getSeconds();
+
+	    // days
+	    if (seconds % 86400 == 0) {
+		return "P" + (seconds / 86400) + "D";
+	    }
+
+	    // hours
+	    if (seconds % 3600 == 0) {
+		return "PT" + (seconds / 3600) + "H";
+	    }
+
+	    // minutes
+	    if (seconds % 60 == 0) {
+		return "PT" + (seconds / 60) + "M";
+	    }
+
+	    // seconds
+	    return "PT" + seconds + "S";
+
+	} catch (DateTimeParseException e) {
+
+	    throw e;
 	}
-
-	// hours
-	if (seconds % 3600 == 0) {
-	    return "PT" + (seconds / 3600) + "H";
-	}
-
-	// minutes
-	if (seconds % 60 == 0) {
-	    return "PT" + (seconds / 60) + "M";
-	}
-
-	// seconds
-	return "PT" + seconds + "S";
     }
 
     /**
-     * 
+     *
      */
     public static long EPOCH = ISO8601DateTimeUtils.parseISO8601ToDate("1970-01-01T00:00:00Z").get().getTime();
 
     /**
-     * 
+     *
      */
     public static long MIN_REASONABLE_DATE = ISO8601DateTimeUtils.parseISO8601ToDate("1000-01-01T00:00:00Z").get().getTime();
 
     /**
-     * 
+     *
      */
     public static void setGISuiteDefaultTimeZone() {
 
@@ -288,14 +295,13 @@ public class ISO8601DateTimeUtils {
     }
 
     /**
-     * Parses a string expressed as a ISO8601 date time (e.g.: "2015-02-02T01:05:05Z") or ISO date (e.g.: "2015-02-02")
-     * This is deprecated
+     * Parses a string expressed as a ISO8601 date time (e.g.: "2015-02-02T01:05:05Z") or ISO date (e.g.: "2015-02-02") This is deprecated
      * in favour of {@link #parseISO8601ToDate(String)} which returns an Optional
      *
-     * @deprecated
      * @param dateTimeString
      * @return
      * @throws ParseException
+     * @deprecated
      */
     @Deprecated
     public static Date parseISO8601(String dateTimeString) throws IllegalArgumentException {
@@ -460,13 +466,11 @@ public class ISO8601DateTimeUtils {
     /**
      * Given a date time expressed in ISO8601 (e.g.: 2021-08-04T10:40:00) which refers to the given
      * <code>dateTimeZone</code>,
-     * this method creates the related
-     * {@link Date} object which refers to the UTC time zone (since when the GI-Project is started, UTC is set
-     * as default time zone).
-     * So if we are in Italy in summer, with local time zone GMT+02:00 DST (Europe/Berlin), and
+     * this method creates the related {@link Date} object which refers to the UTC time zone (since when the GI-Project is started, UTC is
+     * set as default time zone). So if we are in Italy in summer, with local time zone GMT+02:00 DST (Europe/Berlin), and
      * <code>iso8601dateTime</code> is
      * '2021-08-04T10:40:00', this method returns a GMT Date 'Wednesday 4 August 2021 08:40:00'
-     * 
+     *
      * @param iso8601dateTime
      * @param dateTimeZone
      * @return
@@ -509,7 +513,7 @@ public class ISO8601DateTimeUtils {
 
     public static void main(String[] args) throws Exception {
 	String start = "2024-01-01T10:15:00Z";
-	String end   = "2024-01-03T13:45:00Z";
+	String end = "2024-01-03T13:45:00Z";
 
 	System.out.println(humanDuration(start, end));
 
@@ -547,7 +551,7 @@ public class ISO8601DateTimeUtils {
 	    units = "years";
 	    decimal = new BigDecimal(years);
 	}
-	if (decimal==null) {
+	if (decimal == null) {
 	    decimal = new BigDecimal(0);
 	    units = "seconds";
 	}
@@ -602,6 +606,5 @@ public class ISO8601DateTimeUtils {
 	}
 	return null;
     }
-
 
 }

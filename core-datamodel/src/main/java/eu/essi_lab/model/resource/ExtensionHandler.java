@@ -10,12 +10,12 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -42,9 +42,9 @@ import eu.essi_lab.model.resource.worldcereal.WorldCerealMap;
 
 /**
  * Utility class to read/write extended metadata
- * 
- * @see ExtendedMetadata
+ *
  * @author Fabrizio
+ * @see ExtendedMetadata
  */
 public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
@@ -220,7 +220,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-    
+
     /**
      * @return
      */
@@ -334,9 +334,8 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * The size of the dataset (it is the multiplication of the sizes along each dimension, e.g. d_s = d1_s * d2_s * ...
-     * dn_s
-     * 
+     * The size of the dataset (it is the multiplication of the sizes along each dimension, e.g. d_s = d1_s * d2_s * ... dn_s
+     *
      * @param size
      */
     public void setDataSize(Long size) {
@@ -349,8 +348,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @return The size of the dataset (it is the multiplication of the sizes along each dimension, e.g. d_s = d1_s *
-     *         d2_s * ... * dn_s
+     * @return The size of the dataset (it is the multiplication of the sizes along each dimension, e.g. d_s = d1_s * d2_s * ... * dn_s
      */
     public Optional<Long> getDataSize() {
 
@@ -554,7 +552,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
     /**
      * @param timeResolution
-     * @deprecated  use setTimeResolutionDuration8601
+     * @deprecated use setTimeResolutionDuration8601
      */
     @Deprecated
     public void setTimeResolution(String timeResolution) {
@@ -626,15 +624,28 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * @param resolution8601
+     * @param val
      */
-    public void setTimeResolutionDuration8601(String resolution8601) {
+    public void setTimeResolutionDuration8601(String val) {
 	try {
-	    resolution8601 = ISO8601DateTimeUtils.normalizeISO8601Duration(resolution8601);
-	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName(), resolution8601);
+	    val = ISO8601DateTimeUtils.normalizeISO8601Duration(val);
+	    this.metadata.add(MetadataElement.TIME_RESOLUTION_DURATION_8601.getName(), val);
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error("Unable to parse value '{}': {}",resolution8601,e.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to parse value '{}': {}", val, e.getMessage());
+	}
+    }
+
+    /**
+     * @param val
+     */
+    public void setTimeAggregationDuration8601(String val) {
+	try {
+	    val = ISO8601DateTimeUtils.normalizeISO8601Duration(val);
+	    this.metadata.add(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName(), val);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to parse value '{}': {}", val, e.getMessage());
 	}
     }
 
@@ -667,19 +678,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
 	return Optional.empty();
-    }
-
-    /**
-     * @param timeAggregation8601
-     */
-    public void setTimeAggregationDuration8601(String timeAggregation8601) {
-	try {
-	    timeAggregation8601 = ISO8601DateTimeUtils.normalizeISO8601Duration(timeAggregation8601);
-	    this.metadata.add(MetadataElement.TIME_AGGREGATION_DURATION_8601.getName(), timeAggregation8601);
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	}
     }
 
     /**
@@ -750,7 +748,8 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public void clearObservedPropertyURI() {
 
 	try {
-	    this.metadata.remove("//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + MetadataElement.OBSERVED_PROPERTY_URI.getName());
+	    this.metadata.remove(
+		    "//" + NameSpace.GI_SUITE_DATA_MODEL_SCHEMA_PREFIX + ":" + MetadataElement.OBSERVED_PROPERTY_URI.getName());
 	} catch (XPathExpressionException e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -1016,7 +1015,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * 
+     *
      */
     public void clearThemeCategory() {
 
@@ -1114,11 +1113,9 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-    
-
 
     /**
-     * 
+     *
      */
     public void clearOriginatorOrganisationDescriptions() {
 
@@ -1131,7 +1128,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * 
+     *
      */
     public void clearOriginatorOrganisationIdentifiers() {
 
@@ -1380,7 +1377,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     }
 
     /**
-     * 
+     *
      */
     public void setAvailableGranules(String condition) {
 	try {
@@ -1390,7 +1387,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
     }
-
 
     /**
      * @return
