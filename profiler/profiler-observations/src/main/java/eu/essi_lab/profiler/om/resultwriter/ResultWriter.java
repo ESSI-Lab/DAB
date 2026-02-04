@@ -87,7 +87,7 @@ public abstract class ResultWriter {
 		
 	}
 	
-	public void writeFooter(String resumptionToken) throws IOException {
+	public void writeFooter(String resumptionToken,Integer count) throws IOException {
 		
 	}
 

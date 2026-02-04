@@ -97,11 +97,11 @@ public class HISCentralPiemonteClient {
      * @return
      * @throws GSException
      */
-    public String getLastData(String startTime, String endTime) throws GSException {
+    public String getLastData(String startTime, String endTime, boolean nearRealTimeData) throws GSException {
 	String ret = null;
 	try {
 
-	    String parameter = endpoint.trim() + "&data_min=" + startTime + "&data_max=" + endTime + "&format=json";
+	    String parameter = nearRealTimeData ? endpoint.trim() + "&date_from=" + startTime + "&date_to=" + endTime :  endpoint.trim() + "&data_min=" + startTime + "&data_max=" + endTime + "&format=json";
 	    parameter = URLEncoder.encode(parameter, "UTF-8");
 
 	    String url = parameter;

@@ -2237,8 +2237,9 @@ export function initializePortal(config) {
 		jQuery('#tabs-div .tabs-element').css({
 			'position': 'relative'
 		});
-		// Ensure results-tab and sources-tab don't overflow
-		jQuery('#results-tab, #sources-tab').css('overflow', 'hidden');
+		// Results tab must scroll (overflow-y: auto); sources tab no scrollbar, clip to panel
+		jQuery('#results-tab').css({ 'overflow-x': 'hidden', 'overflow-y': 'auto' });
+		jQuery('#sources-tab').css({ 'overflow': 'hidden', 'overflow-x': 'hidden', 'overflow-y': 'hidden' });
 
 		//------------------------------------------------------------------
 		// results tab
@@ -2260,7 +2261,7 @@ export function initializePortal(config) {
 		// Let paginator take full width of its container
 		jQuery('#paginator-widget').css('width', '100%');
 		jQuery('#paginator-widget').css('height', '55px');
-		jQuery('#paginator-widget').css('padding', '0px');
+		jQuery('#paginator-widget').css('padding', '0 0 8px 0');
 		
 		// Paginator now flows naturally in the document, no positioning needed
 		// Position results tab after a short delay to ensure layout is complete
@@ -2405,52 +2406,50 @@ export function initializePortal(config) {
 			'width': '100%'
 		});
 		
-		// Create left sidebar container
+		// Create left sidebar container (flex: 1 min-height: 0 so it gets bounded height and results panel can scroll)
 		var leftSidebar = jQuery('<div id="left-sidebar"></div>');
 		leftSidebar.css({
 			'display': 'flex',
 			'flex-direction': 'column',
-			'flex-shrink': '0',
+			'flex': '1',
+			'min-height': '0',
 			'width': '40%',
 			'min-width': '0',
 			'max-width': 'none',
 			'overflow': 'hidden'
 		});
 		
-		// Move tabs, paginator, and results tab into left sidebar (in order: tabs, paginator, results tab)
+		// Move tabs and paginator into left sidebar.
+		// Keep results-tab inside tabs-div so only the active tab panel is visible (results, filters, or sources).
+		// Put paginator inside tabs-div (after tab strip, before panels) so it appears above the results.
+		// Do NOT put paginator inside results-tab: ResultSetLayout empties #results-tab on update and would remove it.
+		// IMPORTANT: Do both moves before appending tabs to leftSidebar so nodes are still in the document.
 		var tabs = jQuery('#tabs-div');
 		var paginator = jQuery('#paginator-widget');
-		var resultsTab = jQuery('#results-tab');
 		var map = jQuery('#resMapWidget');
 		var stationInfo = jQuery('#stationInfo');
 		
-		// Add tabs first (at the top)
-		if (tabs.length) {
-			tabs.css({
-				'flex-shrink': '0',
-				'width': '100%'
-			});
-			leftSidebar.append(tabs);
-		}
-		
-		// Add paginator second (below tabs)
-		if (paginator.length) {
+		// Insert paginator inside tabs-div, right after the tab strip (so it appears above the tab panels)
+		if (paginator.length && jQuery('#tabs-ul').length) {
 			paginator.css({
 				'flex-shrink': '0',
 				'width': '100%'
 			});
-			leftSidebar.append(paginator);
+			paginator.insertAfter(jQuery('#tabs-ul'));
 		}
 		
-		// Add results tab third (below paginator)
-		if (resultsTab.length) {
-			resultsTab.css({
+		// Add tabs to left sidebar (contains tab strip, paginator, results-tab, filters-tab, sources-tab)
+		if (tabs.length) {
+			tabs.css({
+				'flex-shrink': '0',
 				'flex': '1',
 				'min-height': '0',
 				'width': '100%',
-				'overflow-y': 'auto'
+				'display': 'flex',
+				'flex-direction': 'column',
+				'overflow': 'hidden'
 			});
-			leftSidebar.append(resultsTab);
+			leftSidebar.append(tabs);
 		}
 		
 		// Add left sidebar to wrapper
@@ -3531,7 +3530,7 @@ export function initializePortal(config) {
 								$('<input>').attr({
 									'type': 'checkbox',
 									'id': 'emailNotifications',
-									'checked': true
+									'checked': false
 								}).css('margin-right', '8px')
 							);
 
@@ -3803,12 +3802,19 @@ export function initializePortal(config) {
 			},
 
 			'onSourcesReady': function(sources) {
+				// Remove scrollbar and constrain height: SourcesWidget creates a div with inline overflow-y: scroll and fixed height
+				jQuery('#sources-tab div[style*="overflow-y"]').css({
+					'overflow': 'hidden',
+					'overflow-y': 'hidden',
+					'height': '100%',
+					'max-height': '100%'
+				});
 				// starts the init discover
 				GIAPI.search.discover();
 			}
 		});
 
-		GIAPI.UI_Utils.appendStyle('#sources-tab{ max-height: ' + (jQuery(window).height() - 150) + 'px}');
+		// Sources tab height is constrained by flex layout (tabs-div), no fixed max-height needed
 
 		//------------------------------------
 		// TermFrequencyWidget

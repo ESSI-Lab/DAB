@@ -52,8 +52,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
     public enum PiemonteStationType {
 	METEO("dati_giornalieri_meteo", "sensori_meteo"), //
 	HYDRO("dati_giornalieri_idro", "sensori_idro"), //
-	SNOW("dati_giornalieri_nivo", null),
-	SCALADEFLUSSO("scale_deflusso", null);
+	SNOW("dati_giornalieri_nivo", null), SCALADEFLUSSO("scale_deflusso", null), REALTIME("real_time", null);
 
 	private String dataParameter;
 
@@ -122,11 +121,33 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 	PORTATANAT("Portata naturale", "portatamediat", "m³/s", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
 	IDRO("Livello idrometrico", "livellomedio", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
 	IDRO1("Livello idrometrico canale", "livellomedio1", "m", InterpolationType.AVERAGE, PiemonteStationType.HYDRO), //
-	
+
 	SCALADEFLUSSO("Scala di deflusso", "scala_deflusso", "table", InterpolationType.AVERAGE, PiemonteStationType.SCALADEFLUSSO), //
 
 	HS("Altezza neve dal suolo", "hs", "cm", InterpolationType.MAX, PiemonteStationType.SNOW), //
-	HN("Altezza neve fresca", "hn", "cm", InterpolationType.TOTAL, PiemonteStationType.SNOW); //
+	HN("Altezza neve fresca", "hn", "cm", InterpolationType.TOTAL, PiemonteStationType.SNOW), //
+
+	// REAL-TIME
+	REAL_TIME_T("Temperatura dell'aria", "air_temperature", "°C", InterpolationType.AVERAGE, PiemonteStationType.REALTIME), //
+	REAL_TIME_U("Umidità relativa", "humidity", "%", InterpolationType.AVERAGE, PiemonteStationType.REALTIME), //
+	REAL_TIME_RAIN_1H("Precipitazione cumulata", "cum_rain_1h", "mm", InterpolationType.CONTINUOUS, PiemonteStationType.REALTIME), //
+	REAL_TIME_RAIN_3H("Precipitazione cumulata", "cum_rain_3h", "mm", InterpolationType.CONTINUOUS, PiemonteStationType.REALTIME), //
+	REAL_TIME_RAIN_6H("Precipitazione cumulata", "cum_rain_6h", "mm", InterpolationType.CONTINUOUS, PiemonteStationType.REALTIME), //
+	REAL_TIME_RAIN_12H("Precipitazione cumulata", "cum_rain_12h", "mm", InterpolationType.CONTINUOUS, PiemonteStationType.REALTIME), //
+	REAL_TIME_RAIN_24H("Precipitazione cumulata", "cum_rain_24h", "mm", InterpolationType.CONTINUOUS, PiemonteStationType.REALTIME), //
+
+	// REAL_TIME_WIND("Velocità del vento", "wind", "m/s", InterpolationType.AVERAGE, PiemonteStationType.REALTIME),
+	// //
+	// REAL_TIME_WIND_DIRECTION("Velocità del vento", "wind_direction", "degrees", InterpolationType.TOTAL,
+	// PiemonteStationType.REALTIME), //
+	//
+	// REAL_TIME_WIND_GUST("Velocità del vento", "wind", "m/s", InterpolationType.AVERAGE,
+	// PiemonteStationType.REALTIME), //
+	// REAL_TIME_WIND_DIRECTION("Velocità del vento", "wind_direction", "degrees", InterpolationType.TOTAL,
+	// PiemonteStationType.REALTIME), //
+
+	SNOW_HEIGHT("Altezza neve dal suolo", "snow_height", "cm", InterpolationType.AVERAGE, PiemonteStationType.REALTIME), //
+	HYDROMETRIC_LEVEL("Livello idrometrico", "hydrometric_level", "m", InterpolationType.AVERAGE, PiemonteStationType.REALTIME); //
 
 	// pluviometria giornaliera?
 	// radiazioni??
@@ -234,10 +255,13 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
      * 
      */
 
+    static final String DATA_URL = "data_pie";
     /**
      * 
      */
     public static final String BASE_URL = "https://utility.arpa.piemonte.it/meteoidro/";
+
+    public static final String REAL_TIME_URL = "https://utility.arpa.piemonte.it/api_realtime/";
 
     private int maxRecords;
 
@@ -331,6 +355,37 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 
 			} else {
 			    // meteo - hydro case
+
+			    String stationCode = originalMetadataInfo.optString("codice_stazione").replaceAll("\\s+$", "");
+
+			    HISCentralPiemonteClient rt_client = new HISCentralPiemonteClient(REAL_TIME_URL);
+			    
+			    // 'https://utility.arpa.piemonte.it/api_realtime/data_pie?station_code=001&page=1&page_size=100
+			    String rt_path = DATA_URL + "?station_code=" + stationCode + "&page=1&page_size=100";
+			    String getRealTimeData = rt_client.getData(rt_path);
+				    
+			    if (getRealTimeData != null && !getRealTimeData.isEmpty()) {
+				JSONObject jsonData = new JSONObject(getRealTimeData);
+				if (jsonData != null) {
+				    JSONArray resultsData = jsonData.optJSONArray("data", null);
+				    if (resultsData != null && !resultsData.isEmpty()) {
+					JSONObject firstObj = resultsData.getJSONObject(0);
+					List<PIEMONTE_Variable> realtimeStationType = PIEMONTE_Variable
+						.values(PiemonteStationType.REALTIME);
+					for (PIEMONTE_Variable pv : realtimeStationType) {
+					    String value = firstObj.optString(pv.getParam());
+					    if (value != null && !value.isEmpty() && !value.equalsIgnoreCase("null")) {
+						ret.addRecord(HISCentralPiemonteMapper.create(originalMetadataInfo, variableType, pv.name(),
+							null));
+						countDataset++;
+					    }
+					}
+				    }
+
+				}
+
+			    }
+
 			    JSONArray variables = originalMetadataInfo.optJSONArray(getVariableField);
 			    List<PIEMONTE_Variable> varList = new ArrayList<PIEMONTE_Variable>();
 			    List<String> paramList = new ArrayList<String>();

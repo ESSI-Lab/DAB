@@ -192,21 +192,32 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DateFormat iso8601OutputFormat = null;
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+	    boolean realTimeData = newLink.contains(HISCentralPiemonteConnector.REAL_TIME_URL) ? true : false;
 
 	    while (!completed) {
 
 		HISCentralPiemonteClient client = new HISCentralPiemonteClient(newLink);
-		String dataResponse = client.getLastData(startString, endString);
+
+		String dataResponse = client.getLastData(startString, endString, realTimeData);
 		if (dataResponse != null) {
 		    JSONObject jsonObj = new JSONObject(dataResponse);
-		    JSONArray valuesData = jsonObj.optJSONArray("results");
 
-		    String nextToken = jsonObj.optString("next");
-		    if (nextToken == null || nextToken.isEmpty()) {
+		    JSONArray valuesData;
+
+		    if (realTimeData) {
+			valuesData = jsonObj.optJSONArray("data");
 			completed = true;
 		    } else {
-			// String queryExecutionId = jsonObj.optString("queryExecutionId");
-			newLink = nextToken;
+
+			valuesData = jsonObj.optJSONArray("results");
+
+			String nextToken = jsonObj.optString("next");
+			if (nextToken == null || nextToken.isEmpty()) {
+			    completed = true;
+			} else {
+			    // String queryExecutionId = jsonObj.optString("queryExecutionId");
+			    newLink = nextToken;
+			}
 		    }
 
 		    HISCentralPiemonteMangler mangler = new HISCentralPiemonteMangler();
@@ -275,10 +286,12 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 				// date
 				//
 
-				String date = data.optString("data");
+				String date = realTimeData ?  data.optString("date") : data.optString("data");
 
 				if (iso8601OutputFormat == null) {
-				    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+				    iso8601OutputFormat = realTimeData ? new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX") : new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+				    //SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSXXX");
+				    //SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");// 2020-01-02T06:06:30.000+0000
 				    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 				}
 
@@ -310,7 +323,7 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 	    }
 
 	    return tsrt.getDataFile();
-	    
+
 	} catch (Exception e) {
 
 	    ex = e;
@@ -346,7 +359,9 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralPiemonteConnector.BASE_URL) && //
+		(online.getLinkage().contains(HISCentralPiemonteConnector.BASE_URL)
+			|| online.getLinkage().contains(HISCentralPiemonteConnector.REAL_TIME_URL))
+		&& //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI));
     }
