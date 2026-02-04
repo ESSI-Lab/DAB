@@ -382,7 +382,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		stream().//
 		filter(map -> map.get("identifier").equals(id)).//
 		findFirst().//
-		get()).collect(Collectors.toList());
+		get()).toList();
 
 	this.dataProvider.getItems().removeAll(list);
 
@@ -488,6 +488,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 
 	TextField filterField = new TextField();
+	filterField.getStyle().set("font-size", "13px");
 
 	filterField.addValueChangeListener(event -> {
 

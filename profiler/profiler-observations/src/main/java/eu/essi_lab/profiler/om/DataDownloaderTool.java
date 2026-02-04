@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.om;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -69,15 +69,14 @@ public class DataDownloaderTool {
      * @return the zip file, or null if canceled
      */
     public File download(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId, String downloadName) {
-	DownloadPartResult result = downloadPart(s3wrapper, bucket, requestURL, operationId, downloadName,
-		Integer.MAX_VALUE, Integer.MAX_VALUE, null, BigDecimal.ZERO, 1, new ArrayList<>());
+	DownloadPartResult result = downloadPart(s3wrapper, bucket, requestURL, operationId, downloadName, Integer.MAX_VALUE,
+		Integer.MAX_VALUE, null, BigDecimal.ZERO, 1, new ArrayList<>());
 	return result != null ? result.getPartFile() : null;
     }
 
     /**
-     * Performs a partial download. When current part size exceeds maxDownloadPartSizeMB, returns
-     * a part and resumption token. When total size would exceed maxDownloadSizeMB, returns the
-     * last part with maxSizeReached and error message. Caller publishes each part, sends
+     * Performs a partial download. When current part size exceeds maxDownloadPartSizeMB, returns a part and resumption token. When total
+     * size would exceed maxDownloadSizeMB, returns the last part with maxSizeReached and error message. Caller publishes each part, sends
      * notification, then continues with the resumption token until null.
      *
      * @param s3wrapper
@@ -85,18 +84,17 @@ public class DataDownloaderTool {
      * @param requestURL
      * @param operationId
      * @param downloadName
-     * @param maxDownloadSizeMB    overall max size in MB (process ends when reached)
+     * @param maxDownloadSizeMB overall max size in MB (process ends when reached)
      * @param maxDownloadPartSizeMB max size per part in MB (part returned and continued with token)
      * @param resumptionTokenFromPreviousPart token from previous part, or null for first part
-     * @param totalDownloadedSoFarMB         sum of sizes of previous parts in MB
-     * @param currentPartNumber              part number being downloaded (1-based), for progress messages
-     * @param completedPartLocators         list of locators of completed parts (for progress UI), in order
+     * @param totalDownloadedSoFarMB sum of sizes of previous parts in MB
+     * @param currentPartNumber part number being downloaded (1-based), for progress messages
+     * @param completedPartLocators list of locators of completed parts (for progress UI), in order
      * @return result with part file, optional resumption token, and maxSizeReached/errorMessage
      */
-    public DownloadPartResult downloadPart(S3TransferWrapper s3wrapper, String bucket, String requestURL,
-	    String operationId, String downloadName, int maxDownloadSizeMB, int maxDownloadPartSizeMB,
-	    String resumptionTokenFromPreviousPart, BigDecimal totalDownloadedSoFarMB, int currentPartNumber,
-	    List<String> completedPartLocators) {
+    public DownloadPartResult downloadPart(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId,
+	    String downloadName, int maxDownloadSizeMB, int maxDownloadPartSizeMB, String resumptionTokenFromPreviousPart,
+	    BigDecimal totalDownloadedSoFarMB, int currentPartNumber, List<String> completedPartLocators) {
 
 	GSLoggerFactory.getLogger(getClass()).info("Started asynch download part of {}", requestURL);
 
@@ -171,7 +169,6 @@ public class DataDownloaderTool {
 	List<String> downloadedFileNames = new ArrayList<>();
 	long last = System.currentTimeMillis();
 
-
 	while (firstLoop || resumptionToken != null) {
 
 	    firstLoop = false;
@@ -210,7 +207,8 @@ public class DataDownloaderTool {
 			boolean nextEmpty = (nextMembers == null || nextMembers.length() == 0);
 			if (nextCompleted && nextEmpty) {
 			    resumptionToken = null;
-			    GSLoggerFactory.getLogger(getClass()).info("Look ahead: next response empty and completed, treating current as last");
+			    GSLoggerFactory.getLogger(getClass())
+				    .info("Look ahead: next response empty and completed, treating current as last");
 			}
 		    }
 		}
@@ -218,8 +216,8 @@ public class DataDownloaderTool {
 		if (json.has("member")) {
 
 		    JSONArray members = json.getJSONArray("member");
-		    GSLoggerFactory.getLogger(getClass()).info("Retrieved block of size {}, resumption token {}", members.length(),
-			    resumptionToken);
+		    GSLoggerFactory.getLogger(getClass())
+			    .info("Retrieved block of size {}, resumption token {}", members.length(), resumptionToken);
 		    if (members.length() == 0) {
 			break;
 		    }
@@ -283,8 +281,10 @@ public class DataDownloaderTool {
 			}
 			String extension = oFormat.getExtension();
 			String baseName = foiTitle;
-			File logFile = new File(propertyDir, baseName + "_" + id + "_log.txt");
-			File dataFile = new File(propertyDir, baseName + "_" + id + "_data" + extension);
+
+			File logFile = new File(propertyDir, FileUtils.sanitizeForNtfs(baseName + "_" + id + "_log.txt"));
+
+			File dataFile = new File(propertyDir, FileUtils.sanitizeForNtfs(baseName + "_" + id + "_data" + extension));
 
 			WebRequest get2 = WebRequest.createGET(downloadURL);
 			resources++;
@@ -338,8 +338,10 @@ public class DataDownloaderTool {
 				    String errorInfo = errors > 0 ? " (" + errors + " failed)" : "";
 				    String progressDetail = resources + " files, " + currentPartSizeMB + " MB" + errorInfo;
 				    msg.put("status", currentPartNumber > 0 ? "PartInProgress" : "InProgress");
-				    msg.put("statusMessage", (currentPartNumber > 0 ? "Part " + currentPartNumber + ": " : "Downloading: ") + progressDetail);
-				    msg.put("statusMessageKey", currentPartNumber > 0 ? "status_message_part_in_progress" : "status_message_downloading");
+				    msg.put("statusMessage", (currentPartNumber > 0 ? "Part " + currentPartNumber + ": " : "Downloading: ")
+					    + progressDetail);
+				    msg.put("statusMessageKey",
+					    currentPartNumber > 0 ? "status_message_part_in_progress" : "status_message_downloading");
 				    JSONObject statusParams = new JSONObject();
 				    statusParams.put("fileCount", resources);
 				    statusParams.put("sizeMb", currentPartSizeMB.toString());
@@ -406,7 +408,8 @@ public class DataDownloaderTool {
 	GSLoggerFactory.getLogger(getClass()).info("Ended asynch download part of {} to file: {}", requestURL, zipFile.getAbsolutePath());
 
 	String tokenToReturn = maxSizeReached ? null : resumptionToken;
-	return new DownloadPartResult(zipFile, tokenToReturn, maxSizeReached, maxSizeErrorMessage, sizeInMB, currentPartSizeMB, (tokenToReturn == null), downloadedFileNames);
+	return new DownloadPartResult(zipFile, tokenToReturn, maxSizeReached, maxSizeErrorMessage, sizeInMB, currentPartSizeMB,
+		(tokenToReturn == null), downloadedFileNames);
     }
 
     /**
