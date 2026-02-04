@@ -96,7 +96,7 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 	Grid.Column<GridData> statusColumn = grid.addColumn(GridData::getStatus).//
 		setHeader(STATUS_COLUMN).//
 		setKey(STATUS_COLUMN).//
-		setWidth("70px").//
+		setWidth("110px").//
 		setFlexGrow(0).//
 		setSortable(true);//
 
