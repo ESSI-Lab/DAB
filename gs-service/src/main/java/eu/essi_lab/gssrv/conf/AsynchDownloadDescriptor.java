@@ -3,6 +3,7 @@ package eu.essi_lab.gssrv.conf;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.data.provider.*;
@@ -11,13 +12,22 @@ import com.vaadin.flow.data.value.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.grid.renderer.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.profiler.om.scheduling.*;
 
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.stream.*;
 
 /**
@@ -26,17 +36,19 @@ import java.util.stream.*;
 public class AsynchDownloadDescriptor extends TabDescriptor {
 
     private final VerticalLayout verticalLayout;
-    private final Grid<AsynchDownloadDescriptor.GridData> grid;
-    private final AsynchDownloadDescriptor.GridFilter gridFilter;
+    private final Grid<GridData> grid;
+    private final GridFilter gridFilter;
 
     private static final String DOWNLOAD_NAME_COLUMN = "Download name";
     private static final String EMAIL_COLUMN = "E-mail";
     private static final String BUCKET_COLUMN = "Bucket";
     private static final String MAX_DOWNLOAD_SIZE_COLUMN = "Max. download size";
+    private static final String MAX_DOWNLOAD_PART_SIZE_COLUMN = "Max. download part. size";
     private static final String REQUEST_URL_COLUMN = "Request URL";
-    private static final String PUBLIC_URL_COLUMN = "Public URL";
     private static final String OPERATION_ID_COLUMN = "Operation ID";
     private static final String EMAIL_NOTIFICATIONS_COLUMN = "E-mail notifications";
+    private static final String STATUS_COLUMN = "Status";
+    private static final String HOST_COLUMN = "Host";
 
     /**
      *
@@ -46,7 +58,7 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 	setLabel("Downloads");
 
 	verticalLayout = new VerticalLayout();
-	verticalLayout.getStyle().set("margin-top", "15px");
+	verticalLayout.getStyle().set("margin-top", "-5px");
 
 	verticalLayout.setWidthFull();
 	verticalLayout.setHeightFull();
@@ -55,58 +67,88 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 	//
 	//
 
-	grid = new Grid<>(AsynchDownloadDescriptor.GridData.class, false);
+	grid = new Grid<>(GridData.class, false);
 
 	grid.getStyle().set("font-size", "13px");
 
-	grid.addColumn(AsynchDownloadDescriptor.GridData::getPosition).//
-		setWidth("60px").//
-		setFlexGrow(0);
-
-	Grid.Column<AsynchDownloadDescriptor.GridData> nameColumn = grid.addColumn(AsynchDownloadDescriptor.GridData::getSourceName).//
+	Grid.Column<GridData> downalodNameColumn = grid.addColumn(GridData::getDownloadName).//
 		setHeader(DOWNLOAD_NAME_COLUMN).//
 		setKey(DOWNLOAD_NAME_COLUMN).//
-		setWidth("350px").//
+		setWidth("70px").//
 		setSortable(true).//
 		setResizable(true);//
 
-	Grid.Column<AsynchDownloadDescriptor.GridData> idColumn = grid.addColumn(AsynchDownloadDescriptor.GridData::getSourceId).//
+	Grid.Column<GridData> emailColumn = grid.addColumn(GridData::getEmail).//
 		setHeader(EMAIL_COLUMN).//
 		setKey(EMAIL_COLUMN).//
-		setWidth("350px").//
+		setWidth("100px").//
 		setSortable(true).//
 		setResizable(true);//
 
-	grid.addColumn(AsynchDownloadDescriptor.GridData::getFormattedSize).//
+	Grid.Column<GridData> reqURLColumn = grid.addColumn(GridData::getRequestURL).//
+		setHeader(REQUEST_URL_COLUMN).//
+		setKey(REQUEST_URL_COLUMN).//
+		setWidth("350px").//
+		setFlexGrow(0).//
+		setSortable(true).//
+		setResizable(true);//
+
+	Grid.Column<GridData> statusColumn = grid.addColumn(GridData::getStatus).//
+		setHeader(STATUS_COLUMN).//
+		setKey(STATUS_COLUMN).//
+		setWidth("70px").//
+		setFlexGrow(0).//
+		setSortable(true);//
+
+	Grid.Column<GridData> hostColumn = grid.addColumn(GridData::getHost).//
+		setHeader(HOST_COLUMN).//
+		setKey(HOST_COLUMN).//
+		setWidth("110px").//
+		setFlexGrow(0).//
+		setSortable(true).//
+		setResizable(true);//
+
+	Grid.Column<GridData> opIdColumn = grid.addColumn(GridData::getOperationID).//
+		setHeader(OPERATION_ID_COLUMN).//
+		setKey(OPERATION_ID_COLUMN).//
+		setWidth("200px").//
+		setFlexGrow(0).//
+		setSortable(true).//
+		setResizable(true);//
+
+	Grid.Column<GridData> bucketColumn = grid.addColumn(GridData::getBucket).//
 		setHeader(BUCKET_COLUMN).//
 		setKey(BUCKET_COLUMN).//
 		setWidth("100px").//
 		setFlexGrow(0).//
-		setSortable(true).//
-		setComparator((sd1, sd2) -> sd1.getSize().compareTo(sd2.getSize()));
-
-	grid.addColumn(new ComponentRenderer<>(gd -> {
-
-	    Label label = new Label();
-	    label.setText(gd.getDataFolder());
-	    label.getStyle().set("font-weight", gd.isWritingFolder() ? "bold" : "normal");
-
-	    return label;
-
-	})).setHeader("Data #").//
-		setWidth("100px").//
-		setFlexGrow(0).//
-		setSortable(true);//
-
-	grid.addColumn(AsynchDownloadDescriptor.GridData::getPercentage).//
-		setKey("%").//
-		setWidth("100px").//
-		setFlexGrow(0).//
-		setHeader("%").//
 		setSortable(true);
 
-	grid.setWidthFull();
+	Grid.Column<GridData> maxDownloadSizeColumn = grid.addColumn(GridData::getMaxDownloadSize).//
+		setHeader(MAX_DOWNLOAD_SIZE_COLUMN).//
+		setKey(MAX_DOWNLOAD_SIZE_COLUMN).//
+		setWidth("100px").//
+		setFlexGrow(0).//
+		setSortable(true);
 
+	Grid.Column<GridData> maxDownloadPartSizeColumn = grid.addColumn(GridData::getMaxDownloadPartSize).//
+		setHeader(MAX_DOWNLOAD_PART_SIZE_COLUMN).//
+		setKey(MAX_DOWNLOAD_PART_SIZE_COLUMN).//
+		setWidth("100px").//
+		setFlexGrow(0).//
+		setSortable(true);
+
+	Grid.Column<GridData> emailNotificationsColumn = grid.addColumn(GridData::getEmailNotifications).//
+		setHeader(EMAIL_NOTIFICATIONS_COLUMN).//
+		setKey(EMAIL_NOTIFICATIONS_COLUMN).//
+		setWidth("110px").//
+		setFlexGrow(0).//
+		setSortable(true);
+
+	//
+	//
+	//
+
+	grid.setWidthFull();
 	grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
@@ -121,10 +163,18 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 
 	HeaderRow filterRow = grid.appendHeaderRow();
 
-	gridFilter = new AsynchDownloadDescriptor.GridFilter();
+	gridFilter = new GridFilter();
 
-	addFilterField(filterRow, nameColumn);
-	addFilterField(filterRow, idColumn);
+	addFilterField(filterRow, hostColumn);
+	addFilterField(filterRow, statusColumn);
+	addFilterField(filterRow, bucketColumn);
+	addFilterField(filterRow, maxDownloadSizeColumn);
+	addFilterField(filterRow, reqURLColumn);
+	addFilterField(filterRow, opIdColumn);
+	addFilterField(filterRow, maxDownloadPartSizeColumn);
+	addFilterField(filterRow, emailNotificationsColumn);
+	addFilterField(filterRow, downalodNameColumn);
+	addFilterField(filterRow, emailColumn);
 
 	//
 	//
@@ -137,11 +187,89 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 	//
 
 	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
+		withShowDirective("Click 'Reload' to show the list of asynchronous downloads (running and waiting)", false).//
 		withComponent(verticalLayout).//
+		reloadable(() -> update(verticalLayout)).//
 		build();
 
 	setIndex(GSTabIndex.ASYNC_DOWNLOADS.getIndex());
 	addContentDescriptor(descriptor);
+
+	//
+	//
+	//
+
+	update(verticalLayout);
+    }
+
+    /**
+     * @return
+     */
+    private List<OMSchedulerSetting> getSettings() {
+
+	List<OMSchedulerSetting> settings = new ArrayList<>();
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
+
+	try {
+
+	    List<OMSchedulerSetting> exec = scheduler.//
+		    listExecutingSettings().//
+		    stream().//
+		    filter(s -> s.getGroup() == SchedulerWorkerSetting.SchedulingGroup.ASYNCH_ACCESS).//
+		    map(s -> SettingUtils.downCast(s, OMSchedulerSetting.class)).//
+		    peek(s -> s.setFiredTime(new Date())).//
+		    toList();
+
+	    settings = scheduler.//
+		    listScheduledSettings().//
+		    stream().//
+		    filter(s -> s.getGroup() == SchedulerWorkerSetting.SchedulingGroup.ASYNCH_ACCESS).//
+		    filter(s -> !exec.stream().map(Setting::getIdentifier).toList().contains(s.getIdentifier())).//
+		    map(s -> SettingUtils.downCast(s, OMSchedulerSetting.class)).//
+		    collect(Collectors.toList());
+
+	    settings.addAll(exec);
+
+	    //
+	    //
+	    //
+
+	    List<SchedulerJobStatus> statusList = scheduler.getJobStatuslist();
+
+	    settings.forEach(setting -> {
+
+		Optional<SchedulerJobStatus> jobStatus = getJobStatus(statusList, setting);
+
+		jobStatus.ifPresent(status -> {
+
+		    setting.getObject().put("status", status.getPhase().getLabel());
+		    setting.getObject().put("host", status.getHostName().orElse(""));
+		});
+
+	    });
+
+	} catch (Exception e) {
+
+	    settings = new ArrayList<>();
+
+	    GSLoggerFactory.getLogger(HarvestingSetting.class).error("Error occurred: {}", e.getMessage(), e);
+	}
+
+	return settings;
+    }
+
+    /**
+     * @param setting
+     * @return
+     */
+    private synchronized Optional<SchedulerJobStatus> getJobStatus(List<SchedulerJobStatus> statusList, Setting setting) {
+
+	return statusList.//
+		stream().//
+		filter(s -> s.getSettingId().equals(setting.getIdentifier())).//
+		findFirst();
+
     }
 
     /**
@@ -150,42 +278,18 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
      */
     private void update(VerticalLayout verticalLayout) {
 
-	final List<AsynchDownloadDescriptor.GridData> sdList = Collections.synchronizedList(new ArrayList<>());
-
-	Database db = getDatabase();
-
-	List<DatabaseFolder> dataFolders = getDataFolders(db);
-
-	ConfigurationWrapper.getHarvestedAndMixedSources().//
-		parallelStream().//
-		// filter(sourceFilter).//
-			forEach(s -> {//
-
-		    sdList.addAll(dataFolders.stream().//
-			    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
-			    map(f -> new AsynchDownloadDescriptor.GridData(f, s)).//
-			    toList());
-		});
-
-	double total = sdList.stream().mapToInt(sd -> sd.getSize().intValue()).sum();
-
-	grid.getColumnByKey(BUCKET_COLUMN).setFooter(StringUtils.format(total));
-
-	List<AsynchDownloadDescriptor.GridData> sortedList = sdList.stream().//
-		sorted((sd1, sd2) -> sd2.getSize().compareTo(sd1.getSize())).//
-		peek(sd -> sd.setTotal(total)).//
+	List<GridData> list = getSettings(). //
+		stream().//
+		map(GridData::new).//
+		sorted((sd1, sd2) -> sd2.getEmail().compareTo(sd1.getEmail())).//
 		collect(Collectors.toList());
 
-	grid.setItems(sortedList);
-
-	//
-	//
-	//
+	grid.setItems(list);
 
 	@SuppressWarnings("unchecked")
-	ListDataProvider<AsynchDownloadDescriptor.GridData> dataProvider = (ListDataProvider<AsynchDownloadDescriptor.GridData>) grid.getDataProvider();
+	ListDataProvider<AsynchDownloadDescriptor.GridData> dataProvider = (ListDataProvider<GridData>) grid.getDataProvider();
 
-	dataProvider.setFilter(item -> gridFilter.test(item));
+	dataProvider.setFilter(gridFilter::test);
     }
 
     /**
@@ -195,6 +299,7 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
     private void addFilterField(HeaderRow filterRow, Grid.Column<AsynchDownloadDescriptor.GridData> column) {
 
 	TextField filterField = new TextField();
+	filterField.getStyle().set("font-size", "13px");
 
 	filterField.addValueChangeListener(event -> {
 
@@ -211,93 +316,46 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
     }
 
     /**
-     * @param db
-     * @return
-     */
-    private List<DatabaseFolder> getDataFolders(Database db) {
-
-	try {
-	    return db.getDataFolders();
-
-	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(AsynchDownloadDescriptor.class).error(e);
-	}
-
-	return null;
-    }
-
-    /**
-     * @param f
-     * @return
-     */
-    private static int getFolderSize(DatabaseFolder f) {
-
-	try {
-	    return f.size();
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(AsynchDownloadDescriptor.class).error(e);
-	}
-
-	return 0;
-    }
-
-    /**
-     * @return
-     */
-    private Database getDatabase() {
-
-	try {
-	    return DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
-	} catch (GSException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	}
-
-	return null;
-    }
-
-    /**
      * @author Fabrizio
      */
-    private class GridFilter {
+    private static class GridFilter {
 
-	private final HashMap<String, String> valuesMap;
+	private static final HashMap<String, String> SELECTION_MAP = new HashMap<>();
 
 	/**
 	 *
 	 */
 	private GridFilter() {
-
-	    valuesMap = new HashMap<>();
 	}
 
 	/**
 	 * @param gridData
 	 * @return
 	 */
-	public boolean test(AsynchDownloadDescriptor.GridData gridData) {
+	public boolean test(GridData gridData) {
 
-	    String sourceName = valuesMap.get(DOWNLOAD_NAME_COLUMN);
-	    String sourceId = valuesMap.get(EMAIL_COLUMN);
+	    boolean match = true;
 
-	    boolean nameMatch = sourceName != null && gridData.getSourceName().toLowerCase().contains(sourceName);
-	    boolean idMatch = sourceId != null && gridData.getSourceId().toLowerCase().contains(sourceId);
+	    for (String colum : SELECTION_MAP.keySet()) {
 
-	    if (sourceName != null && sourceId != null) { // both selected
+		String itemValue = switch (colum) {
+		    case BUCKET_COLUMN -> gridData.getBucket();
+		    case DOWNLOAD_NAME_COLUMN -> gridData.getDownloadName();
+		    case EMAIL_COLUMN -> gridData.getEmail();
+		    case EMAIL_NOTIFICATIONS_COLUMN -> gridData.getEmailNotifications();
+		    case HOST_COLUMN -> gridData.getHost();
+		    case MAX_DOWNLOAD_PART_SIZE_COLUMN -> gridData.getMaxDownloadPartSize();
+		    case MAX_DOWNLOAD_SIZE_COLUMN -> gridData.getMaxDownloadSize();
+		    case OPERATION_ID_COLUMN -> gridData.getOperationID();
+		    case REQUEST_URL_COLUMN -> gridData.getRequestURL();
+		    case STATUS_COLUMN -> gridData.getStatus();
+		    default -> null;
+		};
 
-		return nameMatch && idMatch;
+		match &= itemValue == null || itemValue.toLowerCase().contains(SELECTION_MAP.get(colum).toLowerCase());
 	    }
 
-	    if (sourceName != null) { // only name
-
-		return nameMatch;
-	    }
-
-	    if (sourceId != null) { // only id
-
-		return idMatch;
-	    }
-
-	    return true; // none
+	    return match;
 	}
 
 	/**
@@ -306,131 +364,120 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 	 */
 	public void filter(String columnKey, String value) {
 
-	    valuesMap.put(columnKey, value.isEmpty() ? null : value);
+	    SELECTION_MAP.put(columnKey, value);
 	}
     }
 
     /**
      * @author Fabrizio
      */
-    private class GridData {
+    private static class GridData {
 
-	private final String sourceLabel;
-	private final double size;
-	private double total;
-	private final String dataFolder;
-	private final String sourceId;
-	private boolean writingFolder;
+	private final OMSchedulerSetting setting;
 
 	/**
-	 * @param folder
-	 * @param source
+	 * @param setting
 	 */
-	private GridData(DatabaseFolder folder, GSSource source) {
+	private GridData(OMSchedulerSetting setting) {
 
-	    this.sourceLabel = source.getLabel();
-	    this.sourceId = source.getUniqueIdentifier();
-	    this.size = getFolderSize(folder);
-	    this.dataFolder = folder.getName().contains("data-1") ? "1" : "2";
-	    try {
-		this.writingFolder = folder.getBinary(SourceStorageWorker.WRITING_FOLDER_TAG) != null;
-	    } catch (Exception e) {
-		GSLoggerFactory.getLogger(getClass()).error(e);
-	    }
-	}
-
-	/**
-	 * @return the writingFolder
-	 */
-	public boolean isWritingFolder() {
-
-	    return writingFolder;
+	    this.setting = setting;
 	}
 
 	/**
 	 * @return
 	 */
-	public String getDataFolder() {
+	public String getDownloadName() {
 
-	    return dataFolder;
+	    return Optional.ofNullable(setting.getAsynchDownloadName()).orElse("");
 	}
 
 	/**
 	 * @return
 	 */
-	public String getPosition() {
+	public String getEmail() {
 
-	    return String.valueOf(//
-		    grid.getListDataView().//
-			    getItems().//
-			    toList().//
-			    indexOf(this) + 1);
-	}
-
-	/**
-	 * @param total
-	 * @return
-	 */
-	public void setTotal(double total) {
-
-	    this.total = total;
-	}
-
-	/**
-	 * @return
-	 */
-	public String getPercentage() {
-
-	    return StringUtils.format((size / total) * 100);
-	}
-
-	/**
-	 * @return
-	 */
-	public String getSourceName() {
-
-	    return sourceLabel;
-	}
-
-	/**
-	 * @return
-	 */
-	public String getSourceId() {
-
-	    return sourceId;
+	    return Optional.ofNullable(setting.getEmail()).orElse("");
 	}
 
 	/**
 	 * @return the size
 	 */
-	public String getFormattedSize() {
+	public String getBucket() {
 
-	    return StringUtils.format(size);
+	    return Optional.ofNullable(setting.getBucket()).orElse("");
 	}
 
 	/**
-	 * @return the size
+	 * @return
 	 */
-	public Double getSize() {
+	public String getMaxDownloadSize() {
 
-	    return size;
+	    String def = Optional.ofNullable(ConfigurationWrapper.getDefaultMaxDownloadSizeMB()).map(String::valueOf).orElse("");
+
+	    return Optional.ofNullable(setting.getMaxDownloadSizeMB()).map(String::valueOf).orElse(def);
+
+	}
+
+	/**
+	 * @return
+	 */
+	public String getMaxDownloadPartSize() {
+
+	    String def = Optional.ofNullable(ConfigurationWrapper.getDefaultMaxDownloadPartSizeMB()).map(String::valueOf).orElse("");
+
+	    return Optional.ofNullable(setting.getMaxDownloadPartSizeMB()).map(String::valueOf).orElse(def);
+	}
+
+	/**
+	 * @return
+	 */
+	public String getRequestURL() {
+
+	    return Optional.ofNullable(setting.getRequestURL()).orElse("");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getStatus() {
+
+	    return setting.getObject().optString("status", "Waiting");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getHost() {
+
+	    return setting.getObject().optString("host", "-");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getOperationID() {
+
+	    return Optional.ofNullable(setting.getOperationId()).orElse("");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getEmailNotifications() {
+
+	    return Optional.ofNullable(setting.getEmailNotifications()).map(v -> v.equals("true") ? "yes" : "no").orElse("");
 	}
 
 	@Override
 	public String toString() {
 
-	    return getSourceName() + ":" + getSize();
+	    return getDownloadName() + ":" + getEmail();
 	}
 
 	@Override
 	public boolean equals(Object o) {
 
-	    return o instanceof AsynchDownloadDescriptor.GridData && ((AsynchDownloadDescriptor.GridData) o).getSourceName()
-		    .equals(this.getSourceName()) &&
-		    //
-		    ((AsynchDownloadDescriptor.GridData) o).getSize().equals(this.getSize()) && //
-		    ((AsynchDownloadDescriptor.GridData) o).getDataFolder().equals(this.getDataFolder());
+	    return o instanceof GridData && ((GridData) o).getOperationID().equals(this.getOperationID());
 	}
-
     }
 }
