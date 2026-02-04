@@ -12,12 +12,12 @@ import java.util.*;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -39,7 +39,7 @@ import eu.essi_lab.model.resource.composed.ComposedElementItem;
 
 /**
  * A factory to create all types of {@link Bond}s provide by the GI-suite
- * 
+ *
  * @author Fabrizio
  */
 public class BondFactory {
@@ -55,15 +55,15 @@ public class BondFactory {
     public static Optional<Bond> aggregate(List<Bond> bonds, LogicalOperator op) {
 
 	return switch (bonds.size()) {
-	case 0 -> Optional.empty();
-	case 1 -> Optional.of(bonds.getFirst());
-	default -> Optional.of(BondFactory.createLogicalBond(op, bonds));
+	    case 0 -> Optional.empty();
+	    case 1 -> Optional.of(bonds.getFirst());
+	    default -> Optional.of(BondFactory.createLogicalBond(op, bonds));
 	};
     }
 
     /**
      * Creates a view bond according to the view identifier
-     * 
+     *
      * @param viewIdentifier
      * @return
      */
@@ -74,7 +74,7 @@ public class BondFactory {
 
     /**
      * Creates a logical bond according to the supplied <code>operator</code>
-     * 
+     *
      * @param operator
      * @param operands
      * @return
@@ -101,7 +101,7 @@ public class BondFactory {
 
     /**
      * Creates a conjunction of the supplied <code>operands</code>
-     * 
+     *
      * @param operands
      * @return
      * @throws IllegalArgumentException if <code>operands.size()</code> < 2
@@ -117,7 +117,7 @@ public class BondFactory {
 
     /**
      * Creates a conjunction of the supplied <code>operands</code>
-     * 
+     *
      * @param operands
      * @return
      * @throws IllegalArgumentException if <code>operands.length</code> < 2
@@ -133,7 +133,7 @@ public class BondFactory {
 
     /**
      * Creates a conjunction of the supplied <code>operands</code>
-     * 
+     *
      * @param operands
      * @return
      * @throws IllegalArgumentException if <code>operands.size()</code> < 2
@@ -149,7 +149,7 @@ public class BondFactory {
 
     /**
      * Creates an empty conjunction of {@link Bond}s
-     * 
+     *
      * @return
      */
     public static LogicalBond createAndBond() {
@@ -159,7 +159,7 @@ public class BondFactory {
 
     /**
      * Creates a disjunction of the supplied <code>operands</code>
-     * 
+     *
      * @param operands
      * @return
      * @throws IllegalArgumentException if <code>operands.size()</code> < 2
@@ -171,7 +171,7 @@ public class BondFactory {
 
     /**
      * Creates a disjunction of the supplied <code>operands</code>
-     * 
+     *
      * @param operands
      * @return
      * @throws IllegalArgumentException if <code>operands.length</code> < 2
@@ -187,7 +187,7 @@ public class BondFactory {
 
     /**
      * Creates a disjunction of the supplied <code>operands</code>
-     * 
+     *
      * @param operands
      * @return
      * @throws IllegalArgumentException if <code>operands.size()</code> < 2
@@ -203,7 +203,7 @@ public class BondFactory {
 
     /**
      * Creates an empty disjunction of {@link Bond}s
-     * 
+     *
      * @return
      */
     public static LogicalBond createOrBond() {
@@ -213,7 +213,7 @@ public class BondFactory {
 
     /**
      * Creates a negation of the supplied <code>operand</code>
-     * 
+     *
      * @param operand
      * @return
      */
@@ -235,7 +235,7 @@ public class BondFactory {
 
     /**
      * Creates a {@link SimpleValueBond} using {@link BondOperator#NOT_EXISTS} as operator
-     * 
+     *
      * @param element
      * @return
      */
@@ -246,18 +246,18 @@ public class BondFactory {
 
     /**
      * Creates a {@link ResourcePropertyBond} using {@link BondOperator#NOT_EXISTS} as operator.
-     * 
+     *
      * @param property
      * @return
      */
-    public static ResourcePropertyBond createMissingResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
+    public static ResourcePropertyBond createNotExistsResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
 
 	return new ResourcePropertyBond(BondOperator.NOT_EXISTS, property);
     }
 
     /**
      * Creates a {@link SimpleValueBond} using {@link BondOperator#EXISTS} as operator
-     * 
+     *
      * @param element
      * @return
      */
@@ -268,7 +268,7 @@ public class BondFactory {
 
     /**
      * Creates a {@link ResourcePropertyBond} using {@link BondOperator#EXISTS} as operator.
-     * 
+     *
      * @param property
      * @return
      */
@@ -289,19 +289,8 @@ public class BondFactory {
     }
 
     /**
-     * Creates a {@link ResourcePropertyBond} using {@link BondOperator#NOT_EXISTS} as operator.
-     *
-     * @param property
-     * @return
-     */
-    public static ResourcePropertyBond createNotExistsResourcePropertyBond(ResourceProperty property) throws IllegalArgumentException {
-
-	return new ResourcePropertyBond(BondOperator.NOT_EXISTS, property);
-    }
-
-    /**
-     * Creates a simple value bond applied on the given string <code>value</code>.<br>
-     * The supplied <code>element</code> must have one of the following {@link ContentType}:
+     * Creates a simple value bond applied on the given string <code>value</code>.<br> The supplied <code>element</code> must have one of
+     * the following {@link ContentType}:
      * <ul>
      * <li>{@link ContentType#TEXTUAL}</li>
      * <li>{@link ContentType#ISO8601_DATE}</li>
@@ -316,13 +305,13 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
-     * @see Queryable#getContentType()
+     *
      * @param operator
      * @param element
      * @param value
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or
-     *         the supplied <code>element</code> has invalid {@link ContentType}
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has
+     * invalid {@link ContentType}
+     * @see Queryable#getContentType()
      */
     public static SimpleValueBond createSimpleValueBond(BondOperator operator, MetadataElement element, String value)
 	    throws IllegalArgumentException {
@@ -356,20 +345,21 @@ public class BondFactory {
     public static Bond createKeywordListBond(List<String> keywords, LogicalOperator op) {
 
 	List<Bond> resList = keywords.stream().//
-		map(kwd -> BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, kwd), //
+		map(
+		kwd -> BondFactory.createOrBond(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, kwd), //
 			BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.KEYWORD, kwd)))
 		.collect(Collectors.toList());
 
 	return resList.size() == 1 ? resList.getFirst() : switch (op) {
-	case OR -> BondFactory.createOrBond(resList);
-	case AND -> BondFactory.createAndBond(resList);
-	case NOT -> throw new UnsupportedOperationException("Unimplemented case: " + op);
+	    case OR -> BondFactory.createOrBond(resList);
+	    case AND -> BondFactory.createAndBond(resList);
+	    case NOT -> throw new UnsupportedOperationException("Unimplemented case: " + op);
 	};
     }
 
     /**
-     * Creates a statistical element bond applied on the given string <code>value</code>.<br>
-     * The supplied <code>element</code> must have one of the following {@link ContentType}:
+     * Creates a statistical element bond applied on the given string <code>value</code>.<br> The supplied <code>element</code> must have
+     * one of the following {@link ContentType}:
      * <ul>
      * <li>{@link ContentType#TEXTUAL}</li>
      * <li>{@link ContentType#ISO8601_DATE}</li>
@@ -384,13 +374,13 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
-     * @see Queryable#getContentType()
+     *
      * @param operator
      * @param element
      * @param value
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or
-     *         the supplied <code>element</code> has invalid {@link ContentType}
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has
+     * invalid {@link ContentType}
+     * @see Queryable#getContentType()
      */
     public static RuntimeInfoElementBond createRuntimeInfoElementBond(BondOperator operator, RuntimeInfoElement element, String value)
 	    throws IllegalArgumentException {
@@ -417,9 +407,8 @@ public class BondFactory {
     }
 
     /**
-     * Creates a statistical element bond applied on the given double <code>value</code>.<br>
-     * The supplied <code>element</code> must have the {@link ContentType#DOUBLE}.<br>
-     * The supplied <code>operator</code> must be one of the following binary operators:
+     * Creates a statistical element bond applied on the given double <code>value</code>.<br> The supplied <code>element</code> must have
+     * the {@link ContentType#DOUBLE}.<br> The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
      * <li>{@link BondOperator#NOT_EQUAL}</li>
@@ -428,13 +417,13 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
-     * @see Queryable#getContentType()
+     *
      * @param operator
      * @param element
      * @param value
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or
-     *         the supplied <code>element</code> has not {@link ContentType#DOUBLE}
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has not
+     * {@link ContentType#DOUBLE}
+     * @see Queryable#getContentType()
      */
     public static RuntimeInfoElementBond createRuntimeInfoElementBond(BondOperator operator, RuntimeInfoElement element, double value)
 	    throws IllegalArgumentException {
@@ -458,9 +447,8 @@ public class BondFactory {
     }
 
     /**
-     * Creates a statistical element bond applied on the given double <code>value</code>.<br>
-     * The supplied <code>element</code> must have the {@link ContentType#LONG}.<br>
-     * The supplied <code>operator</code> must be one of the following binary operators:
+     * Creates a statistical element bond applied on the given double <code>value</code>.<br> The supplied <code>element</code> must have
+     * the {@link ContentType#LONG}.<br> The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
      * <li>{@link BondOperator#NOT_EQUAL}</li>
@@ -469,13 +457,13 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
-     * @see Queryable#getContentType()
+     *
      * @param operator
      * @param element
      * @param value
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or
-     *         the supplied <code>element</code> has not {@link ContentType#LONG}
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has not
+     * {@link ContentType#LONG}
+     * @see Queryable#getContentType()
      */
     public static RuntimeInfoElementBond createRuntimeInfoElementBond(BondOperator operator, RuntimeInfoElement element, long value)
 	    throws IllegalArgumentException {
@@ -499,9 +487,8 @@ public class BondFactory {
     }
 
     /**
-     * Creates a statistical element bond applied on the given double <code>value</code>.<br>
-     * The supplied <code>element</code> must have the {@link ContentType#INTEGER}.<br>
-     * The supplied <code>operator</code> must be one of the following binary operators:
+     * Creates a statistical element bond applied on the given double <code>value</code>.<br> The supplied <code>element</code> must have
+     * the {@link ContentType#INTEGER}.<br> The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
      * <li>{@link BondOperator#NOT_EQUAL}</li>
@@ -510,13 +497,13 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
-     * @see Queryable#getContentType()
+     *
      * @param operator
      * @param element
      * @param value
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or
-     *         the supplied <code>element</code> has not {@link ContentType#INTEGER}
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has not
+     * {@link ContentType#INTEGER}
+     * @see Queryable#getContentType()
      */
     public static RuntimeInfoElementBond createRuntimeInfoElementBond(BondOperator operator, RuntimeInfoElement element, int value)
 	    throws IllegalArgumentException {
@@ -540,9 +527,8 @@ public class BondFactory {
     }
 
     /**
-     * Creates a simple value bond applied on the given double <code>value</code>.<br>
-     * The supplied <code>element</code> must have the {@link ContentType#DOUBLE}.<br>
-     * The supplied <code>operator</code> must be one of the following binary operators:
+     * Creates a simple value bond applied on the given double <code>value</code>.<br> The supplied <code>element</code> must have the
+     * {@link ContentType#DOUBLE}.<br> The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
      * <li>{@link BondOperator#NOT_EQUAL}</li>
@@ -551,13 +537,13 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
-     * @see Queryable#getContentType()
+     *
      * @param operator
      * @param element
      * @param value
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or
-     *         the supplied <code>element</code> has not {@link ContentType#DOUBLE}
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has not
+     * {@link ContentType#DOUBLE}
+     * @see Queryable#getContentType()
      */
     public static SimpleValueBond createSimpleValueBond(BondOperator operator, MetadataElement element, double value)
 	    throws IllegalArgumentException {
@@ -581,9 +567,8 @@ public class BondFactory {
     }
 
     /**
-     * Creates a simple value bond applied on the given int <code>value</code>.
-     * The supplied <code>element</code> must have the {@link ContentType#INTEGER}.
-     * The supplied <code>operator</code> must be one of the following binary operators:
+     * Creates a simple value bond applied on the given int <code>value</code>. The supplied <code>element</code> must have the
+     * {@link ContentType#INTEGER}. The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
      * <li>{@link BondOperator#EQUAL}</li>
      * <li>{@link BondOperator#NOT_EQUAL}</li>
@@ -592,13 +577,13 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
-     * @see Queryable#getContentType()
+     *
      * @param operator
      * @param element
      * @param value
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or
-     *         the supplied <code>element</code> has not {@link ContentType#DOUBLE}
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has not
+     * {@link ContentType#DOUBLE}
+     * @see Queryable#getContentType()
      */
     public static SimpleValueBond createSimpleValueBond(BondOperator operator, MetadataElement element, int value)
 	    throws IllegalArgumentException {
@@ -675,14 +660,13 @@ public class BondFactory {
     }
 
     /**
-     * Creates a simple value bond applied on the given boolean <code>value</code> with the {@link BondOperator#EQUAL}
-     * operator.<br>
-     * The supplied <code>element</code> must have the {@link ContentType#BOOLEAN}.
-     * 
-     * @see Queryable#getContentType()
+     * Creates a simple value bond applied on the given boolean <code>value</code> with the {@link BondOperator#EQUAL} operator.<br> The
+     * supplied <code>element</code> must have the {@link ContentType#BOOLEAN}.
+     *
      * @param element
      * @param value
      * @throws IllegalArgumentException if the supplied <code>element</code> has not {@link ContentType#BOOLEAN}
+     * @see Queryable#getContentType()
      */
     public static SimpleValueBond createSimpleValueBond(MetadataElement element, boolean value) throws IllegalArgumentException {
 
@@ -702,7 +686,7 @@ public class BondFactory {
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param extent
      * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
@@ -733,11 +717,11 @@ public class BondFactory {
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param quality
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      * @return
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      */
     public static ResourcePropertyBond createAccessQualityBond(BondOperator operator, int quality) {
 
@@ -753,11 +737,11 @@ public class BondFactory {
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param quality
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      * @return
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      */
     public static ResourcePropertyBond createEssentialVarsQualityBond(BondOperator operator, int quality) {
 
@@ -773,11 +757,11 @@ public class BondFactory {
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param timeStamp
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      * @return
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      */
     public static ResourcePropertyBond createTestTimeStampBond(BondOperator operator, String timeStamp) {
 
@@ -793,11 +777,11 @@ public class BondFactory {
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param time
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      * @return
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      */
     public static ResourcePropertyBond createDownloadTimeBond(BondOperator operator, long time) {
 
@@ -813,11 +797,11 @@ public class BondFactory {
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param time
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      * @return
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      */
     public static ResourcePropertyBond createExecutionTimeBond(BondOperator operator, long time) {
 
@@ -833,11 +817,11 @@ public class BondFactory {
      * <li>{@link BondOperator#LESS}</li>
      * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param quality
-     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      * @return
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not accepted
      */
     public static ResourcePropertyBond createMetadataQualityBond(BondOperator operator, int quality) {
 
@@ -872,7 +856,7 @@ public class BondFactory {
      * <li>{@link BondOperator#GREATER}</li>
      * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
      * </ul>
-     * 
+     *
      * @param operator
      * @param resourceTimeStamp
      */
@@ -888,7 +872,7 @@ public class BondFactory {
      * <li>they origin from a {@link GSSource} with the supplied <code>sourceIdentifier</code></li>
      * </ul>
      * The supplied <code>operator</code> <b>MUST</b> be {@link BondOperator#MIN} or {@link BondOperator#MAX}
-     * 
+     *
      * @param sourceIdentifier the identifier of an existent {@link GSSource}
      * @param operator {@link BondOperator#MIN} or {@link BondOperator#MAX}
      */
@@ -904,7 +888,7 @@ public class BondFactory {
 
     /**
      * Applies this bond to resources having the minimum or maximum resource time stamp
-     * 
+     *
      * @param operator {@link BondOperator#MIN} or {@link BondOperator#MAX}
      */
     public static ResourcePropertyBond createMinMaxResourceTimeStampBond(BondOperator operator) throws IllegalArgumentException {
@@ -914,7 +898,7 @@ public class BondFactory {
 
     /**
      * Applies this bond to resources having the minimum or maximum value of the given <code>property</code>
-     * 
+     *
      * @param operator {@link BondOperator#MIN} or {@link BondOperator#MAX}
      */
     public static ResourcePropertyBond createMinMaxResourcePropertyBond(ResourceProperty property, BondOperator operator)
@@ -985,7 +969,7 @@ public class BondFactory {
 
 	if (!deleted) {
 
-	    return createMissingResourcePropertyBond(ResourceProperty.IS_DELETED);
+	    return createNotExistsResourcePropertyBond(ResourceProperty.IS_DELETED);
 	}
 
 	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_DELETED, "true");
@@ -999,7 +983,7 @@ public class BondFactory {
 
 	if (!validated) {
 
-	    return createMissingResourcePropertyBond(ResourceProperty.IS_VALIDATED);
+	    return createNotExistsResourcePropertyBond(ResourceProperty.IS_VALIDATED);
 	}
 
 	return new ResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.IS_VALIDATED, "true");

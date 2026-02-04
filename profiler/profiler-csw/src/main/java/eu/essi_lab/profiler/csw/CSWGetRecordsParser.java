@@ -406,7 +406,7 @@ public class CSWGetRecordsParser {
 	    try {
 		name = removePrefix(name);
 		ResourceProperty property = ResourceProperty.fromName(name);
-		bond = BondFactory.createMissingResourcePropertyBond(property);
+		bond = BondFactory.createNotExistsResourcePropertyBond(property);
 	    } catch (IllegalArgumentException ex) {
 		// nothing to do
 	    }
