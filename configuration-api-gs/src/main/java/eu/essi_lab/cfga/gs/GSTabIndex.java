@@ -83,12 +83,17 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    SEMANTICS(7, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+    ASYNC_DOWNLOADS(7),
 
     /**
      *
      */
-    SYSTEM(8, false,//
+    SEMANTICS(8, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+
+    /**
+     *
+     */
+    SYSTEM(9, false,//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SCHEDULER_SETTING.getLabel())),//

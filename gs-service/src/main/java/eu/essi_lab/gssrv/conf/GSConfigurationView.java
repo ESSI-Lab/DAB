@@ -499,6 +499,7 @@ public class GSConfigurationView extends ConfigurationView {
     protected List<TabDescriptor> getDescriptors() {
 
 	return Arrays.asList(//
+		new AsynchDownloadDescriptor(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//
