@@ -493,6 +493,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 	    page = page + 1;
 	    if (page > 2) {
 		ret.setResumptionToken(null);
+		ids = new HashSet<>();
 		// GSLoggerFactory.getLogger(getClass()).info("Dataset with time interval: {}", countTimeDataset);
 		GSLoggerFactory.getLogger(getClass()).info("Total number of dataset: {}", countDataset);
 	    } else {
