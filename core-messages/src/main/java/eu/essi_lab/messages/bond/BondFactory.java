@@ -567,6 +567,46 @@ public class BondFactory {
     }
 
     /**
+     * Creates a simple value bond applied on the given double <code>value</code>.<br> The supplied <code>element</code> must have the
+     * {@link ContentType#LONG}.<br> The supplied <code>operator</code> must be one of the following binary operators:
+     * <ul>
+     * <li>{@link BondOperator#EQUAL}</li>
+     * <li>{@link BondOperator#NOT_EQUAL}</li>
+     * <li>{@link BondOperator#LESS}</li>
+     * <li>{@link BondOperator#LESS_OR_EQUAL}</li>
+     * <li>{@link BondOperator#GREATER}</li>
+     * <li>{@link BondOperator#GREATER_OR_EQUAL}</li>
+     * </ul>
+     *
+     * @param operator
+     * @param element
+     * @param value
+     * @throws IllegalArgumentException if the supplied <code>operator</code> is not supported or the supplied <code>element</code> has not
+     * {@link ContentType#DOUBLE}
+     * @see Queryable#getContentType()
+     */
+    public static SimpleValueBond createSimpleValueBond(BondOperator operator, MetadataElement element, long value)
+	    throws IllegalArgumentException {
+
+	if (operator != BondOperator.EQUAL && //
+		operator != BondOperator.NOT_EQUAL && //
+		operator != BondOperator.LESS && //
+		operator != BondOperator.LESS_OR_EQUAL && //
+		operator != BondOperator.GREATER && //
+		operator != BondOperator.GREATER_OR_EQUAL) {
+
+	    throw new IllegalArgumentException("Unsupported binary operator: " + operator);
+	}
+
+	if (element.getContentType() != ContentType.LONG) {
+
+	    throw new IllegalArgumentException("Not long content type: " + element.getContentType());
+	}
+
+	return new SimpleValueBond(operator, element, value);
+    }
+
+    /**
      * Creates a simple value bond applied on the given int <code>value</code>. The supplied <code>element</code> must have the
      * {@link ContentType#INTEGER}. The supplied <code>operator</code> must be one of the following binary operators:
      * <ul>
