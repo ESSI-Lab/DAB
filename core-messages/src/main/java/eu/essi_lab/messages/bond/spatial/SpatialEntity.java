@@ -1,6 +1,10 @@
 package eu.essi_lab.messages.bond.spatial;
 
+import com.fasterxml.jackson.annotation.*;
 import eu.essi_lab.messages.bond.SpatialBond;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.ontology.*;
+import eu.essi_lab.model.resource.*;
 
 /*-
  * #%L
@@ -28,6 +32,16 @@ import eu.essi_lab.messages.bond.SpatialBond;
  * 
  * @author Fabrizio
  */
+@JsonTypeInfo( //
+	use = JsonTypeInfo.Id.NAME,//
+	include = JsonTypeInfo.As.PROPERTY,//
+	property = "type"//
+)
+@JsonSubTypes({//
+	@JsonSubTypes.Type(value = IndexedShape.class, name = "indexedShape"),//
+	@JsonSubTypes.Type(value = SpatialExtent.class, name = "spatialExtent"),//
+	@JsonSubTypes.Type(value = WKT.class, name = "wkt")//
+})
 public interface SpatialEntity extends Cloneable {
 
     SpatialEntity clone();

@@ -13,12 +13,12 @@ import java.io.InputStream;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -43,16 +43,16 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.jaxb.ViewFactory;
 
 /**
- * The view object describes a view (a set of predefined constraints associated with a label and a description). Views
- * can be managed by a user in the db,
- * 
+ * The view object describes a view (a set of predefined constraints associated with a label and a description). Views can be managed by a
+ * user in the db,
+ *
  * @author boldrini
  */
 @XmlRootElement
 public class View implements Serializable {
 
     /**
-     * 
+     *
      */
     @Serial
     private static final long serialVersionUID = -4652948734431078022L;
@@ -63,11 +63,11 @@ public class View implements Serializable {
     public enum ViewVisibility {
 
 	/**
-	 * 
+	 *
 	 */
 	PUBLIC,
 	/**
-	 * 
+	 *
 	 */
 	PRIVATE;
 
@@ -104,7 +104,7 @@ public class View implements Serializable {
     protected Bond bond;
 
     /**
-     * 	
+     *
      */
     public View() {
 	setVisibility(ViewVisibility.PRIVATE);
@@ -274,13 +274,19 @@ public class View implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof View) {
-	    return Objects.equals(id, ((View) obj).getId()) && //
-		    Objects.equals(label, ((View) obj).getLabel()) && //
-		    Objects.equals(creationTime, ((View) obj).getCreationTime()) && //
-		    Objects.equals(expirationTime, ((View) obj).getExpirationTime()) && //
-		    Objects.equals(bond, ((View) obj).getBond());
+
+	if (obj instanceof View other) {
+
+	    return Objects.equals(id, other.getId()) && //
+		    Objects.equals(label, other.getLabel()) && //
+		    Objects.equals(creationTime, other.getCreationTime()) && //
+		    Objects.equals(expirationTime, other.getExpirationTime()) && //
+		    Objects.equals(getVisibility(), other.getVisibility()) &&
+		    Objects.equals(owner, other.getOwner()) &&
+		    Objects.equals(sourceDeployment, other.getSourceDeployment()) &&
+		    Objects.equals(bond.toString(), other.getBond().toString());
 	}
+
 	return super.equals(obj);
     }
 
