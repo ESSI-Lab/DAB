@@ -130,7 +130,7 @@ public class DataIdentificationTest extends MetadataTest<DataIdentification, Abs
 	//
 	// topic category
 	//
-	dataId.addTopicCategory(MDTopicCategoryCodeType.BIOTA);
+	dataId.addTopicCategory(MDTopicCategoryCodeType.BIOTA.toString());
 
 	// spatial representation
 	dataId.setSpatialRepresentationType("vector");
