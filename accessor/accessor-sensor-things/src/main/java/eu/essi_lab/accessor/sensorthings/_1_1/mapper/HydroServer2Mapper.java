@@ -611,6 +611,12 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	//
 
 	String platformId = "";
+
+	String siteCode = thing.getProperties().get().optString("siteId");
+	if (platformId.isEmpty() && !siteCode.isEmpty()) {
+	    platformId = siteCode.trim();
+	}
+
 	String samplingFeatureCode = thing.getProperties().get().optString("samplingFeatureCode");
 	if (platformId.isEmpty() && !samplingFeatureCode.isEmpty()) {
 	    platformId = samplingFeatureCode.trim();
