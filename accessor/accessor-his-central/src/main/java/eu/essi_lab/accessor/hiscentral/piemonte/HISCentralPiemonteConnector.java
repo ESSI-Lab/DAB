@@ -73,25 +73,10 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
     }
 
     /**
-     * TIPOLOGIA SENSORI:
-     * 0 -- > METEO_STATION_URL ----- 1287 meteo
-     * "tmedia": null,
-     * "tmax": null,
-     * "tmin": null,
-     * "tclasse": null,
-     * "ptot": null,
-     * "pclasse": null,
-     * "vmedia": null,
-     * "vraffica": null,
-     * "settore_prevalente": null,
-     * "tempo_permanenza": null,
-     * "durata_calma": null,
-     * "vclasse": null,
-     * "umedia": null,
-     * "umin": null,
-     * "umax": null,
-     * 1 -- > HYDRO_STATION_URL ------ variabili livello,portata --- 242
-     * 2 -- > SNOW_STATION_URL ------ variabili hs (altezza neve al suolo) e hn (altezza neve fresca) --- 130
+     * TIPOLOGIA SENSORI: 0 -- > METEO_STATION_URL ----- 1287 meteo "tmedia": null, "tmax": null, "tmin": null, "tclasse": null, "ptot":
+     * null, "pclasse": null, "vmedia": null, "vraffica": null, "settore_prevalente": null, "tempo_permanenza": null, "durata_calma": null,
+     * "vclasse": null, "umedia": null, "umin": null, "umax": null, 1 -- > HYDRO_STATION_URL ------ variabili livello,portata --- 242 2 -- >
+     * SNOW_STATION_URL ------ variabili hs (altezza neve al suolo) e hn (altezza neve fresca) --- 130
      */
 
     public enum PIEMONTE_Variable {
@@ -101,8 +86,8 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 	TMIN("Temperatura dell'aria", "tmin", "°C", InterpolationType.MIN, PiemonteStationType.METEO), //
 	GRADI18("Gradi giorno", "hdd_base18", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO), GRADI20("Gradi giorno",
 		"hdd_base20", "°C", InterpolationType.AVERAGE, PiemonteStationType.METEO), GRADICOOL("Gradi giorno", "cdd_base18", "°C",
-			InterpolationType.AVERAGE,
-			PiemonteStationType.METEO), UMIN("Umidità relativa", "umin", "%", InterpolationType.MIN, PiemonteStationType.METEO), //
+		InterpolationType.AVERAGE, PiemonteStationType.METEO), UMIN("Umidità relativa", "umin", "%", InterpolationType.MIN,
+		PiemonteStationType.METEO), //
 	UMMEDIA("Umidità relativa", "umedia", "%", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
 	UMAX("Umidità relativa", "umax", "%", InterpolationType.MAX, PiemonteStationType.METEO), //
 	VMEDIA("Velocità del vento", "vmedia", "m/s", InterpolationType.AVERAGE, PiemonteStationType.METEO), //
@@ -219,13 +204,15 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 
     private int countDataset = 0;
 
+    private Set<String> ids = new HashSet<>();
+
     /**
-     * 
+     *
      */
     static final String TYPE = "HISCentralPiemonteConnector";
 
     /**
-     * 
+     *
      */
     public HISCentralPiemonteConnector() {
 
@@ -235,29 +222,29 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
     private Downloader downloader;
 
     /**
-     * 
+     *
      */
     // static final String SENSORS_URL = "http://app.protezionecivile.marche.it/his/sensors";
     // static final String SENSOR_URL = "http://app.protezionecivile.marche.it/his/sensors";
     /**
-     * 
+     *
      */
     static final String METEO_STATION_URL = "stazione_meteorologica/";
     /**
-     * 
+     *
      */
     static final String SNOW_STATION_URL = "stazione_nivologica/";
     /**
-     * 
+     *
      */
     static final String HYDRO_STATION_URL = "stazione_idrologica/";
     /**
-     * 
+     *
      */
 
     static final String DATA_URL = "data_pie";
     /**
-     * 
+     *
      */
     public static final String BASE_URL = "https://utility.arpa.piemonte.it/meteoidro/";
 
@@ -358,32 +345,36 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 
 			    String stationCode = originalMetadataInfo.optString("codice_stazione").replaceAll("\\s+$", "");
 
-			    HISCentralPiemonteClient rt_client = new HISCentralPiemonteClient(REAL_TIME_URL);
-			    
-			    // 'https://utility.arpa.piemonte.it/api_realtime/data_pie?station_code=001&page=1&page_size=100
-			    String rt_path = DATA_URL + "?station_code=" + stationCode + "&page=1&page_size=100";
-			    String getRealTimeData = rt_client.getData(rt_path);
-				    
-			    if (getRealTimeData != null && !getRealTimeData.isEmpty()) {
-				JSONObject jsonData = new JSONObject(getRealTimeData);
-				if (jsonData != null) {
-				    JSONArray resultsData = jsonData.optJSONArray("data", null);
-				    if (resultsData != null && !resultsData.isEmpty()) {
-					JSONObject firstObj = resultsData.getJSONObject(0);
-					List<PIEMONTE_Variable> realtimeStationType = PIEMONTE_Variable
-						.values(PiemonteStationType.REALTIME);
-					for (PIEMONTE_Variable pv : realtimeStationType) {
-					    String value = firstObj.optString(pv.getParam());
-					    if (value != null && !value.isEmpty() && !value.equalsIgnoreCase("null")) {
-						ret.addRecord(HISCentralPiemonteMapper.create(originalMetadataInfo, variableType, pv.name(),
-							null));
-						countDataset++;
+			    if (!ids.contains(stationCode)) {
+				ids.add(stationCode);
+				HISCentralPiemonteClient rt_client = new HISCentralPiemonteClient(REAL_TIME_URL);
+
+				// 'https://utility.arpa.piemonte.it/api_realtime/data_pie?station_code=001&page=1&page_size=100
+				String rt_path = DATA_URL + "?station_code=" + stationCode + "&page=1&page_size=100";
+				String getRealTimeData = rt_client.getData(rt_path);
+
+				if (getRealTimeData != null && !getRealTimeData.isEmpty()) {
+				    JSONObject jsonData = new JSONObject(getRealTimeData);
+				    if (jsonData != null) {
+					JSONArray resultsData = jsonData.optJSONArray("data", null);
+					if (resultsData != null && !resultsData.isEmpty()) {
+					    JSONObject firstObj = resultsData.getJSONObject(0);
+					    List<PIEMONTE_Variable> realtimeStationType = PIEMONTE_Variable.values(
+						    PiemonteStationType.REALTIME);
+					    for (PIEMONTE_Variable pv : realtimeStationType) {
+						String value = firstObj.optString(pv.getParam());
+						if (value != null && !value.isEmpty() && !value.equalsIgnoreCase("null")) {
+						    ret.addRecord(
+							    HISCentralPiemonteMapper.create(originalMetadataInfo, variableType, pv.name(),
+								    null));
+						    countDataset++;
+						}
 					    }
 					}
+
 				    }
 
 				}
-
 			    }
 
 			    JSONArray variables = originalMetadataInfo.optJSONArray(getVariableField);
@@ -502,6 +493,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 	    page = page + 1;
 	    if (page > 2) {
 		ret.setResumptionToken(null);
+		ids = new HashSet<>();
 		// GSLoggerFactory.getLogger(getClass()).info("Dataset with time interval: {}", countTimeDataset);
 		GSLoggerFactory.getLogger(getClass()).info("Total number of dataset: {}", countDataset);
 	    } else {

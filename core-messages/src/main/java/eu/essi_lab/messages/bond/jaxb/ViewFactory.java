@@ -10,12 +10,12 @@ package eu.essi_lab.messages.bond.jaxb;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,7 +26,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import com.sun.xml.bind.marshaller.*;
+import eu.essi_lab.jaxb.common.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.xml.*;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
@@ -37,7 +40,7 @@ import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.messages.bond.ViewBond;
 
 /**
- * 
+ *
  */
 public class ViewFactory {
 
@@ -52,6 +55,8 @@ public class ViewFactory {
 	    JAXBContext jc = createContext();
 	    Marshaller m = jc.createMarshaller();
 	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+	    m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
+
 	    return m;
 	} catch (JAXBException e) {
 	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
