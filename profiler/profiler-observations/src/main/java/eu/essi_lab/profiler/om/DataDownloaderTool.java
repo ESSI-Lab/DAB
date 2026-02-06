@@ -40,6 +40,7 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import org.apache.http.client.utils.URIBuilder;
 import org.h2.util.StringUtils;
 import org.json.JSONArray;
@@ -68,9 +69,9 @@ public class DataDownloaderTool {
      * @param downloadName
      * @return the zip file, or null if canceled
      */
-    public File download(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId, String downloadName) {
+    public File download(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId, String downloadName, SchedulerJobStatus status) {
 	DownloadPartResult result = downloadPart(s3wrapper, bucket, requestURL, operationId, downloadName, Integer.MAX_VALUE,
-		Integer.MAX_VALUE, null, BigDecimal.ZERO, 1, new ArrayList<>());
+		Integer.MAX_VALUE, null, BigDecimal.ZERO, 1, new ArrayList<>(), status);
 	return result != null ? result.getPartFile() : null;
     }
 
@@ -84,17 +85,18 @@ public class DataDownloaderTool {
      * @param requestURL
      * @param operationId
      * @param downloadName
-     * @param maxDownloadSizeMB overall max size in MB (process ends when reached)
-     * @param maxDownloadPartSizeMB max size per part in MB (part returned and continued with token)
+     * @param maxDownloadSizeMB               overall max size in MB (process ends when reached)
+     * @param maxDownloadPartSizeMB           max size per part in MB (part returned and continued with token)
      * @param resumptionTokenFromPreviousPart token from previous part, or null for first part
-     * @param totalDownloadedSoFarMB sum of sizes of previous parts in MB
-     * @param currentPartNumber part number being downloaded (1-based), for progress messages
-     * @param completedPartLocators list of locators of completed parts (for progress UI), in order
+     * @param totalDownloadedSoFarMB          sum of sizes of previous parts in MB
+     * @param currentPartNumber               part number being downloaded (1-based), for progress messages
+     * @param completedPartLocators           list of locators of completed parts (for progress UI), in order
+     * @param status
      * @return result with part file, optional resumption token, and maxSizeReached/errorMessage
      */
     public DownloadPartResult downloadPart(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId,
 	    String downloadName, int maxDownloadSizeMB, int maxDownloadPartSizeMB, String resumptionTokenFromPreviousPart,
-	    BigDecimal totalDownloadedSoFarMB, int currentPartNumber, List<String> completedPartLocators) {
+	    BigDecimal totalDownloadedSoFarMB, int currentPartNumber, List<String> completedPartLocators, SchedulerJobStatus status) {
 
 	GSLoggerFactory.getLogger(getClass()).info("Started asynch download part of {}", requestURL);
 
@@ -358,6 +360,9 @@ public class DataDownloaderTool {
 				    }
 				    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 				    OMHandler.status(s3wrapper, bucket, operationId, msg);
+
+				    status.clearMessages();
+				    status.addInfoMessage(totalDownloadedSoFarMB + " MB downloaded");
 				}
 			    }
 			} catch (Exception e) {

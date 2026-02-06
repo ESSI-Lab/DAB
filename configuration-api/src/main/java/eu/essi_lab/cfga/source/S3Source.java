@@ -10,38 +10,28 @@ package eu.essi_lab.cfga.source;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.lib.net.s3.*;
+import eu.essi_lab.lib.utils.*;
+import org.json.*;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.ConfigurationSource;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import java.io.*;
+import java.net.*;
+import java.nio.file.*;
+import java.util.AbstractMap.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -53,9 +43,17 @@ public class S3Source implements ConfigurationSource {
     private String configName;
 
     /**
-     * Used to initialize an S3 source. The s3 endpoint can be omitted, and in such case the default AWS endpoint 'https://s3.amazonaws.com'
-     * is used.<br> E.g: s3://awsUser:awsPassword@bucket/config.json E.g: s3://awsUser:awsPassword@http:endpoint/bucket/config.json E.g:
-     * s3://awsUser:awsPassword@https:endpoint/bucket/config.json
+     * Used to initialize an S3 source with or without the service endpoint.<br>
+     * <ol>
+     * <li>If the service endpoint is omitted, the default AWS endpoint 'https://s3.amazonaws.com'
+     * is used.<br>
+     * E.g: s3://awsUser:awsPassword@bucket/config.json
+     * </li>
+     * <li>If the service endpoint is provided, as in the case of a Minio S3 service, then the config URL should be like this:<br>
+     * E.g: s3://awsUser:awsPassword@http:endpoint/bucket/config.json <br>
+     * E.g: s3://awsUser:awsPassword@https:endpoint/bucket/config.json
+     * </li>
+     * </ol>
      *
      * @param configURL
      * @return
@@ -70,19 +68,25 @@ public class S3Source implements ConfigurationSource {
 	if (endpoint != null) {
 
 	    configURL = configURL.replace(endpoint + "/", "");
+
+	    endpoint = endpoint.replace("https:", "https://");
+	    endpoint = endpoint.replace("http:", "http://");
 	}
 
 	return of(configURL, endpoint);
     }
 
     /**
-     * Used to initialize a Minio S3 source
+     * Used to initialize an S3 source with Minio S3 source
      *
-     * @param configURL s3://user:password@bucket/config.json
-     * @param endpoint http://my-hostname:9000
+     * @param configURL configuration.url -> s3://user:password@bucket/config.json
+     * @param endpoint s3Endpoint -> http://my-hostname:9000
      * @return
      * @throws URISyntaxException
+     * @see eu.essi_lab.messages.JVMOption#CONFIGURATION_URL
+     * @see eu.essi_lab.messages.JVMOption#S3_ENDPOINT
      */
+    @Deprecated
     public static S3Source of(String configURL, String endpoint) throws URISyntaxException {
 
 	URI uri = new URI(configURL);
