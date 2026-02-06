@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.profiler.om.scheduling;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.profiler.om.scheduling;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -88,15 +88,15 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    s3wrapper = OMHandler.getS3TransferWrapper();
 	}
 
-	if (maxDownloadSizeMB==null){
+	if (maxDownloadSizeMB == null) {
 	    maxDownloadSizeMB = ConfigurationWrapper.getDefaultMaxDownloadSizeMB();
-	    if (maxDownloadSizeMB==null){
+	    if (maxDownloadSizeMB == null) {
 		maxDownloadSizeMB = 10;
 	    }
 	}
-	if (maxDownloadPartSizeMB==null){
+	if (maxDownloadPartSizeMB == null) {
 	    maxDownloadPartSizeMB = ConfigurationWrapper.getDefaultMaxDownloadPartSizeMB();
-	    if (maxDownloadPartSizeMB==null){
+	    if (maxDownloadPartSizeMB == null) {
 		maxDownloadPartSizeMB = 1;
 	    }
 	}
@@ -136,7 +136,8 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 				    partLocators.add(locatorsArr.getString(i));
 				}
 			    }
-			    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker RESUMING from part {} for operation id {}", partNumber + 1, operationId);
+			    GSLoggerFactory.getLogger(getClass())
+				    .info("OMSchedulerWorker RESUMING from part {} for operation id {}", partNumber + 1, operationId);
 			}
 		    }
 		}
@@ -155,9 +156,11 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker STARTED, operation id {}", operationId);
 	    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
 		email = getSetting().getEmail();
-		OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(email));
+		OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(),
+			Optional.of(email));
 	    }
-	    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+	    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(),
+		    Optional.empty());
 	}
 
 	while (!done) {
@@ -166,7 +169,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    String partFname = partNumber == 1 ? fname : asynchDownloadName + "_part" + partNumber + ".zip";
 
 	    DownloadPartResult result = downloader.downloadPart(s3wrapper, bucket, requestURL, operationId, asynchDownloadName,
-		    maxDownloadSizeMB, maxDownloadPartSizeMB, resumptionToken, totalDownloadedSoFarMB, partNumber, partLocators);
+		    maxDownloadSizeMB, maxDownloadPartSizeMB, resumptionToken, totalDownloadedSoFarMB, partNumber, partLocators,status);
 
 	    if (result == null || result.getPartFile() == null) {
 
@@ -181,10 +184,12 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 		    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
 			email = getSetting().getEmail();
-			OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(email));
+			OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty(),
+				Optional.empty(), Optional.of(email));
 		    }
 
-		    OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+		    OMDownloadReportsHandler.sendEmail(DownloadStatus.CANCELED, setting, Optional.empty(), Optional.empty(),
+			    Optional.empty(), Optional.empty());
 		}
 		done = true;
 
@@ -211,7 +216,8 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 			int fileCount = result.getDownloadedFileNames() != null ? result.getDownloadedFileNames().size() : 0;
 			String partSizeStr = result.getUncompressedSizeInMB() != null ? result.getUncompressedSizeInMB().toString() : "?";
 			msg.put("status", "PartCompleted");
-			msg.put("statusMessage", "Part " + partNumber + " ready: " + fileCount + " files, " + partSizeStr + " MB (more parts in progress)");
+			msg.put("statusMessage",
+				"Part " + partNumber + " ready: " + fileCount + " files, " + partSizeStr + " MB (more parts in progress)");
 			msg.put("statusMessageKey", "status_message_part_ready_more_in_progress");
 			JSONObject statusParams = new JSONObject();
 			statusParams.put("part", partNumber);
@@ -232,8 +238,11 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 		    OMHandler.status(s3wrapper, bucket, operationId, msg);
 
-		    Optional<String> errorMsg = result.isMaxSizeReached() && result.getErrorMessage() != null
-			    ? Optional.of(result.getErrorMessage()) : Optional.empty();
+		    status.clearMessages();
+		    status.addInfoMessage(totalDownloadedSoFarMB + " MB downloaded");
+
+		    Optional<String> errorMsg = result.isMaxSizeReached() && result.getErrorMessage() != null ? Optional.of(
+			    result.getErrorMessage()) : Optional.empty();
 		    StringBuilder partDetailsBuilder = new StringBuilder();
 		    partDetailsBuilder.append("Part number: ").append(partNumber).append("\n");
 		    partDetailsBuilder.append("Part total size: ").append(result.getUncompressedSizeInMB()).append(" MB");
@@ -250,7 +259,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 		    }
 		    partDetailsBuilder.append("\n");
 		    Optional<String> partDetails = Optional.of(partDetailsBuilder.toString());
-		    DownloadStatus stat = result.isFinalPart() ?DownloadStatus.ENDED:DownloadStatus.PART_ENDED;
+		    DownloadStatus stat = result.isFinalPart() ? DownloadStatus.ENDED : DownloadStatus.PART_ENDED;
 		    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
 			email = getSetting().getEmail();
 			OMDownloadReportsHandler.sendEmail(stat, setting, Optional.of(locator), errorMsg, partDetails, Optional.of(email));
@@ -268,7 +277,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker ENDED, operation id {}",operationId);
+	GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker ENDED, operation id {}", operationId);
     }
 
     @Override
