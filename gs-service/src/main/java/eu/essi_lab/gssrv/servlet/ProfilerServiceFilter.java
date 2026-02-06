@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.servlet;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -37,8 +37,7 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
- * A filter which blocks the request and returns a 404 error code
- * in case the request path owns to an offline profiler
+ * A filter which blocks the request and returns a 404 error code in case the request path owns to an offline profiler
  *
  * @author Fabrizio
  */
@@ -51,11 +50,18 @@ public class ProfilerServiceFilter implements Filter {
 
 	HttpServletRequest httpRequest = (HttpServletRequest) request;
 
+	if (UserFinderFilter.isVaadinRequest(httpRequest)) {
+
+	    filterChain.doFilter(httpRequest, response);
+	    return;
+	}
+
 	String pathInfo = httpRequest.getPathInfo(); // e.g: /essi/oaipmh or /essi/opensearch/query
 
 	Optional<Boolean> online = pathInfo == null ? Optional.empty() : ConfigurationWrapper.isProfilerOnline(pathInfo);
 
 	if (online.isEmpty() || online.get()) {
+
 	    filterChain.doFilter(request, response);
 
 	} else {
