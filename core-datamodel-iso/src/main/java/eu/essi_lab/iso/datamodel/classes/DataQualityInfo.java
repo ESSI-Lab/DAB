@@ -32,6 +32,7 @@ import eu.essi_lab.jaxb.common.ObjectFactories;
 import net.opengis.iso19139.gco.v_20060504.BooleanPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.RecordPropertyType;
+import net.opengis.iso19139.gco.v_20060504.RecordTypeType;
 import net.opengis.iso19139.gco.v_20060504.UnitOfMeasurePropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType;
@@ -292,6 +293,14 @@ public class DataQualityInfo {
      * and a quantitative result containing the value and unit.
      */
     public void addQuantitativeAttributeAccuracy(String name, String description, Double value, String unit) {
+	addQuantitativeAttributeAccuracy(null, name, description, value, unit);
+    }
+
+    /**
+     * Adds a quantitative attribute accuracy with optional id (for model metrics).
+     * When id is not null, it is stored as the first nameOfMeasure; name as the second.
+     */
+    public void addQuantitativeAttributeAccuracy(String id, String name, String description, Double value, String unit) {
 	DataQuality dataQuality = getOrCreateDataQuality();
 	
 	// Create a generic DQ element to contain the quantitative attribute accuracy
@@ -299,9 +308,12 @@ public class DataQualityInfo {
 	// may not be available in v_20060504 package)
 	DQDomainConsistencyType dqElement = new DQDomainConsistencyType();
 	
+	// Set id as first nameOfMeasure when present (for model_metrics id round-trip)
+	if (id != null && !id.isEmpty()) {
+	    dqElement.getNameOfMeasure().add(ISOMetadata.createCharacterStringPropertyType(id));
+	}
 	// Set nameOfMeasure (optional) - from name parameter
 	if (name != null && !name.isEmpty()) {
-	    // getNameOfMeasure() returns a live list, so we can add directly
 	    dqElement.getNameOfMeasure().add(ISOMetadata.createCharacterStringPropertyType(name));
 	}
 	
@@ -314,19 +326,17 @@ public class DataQualityInfo {
 	DQQuantitativeResultType quantitativeResult = new DQQuantitativeResultType();
 	
 	// Set value unit (required)
-	// Note: UnitOfMeasureType structure is complex - this is a minimal implementation
 	UnitOfMeasurePropertyType unitProperty = new UnitOfMeasurePropertyType();
-	// Create UnitOfMeasureType - simplified implementation
-	// Full implementation would require setting proper UnitOfMeasureType fields
 	quantitativeResult.setValueUnit(unitProperty);
 	
-	// Set value (required) - create a RecordPropertyType with the value
-	// Note: RecordType structure is complex - this is a minimal implementation
-	// The value is stored but may need refinement for full ISO 19115 compliance
+	// Set value (required) - RecordTypeType with string value for round-trip
 	List<RecordPropertyType> values = new ArrayList<>();
 	RecordPropertyType valueProperty = new RecordPropertyType();
-	// Create RecordType - simplified implementation
-	// Full implementation would require creating a proper RecordType with fields containing the value
+	if (value != null && !value.isNaN()) {
+	    RecordTypeType recordType = new RecordTypeType();
+	    recordType.setValue(String.valueOf(value));
+	    valueProperty.setRecord(recordType);
+	}
 	values.add(valueProperty);
 	quantitativeResult.setValue(values);
 	

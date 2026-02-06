@@ -30,15 +30,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
-import eu.essi_lab.iso.datamodel.classes.Format;
-import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.iso.datamodel.classes.MDMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ServiceIdentification;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
+import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.MIMetadataType;
 import eu.essi_lab.lib.xml.NameSpace;
 
@@ -94,33 +86,33 @@ public class CoreMetadata {
     @XmlTransient
     public String getTitle() {
 
-	DataIdentification dataIdentification = isoMetadata.getDataIdentification();
-	if (dataIdentification == null) {
+	Identification identification = isoMetadata.getIdentification();
+	if (identification == null) {
 	    return null;
 	}
 
-	return dataIdentification.getCitationTitle();
+	return identification.getCitationTitle();
     }
 
     public void setTitle(String title) {
 
-	getDataIdentification().setCitationTitle(title);
+	getIdentification().setCitationTitle(title);
     }
 
     @XmlTransient
     public String getAbstract() {
 
-	DataIdentification dataIdentification = isoMetadata.getDataIdentification();
-	if (dataIdentification == null) {
+	Identification identification = isoMetadata.getIdentification();
+	if (identification == null) {
 	    return null;
 	}
 
-	return dataIdentification.getAbstract();
+	return identification.getAbstract();
     }
 
     public void setAbstract(String abstract_) {
 
-	getDataIdentification().setAbstract(abstract_);
+	getIdentification().setAbstract(abstract_);
     }
 
     public void addDistributionOnlineResource(String name, String linkage, String protocol, String functionCode) {
@@ -178,7 +170,7 @@ public class CoreMetadata {
     
     public void addBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
 
-	getDataIdentification().addGeographicBoundingBox(north, west, south, east);
+	getIdentification().addGeographicBoundingBox(north, west, south, east);
     }
 
     public GeographicBoundingBox getBoundingBox() {
@@ -236,6 +228,16 @@ public class CoreMetadata {
 	}
 	return dataIdentification;
     }
+
+	public Identification getIdentification() {
+
+		Identification identification = isoMetadata.getIdentification();
+		if (identification == null) {
+			identification = new DataIdentification();
+			isoMetadata.addDataIdentification((DataIdentification) identification);
+		}
+		return identification;
+	}
 
     /**
      * Removes the acquisition information from a copy of the {@link #getReadOnlyMDMetadata()} and returns it as

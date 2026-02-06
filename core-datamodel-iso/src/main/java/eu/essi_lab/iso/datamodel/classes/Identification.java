@@ -22,6 +22,7 @@ package eu.essi_lab.iso.datamodel.classes;
  */
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -38,6 +39,7 @@ import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gco.v_20060504.DatePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.*;
+import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
 
 /**
  * AbstractMD_Identification
@@ -1258,6 +1260,27 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
             GSLoggerFactory.getLogger(getClass()).warn("Could not set date of next update: " + e.getMessage());
         }
     }
+
+    public void addGeographicBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
+        if (type instanceof MDDataIdentificationType mddata) {
+            DataIdentification dataIdentification = new DataIdentification(mddata);
+            dataIdentification.addGeographicBoundingBox(north, west, south, east);
+        } else if (type instanceof SVServiceIdentificationType service) {
+            ServiceIdentification serviceIdentification = new ServiceIdentification(service);
+            serviceIdentification.addBoundingBox(north, west, south, east);
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + type.getClass().getName());
+        }
+    }
+
+    public void addTopicCategory(String topicCategory) {
+        if (type instanceof MDDataIdentificationType mddata) {
+            DataIdentification dataIdentification = new DataIdentification(mddata);
+            dataIdentification.addTopicCategory(topicCategory);
+        }
+    }
+
+
 
     //
     // ***************************************************************************

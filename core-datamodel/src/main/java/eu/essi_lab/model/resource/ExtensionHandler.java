@@ -10,12 +10,12 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -64,6 +64,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String RASTER_MOSAIC = "rasterMosaic";
     private static final String METADATA_VERSION = "metadataVersion";
     private static final String METADATA_ORIGINAL_VERSION = "metadataOriginalVersion";
+    private static final String DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS = "datahubLineageProcessStepParameters";
 
     private ExtendedMetadata metadata;
 
@@ -1232,6 +1233,35 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * Stores the DataHub lineage process step parameters (one JSON array per step) as a single JSON array of arrays.
+     * Used for round-tripping the processing_information.parameter array which has no ISO 19115-2 equivalent.
+     *
+     * @param jsonArrayOfParameterArrays JSON string of an array of arrays, e.g. "[[{...}],[{...}]]"
+     */
+    public void setDatahubLineageProcessStepParameters(String jsonArrayOfParameterArrays) {
+	try {
+	    this.metadata.remove("//*:" + DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS);
+	    if (jsonArrayOfParameterArrays != null && !jsonArrayOfParameterArrays.isEmpty()) {
+		this.metadata.add(DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS, jsonArrayOfParameterArrays);
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return the stored DataHub lineage process step parameters (JSON array of arrays), if present
+     */
+    public Optional<String> getDatahubLineageProcessStepParameters() {
+	try {
+	    String value = this.metadata.getTextContent(DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS);
+	    return Optional.ofNullable(value != null && !value.isEmpty() ? value : null);
+	} catch (Exception e) {
+	    return Optional.empty();
+	}
     }
 
     /**
