@@ -24,11 +24,17 @@ package eu.essi_lab.messages.bond.spatial;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.*;
+
+import javax.xml.bind.annotation.*;
+
 /**
  * @author Fabrizio
  */
 public class WKT implements SpatialEntity {
 
+    @JsonProperty(value = "geom")
+    @XmlAttribute(name = "geom")
     private String value;
 
     /**
@@ -48,6 +54,7 @@ public class WKT implements SpatialEntity {
     /**
      * @return
      */
+    @XmlTransient
     public String getValue() {
 
 	return value;
