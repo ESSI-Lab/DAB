@@ -38,6 +38,7 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.messages.bond.spatial.*;
 
 /**
  *
@@ -86,6 +87,7 @@ public class ViewFactory {
     private static JAXBContext createContext() throws JAXBException {
 	return JAXBContext.newInstance(//
 		View.class, //
+		WKT.class, //
 		ViewBond.class, //
 		LogicalBond.class, //
 		ResourcePropertyBond.class, //
