@@ -1,17 +1,11 @@
 package eu.essi_lab.messages.bond;
 
-import com.fasterxml.jackson.databind.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.messages.bond.spatial.*;
 import eu.essi_lab.model.resource.*;
 import org.json.*;
 import org.junit.*;
-
-import javax.xml.bind.*;
-import java.io.*;
-import java.nio.charset.*;
-import java.util.*;
 
 /**
  * @author Fabrizio
@@ -61,11 +55,11 @@ public class JSONViewTest {
 	//
 
 	ResourcePropertyBond isExecutableBond = BondFactory.createIsExecutableBond(true);
-	ResourcePropertyBond isDownloadableBond = BondFactory.createIsDownloadableBond(true);
+	ResourcePropertyBond isDownloadableBond = BondFactory.createIsDownloadableBond(false);
 	ResourcePropertyBond isTimeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-	ResourcePropertyBond isGridBond = BondFactory.createIsGridBond(true);
+	ResourcePropertyBond isGridBond = BondFactory.createIsGridBond(false);
 	ResourcePropertyBond isVectorBond = BondFactory.createIsVectorBond(true);
-	ResourcePropertyBond isRatingCurveBond = BondFactory.createIsRatingCurveBond(true);
+	ResourcePropertyBond isRatingCurveBond = BondFactory.createIsRatingCurveBond(false);
 	ResourcePropertyBond isTransformableBond = BondFactory.createIsTransformableBond(true);
 
 	andBond.getOperands().add(BondFactory.createOrBond(isExecutableBond, isDownloadableBond, isTimeSeriesBond, isGridBond, isVectorBond,
@@ -108,7 +102,10 @@ public class JSONViewTest {
 	SpatialBond spatialBond2 = BondFactory.createSpatialEntityBond(BondOperator.CONTAINS, extent);
 	SpatialBond spatialBond3 = BondFactory.createSpatialEntityBond(BondOperator.DISJOINT, extent);
 
-	andBond.getOperands().add(BondFactory.createOrBond(spatialBond1, spatialBond2, spatialBond3));
+	WKT wkt = SpatialEntity.of("POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))");
+	SpatialBond spatialBond4 = BondFactory.createSpatialEntityBond(BondOperator.WITHIN, wkt);
+
+	andBond.getOperands().add(BondFactory.createOrBond(spatialBond1, spatialBond2, spatialBond3, spatialBond4));
 
 	//
 	// exists and not exists simple value bond
@@ -196,72 +193,98 @@ public class JSONViewTest {
 			doubleBond5, doubleBond6, doubleBond7, doubleBond8));
 
 	//
+	// metadata element with boolean value
+	//
+
+	SimpleValueBond hasSecConstraints = BondFactory.createSimpleValueBond(MetadataElement.HAS_SECURITY_CONSTRAINTS, true);
+	SimpleValueBond hasAccLegConstrains = BondFactory.createSimpleValueBond(MetadataElement.HAS_ACCESS_LEGAL_CONSTRAINTS, false);
+
+	andBond.getOperands().add(BondFactory.createOrBond(hasSecConstraints, hasAccLegConstrains));
+
+	//
+	//
+	//
+
+	ResourcePropertyBond minTimeStamp = BondFactory.createMinMaxResourceTimeStampBond(BondOperator.MIN);
+	SimpleValueBond minMaxSimpleValueBond = BondFactory.createMinMaxSimpleValueBond(MetadataElement.CLOUD_COVER_PERC, BondOperator.MAX);
+
+	andBond.getOperands().add(BondFactory.createOrBond(minTimeStamp, minMaxSimpleValueBond));
+
+	//
 	//
 	//
 
 	View view1 = new ViewFactory().createView(viewId_, viewLabel, andBond);
 
 	view1.setSourceDeployment("sourceDeployment");
-	view1.setCreator("creator");
-	view1.setVisibility(View.ViewVisibility.PUBLIC);
-	view1.setOwner("owner");
-	view1.setCreationTime(new Date());
-	view1.setExpirationTime(new Date());
 
 	//
 	// 1) marshalls 'view1' in to the string 'xmlView1'
 	//
 
-
-	ByteArrayOutputStream stream1 = new ByteArrayOutputStream();
-	ViewFactory.createMarshaller().marshal(view1, stream1);
-
-	String xmlView1 = stream1.toString(StandardCharsets.UTF_8);
+	String xmlView1 = ViewFactory.asString(view1);
 
 	//
 	// 2) converts the XML view 'xmlView1' in to the JSON string 'jsonView1'
 	//
 
-	ObjectMapper jsonMapper = new ObjectMapper();
-	String jsonView1 = jsonMapper.writeValueAsString(view1);
-
-	System.out.println(new JSONObject(jsonView1).toString(3));
+	String jsonView1 = ViewFactory.toJSONObject(view1).toString(3);
 
 	//
 	// 3) converts the JSON string 'jsonView1' in to the view 'view2'
 	//
 
-	View view2 = jsonMapper.readValue(jsonView1, View.class);
+	View view2 = ViewFactory.fromJSONObject(jsonView1);
 
 	//
 	// 4) marshalls 'view2' in to the string 'xmlView2'
 	//
 
-	ByteArrayOutputStream stream2 = new ByteArrayOutputStream();
-	ViewFactory.createMarshaller().marshal(view2, stream2);
-	String xmlView2 = stream2.toString(StandardCharsets.UTF_8);
-
+	String xmlView2 = ViewFactory.asString(view2);
 
 	//
- 	// 5) compares 'xmlView1' and 'xmlView2'
- 	//
+	// 5) compares 'xmlView1' and 'xmlView2'
+	//
 	Assert.assertEquals(xmlView1, xmlView2);
 
 	//
- 	// 6) unmarshalls 'xmlView2' in to 'view3'
- 	//
+	// 6) unmarshalls 'xmlView2' in to 'view3'
+	//
 
-	Unmarshaller unmarshaller = ViewFactory.createUnmarshaller();
-
-	View view3 =  (View) unmarshaller.unmarshal(new ByteArrayInputStream(xmlView2.getBytes(StandardCharsets.UTF_8)));
+	View view3 = ViewFactory.fromXMLString(xmlView2);
 
 	//
- 	// 7) compares all the views
- 	//
+	// 7) compares all the views
+	//
 
 	Assert.assertEquals(view1, view2);
 	Assert.assertEquals(view1, view3);
 	Assert.assertEquals(view2, view3);
+
+	//
+	// 8) compares the first view with the last one
+	//
+
+	String jsonView3 = ViewFactory.toJSONObject(view3).toString(3);
+
+	Assert.assertEquals(jsonView1, jsonView3);
     }
 
+    @Test
+    public void test2() throws Exception {
+
+	String jsonView = IOStreamUtils.asUTF8String(getClass().getClassLoader().getResourceAsStream("test-view.json"));
+
+	System.out.println(new JSONObject(jsonView).toString(3));
+
+	View view1 = ViewFactory.fromJSONObject(jsonView);
+
+	String xmlView = ViewFactory.asString(view1);
+
+	System.out.println(xmlView);
+
+	View view2 = ViewFactory.fromXMLString(xmlView);
+
+	Assert.assertEquals(view1, view2);
+    }
 }
