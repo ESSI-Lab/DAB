@@ -21,24 +21,14 @@ package eu.essi_lab.messages.bond.jaxb;
  * #L%
  */
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-
-import com.sun.xml.bind.marshaller.*;
 import eu.essi_lab.jaxb.common.*;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.xml.*;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.View.ViewVisibility;
-import eu.essi_lab.messages.bond.ViewBond;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.View.*;
 import eu.essi_lab.messages.bond.spatial.*;
+
+import javax.xml.bind.*;
 
 /**
  *
@@ -109,6 +99,17 @@ public class ViewFactory {
     /**
      * @param id
      * @param label
+     * @param bond
+     * @return
+     */
+    public View createView(String id, Bond bond) {
+
+	return createView(id, null, bond, null, null, null, null);
+    }
+
+    /**
+     * @param id
+     * @param label
      * @param creator
      * @param bond
      * @return
@@ -165,7 +166,9 @@ public class ViewFactory {
 
 	View ret = new View();
 	ret.setId(id);
-	ret.setLabel(label);
+	if (label != null) {
+	    ret.setLabel(label);
+	}
 	ret.setBond(bond);
 	ret.setCreator(creator);
 	ret.setOwner(owner);
