@@ -695,8 +695,8 @@ public class BondFactory {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
+     * <li>{@link BondOperator#CONTAINED}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
      * </ul>
@@ -707,8 +707,7 @@ public class BondFactory {
      */
     public static SpatialBond createSpatialEntityBond(BondOperator operator, SpatialEntity extent) {
 
-	if (operator != BondOperator.BBOX && //
-		operator != BondOperator.CONTAINS &&  //
+	if (operator != BondOperator.CONTAINS &&  //
 		operator != BondOperator.CONTAINED &&  //
 		operator != BondOperator.INTERSECTS &&  //
 		operator != BondOperator.DISJOINT) {

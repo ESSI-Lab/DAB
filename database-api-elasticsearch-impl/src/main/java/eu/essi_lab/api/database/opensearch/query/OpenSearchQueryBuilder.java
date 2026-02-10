@@ -545,7 +545,6 @@ public class OpenSearchQueryBuilder {
 
 	BondOperator operator = bond.getOperator();
 	switch (operator) {
-	case BBOX:
 	case INTERSECTS:
 
 	    shapeBuilder.relation(GeoShapeRelation.Intersects);

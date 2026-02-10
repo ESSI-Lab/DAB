@@ -65,7 +65,6 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 	String west = String.valueOf(extent.getWest());
 
 	switch (op) {
-	case BBOX:
 	case INTERSECTS:
 
 	    return buildIntersetcsQuery(bond);

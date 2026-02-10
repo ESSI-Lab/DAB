@@ -43,7 +43,6 @@ public enum BondOperator {
 
     INTERSECTS,
     DISJOINT, 
-    BBOX, // BBOX is "NOT DISJOINT"
     CONTAINS, // target bbox contains resources bbox
     CONTAINED, // resources bbox contains target bbox
     /**

@@ -49,7 +49,7 @@ public class SpatialBond extends MetadataElementBond<SpatialEntity> {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
+     * <li>{@link BondOperator#CONTAINED}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
@@ -65,7 +65,7 @@ public class SpatialBond extends MetadataElementBond<SpatialEntity> {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
+     * <li>{@link BondOperator#CONTAINED}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
@@ -80,7 +80,7 @@ public class SpatialBond extends MetadataElementBond<SpatialEntity> {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
+     * <li>{@link BondOperator#CONTAINED}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
