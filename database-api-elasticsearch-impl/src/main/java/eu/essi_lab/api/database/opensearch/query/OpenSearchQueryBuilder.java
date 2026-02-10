@@ -551,8 +551,9 @@ public class OpenSearchQueryBuilder {
 
 	    break;
 
-	case CONTAINED:
+	case WITHIN:
 
+	    // OpenSearch expresses the relation from docs. geometry point of view
 	    shapeBuilder.relation(GeoShapeRelation.Contains);
 
 	    weightedQuery = weightedQueriesInclued && area > 0 ? buildContainedWeightQuery(area, 500) : null;
@@ -561,6 +562,7 @@ public class OpenSearchQueryBuilder {
 
 	case CONTAINS:
 
+	    // OpenSearch expresses the relation from docs. geometry point of view
 	    shapeBuilder.relation(GeoShapeRelation.Within);
 
 	    List<Query> operands = new ArrayList<>();

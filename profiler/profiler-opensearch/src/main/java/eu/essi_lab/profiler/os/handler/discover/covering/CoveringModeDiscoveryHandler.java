@@ -435,7 +435,7 @@ public class CoveringModeDiscoveryHandler extends DiscoveryHandler<String> {
 	    // }
 
 	    SpatialBond spatialBond = new SpatialBond();
-	    spatialBond.setOperator(BondOperator.CONTAINED);
+	    spatialBond.setOperator(BondOperator.WITHIN);
 	    spatialBond.setPropertyValue(currentPartition);
 	    spatialBond.setProperty(MetadataElement.BOUNDING_BOX);
 

@@ -86,7 +86,7 @@ public class DefaultMarkLogicSpatialQueryBuilder implements MarkLogicSpatialQuer
 
 	    return buildContainsQuery(bond);
 
-	case CONTAINED:
+	case WITHIN:
 
 	    return buildContainedQuery(bond);
 
