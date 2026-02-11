@@ -46,6 +46,16 @@ public class Parameter {
 
     /**
      * @param name
+     * @param mandatory
+     * @return
+     */
+    public static Parameter of(String name, boolean mandatory) {
+
+	return new Parameter(name, null, mandatory);
+    }
+
+    /**
+     * @param name
      * @param type
      * @param mandatory
      * @return
@@ -268,9 +278,9 @@ public class Parameter {
     /**
      * @return the type
      */
-    public ContentType getContentType() {
+    public Optional<ContentType> getContentType() {
 
-	return type;
+	return Optional.ofNullable(type);
     }
 
     /**

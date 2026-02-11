@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.rest;
 
@@ -22,7 +22,7 @@ public abstract class ConfigRequest {
     private JSONObject object;
 
     /**
-     * 
+     *
      */
     public ConfigRequest() {
 
@@ -212,7 +212,7 @@ public abstract class ConfigRequest {
     protected abstract List<Parameter> getSupportedParameters();
 
     /**
-     * 
+     *
      */
     protected void mandatoryCheck() {
 
@@ -284,7 +284,7 @@ public abstract class ConfigRequest {
     }
 
     /**
-     * 
+     *
      */
     protected void supportedCheck() {
 
@@ -302,9 +302,9 @@ public abstract class ConfigRequest {
 		    stream().//
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")) + ". Supported parameters: " + supported.//
-			    stream().//
-			    map(p -> "'" + p + "'").//
-			    collect(Collectors.joining(", ")));
+		    stream().//
+		    map(p -> "'" + p + "'").//
+		    collect(Collectors.joining(", ")));
 	}
 
 	//
@@ -327,9 +327,9 @@ public abstract class ConfigRequest {
 		    stream().//
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")) + ". Supported composite parameters: " + supportedCompositeNames.//
-			    stream().//
-			    map(p -> "'" + p + "'").//
-			    collect(Collectors.joining(", ")));
+		    stream().//
+		    map(p -> "'" + p + "'").//
+		    collect(Collectors.joining(", ")));
 	}
 
 	//
@@ -355,9 +355,9 @@ public abstract class ConfigRequest {
 		    stream().//
 		    map(p -> "'" + p + "'").//
 		    collect(Collectors.joining(", ")) + ". Supported nested parameters: " + supportedNestedParams.//
-			    stream().//
-			    map(p -> "'" + p.getCompositeName().get() + "." + p.getName() + "'").//
-			    collect(Collectors.joining(", ")));
+		    stream().//
+		    map(p -> "'" + p.getCompositeName().get() + "." + p.getName() + "'").//
+		    collect(Collectors.joining(", ")));
 	}
     }
 
@@ -375,7 +375,7 @@ public abstract class ConfigRequest {
 		findFirst().//
 		get();
 
-	ContentType type = parameter.getContentType();
+	ContentType type = parameter.getContentType().orElse(null);
 
 	boolean multiValue = parameter.isMultiValue();
 
@@ -392,16 +392,16 @@ public abstract class ConfigRequest {
 	values.forEach(val -> {
 
 	    switch (type) {
-	    case BOOLEAN:
+	    case BOOLEAN -> {
 		if (!val.equals("true") && !val.equals("false")) {
 
 		    throw new IllegalArgumentException(
 			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type boolean");
 		}
 
-		break;
+	    }
 
-	    case DOUBLE:
+	    case DOUBLE -> {
 
 		try {
 		    Double.valueOf(val);
@@ -411,9 +411,9 @@ public abstract class ConfigRequest {
 			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type double");
 		}
 
-		break;
+	    }
 
-	    case INTEGER:
+	    case INTEGER -> {
 
 		try {
 		    Integer.valueOf(val);
@@ -423,9 +423,9 @@ public abstract class ConfigRequest {
 			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type integer");
 		}
 
-		break;
+	    }
 
-	    case ISO8601_DATE_TIME:
+	    case ISO8601_DATE_TIME -> {
 
 		if (!parseDateTime(val) || val.length() != "YYYY-MM-DDThh:mm:ss".length()) {
 
@@ -433,9 +433,9 @@ public abstract class ConfigRequest {
 			    + "' must be of type ISO8601 date time according to the 'Europe/Berlin' TimeZone: 'YYYY-MM-DDThh:mm:ss'");
 		}
 
-		break;
+	    }
 
-	    case LONG:
+	    case LONG -> {
 
 		try {
 		    Long.valueOf(val);
@@ -445,7 +445,10 @@ public abstract class ConfigRequest {
 			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type long");
 		}
 
-		break;
+	    }
+
+	    case null, default -> {
+	    }
 	    }
 	});
     }
@@ -486,8 +489,9 @@ public abstract class ConfigRequest {
 
 		if (!matcher.matches()) {
 
-		    throw new IllegalArgumentException("Unsupported value '" + val + "'. Parameter '" + paramName + "' should match the '"
-			    + optPattern.get().getPattern() + "' pattern");
+		    throw new IllegalArgumentException(
+			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' should match the '" + optPattern.get()
+				    .getPattern() + "' pattern");
 		}
 	    });
 	}
