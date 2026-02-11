@@ -23,7 +23,7 @@ package eu.essi_lab.messages.bond;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.*;
 
 /**
  * A bond resulting in an empty selection
@@ -31,12 +31,12 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * @author boldrini
  */
 @XmlRootElement
-public class EmptyBond extends ResourcePropertyBond {
+public class EmptyBond extends QueryableBond<String> {
 
     public static final String EMPTY_BOND_ID = "urn:essi:gs-service:empty-bond";
 
     public EmptyBond() {
-	setProperty(ResourceProperty.PUBLIC_ID);
+	setProperty(MetadataElement.IDENTIFIER);
 	setPropertyValue(EMPTY_BOND_ID);
     }
 

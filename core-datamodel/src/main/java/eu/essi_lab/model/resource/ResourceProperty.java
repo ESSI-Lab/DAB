@@ -47,14 +47,7 @@ public enum ResourceProperty implements Queryable {
      * Mandatory property
      */
     PRIVATE_ID("privateId", false),
-
-    /**
-     * Mandatory property.<br>
-     * This property has no related {@link IndexedResourceProperty} since the value is the same of the
-     * {@link MetadataElement#IDENTIFIER} property which has its own {@link IndexedMetadataElement}
-     */
-    PUBLIC_ID("publicId"),
-
+    
     /**
      * 
      */
