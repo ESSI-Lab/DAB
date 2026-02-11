@@ -15,6 +15,7 @@ import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.rest.*;
 import eu.essi_lab.cfga.rest.ontology.*;
 import eu.essi_lab.cfga.rest.source.*;
+import eu.essi_lab.cfga.rest.views.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.*;
@@ -23,6 +24,7 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.JobStatus.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
 import org.json.*;
 import org.quartz.*;
 
@@ -187,6 +189,16 @@ public class ConfigService {
 	    response = handleListSourcesRequest(request);
 	}
 
+	if (requestName.equals(ConfigRequest.computeName(ListBondQLPropertiesRequest.class))) {
+
+	    ListBondQLPropertiesRequest request = new ListBondQLPropertiesRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleListBondQLPropertiesRequest(request));
+
+	}
+
 	//
 	//
 	//
@@ -228,6 +240,54 @@ public class ConfigService {
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request ENDED", requestName);
 
 	return response != null ? response : buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Unknown request '" + requestName + "'");
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleListBondQLPropertiesRequest(ListBondQLPropertiesRequest request) {
+
+	Optional<String> enumName = request.read(ListBondQLPropertiesRequest.ENUM_NAME).map(Object::toString);
+
+	JSONObject out = new JSONObject();
+
+	JSONArray resourceProperty = new JSONArray();
+
+	ResourceProperty.listOrderedValues().forEach(property -> {
+
+	    JSONObject obj = new JSONObject();
+	    obj.put("name", property.getName());
+	    obj.put("type", property.getContentType());
+
+	    resourceProperty.put(obj);
+	});
+
+	JSONArray metadataElement = new JSONArray();
+
+	MetadataElement.listOrderedValues().forEach(property -> {
+
+	    JSONObject obj = new JSONObject();
+	    obj.put("name", property.getName());
+	    obj.put("type", property.getContentType());
+
+	    metadataElement.put(obj);
+	});
+
+	if (enumName.isEmpty() || enumName.get().equals("ResourceProperty")) {
+
+	    out.put("ResourceProperty", resourceProperty);
+	}
+
+	if (enumName.isEmpty() || enumName.get().equals("MetadataElement")) {
+
+	    out.put("MetadataElement", metadataElement);
+	}
+
+	return Response.status(Status.OK).//
+		entity(out.toString(3)).//
+		type(MediaType.APPLICATION_JSON).//
+		build();
     }
 
     /**
@@ -295,7 +355,7 @@ public class ConfigService {
 
 	return Response.status(Status.OK).//
 		entity(out.toString(3)).//
-		type(MediaType.APPLICATION_JSON.toString()).//
+		type(MediaType.APPLICATION_JSON).//
 		build();
     }
 
