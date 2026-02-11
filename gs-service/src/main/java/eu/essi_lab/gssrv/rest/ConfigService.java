@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.gssrv.rest;
 
+import com.fasterxml.jackson.core.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.*;
@@ -10,6 +11,7 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.cfga.gs.setting.accessor.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.rest.*;
@@ -22,6 +24,8 @@ import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.scheduling.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.JobStatus.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
@@ -128,6 +132,10 @@ public class ConfigService {
 
 	Response response = null;
 
+	//
+	// harvesting requests
+	//
+
 	if (requestName.equals(ConfigRequest.computeName(PutSourceRequest.class))) {
 
 	    PutSourceRequest request = new PutSourceRequest(requestObject);
@@ -189,18 +197,8 @@ public class ConfigService {
 	    response = handleListSourcesRequest(request);
 	}
 
-	if (requestName.equals(ConfigRequest.computeName(ListBondQLPropertiesRequest.class))) {
-
-	    ListBondQLPropertiesRequest request = new ListBondQLPropertiesRequest(requestObject);
-
-	    Optional<Response> validate = validate(request);
-
-	    response = validate.orElseGet(() -> handleListBondQLPropertiesRequest(request));
-
-	}
-
 	//
-	//
+	// ontologies requests
 	//
 
 	if (requestName.equals(ConfigRequest.computeName(PutOntologyRequest.class))) {
@@ -237,9 +235,64 @@ public class ConfigService {
 	    response = handleListOntologiesRequest(request);
 	}
 
+	//
+	// view requests
+	//
+
+	if (requestName.equals(ConfigRequest.computeName(ListBondQLPropertiesRequest.class))) {
+
+	    ListBondQLPropertiesRequest request = new ListBondQLPropertiesRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleListBondQLPropertiesRequest(request));
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(PutViewRequest.class))) {
+
+	    PutViewRequest request = new PutViewRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handlePutViewRequest(request));
+	}
+
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request ENDED", requestName);
 
 	return response != null ? response : buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Unknown request '" + requestName + "'");
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handlePutViewRequest(PutViewRequest request) {
+
+	try {
+
+	    JSONObject jsonView = new JSONObject(request.read(PutViewRequest.VIEW).map(Object::toString).get());
+
+	    View view = ViewFactory.fromJSONObject(jsonView);
+
+	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(setting.asStorageInfo());
+
+	    if (reader.getView(view.getId()).isPresent()) {
+
+		return buildErrorResponse(Status.BAD_REQUEST, "View with id '" + view.getId() + "' already exists");
+	    }
+
+	    DatabaseWriter writer = DatabaseProviderFactory.getWriter(setting.asStorageInfo());
+
+	    writer.store(view);
+
+	    return Response.status(Status.CREATED).build();
+
+	} catch (Exception e) {
+
+	    throw new RuntimeException(e);
+	}
     }
 
     /**

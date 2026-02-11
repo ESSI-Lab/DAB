@@ -66,6 +66,9 @@
 									},
 									{
 										"$ref": "#/components/schemas/ListBondQLProperties"
+									},
+									{
+										"$ref": "#/components/schemas/PutView"
 									}
 								]
 							},
@@ -97,6 +100,27 @@
 										}
 									}
 								},
+
+								"putView1": {
+									"summary": "'PutView' request with atomic bond",
+									"description": "Example of 'PutView' request with a simple view with atomic bond",
+									"value": {
+										"request": "PutView",
+										"parameters": {
+											"view": {
+												"id" : "testView1",
+												"label" : "A simple view with atomic bond",
+												"bond" : {
+													"property" : [ "resourceProperty", "SOURCE_ID" ],
+													"propertyValue" : "theSourceIdentifier",
+													"type" : "resourcePropertyBond",
+													"operator" : "EQUAL"
+												}
+											}
+										}
+									}
+								},
+
 								"putOntology1": {
 									"summary": "'PutOntology' request with only mandatory parameters",
 									"description": "Example of 'PutOntology' request with only mandatory parameters",
@@ -109,6 +133,8 @@
 										}
 									}
 								},
+
+
 								"putOntology2": {
 									"summary": "'PutOntology' request with optional description parameter",
 									"description": "Example of 'PutOntology' request with optional description parameter",
@@ -1130,6 +1156,33 @@
 						"properties": {
 							"enumName": {
 								"$ref": "#/components/schemas/BondQLPropertyEnumName"
+							}
+						}
+					}
+				}
+			},
+			"PutView": {
+				"description": "Puts a new view in the database. If the operation succeeds, the response code is '201'",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "PutView"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"view"
+						],
+						"properties": {
+							"view": {
+								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with reponse code '400'",
+								"type": "string"
 							}
 						}
 					}
