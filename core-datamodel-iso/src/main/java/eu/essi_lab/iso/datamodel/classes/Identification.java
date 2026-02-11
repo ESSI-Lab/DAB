@@ -1160,7 +1160,18 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     void setCitationMD_Authority(String authority) {
     }
 
-    void setCitation(String title, String alternatetTile, String date) {
+
+
+    public void setCitation(CICitationType citation) {
+        CICitationPropertyType cpt = new CICitationPropertyType();
+        cpt.setCICitation(citation);
+        type.setCitation(cpt);
+    }
+
+    public void setCitation(Citation citation) {
+        CICitationPropertyType cpt = new CICitationPropertyType();
+        cpt.setCICitation(citation.getElementType());
+        type.setCitation(cpt);
     }
 
     /**

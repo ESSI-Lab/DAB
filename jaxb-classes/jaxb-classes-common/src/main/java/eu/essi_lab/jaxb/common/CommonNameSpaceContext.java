@@ -186,6 +186,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String AGAME_NS_URI = "http://essi-lab.eu/agame";
     
     public static final String DATALOGGERS_NS_URI = "http://essi-lab.eu/dataloggers";
+    public static final String DATASTREAM_NS_URI = "http://datastream.org/odata";
 
     public CommonNameSpaceContext() {
 
@@ -269,7 +270,8 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("geomountain", GEOMOUNTAIN);
 	map.put("eea", EEA_NS_URI);
 	map.put("agame", AGAME_NS_URI);
-	map.put("dataloggers", DATALOGGERS_NS_URI);
+        map.put("dataloggers", DATALOGGERS_NS_URI);
+        map.put("datastream", DATASTREAM_NS_URI);
 
     }
 
