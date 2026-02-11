@@ -450,9 +450,10 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	//
 
 	String aggregationStatistic = properties.optString("aggregationStatistic");
+	if (aggregationStatistic.isEmpty()) {
+	    aggregationStatistic = properties.optString("interpolationType");
+	}
 	if (!aggregationStatistic.isEmpty()) {
-
-	    // should be Continuous or Average
 	    handler.setTimeInterpolation(aggregationStatistic);
 	}
 

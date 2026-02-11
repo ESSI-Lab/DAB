@@ -466,7 +466,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	for (String key : tags.keySet()) {
 	    String value = tags.get(key);
-	    if (key.equalsIgnoreCase("licence")) {
+	    if (key.equalsIgnoreCase("licence")||key.equalsIgnoreCase("license")) {
 		LegalConstraints lc = new LegalConstraints();
 		lc.addUseConstraintsCode("other");
 		lc.addOtherConstraints(value);
