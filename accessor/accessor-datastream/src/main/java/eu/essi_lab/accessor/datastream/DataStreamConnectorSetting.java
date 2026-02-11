@@ -37,11 +37,11 @@ import eu.essi_lab.cfga.option.StringOptionBuilder;
 public class DataStreamConnectorSetting extends HarvestedConnectorSetting {
 
     public static final String DATASTREAM_API_KEY = "DATASTREAM_API_KEY";
-    public static final String MAX_CHARACTERISTICS = "MAX_CHARACTERISTICS";
+    public static final String OBSERVATION_SAMPLE_SET = "observationSampleSet";
 
     private static final int DEFAULT_PAGE_SIZE = 50;
     /** -1 means no limit (consider all characteristics). */
-    private static final int DEFAULT_MAX_CHARACTERISTICS = -1;
+    private static final int DEFAULT_OBSERVATION_SAMPLE_SET = -1;
 
     public DataStreamConnectorSetting() {
 
@@ -57,13 +57,13 @@ public class DataStreamConnectorSetting extends HarvestedConnectorSetting {
 
 	addOption(apiKeyOption);
 
-	Option<Integer> maxCharsOption = IntegerOptionBuilder.get().//
-		withKey(MAX_CHARACTERISTICS).//
-		withLabel("Max number of characteristic names per location (-1 = all)").//
-		withValue(DEFAULT_MAX_CHARACTERISTICS).//
+	Option<Integer> observationSampleSetOption = IntegerOptionBuilder.get().//
+		withKey(OBSERVATION_SAMPLE_SET).//
+		withLabel("Observation sample set: max characteristics per location to derive names and date range (-1 = all)").//
+		withValue(DEFAULT_OBSERVATION_SAMPLE_SET).//
 		cannotBeDisabled().//
 		build();
-	addOption(maxCharsOption);
+	addOption(observationSampleSetOption);
     }
 
     public DataStreamConnectorSetting(JSONObject object) {
@@ -92,12 +92,12 @@ public class DataStreamConnectorSetting extends HarvestedConnectorSetting {
     }
 
     /**
-     * Max number of characteristic names to consider per location.
+     * Observation sample set: max number of characteristic names to consider per location.
      *
      * @return -1 for unlimited, otherwise the configured positive limit
      */
-    public int getMaxCharacteristics() {
-	return getOption(MAX_CHARACTERISTICS, Integer.class).map(Option::getValue).orElse(DEFAULT_MAX_CHARACTERISTICS);
+    public int getObservationSampleSet() {
+	return getOption(OBSERVATION_SAMPLE_SET, Integer.class).map(Option::getValue).orElse(DEFAULT_OBSERVATION_SAMPLE_SET);
     }
 }
 

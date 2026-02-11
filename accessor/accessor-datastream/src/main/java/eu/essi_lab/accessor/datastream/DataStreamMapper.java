@@ -417,12 +417,30 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	}
 
 	//
-	// Temporal extent is not available directly here; leave it to be refined by
-	// observation-level processing if needed.
+	// Temporal extent: when available, use the first/last observation dates
+	// computed at connector level; otherwise fall back to a placeholder extent to
+	// mark it as a time series.
 	//
-	// However, we still create a placeholder extent to mark it as a time series.
-	//
+	String firstObsDate = json.optString("firstObservationDate", null);
+	String firstObsTime = json.optString("firstObservationTime", null);
+	String lastObsDate = json.optString("lastObservationDate", null);
+	String lastObsTime = json.optString("lastObservationTime", null);
+
 	TemporalExtent tempExtent = new TemporalExtent();
+	if (firstObsDate != null && !firstObsDate.isEmpty()) {
+	    String begin = firstObsDate;
+	    if (firstObsTime != null && !firstObsTime.isEmpty()) {
+		begin = firstObsDate + "T" + firstObsTime;
+	    }
+	    tempExtent.setBeginPosition(begin);
+	}
+	if (lastObsDate != null && !lastObsDate.isEmpty()) {
+	    String end = lastObsDate;
+	    if (lastObsTime != null && !lastObsTime.isEmpty()) {
+		end = lastObsDate + "T" + lastObsTime;
+	    }
+	    tempExtent.setEndPosition(end);
+	}
 	mi.getDataIdentification().addTemporalExtent(tempExtent);
 
 	//
@@ -452,11 +470,15 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	mi.addCoverageDescription(coverageDescription);
 
 	//
-	// Distribution and extension handler
+	// Distribution and extension handler: attribute units from observations
 	//
 	ExtensionHandler extensionHandler = dataset.getExtensionHandler();
-	// We cannot infer units or time resolution here without looking at observations
-	// so we leave them unset; they can be filled by higher-level logic if needed.
+	String resultUnit = json.optString("resultUnit", null);
+	if (resultUnit != null && !resultUnit.isEmpty()) {
+	    extensionHandler.setAttributeUnits(resultUnit);
+	    extensionHandler.setAttributeUnitsAbbreviation(resultUnit);
+	}
+	// Time resolution is not inferred here; it can be filled by higher-level logic if needed.
 
 	//
 	// Online resource and resource identifier using the mangler
@@ -481,7 +503,7 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	core.getDataIdentification().setResourceIdentifier(identifier);
 
 	// Generate additional code-based identifier, similar to other accessors
-	String code = generateCode(dataset, Optional.ofNullable(datasetName).orElse(title));
+	String code = generateCode(dataset, identifier);
 	core.getDataIdentification().setResourceIdentifier(code);
 	if (mi.getDistribution() != null && mi.getDistribution().getDistributionOnline() != null) {
 	    mi.getDistribution().getDistributionOnline().setIdentifier(code);

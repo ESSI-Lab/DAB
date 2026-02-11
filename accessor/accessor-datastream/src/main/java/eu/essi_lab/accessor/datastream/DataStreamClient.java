@@ -55,12 +55,17 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 public class DataStreamClient {
 
     private final String endpoint;
-    private final String apiKey;
+    public static String apiKey;
     private final HttpClient httpClient;
+
+    public DataStreamClient(String endpoint) {
+	this.endpoint = endpoint.endsWith("/") ? endpoint.substring(0, endpoint.length() - 1) : endpoint;
+	this.httpClient = HttpClient.newHttpClient();
+    }
 
     public DataStreamClient(String endpoint, String apiKey) {
 	this.endpoint = endpoint.endsWith("/") ? endpoint.substring(0, endpoint.length() - 1) : endpoint;
-	this.apiKey = apiKey;
+	DataStreamClient.apiKey = apiKey;
 	this.httpClient = HttpClient.newHttpClient();
     }
 
@@ -98,6 +103,19 @@ public class DataStreamClient {
 	public String activityStartDate;
 	public String activityStartTime;
 	public JSONObject raw;
+    }
+
+    /**
+     * Simple value object representing the first and last observation dates and
+     * result unit for a given series (DOI, location, CharacteristicName).
+     */
+    public static class ObservationDateRange {
+	public String firstActivityStartDate;
+	public String firstActivityStartTime;
+	public String lastActivityStartDate;
+	public String lastActivityStartTime;
+	/** ResultUnit from Observations (e.g. "deg C"). */
+	public String resultUnit;
     }
 
     public List<DatasetMetadata> listDatasets(int top) throws IOException, InterruptedException {
@@ -196,10 +214,33 @@ public class DataStreamClient {
 	String filter = "DOI%20eq%20'" + URLEncoder.encode(doi, StandardCharsets.UTF_8) + "'%20and%20LocationId%20eq%20'"
 		+ locationId + "'";
 	String select = "%24select=CharacteristicName";
-	String distinct = "%24distinct=true";
+	
+	String baseUrl = endpoint + "/Observations?%24filter=" + filter +  "&" + select+"&%24top=" + maxCharacteristics;
 
-	String url = endpoint + "/Observations?%24filter=" + filter + "&" + distinct + "&" + select;
-	String next = url;
+	//
+	// When a positive maxCharacteristics is provided, we can simply rely on
+	// $top to have the server return at most that many distinct
+	// CharacteristicName values in a single page, avoiding pagination.
+	//
+	if (maxCharacteristics > 0) {
+	    JSONObject page = executeGet(baseUrl);
+	    JSONArray value = page.optJSONArray("value");
+	    if (value != null) {
+		for (int i = 0; i < value.length(); i++) {
+		    JSONObject obj = value.getJSONObject(i);
+		    String name = obj.optString("CharacteristicName", null);
+		    if (name != null && !name.isEmpty()) {
+			names.add(name);
+		    }
+		}
+	    }
+	    return names;
+	}
+
+	//
+	// Unlimited case: follow all pages.
+	//
+	String next = baseUrl;
 	while (next != null) {
 	    JSONObject page = executeGet(next);
 	    JSONArray value = page.optJSONArray("value");
@@ -209,9 +250,6 @@ public class DataStreamClient {
 		    String name = obj.optString("CharacteristicName", null);
 		    if (name != null && !name.isEmpty()) {
 			names.add(name);
-			if (maxCharacteristics > 0 && names.size() >= maxCharacteristics) {
-			    return names;
-			}
 		    }
 		}
 	    }
@@ -244,14 +282,14 @@ public class DataStreamClient {
 	filter.append("%20and%20CharacteristicName%20eq%20'")
 		.append(URLEncoder.encode(characteristicName, StandardCharsets.UTF_8)).append("'");
 	if (fromYear != null) {
-	    filter.append("%20and%20ActivityStartYear%20ge%20").append(fromYear);
+	    filter.append("%20and%20ActivityStartYear%20ge%20").append((fromYear));
 	}
 	if (toYear != null) {
-	    filter.append("%20and%20ActivityStartYear%20le%20").append(toYear);
+	    filter.append("%20and%20ActivityStartYear%20le%20").append((toYear));
 	}
 
 	StringBuilder urlBuilder = new StringBuilder(endpoint).append("/Observations?%24filter=").append(filter.toString())
-		.append("%24%24select=DOI,CharacteristicName,ResultValue,ResultUnit,ActivityStartDate,ActivityStartTime");
+		.append("&%24select=DOI,CharacteristicName,ResultValue,ResultUnit,ActivityStartDate,ActivityStartTime");
 	if (top > 0) {
 	    urlBuilder.append("&%24top=").append(top);
 	}
@@ -281,6 +319,92 @@ public class DataStreamClient {
 	}
 
 	return results;
+    }
+
+    /**
+     * Retrieves the first and last observation dates (and times, when available)
+     * for the given DOI, location and CharacteristicName.
+     *
+     * <p>
+     * DataStream OData does not support {@code $orderby}, so this method issues
+     * a single request with {@code $top} (see {@link #OBSERVATION_DATE_RANGE_TOP})
+     * and computes the min/max of ActivityStartDate and ActivityStartTime on the
+     * client.
+     * </p>
+     *
+     * @return an {@link ObservationDateRange} with non-null fields when at least
+     *         one observation exists for the series, or {@code null} when no
+     *         observations are found.
+     */
+    public ObservationDateRange getObservationDateRange(String doi, int locationId, String characteristicName, int maxChars)
+	    throws IOException, InterruptedException {
+
+	// DataStream OData does not support $orderby, so we fetch one page with $top and
+	// compute the min/max of ActivityStartDate and ActivityStartTime (same effective
+	// limit as OBSERVATION_PAGE_SIZE * OBSERVATION_DATE_RANGE_MAX_PAGES).
+	StringBuilder filter = new StringBuilder();
+	filter.append("DOI%20eq%20'").append(URLEncoder.encode(doi, StandardCharsets.UTF_8)).append("'");
+	filter.append("%20and%20LocationId%20eq%20'").append(locationId).append("'");
+	filter.append("%20and%20CharacteristicName%20eq%20'")
+		.append(URLEncoder.encode(characteristicName, StandardCharsets.UTF_8)).append("'");
+
+	String select = "%24select=ActivityStartDate,ActivityStartTime,ResultUnit";
+	String url = endpoint + "/Observations?%24filter=" + filter.toString() + "&" + select + "&%24top="
+		+ maxChars;
+
+	String minDate = null, minTime = null, maxDate = null, maxTime = null;
+	String resultUnit = null;
+
+	JSONObject page = executeGet(url);
+	JSONArray value = page.optJSONArray("value");
+	if (value != null) {
+	    for (int i = 0; i < value.length(); i++) {
+		JSONObject obj = value.getJSONObject(i);
+		String d = obj.optString("ActivityStartDate", null);
+		String t = obj.optString("ActivityStartTime", null);
+		if (d == null || d.isEmpty()) {
+		    continue;
+		}
+		if (resultUnit == null) {
+		    resultUnit = obj.optString("ResultUnit", null);
+		}
+		if (minDate == null || compareDateTime(d, t, minDate, minTime) < 0) {
+		    minDate = d;
+		    minTime = t;
+		}
+		if (maxDate == null || compareDateTime(d, t, maxDate, maxTime) > 0) {
+		    maxDate = d;
+		    maxTime = t;
+		}
+	    }
+	}
+
+	if (minDate == null) {
+	    return null;
+	}
+	ObservationDateRange range = new ObservationDateRange();
+	range.firstActivityStartDate = minDate;
+	range.firstActivityStartTime = minTime;
+	range.lastActivityStartDate = maxDate;
+	range.lastActivityStartTime = maxTime;
+	range.resultUnit = resultUnit;
+	return range;
+    }
+
+    /**
+     * Compares (date1, time1) and (date2, time2) chronologically.
+     *
+     * @return negative if (date1, time1) is before (date2, time2), zero if equal,
+     *         positive if after. Null or empty time is treated as start of day.
+     */
+    private static int compareDateTime(String date1, String time1, String date2, String time2) {
+	int c = (date1 != null ? date1 : "").compareTo(date2 != null ? date2 : "");
+	if (c != 0) {
+	    return c;
+	}
+	String t1 = (time1 != null && !time1.isEmpty()) ? time1 : "00:00:00";
+	String t2 = (time2 != null && !time2.isEmpty()) ? time2 : "00:00:00";
+	return t1.compareTo(t2);
     }
 
     private JSONObject executeGet(String url) throws IOException, InterruptedException {

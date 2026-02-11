@@ -201,8 +201,8 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 		List<DataStreamClient.Location> locations = client.listLocationsByDoi(dataset.doi);
 		for (DataStreamClient.Location location : locations) {
 
-		    int maxChars = getSetting().getMaxCharacteristics();
-		    Set<String> characteristicNames = client.getCharacteristicNames(dataset.doi, location.id, maxChars);
+		    int observationSampleSet = getSetting().getObservationSampleSet();
+		    Set<String> characteristicNames = client.getCharacteristicNames(dataset.doi, location.id, observationSampleSet);
 		    for (String cn : characteristicNames) {
 
 			JSONObject seriesJson = new JSONObject();
@@ -213,6 +213,30 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 			seriesJson.put("metadata", dataset.raw);
 			seriesJson.put("characteristicName", cn);
 			seriesJson.put("location", location.raw);
+
+			//
+			// Optional temporal extent enrichment: first/last observation dates
+			// for this (DOI, Location, CharacteristicName) series.
+			//
+			DataStreamClient.ObservationDateRange dateRange = client
+				.getObservationDateRange(dataset.doi, location.id, cn,observationSampleSet);
+			if (dateRange != null) {
+			    if (dateRange.firstActivityStartDate != null) {
+				seriesJson.put("firstObservationDate", dateRange.firstActivityStartDate);
+			    }
+			    if (dateRange.firstActivityStartTime != null) {
+				seriesJson.put("firstObservationTime", dateRange.firstActivityStartTime);
+			    }
+			    if (dateRange.lastActivityStartDate != null) {
+				seriesJson.put("lastObservationDate", dateRange.lastActivityStartDate);
+			    }
+			    if (dateRange.lastActivityStartTime != null) {
+				seriesJson.put("lastObservationTime", dateRange.lastActivityStartTime);
+			    }
+			    if (dateRange.resultUnit != null && !dateRange.resultUnit.isEmpty()) {
+				seriesJson.put("resultUnit", dateRange.resultUnit);
+			    }
+			}
 
 			ret.add(seriesJson.toString());
 			emitted++;

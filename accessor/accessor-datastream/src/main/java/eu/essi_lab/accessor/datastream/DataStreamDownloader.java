@@ -26,15 +26,16 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
+import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
+import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
+import eu.essi_lab.cfga.setting.SettingUtils;
 import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.TsValuesSingleVariableType;
@@ -95,7 +96,12 @@ public class DataStreamDownloader extends WMLDataDownloader {
 	super.setOnlineResource(resource, onlineResourceId);
 	if (online.getProtocol().equals(CommonNameSpaceContext.DATASTREAM_NS_URI)) {
 	    this.connector.setSourceURL(resource.getSource().getEndpoint());
-	    String apiKey = new DataStreamConnectorSetting().getApiKey();
+	    String sourceId = resource.getSource().getUniqueIdentifier();
+	    HarvestingSetting harvestingSetting = ConfigurationWrapper.getHarvestingSettings(sourceId).get();
+	    AccessorSetting selectedAccessorSetting = harvestingSetting.getSelectedAccessorSetting();
+	    HarvestedConnectorSetting harvestedConnectorSetting = selectedAccessorSetting.getHarvestedConnectorSetting();
+	    DataStreamConnectorSetting set = SettingUtils.downCast(harvestedConnectorSetting, DataStreamConnectorSetting.class);
+	    String apiKey = set.getApiKey();
 	    this.client = new DataStreamClient(resource.getSource().getEndpoint(), apiKey);
 	}
     }
@@ -228,7 +234,7 @@ public class DataStreamDownloader extends WMLDataDownloader {
 
 		// Retrieve observations
 		List<DataStreamClient.Observation> observations = client.getObservations(doi, locationId, characteristicName,
-			fromYear, toYear, 0);
+			fromYear, toYear, 1000);
 
 		TimeSeriesResponseType jtst = getJaxbTimeSeriesTemplate();
 		jtst.getTimeSeries().get(0).getVariable().setNoDataValue(NO_DATA_VALUE.doubleValue());
@@ -241,8 +247,6 @@ public class DataStreamDownloader extends WMLDataDownloader {
 		if (observations != null) {
 
 		    ObjectFactory factory = new ObjectFactory();
-
-		    TsValuesSingleVariableType values = jtst.getTimeSeries().get(0).getValues().get(0);
 
 		    for (DataStreamClient.Observation obs : observations) {
 
@@ -271,7 +275,7 @@ public class DataStreamDownloader extends WMLDataDownloader {
 				XMLGregorianCalendar date2 = xmlFactory.newXMLGregorianCalendar(c);
 				v.setDateTime(date2);
 
-				values.getValue().add(v);
+				addValue(tsrt, v);
 			    }
 			}
 		    }
