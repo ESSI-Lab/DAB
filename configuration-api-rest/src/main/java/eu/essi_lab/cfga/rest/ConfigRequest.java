@@ -512,10 +512,9 @@ public abstract class ConfigRequest {
 
 	if (multiValue) {
 
-	    values = Arrays.asList(value.toString().split(",")).//
-		    stream().//
+	    values = Arrays.stream(value.toString().split(",")).//
 		    map(v -> v.trim().strip()).//
-		    collect(Collectors.toList());
+		    toList();
 	}
 
 	Optional<Class<? extends LabeledEnum>> optEnum = parameter.getEnum();
@@ -526,9 +525,9 @@ public abstract class ConfigRequest {
 
 		if (!LabeledEnum.values(optEnum.get()).//
 			stream().//
-			map(e -> e.getLabel()).//
-			collect(Collectors.toList()).//
-			contains(val.toString())) {
+			map(LabeledEnum::getLabel).//
+			toList().//
+			contains(val)) {
 
 		    String supValues = LabeledEnum.values(optEnum.get()).//
 			    stream().//

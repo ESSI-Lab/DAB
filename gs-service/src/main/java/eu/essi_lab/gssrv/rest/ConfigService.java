@@ -111,7 +111,7 @@ public class ConfigService {
 
 	String requestName = optRequestName.get();
 
-	Optional<String> path = uriInfo.getPathSegments().stream().map(s -> s.getPath()).findFirst();
+	Optional<String> path = uriInfo.getPathSegments().stream().map(PathSegment::getPath).findFirst();
 	if (path.isEmpty() && !requestName.toLowerCase().contains("list")) {
 
 	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing required authentication token");
@@ -132,7 +132,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handlePutSourceRequest(request);
+	    response = validate.orElseGet(() -> handlePutSourceRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(EditSourceRequest.class))) {
@@ -141,7 +141,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handleEditSourceRequest(request);
+	    response = validate.orElseGet(() -> handleEditSourceRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(HarvestSchedulingRequest.class))) {
@@ -150,7 +150,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handleHarvestSchedulingRequest(request);
+	    response = validate.orElseGet(() -> handleHarvestSchedulingRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(HarvestUnschedulingRequest.class))) {
@@ -159,7 +159,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handleHarvestUnschedulingRequest(request);
+	    response = validate.orElseGet(() -> handleHarvestUnschedulingRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(RemoveSourceRequest.class))) {
@@ -168,7 +168,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handleRemoveSourceRequest(request);
+	    response = validate.orElseGet(() -> handleRemoveSourceRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(RemoveSourceDataRequest.class))) {
@@ -177,7 +177,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handleRemoveSourceDataRequest(request);
+	    response = validate.orElseGet(() -> handleRemoveSourceDataRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(ListSourcesRequest.class))) {
@@ -197,7 +197,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handlePutOntologyRequest(request);
+	    response = validate.orElseGet(() -> handlePutOntologyRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(EditOntologyRequest.class))) {
@@ -206,7 +206,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handleEditOntologyRequest(request);
+	    response = validate.orElseGet(() -> handleEditOntologyRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(RemoveOntologyRequest.class))) {
@@ -215,7 +215,7 @@ public class ConfigService {
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.isPresent() ? validate.get() : handleRemoveOntologyRequest(request);
+	    response = validate.orElseGet(() -> handleRemoveOntologyRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(ListOntologiesRequest.class))) {
@@ -246,22 +246,22 @@ public class ConfigService {
 
 	if (optional.isPresent()) {
 
-	    ontologiesIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
-		    stream().//
+	    //
+	    ontologiesIds.addAll(Arrays.stream(optional.get().toString().split(",")).//
 		    map(v -> v.trim().strip()).//
-		    collect(Collectors.toList()));
+		    toList());
 
 	    List<String> ids = ConfigurationWrapper.getOntologySettings().//
 		    stream().//
-		    map(s -> s.getOntologyId()).//
-		    collect(Collectors.toList());
+		    map(OntologySetting::getOntologyId).//
+		    toList();
 
 	    String missingOntologies = ontologiesIds.stream().filter(id -> !ids.contains(id)).collect(Collectors.joining(","));
 
-	    if (missingOntologies != null && !missingOntologies.isEmpty()) {
+	    if (!missingOntologies.isEmpty()) {
 
 		String message = missingOntologies.contains(",")
-			? "Ontology with id '" + missingOntologies + "' not found"
+			? "Ontologies with ids '" + missingOntologies + "' not found"
 			: "Ontology with id '" + missingOntologies + "' not found";
 
 		return buildErrorResponse(Status.NOT_FOUND, message);
@@ -434,7 +434,7 @@ public class ConfigService {
      */
     private Response handlePutSourceRequest(PutSourceRequest putSourceRequest) {
 
-	Optional<String> optSourceId = putSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
+	Optional<String> optSourceId = putSourceRequest.read(PutSourceRequest.SOURCE_ID).map(Object::toString);
 
 	Optional<String> randomId = Optional.empty();
 
@@ -448,9 +448,7 @@ public class ConfigService {
 
 	    if (ConfigurationWrapper.getAllSources().//
 		    stream().//
-		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
-		    findFirst().//
-		    isPresent()) {
+		    anyMatch(s -> s.getUniqueIdentifier().equals(sourceId))) {
 
 		return buildErrorResponse(Status.BAD_REQUEST, "Source with id '" + sourceId + "' already exists");
 	    }
@@ -523,7 +521,7 @@ public class ConfigService {
 
 	    return Response.status(Status.CREATED).//
 		    entity(object.toString(3)).//
-		    type(MediaType.APPLICATION_JSON.toString()).//
+		    type(MediaType.APPLICATION_JSON).//
 		    build();
 	}
 
@@ -603,7 +601,7 @@ public class ConfigService {
 
 	Optional<Object> startTime = harvestSourceRequest.read(HarvestSchedulingRequest.START_TIME);
 
-	String sourceId = harvestSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
+	String sourceId = harvestSourceRequest.read(PutSourceRequest.SOURCE_ID).map(Object::toString).get();
 
 	if (startTime.isEmpty() && isHarvestingUnderway(sourceId)) {
 
@@ -675,8 +673,8 @@ public class ConfigService {
 	    boolean contains = scheduler.//
 		    listScheduledSettings().//
 		    stream().//
-		    map(s -> s.getIdentifier()).//
-		    collect(Collectors.toList()).//
+		    map(Setting::getIdentifier).//
+		    toList().//
 		    contains(settingId);
 
 	    if (contains) {
@@ -793,7 +791,7 @@ public class ConfigService {
 	// harvesting underway check
 	//
 
-	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
+	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(Object::toString).get();
 
 	if (isHarvestingUnderway(sourceId)) {
 
@@ -891,7 +889,7 @@ public class ConfigService {
 	// harvesting underway check
 	//
 
-	String sourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString()).get();
+	String sourceId = request.read(PutSourceRequest.SOURCE_ID).map(Object::toString).get();
 
 	if (isHarvestingUnderway(sourceId)) {
 
@@ -942,19 +940,19 @@ public class ConfigService {
 
 	if (optional.isPresent()) {
 
-	    sourceIds.addAll(Arrays.asList(optional.get().toString().split(",")).//
-		    stream().//
+	    //
+	    sourceIds.addAll(Arrays.stream(optional.get().toString().split(",")).//
 		    map(v -> v.trim().strip()).//
-		    collect(Collectors.toList()));
+		    toList());
 
 	    List<String> sources = ConfigurationWrapper.getHarvestedAndMixedSources().//
 		    stream().//
-		    map(s -> s.getUniqueIdentifier()).//
-		    collect(Collectors.toList());
+		    map(GSSource::getUniqueIdentifier).//
+		    toList();
 
 	    String missingSources = sourceIds.stream().filter(id -> !sources.contains(id)).collect(Collectors.joining(","));
 
-	    if (missingSources != null && !missingSources.isEmpty()) {
+	    if (!missingSources.isEmpty()) {
 
 		String message = missingSources.contains(",")
 			? "Sources with id '" + missingSources + "' not found"
@@ -1047,7 +1045,7 @@ public class ConfigService {
 
 	return Response.status(Status.OK).//
 		entity(out.toString(3)).//
-		type(MediaType.APPLICATION_JSON.toString()).//
+		type(MediaType.APPLICATION_JSON).//
 		build();
     }
 
@@ -1114,9 +1112,7 @@ public class ConfigService {
 	return ConfigurationWrapper.getHarvestingSettings().//
 		stream().//
 		filter(s -> s.getSelectedAccessorSetting().getSource().getUniqueIdentifier().equals(sourceId)).//
-		filter(s -> support.getJobPhase(s).equals(JobPhase.RUNNING.getLabel())).//
-		findFirst().//
-		isPresent();
+		anyMatch(s -> support.getJobPhase(s).equals(JobPhase.RUNNING.getLabel()));
 
     }
 
