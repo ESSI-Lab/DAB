@@ -73,7 +73,7 @@ public abstract class ConfigRequest {
     @Override
     public boolean equals(Object object) {
 
-	return object instanceof ConfigRequest && ((ConfigRequest) object).toString().equals(this.toString());
+	return object instanceof ConfigRequest && object.toString().equals(this.toString());
     }
 
     /**
@@ -223,8 +223,8 @@ public abstract class ConfigRequest {
 	List<String> mandatoryParams = getSupportedParameters().//
 		stream().//
 		filter(p -> p.getCompositeName().isEmpty()).//
-		filter(p -> p.isMandatory()).//
-		map(p -> p.getName()).//
+		filter(Parameter::isMandatory).//
+		map(Parameter::getName).//
 		collect(Collectors.toList());
 
 	mandatoryParams.removeAll(readParameters());
@@ -263,13 +263,13 @@ public abstract class ConfigRequest {
 	List<Parameter> mandatoryCompositeParams = getSupportedParameters().//
 		stream().//
 		filter(p -> p.getCompositeName().isPresent()).//
-		filter(p -> p.isMandatory()).//
+		filter(Parameter::isMandatory).//
 		filter(p -> readCompositeParameters().contains(p.getCompositeName().get())).//
-		collect(Collectors.toList());
+		toList();
 
 	List<String> mandatoryNestedParamsNames = mandatoryCompositeParams.//
 		stream().//
-		map(p -> p.getName()).//
+		map(Parameter::getName).//
 		collect(Collectors.toList());
 
 	mandatoryNestedParamsNames.removeAll(readNestedParameters());
@@ -290,8 +290,8 @@ public abstract class ConfigRequest {
 
 	List<String> supported = getSupportedParameters().//
 		stream().//
-		map(p -> p.getName()).//
-		collect(Collectors.toList());
+		map(Parameter::getName).//
+		toList();
 
 	List<String> requestParams = readParameters();
 	requestParams.removeAll(supported);
@@ -316,7 +316,7 @@ public abstract class ConfigRequest {
 		filter(p -> p.getCompositeName().isPresent()).//
 		map(p -> p.getCompositeName().get()).//
 		distinct().//
-		collect(Collectors.toList());
+		toList();
 
 	List<String> compositeParameters = readCompositeParameters();
 	compositeParameters.removeAll(supportedCompositeNames);
@@ -339,12 +339,12 @@ public abstract class ConfigRequest {
 	List<Parameter> supportedNestedParams = getSupportedParameters().//
 		stream().//
 		filter(p -> p.getCompositeName().isPresent()).//
-		collect(Collectors.toList());
+		toList();
 
 	List<String> supportedNestedNames = supportedNestedParams.//
 		stream().//
-		map(p -> p.getName()).//
-		collect(Collectors.toList());
+		map(Parameter::getName).//
+		toList();
 
 	List<String> nestedParameters = readNestedParameters();
 	nestedParameters.removeAll(supportedNestedNames);
@@ -379,21 +379,21 @@ public abstract class ConfigRequest {
 
 	boolean multiValue = parameter.isMultiValue();
 
-	List<String> values = Arrays.asList(value.toString());
+	List<String> values = Collections.singletonList(value.toString());
 
 	if (multiValue) {
 
-	    values = Arrays.asList(value.toString().split(",")).//
-		    stream().//
+	    //
+	    values = Arrays.stream(value.toString().split(",")).//
 		    map(v -> v.trim().strip()).//
-		    collect(Collectors.toList());
+		    toList();
 	}
 
 	values.forEach(val -> {
 
 	    switch (type) {
 	    case BOOLEAN:
-		if (!val.toString().equals("true") && !val.toString().equals("false")) {
+		if (!val.equals("true") && !val.equals("false")) {
 
 		    throw new IllegalArgumentException(
 			    "Unsupported value '" + val + "'. Parameter '" + paramName + "' must be of type boolean");
@@ -404,7 +404,7 @@ public abstract class ConfigRequest {
 	    case DOUBLE:
 
 		try {
-		    Double.valueOf(val.toString());
+		    Double.valueOf(val);
 		} catch (NumberFormatException ex) {
 
 		    throw new IllegalArgumentException(
@@ -416,7 +416,7 @@ public abstract class ConfigRequest {
 	    case INTEGER:
 
 		try {
-		    Integer.valueOf(val.toString());
+		    Integer.valueOf(val);
 		} catch (NumberFormatException ex) {
 
 		    throw new IllegalArgumentException(
@@ -427,7 +427,7 @@ public abstract class ConfigRequest {
 
 	    case ISO8601_DATE_TIME:
 
-		if (!parseDateTime(val.toString()) || val.toString().length() != "YYYY-MM-DDThh:mm:ss".length()) {
+		if (!parseDateTime(val) || val.length() != "YYYY-MM-DDThh:mm:ss".length()) {
 
 		    throw new IllegalArgumentException("Unsupported value '" + val + "'. Parameter '" + paramName
 			    + "' must be of type ISO8601 date time according to the 'Europe/Berlin' TimeZone: 'YYYY-MM-DDThh:mm:ss'");
@@ -438,7 +438,7 @@ public abstract class ConfigRequest {
 	    case LONG:
 
 		try {
-		    Long.valueOf(val.toString());
+		    Long.valueOf(val);
 		} catch (NumberFormatException ex) {
 
 		    throw new IllegalArgumentException(
@@ -469,14 +469,14 @@ public abstract class ConfigRequest {
 
 	if (optPattern.isPresent()) {
 
-	    List<String> values = Arrays.asList(value.toString());
+	    List<String> values = Collections.singletonList(value.toString());
 
 	    if (multiValue) {
 
-		values = Arrays.asList(value.toString().split(",")).//
-			stream().//
+		//
+		values = Arrays.stream(value.toString().split(",")).//
 			map(v -> v.trim().strip()).//
-			collect(Collectors.toList());
+			toList();
 	    }
 
 	    values.forEach(val -> {
@@ -508,7 +508,7 @@ public abstract class ConfigRequest {
 
 	boolean multiValue = parameter.isMultiValue();
 
-	List<String> values = Arrays.asList(value.toString());
+	List<String> values = Collections.singletonList(value.toString());
 
 	if (multiValue) {
 
