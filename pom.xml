@@ -2377,6 +2377,7 @@
         <module>configuration-api-gs</module>
         <module>configuration-api-gui</module>
         <module>configuration-api-test</module>
+        <module>configuration-api-rest</module>
 
         <module>custom-tasks</module>
 
