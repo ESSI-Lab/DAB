@@ -1,5 +1,6 @@
 package eu.essi_lab.messages.bond;
 
+import com.fasterxml.jackson.core.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.messages.bond.spatial.*;
@@ -7,10 +8,133 @@ import eu.essi_lab.model.resource.*;
 import org.json.*;
 import org.junit.*;
 
+import javax.xml.bind.*;
+
+import static org.junit.Assert.assertThrows;
+
 /**
  * @author Fabrizio
  */
 public class JSONViewTest {
+
+    @Test
+    public void validationTest() throws JsonProcessingException, JAXBException {
+
+	assertThrows(Exception.class, () -> {
+
+	    ViewFactory.fromJSONObject("");
+	});
+
+	assertThrows(Exception.class, () -> {
+
+	    JSONObject jsonObject = new JSONObject();
+	    jsonObject.put("xxx", new JSONArray());
+
+	    ViewFactory.fromJSONObject(jsonObject);
+
+	});
+
+	assertThrows(Exception.class, () -> {
+
+	    JSONObject jsonObject = new JSONObject();
+	    JSONArray operands = new JSONArray();
+
+	    jsonObject.put("bond", operands);
+	    operands.put(new JSONObject());
+
+	    ViewFactory.fromJSONObject(jsonObject);
+	});
+
+	//
+	// unrecognized field
+	//
+
+	assertThrows(Exception.class, () -> {
+
+	    JSONObject jsonObject = new JSONObject();
+	    JSONArray operands = new JSONArray();
+
+	    String bond = """	  
+		        {
+		       "properXXX": [
+		       "resourceProperty",
+		        "SOURCE_ID"
+		    ],
+		        "propertyValue": "excludedSourceIdentifier",
+		        "type": "resourcePropertyBond",
+		       "operator": "EQUAL"
+		        }""";
+
+	    jsonObject.put("bond", new JSONObject(bond));
+
+	    ViewFactory.fromJSONObject(jsonObject);
+	});
+
+	//
+	// unrecognized enum value
+	//
+
+	assertThrows(Exception.class, () -> {
+
+	    JSONObject jsonObject = new JSONObject();
+
+	    String bond = """	  
+		        {
+		       "property": [
+		       "resourceProperty",
+		        "SOURCE_IDXXX"
+		    ],
+		        "propertyValue": "excludedSourceIdentifier",
+		        "type": "resourcePropertyBond",
+		       "operator": "EQUAL"
+		        }""";
+
+	    jsonObject.put("bond", new JSONObject(bond));
+
+	    ViewFactory.fromJSONObject(jsonObject);
+	});
+
+	//
+	// from an empty JSON object
+	//
+
+	JSONObject jsonObject1 = new JSONObject();
+	View noBondView = ViewFactory.fromJSONObject(jsonObject1);
+
+	Assert.assertNotNull(noBondView.getCreationTime());
+	Assert.assertNotNull(noBondView.getVisibility());
+	Assert.assertNull(noBondView.getBond());
+
+	//
+	// from a single bond
+	//
+
+	JSONObject jsonObject = new JSONObject();
+	jsonObject.put("id","testView1");
+	jsonObject.put("label","A simple view with an atomic bond");
+
+	JSONArray operands = new JSONArray();
+
+	String bond = """	  
+		 {
+		"property": [ 
+		"resourceProperty",
+			"SOURCE_ID"
+		    ],
+		        "propertyValue": "theSourceIdentifier",
+		 "type": "resourcePropertyBond",
+		"operator": "EQUAL"
+		        }""";
+
+	jsonObject.put("bond", new JSONObject(bond));
+
+	View view = ViewFactory.fromJSONObject(jsonObject);
+
+	Assert.assertNotNull(view.getCreationTime());
+	Assert.assertNotNull(view.getVisibility());
+	Assert.assertEquals(ResourcePropertyBond.class, view.getBond().getClass());
+
+    }
 
     @Test
     public void test() throws Exception {
@@ -229,6 +353,8 @@ public class JSONViewTest {
 	//
 
 	String jsonView1 = ViewFactory.toJSONObject(view1).toString(3);
+
+	System.out.println(jsonView1);
 
 	//
 	// 3) converts the JSON string 'jsonView1' in to the view 'view2'
