@@ -53,14 +53,9 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.auth.*;
 import eu.essi_lab.model.exceptions.*;
-import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.quartz.*;
 
 import javax.servlet.http.*;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.util.*;
 
 /**
@@ -500,6 +495,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	return Arrays.asList(//
 		new AsynchDownloadDescriptor(),//
+		new ViewsDescriptor(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//

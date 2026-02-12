@@ -138,7 +138,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		    } else {
 
-			// if no context is selected, only the non contextual items are enabled
+			// if no context is selected, only the non-contextual items are enabled
 			menuItem.setEnabled(!gmih.isContextual());
 		    }
 		}
