@@ -29,7 +29,7 @@
 				],
 				"requestBody": {
 					"required": true,
-					"description": "The request to execute, in JSON format. Before to be processed, each request is validated according to its specification. In case of validation errors, the request fails with reponse code '405'",
+					"description": "The request to execute, in JSON format. Before to be processed, each request is validated according to its specification. In case of validation errors, the request fails with response code '405'",
 					"content": {
 						"application/json": {
 							"schema": {
@@ -154,6 +154,25 @@
 													"type": "logicalBond"
 												}
 											}
+										}
+									}
+								},
+
+								"listViews1": {
+									"summary": "'ListViews' request",
+									"description": "Example of 'ListViews' to list all the stored views",
+									"value": {
+										"request": "ListViews"
+									}
+								},
+								
+								"listViews2": {
+									"summary": "'ListViews' request which list only a selected view",
+									"description": "Example of 'ListViews' which list only the view with id 'testView2'",
+									"value": {
+										"request": "ListViews",
+										"parameters": {
+											"id": "testView2"
 										}
 									}
 								},
@@ -747,7 +766,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id already exists, the request fails with reponse code '400'",
+								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id already exists, the request fails with response code '400'",
 								"type": "string"
 							},
 							"name": {
@@ -791,7 +810,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id is not found, the request fails with reponse code '404'",
+								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id is not found, the request fails with response code '404'",
 								"type": "string"
 							},
 							"name": {
@@ -835,7 +854,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id is not found, the request fails with reponse code be '404'",
+								"description": "The mandatory ontology id. It must contains alphanumeric characters and/or '_' characters. If an ontology with the given id is not found, the request fails with response code be '404'",
 								"type": "string"
 							}
 						}
@@ -859,7 +878,7 @@
 						"type": "object",
 						"properties": {
 							"id": {
-								"description": "Optional comma separated list of ontology ids. If one or more of the provided ontologies are not found, the request fails with reponse code '404'",
+								"description": "Optional comma separated list of ontology ids. If one or more of the provided ontologies are not found, the request fails with response code '404'",
 								"type": "string"
 							}
 						}
@@ -888,7 +907,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The optional source id. If omitted, a random id is created and returned in the response. If provided, it must contains alphanumeric characters and/or '_' or '-' characters and if a source with the given id already exists, the request fails with reponse code '400'",
+								"description": "The optional source id. If omitted, a random id is created and returned in the response. If provided, it must contains alphanumeric characters and/or '_' or '-' characters and if a source with the given id already exists, the request fails with response code '400'",
 								"type": "string"
 							},
 							"serviceType": {
@@ -949,7 +968,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with response code be '404'",
 								"type": "string"
 							},
 							"serviceType": {
@@ -968,7 +987,7 @@
 				}
 			},
 			"RemoveSource": {
-				"description": "Removes an existing DAB source from the configuration along with its harvested data. If source harvesting is scheduled, it is unscheduled. If the harvesting of the provided source is underway, the request fails with reponse code '400'",
+				"description": "Removes an existing DAB source from the configuration along with its harvested data. If source harvesting is scheduled, it is unscheduled. If the harvesting of the provided source is underway, the request fails with response code '400'",
 				"type": "object",
 				"required": [
 					"request",
@@ -987,7 +1006,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with response code be '404'",
 								"type": "string"
 							}
 						}
@@ -995,7 +1014,7 @@
 				}
 			},
 			"RemoveSourceData": {
-				"description": "Removes the harvested data of an existing DAB source. If the harvesting of the provided source is underway, the request fails with reponse code '400'",
+				"description": "Removes the harvested data of an existing DAB source. If the harvesting of the provided source is underway, the request fails with response code '400'",
 				"type": "object",
 				"required": [
 					"request",
@@ -1014,7 +1033,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with response code be '404'",
 								"type": "string"
 							}
 						}
@@ -1042,7 +1061,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with response code be '404'",
 								"type": "string"
 							},
 							"repeatCount": {
@@ -1083,7 +1102,7 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with reponse code be '404'",
+								"description": "The mandatory source id. It must contains alphanumeric characters and/or '_' or '-' characters. If a source with the given id is not found, the request fails with response code be '404'",
 								"type": "string"
 							}
 						}
@@ -1107,7 +1126,7 @@
 						"type": "object",
 						"properties": {
 							"id": {
-								"description": "Optional comma separated list of source ids. If one or more of the provided sources are not found, the request fails with reponse code '404'",
+								"description": "Optional comma separated list of source ids. If one or more of the provided sources are not found, the request fails with response code '404'",
 								"type": "string"
 							}
 						}
@@ -1266,7 +1285,7 @@
 						],
 						"properties": {
 							"view": {
-								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with reponse code '400'",
+								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with response code '400'",
 								"type": "string"
 							}
 						}
@@ -1293,7 +1312,31 @@
 						],
 						"properties": {
 							"id": {
-								"description": "The mandatory view id. It must contains alphanumeric characters and/or '_' characters. If a view with the given id is not found, the request fails with reponse code be '404'",
+								"description": "The mandatory view id. It must contains alphanumeric characters and/or '_' characters. If a view with the given id is not found, the request fails with response code be '404'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"ListViews": {
+				"description": "Lists all or a subset of the stored views",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "ListViews"
+					},
+					"parameters": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"description": "Optional comma separated list of views ids. If one or more of the provided views are not found, the request fails with response code '404'",
 								"type": "string"
 							}
 						}

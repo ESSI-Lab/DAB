@@ -3,6 +3,7 @@
  */
 package eu.essi_lab.gssrv.rest;
 
+import com.fasterxml.jackson.core.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.*;
@@ -37,6 +38,7 @@ import javax.servlet.http.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.*;
+import javax.xml.bind.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.*;
@@ -265,9 +267,83 @@ public class ConfigService {
 	    response = validate.orElseGet(() -> handleRemoveViewRequest(request));
 	}
 
+	if (requestName.equals(ConfigRequest.computeName(ListViewsRequest.class))) {
+
+	    ListViewsRequest request = new ListViewsRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleListViewsRequest(request));
+	}
+
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request ENDED", requestName);
 
 	return response != null ? response : buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Unknown request '" + requestName + "'");
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleListViewsRequest(ListViewsRequest request) {
+
+	try {
+
+	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(setting.asStorageInfo());
+
+	    //
+	    // reading optional views ids
+	    //
+
+	    final List<String> reqIds = new ArrayList<String>();
+
+	    Optional<Object> optional = request.read(ListOntologiesRequest.ONTOLOGY_ID);
+
+	    if (optional.isPresent()) {
+
+		reqIds.addAll(Arrays.stream(optional.get().toString().split(",")).//
+			map(v -> v.trim().strip()).//
+			toList());
+
+		List<String> dbIds = reader.getViewIdentifiers(GetViewIdentifiersRequest.create());
+
+		String missingViewIds = reqIds.stream().filter(id -> !dbIds.contains(id)).collect(Collectors.joining(","));
+
+		if (!missingViewIds.isEmpty()) {
+
+		    String message = missingViewIds.contains(",")
+			    ? "View with dbIds '" + missingViewIds + "' not found"
+			    : "View with id '" + missingViewIds + "' not found";
+
+		    return buildErrorResponse(Status.NOT_FOUND, message);
+		}
+	    }
+
+	    JSONArray out = new JSONArray();
+
+	    reader.getViews().stream().filter(v -> reqIds.isEmpty() || reqIds.contains(v.getId())).forEach(view -> {
+
+		try {
+
+		    out.put(ViewFactory.toJSONObject(view));
+
+		} catch (JsonProcessingException e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+	    });
+
+	    return Response.status(Status.OK).//
+		    entity(out.toString(3)).//
+		    type(MediaType.APPLICATION_JSON).//
+		    build();
+
+	} catch (GSException e) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+	}
     }
 
     /**
