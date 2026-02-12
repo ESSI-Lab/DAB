@@ -41,6 +41,28 @@ import java.nio.charset.*;
  */
 public class ViewFactory {
 
+    /**
+     *
+     */
+    private static JAXBContext jaxbContext;
+
+    static {
+	try {
+	    jaxbContext = JAXBContext.newInstance(//
+		    View.class, //
+		    WKT.class, //
+		    ViewBond.class, //
+		    LogicalBond.class, //
+		    ResourcePropertyBond.class, //
+		    SimpleValueBond.class, // FS
+		    SpatialBond.class);
+
+	} catch (JAXBException e) {
+
+	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	}
+    }
+
     public ViewFactory() {
     }
 
@@ -49,8 +71,7 @@ public class ViewFactory {
      */
     public static Marshaller createMarshaller() {
 	try {
-	    JAXBContext jc = createContext();
-	    Marshaller m = jc.createMarshaller();
+ 	    Marshaller m = jaxbContext.createMarshaller();
 	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	    m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 
@@ -67,8 +88,7 @@ public class ViewFactory {
      */
     public static Unmarshaller createUnmarshaller() {
 	try {
-	    JAXBContext jc = createContext();
-	    return jc.createUnmarshaller();
+ 	    return jaxbContext.createUnmarshaller();
 	} catch (JAXBException e) {
 	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
 	}
@@ -147,21 +167,6 @@ public class ViewFactory {
 	Unmarshaller unmarshaller = createUnmarshaller();
 
 	return (View) unmarshaller.unmarshal(streamView);
-    }
-
-    /**
-     * @return
-     * @throws JAXBException
-     */
-    private static JAXBContext createContext() throws JAXBException {
-	return JAXBContext.newInstance(//
-		View.class, //
-		WKT.class, //
-		ViewBond.class, //
-		LogicalBond.class, //
-		ResourcePropertyBond.class, //
-		SimpleValueBond.class, // FS
-		SpatialBond.class);
     }
 
     /**
