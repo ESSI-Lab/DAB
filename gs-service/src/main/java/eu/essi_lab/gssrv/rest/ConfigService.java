@@ -309,7 +309,7 @@ public class ConfigService {
 	ResourceProperty.listOrderedValues().forEach(property -> {
 
 	    JSONObject obj = new JSONObject();
-	    obj.put("name", property.getName());
+	    obj.put("name", property.name());
 	    obj.put("type", property.getContentType());
 
 	    resourceProperty.put(obj);
@@ -317,10 +317,16 @@ public class ConfigService {
 
 	JSONArray metadataElement = new JSONArray();
 
-	MetadataElement.listOrderedValues().forEach(property -> {
+	MetadataElement.listOrderedValues().stream().filter(p -> //
+		p != MetadataElement.QML_DEPTH_VALUE && //
+			p != MetadataElement.QML_MAGNITUDE_TYPE && //
+			p != MetadataElement.QML_MAGNITUDE_VALUE && //
+			!p.hasComposedElement()
+
+	).forEach(property -> {
 
 	    JSONObject obj = new JSONObject();
-	    obj.put("name", property.getName());
+	    obj.put("name", property.name());
 	    obj.put("type", property.getContentType());
 
 	    metadataElement.put(obj);

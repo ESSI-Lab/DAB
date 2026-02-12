@@ -121,6 +121,43 @@
 									}
 								},
 
+
+								"putView2": {
+									"summary": "'PutView' request with logical bond",
+									"description": "Example of 'PutView' request with a view with logical OR bond",
+									"value": {
+										"request": "PutView",
+										"parameters": {
+											"view": {
+												"id": "testView2",
+												"label": "A view with logical OR bond",
+												"bond": {
+													"operands": [
+														{
+															"property": [
+																"metadataElement",
+																"TITLE"
+															],
+															"type": "simpleValueBond",
+															"operator": "EXISTS"
+														},
+														{
+															"property": [
+																"metadataElement",
+																"ABSTRACT"
+															],
+															"type": "simpleValueBond",
+															"operator": "NOT_EXISTS"
+														}
+													],
+													"logicalOperator": "OR",
+													"type": "logicalBond"
+												}
+											}
+										}
+									}
+								},
+								
 								"putOntology1": {
 									"summary": "'PutOntology' request with only mandatory parameters",
 									"description": "Example of 'PutOntology' request with only mandatory parameters",
@@ -363,6 +400,43 @@
 						"content": {
 							"application/json": {
 								"examples": {
+
+									"listProperties": {
+
+										"summary": "Shortened 'ListProperties' request response with 'ResourceProperty' enum values",
+										"value": [
+											{
+												"ResourceProperty": [
+													{
+														"name": "SOURCE_ID",
+														"type": "TEXTUAL"
+													},
+
+													{
+														"name": "IS_DOWNLOADABLE",
+														"type": "BOOLEAN"
+													},
+
+													{
+														"name": "METADATA_QUALITY",
+														"type": "INTEGER"
+													},
+
+													{
+														"name": "RESOURCE_TIME_STAMP",
+														"type": "ISO8601_DATE_TIME"
+													},
+													{
+														"name": "DOWNLOAD_TIME",
+														"type": "LONG"
+													}
+												]
+											}
+										]
+
+									},
+
+
 									"listOntologies": {
 										"summary": "'ListOntologies' request response",
 										"value": [
@@ -1130,8 +1204,8 @@
 					}
 				}
 			},
-			"BondQLPropertyEnumName": {
-				"description": "Names of the enum that hold the possible type of properties to define view according to the BondQL specification",
+			"PropertyEnumName": {
+				"description": "Names of the enum that hold the possible type of properties to define views according to the BondQL specification",
 				"type": "string",
 				"enum": [
 					"ResourceProperty",
@@ -1139,7 +1213,7 @@
 				]
 			},
 			"ListProperties": {
-				"description": "Lists all the available properties that can be used to define views according to the BondQL specification",
+				"description": "Lists all the available properties from MetadataElement and ResourceProperty enum that can be used to define views according to the BondQL specification",
 				"type": "object",
 				"required": [
 					"request",
@@ -1155,7 +1229,7 @@
 						"type": "object",
 						"properties": {
 							"enumName": {
-								"$ref": "#/components/schemas/BondQLPropertyEnumName"
+								"$ref": "#/components/schemas/PropertyEnumName"
 							}
 						}
 					}
