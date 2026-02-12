@@ -258,6 +258,15 @@ public class ConfigService {
 	    response = validate.orElseGet(() -> handlePutViewRequest(request));
 	}
 
+	if (requestName.equals(ConfigRequest.computeName(EditViewRequest.class))) {
+
+	    EditViewRequest request = new EditViewRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleEditViewRequestRequest(request));
+	}
+
 	if (requestName.equals(ConfigRequest.computeName(RemoveViewRequest.class))) {
 
 	    RemoveViewRequest request = new RemoveViewRequest(requestObject);
@@ -279,6 +288,41 @@ public class ConfigService {
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request ENDED", requestName);
 
 	return response != null ? response : buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Unknown request '" + requestName + "'");
+    }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
+    private Response handleEditViewRequestRequest(EditViewRequest request) {
+
+
+	try {
+
+	    JSONObject jsonView = new JSONObject(request.read(PutViewRequest.VIEW).map(Object::toString).get());
+
+	    View view = ViewFactory.fromJSONObject(jsonView);
+
+	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+
+	    DatabaseReader reader = DatabaseProviderFactory.getReader(setting.asStorageInfo());
+
+	    if (reader.getView(view.getId()).isEmpty()) {
+
+		return buildErrorResponse(Status.NOT_FOUND, "View with id '" + view.getId() + "' not found");
+	    }
+
+	    DatabaseWriter writer = DatabaseProviderFactory.getWriter(setting.asStorageInfo());
+
+	    writer.store(view);
+
+	    return Response.status(Status.CREATED).build();
+
+	} catch (Exception e) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+	}
     }
 
     /**

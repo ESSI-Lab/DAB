@@ -158,6 +158,26 @@
 									}
 								},
 
+								"editView": {
+									"summary": "'EditView' request",
+									"description": "Example of 'EditView' request",
+									"value": {
+										"request": "EditView",
+										"parameters": {
+											"view": {
+												"id" : "testView1",
+												"label" : "A simple view with atomic bond",
+												"bond" : {
+													"property" : [ "metadataElement", "TITLE" ],
+													"propertyValue" : "The medatata title",
+													"type" : "simpleValueBond",
+													"operator" : "EQUAL"
+												}
+											}
+										}
+									}
+								},
+
 								"listViews1": {
 									"summary": "'ListViews' request",
 									"description": "Example of 'ListViews' to list all the stored views",
@@ -165,7 +185,7 @@
 										"request": "ListViews"
 									}
 								},
-								
+
 								"listViews2": {
 									"summary": "'ListViews' request which list only a selected view",
 									"description": "Example of 'ListViews' which list only the view with id 'testView2'",
@@ -1286,6 +1306,33 @@
 						"properties": {
 							"view": {
 								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with response code '400'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"EditView": {
+				"description": "Edits an existing view. The view with the given id, is always replaced by the view in the request body",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "EditView"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory view id. It must contains alphanumeric characters and/or '_' characters. If a view with the given id is not found, the request fails with response code '404'",
 								"type": "string"
 							}
 						}
