@@ -2356,8 +2356,6 @@
 
         <module>gs-shared-content</module>
 
-        <module>views</module>
-
         <!-- access tools -->
         <module>access-tools</module>
         <module>access-tools-workflow-engine</module>

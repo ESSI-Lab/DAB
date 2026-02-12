@@ -1,25 +1,20 @@
-package eu.essi_lab.views;
-
-import static org.junit.Assert.assertEquals;
-
-import java.util.Optional;
+package eu.essi_lab.api.database.opensearch.views.test;
 
 import eu.essi_lab.api.database.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.jaxb.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.junit.*;
+import org.mockito.*;
 
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.jaxb.ViewFactory;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.MetadataElement;
+import java.util.*;
 
-public class DefaultViewManagerTest {
+import static org.junit.Assert.*;
 
-    private DefaultViewManager manager;
+public class ViewManagerTest {
+
+    private ViewManager manager;
     private SimpleValueBond view1;
     private SimpleValueBond view2;
     private LogicalBond view3;
@@ -27,7 +22,7 @@ public class DefaultViewManagerTest {
 
     @Before
     public void init() throws GSException {
-	this.manager = Mockito.spy(new DefaultViewManager());
+	this.manager = Mockito.spy(new ViewManager());
 	this.view1 = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "temperature");
 	this.view2 = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "discharge");
 	this.view3 = BondFactory.createAndBond(BondFactory.createViewBond("view1"), BondFactory.createViewBond("view2"));

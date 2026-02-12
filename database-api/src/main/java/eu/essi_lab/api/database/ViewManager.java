@@ -1,4 +1,4 @@
-package eu.essi_lab.views;
+package eu.essi_lab.api.database;
 
 /*-
  * #%L
@@ -10,44 +10,30 @@ package eu.essi_lab.views;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.model.exceptions.*;
 
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.GetViewIdentifiersRequest;
-import eu.essi_lab.lib.utils.ExpiringCache;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.DynamicView;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.ViewBond;
-import eu.essi_lab.model.exceptions.GSException;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
- * The {@link DefaultViewManager} connects to the Database trough Database Reader and Database Writer, in order to
- * implement the {@link
- * IViewManager} interface.
+ * The {@link ViewManager} connects to the Database trough Database Reader and Database Writer and provides facility methods and a cache
  *
  * @author boldrini
  */
-public class DefaultViewManager implements IViewManager {
+public class ViewManager {
 
     private static final long CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
     private static final int CACHE_SIZE = 10;
@@ -84,8 +70,7 @@ public class DefaultViewManager implements IViewManager {
     }
 
     /**
-     * Gets the view associated with the given view identifier, resolved (inner views are converted into concrete
-     * bonds).
+     * Gets the view associated with the given view identifier, resolved (inner views are converted into concrete bonds).
      *
      * @param viewId the view identifier
      * @return the resolved view, or null if not found
@@ -114,7 +99,7 @@ public class DefaultViewManager implements IViewManager {
 
 	    Optional<View> ret = getView(viewId);
 
-	    if (!ret.isPresent()) {
+	    if (ret.isEmpty()) {
 		return ret;
 	    }
 
@@ -132,15 +117,13 @@ public class DefaultViewManager implements IViewManager {
 
     /**
      * Resolve the given bond, recursively converting possible inner view bonds into concrete bonds
-     * 
+     *
      * @param bond
      * @return
      */
     private void resolveViewBonds(View view) throws GSException {
 	Bond bond = view.getBond();
-	if (bond instanceof ViewBond) {
-
-	    ViewBond viewBond = (ViewBond) bond;
+	if (bond instanceof ViewBond viewBond) {
 
 	    Optional<View> optionalResolved = getResolvedView(viewBond.getViewIdentifier());
 
@@ -151,8 +134,7 @@ public class DefaultViewManager implements IViewManager {
 		}
 	    }
 
-	} else if (bond instanceof LogicalBond) {
-	    LogicalBond logicalBond = (LogicalBond) bond;
+	} else if (bond instanceof LogicalBond logicalBond) {
 	    ArrayList<Bond> resolvedOperands = new ArrayList<Bond>();
 	    HashSet<String> creators = new HashSet<String>();
 	    for (Bond operand : logicalBond.getOperands()) {
@@ -175,8 +157,8 @@ public class DefaultViewManager implements IViewManager {
     }
 
     /**
-     * Gets the view associated with the given view identifier, not resolved (inner views are returned as initially
-     * defined). A view Id such as viewId1,viewId2 is to be intended as the AND of the views.
+     * Gets the view associated with the given view identifier, not resolved (inner views are returned as initially defined). A view Id such
+     * as viewId1,viewId2 is to be intended as the AND of the views.
      *
      * @param viewId the view identifier
      * @return the given view, or null if not found
@@ -197,8 +179,7 @@ public class DefaultViewManager implements IViewManager {
     }
 
     /**
-     * Puts the given bond associated with the view identifier, overwriting a possible existing view with the same
-     * identifier
+     * Puts the given bond associated with the view identifier, overwriting a possible existing view with the same identifier
      *
      * @param viewId
      * @param view

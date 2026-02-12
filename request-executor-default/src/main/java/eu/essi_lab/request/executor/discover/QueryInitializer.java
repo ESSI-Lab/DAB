@@ -21,44 +21,21 @@ package eu.essi_lab.request.executor.discover;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.authorization.converter.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.messages.bond.parser.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.request.executor.*;
+import org.logicng.formulas.*;
 
-import javax.media.jai.PropertySourceChangeEvent;
-
-import org.logicng.formulas.Formula;
-
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.authorization.converter.IRequestAuthorizationConverter;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.PerformanceLogger;
-import eu.essi_lab.messages.QueryInitializerMessage;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.EmptyBond;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.parser.NotBondParser;
-import eu.essi_lab.messages.bond.parser.SourceBondHandler;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.request.executor.IQueryInitializer;
-import eu.essi_lab.views.DefaultViewManager;
-import eu.essi_lab.views.IViewManager;
+import java.util.*;
 
 /**
  * The default implementation of query initializer performs the following steps:
@@ -775,10 +752,10 @@ public class QueryInitializer implements IQueryInitializer {
 	return bond;
     }
 
-    protected IViewManager createViewManager(StorageInfo databaseURI) throws GSException {
+    protected ViewManager createViewManager(StorageInfo databaseURI) throws GSException {
 	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 	DatabaseWriter writer = DatabaseProviderFactory.getWriter(databaseURI);
-	DefaultViewManager ret = new DefaultViewManager();
+	ViewManager ret = new ViewManager();
 	ret.setDatabaseReader(reader);
 	ret.setDatabaseWriter(writer);
 	return ret;
