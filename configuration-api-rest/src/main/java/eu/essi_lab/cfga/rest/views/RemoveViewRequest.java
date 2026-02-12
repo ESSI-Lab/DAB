@@ -36,7 +36,7 @@ public class RemoveViewRequest extends ConfigRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	list.add(Parameter.of(VIEW_ID, Queryable.ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true));
+	list.add(Parameter.of(VIEW_ID, Queryable.ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false));
 
 	return list;
     }
