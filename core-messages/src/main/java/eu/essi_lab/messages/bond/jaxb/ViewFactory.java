@@ -21,6 +21,7 @@ package eu.essi_lab.messages.bond.jaxb;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import eu.essi_lab.jaxb.common.*;
@@ -83,6 +84,8 @@ public class ViewFactory {
     public static View fromJSONObject(String obj) throws JsonProcessingException {
 
 	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
 	return jsonMapper.readValue(obj, View.class);
     }
 
@@ -94,6 +97,8 @@ public class ViewFactory {
     public static View fromJSONObject(JSONObject obj) throws JsonProcessingException {
 
 	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
 	return jsonMapper.readValue(obj.toString(), View.class);
     }
 
@@ -104,6 +109,8 @@ public class ViewFactory {
     public static JSONObject toJSONObject(View view) throws JsonProcessingException {
 
 	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
 	return new JSONObject(jsonMapper.writeValueAsString(view));
     }
 
@@ -111,7 +118,7 @@ public class ViewFactory {
      * @param view
      * @return
      */
-    public static String asString(View view) throws JAXBException {
+    public static String asXMLString(View view) throws JAXBException {
 
 	ByteArrayOutputStream stream = new ByteArrayOutputStream();
 	ViewFactory.createMarshaller().marshal(view, stream);

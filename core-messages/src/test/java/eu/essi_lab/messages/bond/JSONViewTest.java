@@ -346,7 +346,7 @@ public class JSONViewTest {
 	// 1) marshalls 'view1' in to the string 'xmlView1'
 	//
 
-	String xmlView1 = ViewFactory.asString(view1);
+	String xmlView1 = ViewFactory.asXMLString(view1);
 
 	//
 	// 2) converts the XML view 'xmlView1' in to the JSON string 'jsonView1'
@@ -366,7 +366,7 @@ public class JSONViewTest {
 	// 4) marshalls 'view2' in to the string 'xmlView2'
 	//
 
-	String xmlView2 = ViewFactory.asString(view2);
+	String xmlView2 = ViewFactory.asXMLString(view2);
 
 	//
 	// 5) compares 'xmlView1' and 'xmlView2'
@@ -405,7 +405,7 @@ public class JSONViewTest {
 
 	View view1 = ViewFactory.fromJSONObject(jsonView);
 
-	String xmlView = ViewFactory.asString(view1);
+	String xmlView = ViewFactory.asXMLString(view1);
 
 	System.out.println(xmlView);
 
