@@ -3,7 +3,6 @@
  */
 package eu.essi_lab.gssrv.rest;
 
-import com.fasterxml.jackson.core.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.*;
@@ -239,13 +238,13 @@ public class ConfigService {
 	// view requests
 	//
 
-	if (requestName.equals(ConfigRequest.computeName(ListBondQLPropertiesRequest.class))) {
+	if (requestName.equals(ConfigRequest.computeName(ListPropertiesRequest.class))) {
 
-	    ListBondQLPropertiesRequest request = new ListBondQLPropertiesRequest(requestObject);
+	    ListPropertiesRequest request = new ListPropertiesRequest(requestObject);
 
 	    Optional<Response> validate = validate(request);
 
-	    response = validate.orElseGet(() -> handleListBondQLPropertiesRequest(request));
+	    response = validate.orElseGet(() -> handleListPropertiesRequest(request));
 	}
 
 	if (requestName.equals(ConfigRequest.computeName(PutViewRequest.class))) {
@@ -299,9 +298,9 @@ public class ConfigService {
      * @param request
      * @return
      */
-    private Response handleListBondQLPropertiesRequest(ListBondQLPropertiesRequest request) {
+    private Response handleListPropertiesRequest(ListPropertiesRequest request) {
 
-	Optional<String> enumName = request.read(ListBondQLPropertiesRequest.ENUM_NAME).map(Object::toString);
+	Optional<String> enumName = request.read(ListPropertiesRequest.ENUM_NAME).map(Object::toString);
 
 	JSONObject out = new JSONObject();
 

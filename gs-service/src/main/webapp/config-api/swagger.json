@@ -65,7 +65,7 @@
 										"$ref": "#/components/schemas/ListSources"
 									},
 									{
-										"$ref": "#/components/schemas/ListBondQLProperties"
+										"$ref": "#/components/schemas/ListProperties"
 									},
 									{
 										"$ref": "#/components/schemas/PutView"
@@ -73,28 +73,28 @@
 								]
 							},
 							"examples": {
-								"listBondQLProperties1": {
-									"summary": "'ListBondQLProperties' request",
-									"description": "Example of 'ListBondQLProperties' request that list both kind of properties ",
+								"listProperties1": {
+									"summary": "'ListProperties' request",
+									"description": "Example of 'ListProperties' request that list both kind of properties ",
 									"value": {
-										"request": "ListBondQLProperties"
+										"request": "ListProperties"
 									}
 								},
-								"listBondQLProperties2": {
-									"summary": "'ListBondQLProperties' request for 'MetadataElement' properties",
-									"description": "Example of 'ListBondQLProperties' request that list only 'MetadataElement' enum properties ",
+								"listProperties2": {
+									"summary": "'ListProperties' request for 'MetadataElement' properties",
+									"description": "Example of 'ListProperties' request that list only 'MetadataElement' enum properties ",
 									"value": {
-										"request": "ListBondQLProperties",
+										"request": "ListProperties",
 										"parameters": {
 											"enumName": "MetadataElement"
 										}
 									}
 								},
 								"listBondQLProperties3": {
-									"summary": "'ListBondQLProperties' request for 'ResourceProperty' properties",
-									"description": "Example of 'ListBondQLProperties' request that list only 'ResourceProperty' enum properties ",
+									"summary": "'ListProperties' request for 'ResourceProperty' properties",
+									"description": "Example of 'ListProperties' request that list only 'ResourceProperty' enum properties ",
 									"value": {
-										"request": "ListBondQLProperties",
+										"request": "ListProperties",
 										"parameters": {
 											"enumName": "ResourceProperty"
 										}
@@ -1138,7 +1138,7 @@
 					"MetadataElement"
 				]
 			},
-			"ListBondQLProperties": {
+			"ListProperties": {
 				"description": "Lists all the available properties that can be used to define views according to the BondQL specification",
 				"type": "object",
 				"required": [
@@ -1149,7 +1149,7 @@
 					"request": {
 						"type": "string",
 						"description": "The request name",
-						"const": "ListBondQLProperties"
+						"const": "ListProperties"
 					},
 					"parameters": {
 						"type": "object",

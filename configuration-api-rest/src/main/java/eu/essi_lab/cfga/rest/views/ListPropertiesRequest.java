@@ -13,7 +13,7 @@ import java.util.*;
  * @author Fabrizio
  *
  */
-public class ListBondQLPropertiesRequest extends PutSourceRequest {
+public class ListPropertiesRequest extends PutSourceRequest {
 
     /**
      *
@@ -63,13 +63,13 @@ public class ListBondQLPropertiesRequest extends PutSourceRequest {
     /**
      *
      */
-    public ListBondQLPropertiesRequest() {
+    public ListPropertiesRequest() {
     }
 
     /**
      * @param object
      */
-    public ListBondQLPropertiesRequest(JSONObject object) {
+    public ListPropertiesRequest(JSONObject object) {
 
 	super(object);
     }
