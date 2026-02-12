@@ -129,7 +129,7 @@ public class OpenSearchReader implements DatabaseReader {
 
 	try {
 	    return wrapper.searchBinaries(ViewsMapping.get().getIndex(), query).//
-		    stream().//
+		    parallelStream().//
 		    map(View::createOrNull).//
 		    filter(Objects::nonNull).//
 		    collect(Collectors.toList());
