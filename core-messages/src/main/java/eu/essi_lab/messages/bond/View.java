@@ -281,10 +281,10 @@ public class View implements Serializable {
 		    Objects.equals(label, other.getLabel()) && //
 		    Objects.equals(creationTime, other.getCreationTime()) && //
 		    Objects.equals(expirationTime, other.getExpirationTime()) && //
-		    Objects.equals(getVisibility(), other.getVisibility()) &&
-		    Objects.equals(owner, other.getOwner()) &&
-		    Objects.equals(sourceDeployment, other.getSourceDeployment()) &&
-		    Objects.equals(bond.toString(), other.getBond().toString());
+		    Objects.equals(getVisibility(), other.getVisibility()) && //
+		    Objects.equals(owner, other.getOwner()) &&  //
+		    Objects.equals(sourceDeployment, other.getSourceDeployment()) &&  //
+		    Objects.equals(bond.toString(), other.getBond().toString()); //
 	}
 
 	return super.equals(obj);
