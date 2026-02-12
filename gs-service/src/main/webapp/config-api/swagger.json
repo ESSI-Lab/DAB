@@ -90,7 +90,7 @@
 										}
 									}
 								},
-								"listBondQLProperties3": {
+								"listProperties3": {
 									"summary": "'ListProperties' request for 'ResourceProperty' properties",
 									"description": "Example of 'ListProperties' request that list only 'ResourceProperty' enum properties ",
 									"value": {
@@ -154,6 +154,17 @@
 													"type": "logicalBond"
 												}
 											}
+										}
+									}
+								},
+
+								"removeView": {
+									"summary": "'RemoveView' request",
+									"description": "Example of 'RemoveSource' request",
+									"value": {
+										"request": "RemoveView",
+										"parameters": {
+											"id": "testView1"
 										}
 									}
 								},
@@ -1256,6 +1267,33 @@
 						"properties": {
 							"view": {
 								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with reponse code '400'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"RemoveView": {
+				"description": "Removes an existing view from the database",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "RemoveView"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory view id. It must contains alphanumeric characters and/or '_' characters. If a view with the given id is not found, the request fails with reponse code be '404'",
 								"type": "string"
 							}
 						}

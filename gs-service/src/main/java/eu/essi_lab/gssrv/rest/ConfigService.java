@@ -256,9 +256,57 @@ public class ConfigService {
 	    response = validate.orElseGet(() -> handlePutViewRequest(request));
 	}
 
+	if (requestName.equals(ConfigRequest.computeName(RemoveViewRequest.class))) {
+
+	    RemoveViewRequest request = new RemoveViewRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleRemoveViewRequest(request));
+	}
+
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request ENDED", requestName);
 
 	return response != null ? response : buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Unknown request '" + requestName + "'");
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleRemoveViewRequest(RemoveViewRequest request) {
+
+	Optional<String> optViewId = request.read(RemoveViewRequest.VIEW_ID).map(Object::toString);
+
+	if (optViewId.isEmpty()) {
+
+	    return ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing view identifier");
+
+	} else {
+
+	    String viewId = optViewId.get();
+
+	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+
+	    try {
+		DatabaseReader reader = DatabaseProviderFactory.getReader(setting.asStorageInfo());
+
+		DatabaseWriter writer = DatabaseProviderFactory.getWriter(setting.asStorageInfo());
+
+		if (reader.getView(viewId).isEmpty()) {
+
+		    return ConfigRequest.buildErrorResponse(Status.NOT_FOUND, "View with id '" + viewId + "' not found");
+		}
+
+		writer.removeView(viewId);
+
+		return Response.status(Status.OK).build();
+
+	    } catch (GSException e) {
+
+		return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+	    }
+	}
     }
 
     /**
@@ -290,7 +338,7 @@ public class ConfigService {
 
 	} catch (Exception e) {
 
-	    throw new RuntimeException(e);
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, e.getMessage());
 	}
     }
 

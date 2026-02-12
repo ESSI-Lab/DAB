@@ -17,7 +17,7 @@ import java.util.*;
 /**
  * @author Fabrizio
  */
-public class PutViewRequest extends PutSourceRequest {
+public class PutViewRequest extends ConfigRequest {
 
     /**
      *

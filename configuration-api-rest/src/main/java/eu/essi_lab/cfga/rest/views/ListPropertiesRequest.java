@@ -13,7 +13,7 @@ import java.util.*;
  * @author Fabrizio
  *
  */
-public class ListPropertiesRequest extends PutSourceRequest {
+public class ListPropertiesRequest extends ConfigRequest {
 
     /**
      *
