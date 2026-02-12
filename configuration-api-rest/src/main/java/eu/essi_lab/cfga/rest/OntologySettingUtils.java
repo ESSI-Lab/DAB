@@ -76,15 +76,15 @@ public class OntologySettingUtils {
 	String endpoint = request.read(PutOntologyRequest.ONTOLOGY_ENDPOINT).get().toString();
 	String name = request.read(PutOntologyRequest.ONTOLOGY_NAME).get().toString();
 
-	String availability = request.read(PutOntologyRequest.ONTOLOGY_AVAILABILITY).map(v -> v.toString())
+	String availability = request.read(PutOntologyRequest.ONTOLOGY_AVAILABILITY).map(Object::toString)
 		.orElse(Availability.ENABLED.getLabel());
 
-	String queryLang = request.read(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE).map(v -> v.toString())
+	String queryLang = request.read(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE).map(Object::toString)
 		.orElse(QueryLanguage.SPARQL.getLabel());
 
-	String dataModel = request.read(PutOntologyRequest.ONTOLOGY_DATA_MODEL).map(v -> v.toString()).orElse(DataModel.SKOS.getLabel());
+	String dataModel = request.read(PutOntologyRequest.ONTOLOGY_DATA_MODEL).map(Object::toString).orElse(DataModel.SKOS.getLabel());
 
-	Optional<String> optDesc = request.read(PutOntologyRequest.ONTOLOGY_DESCRIPTION).map(v -> v.toString());
+	Optional<String> optDesc = request.read(PutOntologyRequest.ONTOLOGY_DESCRIPTION).map(Object::toString);
 
 	setting.setOntologyId(id);
 	setting.setOntologyName(name);
@@ -94,7 +94,7 @@ public class OntologySettingUtils {
 	setting.setQueryLanguage(LabeledEnum.valueOf(QueryLanguage.class, queryLang).get());
 	setting.setDataModel(LabeledEnum.valueOf(DataModel.class, dataModel).get());
 
-	optDesc.ifPresent(desc -> setting.setOntologyDescription(desc));
+	optDesc.ifPresent(setting::setOntologyDescription);
 
 	setting.clean();
 	setting.afterClean();
@@ -108,26 +108,23 @@ public class OntologySettingUtils {
      */
     public static SettingFinder<OntologySetting> getOntologySettingFinder(ConfigRequest request) {
 
-	Optional<String> optSourceId = request.read(PutOntologyRequest.ONTOLOGY_ID).map(v -> v.toString());
+	Optional<String> optSourceId = request.read(PutOntologyRequest.ONTOLOGY_ID).map(Object::toString);
 
-	OntologySetting setting = null;
+	OntologySetting setting;
 
-	if (!optSourceId.isPresent()) {
+	if (optSourceId.isEmpty()) {
 
-	    return new SettingFinder<OntologySetting>(
-		    ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing ontology identifier"));
+	    return new SettingFinder<>(ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing ontology identifier"));
 
 	} else {
 
 	    String ontologyId = optSourceId.get();
 
-	    if (!ConfigurationWrapper.getOntologySettings().//
+	    if (ConfigurationWrapper.getOntologySettings().//
 		    stream().//
-		    filter(s -> s.getOntologyId().equals(ontologyId)).//
-		    findFirst().//
-		    isPresent()) {
+		    noneMatch(s -> s.getOntologyId().equals(ontologyId))) {
 
-		return new SettingFinder<OntologySetting>(
+		return new SettingFinder<>(
 			ConfigRequest.buildErrorResponse(Status.NOT_FOUND, "Ontology with id '" + ontologyId + "' not found"));
 	    }
 
@@ -139,7 +136,7 @@ public class OntologySettingUtils {
 		    get();
 	}
 
-	return new SettingFinder<OntologySetting>(setting);
+	return new SettingFinder<>(setting);
     }
 
 }
