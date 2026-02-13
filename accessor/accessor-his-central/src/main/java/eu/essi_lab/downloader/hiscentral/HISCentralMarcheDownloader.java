@@ -10,12 +10,12 @@ package eu.essi_lab.downloader.hiscentral;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -79,7 +79,7 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
     private Downloader downloader;
 
     /**
-     * 
+     *
      */
     public HISCentralMarcheDownloader() {
 
@@ -193,7 +193,9 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 		JSONArray valuesData = jsonObj.optJSONArray("values");
 
 		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
-		DateFormat iso8601OutputFormat = null;
+		DateFormat iso8601OutputFormat1 = null;
+		DateFormat iso8601OutputFormat2 = null;
+
 		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
 		if (valuesData != null) {
@@ -231,24 +233,37 @@ public class HISCentralMarcheDownloader extends WMLDataDownloader {
 
 			    String date = data.optString("date");
 
-			    if (iso8601OutputFormat == null) {
-				iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ITALIAN);
-				iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+			    if (iso8601OutputFormat1 == null) {
+				iso8601OutputFormat1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.ITALIAN);
+				iso8601OutputFormat1.setTimeZone(TimeZone.getTimeZone("GMT"));
 			    }
 
-			    Date parsed = iso8601OutputFormat.parse(date);
+			    if (iso8601OutputFormat2 == null) {
+				iso8601OutputFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssXXX", Locale.ITALIAN);
+				iso8601OutputFormat2.setTimeZone(TimeZone.getTimeZone("GMT"));
+			    }
 
-			    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-			    gregCal.setTime(parsed);
+			    DateFormat iso8601OutputFormat = date.contains(" ") ? iso8601OutputFormat2 : iso8601OutputFormat1;
 
-			    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-			    variable.setDateTimeUTC(xmlGregCal);
+			    Date parsed = null;
+			    try {
+				parsed = iso8601OutputFormat.parse(date);
 
-			    //
-			    //
-			    //
+				GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+				gregCal.setTime(parsed);
 
-			    addValue(tsrt, variable);
+				XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+				variable.setDateTimeUTC(xmlGregCal);
+
+				//
+				//
+				//
+
+				addValue(tsrt, variable);
+
+			    } catch (Exception e) {
+				GSLoggerFactory.getLogger(getClass()).error(e);
+			    }
 			}
 		    }
 		}
