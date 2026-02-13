@@ -1,43 +1,15 @@
 package eu.essi_lab.cfga.gui.components.tabs.descriptor;
 
-import java.util.ArrayList;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.grid.Grid.*;
+import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.gui.components.grid.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.gui.directive.Directive.*;
+import eu.essi_lab.cfga.setting.*;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.List;
-
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.grid.Grid.SelectionMode;
-import com.vaadin.flow.data.provider.SortDirection;
-
-import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.GridInfo;
-import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.directive.AddDirective;
-import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
-import eu.essi_lab.cfga.gui.directive.EditDirective;
-import eu.essi_lab.cfga.gui.directive.RemoveDirective;
-import eu.essi_lab.cfga.gui.directive.ShowDirective;
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -113,6 +85,43 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
+     * @param directive
+     * @return
+     */
+    public TabContentDescriptorBuilder withCustomAddDirective(CustomAddDirective directive) {
+
+	descriptor.getDirectiveManager().add(directive);
+
+	return this;
+    }
+
+    /**
+     *
+     * @param name
+     * @param listener
+     * @return
+     */
+    public TabContentDescriptorBuilder withCustomAddDirective(ComponentEventListener<ClickEvent<Button>> listener) {
+
+	descriptor.getDirectiveManager().add(new  CustomAddDirective(listener));
+
+	return this;
+    }
+
+    /**
+     *
+     * @param name
+     * @param listener
+     * @return
+     */
+    public TabContentDescriptorBuilder withCustomAddDirective(String name, ComponentEventListener<ClickEvent<Button>> listener) {
+
+	descriptor.getDirectiveManager().add(new  CustomAddDirective(name, listener));
+
+	return this;
+    }
+
+    /**
      * @param directiveName
      * @param settingClass
      * @return
@@ -174,7 +183,6 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @return
      */

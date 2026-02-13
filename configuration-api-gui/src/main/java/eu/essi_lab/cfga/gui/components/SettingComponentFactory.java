@@ -10,53 +10,42 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Comparator;
-import java.util.List;
-
-import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.components.option.OptionComponent;
-import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingPutDialog;
-import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
-import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
-import eu.essi_lab.cfga.gui.components.setting.listener.SettingRemoveButtonListener;
-import eu.essi_lab.cfga.gui.components.setting.listener.SettingToggleButtonListener;
+import com.vaadin.componentfactory.*;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.details.Details.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.*;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.Selectable.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.option.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.setting.edit_put.*;
+import eu.essi_lab.cfga.gui.components.setting.group.*;
+import eu.essi_lab.cfga.gui.components.setting.listener.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.directive.AddDirective;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -367,7 +356,7 @@ public class SettingComponentFactory {
 	    TabContent tabContent, //
 	    AddDirective addDirective) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("ADD", VaadinIcon.PLUS_SQUARE_O.create());
+	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
 	button.setWidth(100, Unit.PIXELS);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.getStyle().set("margin-left", "3px");
@@ -384,6 +373,35 @@ public class SettingComponentFactory {
 	//
 
 	button.addClickListener(e -> new SettingPutDialog(configuration, tabContent, addDirective).open());
+
+	EnabledGroupManager.getInstance().add(button);
+
+	return button;
+    }
+
+    /**
+     * @param addDirective
+     * @return
+     */
+    public static Button createCustomAddDirectiveButton(CustomAddDirective addDirective) {
+
+	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
+	button.setWidth(100, Unit.PIXELS);
+	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
+	button.getStyle().set("margin-left", "3px");
+
+	//
+	//
+	//
+	button.addEnabledStyle("color", "white");
+	button.addEnabledStyle("background-color", "#008ab7");
+	button.addEnabledStyle("border", "none");
+
+	//
+	//
+	//
+
+	button.addClickListener(addDirective.getListener());
 
 	EnabledGroupManager.getInstance().add(button);
 
