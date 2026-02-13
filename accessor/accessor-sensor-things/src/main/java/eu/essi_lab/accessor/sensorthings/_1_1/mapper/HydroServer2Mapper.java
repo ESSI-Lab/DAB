@@ -519,9 +519,29 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		VerticalExtent verticalExtent = new VerticalExtent();
 
-		double elevation = properties.optDouble("elevation_m", Double.MAX_VALUE);
+		double elevation = properties.optDouble("elevation_m", Double.NaN);
 
-		if (elevation != Double.MAX_VALUE) {
+		if (Double.isNaN(elevation)){
+
+		    JSONObject loc = location.get().getLocation();
+
+		    JSONObject geometry = loc;
+
+		    if (loc.has("geometry")) {
+			geometry = loc.getJSONObject("geometry");
+		    }
+
+		    if (geometry.has("coordinates")) {
+
+			JSONArray coords = geometry.getJSONArray("coordinates");
+
+			if (coords.length()==3){
+			    elevation = coords.getDouble(2);
+			}
+		    }
+		}
+
+		if (!Double.isNaN(elevation)) {
 
 		    verticalExtent.setMinimumValue(elevation);
 		    verticalExtent.setMaximumValue(elevation);
@@ -543,7 +563,6 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
     /**
      * @param coreMetadata
-     * @param location
      * @param keywords
      * @param dataId
      * @return
