@@ -1,33 +1,32 @@
 package eu.essi_lab.gssrv.conf;
 
 import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.component.grid.contextmenu.*;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.tabs.*;
 import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.component.upload.*;
+import com.vaadin.flow.component.upload.receivers.*;
 import com.vaadin.flow.data.provider.*;
 import com.vaadin.flow.data.renderer.*;
 import com.vaadin.flow.data.value.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
-import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gui.components.*;
-import eu.essi_lab.cfga.gui.components.grid.*;
-import eu.essi_lab.cfga.gui.components.setting.*;
-import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.scheduler.*;
-import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.model.exceptions.*;
-import eu.essi_lab.profiler.om.scheduling.*;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.*;
 
@@ -171,42 +170,62 @@ public class ViewsDescriptor extends TabDescriptor {
 
 	GridContextMenu<ViewsDescriptor.GridData> menu = grid.addContextMenu();
 
-	GridMenuItem<ViewsDescriptor.GridData> gridMenuItem = menu.addItem("Remove view", event -> {
-
-	    Optional<ViewsDescriptor.GridData> eventItem = event.getItem();
-
-	    System.out.println(eventItem.get().getLabel());
-	});
-
 	menu.addGridContextMenuOpenedListener(event -> {
 
 	    GridContextMenu<ViewsDescriptor.GridData> source = event.getSource();
 
-	    List<GridMenuItem<ViewsDescriptor.GridData>> menuItems = source.getItems();
+	    GridMenuItem<ViewsDescriptor.GridData> menuItem = source.getItems().getFirst();
 
 	    Optional<ViewsDescriptor.GridData> eventItem = event.getItem();
 
-	    for (GridMenuItem<ViewsDescriptor.GridData> menuItem : menuItems) {
+	    if (eventItem.isPresent()) {
 
-		String menuItemId = menuItem.getId().get();
+		String viewId = eventItem.get().getId();
 
-		if (eventItem.isPresent()) {
+		HashMap<String, Boolean> selectionMap = createSelectionMap(grid);
 
-		    //		    menuItem.setEnabled(gmih.isEnabled(eventItem.get(), content, configuration, setting.get(), map));
-
-		} else {
-
-		    // if no context is selected, only the non-contextual items are enabled
-		    //		    menuItem.setEnabled(!gmih.isContextual());
-		}
+		menuItem.setEnabled(selectionMap.get(viewId));
 	    }
-
-
-
-
 	});
 
-	gridMenuItem.setId("remove-view");
+	GridMenuItem<ViewsDescriptor.GridData> removeViewItem = menu.addItem("Remove selected views", event -> {
+
+	    Optional<ViewsDescriptor.GridData> eventItem = event.getItem();
+
+	    HashMap<String, Boolean> selectionMap = createSelectionMap(grid);
+
+	    ConfirmationDialog dialog = new ConfirmationDialog(
+
+		    "Click 'Confirm' to permanently deleted the selected views", evt -> {
+
+		try {
+
+		    List<String> ids = selectionMap.keySet().stream().filter(selectionMap::get).toList();
+
+		    for (String id : ids) {
+
+			getWriter().removeView(id);
+		    }
+
+		    update(verticalLayout);
+
+		    NotificationDialog.getInfoDialog(ids.size() == 1 ? "View correctly removed" : "Views correctly removed").open();
+
+		} catch (Exception e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+
+		    NotificationDialog.getErrorDialog("Error occurred, unable to removeviews: " + e.getMessage(), 700).open();
+		}
+	    });
+
+	    dialog.setWidth(670, Unit.PIXELS);
+	    dialog.setTitle("Views removal");
+	    dialog.getContentLayout().getStyle().set("font-size", "14px");
+	    dialog.open();
+	});
+
+	removeViewItem.setId("remove-view");
 
 	//
 	//
@@ -219,6 +238,7 @@ public class ViewsDescriptor extends TabDescriptor {
 	//
 
 	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
+		withCustomAddDirective(e -> openUploadViewDialog()).//
 		withShowDirective("Click 'Reload' to show the list of stored views", false).//
 		withComponent(verticalLayout).//
 		reloadable(() -> update(verticalLayout)).//
@@ -237,23 +257,114 @@ public class ViewsDescriptor extends TabDescriptor {
     }
 
     /**
+     *
+     */
+    private void openUploadViewDialog() {
+
+	final EnhancedDialog dialog = new EnhancedDialog();
+	dialog.setHeight(200, Unit.PIXELS);
+	dialog.setTitle("Add view");
+	dialog.open();
+
+	MemoryBuffer memoryBuffer = new MemoryBuffer();
+
+	Upload upload = new Upload(memoryBuffer);
+	upload.addFinishedListener(event -> {
+
+	    try {
+
+		String mimeType = memoryBuffer.getFileData().getMimeType();
+
+		InputStream viewStream = memoryBuffer.getInputStream();
+
+		View view = mimeType.equals("application/json")
+			? ViewFactory.fromJSONStream(viewStream)
+			: ViewFactory.fromXMLStream(viewStream);
+
+		if(getReader().getView(view.getId()).isPresent()) {
+
+		    NotificationDialog.getErrorDialog("A view with id '"+view.getId()+"' already exists").open();
+
+		    upload.clearFileList();
+		    return;
+		}
+
+		getWriter().store(view);
+
+		update(verticalLayout);
+
+		dialog.close();
+
+		NotificationDialog.getInfoDialog("View correctly added").open();
+
+	    } catch (Exception ex) {
+
+		dialog.close();
+
+		GSLoggerFactory.getLogger(getClass()).error(ex);
+
+		NotificationDialog.getErrorDialog("Error occurred, unable to add view: " + ex.getMessage()).open();
+
+		upload.interruptUpload();
+	    }
+	});
+
+	upload.setMaxFiles(1);
+	upload.setDropAllowed(true);
+	upload.setAcceptedFileTypes("application/json", ".json", "application/xml", ".xml");
+	upload.setDropLabel(new Label("Drop file here"));
+
+	Button localUploadButton = new Button("Select view file (JSON or XML)");
+	localUploadButton.getStyle().set("font-size", "14px");
+	localUploadButton.setWidth("330px");
+	localUploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+	upload.setUploadButton(localUploadButton);
+
+	dialog.setContent(upload);
+
+    }
+
+    /**
+     * @param grid
+     * @return
+     */
+    private HashMap<String, Boolean> createSelectionMap(Grid<ViewsDescriptor.GridData> grid) {
+
+	List<String> selIds = grid.getSelectedItems().//
+		stream().//
+		map(GridData::getId).//
+		toList();
+
+	Stream<ViewsDescriptor.GridData> items = grid.getListDataView().getItems();
+
+	HashMap<String, Boolean> map = new HashMap<>();
+
+	items.forEach(item -> {
+
+	    String identifier = item.getId();
+
+	    if (selIds.contains(identifier)) {
+
+		map.put(identifier, true);
+
+	    } else {
+
+		map.put(identifier, false);
+	    }
+	});
+
+	return map;
+    }
+
+    /**
      * @return
      */
     private List<View> getViews() {
 
 	try {
 
-	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
-
-	    DatabaseReader reader = DatabaseProviderFactory.getReader(setting.asStorageInfo());
-
-	    GSLoggerFactory.getLogger(ViewsDescriptor.class).info("getViews STARTED");
-
-	    List<View> views = reader.getViews();
-
-	    GSLoggerFactory.getLogger(ViewsDescriptor.class).info("getViews ENDED");
-
-	    return views;
+	    return getReader().getViews();
 
 	} catch (Exception e) {
 
@@ -295,29 +406,23 @@ public class ViewsDescriptor extends TabDescriptor {
 
 	    try {
 
-		DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+		Optional<View> view = getReader().getView(gridData.getId());
 
-		DatabaseReader reader = DatabaseProviderFactory.getReader(setting.asStorageInfo());
-
-		Optional<View> view = reader.getView(gridData.getId());
-
-		String jsonView = ViewFactory.toJSONObject(view.get()).toString(3);
-
-		TextArea jsonArea = new TextArea();
+		Div jsonArea = new Div();
 		jsonArea.getStyle().set("font-size", "13px");
 		jsonArea.setHeightFull();
 		jsonArea.setWidthFull();
-		jsonArea.setValue(jsonView);
-		jsonArea.setReadOnly(true);
 
-		String xmlString = ViewFactory.asXMLString(view.get());
+		String jsonView = ViewFactory.toJSONObject(view.get()).toString(3);
+		jsonArea.getElement().setProperty("innerHTML", "<pre> " + escape(jsonView) + " </pre>");
 
-		TextArea xmlArea = new TextArea();
+		Div xmlArea = new Div();
 		xmlArea.getStyle().set("font-size", "13px");
 		xmlArea.setHeightFull();
 		xmlArea.setWidthFull();
-		xmlArea.setValue(xmlString);
-		xmlArea.setReadOnly(true);
+
+		String xmlString = ViewFactory.asXMLString(view.get());
+		xmlArea.getElement().setProperty("innerHTML", "<pre>" + escape(xmlString) + "</pre>");
 
 		TabSheet tabSheet = new TabSheet();
 		tabSheet.getStyle().set("font-size", "13px");
@@ -518,6 +623,36 @@ public class ViewsDescriptor extends TabDescriptor {
 
 	    return o instanceof ViewsDescriptor.GridData && ((ViewsDescriptor.GridData) o).getId().equals(this.getId());
 	}
+    }
 
+    /**
+     * @param text
+     * @return
+     */
+    private static String escape(String text) {
+
+	return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    private static DatabaseWriter getWriter() throws GSException {
+
+	DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+
+	return DatabaseProviderFactory.getWriter(setting.asStorageInfo());
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    private static DatabaseReader getReader() throws GSException {
+
+	DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+
+	return DatabaseProviderFactory.getReader(setting.asStorageInfo());
     }
 }
