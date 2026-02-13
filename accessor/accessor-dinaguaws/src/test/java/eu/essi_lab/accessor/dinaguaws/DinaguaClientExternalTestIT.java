@@ -2,6 +2,9 @@ package eu.essi_lab.accessor.dinaguaws;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -12,6 +15,7 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import eu.essi_lab.accessor.dinaguaws.client.DinaguaClient;
@@ -28,6 +32,23 @@ import eu.essi_lab.model.resource.InterpolationType;
  * @author Fabrizio
  */
 public class DinaguaClientExternalTestIT {
+
+    @Before
+    public void init(){
+	InputStream trustStream = DinaguaClientExternalTestIT.class.getClassLoader().getResourceAsStream("test-trust.p12");
+
+	if (trustStream != null) {
+	    File target = new File(org.apache.commons.io.FileUtils.getTempDirectory(), "test-trust.p12");
+	    try {
+		org.apache.commons.io.FileUtils.copyInputStreamToFile(trustStream, target);
+	    } catch (IOException e) {
+		Assert.fail(e.getMessage());
+	    }
+
+	    System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
+	    System.setProperty("dab.net.ssl.trustStorePassword", "trustpass");
+	}
+    }
 
     @Test
     public void testMissingStations() throws Exception {

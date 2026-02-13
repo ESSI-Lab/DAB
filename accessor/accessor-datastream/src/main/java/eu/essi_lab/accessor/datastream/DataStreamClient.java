@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,9 +55,13 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class DataStreamClient {
 
+    private static final long MIN_REQUEST_INTERVAL_MS = 1000;
+
     private final String endpoint;
     public static String apiKey;
     private final HttpClient httpClient;
+    private final ReentrantLock requestLock = new ReentrantLock();
+    private volatile long lastRequestTimeMillis = 0;
 
     public DataStreamClient(String endpoint) {
 	this.endpoint = endpoint.endsWith("/") ? endpoint.substring(0, endpoint.length() - 1) : endpoint;
@@ -408,18 +413,30 @@ public class DataStreamClient {
     }
 
     private JSONObject executeGet(String url) throws IOException, InterruptedException {
-	GSLoggerFactory.getLogger(getClass()).debug("DataStreamClient GET {}", url);
+	requestLock.lock();
+	try {
+	    long now = System.currentTimeMillis();
+	    long elapsed = now - lastRequestTimeMillis;
+	    if (elapsed < MIN_REQUEST_INTERVAL_MS && lastRequestTimeMillis > 0) {
+		Thread.sleep(MIN_REQUEST_INTERVAL_MS - elapsed);
+	    }
+	    lastRequestTimeMillis = System.currentTimeMillis();
 
-	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url))
-		.header("Accept", "application/vnd.api+json")
-		.header("x-api-key", apiKey != null ? apiKey : "")
-		.GET().build();
+	    GSLoggerFactory.getLogger(getClass()).debug("DataStreamClient GET {}", url);
 
-	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-	if (response.statusCode() != 200) {
-	    throw new IOException("HTTP request failed with status code: " + response.statusCode());
+	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url))
+		    .header("Accept", "application/vnd.api+json")
+		    .header("x-api-key", apiKey != null ? apiKey : "")
+		    .GET().build();
+
+	    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+	    if (response.statusCode() != 200) {
+		throw new IOException("HTTP request failed with status code: " + response.statusCode());
+	    }
+	    return new JSONObject(response.body());
+	} finally {
+	    requestLock.unlock();
 	}
-	return new JSONObject(response.body());
     }
 }
 
