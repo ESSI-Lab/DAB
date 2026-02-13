@@ -123,6 +123,21 @@ public class ViewFactory {
     }
 
     /**
+     * @param stream
+     * @return
+     * @throws JsonProcessingException
+     */
+    public static View fromJSONStream(InputStream stream) throws IOException {
+
+	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+	String utf8String = IOStreamUtils.asUTF8String(stream);
+
+	return jsonMapper.readValue(utf8String, View.class);
+    }
+
+    /**
      * @param view
      * @return
      */
