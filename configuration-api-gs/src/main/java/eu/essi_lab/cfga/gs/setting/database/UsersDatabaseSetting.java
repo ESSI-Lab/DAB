@@ -35,6 +35,7 @@ public class UsersDatabaseSetting extends DatabaseSetting {
     public UsersDatabaseSetting() {
 
 	setName("Users database settings");
+	setShowHeader(true);
 	setDescription("If enabled and configured, this setting allows to retrieve users information from a specific database");
     }
 

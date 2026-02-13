@@ -260,6 +260,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	//
 	DatabaseSetting statsSetting = new DatabaseSetting();
 
+	statsSetting.setShowHeader(true);
 	statsSetting.setCanBeDisabled(true);
 	statsSetting.setEditable(false);
 	statsSetting.setEnabled(false);
