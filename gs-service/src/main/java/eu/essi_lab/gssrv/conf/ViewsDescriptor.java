@@ -1,10 +1,12 @@
 package eu.essi_lab.gssrv.conf;
 
+import com.vaadin.componentfactory.*;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.component.grid.contextmenu.*;
 import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.tabs.*;
 import com.vaadin.flow.component.textfield.*;
@@ -26,6 +28,7 @@ import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.model.exceptions.*;
 
+import javax.xml.bind.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.*;
@@ -39,11 +42,8 @@ public class ViewsDescriptor extends TabDescriptor {
     private static final String ID_COLUMN = "Id";
     private static final String LABEL_COLUMN = "Label";
     private static final String CREATOR_COLUMN = "Creator";
-    private static final String OWNER_COLUMN = "Owner";
-    private static final String VISIBILITY_COLUMN = "Visibility";
     private static final String SOURCE_DEPLOYMENT_COLUMN = "Source Deployment";
     private static final String CREATION_COLUMN = "Creation";
-    private static final String EXPIRATION_TIME = "Expiration";
 
     /**
      *
@@ -103,34 +103,12 @@ public class ViewsDescriptor extends TabDescriptor {
 		setSortable(true).//
 		setResizable(true);//
 
-	//	Grid.Column<ViewsDescriptor.GridData> ownerCol = grid.addColumn(ViewsDescriptor.GridData::getOwner).//
-	//		setHeader(OWNER_COLUMN).//
-	//		setKey(OWNER_COLUMN).//
-	//		setWidth("100px").//
-	//		setFlexGrow(0).//
-	//		setSortable(true).//
-	//		setResizable(true);//
-
 	Grid.Column<ViewsDescriptor.GridData> creationCol = grid.addColumn(ViewsDescriptor.GridData::getCreationTime).//
 		setHeader(CREATION_COLUMN).//
 		setKey(CREATION_COLUMN).//
 		setWidth("150px").//
 		setFlexGrow(0).//
 		setSortable(true);//
-	//
-	//	Grid.Column<ViewsDescriptor.GridData> expirationCol = grid.addColumn(ViewsDescriptor.GridData::getExpirationTime).//
-	//		setHeader(EXPIRATION_TIME).//
-	//		setKey(EXPIRATION_TIME).//
-	//		setWidth("150px").//
-	//		setFlexGrow(0).//
-	//		setSortable(true);
-
-	//	Grid.Column<ViewsDescriptor.GridData> visibilityCol = grid.addColumn(ViewsDescriptor.GridData::getVisibility).//
-	//		setHeader(VISIBILITY_COLUMN).//
-	//		setKey(VISIBILITY_COLUMN).//
-	//		setWidth("100px").//
-	//		setFlexGrow(0).//
-	//		setSortable(false);
 
 	//
 	//
@@ -144,7 +122,7 @@ public class ViewsDescriptor extends TabDescriptor {
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 
 	    int screenHeight = receiver.getScreenHeight();
-	    grid.setHeight(screenHeight - ComponentFactory.MIN_HEIGHT_OFFSET - 400, Unit.PIXELS);
+	    grid.setHeight(screenHeight - ComponentFactory.MIN_HEIGHT_OFFSET - 100, Unit.PIXELS);
 	});
 
 	//
@@ -156,17 +134,50 @@ public class ViewsDescriptor extends TabDescriptor {
 	gridFilter = new ViewsDescriptor.GridFilter();
 
 	addFilterField(filterRow, creatorCol);
-	//	addFilterField(filterRow, ownerCol);
 	addFilterField(filterRow, creationCol);
 	addFilterField(filterRow, depCol);
-	//	addFilterField(filterRow, visibilityCol);
-	//	addFilterField(filterRow, expirationCol);
 	addFilterField(filterRow, idCol);
 	addFilterField(filterRow, labelCol);
 
 	//
 	//
 	//
+
+	addContextMenu();
+
+	//
+	//
+	//
+
+	verticalLayout.add(grid);
+
+	//
+	//
+	//
+
+	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
+		withCustomAddDirective(e -> openAddViewDialog()).//
+		withShowDirective("Click 'Reload' to show the list of stored views", false).//
+		withComponent(verticalLayout).//
+		reloadable(() -> update(verticalLayout)).//
+		build();
+
+	setIndex(GSTabIndex.VIEWS.getIndex());
+	addContentDescriptor(descriptor);
+
+	//
+	//
+	//
+
+	GridFilter.SELECTION_MAP.clear();
+
+	update(verticalLayout);
+    }
+
+    /**
+     *
+     */
+    private void addContextMenu() {
 
 	GridContextMenu<ViewsDescriptor.GridData> menu = grid.addContextMenu();
 
@@ -189,8 +200,6 @@ public class ViewsDescriptor extends TabDescriptor {
 	});
 
 	GridMenuItem<ViewsDescriptor.GridData> removeViewItem = menu.addItem("Remove selected views", event -> {
-
-	    Optional<ViewsDescriptor.GridData> eventItem = event.getItem();
 
 	    HashMap<String, Boolean> selectionMap = createSelectionMap(grid);
 
@@ -226,40 +235,12 @@ public class ViewsDescriptor extends TabDescriptor {
 	});
 
 	removeViewItem.setId("remove-view");
-
-	//
-	//
-	//
-
-	verticalLayout.add(grid);
-
-	//
-	//
-	//
-
-	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
-		withCustomAddDirective(e -> openUploadViewDialog()).//
-		withShowDirective("Click 'Reload' to show the list of stored views", false).//
-		withComponent(verticalLayout).//
-		reloadable(() -> update(verticalLayout)).//
-		build();
-
-	setIndex(GSTabIndex.VIEWS.getIndex());
-	addContentDescriptor(descriptor);
-
-	//
-	//
-	//
-
-	GridFilter.SELECTION_MAP.clear();
-
-	update(verticalLayout);
     }
 
     /**
      *
      */
-    private void openUploadViewDialog() {
+    private void openAddViewDialog() {
 
 	final EnhancedDialog dialog = new EnhancedDialog();
 	dialog.setHeight(200, Unit.PIXELS);
@@ -281,9 +262,9 @@ public class ViewsDescriptor extends TabDescriptor {
 			? ViewFactory.fromJSONStream(viewStream)
 			: ViewFactory.fromXMLStream(viewStream);
 
-		if(getReader().getView(view.getId()).isPresent()) {
+		if (getReader().getView(view.getId()).isPresent()) {
 
-		    NotificationDialog.getErrorDialog("A view with id '"+view.getId()+"' already exists").open();
+		    NotificationDialog.getErrorDialog("A view with id '" + view.getId() + "' already exists").open();
 
 		    upload.clearFileList();
 		    return;
@@ -299,7 +280,7 @@ public class ViewsDescriptor extends TabDescriptor {
 
 	    } catch (Exception ex) {
 
-		dialog.close();
+		upload.clearFileList();
 
 		GSLoggerFactory.getLogger(getClass()).error(ex);
 
@@ -406,23 +387,15 @@ public class ViewsDescriptor extends TabDescriptor {
 
 	    try {
 
-		Optional<View> view = getReader().getView(gridData.getId());
+		View view = getReader().getView(gridData.getId()).get();
 
-		Div jsonArea = new Div();
-		jsonArea.getStyle().set("font-size", "13px");
-		jsonArea.setHeightFull();
-		jsonArea.setWidthFull();
+		TextArea jsonArea = createTextArea(ViewFactory.toJSONObject(view).toString(3));
+		TextArea xmlArea = createTextArea(ViewFactory.toXMLString(view));
 
-		String jsonView = ViewFactory.toJSONObject(view.get()).toString(3);
-		jsonArea.getElement().setProperty("innerHTML", "<pre> " + escape(jsonView) + " </pre>");
-
-		Div xmlArea = new Div();
-		xmlArea.getStyle().set("font-size", "13px");
-		xmlArea.setHeightFull();
-		xmlArea.setWidthFull();
-
-		String xmlString = ViewFactory.asXMLString(view.get());
-		xmlArea.getElement().setProperty("innerHTML", "<pre>" + escape(xmlString) + "</pre>");
+		CopyToClipboardButton copyButton = ComponentFactory.createCopyToClipboardButton(jsonArea::getValue);
+		copyButton.getStyle().set("margin-top", "-5px");
+		copyButton.getStyle().set("margin-bottom", "-10px");
+		copyButton.getStyle().set("margin-left", "15px");
 
 		TabSheet tabSheet = new TabSheet();
 		tabSheet.getStyle().set("font-size", "13px");
@@ -430,8 +403,128 @@ public class ViewsDescriptor extends TabDescriptor {
 		tabSheet.setWidthFull();
 		tabSheet.add("JSON encoding", jsonArea);
 		tabSheet.add("XML encoding", xmlArea);
+		tabSheet.addSelectedChangeListener(
+			evt -> copyButton.setSupplier(tabSheet.getSelectedIndex() == 0 ? jsonArea::getValue : xmlArea::getValue));
 
-		return tabSheet;
+		VerticalLayout layout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+
+		layout.getStyle().set("margin-top", "-20px");
+		layout.add(tabSheet);
+
+		HorizontalLayout buttonsLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
+		layout.add(buttonsLayout);
+
+		Label readOnlyLabel = ComponentFactory.createLabel("Read-only", 13);
+		readOnlyLabel.getStyle().set("margin-left", "16px");
+		readOnlyLabel.setWidth("65px");
+
+		ToggleButton toggleButton = ComponentFactory.createToggleButton(false, true);
+
+		Button updateButton = new Button(VaadinIcon.UPLOAD.create());
+		updateButton.getStyle().set("margin-top", "-5px");
+		updateButton.setTooltipText("Update view");
+		updateButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+		updateButton.getStyle().set("margin-left", "5px");
+		updateButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
+		updateButton.getStyle().set("border-radius", "0px");
+		updateButton.setEnabled(false);
+		updateButton.addClickListener(evt -> {
+
+		    View modified = null;
+
+		    try {
+			switch (tabSheet.getSelectedIndex()) {
+			case 0 -> {
+
+			    modified = ViewFactory.fromJSONObject(jsonArea.getValue());
+
+			}
+			case 1 -> {
+
+			    modified = ViewFactory.fromXMLString(xmlArea.getValue());
+			}
+			}
+
+			getWriter().store(modified);
+
+			NotificationDialog.getInfoDialog("View correctly updated").open();
+
+			updateButton.setEnabled(false);
+
+			toggleButton.setValue(false);
+
+			readOnlyLabel.setText("Read-only");
+
+		    } catch (UnmarshalException ex) {
+
+			NotificationDialog.getErrorDialog("Error occurred, unable to update view: " + ex.getLinkedException()).open();
+
+			GSLoggerFactory.getLogger(getClass()).error(ex);
+
+
+		    } catch (Exception ex) {
+
+			NotificationDialog.getErrorDialog("Error occurred, unable to update view: " + ex.getMessage()).open();
+
+			GSLoggerFactory.getLogger(getClass()).error(ex);
+		    }
+		});
+
+		toggleButton.addValueChangeListener(evt -> {
+
+		    readOnlyLabel.setText(evt.getValue() ? "Editable" : "Read-only");
+		    updateButton.setEnabled(evt.getValue());
+
+		    switch (tabSheet.getSelectedIndex()) {
+		    case 0 -> {
+
+			jsonArea.setReadOnly(!evt.getValue());
+
+			if (evt.getValue()) { // JSON editing
+
+			    jsonArea.removeClassName("text-area-readonly");
+			    jsonArea.addClassName("text-area-default");
+
+			    tabSheet.getTabAt(1).setEnabled(false);
+
+			} else { // JSON readonly
+
+			    jsonArea.addClassName("text-area-readonly");
+			    jsonArea.removeClassName("text-area-default");
+
+			    tabSheet.getTabAt(1).setEnabled(true);
+			}
+		    }
+
+		    case 1 -> {
+
+			xmlArea.setReadOnly(!evt.getValue());
+
+			if (evt.getValue()) { // XML editing
+
+			    xmlArea.removeClassName("text-area-readonly");
+			    jsonArea.addClassName("text-area-default");
+
+			    tabSheet.getTabAt(0).setEnabled(false);
+
+			} else { // XML readonly
+
+			    xmlArea.addClassName("text-area-readonly");
+			    xmlArea.removeClassName("text-area-default");
+
+			    tabSheet.getTabAt(0).setEnabled(true);
+			}
+		    }
+		    }
+		});
+
+		buttonsLayout.add(readOnlyLabel);
+		buttonsLayout.add(toggleButton);
+		buttonsLayout.add(updateButton);
+
+		buttonsLayout.add(copyButton);
+
+		return layout;
 
 	    } catch (Exception e) {
 
@@ -440,6 +533,24 @@ public class ViewsDescriptor extends TabDescriptor {
 
 	    return null;
 	});
+    }
+
+    /**
+     * @return
+     */
+    private TextArea createTextArea(String string) {
+
+	TextArea area = new TextArea();
+	area.getStyle().set("font-size", "13px");
+	area.getStyle().set("vertical-overflow", "auto");
+	area.addClassName("text-area-readonly");
+	area.setHeightFull();
+	area.setWidthFull();
+	area.setReadOnly(true);
+	area.setMaxHeight(500, Unit.PIXELS);
+	area.setValue(string);
+
+	return area;
     }
 
     /**
@@ -492,9 +603,6 @@ public class ViewsDescriptor extends TabDescriptor {
 		    case CREATOR_COLUMN -> gridData.getCreator();
 		    case ID_COLUMN -> gridData.getId();
 		    case LABEL_COLUMN -> gridData.getLabel();
-		    case EXPIRATION_TIME -> gridData.getExpirationTime();
-		    case VISIBILITY_COLUMN -> gridData.getVisibility();
-		    case OWNER_COLUMN -> gridData.getOwner();
 		    case SOURCE_DEPLOYMENT_COLUMN -> gridData.getDeployment();
 		    case CREATION_COLUMN -> gridData.getCreationTime();
 		    default -> null;
