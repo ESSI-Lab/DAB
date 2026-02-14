@@ -10,32 +10,29 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.vaadin.componentfactory.ToggleButton;
+import com.vaadin.componentfactory.*;
 import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.accordion.Accordion;
-import com.vaadin.flow.component.accordion.AccordionPanel;
+import com.vaadin.flow.component.accordion.*;
 import com.vaadin.flow.component.button.*;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Hr;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.details.Details.*;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.*;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
+
+import java.util.function.*;
 
 /**
  * @author Fabrizio
@@ -61,8 +58,6 @@ public class ComponentFactory {
 
 	return layout;
     }
-
-
 
     /**
      * @return
@@ -250,10 +245,9 @@ public class ComponentFactory {
     }
 
     /**
-     *
      * @return
      */
-    public static CustomButton createReloadButton(){
+    public static CustomButton createReloadButton() {
 
 	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
 	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
@@ -264,6 +258,23 @@ public class ComponentFactory {
 	reloadButton.getStyle().set("border-radius", "0px");
 
 	return reloadButton;
+    }
+
+    /**
+     * @return
+     */
+    public static CopyToClipboardButton createCopyToClipboardButton() {
+
+	return new CopyToClipboardButton();
+    }
+
+    /**
+     * @param supplier
+     * @return
+     */
+    public static CopyToClipboardButton createCopyToClipboardButton(Supplier<String> supplier) {
+
+	return new CopyToClipboardButton(supplier);
     }
 
     /**
@@ -323,7 +334,6 @@ public class ComponentFactory {
     }
 
     /**
-     *
      * @return
      */
     public static Div createSeparator() {
