@@ -46,23 +46,6 @@ public class ViewFactory {
      */
     private static JAXBContext jaxbContext;
 
-    static {
-	try {
-	    jaxbContext = JAXBContext.newInstance(//
-		    View.class, //
-		    WKT.class, //
-		    ViewBond.class, //
-		    LogicalBond.class, //
-		    ResourcePropertyBond.class, //
-		    SimpleValueBond.class, //
-		    SpatialBond.class);
-
-	} catch (JAXBException e) {
-
-	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
-	}
-    }
-
     /**
      *
      */
@@ -74,7 +57,7 @@ public class ViewFactory {
      */
     public static Marshaller createMarshaller() {
 	try {
-	    Marshaller m = jaxbContext.createMarshaller();
+	    Marshaller m = getContext().createMarshaller();
 	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	    m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 
@@ -91,7 +74,7 @@ public class ViewFactory {
      */
     public static Unmarshaller createUnmarshaller() {
 	try {
-	    return jaxbContext.createUnmarshaller();
+	    return getContext().createUnmarshaller();
 	} catch (JAXBException e) {
 	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
 	}
@@ -229,7 +212,7 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public static  View createView(String id, String label, String creator, Bond bond, ViewVisibility viewVisibility) {
+    public static View createView(String id, String label, String creator, Bond bond, ViewVisibility viewVisibility) {
 
 	return createView(id, label, bond, creator, null, viewVisibility, null);
     }
@@ -283,4 +266,32 @@ public class ViewFactory {
 	return ret;
     }
 
+    /**
+     * @return
+     */
+    private static JAXBContext getContext() {
+
+	synchronized (ViewFactory.class) {
+	    if (jaxbContext == null) {
+
+		try {
+		    jaxbContext = JAXBContext.newInstance(//
+			    View.class, //
+			    WKT.class, //
+			    ViewBond.class, //
+			    LogicalBond.class, //
+			    ResourcePropertyBond.class, //
+			    SimpleValueBond.class, //
+			    SpatialBond.class);
+
+		} catch (JAXBException e) {
+
+		    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+		}
+	    }
+
+	    return jaxbContext;
+
+	}
+    }
 }
