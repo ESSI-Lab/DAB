@@ -75,6 +75,8 @@ import java.util.*;
 @CssImport(value = "./styles/vaadin-text-area-no-border.css", themeFor = "vaadin-text-area")
 @CssImport(value = "./styles/vaadin-text-area-no-margin-top.css", themeFor = "vaadin-text-area")
 @CssImport(value = "./styles/vaadin-text-field-no-border.css", themeFor = "vaadin-text-field")
+@CssImport(value = "./styles/vaadin-text-area-readonly.css", themeFor = "vaadin-text-area")
+@CssImport(value = "./styles/vaadin-text-area-default.css", themeFor = "vaadin-text-area")
 
 public class GSConfigurationView extends ConfigurationView {
 

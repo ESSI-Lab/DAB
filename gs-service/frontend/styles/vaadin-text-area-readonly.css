@@ -1,0 +1,5 @@
+:host(.text-area-readonly[readonly]) [part="input-field"] {
+    background-color: #f0f0f0;
+    border: 1px solid hsl(0deg 0% 81%);
+    border-radius: 0px;
+}
