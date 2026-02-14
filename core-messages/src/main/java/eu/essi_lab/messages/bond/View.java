@@ -143,8 +143,6 @@ public class View implements Serializable {
      */
     public static View fromStream(InputStream stream) throws JAXBException {
 
-	ViewFactory factory = new ViewFactory();
-
 	Unmarshaller unmarshaller = ViewFactory.createUnmarshaller();
 
 	return (View) unmarshaller.unmarshal(stream);

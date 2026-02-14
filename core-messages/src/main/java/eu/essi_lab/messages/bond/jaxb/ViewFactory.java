@@ -54,7 +54,7 @@ public class ViewFactory {
 		    ViewBond.class, //
 		    LogicalBond.class, //
 		    ResourcePropertyBond.class, //
-		    SimpleValueBond.class, // FS
+		    SimpleValueBond.class, //
 		    SpatialBond.class);
 
 	} catch (JAXBException e) {
@@ -63,7 +63,10 @@ public class ViewFactory {
 	}
     }
 
-    public ViewFactory() {
+    /**
+     *
+     */
+    private ViewFactory() {
     }
 
     /**
@@ -71,7 +74,7 @@ public class ViewFactory {
      */
     public static Marshaller createMarshaller() {
 	try {
- 	    Marshaller m = jaxbContext.createMarshaller();
+	    Marshaller m = jaxbContext.createMarshaller();
 	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	    m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 
@@ -88,7 +91,7 @@ public class ViewFactory {
      */
     public static Unmarshaller createUnmarshaller() {
 	try {
- 	    return jaxbContext.createUnmarshaller();
+	    return jaxbContext.createUnmarshaller();
 	} catch (JAXBException e) {
 	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
 	}
@@ -153,7 +156,7 @@ public class ViewFactory {
      * @param view
      * @return
      */
-    public static String asXMLString(View view) throws JAXBException {
+    public static String toXMLString(View view) throws JAXBException {
 
 	ByteArrayOutputStream stream = new ByteArrayOutputStream();
 	ViewFactory.createMarshaller().marshal(view, stream);
@@ -190,7 +193,7 @@ public class ViewFactory {
      * @param bond
      * @return
      */
-    public View createView(String id, String label, Bond bond) {
+    public static View createView(String id, String label, Bond bond) {
 
 	return createView(id, label, bond, null, null, null, null);
     }
@@ -201,7 +204,7 @@ public class ViewFactory {
      * @param bond
      * @return
      */
-    public View createView(String id, Bond bond) {
+    public static View createView(String id, Bond bond) {
 
 	return createView(id, null, bond, null, null, null, null);
     }
@@ -213,7 +216,7 @@ public class ViewFactory {
      * @param bond
      * @return
      */
-    public View createView(String id, String label, String creator, Bond bond) {
+    public static View createView(String id, String label, String creator, Bond bond) {
 
 	return createView(id, label, bond, creator, null, null, null);
     }
@@ -226,7 +229,7 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public View createView(String id, String label, String creator, Bond bond, ViewVisibility viewVisibility) {
+    public static  View createView(String id, String label, String creator, Bond bond, ViewVisibility viewVisibility) {
 
 	return createView(id, label, bond, creator, null, viewVisibility, null);
     }
@@ -240,7 +243,7 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public View createView(String id, String label, String creator, String owner, Bond bond, ViewVisibility viewVisibility) {
+    public static View createView(String id, String label, String creator, String owner, Bond bond, ViewVisibility viewVisibility) {
 
 	return createView(id, label, bond, creator, owner, viewVisibility, null);
     }
@@ -254,7 +257,7 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public View createView(//
+    public static View createView(//
 	    String id, //
 	    String label, //
 	    Bond bond, //

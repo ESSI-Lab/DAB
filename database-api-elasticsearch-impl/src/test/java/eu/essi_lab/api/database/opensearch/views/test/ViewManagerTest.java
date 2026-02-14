@@ -27,11 +27,11 @@ public class ViewManagerTest {
 	this.view2 = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "discharge");
 	this.view3 = BondFactory.createAndBond(BondFactory.createViewBond("view1"), BondFactory.createViewBond("view2"));
 	this.view4 = BondFactory.createOrBond(view3, view1);
-	ViewFactory vf = new ViewFactory();
-	Mockito.doReturn(Optional.of(vf.createView("view1", "", view1))).when(manager).getView("view1");
-	Mockito.doReturn(Optional.of(vf.createView("view2", "", view2))).when(manager).getView("view2");
-	Mockito.doReturn(Optional.of(vf.createView("view3", "", view3))).when(manager).getView("view3");
-	Mockito.doReturn(Optional.of(vf.createView("view4", "", view4))).when(manager).getView("view4");
+
+	Mockito.doReturn(Optional.of(ViewFactory.createView("view1", "", view1))).when(manager).getView("view1");
+	Mockito.doReturn(Optional.of(ViewFactory.createView("view2", "", view2))).when(manager).getView("view2");
+	Mockito.doReturn(Optional.of(ViewFactory.createView("view3", "", view3))).when(manager).getView("view3");
+	Mockito.doReturn(Optional.of(ViewFactory.createView("view4", "", view4))).when(manager).getView("view4");
     }
 
     @Test
