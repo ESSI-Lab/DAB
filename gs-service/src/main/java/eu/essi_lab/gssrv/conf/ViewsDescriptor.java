@@ -455,6 +455,8 @@ public class ViewsDescriptor extends TabDescriptor {
 
 			readOnlyLabel.setText("Read-only");
 
+			update(verticalLayout);
+
 		    } catch (UnmarshalException ex) {
 
 			NotificationDialog.getErrorDialog("Error occurred, unable to update view: " + ex.getLinkedException()).open();
