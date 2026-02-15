@@ -26,8 +26,7 @@ import java.io.InputStream;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Objects;
+import java.util.*;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -37,6 +36,7 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -103,7 +103,7 @@ public class View implements Serializable {
 	    @XmlElement(name = "falseBond", type = FalseBond.class),
 	    @XmlElement(name = "trueBond", type = TrueBond.class)
     })
-	    @XmlElement(name = "emptyBond", type = EmptyBond.class) })
+    @JsonProperty
     protected Bond bond;
 
     /**
@@ -251,8 +251,10 @@ public class View implements Serializable {
     }
 
     @XmlTransient
+    @JsonIgnore
     public Bond getBond() {
-	return bond;
+
+	return bond != null ?  bond : BondFactory.createTrueBond();
     }
 
     public void setBond(Bond bond) {
