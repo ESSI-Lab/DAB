@@ -10,52 +10,51 @@ package eu.essi_lab.messages.bond;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import eu.essi_lab.model.resource.*;
 
+import javax.xml.bind.annotation.*;
+
 /**
- * A bond resulting in an empty selection
- * 
- * @author boldrini
+ * @author Fabrizio
  */
 @XmlRootElement
-public class EmptyBond extends QueryableBond<String> {
+public class FalseBond extends ResourcePropertyBond {
 
-    public static final String EMPTY_BOND_ID = "urn:essi:gs-service:empty-bond";
-
-    public EmptyBond() {
-	setProperty(MetadataElement.IDENTIFIER);
-	setPropertyValue(EMPTY_BOND_ID);
+    /**
+     *
+     */
+    public FalseBond() {
+	setProperty(ResourceProperty.PRIVATE_ID);
+	setOperator(BondOperator.NOT_EXISTS);
     }
 
     @Override
-    public EmptyBond clone() {
-	return new EmptyBond();
+    public FalseBond clone() {
+	return new FalseBond();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof EmptyBond) {
+	if (obj instanceof FalseBond) {
 	    return true;
 	}
 	return super.equals(obj);
     }
-    
+
     @Override
     public String toString() {
-	 
-	return "empty-bond";
+
+	return "false-bond";
     }
 }

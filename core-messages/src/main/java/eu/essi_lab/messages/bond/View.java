@@ -100,6 +100,9 @@ public class View implements Serializable {
 	    @XmlElement(name = "simpleValueBond", type = SimpleValueBond.class), //
 	    @XmlElement(name = "spatialBond", type = SpatialBond.class), //
 	    @XmlElement(name = "logicalBond", type = LogicalBond.class), //
+	    @XmlElement(name = "falseBond", type = FalseBond.class),
+	    @XmlElement(name = "trueBond", type = TrueBond.class)
+    })
 	    @XmlElement(name = "emptyBond", type = EmptyBond.class) })
     protected Bond bond;
 

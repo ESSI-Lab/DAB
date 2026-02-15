@@ -22,6 +22,22 @@ public class BondFactory {
     }
 
     /**
+     * @return
+     */
+    public static Bond createFalseBond() {
+
+	return new FalseBond();
+    }
+
+    /**
+     * @return
+     */
+    public static Bond createTrueBond() {
+
+	return new TrueBond();
+    }
+
+    /**
      * @param bonds
      * @param op
      * @return

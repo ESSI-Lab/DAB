@@ -43,7 +43,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 	@JsonSubTypes.Type(value = LogicalBond.class, name = "logicalBond"),//
 	@JsonSubTypes.Type(value = ResourcePropertyBond.class, name = "resourcePropertyBond"),//
 	@JsonSubTypes.Type(value = ComposedElementBond.class, name = "composedElementBond"),//
-	@JsonSubTypes.Type(value = EmptyBond.class, name = "emptyBond"),//
+	@JsonSubTypes.Type(value = FalseBond.class, name = "falseBond"),//
+	@JsonSubTypes.Type(value = TrueBond.class, name = "trueBond"),//
 	@JsonSubTypes.Type(value = MetadataElementBond.class, name = "metadataElementBond"),//
 	@JsonSubTypes.Type(value = OntologyPropertyBond.class, name = "ontologyPropertyBond"),//
 	@JsonSubTypes.Type(value = RuntimeInfoElementBond.class, name = "runtimeInfoElementBond"),//

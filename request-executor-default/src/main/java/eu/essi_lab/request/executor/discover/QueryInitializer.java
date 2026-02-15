@@ -509,8 +509,8 @@ public class QueryInitializer implements IQueryInitializer {
 			Bond toSimplify = simplifiableSourceBonds.get(i);
 			simplifiedBond = simplifySourceBonds(simplifiedBond, toSimplify);
 		    }
-		    if (simplifiedBond.equals(new EmptyBond())) {
-			return new EmptyBond();
+		    if (simplifiedBond.equals(new FalseBond())) {
+			return new FalseBond();
 		    }
 		    others.add(simplifiedBond);
 		    switch (others.size()) {
@@ -568,7 +568,7 @@ public class QueryInitializer implements IQueryInitializer {
 	}
 	switch (result.size()) {
 	case 0:
-	    return new EmptyBond();
+	    return new FalseBond();
 	case 1:
 	    return result.get(0);
 	default:
