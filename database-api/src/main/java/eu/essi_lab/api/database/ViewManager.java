@@ -21,6 +21,9 @@ package eu.essi_lab.api.database;
  * #L%
  */
 
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.model.exceptions.*;
@@ -29,8 +32,9 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * The {@link ViewManager} connects to the database trough {@link DatabaseReader}
- * to resolve inner views and to handle dynamic views
+ * The {@link ViewManager} connects to the database trough {@link DatabaseReader} to resolve inner views and to handle dynamic views.<br> To
+ * improve performances, this component uses a cache to store the resolved views. The cache holds a
+ * maximum of 10 entries; the entries expire after 30 minutes.<br>
  *
  * @author boldrini
  */
@@ -71,6 +75,16 @@ public class ViewManager {
      */
     public Optional<View> getResolvedView(String viewId) throws GSException {
 
+	if( !ConfigurationWrapper.getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.VIEWS_CACHE.getLabel()).//
+		map(Boolean::parseBoolean). //
+		orElse(true)){
+
+	    GSLoggerFactory.getLogger(getClass()).info("Views cache disabled");
+
+	    return getAndResolve(viewId);
+	}
+
 	String lock = null;
 
 	synchronized (resolvedViewLocks) {
@@ -92,69 +106,14 @@ public class ViewManager {
 
 	    GSLoggerFactory.getLogger(getClass()).trace("View cache MISS: " + viewId);
 
-	    Optional<View> ret = getView(viewId);
+	    Optional<View> view = getAndResolve(viewId);
 
-	    if (ret.isEmpty()) {
-		return ret;
-	    }
+	    view.ifPresent(v ->  resolvedViewCache.put(viewId, v));
 
-	    View view = ret.get();
+	    GSLoggerFactory.getLogger(getClass()).trace("Resolving view {} bonds ENDED", view.get().getId());
 
-	    resolveViewBonds(view);
-
-	    GSLoggerFactory.getLogger(getClass()).trace("Resolving view {} bonds ENDED", view.getId());
-
-	    resolvedViewCache.put(viewId, view);
-
-	    return Optional.of(view);
+	    return view;
 	}
-    }
-
-    /**
-     * Resolve the given bond, recursively converting possible inner view bonds into concrete bonds
-     *
-     * @param bond
-     * @return
-     */
-    private void resolveViewBonds(View view) throws GSException {
-
-	Bond bond = view.getBond();
-
-	if (bond instanceof ViewBond viewBond) {
-
-	    Optional<View> optionalResolved = getResolvedView(viewBond.getViewIdentifier());
-
-	    if (optionalResolved.isPresent()) {
-		bond = optionalResolved.get().getBond();
-		if (view.getCreator() == null) {
-		    view.setCreator(optionalResolved.get().getCreator());
-		}
-	    }
-
-	} else if (bond instanceof LogicalBond logicalBond) {
-
-	    ArrayList<Bond> resolvedOperands = new ArrayList<Bond>();
-	    HashSet<String> creators = new HashSet<String>();
-
-	    for (Bond operand : logicalBond.getOperands()) {
-		View childView = new View();
-		childView.setBond(operand);
-		resolveViewBonds(childView);
-		resolvedOperands.add(childView.getBond());
-		String creator = childView.getCreator();
-		if (creator != null) {
-		    creators.add(creator);
-		}
-	    }
-
-	    if (view.getCreator() == null && creators.size() == 1) {
-		view.setCreator(creators.iterator().next());
-	    }
-
-	    bond = BondFactory.createLogicalBond(logicalBond.getLogicalOperator(), resolvedOperands);
-	}
-
-	view.setBond(bond);
     }
 
     /**
@@ -190,5 +149,74 @@ public class ViewManager {
     public List<String> getViewIdentifiers(GetViewIdentifiersRequest vir) throws GSException {
 
 	return reader.getViewIdentifiers(vir);
+    }
+
+    /**
+     *
+     * @param viewId
+     * @return
+     * @throws GSException
+     */
+    private Optional<View> getAndResolve(String viewId) throws GSException {
+
+	Optional<View> ret = getView(viewId);
+
+	if (ret.isEmpty()) {
+
+	    return ret;
+	}
+
+	View view = ret.get();
+
+	resolve(view);
+
+	return Optional.of(view);
+    }
+
+    /**
+     * Resolve the given bond, recursively converting possible inner view bonds into concrete bonds
+     *
+     * @param bond
+     * @return
+     */
+    private void resolve(View view) throws GSException {
+
+	Bond bond = view.getBond();
+
+	if (bond instanceof ViewBond viewBond) {
+
+	    Optional<View> optionalResolved = getResolvedView(viewBond.getViewIdentifier());
+
+	    if (optionalResolved.isPresent()) {
+		bond = optionalResolved.get().getBond();
+		if (view.getCreator() == null) {
+		    view.setCreator(optionalResolved.get().getCreator());
+		}
+	    }
+
+	} else if (bond instanceof LogicalBond logicalBond) {
+
+	    ArrayList<Bond> resolvedOperands = new ArrayList<Bond>();
+	    HashSet<String> creators = new HashSet<String>();
+
+	    for (Bond operand : logicalBond.getOperands()) {
+		View childView = new View();
+		childView.setBond(operand);
+		resolve(childView);
+		resolvedOperands.add(childView.getBond());
+		String creator = childView.getCreator();
+		if (creator != null) {
+		    creators.add(creator);
+		}
+	    }
+
+	    if (view.getCreator() == null && creators.size() == 1) {
+		view.setCreator(creators.iterator().next());
+	    }
+
+	    bond = BondFactory.createLogicalBond(logicalBond.getLogicalOperator(), resolvedOperands);
+	}
+
+	view.setBond(bond);
     }
 }

@@ -114,7 +114,13 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 *
 	 */
-	DATA_PROXY_SERVER("dataProxyServer");
+	DATA_PROXY_SERVER("dataProxyServer"),
+
+	/**
+	 *
+	 */
+	VIEWS_CACHE("viewsCache");
+
 
 	/**
 	 * MirrorSiteTokenGeneratorHandler option prefix
