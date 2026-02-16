@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.stream.*;
 
 /**
- * A factory to create all types of {@link Bond}s provide by the GI-suite
+ * A factory with several facility methods to create all types of {@link Bond}s
  *
  * @author Fabrizio
  */
@@ -24,7 +24,7 @@ public class BondFactory {
     /**
      * @return
      */
-    public static Bond createFalseBond() {
+    public static Bond getFalseBond() {
 
 	return new FalseBond();
     }
@@ -32,7 +32,7 @@ public class BondFactory {
     /**
      * @return
      */
-    public static Bond createTrueBond() {
+    public static Bond getTrueBond() {
 
 	return new TrueBond();
     }

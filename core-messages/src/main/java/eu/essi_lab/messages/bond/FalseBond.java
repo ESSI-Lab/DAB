@@ -35,12 +35,14 @@ public class FalseBond extends ResourcePropertyBond {
      *
      */
     public FalseBond() {
+
 	setProperty(ResourceProperty.PRIVATE_ID);
 	setOperator(BondOperator.NOT_EXISTS);
     }
 
     @Override
     public FalseBond clone() {
+
 	return new FalseBond();
     }
 

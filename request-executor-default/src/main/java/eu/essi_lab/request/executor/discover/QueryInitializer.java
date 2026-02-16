@@ -509,8 +509,8 @@ public class QueryInitializer implements IQueryInitializer {
 			Bond toSimplify = simplifiableSourceBonds.get(i);
 			simplifiedBond = simplifySourceBonds(simplifiedBond, toSimplify);
 		    }
-		    if (simplifiedBond.equals(new FalseBond())) {
-			return new FalseBond();
+		    if (simplifiedBond.equals(BondFactory.getFalseBond())) {
+			return BondFactory.getFalseBond();
 		    }
 		    others.add(simplifiedBond);
 		    switch (others.size()) {
@@ -568,9 +568,9 @@ public class QueryInitializer implements IQueryInitializer {
 	}
 	switch (result.size()) {
 	case 0:
-	    return new FalseBond();
+	    return BondFactory.getFalseBond();
 	case 1:
-	    return result.get(0);
+	    return result.getFirst();
 	default:
 	    return BondFactory.createOrBond(result);
 	}
@@ -757,7 +757,6 @@ public class QueryInitializer implements IQueryInitializer {
 	DatabaseWriter writer = DatabaseProviderFactory.getWriter(databaseURI);
 	ViewManager ret = new ViewManager();
 	ret.setDatabaseReader(reader);
-	ret.setDatabaseWriter(writer);
 	return ret;
     }
 

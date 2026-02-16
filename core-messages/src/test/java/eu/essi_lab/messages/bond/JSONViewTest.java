@@ -102,7 +102,7 @@ public class JSONViewTest {
 
 	Assert.assertNotNull(noBondView.getCreationTime());
 	Assert.assertNotNull(noBondView.getVisibility());
-	Assert.assertEquals(new TrueBond(),  noBondView.getBond());
+	Assert.assertEquals(BondFactory.getTrueBond(),  noBondView.getBond());
 
 	//
 	// from a single bond
@@ -414,7 +414,7 @@ public class JSONViewTest {
 	//
 	//
 
-	Assert.assertEquals(new TrueBond(), view1.getBond());
+	Assert.assertEquals(BondFactory.getTrueBond(), view1.getBond());
 
 	//
 	// 1) marshalls 'view1' in to the string 'xmlView1'
@@ -436,7 +436,7 @@ public class JSONViewTest {
 
 	View view2 = ViewFactory.fromJSONObject(jsonView1);
 
-	Assert.assertEquals(new TrueBond(), view2.getBond());
+	Assert.assertEquals(BondFactory.getTrueBond(), view2.getBond());
 
 	//
 	// 4) marshalls 'view2' in to the string 'xmlView2'
@@ -455,7 +455,7 @@ public class JSONViewTest {
 
 	View view3 = ViewFactory.fromXMLString(xmlView2);
 
-	Assert.assertEquals(new TrueBond(), view3.getBond());
+	Assert.assertEquals(BondFactory.getTrueBond(), view3.getBond());
 
 	//
 	// 7) compares all the views

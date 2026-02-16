@@ -220,7 +220,7 @@ public class View implements Serializable {
     @JsonIgnore
     public Bond getBond() {
 
-	return bond != null ? bond : BondFactory.createTrueBond();
+	return bond != null ? bond : BondFactory.getTrueBond();
     }
 
     public void setBond(Bond bond) {

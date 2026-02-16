@@ -756,7 +756,7 @@ public class QueryInitializerTest {
 	doTestWithAuthorizedSources(sourceSet1);
 	// Assert.assertEquals(BondFactory.createAndBond(userBond, //
 	// source1Bond), message.getPermittedBond());
-	Assert.assertEquals(new FalseBond(),  message.getNormalizedBond());
+	Assert.assertEquals(BondFactory.getFalseBond(),  message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet12);
 	// Assert.assertEquals(BondFactory.createAndBond( //

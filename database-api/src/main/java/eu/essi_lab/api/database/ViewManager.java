@@ -29,7 +29,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * The {@link ViewManager} connects to the Database trough Database Reader and Database Writer and provides facility methods and a cache
+ * The {@link ViewManager} connects to the database trough {@link DatabaseReader}
+ * to resolve inner views and to handle dynamic views
  *
  * @author boldrini
  */
@@ -38,16 +39,7 @@ public class ViewManager {
     private static final long CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
     private static final int CACHE_SIZE = 10;
 
-    private DatabaseWriter writer;
     private DatabaseReader reader;
-
-    /**
-     * @param dataBaseWriter
-     */
-    public void setDatabaseWriter(DatabaseWriter dataBaseWriter) {
-
-	this.writer = dataBaseWriter;
-    }
 
     /**
      * @param executor
@@ -64,6 +56,7 @@ public class ViewManager {
 	resolvedViewCache = new ExpiringCache<>();
 	resolvedViewCache.setDuration(CACHE_DURATION);
 	resolvedViewCache.setMaxSize(CACHE_SIZE);
+
 	resolvedViewLocks = new ExpiringCache<>();
 	resolvedViewLocks.setDuration(CACHE_DURATION);
 	resolvedViewLocks.setMaxSize(CACHE_SIZE);
@@ -89,7 +82,9 @@ public class ViewManager {
 	}
 
 	synchronized (lock) {
+
 	    View cachedView = resolvedViewCache.get(viewId);
+
 	    if (cachedView != null) {
 		GSLoggerFactory.getLogger(getClass()).trace("View cache HIT: " + viewId);
 		return Optional.of(cachedView);
@@ -122,7 +117,9 @@ public class ViewManager {
      * @return
      */
     private void resolveViewBonds(View view) throws GSException {
+
 	Bond bond = view.getBond();
+
 	if (bond instanceof ViewBond viewBond) {
 
 	    Optional<View> optionalResolved = getResolvedView(viewBond.getViewIdentifier());
@@ -135,8 +132,10 @@ public class ViewManager {
 	    }
 
 	} else if (bond instanceof LogicalBond logicalBond) {
+
 	    ArrayList<Bond> resolvedOperands = new ArrayList<Bond>();
 	    HashSet<String> creators = new HashSet<String>();
+
 	    for (Bond operand : logicalBond.getOperands()) {
 		View childView = new View();
 		childView.setBond(operand);
@@ -147,9 +146,11 @@ public class ViewManager {
 		    creators.add(creator);
 		}
 	    }
+
 	    if (view.getCreator() == null && creators.size() == 1) {
 		view.setCreator(creators.iterator().next());
 	    }
+
 	    bond = BondFactory.createLogicalBond(logicalBond.getLogicalOperator(), resolvedOperands);
 	}
 
@@ -165,9 +166,11 @@ public class ViewManager {
      * @throws GSException
      */
     public Optional<View> getView(String viewId) throws GSException {
+
 	if (viewId == null) {
 	    return Optional.empty();
 	}
+
 	Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(viewId);
 
 	if (dynamicView.isPresent()) {
@@ -179,52 +182,13 @@ public class ViewManager {
     }
 
     /**
-     * Puts the given bond associated with the view identifier, overwriting a possible existing view with the same identifier
-     *
-     * @param viewId
-     * @param view
-     * @throws GSException
-     */
-    public void putView(View view) throws GSException {
-	String viewId = view.getId();
-	Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(viewId);
-	if (dynamicView.isPresent()) {
-	    throw new IllegalArgumentException("A dynamic view can't be stored: please change the view id.");
-	}
-	writer.store(view);
-    }
-
-    /**
-     * Removes the view associated with the given identifier
-     *
-     * @param viewId
-     * @throws GSException
-     */
-    public void removeView(String viewId) throws GSException {
-	writer.removeView(viewId);
-
-    }
-
-    /**
-     * Gets the list of view identifiers
-     *
-     * @return
-     * @throws GSException
-     */
-    public List<String> getViewIdentifiers(int start, int count) throws GSException {
-	return reader.getViewIdentifiers(GetViewIdentifiersRequest.create(start, count));
-
-    }
-
-    /**
      * Gets the list of view identifiers
      *
      * @return
      * @throws GSException
      */
     public List<String> getViewIdentifiers(GetViewIdentifiersRequest vir) throws GSException {
+
 	return reader.getViewIdentifiers(vir);
-
     }
-
 }
