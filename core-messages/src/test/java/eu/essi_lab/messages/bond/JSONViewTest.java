@@ -10,7 +10,7 @@ import org.junit.*;
 
 import javax.xml.bind.*;
 
-import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.*;
 
 /**
  * @author Fabrizio
@@ -31,7 +31,6 @@ public class JSONViewTest {
 	    jsonObject.put("xxx", new JSONArray());
 
 	    ViewFactory.fromJSONObject(jsonObject);
-
 	});
 
 	assertThrows(Exception.class, () -> {
@@ -103,15 +102,15 @@ public class JSONViewTest {
 
 	Assert.assertNotNull(noBondView.getCreationTime());
 	Assert.assertNotNull(noBondView.getVisibility());
-	Assert.assertNull(noBondView.getBond());
+	Assert.assertEquals(new TrueBond(),  noBondView.getBond());
 
 	//
 	// from a single bond
 	//
 
 	JSONObject jsonObject = new JSONObject();
-	jsonObject.put("id","testView1");
-	jsonObject.put("label","A simple view with an atomic bond");
+	jsonObject.put("id", "testView1");
+	jsonObject.put("label", "A simple view with an atomic bond");
 
 	JSONArray operands = new JSONArray();
 
@@ -378,6 +377,85 @@ public class JSONViewTest {
 	//
 
 	View view3 = ViewFactory.fromXMLString(xmlView2);
+
+	//
+	// 7) compares all the views
+	//
+
+	Assert.assertEquals(view1, view2);
+	Assert.assertEquals(view1, view3);
+	Assert.assertEquals(view2, view3);
+
+	//
+	// 8) compares the first view with the last one
+	//
+
+	String jsonView3 = ViewFactory.toJSONObject(view3).toString(3);
+
+	Assert.assertEquals(jsonView1, jsonView3);
+    }
+
+    @Test
+    public void emptyViewTest() throws Exception {
+
+	String viewId_ = "viewId";
+	String viewLabel = "viewLabel";
+
+	//
+	//
+	//
+
+	View view1 = new View();
+	view1.setId(viewId_);
+	view1.setLabel(viewLabel);
+	view1.setSourceDeployment("sourceDeployment");
+
+	//
+	//
+	//
+
+	Assert.assertEquals(new TrueBond(), view1.getBond());
+
+	//
+	// 1) marshalls 'view1' in to the string 'xmlView1'
+	//
+
+	String xmlView1 = ViewFactory.toXMLString(view1);
+
+	//
+	// 2) converts the XML view 'xmlView1' in to the JSON string 'jsonView1'
+	//
+
+	String jsonView1 = ViewFactory.toJSONObject(view1).toString(3);
+
+	System.out.println(jsonView1);
+
+	//
+	// 3) converts the JSON string 'jsonView1' in to the view 'view2'
+	//
+
+	View view2 = ViewFactory.fromJSONObject(jsonView1);
+
+	Assert.assertEquals(new TrueBond(), view2.getBond());
+
+	//
+	// 4) marshalls 'view2' in to the string 'xmlView2'
+	//
+
+	String xmlView2 = ViewFactory.toXMLString(view2);
+
+	//
+	// 5) compares 'xmlView1' and 'xmlView2'
+	//
+	Assert.assertEquals(xmlView1, xmlView2);
+
+	//
+	// 6) unmarshalls 'xmlView2' in to 'view3'
+	//
+
+	View view3 = ViewFactory.fromXMLString(xmlView2);
+
+	Assert.assertEquals(new TrueBond(), view3.getBond());
 
 	//
 	// 7) compares all the views
