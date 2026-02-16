@@ -505,7 +505,7 @@ public class ViewsDescriptor extends TabDescriptor {
 			if (evt.getValue()) { // XML editing
 
 			    xmlArea.removeClassName("text-area-readonly");
-			    jsonArea.addClassName("text-area-default");
+			    xmlArea.addClassName("text-area-default");
 
 			    tabSheet.getTabAt(0).setEnabled(false);
 
