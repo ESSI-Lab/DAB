@@ -1,46 +1,14 @@
 package eu.essi_lab.messages.bond;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.*;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-
 import com.fasterxml.jackson.annotation.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.bond.jaxb.*;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.bond.jaxb.ViewFactory;
+import javax.xml.bind.*;
+import javax.xml.bind.annotation.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * The view object describes a view (a set of predefined constraints associated with a label and a description). Views can be managed by a
@@ -100,9 +68,7 @@ public class View implements Serializable {
 	    @XmlElement(name = "simpleValueBond", type = SimpleValueBond.class), //
 	    @XmlElement(name = "spatialBond", type = SpatialBond.class), //
 	    @XmlElement(name = "logicalBond", type = LogicalBond.class), //
-	    @XmlElement(name = "falseBond", type = FalseBond.class),
-	    @XmlElement(name = "trueBond", type = TrueBond.class)
-    })
+	    @XmlElement(name = "falseBond", type = FalseBond.class), @XmlElement(name = "trueBond", type = TrueBond.class) })
     @JsonProperty
     protected Bond bond;
 
@@ -254,7 +220,7 @@ public class View implements Serializable {
     @JsonIgnore
     public Bond getBond() {
 
-	return bond != null ?  bond : BondFactory.createTrueBond();
+	return bond != null ? bond : BondFactory.createTrueBond();
     }
 
     public void setBond(Bond bond) {
@@ -287,7 +253,8 @@ public class View implements Serializable {
 		    Objects.equals(getVisibility(), other.getVisibility()) && //
 		    Objects.equals(owner, other.getOwner()) &&  //
 		    Objects.equals(sourceDeployment, other.getSourceDeployment()) &&  //
-		    Objects.equals(bond.toString(), other.getBond().toString()); //
+		    ((bond == null && other.bond == null) || bond.toString().equals(other.bond.toString()));
+
 	}
 
 	return super.equals(obj);
