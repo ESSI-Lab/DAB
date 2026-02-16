@@ -91,6 +91,11 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
     protected Boolean quoteIdentifiers;
 
     /**
+     * When true, location coordinates are [latitude, longitude]; when false (default), [longitude, latitude].
+     */
+    protected Boolean coordinatesLatitudeFirst;
+
+    /**
      * @return
      */
     public static List<String> getNames() {
@@ -206,6 +211,8 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	}
 
 	quoteIdentifiers = originalMD.getAdditionalInfo().get("quoteIdentifiers", Boolean.class);
+
+	coordinatesLatitudeFirst = Boolean.TRUE.equals(originalMD.getAdditionalInfo().get("coordinatesLatitudeFirst", Boolean.class));
 
 	String entityId = readId(originalMD.getMetadata());
 
@@ -1037,11 +1044,15 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	    boundingBox.setId(locationName.get());
 	}
 
-	boundingBox.setBigDecimalNorth(coordinates.getBigDecimal(1));
-	boundingBox.setBigDecimalSouth(coordinates.getBigDecimal(1));
+	// Default: longitude first [lon, lat] -> index 0=lon, 1=lat. Option: latitude first [lat, lon] -> 0=lat, 1=lon
+	int lonIndex = Boolean.TRUE.equals(coordinatesLatitudeFirst) ? 1 : 0;
+	int latIndex = Boolean.TRUE.equals(coordinatesLatitudeFirst) ? 0 : 1;
 
-	boundingBox.setBigDecimalWest(coordinates.getBigDecimal(0));
-	boundingBox.setBigDecimalEast(coordinates.getBigDecimal(0));
+	boundingBox.setBigDecimalWest(coordinates.getBigDecimal(lonIndex));
+	boundingBox.setBigDecimalEast(coordinates.getBigDecimal(lonIndex));
+
+	boundingBox.setBigDecimalNorth(coordinates.getBigDecimal(latIndex));
+	boundingBox.setBigDecimalSouth(coordinates.getBigDecimal(latIndex));
 
 	return boundingBox;
     }
