@@ -392,7 +392,8 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 	}
 
 	return Boolean.parseBoolean(
-		getPersistentSchedulerSetting().get().getOption(SQL_DATABASE_USE_SSL_OPTION_KEY, String.class).get().getValue());
+		getPersistentSchedulerSetting().get().getOption(SQL_DATABASE_USE_SSL_OPTION_KEY, String.class).
+			map(Option::getValue).orElse("false"));
     }
 
     /**
