@@ -246,7 +246,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	customAddDirective.ifPresent(dir -> {
 
-	    Button addButton = SettingComponentFactory.createCustomAddDirectiveButton(dir);
+	    Button addButton = ComponentFactory.createCustomAddDirectiveButton(dir);
 	    headerLayout.add(addButton);
 	});
 

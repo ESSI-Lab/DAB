@@ -322,7 +322,7 @@ public class SettingComponentFactory {
 	    SettingComponent currentSettingComponent, //
 	    TabContent tabContent) {
 
-	Optional<EditDirective> editDirective = tabContent == null? Optional.empty() : tabContent.getEditDirective();
+	Optional<EditDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getEditDirective();
 
 	String name = editDirective.map(EditDirective::getName).orElse("EDIT");
 
@@ -380,35 +380,6 @@ public class SettingComponentFactory {
 	//
 
 	button.addClickListener(e -> new SettingPutDialog(configuration, tabContent, addDirective).open());
-
-	EnabledGroupManager.getInstance().add(button);
-
-	return button;
-    }
-
-    /**
-     * @param addDirective
-     * @return
-     */
-    public static Button createCustomAddDirectiveButton(CustomAddDirective addDirective) {
-
-	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
-	button.setWidth(100, Unit.PIXELS);
-	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	button.getStyle().set("margin-left", "3px");
-
-	//
-	//
-	//
-	button.addEnabledStyle("color", "white");
-	button.addEnabledStyle("background-color", "#008ab7");
-	button.addEnabledStyle("border", "none");
-
-	//
-	//
-	//
-
-	button.addClickListener(addDirective.getListener());
 
 	EnabledGroupManager.getInstance().add(button);
 

@@ -271,8 +271,8 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	    descriptor = TabContentDescriptorBuilder.get(ProfilerSetting.class).//
 
 		    withLabel("Profilers").//
-		    withAddDirective("Add profiler", ProfilerSettingSelector.class). //
-		    withEditDirective("Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
+		    withAddDirective("ADD","Add profiler", ProfilerSettingSelector.class). //
+		    withEditDirective("EDIT","Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
 		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//
 		    withShowDirective(desc, SortDirection.ASCENDING).//
 		    withGridInfo(Arrays.asList(//

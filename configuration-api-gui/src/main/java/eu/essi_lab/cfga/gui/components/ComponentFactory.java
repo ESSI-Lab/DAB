@@ -31,6 +31,7 @@ import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.directive.*;
 
 import java.util.function.*;
 
@@ -258,6 +259,35 @@ public class ComponentFactory {
 	reloadButton.getStyle().set("border-radius", "0px");
 
 	return reloadButton;
+    }
+
+    /**
+     * @param addDirective
+     * @return
+     */
+    public static Button createCustomAddDirectiveButton(CustomAddDirective addDirective) {
+
+	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
+	button.setWidth(100, Unit.PIXELS);
+	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
+	button.getStyle().set("margin-left", "3px");
+
+	//
+	//
+	//
+	button.addEnabledStyle("color", "white");
+	button.addEnabledStyle("background-color", "#008ab7");
+	button.addEnabledStyle("border", "none");
+
+	//
+	//
+	//
+
+	button.addClickListener(addDirective.getListener());
+
+	EnabledGroupManager.getInstance().add(button);
+
+	return button;
     }
 
     /**

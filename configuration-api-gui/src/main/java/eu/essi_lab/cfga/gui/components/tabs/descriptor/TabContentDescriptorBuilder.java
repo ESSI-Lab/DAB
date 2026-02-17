@@ -63,28 +63,6 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     * @param settingClass
-     * @return
-     */
-    public TabContentDescriptorBuilder withSettingClass(Class<? extends Setting> settingClass) {
-
-	descriptor.setSettingClass(settingClass);
-
-	return this;
-    }
-
-    /**
-     * @param directive
-     * @return
-     */
-    public TabContentDescriptorBuilder withAddDirective(AddDirective directive) {
-
-	descriptor.getDirectiveHolder().add(directive);
-
-	return this;
-    }
-
-    /**
      * @param directive
      * @return
      */
@@ -96,27 +74,36 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @param listener
      * @return
      */
     public TabContentDescriptorBuilder withCustomAddDirective(ComponentEventListener<ClickEvent<Button>> listener) {
 
-	descriptor.getDirectiveHolder().add(new  CustomAddDirective(listener));
+	descriptor.getDirectiveHolder().add(new CustomAddDirective(listener));
 
 	return this;
     }
 
     /**
-     *
      * @param name
      * @param listener
      * @return
      */
     public TabContentDescriptorBuilder withCustomAddDirective(String name, ComponentEventListener<ClickEvent<Button>> listener) {
 
-	descriptor.getDirectiveHolder().add(new  CustomAddDirective(name, listener));
+	descriptor.getDirectiveHolder().add(new CustomAddDirective(name, listener));
+
+	return this;
+    }
+
+    /**
+     * @param directive
+     * @return
+     */
+    public TabContentDescriptorBuilder withAddDirective(AddDirective directive) {
+
+	descriptor.getDirectiveHolder().add(directive);
 
 	return this;
     }
@@ -146,7 +133,6 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @param description
      * @param settingClass
@@ -160,7 +146,6 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @param description
      * @param settingClass
@@ -172,7 +157,6 @@ public class TabContentDescriptorBuilder {
 
 	return this;
     }
-
 
     /**
      * @param directive
@@ -235,7 +219,6 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @param description
      * @return
@@ -248,7 +231,6 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @param description
      * @param policy
@@ -260,7 +242,6 @@ public class TabContentDescriptorBuilder {
 
 	return this;
     }
-
 
     /**
      * @param description
