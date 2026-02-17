@@ -838,7 +838,7 @@ public class DABStarter implements ConfigurationChangeListener {
 			    }
 			    GSLoggerFactory.getLogger(getClass()).info("SHA-256 Fingerprint: " + hex.toString());
 
-			    System.out.println("-----");
+			    GSLoggerFactory.getLogger(getClass()).info("-----");
 			}
 		    }
 
