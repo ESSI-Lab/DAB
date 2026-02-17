@@ -795,6 +795,10 @@ public class DABStarter implements ConfigurationChangeListener {
 		System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
 		System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
 
+		System.setProperty("javax.net.ssl.trustStore", target.getAbsolutePath());
+		System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
+		System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
+
 		GSLoggerFactory.getLogger(getClass()).info("Using trust store at {}", target.getAbsolutePath());
 
 		try {
