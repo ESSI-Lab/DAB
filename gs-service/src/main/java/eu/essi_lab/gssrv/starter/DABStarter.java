@@ -67,6 +67,9 @@ import javax.ws.rs.ext.*;
 import javax.xml.bind.*;
 import java.io.*;
 import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -173,8 +176,8 @@ public class DABStarter implements ConfigurationChangeListener {
 	}
 
 	//
- 	// this field must be updated here, after the config fix to get possible modification to the SchedulerSetting
- 	//
+	// this field must be updated here, after the config fix to get possible modification to the SchedulerSetting
+	//
 	schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
 	applySystemSettings();
@@ -807,8 +810,38 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		    while (aliases.hasMoreElements()) {
 			String alias = aliases.nextElement();
-			GSLoggerFactory.getLogger(getClass()).info("{}: {}", alias);
+			String type = (ks.isCertificateEntry(alias) ? "trustedCertEntry" : "keyEntry");
+			GSLoggerFactory.getLogger(getClass()).info("{}: {} {}", ++i, alias, type);
+
+			Certificate cert = ks.getCertificate(alias);
+
+			if (cert instanceof X509Certificate) {
+			    X509Certificate x = (X509Certificate) cert;
+
+			    //			    System.out.println("Subject: " + x.getSubjectX500Principal());
+			    //			    System.out.println("Issuer: " + x.getIssuerX500Principal());
+			    //			    System.out.println("Serial: " + x.getSerialNumber());
+			    //			    System.out.println("Valid from: " + x.getNotBefore());
+			    //			    System.out.println("Valid until: " + x.getNotAfter());
+			    //			    System.out.println("Signature algorithm: " + x.getSigAlgName());
+			    GSLoggerFactory.getLogger(getClass()).info("{} {}", x.getSubjectX500Principal(), x.getIssuerX500Principal());
+			    byte[] encoded = x.getEncoded();
+			    MessageDigest md = MessageDigest.getInstance("SHA-256");
+			    byte[] digest = md.digest(encoded);
+
+			    // convert to hex with colon separators
+			    StringBuilder hex = new StringBuilder();
+			    for (int h = 0; h < digest.length; h++) {
+				hex.append(String.format("%02X", digest[h]));
+				if (h < digest.length - 1)
+				    hex.append(":");
+			    }
+			    GSLoggerFactory.getLogger(getClass()).info("SHA-256 Fingerprint: " + hex.toString());
+
+			    System.out.println("-----");
+			}
 		    }
+
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error("Fatal error reading the trust store");
 		}
