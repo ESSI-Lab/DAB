@@ -172,6 +172,11 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 	}
 
+	//
+ 	// this field must be updated here, after the config fix to get possible modification to the SchedulerSetting
+ 	//
+	schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+
 	applySystemSettings();
 
 	initTrustStore();
@@ -558,8 +563,6 @@ public class DABStarter implements ConfigurationChangeListener {
 	    DABStarter.configuration = configuration;
 
 	    ConfigurationWrapper.setConfiguration(configuration);
-
-	    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
 	    configuration.addChangeEventListener(this);
 

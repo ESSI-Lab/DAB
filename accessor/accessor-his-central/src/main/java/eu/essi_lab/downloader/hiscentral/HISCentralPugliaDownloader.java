@@ -10,12 +10,12 @@ package eu.essi_lab.downloader.hiscentral;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -91,7 +91,7 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
     private HISCentralPugliaConnector connector;
 
     /**
-     * 
+     *
      */
     public HISCentralPugliaDownloader() {
 
@@ -190,97 +190,127 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 	    String endTime = ISO8601DateTimeUtils.getISO8601Date(end);
 	    // http://93.57.89.5:9000/api/data/aggregation/101/station/6/measure/3/date-from/2024-01-01
 	    // 00:00/date-to/2024-01-21 00:00
-	    String link = online.getLinkage().endsWith("/") ? online.getLinkage() + "date-from/" + startTime + "/date-to/" + endTime
+
+	    boolean completed = false;
+
+	    String link = online.getLinkage().endsWith("/")
+		    ? online.getLinkage() + "date-from/" + startTime + "/date-to/" + endTime
 		    : online.getLinkage() + "/date-from/" + startTime + "/date-to/" + endTime;
 
-	    JSONObject jsonObj = getData(link);
+	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
-	    if (jsonObj != null) {
+	    while (!completed) {
 
-		TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
+		JSONObject jsonObj = getData(link);
 
-		DateFormat iso8601OutputFormat = null;
-		DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
+		if (jsonObj != null) {
 
-		JSONArray jsonArray = jsonObj.optJSONArray("data");
+		    DateFormat iso8601OutputFormat = null;
+		    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
-		for (Object arr : jsonArray) {
+		    String error = jsonObj.optString("error", null);
+		    if (error != null && !error.isEmpty()) {
+			GSLoggerFactory.getLogger(getClass()).info("Got: " + error);
+			//TODO: update date
+			//			begin = new Date(System.currentTimeMillis() - 24 * 60 * 180 * 1000L);
+			//			startTime = ISO8601DateTimeUtils.getISO8601Date(begin);
+			//			link = online.getLinkage().endsWith("/") ? online.getLinkage() + "date-from/" + startTime + "/date-to/" + endTime
+			//				: online.getLinkage() + "/date-from/" + startTime + "/date-to/" + endTime;
 
-		    JSONObject data = (JSONObject) arr;
+		    }
 
-		    Integer validationCode = data.optIntegerObject("codice_validazione", null);
+		    String nextToken = jsonObj.optString("next_page_url", null);
 
-		    ValueSingleVariable variable = new ValueSingleVariable();
+		    if (nextToken == null || nextToken.isEmpty()) {
+			completed = true;
+		    } else {
+			// String queryExecutionId = jsonObj.optString("queryExecutionId");
+			link = nextToken;
+		    }
 
-		    BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
+		    JSONArray jsonArray = jsonObj.optJSONArray("data");
 
-		    BigDecimal dataValue = data.optBigDecimal("valore_misura", missingValue);
+		    if (jsonArray != null) {
 
-		    //
-		    // value
-		    //
+			for (Object arr : jsonArray) {
 
-		    variable.setValue(dataValue);
+			    JSONObject data = (JSONObject) arr;
 
-		    if (validationCode != null) {
+			    Integer validationCode = data.optIntegerObject("codice_validazione", null);
 
-			WML2QualityCategory quality = null;
-			switch (validationCode) {
-			case 1:
-			    // quality = WML2QualityCategory.GOOD;
-			    break;
-			case 11:
-			    break;
-			default:
-			    break;
+			    ValueSingleVariable variable = new ValueSingleVariable();
+
+			    BigDecimal missingValue = new BigDecimal(MISSING_VALUE);
+
+			    BigDecimal dataValue = data.optBigDecimal("valore_misura", missingValue);
+
+			    //
+			    // value
+			    //
+
+			    variable.setValue(dataValue);
+
+			    if (validationCode != null) {
+
+				WML2QualityCategory quality = null;
+				switch (validationCode) {
+				case 1:
+				    // quality = WML2QualityCategory.GOOD;
+				    break;
+				case 11:
+				    break;
+				default:
+				    break;
+				}
+				if (quality != null) {
+				    variable.setQualityControlLevelCode(quality.getUri());
+				}
+
+			    }
+
+			    //
+			    // date
+			    //
+
+			    String date = data.optString("inizio_periodo");// data.optString("datetime");
+			    if (date.isEmpty()) {
+				date = data.optString("data_giorno");
+			    }
+			    if (date.isEmpty()) {
+				date = data.optString("data_valore");
+			    }
+			    date = date.replaceFirst(" ", "T").trim();
+			    if (iso8601OutputFormat == null) {
+				if (date.contains("T")) {
+				    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ITALIAN);
+				    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+				} else {
+				    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+				    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+				}
+
+			    }
+
+			    Date parsed = iso8601OutputFormat.parse(date);
+
+			    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+			    gregCal.setTime(parsed);
+
+			    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
+			    variable.setDateTimeUTC(xmlGregCal);
+
+			    //
+			    //
+			    //
+
+			    addValue(tsrt, variable);
+
 			}
-			if (quality != null) {
-			    variable.setQualityControlLevelCode(quality.getUri());
-			}
-
 		    }
-
-		    //
-		    // date
-		    //
-
-		    String date = data.optString("inizio_periodo");// data.optString("datetime");
-		    if (date.isEmpty()) {
-			date = data.optString("data_giorno");
-		    }
-		    if (date.isEmpty()) {
-			date = data.optString("data_valore");
-		    }
-		    date = date.replaceFirst(" ", "T").trim();
-		    if (iso8601OutputFormat == null) {
-			if (date.contains("T")) {
-			    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ITALIAN);
-			    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-			} else {
-			    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
-			    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-			}
-
-		    }
-
-		    Date parsed = iso8601OutputFormat.parse(date);
-
-		    GregorianCalendar gregCal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-		    gregCal.setTime(parsed);
-
-		    XMLGregorianCalendar xmlGregCal = xmlFactory.newXMLGregorianCalendar(gregCal);
-		    variable.setDateTimeUTC(xmlGregCal);
-
-		    //
-		    //
-		    //
-
-		    addValue(tsrt, variable);
-
 		}
-
-		return tsrt.getDataFile();
 	    }
+
+	    return tsrt.getDataFile();
 
 	} catch (Exception e) {
 
