@@ -56,30 +56,39 @@ public class ViewFactory {
      * @return
      */
     public static Marshaller createMarshaller() {
-	try {
-	    Marshaller m = getContext().createMarshaller();
-	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-	    m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 
-	    return m;
-	} catch (JAXBException e) {
-	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	synchronized (ViewFactory.class) {
+
+	    try {
+		Marshaller m = getContext().createMarshaller();
+		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
+
+		return m;
+
+	    } catch (JAXBException e) {
+
+		GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	    }
+	    return null;
 	}
-	// this shouldn't happen as JAXBFactory test is used to check it will not happen
-	return null;
     }
 
     /**
      * @return
      */
     public static Unmarshaller createUnmarshaller() {
-	try {
-	    return getContext().createUnmarshaller();
-	} catch (JAXBException e) {
-	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	synchronized (ViewFactory.class) {
+
+	    try {
+		return getContext().createUnmarshaller();
+
+	    } catch (JAXBException e) {
+
+		GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	    }
+	    return null;
 	}
-	// this shouldn't happen as JAXBFactory test is used to check it will not happen
-	return null;
     }
 
     /**

@@ -41,6 +41,7 @@ public class PutSourceRequest extends ConfigRequest {
     public static final String SOURCE_LABEL = "label";
     public static final String SOURCE_ENDPOINT = "endpoint";
     public static final String SERVICE_TYPE = "serviceType";
+    public static final String SOURCE_DEPLOYMENT = "sourceDeployment";
     public static final String HARVEST_SCHEDULING = "HarvestScheduling";
 
     /**
@@ -126,6 +127,10 @@ public class PutSourceRequest extends ConfigRequest {
 	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, true));
 	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, true));
 
+	Parameter sourceDep = Parameter.of(SOURCE_DEPLOYMENT, ContentType.TEXTUAL, false);
+	sourceDep.setMultiValue();
+
+	list.add(sourceDep);
 	list.add(Parameter.of(HARVEST_SCHEDULING, false, HarvestSchedulingRequest.START_TIME, ContentType.ISO8601_DATE_TIME, false));
 	list.add(Parameter.of(HARVEST_SCHEDULING, false, HarvestSchedulingRequest.REPEAT_COUNT, ContentType.TEXTUAL, HarvestSchedulingRequest.RepeatCount.class,
 		true));

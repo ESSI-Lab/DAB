@@ -941,6 +941,10 @@
 								"description": "The mandatory source endpoint",
 								"type": "string"
 							},
+							"sourceDeployment": {
+								"description": "The optional source deployment (comma separated list)",
+								"type": "string"
+							},
 							"HarvestScheduling": {
 								"description": "The harvesting of the source just created can optionally be scheduled. The parameters are the same of the 'HarvestScheduling' request, except 'id' that must be omitted",
 								"type": "object",
@@ -1000,6 +1004,10 @@
 							},
 							"endpoint": {
 								"description": "The source endpoint",
+								"type": "string"
+							},
+							"sourceDeployment": {
+								"description": "The optional source deployment (comma separated list)",
 								"type": "string"
 							}
 						}

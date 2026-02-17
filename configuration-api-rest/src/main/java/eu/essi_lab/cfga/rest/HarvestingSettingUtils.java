@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.rest;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.cfga.rest;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -32,13 +32,14 @@ import eu.essi_lab.cfga.gs.setting.connector.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.rest.source.*;
 import eu.essi_lab.cfga.rest.source.PutSourceRequest.*;
-
 import eu.essi_lab.cfga.setting.scheduling.*;
 import eu.essi_lab.lib.utils.*;
 
 import javax.ws.rs.core.Response.*;
 import java.util.*;
 import java.util.concurrent.*;
+
+import static eu.essi_lab.cfga.rest.source.PutSourceRequest.SourceType.*;
 
 /**
  * @author Fabrizio
@@ -47,41 +48,50 @@ public class HarvestingSettingUtils {
 
     /**
      * @param request
-     * @param model
+     * @param target
      * @return
      */
-    public static HarvestingSetting build(PutSourceRequest request, HarvestingSetting model) {
+    public static HarvestingSetting build(EditSourceRequest request, HarvestingSetting target) {
 
-	HarvestedConnectorSetting modelConnectorSetting = model.getSelectedAccessorSetting().getHarvestedConnectorSetting();
+	HarvestedConnectorSetting currentConnectorSetting = target.getSelectedAccessorSetting().getHarvestedConnectorSetting();
 
-	String modelType = model.getSelectedAccessorSetting().getAccessorType().replace(" Connector", "");
+	String currentType = target.getSelectedAccessorSetting().getAccessorType().replace(" Connector", "");
 
-	if (modelConnectorSetting instanceof ConnectorWrapperSetting) {
+	if (currentConnectorSetting instanceof ConnectorWrapperSetting) {
 
-	    ConnectorWrapperSetting<?> wrapped = (ConnectorWrapperSetting<?>) modelConnectorSetting;
-	    modelType = wrapped.getSelectedConnector().getType().//
+	    ConnectorWrapperSetting<?> wrapped = (ConnectorWrapperSetting<?>) currentConnectorSetting;
+	    currentType = wrapped.getSelectedConnector().getType().//
 		    replace("Connector ", "").// for connectors with a version, like "WCS Connector 1.1.0"
 		    replace(" Connector", "");// for connectors with no version, like "CSW Connector"
 	}
 
-	String modelLabel = model.getSelectedAccessorSetting().getSource().getLabel();
+	String currentLabel = target.getSelectedAccessorSetting().getSource().getLabel();
 
-	String modelEndpoint = model.getSelectedAccessorSetting().getSource().getEndpoint();
+	String currentEndpoint = target.getSelectedAccessorSetting().getSource().getEndpoint();
+
+	List<String> currentDep = target.getSelectedAccessorSetting().getGSSourceSetting().getSourceDeployment();
 
 	String sourceID = request.read(PutSourceRequest.SOURCE_ID).get().toString();
 
-	String type = request.read(PutSourceRequest.SERVICE_TYPE).isEmpty() ? modelType
+	String type = request.read(PutSourceRequest.SERVICE_TYPE).isEmpty()
+		? currentType
 		: request.read(PutSourceRequest.SERVICE_TYPE).get().toString();
-
-	String sourceEndpoint = request.read(PutSourceRequest.SOURCE_ENDPOINT).isEmpty() ? modelEndpoint
-		: request.read(PutSourceRequest.SOURCE_ENDPOINT).get().toString();
-
-	String label = request.read(PutSourceRequest.SOURCE_LABEL).isEmpty() ? modelLabel
-		: request.read(PutSourceRequest.SOURCE_LABEL).get().toString();
 
 	SourceType sourceType = LabeledEnum.valueOf(SourceType.class, type).get();
 
-	return build(sourceType, sourceID, label, sourceEndpoint);
+	String sourceEndpoint = request.read(PutSourceRequest.SOURCE_ENDPOINT).isEmpty()
+		? currentEndpoint
+		: request.read(PutSourceRequest.SOURCE_ENDPOINT).get().toString();
+
+	String label = request.read(PutSourceRequest.SOURCE_LABEL).isEmpty()
+		? currentLabel
+		: request.read(PutSourceRequest.SOURCE_LABEL).get().toString();
+
+	List<String> sourceDep = request.read(PutSourceRequest.SOURCE_DEPLOYMENT).isEmpty()
+		? currentDep
+		: Arrays.asList(request.read(PutSourceRequest.SOURCE_DEPLOYMENT).get().toString().split(","));
+
+	return buildFromSourceType(sourceType, sourceID, label, sourceEndpoint, sourceDep);
     }
 
     /**
@@ -99,7 +109,10 @@ public class HarvestingSettingUtils {
 
 	String label = request.read(PutSourceRequest.SOURCE_LABEL).get().toString();
 
-	return build(sourceType, sourceID, label, sourceEndpoint);
+	List<String> sourceDep = request.read(PutSourceRequest.SOURCE_DEPLOYMENT).map(v -> Arrays.asList(v.toString().split(",")))
+		.orElse(List.of());
+
+	return buildFromSourceType(sourceType, sourceID, label, sourceEndpoint, sourceDep);
     }
 
     /**
@@ -120,7 +133,8 @@ public class HarvestingSettingUtils {
 
 	    scheduling.setRunIndefinitely();
 
-	    HarvestSchedulingRequest.RepeatIntervalUnit intUnit = LabeledEnum.valueOf(HarvestSchedulingRequest.RepeatIntervalUnit.class, unit.get()).get();
+	    HarvestSchedulingRequest.RepeatIntervalUnit intUnit = LabeledEnum.valueOf(HarvestSchedulingRequest.RepeatIntervalUnit.class,
+		    unit.get()).get();
 	    switch (intUnit) {
 	    case MINUTES:
 		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.MINUTES);
@@ -161,78 +175,69 @@ public class HarvestingSettingUtils {
      * @param sourceEndpoint
      * @return
      */
-    private static HarvestingSetting build(//
+    private static HarvestingSetting buildFromSourceType(//
 	    SourceType sourceType, //
 	    String sourceID, //
 	    String label, //
-	    String sourceEndpoint) {
+	    String sourceEndpoint,//
+	    List<String> sourceDep) { //
 
 	return switch (sourceType) {
-	case CSW ->
+	    case CSW -> buildFromAccessorType(//
+		    "CSW", //
+		    Optional.empty(), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint,
+		    sourceDep);
 
-		build(//
-			"CSW", //
-			Optional.empty(), //
-			sourceID, //
-			label, //
-			sourceEndpoint);
+	    case WCS_100 -> buildFromAccessorType(//
+		    "WCS", //
+		    Optional.of("WCS Connector 1.0.0"), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint,
+		    sourceDep);
 
-	case WCS_100 ->
+	    case WCS_110 -> buildFromAccessorType(//
+		    "WCS", //
+		    Optional.of("WCS Connector 1.1.0"), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint,
+		    sourceDep);
 
-		build(//
-			"WCS", //
-			Optional.of("WCS Connector 1.0.0"), //
-			sourceID, //
-			label, //
-			sourceEndpoint);
+	    case WCS_111 -> buildFromAccessorType(//
+		    "WCS", //
+		    Optional.of("WCS Connector 1.1.1"), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint,
+		    sourceDep);
 
-	case WCS_110 ->
+	    case WFS_110 -> buildFromAccessorType(//
+		    "WFS", //
+		    Optional.of("WFS Connector 1.1.0"), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint,
+		    sourceDep);
 
-		build(//
-			"WCS", //
-			Optional.of("WCS Connector 1.1.0"), //
-			sourceID, //
-			label, //
-			sourceEndpoint);
+	    case WMS_111 -> buildFromAccessorType(//
+		    "WMS", //
+		    Optional.of("WMS Connector 1.1.1"), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint,
+		    sourceDep);
 
-	case WCS_111 ->
-
-		build(//
-			"WCS", //
-			Optional.of("WCS Connector 1.1.1"), //
-			sourceID, //
-			label, //
-			sourceEndpoint);
-
-	case WFS_110 ->
-
-		build(//
-			"WFS", //
-			Optional.of("WFS Connector 1.1.0"), //
-			sourceID, //
-			label, //
-			sourceEndpoint);
-
-	case WMS_111 ->
-
-		build(//
-			"WMS", //
-			Optional.of("WMS Connector 1.1.1"), //
-			sourceID, //
-			label, //
-			sourceEndpoint);
-
-	case WMS_130 ->
-
-		build(//
-			"WMS", //
-			Optional.of("WMS Connector 1.3.0"), //
-			sourceID, //
-			label, //
-			sourceEndpoint);
-
-	default -> throw new IllegalArgumentException("Unexpected value: " + sourceType);
-
+	    case WMS_130 -> buildFromAccessorType(//
+		    "WMS", //
+		    Optional.of("WMS Connector 1.3.0"), //
+		    sourceID, //
+		    label, //
+		    sourceEndpoint,
+		    sourceDep);
 	};
     }
 
@@ -245,12 +250,13 @@ public class HarvestingSettingUtils {
      * @param schedulerDelay
      * @return
      */
-    private static HarvestingSetting build(//
+    private static HarvestingSetting buildFromAccessorType(//
 	    String accessorType, //
 	    Optional<String> wrappedConnectorType, //
 	    String sourceId, //
 	    String sourceLabel, //
-	    String sourceEndpoint
+	    String sourceEndpoint,//
+	    List<String> sourceDep
 
     ) {
 
@@ -269,6 +275,7 @@ public class HarvestingSettingUtils {
 	accessorSetting.getGSSourceSetting().setSourceIdentifier(sourceId);
 	accessorSetting.getGSSourceSetting().setSourceLabel(sourceLabel);
 	accessorSetting.getGSSourceSetting().setSourceEndpoint(sourceEndpoint);
+	sourceDep.forEach(dep -> accessorSetting.getGSSourceSetting().addSourceDeployment(dep));
 
 	//
 	// optional wrapped connector
@@ -305,7 +312,7 @@ public class HarvestingSettingUtils {
 
 	return harvSetting;
     }
-    
+
     /**
      * @param request
      * @return
@@ -318,7 +325,8 @@ public class HarvestingSettingUtils {
 
 	if (!optSourceId.isPresent()) {
 
-	    return new SettingFinder<HarvestingSetting>(ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
+	    return new SettingFinder<HarvestingSetting>(
+		    ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
 
 	} else {
 

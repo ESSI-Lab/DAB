@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.rest.source;
 
@@ -16,7 +16,7 @@ import java.util.*;
 public class EditSourceRequest extends PutSourceRequest {
 
     /**
-     * 
+     *
      */
     public EditSourceRequest() {
     }
@@ -39,11 +39,16 @@ public class EditSourceRequest extends PutSourceRequest {
 	list.add(Parameter.of(SOURCE_ENDPOINT, ContentType.TEXTUAL, false));
 	list.add(Parameter.of(SERVICE_TYPE, ContentType.TEXTUAL, SourceType.class, false));
 
+	Parameter sourceDep = Parameter.of(SOURCE_DEPLOYMENT, ContentType.TEXTUAL, false);
+	sourceDep.setMultiValue();
+
+	list.add(sourceDep);
+
 	return list;
     }
 
     /**
-     * 
+     *
      */
     @Override
     protected void mandatoryCheck() {
@@ -52,8 +57,9 @@ public class EditSourceRequest extends PutSourceRequest {
 
 	if (readParameters().size() == 1) {
 
-	    throw new IllegalArgumentException("At least one of the parameters '" + SOURCE_LABEL + "', '" + SOURCE_ENDPOINT + "', '"
-		    + SERVICE_TYPE + "' must be provided'");
+	    throw new IllegalArgumentException(
+		    "At least one of the parameters '" + SOURCE_LABEL + "', '" + SOURCE_ENDPOINT + "', '" + SERVICE_TYPE
+			    + "' must be provided'");
 	}
     }
 }

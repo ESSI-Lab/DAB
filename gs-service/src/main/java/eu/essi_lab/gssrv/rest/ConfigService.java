@@ -1272,6 +1272,11 @@ public class ConfigService {
 		sourceObject.put(PutSourceRequest.SOURCE_ENDPOINT, source.getEndpoint());
 		sourceObject.put(PutSourceRequest.SERVICE_TYPE, accessorSetting.getAccessorType());
 
+		if(!source.getDeployment().isEmpty()) {
+
+		    sourceObject.put(PutSourceRequest.SOURCE_DEPLOYMENT, String.join(",", source.getDeployment()));
+		}
+
 		JSONObject scheduling = new JSONObject();
 
 		String jobPhase = support.getJobPhase(setting);
