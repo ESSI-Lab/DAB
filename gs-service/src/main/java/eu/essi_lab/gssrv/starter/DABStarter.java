@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -66,6 +66,7 @@ import org.quartz.*;
 import javax.ws.rs.ext.*;
 import javax.xml.bind.*;
 import java.io.*;
+import java.security.KeyStore;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -113,8 +114,6 @@ public class DABStarter implements ConfigurationChangeListener {
      * @throws GSException
      */
     public void start() throws GSException {
-
-
 
 	GSLoggerFactory.getLogger(getClass()).info("Cluster: {}", ClusterType.get().getLabel());
 
@@ -551,7 +550,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
-	    
+
 	    //
 	    //
 	    // ---------------------------------------------------------------
@@ -762,7 +761,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		if (wrapper.isPresent()) {
 
-		    GSLoggerFactory.getLogger(getClass()).info("Loading trust store S3 bucket: {}", trustStore.get());
+		    GSLoggerFactory.getLogger(getClass()).info("Loading trust store from S3 bucket: {}", trustStore.get());
 
 		    target = new File(FileUtils.getTempDir(), trustStoreName.get());
 
@@ -789,6 +788,27 @@ public class DABStarter implements ConfigurationChangeListener {
 		System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
 		System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
 		System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
+
+		GSLoggerFactory.getLogger(getClass()).info("Using trust store at {}", target.getAbsolutePath());
+
+		try {
+		    KeyStore ks = KeyStore.getInstance("PKCS12");
+
+		    GSLoggerFactory.getLogger(getClass()).info("Reading certificates");
+		    try (FileInputStream fis = new FileInputStream(target)) {
+			ks.load(fis, trustStorePwd.get().toCharArray());
+		    }
+
+		    Enumeration<String> aliases = ks.aliases();
+		    int i = 0;
+
+		    while (aliases.hasMoreElements()) {
+			String alias = aliases.nextElement();
+			GSLoggerFactory.getLogger(getClass()).info("{}: {}", alias);
+		    }
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error("Fatal error reading the trust store");
+		}
 
 		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
 	    }
