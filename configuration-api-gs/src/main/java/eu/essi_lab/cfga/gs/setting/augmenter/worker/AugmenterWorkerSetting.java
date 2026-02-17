@@ -251,6 +251,7 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 		    SortDirection.ASCENDING).//
 
 		    withAddDirective(//
+		    "ADD",//
 		    "Add augmentation job", //
 		    "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//
 		    withRemoveDirective("Remove augmenter", true, "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//

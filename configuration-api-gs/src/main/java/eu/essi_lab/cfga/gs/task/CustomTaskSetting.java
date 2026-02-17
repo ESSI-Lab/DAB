@@ -207,9 +207,10 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
  		    withShowDirective("Manage custom tasks. Click \"Reload\" to update the scheduler information\n", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
-		    "Add task", //
+		    "ADD",//
+		    "Add custom task", //
 		    CustomTaskSetting.class.getCanonicalName()).//
-		    withRemoveDirective("Remove task", false, CustomTaskSetting.class.getCanonicalName()).//
+		    withRemoveDirective("Remove custom task", false, CustomTaskSetting.class.getCanonicalName()).//
 		    withEditDirective("Edit custom task", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//

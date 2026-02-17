@@ -114,7 +114,7 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 
 	    descriptor = TabContentDescriptorBuilder.get(GDCSourcesSetting.class).//
 		    withLabel("GDC Sources").//
-		    withEditDirective("Edit GEOSS Data Core settings").//
+		    withEditDirective("EDIT","Edit GEOSS Data Core settings").//
 		    build();
 	}
 

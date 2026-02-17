@@ -103,10 +103,10 @@ public class TabContent extends VerticalLayout implements Renderable {
 	this.tabContentDesc = tabContentDesc;
 	this.tabDesc = tabDesc;
 
-	DirectiveManager directiveManager = tabContentDesc.getDirectiveManager();
+	DirectiveHolder directiveHolder = tabContentDesc.getDirectiveHolder();
 
-	this.removeDirective = directiveManager.get(RemoveDirective.class);
-	this.editDirective = directiveManager.get(EditDirective.class);
+	this.removeDirective = directiveHolder.get(RemoveDirective.class);
+	this.editDirective = directiveHolder.get(EditDirective.class);
 
 	//
 	// Header
@@ -123,7 +123,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 	// Description
 	//
 
-	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
+	Optional<ShowDirective> showDirective = directiveHolder.get(ShowDirective.class);
 
 	if (showDirective.flatMap(ShowDirective::getDescription).isPresent()) {
 
@@ -167,7 +167,7 @@ public class TabContent extends VerticalLayout implements Renderable {
  	    // max description length is limited
  	    //
 
-	    Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
+	    Optional<AddDirective> addDirective = directiveHolder.get(AddDirective.class);
 
 	    int maxDescLength = 300; // no add, no reload
 
@@ -234,7 +234,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 	// ADD button
 	//
 
-	Optional<AddDirective> addDirective = directiveManager.get(AddDirective.class);
+	Optional<AddDirective> addDirective = directiveHolder.get(AddDirective.class);
 
 	addDirective.ifPresent(dir -> {
 
@@ -242,7 +242,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    headerLayout.add(addButton);
 	});
 
-	Optional<CustomAddDirective> customAddDirective = directiveManager.get(CustomAddDirective.class);
+	Optional<CustomAddDirective> customAddDirective = directiveHolder.get(CustomAddDirective.class);
 
 	customAddDirective.ifPresent(dir -> {
 
@@ -295,9 +295,9 @@ public class TabContent extends VerticalLayout implements Renderable {
 		map(s -> (Setting) s).//
 		collect(Collectors.toList());
 
-	DirectiveManager directiveManager = tabContentDesc.getDirectiveManager();
+	DirectiveHolder directiveHolder = tabContentDesc.getDirectiveHolder();
 
-	Optional<ShowDirective> showDirective = directiveManager.get(ShowDirective.class);
+	Optional<ShowDirective> showDirective = directiveHolder.get(ShowDirective.class);
 
 	//
 	// optional settings sorting

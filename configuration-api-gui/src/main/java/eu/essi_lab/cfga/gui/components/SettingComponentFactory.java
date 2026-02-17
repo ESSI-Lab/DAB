@@ -322,7 +322,14 @@ public class SettingComponentFactory {
 	    SettingComponent currentSettingComponent, //
 	    TabContent tabContent) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("EDIT", VaadinIcon.EDIT.create());
+	Optional<EditDirective> editDirective = tabContent == null? Optional.empty() : tabContent.getEditDirective();
+
+	String name = editDirective.map(EditDirective::getName).orElse("EDIT");
+
+	ConfigurationViewButton button = new ConfigurationViewButton( //
+		name, //
+		VaadinIcon.EDIT.create());//
+
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(100, Unit.PIXELS);
 

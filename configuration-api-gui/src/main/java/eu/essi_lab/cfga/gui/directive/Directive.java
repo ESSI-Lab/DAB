@@ -10,16 +10,18 @@ package eu.essi_lab.cfga.gui.directive;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
+
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -27,6 +29,7 @@ package eu.essi_lab.cfga.gui.directive;
 public abstract class Directive {
 
     private String name;
+    private String description;
 
     /**
      * @author Fabrizio
@@ -34,15 +37,15 @@ public abstract class Directive {
     public enum ConfirmationPolicy {
 
 	/**
-	 * 
+	 *
 	 */
 	NEVER,
 	/**
-	 * 
+	 *
 	 */
 	ALWAYS,
 	/**
-	 * 
+	 *
 	 */
 	ON_WARNINGS
     }
@@ -74,6 +77,7 @@ public abstract class Directive {
     /**
      * @return the name
      */
+
     public String getName() {
 
 	return name;
@@ -85,6 +89,22 @@ public abstract class Directive {
     public void setName(String name) {
 
 	this.name = name;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getDescription() {
+
+	return Optional.ofNullable(description);
+    }
+
+    /**
+     * @param description
+     */
+    public void setDescription(String description) {
+
+	this.description = description;
     }
 
     /**

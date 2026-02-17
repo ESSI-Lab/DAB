@@ -71,12 +71,8 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
 	this.currentSettingComponent = currentSettingComponent;
 	
 	Optional<EditDirective> editDirective = tabContent == null? Optional.empty() : tabContent.getEditDirective();
-	String title = "Edit setting";
-	
-	if(editDirective.isPresent()){
-	    
-	    title = editDirective.get().getName();	    
-	}
+
+	String title = editDirective.flatMap(EditDirective::getDescription).orElse("Edit setting");
 
 	setTitle(title);
 	setConfirmText("Apply changes");

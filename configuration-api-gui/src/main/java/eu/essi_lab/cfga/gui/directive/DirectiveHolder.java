@@ -28,14 +28,14 @@ import java.util.Optional;
 /**
  * @author Fabrizio
  */
-public class DirectiveManager {
+public class DirectiveHolder {
 
     private final List<Directive> list;
 
     /**
      * 
      */
-    public DirectiveManager() {
+    public DirectiveHolder() {
 
 	list = new ArrayList<>();
     }

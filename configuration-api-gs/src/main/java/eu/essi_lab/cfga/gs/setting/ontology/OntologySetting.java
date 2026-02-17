@@ -445,9 +445,9 @@ public class OntologySetting extends Setting implements EditableSetting {
 	    descriptor = TabContentDescriptorBuilder.get(OntologySetting.class).//
 		    withLabel("Ontologies").//
 		    withShowDirective("Registered ontologies that can be brokered by the semantic search engine", SortDirection.ASCENDING).//
-		    withAddDirective("Add ontology", OntologySetting.class).//
+		    withAddDirective("ADD","Add ontology", OntologySetting.class).//
 		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
-		    withEditDirective("Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
+		    withEditDirective("EDIT","Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
 		    withGridInfo(Arrays.asList(//
 
 		    ColumnDescriptor.createPositionalDescriptor(), //
