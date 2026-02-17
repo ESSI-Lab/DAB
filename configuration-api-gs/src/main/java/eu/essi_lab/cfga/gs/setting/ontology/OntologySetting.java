@@ -446,7 +446,7 @@ public class OntologySetting extends Setting implements EditableSetting {
 		    withLabel("Ontologies").//
 		    withShowDirective("Registered ontologies that can be brokered by the semantic search engine", SortDirection.ASCENDING).//
 		    withAddDirective("ADD","Add ontology", OntologySetting.class).//
-		    withRemoveDirective("Remove ontology", true, OntologySetting.class).//
+		    withRemoveDirective("REMOVE","Remove ontology", true, OntologySetting.class).//
 		    withEditDirective("EDIT","Edit ontology", ConfirmationPolicy.ON_WARNINGS).//
 		    withGridInfo(Arrays.asList(//
 

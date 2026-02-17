@@ -69,6 +69,42 @@ public class RemoveDirective extends AddDirective {
     }
 
     /**
+     *
+     * @param name
+     * @param description
+     * @param allowFullRemoval
+     * @param settingClass
+     */
+    public RemoveDirective(String name, String description, boolean allowFullRemoval, Class<? extends Setting> settingClass) {
+
+	super(name, settingClass);
+
+	setDescription(description);
+
+	setAllowFullRemoval(allowFullRemoval);
+
+	setConfirmationPolicy(ConfirmationPolicy.ALWAYS);
+    }
+
+    /**
+     *
+     * @param name
+     * @param description
+     * @param allowFullRemoval
+     * @param settingClass
+     */
+    public RemoveDirective(String name, String description, boolean allowFullRemoval, String settingClass) {
+
+	super(name, settingClass);
+
+	setDescription(description);
+
+	setAllowFullRemoval(allowFullRemoval);
+
+	setConfirmationPolicy(ConfirmationPolicy.ALWAYS);
+    }
+
+    /**
      * @return
      */
     public boolean isFullRemovalAllowed() {

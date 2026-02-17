@@ -273,7 +273,7 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 		    withLabel("Profilers").//
 		    withAddDirective("ADD","Add profiler", ProfilerSettingSelector.class). //
 		    withEditDirective("EDIT","Edit profiler", ConfirmationPolicy.ON_WARNINGS).//
-		    withRemoveDirective("Remove profiler", false, ProfilerSetting.class).//
+		    withRemoveDirective("REMOVE","Remove profiler", false, ProfilerSetting.class).//
 		    withShowDirective(desc, SortDirection.ASCENDING).//
 		    withGridInfo(Arrays.asList(//
 

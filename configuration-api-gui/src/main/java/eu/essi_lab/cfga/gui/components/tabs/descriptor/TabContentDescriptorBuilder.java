@@ -196,6 +196,36 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
+     *
+     * @param name
+     * @param description
+     * @param allowFullRemoval
+     * @param settingClass
+     * @return
+     */
+    public TabContentDescriptorBuilder withRemoveDirective(String name, String description,  boolean allowFullRemoval, Class<? extends Setting> settingClass) {
+
+	descriptor.getDirectiveHolder().add(new RemoveDirective(name, description, allowFullRemoval, settingClass));
+
+	return this;
+    }
+
+    /**
+     *
+     * @param name
+     * @param description
+     * @param allowFullRemoval
+     * @param settingClass
+     * @return
+     */
+    public TabContentDescriptorBuilder withRemoveDirective(String name, String description, boolean allowFullRemoval, String settingClass) {
+
+	descriptor.getDirectiveHolder().add(new RemoveDirective(name, description, allowFullRemoval, settingClass));
+
+	return this;
+    }
+
+    /**
      * @param name
      * @return
      */

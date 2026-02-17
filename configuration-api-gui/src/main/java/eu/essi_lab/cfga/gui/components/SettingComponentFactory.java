@@ -325,11 +325,13 @@ public class SettingComponentFactory {
 	Optional<EditDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getEditDirective();
 
 	String name = editDirective.map(EditDirective::getName).orElse("EDIT");
+	String desc = editDirective.flatMap(EditDirective::getDescription).orElse("EDIT");
 
 	ConfigurationViewButton button = new ConfigurationViewButton( //
 		name, //
 		VaadinIcon.EDIT.create());//
 
+	button.setTooltip(desc);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(100, Unit.PIXELS);
 
@@ -364,6 +366,7 @@ public class SettingComponentFactory {
 	    AddDirective addDirective) {
 
 	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
+	button.setTooltip(addDirective.getDescription().orElse("Add setting"));
 	button.setWidth(100, Unit.PIXELS);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.getStyle().set("margin-left", "3px");
@@ -397,7 +400,12 @@ public class SettingComponentFactory {
 	    TabContent tabContent,//
 	    SettingComponent settingComponent) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("REMOVE", VaadinIcon.MINUS_SQUARE_O.create());
+	Optional<RemoveDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getRemoveDirective();
+
+	String name = editDirective.map(RemoveDirective::getName).orElse("REMOVE");
+
+	ConfigurationViewButton button = new ConfigurationViewButton(name, VaadinIcon.MINUS_SQUARE_O.create());
+
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(150, Unit.PIXELS);
 	button.getStyle().set("margin-left", "3px");
@@ -420,19 +428,6 @@ public class SettingComponentFactory {
 	EnabledGroupManager.getInstance().add(button);
 
 	return button;
-    }
-
-    /**
-     * @param onConfirmListener
-     * @return
-     */
-    public static ConfirmationDialog createSettingRemoveDialog(ButtonChangeListener onConfirmListener) {
-
-	ConfirmationDialog dialog = new ConfirmationDialog("Are you sure you want to remove this setting?", onConfirmListener);
-
-	dialog.addToCloseAll();
-
-	return dialog;
     }
 
     /**
