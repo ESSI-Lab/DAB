@@ -21,6 +21,7 @@ package eu.essi_lab.iso.datamodel.classes;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +30,12 @@ import javax.xml.bind.JAXBElement;
 
 import com.google.common.collect.Lists;
 
+import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.todo.OperationMetadata;
 import eu.essi_lab.jaxb.common.ObjectFactories;
 import net.opengis.gml.v_3_2_0.CodeType;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
+import net.opengis.iso19139.gco.v_20060504.GenericNamePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.AbstractEXGeographicExtentType;
 import net.opengis.iso19139.gmd.v_20060504.EXBoundingPolygonType;
 import net.opengis.iso19139.gmd.v_20060504.EXExtentPropertyType;
@@ -44,6 +47,7 @@ import net.opengis.iso19139.gmd.v_20060504.EXTemporalExtentPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.EXTemporalExtentType;
 import net.opengis.iso19139.gmd.v_20060504.EXVerticalExtentPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.EXVerticalExtentType;
+import net.opengis.iso19139.gmd.v_20060504.MDDataIdentificationPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDBrowseGraphicPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
 import net.opengis.iso19139.gmd.v_20060504.MDIdentifierType;
@@ -75,12 +79,12 @@ public class ServiceIdentification extends Identification {
     /**
     *    @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:description/gco:CharacterString")
     */
-    public void addBoundingBox(String description, double north, double west, double south, double east) {
+    public void addBoundingBox(String description, BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
 	GeographicBoundingBox bbox = new GeographicBoundingBox();
-	bbox.setNorth(north);
-	bbox.setSouth(south);
-	bbox.setEast(east);
-	bbox.setWest(west);
+	bbox.setBigDecimalNorth(north);
+	bbox.setBigDecimalSouth(south);
+	bbox.setBigDecimalEast(east);
+	bbox.setBigDecimalWest(west);
 
 	EXGeographicExtentPropertyType exGeographicExtentPropertyType = new EXGeographicExtentPropertyType();
 	exGeographicExtentPropertyType.setAbstractEXGeographicExtent(bbox.getElement());
@@ -105,9 +109,22 @@ public class ServiceIdentification extends Identification {
 
     /**
     *    @XPathDirective(target = "srv:serviceType/gco:LocalName")
+    *    @return the service type string (e.g. "view") or null
     */
-    String getServiceType() {
-	return null;
+    public String getServiceType() {
+	try {
+	    SVServiceIdentificationType t = getElementType();
+	    if (t == null || !t.isSetServiceType()) return null;
+	    GenericNamePropertyType prop = t.getServiceType();
+	    if (prop == null || !prop.isSetAbstractGenericName()) return null;
+	    javax.xml.bind.JAXBElement<?> el = prop.getAbstractGenericName();
+	    if (el == null) return null;
+	    Object val = el.getValue();
+	    if (val instanceof CodeType) return ((CodeType) val).getValue();
+	    return null;
+	} catch (Exception e) {
+	    return null;
+	}
     }
 
     /**
@@ -131,12 +148,28 @@ public class ServiceIdentification extends Identification {
     /**
     *    @XPathDirective(target = ".//srv:serviceTypeVersion/gco:CharacterString")
     */
-    Iterator<String> getServiceTypeVersions() {
-	return null;
+    public Iterator<String> getServiceTypeVersions() {
+	try {
+	    SVServiceIdentificationType t = getElementType();
+	    if (t == null || !t.isSetServiceTypeVersion() || t.getServiceTypeVersion() == null)
+		return new ArrayList<String>().iterator();
+	    List<String> out = new ArrayList<>();
+	    for (CharacterStringPropertyType pt : t.getServiceTypeVersion()) {
+		String s = ISOMetadata.getStringFromCharacterString(pt);
+		if (s != null) out.add(s);
+	    }
+	    return out.iterator();
+	} catch (Exception e) {
+	    return new ArrayList<String>().iterator();
+	}
     }
 
-    String getServiceTypeVersion() {
-	return null;
+    /**
+     * @return the first service type version string (e.g. "1.3.0") or null
+     */
+    public String getServiceTypeVersion() {
+	Iterator<String> it = getServiceTypeVersions();
+	return (it != null && it.hasNext()) ? it.next() : null;
     }
 
     /**
@@ -204,15 +237,39 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-    *    @XPathDirective(target = ".//srv:coupledResource/srv:SV_CoupledResource/srv:identifier/gco:CharacterString")
-    */
+     * Returns identifiers of resources this service operates on. Reads from srv:operatesOn (href)
+     * when present, otherwise from srv:coupledResource/srv:identifier.
+     * @XPathDirective(target = ".//srv:coupledResource/srv:SV_CoupledResource/srv:identifier/gco:CharacterString")
+     */
     public Iterator<String> getOperatesOnIdentifiers() {
-	List<SVCoupledResourcePropertyType> coupledResources = getElementType().getCoupledResource();
-	ArrayList<String> identifiers = new ArrayList<String>();
-	for(SVCoupledResourcePropertyType coupledResource : coupledResources) {
-	    SVCoupledResourceType svCoupled = coupledResource.getSVCoupledResource();
-	    CharacterStringPropertyType identifier = svCoupled.getIdentifier();
-	    identifiers.add(identifier.toString());
+	ArrayList<String> identifiers = new ArrayList<>();
+	try {
+	    SVServiceIdentificationType t = getElementType();
+	    if (t != null && t.isSetOperatesOn() && t.getOperatesOn() != null) {
+		for (MDDataIdentificationPropertyType prop : t.getOperatesOn()) {
+		    if (prop != null && prop.isSetHref()) {
+			String href = prop.getHref();
+			if (href != null && !href.isEmpty()) identifiers.add(href);
+		    }
+		}
+	    }
+	    if (identifiers.isEmpty()) {
+		List<SVCoupledResourcePropertyType> coupledResources = t != null ? t.getCoupledResource() : null;
+		if (coupledResources != null) {
+		    for (SVCoupledResourcePropertyType coupledResource : coupledResources) {
+			if (coupledResource == null) continue;
+			SVCoupledResourceType svCoupled = coupledResource.getSVCoupledResource();
+			if (svCoupled == null) continue;
+			CharacterStringPropertyType identifier = svCoupled.getIdentifier();
+			if (identifier != null) {
+			    String s = ISOMetadata.getStringFromCharacterString(identifier);
+			    if (s != null) identifiers.add(s);
+			}
+		    }
+		}
+	    }
+	} catch (Exception e) {
+	    // ignore
 	}
 	return identifiers.iterator();
     }
@@ -261,16 +318,20 @@ public class ServiceIdentification extends Identification {
     /**
      * @XPathDirective(create = "gmd:language/gco:CharacterString", target = ".", after = "gmd:spatialResolution",
      *                        position = Position.FIRST)
-     * @param language
      */
 
     public void addBoundingBox(double north, double west, double south, double east) {
-	addBoundingBox(null, north, west, south, east);
+	addBoundingBox(null, new BigDecimal(north), new BigDecimal(west), new BigDecimal(south), new BigDecimal(east));
 	
     }
 
+	public void addBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
+		addBoundingBox(null, north, west, south, east);
+
+	}
+
     public void addBoundingBox(GeographicBoundingBox bbox) {
-	addBoundingBox(null, bbox.getNorth(), bbox.getWest(), bbox.getSouth(), bbox.getEast());
+	addBoundingBox(null, new BigDecimal(bbox.getNorth()), new BigDecimal(bbox.getWest()), new BigDecimal(bbox.getSouth()), new BigDecimal(bbox.getEast()));
 	
     }
 

@@ -1,0 +1,133 @@
+The DataStream API based on OData has the following requests (and maybe others from OData):
+
+List dataset metadata: https://api.datastream.org/v1/odata/v4/Metadata?%24top=10
+
+{
+    "value": [
+        {
+            "Id": "000195cd-563c-44f3-9bf4-1b740cbb7a6e",
+            "DOI": "10.25976/v9oa-cv84",
+            "Version": "4.1.0",
+            "DatasetName": "Hunter-Clyde Watershed Group Water Quality Monitoring Data",
+            "DataStewardEmail": "coordinator.hcwg@gmail.com",
+            "DataCollectionOrganization": "Hunter-Clyde Watershed Group",
+            "DataUploadOrganization": "Hunter-Clyde Watershed Group",
+            "ProgressCode": "onGoing",
+            "MaintenanceFrequencyCode": "asNeeded",
+            "Abstract": "The Hunter-Clyde Watershed Group Water Quality Monitoring project is designed to gather water quality baseline data and seasonal trends within the watershed. Water quality is collected using YSI probes, HOBO in-stream depth loggers (collects data in 15-minute intervals) and a flow probe at 6 locations throughout the watershed, and an additional 13 YSI only sites.",
+            "DataCollectionInformation": "At all depth logger locations, depth and flow are taken at 10 points between left bank wetted width and right bank wetted width, using a metre stick and flow probe on a weekly basis. At these sampling locations, as well as an additional 13 YSI only sites, physio-chemical parameters are collected using YSI probes (temperature, pH, nitrates, dissolved oxygen, total dissolved solids, salinity and conductivity). YSI only sites are not accessible for four months during the winter. At each depth logger site there are in-stream HOBO depth loggers attached to metal posts that collect depth and temperature data every 15 minutes. These loggers are removed every four to six months to download the data and are then immediately put back in the stream. There is also a HOBO deployed into Campbell’s Pond during the summer and fall months to gather dissolved oxygen data within the pond.",
+            "DataProcessing": "Outlier data was removed.",
+            "FundingSources": "Government of Prince Edward Island",
+            "DataSourceURL": null,
+            "OtherDataSources": "",
+            "Citation": "Hunter-Clyde Watershed Group. 2024. \"Hunter-Clyde Watershed Group Water Quality Monitoring Data\" (dataset). 4.1.0. DataStream. https://doi.org/10.25976/v9oa-cv84.",
+            "Licence": "https://opendatacommons.org/licenses/by/1-0/",
+            "Disclaimer": "",
+            "TopicCategoryCode": [
+                "inlandWaters"
+            ],
+            "Keywords": [
+                "Water quality",
+                "Prince Edward Island",
+                "Hunter River",
+                "nitrates",
+                "temperature"
+            ],
+            "CreateTimestamp": "2024-04-17T13:38:08.394Z",
+            "PublishedTimestamp": "2024-04-17T13:44:35.995Z"
+        }
+		],
+    "@odata.nextLink": "https://api.datastream.org/v1/odata/v4/Metadata?%24skiptoken=Id%3A0456bedd-cd0c-44ce-8f8d-da0afbb6694b&%24top=10"
+}
+
+List dataset metadata specific fields: https://api.datastream.org/v1/odata/v4/Metadata?%24select=DOI,DatasetName
+
+{
+    "value": [
+        {
+            "DOI": "10.25976/v9oa-cv84",
+            "DatasetName": "Hunter-Clyde Watershed Group Water Quality Monitoring Data",
+            "Id": "000195cd-563c-44f3-9bf4-1b740cbb7a6e"
+        }
+		],
+    "@odata.nextLink": "https://api.datastream.org/v1/odata/v4/Metadata?%24skiptoken=Id%3A0456bedd-cd0c-44ce-8f8d-da0afbb6694b&%24top=10&%24select=DOI%2CDatasetName"
+}
+
+Get locations from a dataset: https://api.datastream.org/v1/odata/v4/Locations?%24filter=DOI eq '10.25976/2u81-ra56'
+
+{
+    "value": [
+        {
+            "Id": 909403,
+            "DOI": "10.25976/2u81-ra56",
+            "ID": "Dease17-2",
+            "Name": "Dease17-2",
+            "Latitude": 66.51087,
+            "Longitude": -120.3675,
+            "HorizontalCoordinateReferenceSystem": "WGS84",
+            "HorizontalAccuracyMeasure": null,
+            "HorizontalAccuracyUnit": null,
+            "VerticalMeasure": null,
+            "VerticalUnit": null,
+            "MonitoringLocationType": "Lake/Pond"
+        },
+		{
+            "Id": 909404,
+            "DOI": "10.25976/2u81-ra56",
+            "ID": "Smith14A",
+            "Name": "Smith 14A",
+            "Latitude": 66.1232,
+            "Longitude": -124.64048,
+            "HorizontalCoordinateReferenceSystem": "WGS84",
+            "HorizontalAccuracyMeasure": null,
+            "HorizontalAccuracyUnit": null,
+            "VerticalMeasure": null,
+            "VerticalUnit": null,
+            "MonitoringLocationType": "Lake/Pond"
+        }
+    ],
+    "@odata.nextLink": "https://api.datastream.org/v1/odata/v4/Locations?%24skiptoken=Id%3A909412&%24top=10&%24filter=DOI%20eq%20%2710.25976%2F2u81-ra56%27"
+}
+
+Get Observations from a specific dataset and CharacteristicName and : https://api.datastream.org/v1/odata/v4/Observations?%24filter=DOI eq '10.25976/t5rx-qr11' and CharacteristicName eq 'Temperature, air' and ActivityStartYear gt '2014'&%24top=10&%24select=DOI,CharacteristicName,ResultValue,ResultUnit,ActivityStartDate,ActivityStartTime
+
+Get Observations from a specific dataset and CharacteristicName and on year 2014: https://api.datastream.org/v1/odata/v4/Observations?%24filter=DOI eq '10.25976/t5rx-qr11' and CharacteristicName eq 'Temperature, air' and ActivityStartYear gt '2013' and ActivityStartYear lt '2015'&%24top=10&%24select=DOI,CharacteristicName,ResultValue,ResultUnit,ActivityStartDate,ActivityStartTime
+
+{
+    "value": [
+        {
+            "DOI": "10.25976/t5rx-qr11",
+            "CharacteristicName": "Temperature, air",
+            "ResultValue": 7,
+            "ResultUnit": "deg C",
+            "ActivityStartDate": "2014-05-14",
+            "ActivityStartTime": "09:05:00",
+            "Id": 259889
+        }
+		],
+    "@odata.nextLink": "https://api.datastream.org/v1/odata/v4/Observations?%24skiptoken=Id%3A260196&%24top=10&%24filter=DOI%20eq%20%2710.25976%2Ft5rx-qr11%27%20and%20CharacteristicName%20eq%20%27Temperature%2C%20air%27%20and%20ActivityStartYear%20gt%20%272013%27%20and%20ActivityStartYear%20lt%20%272015%27&%24select=DOI%2CCharacteristicName%2CResultValue%2CResultUnit%2CActivityStartDate%2CActivityStartTime"
+}
+
+Get Observation Characteristics: https://api.datastream.org/v1/odata/v4/Observations?%24filter=DOI eq '10.25976/t5rx-qr11' and LocationId eq '615'&%24distinct=true&%24select=CharacteristicName
+
+{
+    "value": [
+        {
+            "CharacteristicName": "Specific conductance",
+            "Id": 259947
+        },
+        {
+            "CharacteristicName": "pH",
+            "Id": 259966
+        },
+        {
+            "CharacteristicName": "Depth, Secchi disk depth",
+            "Id": 260085
+        },
+        {
+            "CharacteristicName": "pH",
+            "Id": 260242
+        }
+		],
+    "@odata.nextLink": "https://api.datastream.org/v1/odata/v4/Observations?%24skiptoken=Id%3A260558&%24top=10&%24distinct=true&%24filter=DOI%20eq%20%2710.25976%2Ft5rx-qr11%27%20and%20LocationId%20eq%20%27615%27&%24select=CharacteristicName"
+}

@@ -54,6 +54,11 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
     private static final String DISCARDS_STATIONS_WITH_NO_DATA = "discardsStationsWithNoData";
 
     /**
+     * When true, location coordinates are interpreted as [latitude, longitude]; when false (default), [longitude, latitude].
+     */
+    private static final String COORDINATES_LATITUDE_FIRST_OPTION_KEY = "coordinatesLatitudeFirst";
+
+    /**
      * 
      */
     public SensorThingsConnectorSetting() {
@@ -90,6 +95,17 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
 		build();
 
 	addOption(option);
+
+	Option<BooleanChoice> coordinatesOrderOption = BooleanChoiceOptionBuilder.get().//
+		withKey(COORDINATES_LATITUDE_FIRST_OPTION_KEY).//
+		withLabel("Use latitude-first coordinate order (some services use [lat, lon] instead of [lon, lat])").//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.FALSE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(coordinatesOrderOption);
     }
 
     /**
@@ -153,6 +169,13 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
 	return BooleanChoice.toBoolean(getOption(DISCARDS_STATIONS_WITH_NO_DATA, BooleanChoice.class).get().getSelectedValue());
     }
 
+    /**
+     * @return true if coordinates are [latitude, longitude]; false (default) for [longitude, latitude]
+     */
+    public boolean isCoordinatesLatitudeFirst() {
+
+	return BooleanChoice.toBoolean(getOption(COORDINATES_LATITUDE_FIRST_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
+    }
 
     /**
      * @return

@@ -33,15 +33,27 @@ import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
 import net.opengis.iso19139.gco.v_20060504.DatePropertyType;
 import net.opengis.iso19139.gmd.v_20060504.*;
+import net.opengis.iso19139.srv.v_20060504.SVOperationMetadataPropertyType;
+import net.opengis.iso19139.srv.v_20060504.SVOperationMetadataType;
+import net.opengis.iso19139.srv.v_20060504.SVParameterPropertyType;
+import net.opengis.iso19139.srv.v_20060504.SVParameterType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEAlgorithmPropertyType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEAlgorithmType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepReportPropertyType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepReportType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessStepType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LESourcePropertyType;
+import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.LEProcessingType;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.ModelSpecificFields;
 
 /**
  * Maps a GSResource (ISO 19115 internal model) to DataHub JSON metadata model v3.8.
@@ -106,13 +118,16 @@ public final class DatahubToJsonMapper {
         mapTemporalInformation(out, identification);
         mapConstraints(out, identification);
         mapDistribution(out, core);
-        mapQualityInformation(out, mi);
+        mapQualityInformation(out, mi, resource);
 
         if ("dataset".equalsIgnoreCase(hierarchyLevel) || "document".equalsIgnoreCase(hierarchyLevel) || "series".equalsIgnoreCase(hierarchyLevel)) {
             mapDatasetSpecific(out, core, identification);
         }
         if ("service".equalsIgnoreCase(hierarchyLevel)) {
             mapServiceSpecific(out, mi);
+        }
+        if ("model".equalsIgnoreCase(hierarchyLevel)) {
+            mapModelSpecific(out, resource, core);
         }
 
         // Required by DataHub model
@@ -440,6 +455,8 @@ public final class DatahubToJsonMapper {
 
     private static final String SPATIAL_SCOPE_THESAURUS_NAME = "Spatial scope";
     private static final String SPATIAL_SCOPE_THESAURUS_URL_FRAGMENT = "SpatialScope";
+    private static final String INSPIRE_PRIORITY_DATASET_THESAURUS_NAME = "INSPIRE priority data set";
+    private static final String INSPIRE_PRIORITY_DATASET_THESAURUS_URL_FRAGMENT = "PriorityDataset";
 
     private static void mapKeywords(JSONObject out, Identification identification) {
         JSONArray descriptiveKeywords = new JSONArray();
@@ -451,6 +468,7 @@ public final class DatahubToJsonMapper {
                     Citation th = kw.getThesaurusCitation();
                     JSONObject thObj = th != null ? thesaurusToJson(th) : null;
                     boolean isSpatialScope = isSpatialScopeThesaurus(thObj);
+                    boolean isInspirePriorityDataset = isInspirePriorityDatasetThesaurus(thObj);
                     List<CharacterStringPropertyType> keywordProps = kw.getElementType().getKeyword();
                     if (isSpatialScope && keywordProps != null && !keywordProps.isEmpty()) {
                         CharacterStringPropertyType first = keywordProps.get(0);
@@ -463,6 +481,19 @@ public final class DatahubToJsonMapper {
                         spatialScope.put("keywords", keywordsObj);
                         if (thObj != null) spatialScope.put("thesaurus", thObj);
                         out.put("spatial_scope", spatialScope);
+                        continue;
+                    }
+                    if (isInspirePriorityDataset && keywordProps != null && !keywordProps.isEmpty()) {
+                        CharacterStringPropertyType first = keywordProps.get(0);
+                        String label = ISOMetadata.getStringFromCharacterString(first);
+                        String uri = ISOMetadata.getHREFStringFromCharacterString(first);
+                        JSONObject keywordsObj = new JSONObject();
+                        keywordsObj.put("label", label != null ? label : "");
+                        if (uri != null && !uri.isEmpty()) keywordsObj.put("uri", uri);
+                        JSONObject inspirePriorityDataset = new JSONObject();
+                        inspirePriorityDataset.put("keywords", keywordsObj);
+                        if (thObj != null) inspirePriorityDataset.put("thesaurus", thObj);
+                        out.put("inspire_priority_dataset", inspirePriorityDataset);
                         continue;
                     }
                     JSONObject group = new JSONObject();
@@ -496,16 +527,26 @@ public final class DatahubToJsonMapper {
         return url != null && url.contains(SPATIAL_SCOPE_THESAURUS_URL_FRAGMENT);
     }
 
+    private static boolean isInspirePriorityDatasetThesaurus(JSONObject thesaurusObj) {
+        if (thesaurusObj == null) return false;
+        String name = thesaurusObj.optString("name", null);
+        if (name != null && INSPIRE_PRIORITY_DATASET_THESAURUS_NAME.equalsIgnoreCase(name.trim())) return true;
+        String url = thesaurusObj.optString("url", null);
+        return url != null && url.contains(INSPIRE_PRIORITY_DATASET_THESAURUS_URL_FRAGMENT);
+    }
+
     private static JSONObject thesaurusToJson(Citation th) {
         if (th == null) return null;
         String name = th.getTitle();
         String url = thesaurusCitationUrl(th);
         String publicationDate = thesaurusCitationPublicationDate(th);
-        if (name == null && url == null && publicationDate == null) return null;
+        String revisionDate = thesaurusCitationRevisionDate(th);
+        if (name == null && url == null && publicationDate == null && revisionDate == null) return null;
         JSONObject o = new JSONObject();
         if (name != null) o.put("name", name);
         if (url != null) o.put("url", url);
         if (publicationDate != null) o.put("publication_date", publicationDate);
+        if (revisionDate != null) o.put("revision_date", revisionDate);
         return o;
     }
 
@@ -516,6 +557,14 @@ public final class DatahubToJsonMapper {
     }
 
     private static String thesaurusCitationPublicationDate(Citation th) {
+        return thesaurusCitationDateByType(th, "publication");
+    }
+
+    private static String thesaurusCitationRevisionDate(Citation th) {
+        return thesaurusCitationDateByType(th, "revision");
+    }
+
+    private static String thesaurusCitationDateByType(Citation th, String dateTypeCode) {
         try {
             List<CIDatePropertyType> dateList = th.getElementType().getDate();
             if (dateList == null) return null;
@@ -529,7 +578,7 @@ public final class DatahubToJsonMapper {
                 if (codeVal instanceof JAXBElement) codeVal = ((JAXBElement<?>) codeVal).getValue();
                 if (codeVal instanceof CodeListValueType) {
                     String typeStr = ((CodeListValueType) codeVal).getCodeListValue();
-                    if (typeStr != null && "publication".equalsIgnoreCase(typeStr)) {
+                    if (typeStr != null && dateTypeCode.equalsIgnoreCase(typeStr)) {
                         DatePropertyType dateProp = ciDate.getDate();
                         if (dateProp != null) {
                             String dt = dateProp.getDate();
@@ -584,11 +633,21 @@ public final class DatahubToJsonMapper {
             Iterator<eu.essi_lab.iso.datamodel.classes.ReferenceSystem> it = core.getMIMetadata().getReferenceSystemInfos();
             if (it != null && it.hasNext()) {
                 eu.essi_lab.iso.datamodel.classes.ReferenceSystem ref = it.next();
-                String url = ref.getCodeString().orElse(null);
+                CharacterStringPropertyType codeProp = ref.getElementType() != null
+                    && ref.getElementType().getReferenceSystemIdentifier() != null
+                    && ref.getElementType().getReferenceSystemIdentifier().getRSIdentifier() != null
+                    ? ref.getElementType().getReferenceSystemIdentifier().getRSIdentifier().getCode()
+                    : null;
+                // When set with setCodeWithAnchor(url, label): url = href, label = anchor value
+                String url = codeProp != null ? ISOMetadata.getHREFStringFromCharacterString(codeProp) : null;
+                if (url == null) url = ref.getCodeString().orElse(null);
                 if (url != null) {
                     JSONObject nativeEpsg = new JSONObject();
                     nativeEpsg.put("url", url);
-                    putOpt(nativeEpsg, "label", ref.getCodeSpace());
+                    String label = ref.getCodeAnchorType().isPresent() && codeProp != null
+                        ? ISOMetadata.getStringFromCharacterString(codeProp)
+                        : null;
+                    putOpt(nativeEpsg, "label", label);
                     out.put("native_epsg", nativeEpsg);
                 }
             }
@@ -724,7 +783,6 @@ public final class DatahubToJsonMapper {
         putOpt(o, "protocol", protocolObj(online));
         putOpt(o, "function", functionObj(online));
         putOpt(o, "application_profile", applicationProfileObj(online));
-        o.put("source_auth_type", "NO_AUTH");
         return o;
     }
 
@@ -780,7 +838,7 @@ public final class DatahubToJsonMapper {
         return ISOMetadata.getHREFStringFromCharacterString(appProfile);
     }
 
-    private static void mapQualityInformation(JSONObject out, eu.essi_lab.iso.datamodel.classes.MDMetadata mi) {
+    private static void mapQualityInformation(JSONObject out, eu.essi_lab.iso.datamodel.classes.MDMetadata mi, GSResource resource) {
         try {
             Iterator<eu.essi_lab.iso.datamodel.classes.DataQuality> dqIt = mi.getDataQualities();
             if (dqIt == null || !dqIt.hasNext()) return;
@@ -788,6 +846,31 @@ public final class DatahubToJsonMapper {
             putOpt(out, "lineage_statement", dq.getLineageStatement());
             List<JSONObject> lineageSources = lineageSourcesFromDataQuality(dq);
             if (lineageSources != null && !lineageSources.isEmpty()) out.put("lineage_source", new JSONArray(lineageSources));
+            List<JSONObject> processSteps = lineageProcessStepsFromDataQuality(dq);
+            if (processSteps != null && !processSteps.isEmpty()) {
+                if (resource != null && resource.getExtensionHandler() != null) {
+                    resource.getExtensionHandler().getDatahubLineageProcessStepParameters().ifPresent(paramsJson -> {
+                        try {
+                            JSONArray paramsPerStep = new JSONArray(paramsJson);
+                            for (int i = 0; i < processSteps.size() && i < paramsPerStep.length(); i++) {
+                                JSONObject stepObj = processSteps.get(i);
+                                JSONArray paramArr = paramsPerStep.optJSONArray(i);
+                                if (paramArr != null && paramArr.length() > 0) {
+                                    JSONObject procInfo = stepObj.optJSONObject("processing_information");
+                                    if (procInfo != null) {
+                                        procInfo.put("parameter", paramArr);
+                                    } else {
+                                        stepObj.put("processing_information", new JSONObject().put("parameter", paramArr));
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            // ignore malformed stored parameters
+                        }
+                    });
+                }
+                out.put("lineage_process_step", new JSONArray(processSteps));
+            }
             List<JSONObject> conformity = conformanceResultsFromDataQuality(dq);
             if (conformity != null && !conformity.isEmpty()) out.put("conformity", new JSONArray(conformity));
             putOpt(out, "quality_scope", qualityScopeObj(dq));
@@ -815,6 +898,134 @@ public final class DatahubToJsonMapper {
             // ignore
         }
         return list;
+    }
+
+    private static List<JSONObject> lineageProcessStepsFromDataQuality(eu.essi_lab.iso.datamodel.classes.DataQuality dq) {
+        List<JSONObject> list = new ArrayList<>();
+        try {
+            LILineagePropertyType lineageProp = dq.getElementType().getLineage();
+            if (lineageProp == null) return list;
+            LILineageType lineageType = lineageProp.getLILineage();
+            if (lineageType == null) return list;
+            List<LIProcessStepPropertyType> steps = lineageType.getProcessStep();
+            if (steps == null) return list;
+            for (LIProcessStepPropertyType stepProp : steps) {
+                if (stepProp == null || !stepProp.isSetLIProcessStep()) continue;
+                LIProcessStepType step = stepProp.getLIProcessStep();
+                if (step == null) continue;
+                JSONObject ps = processStepToJson(step);
+                if (ps != null) list.add(ps);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return list;
+    }
+
+    private static JSONObject processStepToJson(LIProcessStepType step) {
+        if (step == null) return null;
+        JSONObject o = new JSONObject();
+        putOpt(o, "description", stringFromCharProp(step.getDescription()));
+        putOpt(o, "rationale", stringFromCharProp(step.getRationale()));
+        if (step.isSetDateTime() && step.getDateTime() != null && step.getDateTime().getDateTime() != null) {
+            try {
+                o.put("date", step.getDateTime().getDateTime().toXMLFormat());
+            } catch (Exception e) {
+                // ignore
+            }
+        }
+        if (step.isSetProcessor() && step.getProcessor() != null && !step.getProcessor().isEmpty()) {
+            CIResponsiblePartyPropertyType first = step.getProcessor().get(0);
+            if (first != null && first.getCIResponsibleParty() != null) {
+                ResponsibleParty rp = new ResponsibleParty(first.getCIResponsibleParty());
+                JSONObject proc = responsiblePartyToJson(rp);
+                if (proc != null) o.put("processor", proc);
+            }
+        }
+        if (step.isSetSource() && step.getSource() != null && !step.getSource().isEmpty()) {
+            LISourcePropertyType firstSource = step.getSource().get(0);
+            if (firstSource != null && firstSource.getLISource() != null) {
+                JSONObject src = lineageSourceToJson(firstSource.getLISource());
+                if (src != null) o.put("source", src);
+            }
+        }
+        if (step instanceof LEProcessStepType) {
+            LEProcessStepType leStep = (LEProcessStepType) step;
+            if (leStep.isSetOutput() && leStep.getOutput() != null && !leStep.getOutput().isEmpty()) {
+                LESourcePropertyType firstOutput = leStep.getOutput().get(0);
+                if (firstOutput != null && firstOutput.getLESource() != null) {
+                    JSONObject outputJson = lineageSourceToJson(firstOutput.getLESource());
+                    if (outputJson != null) o.put("output", outputJson);
+                }
+            }
+            if (leStep.getProcessingInformation() != null && leStep.getProcessingInformation().getLEProcessing() != null) {
+                JSONObject procInfoJson = processingInformationToJson(leStep.getProcessingInformation().getLEProcessing());
+                if (procInfoJson != null) o.put("processing_information", procInfoJson);
+            }
+            if (leStep.isSetReport() && leStep.getReport() != null && !leStep.getReport().isEmpty()) {
+                LEProcessStepReportPropertyType firstReportProp = leStep.getReport().get(0);
+                if (firstReportProp != null && firstReportProp.getLEProcessStepReport() != null) {
+                    JSONObject reportJson = processStepReportToJson(firstReportProp.getLEProcessStepReport());
+                    if (reportJson != null) o.put("report", reportJson);
+                }
+            }
+        }
+        return o.length() > 0 ? o : null;
+    }
+
+    private static JSONObject processingInformationToJson(LEProcessingType proc) {
+        if (proc == null) return null;
+        JSONObject o = new JSONObject();
+        if (proc.isSetIdentifier() && proc.getIdentifier() != null) {
+            Object idVal = proc.getIdentifier().getMDIdentifier();
+            if (idVal instanceof JAXBElement) idVal = ((JAXBElement<?>) idVal).getValue();
+            if (idVal instanceof MDIdentifierType) {
+                String code = ISOMetadata.getStringFromCharacterString(((MDIdentifierType) idVal).getCode());
+                if (code != null) o.put("id", code);
+            }
+        }
+        if (proc.isSetSoftwareReference() && proc.getSoftwareReference() != null && !proc.getSoftwareReference().isEmpty()) {
+            JSONObject swRef = lineageSourceCitationToJson(proc.getSoftwareReference().get(0));
+            if (swRef != null) o.put("software_reference", swRef);
+        }
+        putOpt(o, "procedure_description", stringFromCharProp(proc.getProcedureDescription()));
+        if (proc.isSetDocumentation() && proc.getDocumentation() != null && !proc.getDocumentation().isEmpty()) {
+            List<JSONObject> docList = new ArrayList<>();
+            for (CICitationPropertyType docProp : proc.getDocumentation()) {
+                JSONObject docJson = lineageSourceCitationToJson(docProp);
+                if (docJson != null) docList.add(docJson);
+            }
+            if (!docList.isEmpty()) o.put("documentation", new JSONArray(docList));
+        }
+        putOpt(o, "run_time_parameters", stringFromCharProp(proc.getRunTimeParameters()));
+        if (proc.isSetAlgorithm() && proc.getAlgorithm() != null && !proc.getAlgorithm().isEmpty()) {
+            LEAlgorithmPropertyType firstAlg = proc.getAlgorithm().get(0);
+            if (firstAlg != null && firstAlg.getLEAlgorithm() != null) {
+                JSONObject algJson = algorithmToJson(firstAlg.getLEAlgorithm());
+                if (algJson != null) o.put("algorithm", algJson);
+            }
+        }
+        return o.length() > 0 ? o : null;
+    }
+
+    private static JSONObject algorithmToJson(LEAlgorithmType alg) {
+        if (alg == null) return null;
+        JSONObject o = new JSONObject();
+        if (alg.getCitation() != null) {
+            JSONObject citJson = lineageSourceCitationToJson(alg.getCitation());
+            if (citJson != null) o.put("citation", citJson);
+        }
+        putOpt(o, "description", stringFromCharProp(alg.getDescription()));
+        return o.length() > 0 ? o : null;
+    }
+
+    private static JSONObject processStepReportToJson(LEProcessStepReportType report) {
+        if (report == null) return null;
+        JSONObject o = new JSONObject();
+        putOpt(o, "description", stringFromCharProp(report.getDescription()));
+        putOpt(o, "file_type", stringFromCharProp(report.getFileType()));
+        putOpt(o, "name", stringFromCharProp(report.getName()));
+        return o.length() > 0 ? o : null;
     }
 
     private static JSONObject lineageSourceToJson(LISourceType liSource) {
@@ -1018,13 +1229,254 @@ public final class DatahubToJsonMapper {
         try {
             ServiceIdentification svc = mi.getServiceIdentification();
             if (svc == null) return;
+            putOpt(out, "service_type", svc.getServiceType());
+            putOpt(out, "service_type_version", svc.getServiceTypeVersion());
             putOpt(out, "service_coupling_type", svc.getCouplingType());
             JSONArray operatesOn = new JSONArray();
             Iterator<String> it = svc.getOperatesOnIdentifiers();
             if (it != null) while (it.hasNext()) operatesOn.put(it.next());
             if (operatesOn.length() > 0) out.put("service_operates_on", operatesOn);
+            JSONArray serviceOps = serviceOperationsToJson(svc);
+            if (serviceOps != null && serviceOps.length() > 0) out.put("service_operations", serviceOps);
         } catch (Exception e) {
             // ignore
         }
+    }
+
+    private static void mapModelSpecific(JSONObject out, GSResource resource, CoreMetadata core) {
+        if (resource == null) return;
+        try {
+            ModelSpecificFields m = resource.getExtensionHandler().getModelSpecificFields().orElse(null);
+            if (m != null) {
+                putOpt(out, "model_maturity_level", m.getModelMaturityLevel());
+                putOpt(out, "model_category", m.getModelCategory());
+                putOpt(out, "model_methodology_description", m.getModelMethodologyDescription());
+                if (m.getModelTypes() != null && !m.getModelTypes().isEmpty()) {
+                    JSONArray arr = new JSONArray();
+                    for (String t : m.getModelTypes()) arr.put(t);
+                    out.put("model_types", arr);
+                }
+                if (m.getSupportedPlatforms() != null && !m.getSupportedPlatforms().isEmpty()) {
+                    JSONArray arr = new JSONArray();
+                    for (String p : m.getSupportedPlatforms()) arr.put(p);
+                    out.put("supported_platforms", arr);
+                }
+                if (m.getCpu() != null || m.getGpu() != null || m.getRam() != null || m.getStorage() != null) {
+                    JSONObject comp = new JSONObject();
+                    putOpt(comp, "cpu", m.getCpu());
+                    putOpt(comp, "gpu", m.getGpu());
+                    putOpt(comp, "ram", m.getRam());
+                    putOpt(comp, "storage", m.getStorage());
+                    out.put("model_computational_requirements", comp);
+                }
+            }
+            // model_quality_information from DataQualityInfo (descriptive result + quantitative metrics)
+            if (core != null) {
+                JSONObject qualityInfo = modelQualityInformationToJson(core);
+                if (qualityInfo != null && qualityInfo.length() > 0) {
+                    out.put("model_quality_information", qualityInfo);
+                }
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    private static JSONObject modelQualityInformationToJson(CoreMetadata core) {
+        if (core == null) return null;
+        try {
+            Iterator<eu.essi_lab.iso.datamodel.classes.DataQuality> dqIt = core.getMIMetadata().getDataQualities();
+            if (dqIt == null || !dqIt.hasNext()) return null;
+            String modelQualityReport = null;
+            JSONArray modelMetrics = new JSONArray();
+            while (dqIt.hasNext()) {
+                eu.essi_lab.iso.datamodel.classes.DataQuality dq = dqIt.next();
+                if (dq == null) continue;
+                List<net.opengis.iso19139.gmd.v_20060504.DQElementPropertyType> reports = dq.getReports();
+                if (reports == null) continue;
+                for (net.opengis.iso19139.gmd.v_20060504.DQElementPropertyType report : reports) {
+                    if (report == null || !report.isSetAbstractDQElement()) continue;
+                    Object elem = report.getAbstractDQElement().getValue();
+                    if (!(elem instanceof net.opengis.iso19139.gmd.v_20060504.DQDomainConsistencyType)) continue;
+                    net.opengis.iso19139.gmd.v_20060504.DQDomainConsistencyType dqElem =
+                        (net.opengis.iso19139.gmd.v_20060504.DQDomainConsistencyType) elem;
+                    List<net.opengis.iso19139.gmd.v_20060504.DQResultPropertyType> results = dqElem.getResult();
+                    boolean hasQuantitativeResult = results != null && !results.isEmpty();
+                    if (!hasQuantitativeResult) {
+                        if (modelQualityReport == null && dqElem.isSetMeasureDescription()) {
+                            modelQualityReport = ISOMetadata.getStringFromCharacterString(dqElem.getMeasureDescription());
+                        }
+                    } else {
+                        String id = null;
+                        String name = null;
+                        if (dqElem.isSetNameOfMeasure() && dqElem.getNameOfMeasure() != null && !dqElem.getNameOfMeasure().isEmpty()) {
+                            if (dqElem.getNameOfMeasure().size() >= 2) {
+                                id = ISOMetadata.getStringFromCharacterString(dqElem.getNameOfMeasure().get(0));
+                                name = ISOMetadata.getStringFromCharacterString(dqElem.getNameOfMeasure().get(1));
+                            } else {
+                                name = ISOMetadata.getStringFromCharacterString(dqElem.getNameOfMeasure().get(0));
+                            }
+                        }
+                        String description = dqElem.isSetMeasureDescription()
+                            ? ISOMetadata.getStringFromCharacterString(dqElem.getMeasureDescription()) : null;
+                        Double valueNum = null;
+                        for (net.opengis.iso19139.gmd.v_20060504.DQResultPropertyType r : results) {
+                            if (r == null || !r.isSetAbstractDQResult()) continue;
+                            Object resVal = r.getAbstractDQResult().getValue();
+                            if (resVal instanceof net.opengis.iso19139.gmd.v_20060504.DQQuantitativeResultType) {
+                                valueNum = extractQuantitativeValue((net.opengis.iso19139.gmd.v_20060504.DQQuantitativeResultType) resVal);
+                                break;
+                            }
+                        }
+                        if (id != null || name != null || description != null || valueNum != null) {
+                            JSONObject metric = new JSONObject();
+                            putOpt(metric, "id", id);
+                            putOpt(metric, "name", name);
+                            putOpt(metric, "description", description);
+                            if (valueNum != null && !valueNum.isNaN()) metric.put("value", String.valueOf(valueNum));
+                            modelMetrics.put(metric);
+                        }
+                    }
+                }
+            }
+            if (modelQualityReport == null && modelMetrics.length() == 0) return null;
+            JSONObject o = new JSONObject();
+            putOpt(o, "model_quality_report", modelQualityReport);
+            if (modelMetrics.length() > 0) o.put("model_metrics", modelMetrics);
+            return o;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static Double extractQuantitativeValue(net.opengis.iso19139.gmd.v_20060504.DQQuantitativeResultType quant) {
+        if (quant == null || !quant.isSetValue() || quant.getValue() == null || quant.getValue().isEmpty()) return null;
+        try {
+            net.opengis.iso19139.gco.v_20060504.RecordPropertyType rp = quant.getValue().get(0);
+            if (rp == null) return null;
+            Object record = rp.getRecord();
+            if (record == null) return null;
+            try {
+                java.lang.reflect.Method getVal = record.getClass().getMethod("getValue");
+                Object val = getVal.invoke(record);
+                if (val != null) {
+                    String s = val.toString();
+                    if (s != null && !s.isEmpty()) return Double.parseDouble(s);
+                }
+            } catch (NoSuchMethodException e) {
+                // record type has no getValue, skip
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
+    }
+
+    private static JSONArray serviceOperationsToJson(ServiceIdentification svc) {
+        if (svc == null) return null;
+        try {
+            List<SVOperationMetadataPropertyType> list = svc.getElementType().getContainsOperations();
+            if (list == null || list.isEmpty()) return null;
+            JSONArray arr = new JSONArray();
+            for (SVOperationMetadataPropertyType prop : list) {
+                if (prop == null) continue;
+                SVOperationMetadataType op = prop.getSVOperationMetadata();
+                if (op == null) continue;
+                JSONObject o = operationMetadataToJson(op);
+                if (o != null) arr.put(o);
+            }
+            return arr.length() > 0 ? arr : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static JSONObject operationMetadataToJson(SVOperationMetadataType op) {
+        if (op == null) return null;
+        JSONObject out = new JSONObject();
+        putOpt(out, "operation_name", stringFromCharProp(op.getOperationName()));
+        putOpt(out, "operation_description", stringFromCharProp(op.getOperationDescription()));
+        putOpt(out, "invocation_name", stringFromCharProp(op.getInvocationName()));
+        // DCP list
+        if (op.isSetDCP() && op.getDCP() != null) {
+            JSONArray dcpArr = new JSONArray();
+            for (Object dcpProp : op.getDCP()) {
+                String code = codeListValueFromDCP(dcpProp);
+                if (code != null) dcpArr.put(code);
+            }
+            if (dcpArr.length() > 0) out.put("dcp", dcpArr);
+        }
+        // connect_point (array of URLs)
+        if (op.isSetConnectPoint() && op.getConnectPoint() != null) {
+            JSONArray cpArr = new JSONArray();
+            for (Object cpProp : op.getConnectPoint()) {
+                String url = urlFromConnectPoint(cpProp);
+                if (url != null) cpArr.put(url);
+            }
+            if (cpArr.length() > 0) out.put("connect_point", cpArr);
+        }
+        // parameters
+        if (op.isSetParameters() && op.getParameters() != null && !op.getParameters().isEmpty()) {
+            JSONArray paramsArr = new JSONArray();
+            for (SVParameterPropertyType paramProp : op.getParameters()) {
+                if (paramProp == null) continue;
+                JSONObject p = parameterToJson(paramProp.getSVParameter());
+                if (p != null) paramsArr.put(p);
+            }
+            if (paramsArr.length() > 0) out.put("parameters", paramsArr);
+        }
+        return out.length() > 0 ? out : null;
+    }
+
+    private static String stringFromCharProp(CharacterStringPropertyType p) {
+        return p != null ? ISOMetadata.getStringFromCharacterString(p) : null;
+    }
+
+    private static String codeListValueFromDCP(Object dcpProp) {
+        try {
+            if (dcpProp == null) return null;
+            Object listObj = dcpProp.getClass().getMethod("getDCPList").invoke(dcpProp);
+            if (listObj == null) return null;
+            Object code = listObj.getClass().getMethod("getCodeListValue").invoke(listObj);
+            return code != null ? code.toString() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String urlFromConnectPoint(Object cpProp) {
+        try {
+            if (cpProp == null) return null;
+            Object online = cpProp.getClass().getMethod("getCIOnlineResource").invoke(cpProp);
+            if (online == null) return null;
+            Object linkage = online.getClass().getMethod("getLinkage").invoke(online);
+            if (linkage == null) return null;
+            Object url = linkage.getClass().getMethod("getURL").invoke(linkage);
+            return url != null ? url.toString() : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static JSONObject parameterToJson(SVParameterType param) {
+        if (param == null) return null;
+        JSONObject p = new JSONObject();
+        String name = null;
+        if (param.isSetName() && param.getName() != null && param.getName().getAName() != null) {
+            name = ISOMetadata.getStringFromCharacterString(param.getName().getAName());
+        }
+        putOpt(p, "name", name);
+        putOpt(p, "description", stringFromCharProp(param.getDescription()));
+        if (param.isSetDirection() && param.getDirection() != null && param.getDirection().getSVParameterDirection() != null) {
+            putOpt(p, "direction", param.getDirection().getSVParameterDirection().value());
+        }
+        if (param.isSetOptionality()) {
+            String opt = stringFromCharProp(param.getOptionality());
+            if (opt != null) p.put("optionality", Boolean.parseBoolean(opt));
+        }
+        if (param.isSetRepeatability() && param.getRepeatability() != null && param.getRepeatability().isSetBoolean()) {
+            p.put("repeatability", param.getRepeatability().isBoolean());
+        }
+        return p;
     }
 }

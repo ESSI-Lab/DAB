@@ -119,7 +119,7 @@ public class DatahubMapper extends FileIdentifierMapper {
                 break;
             case "service":
                 // Service mapped to Dataset; identification will be SV_ServiceIdentification
-                resource = new Dataset();
+                resource = new DatasetService();
                 logger.debug("Service hierarchy level mapped to Dataset with SV_ServiceIdentification");
                 break;
             case "dataset":
@@ -159,7 +159,7 @@ public class DatahubMapper extends FileIdentifierMapper {
         mapDistribution(json, coreMetadata, resource, hierarchyLevel);
 
         // Map quality information
-        mapQualityInformation(json, coreMetadata, hierarchyLevel);
+        mapQualityInformation(json, coreMetadata, resource, hierarchyLevel);
 
         // Map model-specific fields (if hierarchy_level is model)
         if ("model".equalsIgnoreCase(hierarchyLevel)) {
@@ -420,7 +420,7 @@ public class DatahubMapper extends FileIdentifierMapper {
             for (int i = 0; i < topicCategories.length(); i++) {
                 String topicCategory = topicCategories.optString(i, null);
                 if (topicCategory != null) {
-                    ((DataIdentification) identification).addTopicCategory(topicCategory);
+                     identification.addTopicCategory(topicCategory);
                 }
             }
         }
@@ -490,6 +490,7 @@ public class DatahubMapper extends FileIdentifierMapper {
         ResponsibleParty party = new ResponsibleParty();
 
         String organizationName = json.optString("organization_name", null);
+        if (organizationName == null) organizationName = json.optString("organisation_name", null);
         if (organizationName != null) {
             party.setOrganisationName(organizationName);
         }
@@ -702,7 +703,7 @@ public class DatahubMapper extends FileIdentifierMapper {
             BigDecimal north = toBigDecimal(bbox4326.opt("north_bound_latitude"));
 
             if (west != null && east != null && south != null && north != null) {
-                coreMetadata.addBoundingBox(north, west, south, east);
+                identification.addGeographicBoundingBox(north, west, south, east);
             }
         }
 
@@ -1133,7 +1134,7 @@ public class DatahubMapper extends FileIdentifierMapper {
     /**
      * Maps quality information
      */
-    private void mapQualityInformation(JSONObject json, CoreMetadata coreMetadata, String hierarchyLevel) {
+    private void mapQualityInformation(JSONObject json, CoreMetadata coreMetadata, GSResource resource, String hierarchyLevel) {
         // Conformity
         JSONArray conformity = json.optJSONArray("conformity");
         if (conformity != null) {
@@ -1262,11 +1263,22 @@ public class DatahubMapper extends FileIdentifierMapper {
         // Lineage process step
         JSONArray lineageProcessStep = json.optJSONArray("lineage_process_step");
         if (lineageProcessStep != null) {
+            List<JSONArray> parametersPerStep = new ArrayList<>();
             for (int i = 0; i < lineageProcessStep.length(); i++) {
                 JSONObject processStepObj = lineageProcessStep.optJSONObject(i);
                 if (processStepObj != null) {
                     mapProcessStep(processStepObj, coreMetadata);
+                    JSONObject procInfo = processStepObj.optJSONObject("processing_information");
+                    JSONArray paramArr = (procInfo != null) ? procInfo.optJSONArray("parameter") : null;
+                    parametersPerStep.add(paramArr != null ? paramArr : new JSONArray());
                 }
+            }
+            if (resource != null && resource.getExtensionHandler() != null && !parametersPerStep.isEmpty()) {
+                JSONArray ofArrays = new JSONArray();
+                for (JSONArray arr : parametersPerStep) {
+                    ofArrays.put(arr);
+                }
+                resource.getExtensionHandler().setDatahubLineageProcessStepParameters(ofArrays.toString());
             }
         }
     }
@@ -1360,6 +1372,18 @@ public class DatahubMapper extends FileIdentifierMapper {
                 if (title != null) {
                     citation.setTitle(title);
                 }
+                JSONArray onlineResources = sourceCitation.optJSONArray("online_resource");
+                if (onlineResources != null) {
+                    for (int j = 0; j < onlineResources.length(); j++) {
+                        JSONObject onlineResourceObj = onlineResources.optJSONObject(j);
+                        if (onlineResourceObj != null) {
+                            String url = onlineResourceObj.optString("url", null);
+                            if (url != null) {
+                                citation.addIdentifier(url);
+                            }
+                        }
+                    }
+                }
                 net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
                 citationProperty.setCICitation(citation.getElementType());
                 sourceType.setSourceCitation(citationProperty);
@@ -1408,7 +1432,18 @@ public class DatahubMapper extends FileIdentifierMapper {
                 if (title != null) {
                     citation.setTitle(title);
                 }
-                // TODO: Map online_resource if needed
+                JSONArray onlineResources = softwareReference.optJSONArray("online_resource");
+                if (onlineResources != null) {
+                    for (int j = 0; j < onlineResources.length(); j++) {
+                        JSONObject onlineResourceObj = onlineResources.optJSONObject(j);
+                        if (onlineResourceObj != null) {
+                            String url = onlineResourceObj.optString("url", null);
+                            if (url != null) {
+                                citation.addIdentifier(url);
+                            }
+                        }
+                    }
+                }
                 net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
                 citationProperty.setCICitation(citation.getElementType());
                 processingType.getSoftwareReference().add(citationProperty);
@@ -1431,7 +1466,18 @@ public class DatahubMapper extends FileIdentifierMapper {
                         if (docTitle != null) {
                             docCitation.setTitle(docTitle);
                         }
-                        // TODO: Map online_resource if needed
+                        JSONArray docOnlineResources = docObj.optJSONArray("online_resource");
+                        if (docOnlineResources != null) {
+                            for (int k = 0; k < docOnlineResources.length(); k++) {
+                                JSONObject orObj = docOnlineResources.optJSONObject(k);
+                                if (orObj != null) {
+                                    String url = orObj.optString("url", null);
+                                    if (url != null) {
+                                        docCitation.addIdentifier(url);
+                                    }
+                                }
+                            }
+                        }
                         net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType docCitationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
                         docCitationProperty.setCICitation(docCitation.getElementType());
                         processingType.getDocumentation().add(docCitationProperty);
@@ -1458,7 +1504,18 @@ public class DatahubMapper extends FileIdentifierMapper {
                     if (title != null) {
                         citation.setTitle(title);
                     }
-                    // TODO: Map online_resource if needed
+                    JSONArray algOnlineResources = algorithmCitation.optJSONArray("online_resource");
+                    if (algOnlineResources != null) {
+                        for (int j = 0; j < algOnlineResources.length(); j++) {
+                            JSONObject orObj = algOnlineResources.optJSONObject(j);
+                            if (orObj != null) {
+                                String url = orObj.optString("url", null);
+                                if (url != null) {
+                                    citation.addIdentifier(url);
+                                }
+                            }
+                        }
+                    }
                     net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
                     citationProperty.setCICitation(citation.getElementType());
                     algorithmType.setCitation(citationProperty);
@@ -1498,6 +1555,18 @@ public class DatahubMapper extends FileIdentifierMapper {
                 String title = outputCitation.optString("title", null);
                 if (title != null) {
                     citation.setTitle(title);
+                }
+                JSONArray onlineResources = outputCitation.optJSONArray("online_resource");
+                if (onlineResources != null) {
+                    for (int j = 0; j < onlineResources.length(); j++) {
+                        JSONObject onlineResourceObj = onlineResources.optJSONObject(j);
+                        if (onlineResourceObj != null) {
+                            String url = onlineResourceObj.optString("url", null);
+                            if (url != null) {
+                                citation.addIdentifier(url);
+                            }
+                        }
+                    }
                 }
                 net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType citationProperty = new net.opengis.iso19139.gmd.v_20060504.CICitationPropertyType();
                 citationProperty.setCICitation(citation.getElementType());
@@ -1658,11 +1727,20 @@ public class DatahubMapper extends FileIdentifierMapper {
                         String metricName = metricObj.optString("name", null);
                         String metricDescription = metricObj.optString("description", null);
                         Double metricValue = metricObj.optDouble("value", Double.NaN);
+                        if (metricValue.isNaN()) {
+                            String valueStr = metricObj.optString("value", null);
+                            if (valueStr != null && !valueStr.isEmpty()) {
+                                try {
+                                    metricValue = Double.parseDouble(valueStr);
+                                } catch (NumberFormatException e) {
+                                    // ignore
+                                }
+                            }
+                        }
 
                         if (metricName != null && !metricValue.isNaN()) {
-                            // TODO: Metric values are adimensional - may need special handling
                             coreMetadata.getMIMetadata().getDataQualityInfo()
-                                    .addQuantitativeAttributeAccuracy(metricName, metricDescription, metricValue, null);
+                                    .addQuantitativeAttributeAccuracy(metricId, metricName, metricDescription, metricValue, null);
                         }
                     }
                 }
@@ -1768,21 +1846,19 @@ public class DatahubMapper extends FileIdentifierMapper {
                                 }
                             }
                         }
-                        // connect_point (array of URLs) --> srv:connectPoint
-                        JSONArray connectPointArray = opObj.optJSONArray("connect_point");
-                        if (connectPointArray != null) {
+                        // connect_point (array of URLs or single URL string) --> srv:connectPoint
+                        Object connectPointObj = opObj.opt("connect_point");
+                        if (connectPointObj instanceof JSONArray) {
+                            JSONArray connectPointArray = (JSONArray) connectPointObj;
                             for (int c = 0; c < connectPointArray.length(); c++) {
                                 String url = connectPointArray.optString(c, null);
                                 if (url != null) {
-                                    CIOnlineResourceType onlineType = new CIOnlineResourceType();
-                                    URLPropertyType urlProp = new URLPropertyType();
-                                    urlProp.setURL(url);
-                                    onlineType.setLinkage(urlProp);
-                                    CIOnlineResourcePropertyType onlineProp = new CIOnlineResourcePropertyType();
-                                    onlineProp.setCIOnlineResource(onlineType);
-                                    opType.getConnectPoint().add(onlineProp);
+                                    addConnectPoint(opType, url);
                                 }
                             }
+                        } else if (connectPointObj instanceof String) {
+                            String url = (String) connectPointObj;
+                            if (!url.isEmpty()) addConnectPoint(opType, url);
                         }
                         // parameters --> srv:parameters/srv:SV_Parameter
                         JSONArray parameters = opObj.optJSONArray("parameters");
@@ -1798,6 +1874,13 @@ public class DatahubMapper extends FileIdentifierMapper {
                                             MemberNameType memberName = new MemberNameType();
                                             memberName.setAName(ISOMetadata.createCharacterStringPropertyType(name));
                                             svParam.setName(memberName);
+                                        }
+                                        String direction = paramObj.optString("direction", null);
+                                        if (direction != null) {
+                                            SVParameterDirectionPropertyType directionpt = new SVParameterDirectionPropertyType();
+                                            SVParameterDirectionType svp = SVParameterDirectionType.fromValue(direction);
+                                            directionpt.setSVParameterDirection(svp);
+                                            svParam.setDirection(directionpt);
                                         }
                                         String description = paramObj.optString("description", null);
                                         if (description != null) {
@@ -1826,6 +1909,20 @@ public class DatahubMapper extends FileIdentifierMapper {
                     }
                 }
             }
+        }
+    }
+
+    private static void addConnectPoint(SVOperationMetadataType opType, String url) {
+        try {
+            CIOnlineResourceType onlineType = new CIOnlineResourceType();
+            URLPropertyType urlProp = new URLPropertyType();
+            urlProp.setURL(url);
+            onlineType.setLinkage(urlProp);
+            CIOnlineResourcePropertyType onlineProp = new CIOnlineResourcePropertyType();
+            onlineProp.setCIOnlineResource(onlineType);
+            opType.getConnectPoint().add(onlineProp);
+        } catch (Exception e) {
+            // ignore
         }
     }
 

@@ -450,9 +450,10 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	//
 
 	String aggregationStatistic = properties.optString("aggregationStatistic");
+	if (aggregationStatistic.isEmpty()) {
+	    aggregationStatistic = properties.optString("interpolationType");
+	}
 	if (!aggregationStatistic.isEmpty()) {
-
-	    // should be Continuous or Average
 	    handler.setTimeInterpolation(aggregationStatistic);
 	}
 
@@ -518,9 +519,29 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
 		VerticalExtent verticalExtent = new VerticalExtent();
 
-		double elevation = properties.optDouble("elevation_m", Double.MAX_VALUE);
+		double elevation = properties.optDouble("elevation_m", Double.NaN);
 
-		if (elevation != Double.MAX_VALUE) {
+		if (Double.isNaN(elevation)){
+
+		    JSONObject loc = location.get().getLocation();
+
+		    JSONObject geometry = loc;
+
+		    if (loc.has("geometry")) {
+			geometry = loc.getJSONObject("geometry");
+		    }
+
+		    if (geometry.has("coordinates")) {
+
+			JSONArray coords = geometry.getJSONArray("coordinates");
+
+			if (coords.length()==3){
+			    elevation = coords.getDouble(2);
+			}
+		    }
+		}
+
+		if (!Double.isNaN(elevation)) {
 
 		    verticalExtent.setMinimumValue(elevation);
 		    verticalExtent.setMaximumValue(elevation);
@@ -542,7 +563,6 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 
     /**
      * @param coreMetadata
-     * @param location
      * @param keywords
      * @param dataId
      * @return
@@ -611,6 +631,12 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	//
 
 	String platformId = "";
+
+	String siteCode = thing.getProperties().get().optString("siteId");
+	if (platformId.isEmpty() && !siteCode.isEmpty()) {
+	    platformId = siteCode.trim();
+	}
+
 	String samplingFeatureCode = thing.getProperties().get().optString("samplingFeatureCode");
 	if (platformId.isEmpty() && !samplingFeatureCode.isEmpty()) {
 	    platformId = samplingFeatureCode.trim();
@@ -666,28 +692,6 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    }
 
 	}
-    }
-
-    /**
-     * @param locationName
-     * @param coordinates
-     * @return
-     */
-    protected GeographicBoundingBox createBoundingBox(Optional<String> locationName, JSONArray coordinates) {
-
-	GeographicBoundingBox boundingBox = new GeographicBoundingBox();
-
-	if (locationName.isPresent()) {
-	    boundingBox.setId(locationName.get());
-	}
-
-	boundingBox.setBigDecimalNorth(coordinates.getBigDecimal(0));
-	boundingBox.setBigDecimalSouth(coordinates.getBigDecimal(0));
-
-	boundingBox.setBigDecimalWest(coordinates.getBigDecimal(1));
-	boundingBox.setBigDecimalEast(coordinates.getBigDecimal(1));
-
-	return boundingBox;
     }
 
     @Override

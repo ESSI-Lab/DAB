@@ -36,5 +36,6 @@
 	"showSourceEndpoint" : false,
 	"title-left": "WMO Hydrological Observing System (WHOS) global portal",
 	"logo-left" : "wmo-logo.svg",
-	"logo-left-href" : "https://wmo.int/activities/wmo-hydrological-observing-system-whos"
+	"logo-left-href" : "https://wmo.int/activities/wmo-hydrological-observing-system-whos",
+	"zoomOnResults" : true
 }

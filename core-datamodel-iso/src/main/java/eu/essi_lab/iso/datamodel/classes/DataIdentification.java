@@ -120,15 +120,11 @@ public class DataIdentification extends Identification {
     }
 
     /**
-     * @param topic
-     * @XPathDirective(target = ".", after = "gmd:characterSet", position = Position.FIRST)
+     * @param type
      */
-    public void addTopicCategory(MDTopicCategoryCodeType topic) {
+    public void addTopicCategory(MDTopicCategoryCodeType type) {
 
-	MDTopicCategoryCodePropertyType type = new MDTopicCategoryCodePropertyType();
-	type.setMDTopicCategoryCode(topic);
-
-	getElementType().getTopicCategory().add(type);
+	addTopicCategory(type.name());
     }
 
     /**
@@ -143,17 +139,15 @@ public class DataIdentification extends Identification {
 	// Try to find matching enum value
 	try {
 	    MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.fromValue(topicCategoryString.toLowerCase());
-	    addTopicCategory(topic);
+	    MDTopicCategoryCodePropertyType topicProp = new MDTopicCategoryCodePropertyType();
+	    topicProp.setMDTopicCategoryCode(topic);
+	    getElementType().getTopicCategory().add(topicProp);
 	} catch (Exception e) {
 	    // If enum conversion fails, try to match by name
-	    try {
-		MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.valueOf(topicCategoryString.toUpperCase());
-		addTopicCategory(topic);
-	    } catch (Exception e2) {
-		// If still fails, log warning and skip
-		eu.essi_lab.lib.utils.GSLoggerFactory.getLogger(getClass())
-			.warn("Could not convert topic category string to enum: " + topicCategoryString);
-	    }
+
+	    eu.essi_lab.lib.utils.GSLoggerFactory.getLogger(getClass())
+		    .warn("Could not convert topic category string to enum: " + topicCategoryString);
+
 	}
     }
 

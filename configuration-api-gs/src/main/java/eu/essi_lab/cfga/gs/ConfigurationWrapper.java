@@ -1075,4 +1075,9 @@ public class ConfigurationWrapper {
         }
         return null;
         }
+
+    public static Optional<HarvestingSetting> getHarvestingSettings(String sourceId) {
+	return getHarvestingSettings().stream().
+		filter(set -> set.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier().equals(sourceId)).findFirst();
+    }
 }

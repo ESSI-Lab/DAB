@@ -111,6 +111,7 @@
 		<module>accessor-geo-mountain</module>
 		<module>accessor-agrostac</module>
 		<module>accessor-oai-pmh-wrapper</module>
+		<module>accessor-datastream</module>
 	</modules>
 
 	<dependencies>

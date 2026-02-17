@@ -137,6 +137,10 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 		toRemove.add(concept);
 		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/11")); // level, stream
 		break;
+	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/76": // flux, discharge
+		toRemove.add(concept);
+		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/78")); // discharge, stream
+		break;
 	    case HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/3b": // water level
 		toRemove.add(concept);
 		toAdd.add(new SKOSConcept(HISCentralOntology.HIS_CENTRAL_BASE_URI + "/concept/11")); // level, stream

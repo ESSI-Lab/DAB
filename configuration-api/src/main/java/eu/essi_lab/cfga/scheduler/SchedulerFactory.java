@@ -263,8 +263,9 @@ public class SchedulerFactory {
 	    String mySQLDatabaseName = setting.getSQLDatabaseName();
 	    String user = setting.getSQLDatabaseUser();
 	    String password = setting.getSQLDatabasePassword();
+	    boolean useSSL = setting.isUseSSL();
 
-	    String quartzDSURL = MySQLConnectionManager.createConnectionURL(mySQLDatabaseURI, mySQLDatabaseName);
+	    String quartzDSURL = MySQLConnectionManager.createConnectionURL(mySQLDatabaseURI, mySQLDatabaseName, useSSL);
 
 	    properties.setProperty("org.quartz.dataSource.myDS.user", user);
 	    properties.setProperty("org.quartz.dataSource.myDS.password", password);

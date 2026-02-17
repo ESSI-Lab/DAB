@@ -373,7 +373,10 @@ public class GIResourceParser extends StAXDocumentParser {
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ONLINE_LINKAGE.getName()), v -> this.distributionLinkage += v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ONLINE_PROTOCOL_EL_NAME), v -> this.distributionProtocol = v);
+	QName[]onlineList = new QName[]{};
 
+//	/gs:Dataset/gs:harmonizedMetadata[1]/gs:extendedMetadata[1]/gs:extension[1]/gs:accessReports[1]/gs:report[1]/gs:onlineId[1]
+//	add (onlineList)
 	add(new QName("http://www.isotc211.org/2005/gmd", "name"), new QName("http://www.isotc211.org/2005/gco", "CharacterString"),
 		v -> this.distributionName = v);
 

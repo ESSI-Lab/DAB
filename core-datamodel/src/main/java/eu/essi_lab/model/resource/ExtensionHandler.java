@@ -64,6 +64,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String RASTER_MOSAIC = "rasterMosaic";
     private static final String METADATA_VERSION = "metadataVersion";
     private static final String METADATA_ORIGINAL_VERSION = "metadataOriginalVersion";
+    private static final String DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS = "datahubLineageProcessStepParameters";
 
     private ExtendedMetadata metadata;
 
@@ -1232,6 +1233,35 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * Stores the DataHub lineage process step parameters (one JSON array per step) as a single JSON array of arrays.
+     * Used for round-tripping the processing_information.parameter array which has no ISO 19115-2 equivalent.
+     *
+     * @param jsonArrayOfParameterArrays JSON string of an array of arrays, e.g. "[[{...}],[{...}]]"
+     */
+    public void setDatahubLineageProcessStepParameters(String jsonArrayOfParameterArrays) {
+	try {
+	    this.metadata.remove("//*:" + DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS);
+	    if (jsonArrayOfParameterArrays != null && !jsonArrayOfParameterArrays.isEmpty()) {
+		this.metadata.add(DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS, jsonArrayOfParameterArrays);
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return the stored DataHub lineage process step parameters (JSON array of arrays), if present
+     */
+    public Optional<String> getDatahubLineageProcessStepParameters() {
+	try {
+	    String value = this.metadata.getTextContent(DATAHUB_LINEAGE_PROCESS_STEP_PARAMETERS);
+	    return Optional.ofNullable(value != null && !value.isEmpty() ? value : null);
+	} catch (Exception e) {
+	    return Optional.empty();
+	}
     }
 
     /**

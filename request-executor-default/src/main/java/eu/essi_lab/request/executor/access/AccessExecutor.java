@@ -206,7 +206,11 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		}
 	    }
 	    if (report == null) {
-		report = reports.stream().filter(r -> r.getOnlineId().equals(onlineId)).findFirst().get();
+		Optional<DataComplianceReport> optionalReport = reports.stream().filter(r -> r.getOnlineId().equals(onlineId)).findFirst();
+		if (optionalReport.isPresent()) {
+		    report = optionalReport.get();
+		}
+
 	    }
 
 	    if (report == null) {
