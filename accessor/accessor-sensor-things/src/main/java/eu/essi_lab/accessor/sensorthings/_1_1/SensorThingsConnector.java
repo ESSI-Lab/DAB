@@ -400,6 +400,9 @@ public class SensorThingsConnector extends HarvestedQueryConnector<SensorThingsC
 	handler.add(//
 		new GSProperty<Boolean>("quoteIdentifiers", getSetting().isQuoteIdentifiersSet()));
 
+	handler.add(//
+		new GSProperty<Boolean>("coordinatesLatitudeFirst", getSetting().isCoordinatesLatitudeFirst()));
+
 	if (parentThing != null) {
 
 	    handler.add(//

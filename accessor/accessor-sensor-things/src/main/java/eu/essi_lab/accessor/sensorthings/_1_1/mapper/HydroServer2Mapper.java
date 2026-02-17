@@ -694,28 +694,6 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	}
     }
 
-    /**
-     * @param locationName
-     * @param coordinates
-     * @return
-     */
-    protected GeographicBoundingBox createBoundingBox(Optional<String> locationName, JSONArray coordinates) {
-
-	GeographicBoundingBox boundingBox = new GeographicBoundingBox();
-
-	if (locationName.isPresent()) {
-	    boundingBox.setId(locationName.get());
-	}
-
-	boundingBox.setBigDecimalNorth(coordinates.getBigDecimal(0));
-	boundingBox.setBigDecimalSouth(coordinates.getBigDecimal(0));
-
-	boundingBox.setBigDecimalWest(coordinates.getBigDecimal(1));
-	boundingBox.setBigDecimalEast(coordinates.getBigDecimal(1));
-
-	return boundingBox;
-    }
-
     @Override
     public String getProfileName() {
 

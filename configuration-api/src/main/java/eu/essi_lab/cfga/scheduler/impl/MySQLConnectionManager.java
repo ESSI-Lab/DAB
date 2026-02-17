@@ -75,6 +75,17 @@ public class MySQLConnectionManager {
     }
 
     /**
+     * @param dbUri
+     * @param dbName
+     * @param useSSl
+     * @return
+     */
+    public static String createConnectionURL(String dbUri, String dbName, boolean useSSl) {
+
+	return createConnectionURL(dbUri, dbName, useSSl, false);
+    }
+
+    /**
      * @param query
      * @return
      * @throws SQLException
@@ -410,7 +421,7 @@ public class MySQLConnectionManager {
 	GSLoggerFactory.getLogger(getClass()).debug("Autoreconnect: {}", this.autoReconnect);
 	GSLoggerFactory.getLogger(getClass()).debug("Use SSL: {}", this.useSSl);
 
-	String connectionURL = createConnectionURL(this.dbUri, this.dbName);
+	String connectionURL = createConnectionURL(this.dbUri, this.dbName, this.useSSl);
 
 	Connection connection = connect(connectionURL, this.user, this.pwd);
 

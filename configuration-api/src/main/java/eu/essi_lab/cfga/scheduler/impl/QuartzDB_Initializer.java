@@ -135,7 +135,8 @@ public class QuartzDB_Initializer {
 
 	String uri = MySQLConnectionManager.createConnectionURL(//
 		setting.getSQLDatabaseUri(), //
-		withDBName ? setting.getSQLDatabaseName() : null);
+		withDBName ? setting.getSQLDatabaseName() : null, //
+		setting.isUseSSL());
 
 	//
 

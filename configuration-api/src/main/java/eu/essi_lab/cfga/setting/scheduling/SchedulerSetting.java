@@ -56,6 +56,7 @@ public class SchedulerSetting extends Setting implements EditableSetting {
     private static final String SQL_DATABASE_USER_OPTION_KEY = "sqlDatabaseUser";
     private static final String SQL_DATABASE_PWD_OPTION_KEY = "sqlDatabasePassword";
     private static final String SQL_DATABASE_NAME_OPTION_KEY = "sqlDatabaseName";
+    private static final String SQL_DATABASE_USE_SSL_OPTION_KEY = "useSSL";
 
     /**
      * @author Fabrizio
@@ -177,6 +178,18 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 		build();
 
 	persistentSchedulerSetting.addOption(dbNameOption);
+
+	Option<String> useSSLOption = StringOptionBuilder.get().//
+		withLabel("Use SSL for SQL Database connection").//
+		withKey(SQL_DATABASE_USE_SSL_OPTION_KEY).//
+		withSingleSelection().//
+		withValues(Arrays.asList("false", "true")).//
+		withSelectedValue("false").//
+		cannotBeDisabled().//
+		required().//
+		build();
+
+	persistentSchedulerSetting.addOption(useSSLOption);
 
 	addSetting(persistentSchedulerSetting);
     }
@@ -355,6 +368,34 @@ public class SchedulerSetting extends Setting implements EditableSetting {
     }
 
     /**
+     * @param useSSL
+     */
+    public void setUseSSL(boolean useSSL) {
+
+	if (isVolatile()) {
+
+	    throw new UnsupportedOperationException("Attempting to edit a volatile scheduler setting");
+	}
+
+	getPersistentSchedulerSetting().get().getOption(SQL_DATABASE_USE_SSL_OPTION_KEY, String.class).get()
+		.setValue(Boolean.toString(useSSL));
+    }
+
+    /**
+     * @return
+     */
+    public boolean isUseSSL() {
+
+	if (isVolatile()) {
+
+	    return false;
+	}
+
+	return Boolean.parseBoolean(
+		getPersistentSchedulerSetting().get().getOption(SQL_DATABASE_USE_SSL_OPTION_KEY, String.class).get().getValue());
+    }
+
+    /**
      * @param dateTimeZone
      */
     public void setUserDateTimeZone(String dateTimeZone) {
@@ -379,6 +420,7 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 	GSLoggerFactory.getLogger(getClass()).debug("DB name: {}", getSQLDatabaseName());
 	GSLoggerFactory.getLogger(getClass()).debug("DB pwd: {}", getSQLDatabasePassword());
 	GSLoggerFactory.getLogger(getClass()).debug("DB user: {}", getSQLDatabaseUser());
+	GSLoggerFactory.getLogger(getClass()).debug("DB use SSL: {}", isUseSSL());
     }
 
     @Override
@@ -392,7 +434,8 @@ public class SchedulerSetting extends Setting implements EditableSetting {
 		|| this.getSQLDatabaseName().equals(sch.getSQLDatabaseName())) && (
 		this.getSQLDatabaseUri() == null && sch.getSQLDatabaseUri() == null || this.getSQLDatabaseUri()
 			.equals(sch.getSQLDatabaseUri())) && (this.getUserDateTimeZone() == null && sch.getUserDateTimeZone() == null
-		|| this.getUserDateTimeZone().equals(sch.getUserDateTimeZone())) && (this.getSlotsCout() == sch.getSlotsCout());
+		|| this.getUserDateTimeZone().equals(sch.getUserDateTimeZone())) && (this.getSlotsCout() == sch.getSlotsCout())
+		&& this.isUseSSL() == sch.isUseSSL();
 
     }
 
