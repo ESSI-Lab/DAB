@@ -155,9 +155,16 @@ public class ViewsDescriptor extends TabDescriptor {
 	//
 	//
 
+	String desc = "Click 'Reload' to show the list of stored views.\n\nViews are provided both with JSON and XML encoding.\n\n";
+	desc += "To edit a view click the toggle button to enable the 'Editable' mode. When done, click the button beside to ";
+	desc += "update the view in the database, and click the toggle button again to enable the 'Read-only' mode.\n\n";
+	desc += "To remove one or more views, use the checkbox to select and click the mouse right button to open the contextual ";
+	desc += "menu, than click 'Remove selected views'";
+
+
 	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
 		withCustomAddDirective(e -> openAddViewDialog()).//
-		withShowDirective("Click 'Reload' to show the list of stored views", false).//
+		withShowDirective(desc, false).//
 		withComponent(verticalLayout).//
 		reloadable(() -> update(verticalLayout)).//
 		build();
@@ -419,6 +426,7 @@ public class ViewsDescriptor extends TabDescriptor {
 		readOnlyLabel.setWidth("65px");
 
 		ToggleButton toggleButton = ComponentFactory.createToggleButton(false, true);
+		toggleButton.setTooltipText("Edit view");
 
 		Button updateButton = new Button(VaadinIcon.UPLOAD.create());
 		updateButton.getStyle().set("margin-top", "-5px");
