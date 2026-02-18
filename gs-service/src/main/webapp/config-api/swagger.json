@@ -764,6 +764,46 @@
 	},
 	"components": {
 		"schemas": {
+			"View": {
+				"description": "JSON encoding of a DAB view",
+				"type": "object",
+				"properties": {
+
+					"id": {
+						"required": true,
+						"type": "string",
+						"description": "Unique identifier of the view. It must contains alphanumeric characters and/or '_' characters"
+					},
+					"label": {
+						"type": "string",
+						"description": "View description"
+					},
+					"creator": {
+						"type": "string",
+						"description": "View creator"
+					},
+					"visibility": {
+						"$ref": "#/components/schemas/Visibility"
+					},
+					"sourceDeployment": {
+						"type": "string",
+						"description": "The source deployment"
+					},
+					"bond": {
+						"type": "object",
+						"description": "The view bond, according to the BondQL specification"
+					}
+				}
+			},
+			"Visibility": {
+				"description": "View visibility",
+				"type": "string",
+				"enum": [
+					"PRIVATE",
+					"PUBLIC"
+				]
+			},
+
 			"ListProperties": {
 				"description": "Lists all the available properties from MetadataElement and ResourceProperty enum that can be used to define views according to the BondQL specification",
 				"type": "object",
@@ -807,8 +847,7 @@
 						],
 						"properties": {
 							"view": {
-								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with response code '400'",
-								"type": "string"
+								"$ref": "#/components/schemas/View"
 							}
 						}
 					}
@@ -834,8 +873,7 @@
 						],
 						"properties": {
 							"view": {
-								"description": "The JSON enconding of the view. If a view with the given id is not found, the request fails with response code '404'",
-								"type": "string"
+								"$ref": "#/components/schemas/View"
 							}
 						}
 					}
