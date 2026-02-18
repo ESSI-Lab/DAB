@@ -58,7 +58,7 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 
     private final Logger logger = GSLoggerFactory.getLogger(getClass());
 
-    /** Cache of dataset collection identifiers (id, doi, name only), sorted alphabetically by id. */
+    /** Cache of dataset collection identifiers (id, doi, name only), sorted alphabetically by DOI. */
     private List<DataStreamClient.DatasetMetadata> collectionIdCache;
     private int partialNumbers;
     private DataStreamClient client;
@@ -87,13 +87,13 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	}
 
 	String token = request.getResumptionToken();
-	int index; // index of the collection to process (token = id of that collection; null = first)
+	int index; // index of the collection to process (token = DOI of that collection; null = first)
 	if (token == null || token.isEmpty()) {
 	    index = 0;
 	} else {
-	    int idx = findCollectionIndexById(cache, token);
+	    int idx = findCollectionIndexByDoi(cache, token);
 	    if (idx < 0) {
-		logger.warn("Resumption token '{}' not found in collection cache; starting from first collection", token);
+		logger.warn("Resumption token (DOI) '{}' not found in collection cache; starting from first collection", token);
 		index = 0;
 	    } else {
 		index = idx;
@@ -130,16 +130,16 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    }
 	}
 
-	// Next resumption token = id of the next collection, or null if this was the last or maxRecords reached
+	// Next resumption token = DOI of the next collection, or null if this was the last or maxRecords reached
 	String nextToken = null;
 	if (maxRecords <= 0 || partialNumbers < maxRecords) {
 	    if (index + 1 < cache.size()) {
-		nextToken = cache.get(index + 1).id;
+		nextToken = cache.get(index + 1).doi;
 	    }
 	}
 	ret.setResumptionToken(nextToken);
 
-	logger.debug("ADDED {} records for collection {} ({}). Next token: {}", recordsForCollection.size(),
+	logger.debug("ADDED {} records for collection {} (DOI: {}). Next token: {}", recordsForCollection.size(),
 		cache.get(index).id, cache.get(index).doi, nextToken);
 
 	return ret;
@@ -163,10 +163,10 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    String apiKey = getSetting().getApiKey();
 	    this.client = new DataStreamClient(endpoint, apiKey);
 	    List<DataStreamClient.DatasetMetadata> list = client.listDatasetIdentifiers(0);
-	    list.removeIf(d -> d.id == null || d.doi == null || d.doi.isEmpty());
-	    Collections.sort(list, Comparator.comparing(d -> d.id != null ? d.id : ""));
+	    list.removeIf(d -> d.doi == null || d.doi.isEmpty());
+	    Collections.sort(list, Comparator.comparing(d -> d.doi != null ? d.doi : ""));
 	    collectionIdCache = list;
-	    logger.trace("DataStream collection cache filled with {} identifiers", collectionIdCache.size());
+	    logger.trace("DataStream collection cache filled with {} DOIs", collectionIdCache.size());
 	} catch (IOException | InterruptedException e) {
 	    logger.error("Error retrieving DataStream collection list", e);
 	    throw GSException.createException(//
@@ -179,9 +179,9 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	}
     }
 
-    private static int findCollectionIndexById(List<DataStreamClient.DatasetMetadata> cache, String id) {
+    private static int findCollectionIndexByDoi(List<DataStreamClient.DatasetMetadata> cache, String doi) {
 	for (int i = 0; i < cache.size(); i++) {
-	    if (id.equals(cache.get(i).id)) {
+	    if (doi.equals(cache.get(i).doi)) {
 		return i;
 	    }
 	}
@@ -199,7 +199,7 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 
 	List<String> ret = new ArrayList<>();
 	try {
-	    DataStreamClient.DatasetMetadata dataset = client.getMetadataById(collectionMinimal.id);
+	    DataStreamClient.DatasetMetadata dataset = client.getMetadataByDoi(collectionMinimal.doi);
 	    if (dataset == null || dataset.doi == null || dataset.doi.isEmpty()) {
 		return ret;
 	    }
