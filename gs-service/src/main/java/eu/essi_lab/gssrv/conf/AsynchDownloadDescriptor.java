@@ -95,7 +95,7 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 	Grid.Column<GridData> downalodNameColumn = grid.addColumn(GridData::getDownloadName).//
 		setHeader(DOWNLOAD_NAME_COLUMN).//
 		setKey(DOWNLOAD_NAME_COLUMN).//
-		setWidth("70px").//
+		setWidth("100px").//
 		setSortable(true).//
 		setResizable(true);//
 
@@ -109,7 +109,7 @@ public class AsynchDownloadDescriptor extends TabDescriptor {
 	Grid.Column<GridData> reqURLColumn = grid.addColumn(GridData::getRequestURL).//
 		setHeader(REQUEST_URL_COLUMN).//
 		setKey(REQUEST_URL_COLUMN).//
-		setWidth("350px").//
+		setWidth("320px").//
 		setFlexGrow(0).//
 		setSortable(true).//
 		setResizable(true);//
