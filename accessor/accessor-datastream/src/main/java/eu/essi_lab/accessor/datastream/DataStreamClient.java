@@ -483,7 +483,7 @@ public class DataStreamClient {
     private JSONObject executeGet(String url) throws IOException, InterruptedException {
 	requestLock.lock();
 	
-	String status = null;
+	Integer status = null;
 	try {
 	    long now = System.currentTimeMillis();
 	    long elapsed = now - lastRequestTimeMillis;
