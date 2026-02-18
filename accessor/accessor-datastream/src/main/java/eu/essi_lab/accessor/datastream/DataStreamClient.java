@@ -221,10 +221,10 @@ public class DataStreamClient {
     }
 
     /**
-     * Fetches full metadata for a single dataset collection by its Id.
+     * Fetches full metadata for a single dataset collection by its DOI.
      */
-    public DatasetMetadata getMetadataById(String id) throws IOException, InterruptedException {
-	String filter = "Id%20eq%20'" + URLEncoder.encode(id, StandardCharsets.UTF_8) + "'";
+    public DatasetMetadata getMetadataByDoi(String doi) throws IOException, InterruptedException {
+	String filter = "DOI%20eq%20'" + URLEncoder.encode(doi, StandardCharsets.UTF_8) + "'";
 	String url = endpoint + "/Metadata?%24filter=" + filter;
 	JSONObject page = executeGet(url);
 	JSONArray value = page != null ? page.optJSONArray("value") : null;
