@@ -13,20 +13,22 @@ package eu.essi_lab.lib.utils;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.*;
+import java.security.*;
+import java.security.cert.*;
+import java.security.cert.Certificate;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -59,6 +61,64 @@ public class FileUtils {
 	    "LPT7",//
 	    "LPT8",//
 	    "LPT9");
+
+    /**
+     * @param trustStoreFile
+     * @param trustStorePwd
+     */
+    public static void printTrustStoreCertificates(File trustStoreFile, String trustStorePwd) {
+
+	try {
+	    KeyStore ks = KeyStore.getInstance("PKCS12");
+
+	    GSLoggerFactory.getLogger(FileUtils.class).trace("Reading certificates");
+
+	    try (FileInputStream fis = new FileInputStream(trustStoreFile)) {
+
+		ks.load(fis, trustStorePwd.toCharArray());
+	    }
+
+	    List<String> aliases = StreamUtils.iteratorToStream(ks.aliases().asIterator()).toList();
+	    int i = 0;
+
+	    GSLoggerFactory.getLogger(FileUtils.class).trace("Found {} certificates", aliases.size());
+
+	    for (String alias : aliases) {
+
+		String type = (ks.isCertificateEntry(alias) ? "trustedCertEntry" : "keyEntry");
+		GSLoggerFactory.getLogger(FileUtils.class).info("{}: {} {}", ++i, alias, type);
+
+		Certificate cert = ks.getCertificate(alias);
+
+		if (cert instanceof X509Certificate x) {
+
+		    GSLoggerFactory.getLogger(FileUtils.class).trace("{} {}", x.getSubjectX500Principal(), x.getIssuerX500Principal());
+
+		    byte[] encoded = x.getEncoded();
+		    MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+		    byte[] digest = md.digest(encoded);
+
+		    // convert to hex with colon separators
+		    StringBuilder hex = new StringBuilder();
+
+		    for (int h = 0; h < digest.length; h++) {
+			hex.append(String.format("%02X", digest[h]));
+			if (h < digest.length - 1)
+			    hex.append(":");
+		    }
+
+		    GSLoggerFactory.getLogger(FileUtils.class).trace("SHA-256 Fingerprint: " + hex.toString());
+
+		    GSLoggerFactory.getLogger(FileUtils.class).trace("-----");
+		}
+	    }
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(FileUtils.class).error(e);
+	}
+    }
 
     /**
      * @param path

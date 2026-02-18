@@ -801,54 +801,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		GSLoggerFactory.getLogger(getClass()).info("Using trust store at {}", target.getAbsolutePath());
 
-		try {
-		    KeyStore ks = KeyStore.getInstance("PKCS12");
-
-		    GSLoggerFactory.getLogger(getClass()).info("Reading certificates");
-		    try (FileInputStream fis = new FileInputStream(target)) {
-			ks.load(fis, trustStorePwd.get().toCharArray());
-		    }
-
-		    Enumeration<String> aliases = ks.aliases();
-		    int i = 0;
-
-		    while (aliases.hasMoreElements()) {
-			String alias = aliases.nextElement();
-			String type = (ks.isCertificateEntry(alias) ? "trustedCertEntry" : "keyEntry");
-			GSLoggerFactory.getLogger(getClass()).info("{}: {} {}", ++i, alias, type);
-
-			Certificate cert = ks.getCertificate(alias);
-
-			if (cert instanceof X509Certificate) {
-			    X509Certificate x = (X509Certificate) cert;
-
-			    //			    System.out.println("Subject: " + x.getSubjectX500Principal());
-			    //			    System.out.println("Issuer: " + x.getIssuerX500Principal());
-			    //			    System.out.println("Serial: " + x.getSerialNumber());
-			    //			    System.out.println("Valid from: " + x.getNotBefore());
-			    //			    System.out.println("Valid until: " + x.getNotAfter());
-			    //			    System.out.println("Signature algorithm: " + x.getSigAlgName());
-			    GSLoggerFactory.getLogger(getClass()).info("{} {}", x.getSubjectX500Principal(), x.getIssuerX500Principal());
-			    byte[] encoded = x.getEncoded();
-			    MessageDigest md = MessageDigest.getInstance("SHA-256");
-			    byte[] digest = md.digest(encoded);
-
-			    // convert to hex with colon separators
-			    StringBuilder hex = new StringBuilder();
-			    for (int h = 0; h < digest.length; h++) {
-				hex.append(String.format("%02X", digest[h]));
-				if (h < digest.length - 1)
-				    hex.append(":");
-			    }
-			    GSLoggerFactory.getLogger(getClass()).info("SHA-256 Fingerprint: " + hex.toString());
-
-			    GSLoggerFactory.getLogger(getClass()).info("-----");
-			}
-		    }
-
-		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).error("Fatal error reading the trust store");
-		}
+	        FileUtils.printTrustStoreCertificates(target, trustStorePwd.get());
 
 		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
 	    }
