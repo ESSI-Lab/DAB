@@ -403,7 +403,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return createEqualBond(value, MetadataElement.TIME_INTERPOLATION);
+	    return BondUtils.createBond(BondOperator.TEXT_SEARCH, value, MetadataElement.TIME_INTERPOLATION);
 	}
     };
 
