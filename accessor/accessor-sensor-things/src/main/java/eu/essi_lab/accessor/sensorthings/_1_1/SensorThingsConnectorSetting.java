@@ -166,7 +166,8 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
      */
     public boolean isDiscardStationsWithNoData() {
 
-	return BooleanChoice.toBoolean(getOption(DISCARDS_STATIONS_WITH_NO_DATA, BooleanChoice.class).get().getSelectedValue());
+	return BooleanChoice.toBoolean(getOption(DISCARDS_STATIONS_WITH_NO_DATA, BooleanChoice.class).
+		map(Option::getSelectedValue).orElse(BooleanChoice.TRUE));
     }
 
     /**
@@ -174,7 +175,8 @@ public class SensorThingsConnectorSetting extends HarvestedConnectorSetting {
      */
     public boolean isCoordinatesLatitudeFirst() {
 
-	return BooleanChoice.toBoolean(getOption(COORDINATES_LATITUDE_FIRST_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
+	return BooleanChoice.toBoolean(getOption(COORDINATES_LATITUDE_FIRST_OPTION_KEY, BooleanChoice.class).
+		map(Option::getSelectedValue).orElse(BooleanChoice.FALSE));
     }
 
     /**
