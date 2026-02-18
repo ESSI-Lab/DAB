@@ -301,7 +301,8 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 	
 	              tableContent += '<td title="' + (source.report().title) + '" style="vertical-align: bottom;"><label class="sources-widget-src-label">' + title + '</label></br>';
 	
-	              var infoDiv = '<div id="'+targetDivId+'" style="display:none"></div>';
+	              // padding-left gives room for table margin-left:-78px so the gray frame and links stay visible
+	              var infoDiv = '<div id="'+targetDivId+'" style="display:none; padding-left: 78px"></div>';
 	              
 	              tableContent += infoDiv + '</td>';
 	
