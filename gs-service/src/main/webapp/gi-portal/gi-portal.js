@@ -1705,7 +1705,13 @@ export function initializePortal(config) {
 	var viewParam = getUrlParameter('view');
 	if (viewParam!==undefined && viewParam!==null&&viewParam!=="") {
 		view = viewParam;
+	}else{
+	   viewParam = getUrlParameter('viewId');
+	   if (viewParam!==undefined && viewParam!==null&&viewParam!=="") {
+       		view = viewParam;
+       }
 	}
+
 	token = config.token;
 	document.title = config.title;
 
