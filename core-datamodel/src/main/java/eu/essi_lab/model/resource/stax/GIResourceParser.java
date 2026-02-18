@@ -24,6 +24,7 @@ package eu.essi_lab.model.resource.stax;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -251,6 +252,10 @@ public class GIResourceParser extends StAXDocumentParser {
 	return onlineId;
     }
 
+    public String getReportOnlineId() {
+	return reportOnlineId;
+    }
+
     public String getSourceId() {
 	return sourceId;
     }
@@ -300,6 +305,8 @@ public class GIResourceParser extends StAXDocumentParser {
     }
 
     public String onlineId = "";
+
+    private String reportOnlineId = "";
 
     public String sourceId = "";
     public List<String> points = new ArrayList<>();
@@ -373,10 +380,16 @@ public class GIResourceParser extends StAXDocumentParser {
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ONLINE_LINKAGE.getName()), v -> this.distributionLinkage += v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ONLINE_PROTOCOL_EL_NAME), v -> this.distributionProtocol = v);
-	QName[]onlineList = new QName[]{};
+	
+	QName[] reportOnlineIdPath = new QName[] { new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Dataset"),
+		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "harmonizedMetadata"),
+		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "extendedMetadata"),
+		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "extension"),
+		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "accessReports"),
+		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "report"),
+		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "onlineId") };
+	add(Arrays.asList(reportOnlineIdPath), v -> this.reportOnlineId = normalize(v));
 
-//	/gs:Dataset/gs:harmonizedMetadata[1]/gs:extendedMetadata[1]/gs:extension[1]/gs:accessReports[1]/gs:report[1]/gs:onlineId[1]
-//	add (onlineList)
 	add(new QName("http://www.isotc211.org/2005/gmd", "name"), new QName("http://www.isotc211.org/2005/gco", "CharacterString"),
 		v -> this.distributionName = v);
 

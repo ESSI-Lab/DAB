@@ -428,7 +428,7 @@ public class ObservationMapper {
 	    }
 	}
 
-	observation.setId(parser.onlineId);
+	observation.setId(parser.getReportOnlineId());
 
 	return observation;
 

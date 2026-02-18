@@ -23,6 +23,8 @@ package eu.essi_lab.accessor.datastream;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -56,12 +58,13 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 
     private final Logger logger = GSLoggerFactory.getLogger(getClass());
 
-    private List<String> originalMetadata;
+    /** Cache of dataset collection identifiers (id, doi, name only), sorted alphabetically by id. */
+    private List<DataStreamClient.DatasetMetadata> collectionIdCache;
     private int partialNumbers;
     private DataStreamClient client;
 
     public DataStreamConnector() {
-	this.originalMetadata = new ArrayList<>();
+	this.collectionIdCache = new ArrayList<>();
     }
 
     @Override
@@ -75,74 +78,77 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
-	if (originalMetadata.isEmpty()) {
+	ensureCollectionCacheFilled();
 
-	    Optional<Integer> mr = getSetting().getMaxRecords();
-	    int maxRecords = 0;
-	    if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent()) {
-		maxRecords = mr.get();
-	    }
-
-	    originalMetadata = getOriginalMetadata(maxRecords);
+	List<DataStreamClient.DatasetMetadata> cache = collectionIdCache;
+	if (cache.isEmpty()) {
+	    ret.setResumptionToken(null);
+	    return ret;
 	}
 
 	String token = request.getResumptionToken();
-	int start = 0;
-	if (token != null) {
-	    start = Integer.valueOf(token);
-	}
-
-	int pageSize = getSetting().getPageSize();
-
-	Optional<Integer> mr = getSetting().getMaxRecords();
-	boolean maxNumberReached = false;
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && start > mr.get() - 1) {
-	    maxNumberReached = true;
-	}
-
-	if (start < originalMetadata.size() && !maxNumberReached) {
-	    int end = start + pageSize;
-	    if (end > originalMetadata.size()) {
-		end = originalMetadata.size();
-	    }
-
-	    if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && end > mr.get()) {
-		end = mr.get();
-	    }
-	    int count = 0;
-
-	    for (int i = start; i < end; i++) {
-		String om = originalMetadata.get(i);
-
-		if (om != null && !om.isEmpty()) {
-		    OriginalMetadata metadata = new OriginalMetadata();
-		    metadata.setSchemeURI(CommonNameSpaceContext.DATASTREAM_NS_URI);
-		    metadata.setMetadata(om);
-		    ret.addRecord(metadata);
-		    partialNumbers++;
-		    count++;
-		}
-	    }
-	    ret.setResumptionToken(String.valueOf(start + count));
-	    logger.debug("ADDED {} records. Number of analyzed DataStream logical series: {}", partialNumbers,
-		    String.valueOf(start + count));
-
+	int index; // index of the collection to process (token = id of that collection; null = first)
+	if (token == null || token.isEmpty()) {
+	    index = 0;
 	} else {
+	    int idx = findCollectionIndexById(cache, token);
+	    if (idx < 0) {
+		logger.warn("Resumption token '{}' not found in collection cache; starting from first collection", token);
+		index = 0;
+	    } else {
+		index = idx;
+	    }
+	}
+
+	if (index >= cache.size()) {
 	    ret.setResumptionToken(null);
-	    logger.debug("Added DataStream records: {} . TOTAL DATASTREAM SIZE: {}", partialNumbers, originalMetadata.size());
+	    logger.debug("DataStream listRecords completed. Total records emitted: {}", partialNumbers);
 	    partialNumbers = 0;
 	    return ret;
 	}
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	int maxRecords = (!getSetting().isMaxRecordsUnlimited() && mr.isPresent()) ? mr.get() : 0;
+	int remainingBudget = maxRecords > 0 ? Math.max(0, maxRecords - partialNumbers) : 0;
+	if (maxRecords > 0 && remainingBudget <= 0) {
+	    ret.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return ret;
+	}
+
+	List<String> recordsForCollection = getOriginalMetadataForCollection(cache.get(index), remainingBudget);
+	for (String om : recordsForCollection) {
+	    if (om != null && !om.isEmpty()) {
+		OriginalMetadata metadata = new OriginalMetadata();
+		metadata.setSchemeURI(CommonNameSpaceContext.DATASTREAM_NS_URI);
+		metadata.setMetadata(om);
+		ret.addRecord(metadata);
+		partialNumbers++;
+		if (maxRecords > 0 && partialNumbers >= maxRecords) {
+		    break;
+		}
+	    }
+	}
+
+	// Next resumption token = id of the next collection, or null if this was the last or maxRecords reached
+	String nextToken = null;
+	if (maxRecords <= 0 || partialNumbers < maxRecords) {
+	    if (index + 1 < cache.size()) {
+		nextToken = cache.get(index + 1).id;
+	    }
+	}
+	ret.setResumptionToken(nextToken);
+
+	logger.debug("ADDED {} records for collection {} ({}). Next token: {}", recordsForCollection.size(),
+		cache.get(index).id, cache.get(index).doi, nextToken);
+
 	return ret;
     }
 
-    private List<String> getOriginalMetadata(int maxRecords) throws GSException {
-
-	logger.trace("DataStream list metadata STARTED");
-
-	List<String> ret = new ArrayList<>();
-
+    private void ensureCollectionCacheFilled() throws GSException {
+	if (!collectionIdCache.isEmpty()) {
+	    return;
+	}
 	String endpoint = getSourceURL();
 	if (endpoint == null || endpoint.isEmpty()) {
 	    throw GSException.createException(//
@@ -153,111 +159,16 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 		    ErrorInfo.SEVERITY_ERROR, //
 		    DATASTREAM_URL_NOT_FOUND_ERROR);
 	}
-
 	try {
-
 	    String apiKey = getSetting().getApiKey();
 	    this.client = new DataStreamClient(endpoint, apiKey);
-
-	    // 1) list datasets (Metadata entries), possibly limited by maxRecords
-	    int datasetTop = maxRecords > 0 ? maxRecords : 0;
-	    List<DataStreamClient.DatasetMetadata> datasets = client.listDatasets(datasetTop);
-
-	    int emitted = 0;
-	    boolean limitReached = false;
-
-	    for (DataStreamClient.DatasetMetadata dataset : datasets) {
-
-		if (dataset.doi == null || dataset.doi.isEmpty()) {
-		    continue;
-		}
-
-		//
-		// Collection-level original metadata
-		//
-		JSONObject collectionJson = new JSONObject();
-		collectionJson.put("type", "collection");
-		collectionJson.put("doi", dataset.doi);
-		collectionJson.put("datasetId", dataset.id);
-		collectionJson.put("datasetName", dataset.name);
-		collectionJson.put("metadata", dataset.raw);
-		ret.add(collectionJson.toString());
-		emitted++;
-		if (maxRecords > 0 && emitted >= maxRecords) {
-		    limitReached = true;
-		    break;
-		}
-
-		if (limitReached) {
-		    break;
-		}
-
-		//
-		// Time-series level original metadata: one per (location, CharacteristicName)
-		// Each series also carries the collection-level metadata so that key fields
-		// such as Abstract, Licence, TopicCategoryCode, Keywords and organisation
-		// info can be propagated into the dataset-level ISO mapping.
-		//
-		List<DataStreamClient.Location> locations = client.listLocationsByDoi(dataset.doi);
-		for (DataStreamClient.Location location : locations) {
-
-		    int observationSampleSet = getSetting().getObservationSampleSet();
-		    Set<String> characteristicNames = client.getCharacteristicNames(dataset.doi, location.id, observationSampleSet);
-		    for (String cn : characteristicNames) {
-
-			JSONObject seriesJson = new JSONObject();
-			seriesJson.put("type", "dataset");
-			seriesJson.put("doi", dataset.doi);
-			seriesJson.put("datasetId", dataset.id);
-			seriesJson.put("datasetName", dataset.name);
-			seriesJson.put("metadata", dataset.raw);
-			seriesJson.put("characteristicName", cn);
-			seriesJson.put("location", location.raw);
-
-			//
-			// Optional temporal extent enrichment: first/last observation dates
-			// for this (DOI, Location, CharacteristicName) series.
-			//
-			DataStreamClient.ObservationDateRange dateRange = client
-				.getObservationDateRange(dataset.doi, location.id, cn,observationSampleSet);
-			if (dateRange != null) {
-			    if (dateRange.firstActivityStartDate != null) {
-				seriesJson.put("firstObservationDate", dateRange.firstActivityStartDate);
-			    }
-			    if (dateRange.firstActivityStartTime != null) {
-				seriesJson.put("firstObservationTime", dateRange.firstActivityStartTime);
-			    }
-			    if (dateRange.lastActivityStartDate != null) {
-				seriesJson.put("lastObservationDate", dateRange.lastActivityStartDate);
-			    }
-			    if (dateRange.lastActivityStartTime != null) {
-				seriesJson.put("lastObservationTime", dateRange.lastActivityStartTime);
-			    }
-			    if (dateRange.resultUnit != null && !dateRange.resultUnit.isEmpty()) {
-				seriesJson.put("resultUnit", dateRange.resultUnit);
-			    }
-			}
-
-			ret.add(seriesJson.toString());
-			emitted++;
-			if (maxRecords > 0 && emitted >= maxRecords) {
-			    limitReached = true;
-			    break;
-			}
-		    }
-
-		    if (limitReached) {
-			break;
-		    }
-		}
-
-		if (limitReached) {
-		    break;
-		}
-	    }
-
+	    List<DataStreamClient.DatasetMetadata> list = client.listDatasetIdentifiers(0);
+	    list.removeIf(d -> d.id == null || d.doi == null || d.doi.isEmpty());
+	    Collections.sort(list, Comparator.comparing(d -> d.id != null ? d.id : ""));
+	    collectionIdCache = list;
+	    logger.trace("DataStream collection cache filled with {} identifiers", collectionIdCache.size());
 	} catch (IOException | InterruptedException e) {
-	    logger.error("Error retrieving DataStream content", e);
+	    logger.error("Error retrieving DataStream collection list", e);
 	    throw GSException.createException(//
 		    this.getClass(), //
 		    DATASTREAM_READ_ERROR + ": " + e.getMessage(), //
@@ -266,8 +177,93 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 		    ErrorInfo.SEVERITY_ERROR, //
 		    DATASTREAM_URL_NOT_FOUND_ERROR);
 	}
+    }
 
-	logger.trace("DataStream list metadata ENDED");
+    private static int findCollectionIndexById(List<DataStreamClient.DatasetMetadata> cache, String id) {
+	for (int i = 0; i < cache.size(); i++) {
+	    if (id.equals(cache.get(i).id)) {
+		return i;
+	    }
+	}
+	return -1;
+    }
+
+    /**
+     * Fetches original metadata (collection record + all time-series records) for a single dataset
+     * collection. Does not load all collections into memory.
+     *
+     * @param remainingRecordBudget max records to add (0 = no limit). Used when maxRecords is set globally.
+     */
+    private List<String> getOriginalMetadataForCollection(DataStreamClient.DatasetMetadata collectionMinimal,
+	    int remainingRecordBudget) throws GSException {
+
+	List<String> ret = new ArrayList<>();
+	try {
+	    DataStreamClient.DatasetMetadata dataset = client.getMetadataById(collectionMinimal.id);
+	    if (dataset == null || dataset.doi == null || dataset.doi.isEmpty()) {
+		return ret;
+	    }
+
+	    // Collection-level record
+	    JSONObject collectionJson = new JSONObject();
+	    collectionJson.put("type", "collection");
+	    collectionJson.put("doi", dataset.doi);
+	    collectionJson.put("datasetId", dataset.id);
+	    collectionJson.put("datasetName", dataset.name);
+	    collectionJson.put("metadata", dataset.raw);
+	    ret.add(collectionJson.toString());
+
+	    int emitted = 1;
+	    if (remainingRecordBudget > 0 && emitted >= remainingRecordBudget) {
+		return ret;
+	    }
+
+	    List<DataStreamClient.Location> locations = client.listLocationsByDoi(dataset.doi);
+	    int observationSampleSet = getSetting().getObservationSampleSet();
+
+	    for (DataStreamClient.Location location : locations) {
+		Set<String> characteristicNames = client.getCharacteristicNames(dataset.doi, location.id, observationSampleSet);
+		for (String cn : characteristicNames) {
+		    JSONObject seriesJson = new JSONObject();
+		    seriesJson.put("type", "dataset");
+		    seriesJson.put("doi", dataset.doi);
+		    seriesJson.put("datasetId", dataset.id);
+		    seriesJson.put("datasetName", dataset.name);
+		    seriesJson.put("metadata", dataset.raw);
+		    seriesJson.put("characteristicName", cn);
+		    seriesJson.put("location", location.raw);
+
+		    DataStreamClient.ObservationDateRange dateRange = client
+			    .getObservationDateRange(dataset.doi, location.id, cn, observationSampleSet);
+		    if (dateRange != null) {
+			if (dateRange.firstActivityStartDate != null) {
+			    seriesJson.put("firstObservationDate", dateRange.firstActivityStartDate);
+			}
+			if (dateRange.firstActivityStartTime != null) {
+			    seriesJson.put("firstObservationTime", dateRange.firstActivityStartTime);
+			}
+			if (dateRange.lastActivityStartDate != null) {
+			    seriesJson.put("lastObservationDate", dateRange.lastActivityStartDate);
+			}
+			if (dateRange.lastActivityStartTime != null) {
+			    seriesJson.put("lastObservationTime", dateRange.lastActivityStartTime);
+			}
+			if (dateRange.resultUnit != null && !dateRange.resultUnit.isEmpty()) {
+			    seriesJson.put("resultUnit", dateRange.resultUnit);
+			}
+		    }
+
+		    ret.add(seriesJson.toString());
+		    emitted++;
+		    if (remainingRecordBudget > 0 && emitted >= remainingRecordBudget) {
+			return ret;
+		    }
+		}
+	    }
+	} catch (IOException | InterruptedException e) {
+	    logger.warn("Skipping collection {} (DOI: {}) due to error: {}", collectionMinimal.id, collectionMinimal.doi,
+		    e.getMessage(), e);
+	}
 	return ret;
     }
 
