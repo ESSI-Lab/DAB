@@ -172,6 +172,74 @@ public class DataStreamClient {
 	return results;
     }
 
+    /**
+     * Lists dataset collection identifiers only (Id, DOI, DatasetName) without full metadata,
+     * to build a lightweight cache. Results are not sorted; sort by id in the caller if needed.
+     *
+     * @param maxCollections max number of collections to return; 0 or negative = no limit (paginate all)
+     */
+    public List<DatasetMetadata> listDatasetIdentifiers(int maxCollections) throws IOException, InterruptedException {
+	String select = "%24select=Id,DOI,DatasetName";
+	String url = endpoint + "/Metadata?" + select;
+	if (maxCollections > 0) {
+	    url += "&%24top=" + maxCollections;
+	    List<DatasetMetadata> results = new ArrayList<>();
+	    JSONObject page = executeGet(url);
+	    JSONArray value = page.optJSONArray("value");
+	    if (value != null) {
+		for (int i = 0; i < value.length(); i++) {
+		    JSONObject obj = value.getJSONObject(i);
+		    DatasetMetadata md = new DatasetMetadata();
+		    md.raw = null;
+		    md.id = obj.optString("Id", null);
+		    md.doi = obj.optString("DOI", null);
+		    md.name = obj.optString("DatasetName", null);
+		    results.add(md);
+		}
+	    }
+	    return results;
+	}
+	List<DatasetMetadata> results = new ArrayList<>();
+	String next = url;
+	while (next != null) {
+	    JSONObject page = executeGet(next);
+	    JSONArray value = page.optJSONArray("value");
+	    if (value != null) {
+		for (int i = 0; i < value.length(); i++) {
+		    JSONObject obj = value.getJSONObject(i);
+		    DatasetMetadata md = new DatasetMetadata();
+		    md.raw = null;
+		    md.id = obj.optString("Id", null);
+		    md.doi = obj.optString("DOI", null);
+		    md.name = obj.optString("DatasetName", null);
+		    results.add(md);
+		}
+	    }
+	    next = page.optString("@odata.nextLink", null);
+	}
+	return results;
+    }
+
+    /**
+     * Fetches full metadata for a single dataset collection by its Id.
+     */
+    public DatasetMetadata getMetadataById(String id) throws IOException, InterruptedException {
+	String filter = "Id%20eq%20'" + URLEncoder.encode(id, StandardCharsets.UTF_8) + "'";
+	String url = endpoint + "/Metadata?%24filter=" + filter;
+	JSONObject page = executeGet(url);
+	JSONArray value = page != null ? page.optJSONArray("value") : null;
+	if (value != null && value.length() > 0) {
+	    JSONObject obj = value.getJSONObject(0);
+	    DatasetMetadata md = new DatasetMetadata();
+	    md.raw = obj;
+	    md.id = obj.optString("Id", null);
+	    md.doi = obj.optString("DOI", null);
+	    md.name = obj.optString("DatasetName", null);
+	    return md;
+	}
+	return null;
+    }
+
     public List<Location> listLocationsByDoi(String doi) throws IOException, InterruptedException {
 	List<Location> results = new ArrayList<>();
 
@@ -414,6 +482,8 @@ public class DataStreamClient {
 
     private JSONObject executeGet(String url) throws IOException, InterruptedException {
 	requestLock.lock();
+	
+	String status = null;
 	try {
 	    long now = System.currentTimeMillis();
 	    long elapsed = now - lastRequestTimeMillis;
@@ -429,11 +499,22 @@ public class DataStreamClient {
 		    .header("x-api-key", apiKey != null ? apiKey : "")
 		    .GET().build();
 
-	    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-	    if (response.statusCode() != 200) {
+		HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+	    status = response.statusCode();
+		if (status != 200) {
 		throw new IOException("HTTP request failed with status code: " + response.statusCode());
 	    }
 	    return new JSONObject(response.body());
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error executing GET request " + url + " " + status, e);
+	    if (e instanceof IOException) {
+		throw (IOException) e;
+	    }
+	    if (e instanceof InterruptedException) {
+		throw (InterruptedException) e;
+	    }
+	    throw new IOException("Error executing GET request " + url, e);
 	} finally {
 	    requestLock.unlock();
 	}
