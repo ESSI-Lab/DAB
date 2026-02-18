@@ -764,6 +764,134 @@
 	},
 	"components": {
 		"schemas": {
+			"ListProperties": {
+				"description": "Lists all the available properties from MetadataElement and ResourceProperty enum that can be used to define views according to the BondQL specification",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "ListProperties"
+					},
+					"parameters": {
+						"type": "object",
+						"properties": {
+							"enumName": {
+								"$ref": "#/components/schemas/PropertyEnumName"
+							}
+						}
+					}
+				}
+			},
+			"PutView": {
+				"description": "Puts a new view in the database. If the operation succeeds, the response code is '201'",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "PutView"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"view"
+						],
+						"properties": {
+							"view": {
+								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with response code '400'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"EditView": {
+				"description": "Edits an existing view. The view with the given id, is always replaced by the view in the request body",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "EditView"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"view"
+						],
+						"properties": {
+							"view": {
+								"description": "The JSON enconding of the view. If a view with the given id is not found, the request fails with response code '404'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"RemoveView": {
+				"description": "Removes one or more existing views from the database",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "RemoveView"
+					},
+					"parameters": {
+						"type": "object",
+						"required": [
+							"id"
+						],
+						"properties": {
+							"id": {
+								"description": "The mandatory comma separated list of view ids. If one or more of the provided views are not found, the request fails with response code be '404'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
+			"ListViews": {
+				"description": "Lists all or a subset of the stored views",
+				"type": "object",
+				"required": [
+					"request",
+					"parameters"
+				],
+				"properties": {
+					"request": {
+						"type": "string",
+						"description": "The request name",
+						"const": "ListViews"
+					},
+					"parameters": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"description": "Optional comma separated list of views ids. If one or more of the provided views are not found, the request fails with response code '404'",
+								"type": "string"
+							}
+						}
+					}
+				}
+			},
 			"PutOntology": {
 				"description": "Adds a new ontology on which to make semantic queries. If the operation succeeds, the response code is '201'",
 				"type": "object",
@@ -1263,140 +1391,12 @@
 				}
 			},
 			"PropertyEnumName": {
-				"description": "Names of the enum that hold the possible type of properties to define views according to the BondQL specification",
+				"description": "Names of the enum that holds the possible type of properties to define views according to the BondQL specification",
 				"type": "string",
 				"enum": [
 					"ResourceProperty",
 					"MetadataElement"
 				]
-			},
-			"ListProperties": {
-				"description": "Lists all the available properties from MetadataElement and ResourceProperty enum that can be used to define views according to the BondQL specification",
-				"type": "object",
-				"required": [
-					"request",
-					"parameters"
-				],
-				"properties": {
-					"request": {
-						"type": "string",
-						"description": "The request name",
-						"const": "ListProperties"
-					},
-					"parameters": {
-						"type": "object",
-						"properties": {
-							"enumName": {
-								"$ref": "#/components/schemas/PropertyEnumName"
-							}
-						}
-					}
-				}
-			},
-			"PutView": {
-				"description": "Puts a new view in the database. If the operation succeeds, the response code is '201'",
-				"type": "object",
-				"required": [
-					"request",
-					"parameters"
-				],
-				"properties": {
-					"request": {
-						"type": "string",
-						"description": "The request name",
-						"const": "PutView"
-					},
-					"parameters": {
-						"type": "object",
-						"required": [
-							"view"
-						],
-						"properties": {
-							"view": {
-								"description": "The JSON enconding of the view. If a view with the given id already exists, the request fails with response code '400'",
-								"type": "string"
-							}
-						}
-					}
-				}
-			},
-			"EditView": {
-				"description": "Edits an existing view. The view with the given id, is always replaced by the view in the request body",
-				"type": "object",
-				"required": [
-					"request",
-					"parameters"
-				],
-				"properties": {
-					"request": {
-						"type": "string",
-						"description": "The request name",
-						"const": "EditView"
-					},
-					"parameters": {
-						"type": "object",
-						"required": [
-							"id"
-						],
-						"properties": {
-							"id": {
-								"description": "The mandatory view id. It must contains alphanumeric characters and/or '_' characters. If a view with the given id is not found, the request fails with response code '404'",
-								"type": "string"
-							}
-						}
-					}
-				}
-			},
-			"RemoveView": {
-				"description": "Removes an existing view from the database",
-				"type": "object",
-				"required": [
-					"request",
-					"parameters"
-				],
-				"properties": {
-					"request": {
-						"type": "string",
-						"description": "The request name",
-						"const": "RemoveView"
-					},
-					"parameters": {
-						"type": "object",
-						"required": [
-							"id"
-						],
-						"properties": {
-							"id": {
-								"description": "The mandatory view id. It must contains alphanumeric characters and/or '_' characters. If a view with the given id is not found, the request fails with response code be '404'",
-								"type": "string"
-							}
-						}
-					}
-				}
-			},
-			"ListViews": {
-				"description": "Lists all or a subset of the stored views",
-				"type": "object",
-				"required": [
-					"request",
-					"parameters"
-				],
-				"properties": {
-					"request": {
-						"type": "string",
-						"description": "The request name",
-						"const": "ListViews"
-					},
-					"parameters": {
-						"type": "object",
-						"properties": {
-							"id": {
-								"description": "Optional comma separated list of views ids. If one or more of the provided views are not found, the request fails with response code '404'",
-								"type": "string"
-							}
-						}
-					}
-				}
 			}
 		}
 	}

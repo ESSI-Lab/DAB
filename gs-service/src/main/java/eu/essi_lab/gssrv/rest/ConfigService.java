@@ -291,12 +291,10 @@ public class ConfigService {
     }
 
     /**
-     *
      * @param request
      * @return
      */
     private Response handleEditViewRequestRequest(EditViewRequest request) {
-
 
 	try {
 
@@ -400,25 +398,32 @@ public class ConfigService {
 
 	if (optViewId.isEmpty()) {
 
-	    return ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing view identifier");
+	    return ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing mandatory view/s identifier/s");
 
 	} else {
 
-	    String viewId = optViewId.get();
+	    List<String> viewIds = Arrays.asList(optViewId.get().split(","));
 
 	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
 
 	    try {
+
 		DatabaseReader reader = DatabaseProviderFactory.getReader(setting.asStorageInfo());
 
 		DatabaseWriter writer = DatabaseProviderFactory.getWriter(setting.asStorageInfo());
 
-		if (reader.getView(viewId).isEmpty()) {
+		for (String viewId : viewIds) {
 
-		    return ConfigRequest.buildErrorResponse(Status.NOT_FOUND, "View with id '" + viewId + "' not found");
+		    if (reader.getView(viewId).isEmpty()) {
+
+			return ConfigRequest.buildErrorResponse(Status.NOT_FOUND, "View with id '" + viewId + "' not found");
+		    }
 		}
 
-		writer.removeView(viewId);
+		for (String viewId : viewIds) {
+
+		    writer.removeView(viewId);
+		}
 
 		return Response.status(Status.OK).build();
 
@@ -474,18 +479,23 @@ public class ConfigService {
 
 	JSONArray resourceProperty = new JSONArray();
 
-	ResourceProperty.listOrderedValues().forEach(property -> {
+	ResourceProperty.listOrderedValues()
 
-	    JSONObject obj = new JSONObject();
-	    obj.put("name", property.name());
-	    obj.put("type", property.getContentType());
+		.stream().filter(p -> //
+			// reserved property
+			p != ResourceProperty.SOURCE_DEPLOYMENT).forEach(property -> {
 
-	    resourceProperty.put(obj);
-	});
+		    JSONObject obj = new JSONObject();
+		    obj.put("name", property.name());
+		    obj.put("type", property.getContentType());
+
+		    resourceProperty.put(obj);
+		});
 
 	JSONArray metadataElement = new JSONArray();
 
 	MetadataElement.listOrderedValues().stream().filter(p -> //
+		// reserved properties
 		p != MetadataElement.QML_DEPTH_VALUE && //
 			p != MetadataElement.QML_MAGNITUDE_TYPE && //
 			p != MetadataElement.QML_MAGNITUDE_VALUE && //
@@ -1272,7 +1282,7 @@ public class ConfigService {
 		sourceObject.put(PutSourceRequest.SOURCE_ENDPOINT, source.getEndpoint());
 		sourceObject.put(PutSourceRequest.SERVICE_TYPE, accessorSetting.getAccessorType());
 
-		if(!source.getDeployment().isEmpty()) {
+		if (!source.getDeployment().isEmpty()) {
 
 		    sourceObject.put(PutSourceRequest.SOURCE_DEPLOYMENT, String.join(",", source.getDeployment()));
 		}
