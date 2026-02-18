@@ -801,7 +801,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		GSLoggerFactory.getLogger(getClass()).info("Using trust store at {}", target.getAbsolutePath());
 
-	        FileUtils.printTrustStoreCertificates(trustFile, trustStorePwd.get());
+	        FileUtils.printTrustStoreCertificates(target, trustStorePwd.get());
 
 		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
 	    }
