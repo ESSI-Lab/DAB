@@ -148,10 +148,18 @@ public class SMTPClient {
 		    withDelay(Duration.ofSeconds(RETRY_DELAY_SECONDS)).//
 		    withMaxAttempts(MAX_RETRY_ATTEMTPS).//
 		    onRetry(e -> {
-		GSLoggerFactory.getLogger(getClass()).warn("Failure #{}. Retrying...", e.getAttemptCount());
+
+		GSLoggerFactory.getLogger(getClass()).error(e.getLastException());
+
+		GSLoggerFactory.getLogger(getClass()).warn("Failure #{}: '{}'. Retrying...", //
+			e.getAttemptCount(), //
+			e.getLastException().getMessage());//
 	    }).//
 		    onRetriesExceeded(e -> {
-		GSLoggerFactory.getLogger(getClass()).warn("Failed to connect. Max retries exceeded");
+
+		GSLoggerFactory.getLogger(getClass()).error(e.getException());
+
+		GSLoggerFactory.getLogger(getClass()).warn("Failed to connect: '{}'. Max retries exceeded", e.getException().getMessage());
 	    }).//
 		    build();
 
