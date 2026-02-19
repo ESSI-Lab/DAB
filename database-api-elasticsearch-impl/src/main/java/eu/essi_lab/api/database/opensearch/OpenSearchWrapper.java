@@ -161,7 +161,7 @@ public class OpenSearchWrapper {
 			index(DataFolderMapping.get().getIndex()).//
 			size(0);
 
-		if (OpenSearchDatabase.debugQueries) {
+		if (OpenSearchDatabase.debugQueries()) {
 
 		    debugCountRequest(searchQuery, DataFolderMapping.toKeywordField(element.get().getName()), aggregation);
 		}
@@ -186,7 +186,7 @@ public class OpenSearchWrapper {
 			index(DataFolderMapping.get().getIndex()).//
 			size(0);
 
-		if (OpenSearchDatabase.debugQueries) {
+		if (OpenSearchDatabase.debugQueries()) {
 
 		    debugCountRequest(searchQuery, targets, maxItems);
 		}
@@ -257,7 +257,7 @@ public class OpenSearchWrapper {
 		aggregations(map).//
 		build();
 
-	if (OpenSearchDatabase.debugQueries && logQuery) {
+	if (OpenSearchDatabase.debugQueries() && logQuery) {
 
 	    GSLoggerFactory.getLogger(getClass()).debug("\n\n--- NESTED AGGREGATION ---\n");
 	    GSLoggerFactory.getLogger(OpenSearchFinder.class).debug(OpenSearchUtils.toJSONObject(searchRequest).toString(3));
@@ -426,7 +426,7 @@ public class OpenSearchWrapper {
 		builder.requestCache(true);
 	    }
 
-	    if (OpenSearchDatabase.debugQueries) {
+	    if (OpenSearchDatabase.debugQueries()) {
 
 		debugSearchRequest(//
 			searchQuery, //
@@ -701,7 +701,7 @@ public class OpenSearchWrapper {
 		    size(0).//
 		    aggregations(map);
 
-	    if (OpenSearchDatabase.debugQueries) {
+	    if (OpenSearchDatabase.debugQueries()) {
 
 		debugMinMaxRequest(searchQuery, field, map);
 	    }

@@ -45,15 +45,6 @@ public class JVMOptionTest {
 	//
 	//
 
-	Assert.assertFalse(JVMOption.DEBUG_OPENSEARCH_QUERIES.getDefaultBooleanValue().get());
-
-	Assert.assertEquals(JVMOption.DEBUG_OPENSEARCH_QUERIES.getDefaultBooleanValue(),
-		JVMOption.isEnabled(JVMOption.DEBUG_OPENSEARCH_QUERIES));
-
-	//
-	//
-	//
-
 	Assert.assertFalse(JVMOption.FORCE_VOLATILE_DB.getDefaultBooleanValue().get());
 
 	Assert.assertEquals(JVMOption.FORCE_VOLATILE_DB.getDefaultBooleanValue(), JVMOption.isEnabled(JVMOption.FORCE_VOLATILE_DB));

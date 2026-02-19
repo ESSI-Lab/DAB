@@ -65,6 +65,11 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	FORCE_SPARQL_PROXY_ACCEPT_HEADER("forceSparqlProxyAcceptHeader"), //
 
 	/**
+	 * OpenSearch database
+	 */
+	DEBUG_OPENSEARCH_QUERIES("debugOpenSearchQueries"),
+
+	/**
 	 * ADMIN users
 	 */
 	ADMIN_USERS("adminUsers"), //
