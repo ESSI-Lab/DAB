@@ -25,10 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -538,32 +535,7 @@ public class MDMetadata extends ISOMetadata<MDMetadataType> {
 	if (serviceIdentifications.hasNext()) {
 	    ServiceIdentification serviceId = serviceIdentifications.next();
 
-	    DataIdentification dataId = convertServiceIdentificationToDataIdentification(serviceId);
-
-	    return dataId;
-	}
-
-	return null;
-    }
-
-    /**
-     * @return
-     */
-    public Identification getFirstIdentification() {
-
-	Iterator<DataIdentification> dataIdentifications = getDataIdentifications();
-
-	if (dataIdentifications.hasNext()) {
-
-	    return dataIdentifications.next();
-	}
-
-	Iterator<ServiceIdentification> serviceIdentifications = getServiceIdentifications();
-
-	if (serviceIdentifications.hasNext()) {
-
-	    return serviceIdentifications.next();
-
+	    return convertServiceIdentificationToDataIdentification(serviceId);
 	}
 
 	return null;
