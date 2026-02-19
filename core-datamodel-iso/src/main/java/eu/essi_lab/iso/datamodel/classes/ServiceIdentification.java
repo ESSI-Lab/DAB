@@ -10,12 +10,12 @@ package eu.essi_lab.iso.datamodel.classes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -77,8 +77,8 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-    *    @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:description/gco:CharacterString")
-    */
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:description/gco:CharacterString")
+     */
     public void addBoundingBox(String description, BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
 	GeographicBoundingBox bbox = new GeographicBoundingBox();
 	bbox.setBigDecimalNorth(north);
@@ -102,25 +102,29 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-    *    @XPathDirective(target = "srv:serviceType/gco:LocalName")
-    */
+     * @XPathDirective(target = "srv:serviceType/gco:LocalName")
+     */
     void setServiceType(String type) {
     }
 
     /**
-    *    @XPathDirective(target = "srv:serviceType/gco:LocalName")
-    *    @return the service type string (e.g. "view") or null
-    */
+     * @return the service type string (e.g. "view") or null
+     * @XPathDirective(target = "srv:serviceType/gco:LocalName")
+     */
     public String getServiceType() {
 	try {
 	    SVServiceIdentificationType t = getElementType();
-	    if (t == null || !t.isSetServiceType()) return null;
+	    if (t == null || !t.isSetServiceType())
+		return null;
 	    GenericNamePropertyType prop = t.getServiceType();
-	    if (prop == null || !prop.isSetAbstractGenericName()) return null;
+	    if (prop == null || !prop.isSetAbstractGenericName())
+		return null;
 	    javax.xml.bind.JAXBElement<?> el = prop.getAbstractGenericName();
-	    if (el == null) return null;
+	    if (el == null)
+		return null;
 	    Object val = el.getValue();
-	    if (val instanceof CodeType) return ((CodeType) val).getValue();
+	    if (val instanceof CodeType)
+		return ((CodeType) val).getValue();
 	    return null;
 	} catch (Exception e) {
 	    return null;
@@ -128,26 +132,27 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-    *    @XPathDirective(clear = ".//srv:serviceTypeVersion")
-    */
+     * @XPathDirective(clear = ".//srv:serviceTypeVersion")
+     */
     void clearServiceTypeVersions() {
     }
 
     /**
-    *    @XPathDirective(target = ".", create = "srv:serviceTypeVersion/gco:CharacterString", after = "srv:serviceType")
-    */
+     * @XPathDirective(target = ".", create = "srv:serviceTypeVersion/gco:CharacterString", after = "srv:serviceType")
+     */
     void addServiceTypeVersion(String version) {
     }
 
     /**
-    *    @XPathDirective(target = ".", clear = ".//srv:serviceTypeVersion", create = "srv:serviceTypeVersion/gco:CharacterString", after = "srv:serviceType")
-    */
+     * @XPathDirective(target = ".", clear = ".//srv:serviceTypeVersion", create = "srv:serviceTypeVersion/gco:CharacterString", after =
+     * "srv:serviceType")
+     */
     void setServiceTypeVersion(String version) {
     }
 
     /**
-    *    @XPathDirective(target = ".//srv:serviceTypeVersion/gco:CharacterString")
-    */
+     * @XPathDirective(target = ".//srv:serviceTypeVersion/gco:CharacterString")
+     */
     public Iterator<String> getServiceTypeVersions() {
 	try {
 	    SVServiceIdentificationType t = getElementType();
@@ -156,7 +161,8 @@ public class ServiceIdentification extends Identification {
 	    List<String> out = new ArrayList<>();
 	    for (CharacterStringPropertyType pt : t.getServiceTypeVersion()) {
 		String s = ISOMetadata.getStringFromCharacterString(pt);
-		if (s != null) out.add(s);
+		if (s != null)
+		    out.add(s);
 	    }
 	    return out.iterator();
 	} catch (Exception e) {
@@ -173,8 +179,8 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-    *    @XPathDirective(target = ".", before = "srv:containsOperations", clear = "srv:couplingType")
-    */
+     * @XPathDirective(target = ".", before = "srv:containsOperations", clear = "srv:couplingType")
+     */
     public void setCouplingType(String couplingTypeCode) {
 	SVCouplingTypePropertyType couplingTypeProperty = new SVCouplingTypePropertyType();
 	couplingTypeProperty.setSVCouplingType(
@@ -190,15 +196,15 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-    *    @XPathDirective(target = ".//srv:containsOperations/srv:SV_OperationMetadata")
-    */
+     * @XPathDirective(target = ".//srv:containsOperations/srv:SV_OperationMetadata")
+     */
     public Iterator<OperationMetadata> getOperationMetadatas() {
 	List<SVOperationMetadataPropertyType> containsOperationList = getElementType().getContainsOperations();
-	ArrayList<OperationMetadata>svOperationMetadata = new ArrayList<OperationMetadata>();
-	for(SVOperationMetadataPropertyType svOp: containsOperationList) {
+	ArrayList<OperationMetadata> svOperationMetadata = new ArrayList<OperationMetadata>();
+	for (SVOperationMetadataPropertyType svOp : containsOperationList) {
 	    SVOperationMetadataType operationMetadata = svOp.getSVOperationMetadata();
 	    OperationMetadata om = new OperationMetadata(operationMetadata);
-	    svOperationMetadata.add(om);    
+	    svOperationMetadata.add(om);
 	}
 	return svOperationMetadata.iterator();
     }
@@ -208,37 +214,39 @@ public class ServiceIdentification extends Identification {
 	if (operationMetadatas.hasNext()) {
 	    return operationMetadatas.next();
 	}
-	return null;	
+	return null;
     }
 
     /**
-    *    @XPathDirective(target = ".", parent = "srv:containsOperations", position = Position.LAST)
-    */
+     * @XPathDirective(target = ".", parent = "srv:containsOperations", position = Position.LAST)
+     */
     void addContainsOperation(OperationMetadata operation) {
     }
 
     /**
-    *    @XPathDirective(target = ".", parent = "srv:containsOperations", position = Position.LAST, clear = "//srv:containsOperations")
-    */
+     * @XPathDirective(target = ".", parent = "srv:containsOperations", position = Position.LAST, clear = "//srv:containsOperations")
+     */
     void setContainsOperation(OperationMetadata operation) {
     }
 
     /**
-    *    @XPathDirective(clear = ".//srv:containsOperations")
-    */
+     * @XPathDirective(clear = ".//srv:containsOperations")
+     */
     void clearContainsOperation() {
     }
 
     /**
-    *    @XPathDirective(target = ".//srv:operatesOn/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier//gmd:code/gco:CharacterString")
-    */
+     * @XPathDirective(target =
+     * ".//srv:operatesOn/gmd:MD_DataIdentification/gmd:citation/gmd:CI_Citation/gmd:identifier//gmd:code/gco:CharacterString")
+     */
     Iterator<String> getOperatesOnCodes() {
 	return null;
     }
 
     /**
-     * Returns identifiers of resources this service operates on. Reads from srv:operatesOn (href)
-     * when present, otherwise from srv:coupledResource/srv:identifier.
+     * Returns identifiers of resources this service operates on. Reads from srv:operatesOn (href) when present, otherwise from
+     * srv:coupledResource/srv:identifier.
+     *
      * @XPathDirective(target = ".//srv:coupledResource/srv:SV_CoupledResource/srv:identifier/gco:CharacterString")
      */
     public Iterator<String> getOperatesOnIdentifiers() {
@@ -249,7 +257,8 @@ public class ServiceIdentification extends Identification {
 		for (MDDataIdentificationPropertyType prop : t.getOperatesOn()) {
 		    if (prop != null && prop.isSetHref()) {
 			String href = prop.getHref();
-			if (href != null && !href.isEmpty()) identifiers.add(href);
+			if (href != null && !href.isEmpty())
+			    identifiers.add(href);
 		    }
 		}
 	    }
@@ -257,13 +266,16 @@ public class ServiceIdentification extends Identification {
 		List<SVCoupledResourcePropertyType> coupledResources = t != null ? t.getCoupledResource() : null;
 		if (coupledResources != null) {
 		    for (SVCoupledResourcePropertyType coupledResource : coupledResources) {
-			if (coupledResource == null) continue;
+			if (coupledResource == null)
+			    continue;
 			SVCoupledResourceType svCoupled = coupledResource.getSVCoupledResource();
-			if (svCoupled == null) continue;
+			if (svCoupled == null)
+			    continue;
 			CharacterStringPropertyType identifier = svCoupled.getIdentifier();
 			if (identifier != null) {
 			    String s = ISOMetadata.getStringFromCharacterString(identifier);
-			    if (s != null) identifiers.add(s);
+			    if (s != null)
+				identifiers.add(s);
 			}
 		    }
 		}
@@ -275,26 +287,26 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-    *    @XPathDirective(target = ".//srv:coupledResource/srv:SV_CoupledResource/srv:operationName/gco:CharacterString")
-    */
+     * @XPathDirective(target = ".//srv:coupledResource/srv:SV_CoupledResource/srv:operationName/gco:CharacterString")
+     */
     public Iterator<String> getOperatesOnNames() {
 	List<SVCoupledResourcePropertyType> coupledResources = getElementType().getCoupledResource();
 	ArrayList<String> identifiers = new ArrayList<String>();
-	for(SVCoupledResourcePropertyType coupledResource : coupledResources) {
+	for (SVCoupledResourcePropertyType coupledResource : coupledResources) {
 	    SVCoupledResourceType svCoupled = coupledResource.getSVCoupledResource();
 	    CharacterStringPropertyType operationName = svCoupled.getOperationName();
 	    identifiers.add(operationName.toString());
 	}
 	return identifiers.iterator();
     }
-    
+
     /**
-    *    @XPathDirective(target = ".//srv:coupledResource/srv:SV_CoupledResource/gco:ScopedName")
-    */
+     * @XPathDirective(target = ".//srv:coupledResource/srv:SV_CoupledResource/gco:ScopedName")
+     */
     public Iterator<String> getScopedNames() {
 	List<SVCoupledResourcePropertyType> coupledResources = getElementType().getCoupledResource();
 	ArrayList<String> identifiers = new ArrayList<String>();
-	for(SVCoupledResourcePropertyType coupledResource : coupledResources) {
+	for (SVCoupledResourcePropertyType coupledResource : coupledResources) {
 	    SVCoupledResourceType svCoupled = coupledResource.getSVCoupledResource();
 	    CodeType scopedName = svCoupled.getScopedName();
 	    identifiers.add(scopedName.getValue());
@@ -302,11 +314,13 @@ public class ServiceIdentification extends Identification {
 	return identifiers.iterator();
     }
 
+    @Override
     public SVServiceIdentificationType getElementType() {
 
 	return (SVServiceIdentificationType) type;
     }
 
+    @Override
     public JAXBElement<SVServiceIdentificationType> getElement() {
 
 	JAXBElement<SVServiceIdentificationType> element = ObjectFactories.SRV()
@@ -314,34 +328,36 @@ public class ServiceIdentification extends Identification {
 
 	return element;
     }
-    
+
     /**
-     * @XPathDirective(create = "gmd:language/gco:CharacterString", target = ".", after = "gmd:spatialResolution",
-     *                        position = Position.FIRST)
+     * @XPathDirective(create = "gmd:language/gco:CharacterString", target = ".", after = "gmd:spatialResolution", position =
+     * Position.FIRST)
      */
 
     public void addBoundingBox(double north, double west, double south, double east) {
 	addBoundingBox(null, new BigDecimal(north), new BigDecimal(west), new BigDecimal(south), new BigDecimal(east));
-	
+
     }
 
-	public void addBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
-		addBoundingBox(null, north, west, south, east);
+    public void addBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
+	addBoundingBox(null, north, west, south, east);
 
-	}
+    }
 
     public void addBoundingBox(GeographicBoundingBox bbox) {
-	addBoundingBox(null, new BigDecimal(bbox.getNorth()), new BigDecimal(bbox.getWest()), new BigDecimal(bbox.getSouth()), new BigDecimal(bbox.getEast()));
-	
+	addBoundingBox(null, new BigDecimal(bbox.getNorth()), new BigDecimal(bbox.getWest()), new BigDecimal(bbox.getSouth()),
+		new BigDecimal(bbox.getEast()));
+
     }
 
     // ----------------------------
     //
     // Bounding polygon
     //
+
     /**
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.LAST)
      * @param polygon
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.LAST)
      */
     public void addBoundingPolygon(BoundingPolygon polygon) {
 	EXExtentPropertyType extentProperty = new EXExtentPropertyType();
@@ -367,9 +383,9 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:temporalElement", before =
-     *                        "srv:extent/gmd:EX_Extent/gmd:verticalElement", position = Position.LAST)
      * @param extent
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:temporalElement", before =
+     * "srv:extent/gmd:EX_Extent/gmd:verticalElement", position = Position.LAST)
      */
     public void addTemporalExtent(TemporalExtent extent) {
 
@@ -395,8 +411,8 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:verticalElement", position = Position.LAST)
      * @param extent
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:verticalElement", position = Position.LAST)
      */
     public void addVerticalExtent(VerticalExtent extent) {
 	EXVerticalExtentPropertyType exGeographicExtentPropertyType = new EXVerticalExtentPropertyType();
@@ -419,16 +435,15 @@ public class ServiceIdentification extends Identification {
 	addVerticalExtent(extent);
     }
 
-
     public void setSpatialRepresentationType(String string) {
 	// TODO Auto-generated method stub
-	
+
     }
 
     /**
-     * @XPathDirective(target = ".", after = "gmd:citation gmd:abstract gmd:purpose gmd:credit gmd_status
-     *                        gmd:pointOfContact gmd:resourceMaintenance", position = Position.FIRST)
      * @param browseGraphic
+     * @XPathDirective(target = ".", after = "gmd:citation gmd:abstract gmd:purpose gmd:credit gmd_status gmd:pointOfContact
+     * gmd:resourceMaintenance", position = Position.FIRST)
      */
     public void addGraphicOverview(BrowseGraphic browseGraphic) {
 	MDBrowseGraphicPropertyType browseGraphicProperty = new MDBrowseGraphicPropertyType();
@@ -438,22 +453,22 @@ public class ServiceIdentification extends Identification {
 
     public void setSupplementalInformation(String string) {
 	// TODO Auto-generated method stub
-	
+
     }
 
     public void setSpatialResolution(MDResolution res) {
 	// TODO Auto-generated method stub
-	
+
     }
 
     public String getCharacterSetCode() {
 	// TODO Auto-generated method stub
 	return null;
     }
-    
+
     /**
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
      * @return
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
      */
     public Iterator<GeographicBoundingBox> getGeographicBoundingBoxes() {
 
@@ -466,8 +481,7 @@ public class ServiceIdentification extends Identification {
 		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
 		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
 
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType
-			    .getAbstractEXGeographicExtent();
+		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
 		    if (abstractEXGeographicExtent != null) {
 			AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
 			if (value instanceof EXGeographicBoundingBoxType) {
@@ -522,8 +536,8 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.LAST)
      * @return
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent", parent = "gmd:geographicElement", position = Position.LAST)
      */
     public Iterator<BoundingPolygon> getBoundingPolygons() {
 	List<BoundingPolygon> ret = new ArrayList<>();
@@ -536,8 +550,7 @@ public class ServiceIdentification extends Identification {
 			List<EXGeographicExtentPropertyType> geographics = extent.getGeographicElement();
 			for (EXGeographicExtentPropertyType geographic : geographics) {
 			    if (geographic.isSetAbstractEXGeographicExtent()) {
-				JAXBElement<? extends AbstractEXGeographicExtentType> abstractGeo = geographic
-					.getAbstractEXGeographicExtent();
+				JAXBElement<? extends AbstractEXGeographicExtentType> abstractGeo = geographic.getAbstractEXGeographicExtent();
 				AbstractEXGeographicExtentType abstractExtent = abstractGeo.getValue();
 				if (abstractExtent instanceof EXBoundingPolygonType) {
 				    EXBoundingPolygonType polygonType = (EXBoundingPolygonType) abstractExtent;
@@ -551,12 +564,12 @@ public class ServiceIdentification extends Identification {
 	}
 	return ret.iterator();
     }
-    
-    /**
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:temporalElement//gmd:EX_TemporalExtent")
-     * @return
-     */
 
+    /**
+     * @return
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:temporalElement//gmd:EX_TemporalExtent")
+     */
+    @Override
     public Iterator<TemporalExtent> getTemporalExtents() {
 	ArrayList<TemporalExtent> out = new ArrayList<TemporalExtent>();
 	try {
@@ -598,9 +611,10 @@ public class ServiceIdentification extends Identification {
     //
     // Vertical extent
     //
+
     /**
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:verticalElement//gmd:EX_VerticalExtent")
      * @return
+     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:verticalElement//gmd:EX_VerticalExtent")
      */
     public Iterator<VerticalExtent> getVerticalExtents() {
 	ArrayList<VerticalExtent> out = new ArrayList<VerticalExtent>();
@@ -622,26 +636,17 @@ public class ServiceIdentification extends Identification {
 	return out.iterator();
     }
 
+    /**
+     * @return
+     */
+    public String getTopicCategory() {
 
-    public Object getTopicCategoryString() {
-	// TODO Auto-generated method stub
 	return null;
     }
-
-    public Iterator<String> getTopicCategoriesStrings() {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    public Object getTopicCategory() {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
 
     /**
-     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      * @return
+     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      */
     public BrowseGraphic getGraphicOverview() {
 	Iterator<BrowseGraphic> iterator = getGraphicOverviews();
@@ -652,9 +657,10 @@ public class ServiceIdentification extends Identification {
     }
 
     /**
-     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      * @return
+     * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      */
+    @Override
     public Iterator<BrowseGraphic> getGraphicOverviews() {
 	List<MDBrowseGraphicPropertyType> overviews = getElementType().getGraphicOverview();
 	ArrayList<BrowseGraphic> ret = new ArrayList<BrowseGraphic>();
@@ -669,32 +675,31 @@ public class ServiceIdentification extends Identification {
 
     public void clearLanguages() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     public void clearExtents() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     public void clearTopicCategories() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     public void clearGraphicOverviews() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     public void clearSpatialResolution() {
 	// TODO Auto-generated method stub
-	
+
     }
 
     /**
-     * @XPathDirective(target =
-     *                        ".//srv:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
+     * @XPathDirective(target = ".//srv:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
      */
     public Iterator<String> getGeographicDescriptionCodes() {
 
@@ -706,8 +711,7 @@ public class ServiceIdentification extends Identification {
 		EXExtentType exExtent = exExtentPropertyType.getEXExtent();
 		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
 		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType
-			    .getAbstractEXGeographicExtent();
+		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
 		    AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
 		    if (value instanceof EXGeographicDescriptionType) {
 			EXGeographicDescriptionType type = (EXGeographicDescriptionType) value;
