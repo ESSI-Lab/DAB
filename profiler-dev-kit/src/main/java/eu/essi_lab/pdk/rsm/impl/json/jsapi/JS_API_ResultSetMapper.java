@@ -145,8 +145,6 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	MIMetadata mi_Metadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 
-	List<DataIdentification> diList = Lists.newArrayList(mi_Metadata.getDataIdentifications());
-
 	// ---
 	// id
 	// ---
@@ -375,35 +373,32 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    }
 	}
 
-	// -------------------------------------------
+	// --------------------------------------------------------
 	//
-	// from the first data identification
+	// from the first data id or service id mapped to a data id
 	//
 
-	if (!diList.isEmpty()) {
+	Identification firstId = mi_Metadata.getDataIdentification();
 
-	    DataIdentification firstId = diList.getFirst();
+	// -----
+	// title
+	// -----
 
-	    // -----
-	    // title
-	    // -----
+	String title = normalizeText(firstId.getCitationTitle()).orElse("none");
 
-	    String title = normalizeText(firstId.getCitationTitle()).orElse("none");
+	report.put("title", title);
 
-	    report.put("title", title);
+	// ---------------
+	// alternate title
+	// ---------------
 
-	    // ---------------
-	    // alternate title
-	    // ---------------
+	normalizeText(firstId.getCitationAlternateTitle()).ifPresent(desc -> report.put("alternateTitle", desc));
 
-	    normalizeText(firstId.getCitationAlternateTitle()).ifPresent(desc -> report.put("alternateTitle", desc));
+	// -----------
+	// description
+	// -----------
 
-	    // -----------
-	    // description
-	    // -----------
-
-	    normalizeText(firstId.getAbstract()).ifPresent(desc -> report.put("description", desc));
-	}
+	normalizeText(firstId.getAbstract()).ifPresent(desc -> report.put("description", desc));
 
 	// ---------------------------------------------
 	//
@@ -425,8 +420,11 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	JSONArray updatedArray = new JSONArray();
 	JSONArray createdArray = new JSONArray();
 	JSONArray expirationArray = new JSONArray();
+	JSONArray publicationArray = new JSONArray();
 
-	for (DataIdentification identification : diList) {
+	List<Identification> identifications = mi_Metadata.getIdentifications();
+
+	for (Identification identification : identifications) {
 
 	    // --------------------------
 	    // spatialRepresentationType
@@ -456,6 +454,12 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // ----------
 
 	    handleCitationDate(identification, createdArray, Identification.CREATION);
+
+	    // ----------
+	    // publication
+	    // ----------
+
+	    handleCitationDate(identification, publicationArray, Identification.PUBLICATION);
 
 	    // -------
 	    // rights
@@ -700,6 +704,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (!expirationArray.isEmpty()) {
 
 	    report.put("expiration", expirationArray);
+	}
+
+	// ------------------------
+	// inserts publication dates
+	if (!publicationArray.isEmpty()) {
+
+	    report.put("published", publicationArray);
 	}
 
 	// ------------------------
