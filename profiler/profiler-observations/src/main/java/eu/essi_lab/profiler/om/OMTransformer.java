@@ -241,7 +241,7 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 
 	String interpolation = request.getParameterValue(APIParameters.TIME_INTERPOLATION);
 	if (interpolation != null) {
-	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.TIME_INTERPOLATION, interpolation));
+	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH,MetadataElement.TIME_INTERPOLATION, interpolation));
 	}
 
 	String timeseriesCode = request.getParameterValue(APIParameters.OBSERVATION);
