@@ -10,12 +10,12 @@ package eu.essi_lab.pdk.rsm.impl.json.jsapi;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,6 +26,7 @@ import eu.essi_lab.access.compliance.*;
 import eu.essi_lab.access.compliance.DataComplianceTester.*;
 import eu.essi_lab.access.compliance.wrapper.*;
 import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.xml.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.*;
@@ -138,7 +139,6 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    source.put("operation", operations);
 
 	    return source.toString();
-
 	}
 
 	JSONObject report = new JSONObject();
@@ -174,6 +174,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	String parent = mi_Metadata.getParentIdentifier();
 
 	if (parent != null) {
+
 	    report.put("parentId", parent);
 	}
 
@@ -255,6 +256,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	CoverageDescription covDesc = mi_Metadata.getCoverageDescription();
 
 	if (covDesc != null) {
+
 	    String coverageDescription = covDesc.getAttributeDescription();
 	    report.put("coverageDescription", coverageDescription);
 	}
@@ -282,6 +284,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    distribution.getDistributorParties().forEach(party -> {
 
 		String name = party.getOrganisationName();
+
 		if (name != null && !name.isEmpty()) {
 
 		    report.put("distributorOrgName", name);
@@ -295,12 +298,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    List<Format> formats = Lists.newArrayList(distribution.getFormats());
 
 	    if (!formats.isEmpty()) {
+
 		JSONArray array = new JSONArray();
-		for (Format format : formats) {
-		    if (format.getName() != null && !format.getName().isEmpty()) {
-			array.put(format.getName());
-		    }
-		}
+
+		formats.stream(). //
+			filter(f -> f.getName() != null && !f.getName().isEmpty()).//
+			forEach(f -> array.put(f.getName()));//
+
 		report.put("format", array);
 	    }
 
@@ -319,48 +323,56 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		JSONArray online = new JSONArray();
 
 		for (Online on : onlineList) {
+
 		    JSONObject obj = createOnline(on, message);
+
 		    if (obj != null) {
 			online.put(obj);
 		    }
 		}
 
 		ReportsMetadataHandler handler = new ReportsMetadataHandler(resource);
+
 		List<DataComplianceReport> reports = handler.getReports();
-		for (DataComplianceReport r : reports) {
-		    DataComplianceTest lastSucceededTest = r.getLastSucceededTest();
-		    if (lastSucceededTest.equals(DataComplianceTest.EXECUTION)) {
-			if (r.getFullDataDescriptor().getDataType().equals(DataType.TIME_SERIES)) {
-			    try {
-				String onlineId = r.getOnlineId();
-				JSONObject jsonOnline = new JSONObject();
-				jsonOnline.put("protocol", "GWIS");
-				jsonOnline.put("function", "info");
-				URL base = new URL(message.getRequestAbsolutePath());
-				Optional<String> token = message.getWebRequest().extractTokenId();
-				String tokenString = "";
-				if (token.isPresent()) {
-				    tokenString = "&token=" + token.get();
-				}
-				URL url = new URL(base, "../gwis?request=plot&onlineId=" + onlineId + tokenString);
-				jsonOnline.put("url", url.toExternalForm());
-				online.put(jsonOnline);
-			    } catch (MalformedURLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			    }
-			    break;
+
+		reports.stream().//
+			filter(r -> r.getFullDataDescriptor().getDataType().equals(DataType.TIME_SERIES)).//
+			filter(r -> r.getLastSucceededTest().equals(DataComplianceTest.EXECUTION)).//
+			forEach(r -> {
+		    try {
+
+			String onlineId = r.getOnlineId();
+
+			JSONObject jsonOnline = new JSONObject();
+			jsonOnline.put("protocol", "GWIS");
+			jsonOnline.put("function", "info");
+
+			URL base = new URI(message.getRequestAbsolutePath()).toURL();
+
+			Optional<String> token = message.getWebRequest().extractTokenId();
+			String tokenString = "";
+
+			if (token.isPresent()) {
+			    tokenString = "&token=" + token.get();
 			}
+
+			URL url = new URL(base, "../gwis?request=plot&onlineId=" + onlineId + tokenString);
+			jsonOnline.put("url", url.toExternalForm());
+
+			online.put(jsonOnline);
+
+		    } catch (Exception e) {
+
+			GSLoggerFactory.getLogger(getClass()).error(e);
 		    }
 
-		}
+		});
 
 		if (!online.isEmpty()) {
 
 		    report.put("online", online);
 		}
 	    }
-
 	}
 
 	// -------------------------------------------
@@ -424,7 +436,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	    for (String code : spatialRepTypeList) {
 
-		normalizeText(code).ifPresent(type -> spatialRepTypeArray.put(type));
+		normalizeText(code).ifPresent(spatialRepTypeArray::put);
 	    }
 
 	    // -------
@@ -649,7 +661,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	    for (String code : topicCategoryList) {
 
-		normalizeText(code).ifPresent(val -> topicArray.put(val));
+		normalizeText(code).ifPresent(topicArray::put);
 	    }
 
 	    // ---------
@@ -1017,13 +1029,17 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
     private void addWhen(JSONArray when, String from, String to) {
 
 	if (from != null || to != null) {
+
 	    JSONObject obj = new JSONObject();
+
 	    if (from != null) {
 		obj.put("from", normalizeTime(from));
 	    }
+
 	    if (to != null) {
 		obj.put("to", normalizeTime(to));
 	    }
+
 	    when.put(obj);
 	}
     }
@@ -1056,73 +1072,35 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	if (url != null) {
 
-	    // filter old gi-axe urls
-	    if (url.contains("axe.geodab.eu") || url.contains("geodab-gi-axe")) {
-		return null;
-	    }
-	    // china geoss case: endpoint changed
-	    String token = "ChinaGEOSS-2018@124.16.184.25";
-	    if (url.contains(token)) {
-		url = url.replace(token, "ChinaGEOSS@124.16.184.9");
-	    }
-
 	    // Trans-African Hydro-Meteorological Observatory (TAHMO) case: use proxy
-	    if (url.startsWith(SOS_TAHMO_URL)) {
-		try {
-		    // check if it is the base endpoint only or getobservation request
-		    URL checkURL = new URL(url);
-		    if (checkURL.getQuery() != null && !checkURL.getQuery().isEmpty()) {
-			String instanceBaseUrl = message.getWebRequest().getUriInfo().getBaseUri().toString();
-			String replaceUrl = instanceBaseUrl.endsWith("/")
-				? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
-				: instanceBaseUrl + "/" + SOS_TAHMO_PROXY_PATH;
-			url = url.replace(SOS_TAHMO_URL, replaceUrl);
-		    }
-
-		} catch (MalformedURLException e) {
-		    e.printStackTrace();
-		}
-
-	    }
-
+	    url = handleSOSTahmoURL(url, SOS_TAHMO_URL, message).orElse(url);
 	    // TWIGA use case: use proxy (should replace the TAHMO SOS)
-	    if (url.startsWith(SOS_TWIGA_URL)) {
-		try {
-		    // check if it is the base endpoint only or getobservation request
-		    URL checkURL = new URL(url);
-		    if (checkURL.getQuery() != null && !checkURL.getQuery().isEmpty()) {
-			String instanceBaseUrl = message.getWebRequest().getUriInfo().getBaseUri().toString();
-			String replaceUrl = instanceBaseUrl.endsWith("/")
-				? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
-				: instanceBaseUrl + "/" + SOS_TAHMO_PROXY_PATH;
-			url = url.replace(SOS_TWIGA_URL, replaceUrl);
-		    }
-
-		} catch (MalformedURLException e) {
-		    e.printStackTrace();
-		}
-
-	    }
+	    url = handleSOSTahmoURL(url, SOS_TWIGA_URL, message).orElse(url);
 
 	    online.put("url", url);
 	    addOnline = true;
 	}
+
 	if (name != null) {
 	    online.put("name", name);
 	    addOnline = true;
 	}
+
 	if (description != null) {
 	    online.put("description", description);
 	    addOnline = true;
 	}
+
 	if (protocol != null) {
 	    online.put("protocol", protocol);
 	    addOnline = true;
 	}
+
 	if (function != null) {
 	    online.put("function", function);
 	    addOnline = true;
 	}
+
 	if (anchor != null && anchor.startsWith("http://www.essi-lab.eu/broker/accesstypes/")) {
 	    addOnline = true;
 	    anchor = anchor.replace("http://www.essi-lab.eu/broker/accesstypes/", "");
@@ -1177,10 +1155,42 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	}
 
 	if (addOnline) {
+
 	    return online;
 	}
 
 	return null;
+    }
+
+    /**
+     * @param url
+     * @param target
+     * @param message
+     */
+    private Optional<String> handleSOSTahmoURL(String url, String target, DiscoveryMessage message) {
+
+	if (url.startsWith(target)) {
+	    try {
+		// check if it is the base endpoint only or getobservation request
+		URL checkURL = new URI(url).toURL();
+
+		if (checkURL.getQuery() != null && !checkURL.getQuery().isEmpty()) {
+
+		    String instanceBaseUrl = message.getWebRequest().getUriInfo().getBaseUri().toString();
+
+		    String replaceUrl = instanceBaseUrl.endsWith("/")
+			    ? instanceBaseUrl + SOS_TAHMO_PROXY_PATH
+			    : instanceBaseUrl + "/" + SOS_TAHMO_PROXY_PATH;
+
+		    return Optional.of(url.replace(target, replaceUrl));
+		}
+
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
+	}
+
+	return Optional.empty();
     }
 
     /**
