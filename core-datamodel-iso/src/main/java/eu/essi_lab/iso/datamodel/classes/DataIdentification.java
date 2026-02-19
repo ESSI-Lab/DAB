@@ -10,12 +10,12 @@ package eu.essi_lab.iso.datamodel.classes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -105,6 +105,7 @@ public class DataIdentification extends Identification {
 	return getTopicCategory() != null ? getTopicCategory().value() : null;
     }
 
+    @Override
     public Iterator<String> getTopicCategoriesStrings() {
 
 	Iterator<MDTopicCategoryCodeType> topicCategories = getTopicCategories();
@@ -132,6 +133,7 @@ public class DataIdentification extends Identification {
      *
      * @param topicCategoryString
      */
+    @Override
     public void addTopicCategory(String topicCategoryString) {
 	if (topicCategoryString == null || topicCategoryString.isEmpty()) {
 	    return;
@@ -240,6 +242,7 @@ public class DataIdentification extends Identification {
      * @return
      * @XPathDirective(target = "./*:extent/gmd:EX_Extent/gmd:temporalElement//gmd:EX_TemporalExtent")
      */
+    @Override
     public Iterator<TemporalExtent> getTemporalExtents() {
 
 	ArrayList<TemporalExtent> out = new ArrayList<TemporalExtent>();
@@ -389,6 +392,7 @@ public class DataIdentification extends Identification {
 	addGeographicBoundingBox(new BigDecimal(north), new BigDecimal(west), new BigDecimal(south), new BigDecimal(east));
     }
 
+    @Override
     public void addGeographicBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
 
 	addGeographicBoundingBox(null, north, west, south, east);
@@ -424,6 +428,7 @@ public class DataIdentification extends Identification {
      * @return
      * @XPathDirective(target = "./*:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
      */
+    @Override
     public Iterator<GeographicBoundingBox> getGeographicBoundingBoxes() {
 
 	ArrayList<GeographicBoundingBox> out = new ArrayList<GeographicBoundingBox>();
@@ -529,6 +534,7 @@ public class DataIdentification extends Identification {
      * @return
      * @XPathDirective(target = "./gmd:extent/gmd:EX_Extent/gmd:verticalElement//gmd:EX_VerticalExtent")
      */
+    @Override
     public Iterator<VerticalExtent> getVerticalExtents() {
 	ArrayList<VerticalExtent> out = new ArrayList<VerticalExtent>();
 
@@ -712,6 +718,7 @@ public class DataIdentification extends Identification {
     /**
      * @return
      */
+    @Override
     public List<String> getSpatialRepresentationTypeCodeListValueList() {
 
 	ArrayList<String> out = new ArrayList<>();
@@ -795,6 +802,7 @@ public class DataIdentification extends Identification {
      * @return
      * @XPathDirective(target = "gmd:graphicOverview/gmd:MD_BrowseGraphic")
      */
+    @Override
     public Iterator<BrowseGraphic> getGraphicOverviews() {
 	List<MDBrowseGraphicPropertyType> overviews = getElementType().getGraphicOverview();
 	ArrayList<BrowseGraphic> ret = new ArrayList<BrowseGraphic>();
@@ -951,42 +959,4 @@ public class DataIdentification extends Identification {
     public List<ResponsibleParty> getOriginatorParty() {
 	return getCitedParty(new String[] { "originator" });
     }
-
-    public List<ResponsibleParty> getCitedParty(String... roles) {
-	List<ResponsibleParty> ret = new ArrayList<>();
-	CICitationPropertyType citation = getElementType().getCitation();
-	if (citation != null) {
-	    CICitationType cicitation = citation.getCICitation();
-	    if (cicitation != null) {
-		List<CIResponsiblePartyPropertyType> parties = cicitation.getCitedResponsibleParty();
-		if (parties != null) {
-		    for (CIResponsiblePartyPropertyType party : parties) {
-			CIResponsiblePartyType ciparty = party.getCIResponsibleParty();
-			if (ciparty != null) {
-			    CIRoleCodePropertyType role = ciparty.getRole();
-			    if (role != null) {
-				CodeListValueType roleCode = role.getCIRoleCode();
-				if (roleCode != null) {
-				    String value = roleCode.getCodeListValue();
-				    if (value != null) {
-					if (roles != null && roles.length > 0) {
-					    for (String r : roles) {
-						if (value.equals(r)) {
-						    ret.add(new ResponsibleParty(ciparty));
-						}
-					    }
-					} else {
-					    ret.add(new ResponsibleParty(ciparty));
-					}
-				    }
-				}
-			    }
-			}
-		    }
-		}
-	    }
-	}
-	return ret;
-    }
-
 }

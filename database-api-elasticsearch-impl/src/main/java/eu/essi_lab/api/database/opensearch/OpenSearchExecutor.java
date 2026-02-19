@@ -24,69 +24,42 @@ package eu.essi_lab.api.database.opensearch;
  * #L%
  */
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.spatial.SpatialExtent;
-import eu.essi_lab.messages.stats.ComputationResult;
-import eu.essi_lab.messages.stats.ResponseItem;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsMessage.GroupByPeriod;
-import eu.essi_lab.messages.stats.StatisticsResponse;
-import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMap;
-import eu.essi_lab.messages.termfrequency.TermFrequencyMapType;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.Queryable.ContentType;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.index.IndexedElement;
-import eu.essi_lab.model.index.IndexedMetadataElement;
-import eu.essi_lab.model.index.IndexedResourceProperty;
-import eu.essi_lab.model.index.jaxb.BoundingBox;
-import eu.essi_lab.model.index.jaxb.CardinalValues;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import jakarta.json.Json;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonNumber;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
-import jakarta.json.stream.JsonGenerator;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.opensearch.client.json.JsonData;
-import org.opensearch.client.json.jackson.JacksonJsonpMapper;
-import org.opensearch.client.opensearch.OpenSearchClient;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.opensearch.index.mappings.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.spatial.*;
+import eu.essi_lab.messages.stats.*;
+import eu.essi_lab.messages.stats.StatisticsMessage.*;
+import eu.essi_lab.messages.termfrequency.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.Queryable.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.index.*;
+import eu.essi_lab.model.index.jaxb.*;
+import eu.essi_lab.model.resource.*;
+import jakarta.json.*;
+import jakarta.json.stream.*;
+import org.json.*;
+import org.opensearch.client.json.*;
+import org.opensearch.client.json.jackson.*;
+import org.opensearch.client.opensearch.*;
 import org.opensearch.client.opensearch._types.*;
+import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.aggregations.*;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.opensearch.core.SearchRequest.Builder;
-import org.opensearch.client.opensearch.core.SearchResponse;
-import org.opensearch.client.opensearch.core.search.Hit;
+import org.opensearch.client.opensearch._types.query_dsl.*;
+import org.opensearch.client.opensearch.core.*;
+import org.opensearch.client.opensearch.core.SearchRequest.*;
+import org.opensearch.client.opensearch.core.search.*;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap.SimpleEntry;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.*;
+import java.util.AbstractMap.*;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.Map.*;
 
 /**
  * @author Fabrizio
@@ -325,7 +298,7 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 
 	try {
 
-	    if (OpenSearchDatabase.debugQueries) {
+	    if (OpenSearchDatabase.debugQueries()) {
 		debugQuery(searchRequest);
 	    }
 

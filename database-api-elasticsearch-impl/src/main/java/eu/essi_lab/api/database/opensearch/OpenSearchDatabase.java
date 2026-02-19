@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.configuration.ExecutionMode;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.http.HttpHost;
@@ -36,12 +38,12 @@ import com.fasterxml.jackson.core.StreamReadConstraints;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -65,17 +67,12 @@ import software.amazon.awssdk.regions.Region;
  */
 public class OpenSearchDatabase extends Database {
 
-    public static boolean debugQueries = false;
-
-
     /**
      *
      */
     public static final Integer MAX_RESULT_WINDOW_SIZE = 10000;
 
     static {
-
-	debugQueries = JVMOption.isEnabled(JVMOption.DEBUG_OPENSEARCH_QUERIES);
 
 	//
 	// set the Jackson StreamReadConstraints maxStringLength to 50 MB instead of the
@@ -91,6 +88,16 @@ public class OpenSearchDatabase extends Database {
     private SdkHttpClient httpClient;
     private boolean initialized;
     private StorageInfo storageInfo;
+
+    /**
+     * @return
+     */
+    static boolean debugQueries() {
+
+	return ConfigurationWrapper.getSystemSettings(). //
+		readKeyValue(SystemSetting.KeyValueOptionKeys.DEBUG_OPENSEARCH_QUERIES.getLabel()). //
+		map(Boolean::valueOf).orElse(false); //
+    }
 
     /**
      * @return

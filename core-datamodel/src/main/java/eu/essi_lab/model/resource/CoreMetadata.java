@@ -10,12 +10,12 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -36,7 +36,7 @@ import eu.essi_lab.lib.xml.NameSpace;
 
 /**
  * Core set of harmonized metadata, based on the "ISO-19115 Core metadata for geographic datasets" and on "Dublin Core"
- * 
+ *
  * @author Fabrizio
  */
 public class CoreMetadata {
@@ -86,33 +86,24 @@ public class CoreMetadata {
     @XmlTransient
     public String getTitle() {
 
-	Identification identification = isoMetadata.getIdentification();
-	if (identification == null) {
-	    return null;
-	}
+	return isoMetadata.getDataIdentification().getCitationTitle();
 
-	return identification.getCitationTitle();
     }
 
     public void setTitle(String title) {
 
-	getIdentification().setCitationTitle(title);
+	getDataIdentification().setCitationTitle(title);
     }
 
     @XmlTransient
     public String getAbstract() {
 
-	Identification identification = isoMetadata.getIdentification();
-	if (identification == null) {
-	    return null;
-	}
-
-	return identification.getAbstract();
+	return isoMetadata.getDataIdentification().getAbstract();
     }
 
     public void setAbstract(String abstract_) {
 
-	getIdentification().setAbstract(abstract_);
+	getDataIdentification().setAbstract(abstract_);
     }
 
     public void addDistributionOnlineResource(String name, String linkage, String protocol, String functionCode) {
@@ -158,19 +149,26 @@ public class CoreMetadata {
 
     /**
      * use big decimals method
+     *
      * @param north
      * @param west
      * @param south
      * @param east
      */
-    @Deprecated 
+    @Deprecated
     public void addBoundingBox(double north, double west, double south, double east) {
 	addBoundingBox(new BigDecimal(north), new BigDecimal(west), new BigDecimal(south), new BigDecimal(east));
     }
-    
+
+    /**
+     * @param north
+     * @param west
+     * @param south
+     * @param east
+     */
     public void addBoundingBox(BigDecimal north, BigDecimal west, BigDecimal south, BigDecimal east) {
 
-	getIdentification().addGeographicBoundingBox(north, west, south, east);
+	getDataIdentification().addGeographicBoundingBox(north, west, south, east);
     }
 
     public GeographicBoundingBox getBoundingBox() {
@@ -219,30 +217,26 @@ public class CoreMetadata {
 	return distribution;
     }
 
+    /**
+     * @return
+     */
     public DataIdentification getDataIdentification() {
 
 	DataIdentification dataIdentification = isoMetadata.getDataIdentification();
+
 	if (dataIdentification == null) {
+
 	    dataIdentification = new DataIdentification();
 	    isoMetadata.addDataIdentification(dataIdentification);
 	}
+
 	return dataIdentification;
     }
 
-	public Identification getIdentification() {
-
-		Identification identification = isoMetadata.getIdentification();
-		if (identification == null) {
-			identification = new DataIdentification();
-			isoMetadata.addDataIdentification((DataIdentification) identification);
-		}
-		return identification;
-	}
-
     /**
-     * Removes the acquisition information from a copy of the {@link #getReadOnlyMDMetadata()} and returns it as
-     * {@link MDMetadata} in the GMD namespace
-     * 
+     * Removes the acquisition information from a copy of the {@link #getReadOnlyMDMetadata()} and returns it as {@link MDMetadata} in the
+     * GMD namespace
+     *
      * @return a copy of {@link #getReadOnlyMDMetadata()} without the acquisition information and in the GMD namespace
      * @throws JAXBException
      * @throws UnsupportedEncodingException

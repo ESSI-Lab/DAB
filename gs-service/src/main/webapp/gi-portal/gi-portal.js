@@ -2916,7 +2916,7 @@ export function initializePortal(config) {
 			// After constraints are initialized, try to fetch and update values
 			const authToken = localStorage.getItem('authToken') || undefined;
 			
-			if (authToken !== undefined) {
+			if (authToken !== undefined && view != undefined) {
 				fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=timeInterpolation&limit=50`)
 					.then(response => response.json())
 					.then(data => {
@@ -2959,7 +2959,7 @@ export function initializePortal(config) {
 		// After constraints are initialized, try to fetch and update values
 		const authToken = localStorage.getItem('authToken') || config.token;
 		
-		if (authToken !== undefined) {
+		if (authToken !== undefined && view != undefined) {
 			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
 				.then(response => response.json())
 				.then(data => {
@@ -3020,7 +3020,7 @@ export function initializePortal(config) {
 		// After constraints are initialized, try to fetch and update values
 		const authToken = localStorage.getItem('authToken') || config.token;
 		
-		if (authToken !== undefined) {
+		if (authToken !== undefined && view != undefined) {
 			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
 				.then(response => response.json())
 				.then(data => {
