@@ -179,6 +179,32 @@ public abstract class ConfigRequest {
     }
 
     /**
+     * @param parameter
+     * @return
+     */
+    public Optional<String> readString(String parameter) {
+
+	return read(parameter).map(String::valueOf);
+    }
+
+    /**
+     * @param parameter
+     * @return
+     */
+    public List<String> readStrings(String parameter) {
+
+	if (object.has("parameters") && getParametersObject().has(parameter)) {
+
+	    return Arrays.stream(readValue(parameter).toString().split(",")).//
+		    map(String::trim).//
+		    map(String::strip).//
+		    collect(Collectors.toList());
+	}
+
+	return List.of();
+    }
+
+    /**
      * @param compositeParam
      * @param nestedParam
      * @return

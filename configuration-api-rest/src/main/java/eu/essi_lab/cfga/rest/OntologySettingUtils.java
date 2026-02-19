@@ -49,14 +49,14 @@ public class OntologySettingUtils {
 
 	OntologySetting out = SettingUtils.downCast(SelectionUtils.resetAndSelect(setting, false), OntologySetting.class);
 
-	request.read(PutOntologyRequest.ONTOLOGY_ENDPOINT).ifPresent(v -> out.setOntologyEndpoint(v.toString()));
+	request.readString(PutOntologyRequest.ONTOLOGY_ENDPOINT).ifPresent(out::setOntologyEndpoint);
 
-	request.read(PutOntologyRequest.ONTOLOGY_NAME).ifPresent(v -> out.setOntologyName(v.toString()));
+	request.readString(PutOntologyRequest.ONTOLOGY_NAME).ifPresent(out::setOntologyName);
 
-	request.read(PutOntologyRequest.ONTOLOGY_AVAILABILITY)
-		.ifPresent(v -> out.setOntologyAvailability(LabeledEnum.valueOf(Availability.class, v.toString()).get()));
+	request.readString(PutOntologyRequest.ONTOLOGY_AVAILABILITY)
+		.ifPresent(v -> out.setOntologyAvailability(LabeledEnum.valueOf(Availability.class, v).get()));
 
-	request.read(PutOntologyRequest.ONTOLOGY_DESCRIPTION).ifPresent(v -> out.setOntologyDescription(v.toString()));
+	request.readString(PutOntologyRequest.ONTOLOGY_DESCRIPTION).ifPresent(out::setOntologyDescription);
 
 	setting.clean();
 	setting.afterClean();
@@ -72,19 +72,20 @@ public class OntologySettingUtils {
 
 	OntologySetting setting = new OntologySetting();
 
-	String id = request.read(PutOntologyRequest.ONTOLOGY_ID).get().toString();
-	String endpoint = request.read(PutOntologyRequest.ONTOLOGY_ENDPOINT).get().toString();
-	String name = request.read(PutOntologyRequest.ONTOLOGY_NAME).get().toString();
+	String id = request.readString(PutOntologyRequest.ONTOLOGY_ID).get();
+	String endpoint = request.readString(PutOntologyRequest.ONTOLOGY_ENDPOINT).get();
+	String name = request.readString(PutOntologyRequest.ONTOLOGY_NAME).get();
 
-	String availability = request.read(PutOntologyRequest.ONTOLOGY_AVAILABILITY).map(Object::toString)
+	String availability = request.readString(PutOntologyRequest.ONTOLOGY_AVAILABILITY)
 		.orElse(Availability.ENABLED.getLabel());
 
-	String queryLang = request.read(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE).map(Object::toString)
+	String queryLang = request.readString(PutOntologyRequest.ONTOLOGY_QUERY_LANGUAGE)
 		.orElse(QueryLanguage.SPARQL.getLabel());
 
-	String dataModel = request.read(PutOntologyRequest.ONTOLOGY_DATA_MODEL).map(Object::toString).orElse(DataModel.SKOS.getLabel());
+	String dataModel = request.readString(PutOntologyRequest.ONTOLOGY_DATA_MODEL).
+		orElse(DataModel.SKOS.getLabel());
 
-	Optional<String> optDesc = request.read(PutOntologyRequest.ONTOLOGY_DESCRIPTION).map(Object::toString);
+	Optional<String> optDesc = request.readString(PutOntologyRequest.ONTOLOGY_DESCRIPTION);
 
 	setting.setOntologyId(id);
 	setting.setOntologyName(name);
@@ -108,7 +109,7 @@ public class OntologySettingUtils {
      */
     public static SettingFinder<OntologySetting> getOntologySettingFinder(ConfigRequest request) {
 
-	Optional<String> optSourceId = request.read(PutOntologyRequest.ONTOLOGY_ID).map(Object::toString);
+	Optional<String> optSourceId = request.readString(PutOntologyRequest.ONTOLOGY_ID);
 
 	OntologySetting setting;
 

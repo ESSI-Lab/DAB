@@ -38,7 +38,6 @@ import javax.servlet.http.*;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.*;
-import javax.xml.bind.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.*;
@@ -298,7 +297,7 @@ public class ConfigService {
 
 	try {
 
-	    JSONObject jsonView = new JSONObject(request.read(PutViewRequest.VIEW).map(Object::toString).get());
+	    JSONObject jsonView = new JSONObject(request.readString(PutViewRequest.VIEW).get());
 
 	    View view = ViewFactory.fromJSONObject(jsonView);
 
@@ -339,19 +338,16 @@ public class ConfigService {
 	    // reading optional views ids
 	    //
 
-	    final List<String> reqIds = new ArrayList<String>();
+	    List<String> reqIds = request.readStrings(ListViewsRequest.VIEW_ID);
 
-	    Optional<Object> optional = request.read(ListOntologiesRequest.ONTOLOGY_ID);
-
-	    if (optional.isPresent()) {
-
-		reqIds.addAll(Arrays.stream(optional.get().toString().split(",")).//
-			map(v -> v.trim().strip()).//
-			toList());
+	    if (!reqIds.isEmpty()) {
 
 		List<String> dbIds = reader.getViewIdentifiers(GetViewIdentifiersRequest.create());
 
-		String missingViewIds = reqIds.stream().filter(id -> !dbIds.contains(id)).collect(Collectors.joining(","));
+		String missingViewIds = reqIds. //
+			stream(). //
+			filter(id -> !dbIds.contains(id)).//
+			collect(Collectors.joining(","));//
 
 		if (!missingViewIds.isEmpty()) {
 
@@ -394,7 +390,7 @@ public class ConfigService {
      */
     private Response handleRemoveViewRequest(RemoveViewRequest request) {
 
-	Optional<String> optViewId = request.read(RemoveViewRequest.VIEW_ID).map(Object::toString);
+	Optional<String> optViewId = request.readString(RemoveViewRequest.VIEW_ID);
 
 	if (optViewId.isEmpty()) {
 
@@ -402,7 +398,7 @@ public class ConfigService {
 
 	} else {
 
-	    List<String> viewIds = Arrays.asList(optViewId.get().split(","));
+	    List<String> viewIds = request.readStrings(RemoveViewRequest.VIEW_ID);
 
 	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
 
@@ -473,7 +469,7 @@ public class ConfigService {
      */
     private Response handleListPropertiesRequest(ListPropertiesRequest request) {
 
-	Optional<String> enumName = request.read(ListPropertiesRequest.ENUM_NAME).map(Object::toString);
+	Optional<String> enumName = request.readString(ListPropertiesRequest.ENUM_NAME);
 
 	JSONObject out = new JSONObject();
 
@@ -536,23 +532,19 @@ public class ConfigService {
 	// reading optional ontology ids
 	//
 
-	final List<String> ontologiesIds = new ArrayList<String>();
+	List<String> ontologiesIds = request.readStrings(ListOntologiesRequest.ONTOLOGY_ID);
 
-	Optional<Object> optional = request.read(ListOntologiesRequest.ONTOLOGY_ID);
-
-	if (optional.isPresent()) {
-
-	    //
-	    ontologiesIds.addAll(Arrays.stream(optional.get().toString().split(",")).//
-		    map(v -> v.trim().strip()).//
-		    toList());
+	if (!ontologiesIds.isEmpty()) {
 
 	    List<String> ids = ConfigurationWrapper.getOntologySettings().//
 		    stream().//
 		    map(OntologySetting::getOntologyId).//
 		    toList();
 
-	    String missingOntologies = ontologiesIds.stream().filter(id -> !ids.contains(id)).collect(Collectors.joining(","));
+	    String missingOntologies = ontologiesIds. //
+		    stream().//
+		    filter(id -> !ids.contains(id)).//
+		    collect(Collectors.joining(","));//
 
 	    if (!missingOntologies.isEmpty()) {
 
@@ -692,7 +684,7 @@ public class ConfigService {
      */
     private Response handlePutOntologyRequest(PutOntologyRequest request) {
 
-	String ontologyId = request.read(PutOntologyRequest.ONTOLOGY_ID).get().toString();
+	String ontologyId = request.readString(PutOntologyRequest.ONTOLOGY_ID).get();
 
 	if (ConfigurationWrapper.getOntologySettings().//
 		stream().//
@@ -730,7 +722,7 @@ public class ConfigService {
      */
     private Response handlePutSourceRequest(PutSourceRequest putSourceRequest) {
 
-	Optional<String> optSourceId = putSourceRequest.read(PutSourceRequest.SOURCE_ID).map(Object::toString);
+	Optional<String> optSourceId = putSourceRequest.readString(PutSourceRequest.SOURCE_ID);
 
 	Optional<String> randomId = Optional.empty();
 
@@ -895,9 +887,9 @@ public class ConfigService {
 	// harvesting underway check in case of start harvesting now
 	//
 
-	Optional<Object> startTime = harvestSourceRequest.read(HarvestSchedulingRequest.START_TIME);
+	Optional<String> startTime = harvestSourceRequest.readString(HarvestSchedulingRequest.START_TIME);
 
-	String sourceId = harvestSourceRequest.read(PutSourceRequest.SOURCE_ID).map(Object::toString).get();
+	String sourceId = harvestSourceRequest.readString(PutSourceRequest.SOURCE_ID).get();
 
 	if (startTime.isEmpty() && isHarvestingUnderway(sourceId)) {
 
@@ -913,7 +905,7 @@ public class ConfigService {
 
 	    String currentTime = ISO8601DateTimeUtils.getISO8601DateTime("Europe/Berlin");
 
-	    if (startTime.get().toString().compareTo(currentTime) < 0) {
+	    if (startTime.get().compareTo(currentTime) < 0) {
 
 		return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "The provided start time '" + startTime.get() + "' is in the past");
 	    }
@@ -1087,7 +1079,7 @@ public class ConfigService {
 	// harvesting underway check
 	//
 
-	String sourceId = removeSourceRequest.read(PutSourceRequest.SOURCE_ID).map(Object::toString).get();
+	String sourceId = removeSourceRequest.readString(PutSourceRequest.SOURCE_ID).get();
 
 	if (isHarvestingUnderway(sourceId)) {
 
@@ -1185,7 +1177,7 @@ public class ConfigService {
 	// harvesting underway check
 	//
 
-	String sourceId = request.read(PutSourceRequest.SOURCE_ID).map(Object::toString).get();
+	String sourceId = request.readString(PutSourceRequest.SOURCE_ID).get();
 
 	if (isHarvestingUnderway(sourceId)) {
 
@@ -1230,23 +1222,19 @@ public class ConfigService {
 	// reading optional source ids
 	//
 
-	final List<String> sourceIds = new ArrayList<String>();
+	List<String> sourceIds = request.readStrings(ListSourcesRequest.SOURCE_ID);
 
-	Optional<Object> optional = request.read(ListSourcesRequest.SOURCE_ID);
-
-	if (optional.isPresent()) {
-
-	    //
-	    sourceIds.addAll(Arrays.stream(optional.get().toString().split(",")).//
-		    map(v -> v.trim().strip()).//
-		    toList());
+	if (!sourceIds.isEmpty()) {
 
 	    List<String> sources = ConfigurationWrapper.getHarvestedAndMixedSources().//
 		    stream().//
 		    map(GSSource::getUniqueIdentifier).//
 		    toList();
 
-	    String missingSources = sourceIds.stream().filter(id -> !sources.contains(id)).collect(Collectors.joining(","));
+	    String missingSources = sourceIds. //
+		    stream().//
+		    filter(id -> !sources.contains(id)).//
+		    collect(Collectors.joining(","));//
 
 	    if (!missingSources.isEmpty()) {
 

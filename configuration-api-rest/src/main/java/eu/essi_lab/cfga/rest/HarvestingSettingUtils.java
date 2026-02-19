@@ -57,9 +57,8 @@ public class HarvestingSettingUtils {
 
 	String currentType = target.getSelectedAccessorSetting().getAccessorType().replace(" Connector", "");
 
-	if (currentConnectorSetting instanceof ConnectorWrapperSetting) {
+	if (currentConnectorSetting instanceof ConnectorWrapperSetting<?> wrapped) {
 
-	    ConnectorWrapperSetting<?> wrapped = (ConnectorWrapperSetting<?>) currentConnectorSetting;
 	    currentType = wrapped.getSelectedConnector().getType().//
 		    replace("Connector ", "").// for connectors with a version, like "WCS Connector 1.1.0"
 		    replace(" Connector", "");// for connectors with no version, like "CSW Connector"
@@ -71,25 +70,19 @@ public class HarvestingSettingUtils {
 
 	List<String> currentDep = target.getSelectedAccessorSetting().getGSSourceSetting().getSourceDeployment();
 
-	String sourceID = request.read(PutSourceRequest.SOURCE_ID).get().toString();
+	String sourceID = request.readString(PutSourceRequest.SOURCE_ID).get();
 
-	String type = request.read(PutSourceRequest.SERVICE_TYPE).isEmpty()
-		? currentType
-		: request.read(PutSourceRequest.SERVICE_TYPE).get().toString();
+	String type = request.readString(PutSourceRequest.SERVICE_TYPE).orElse(currentType);
 
 	SourceType sourceType = LabeledEnum.valueOf(SourceType.class, type).get();
 
-	String sourceEndpoint = request.read(PutSourceRequest.SOURCE_ENDPOINT).isEmpty()
-		? currentEndpoint
-		: request.read(PutSourceRequest.SOURCE_ENDPOINT).get().toString();
+	String sourceEndpoint = request.readString(PutSourceRequest.SOURCE_ENDPOINT).orElse(currentEndpoint);
 
-	String label = request.read(PutSourceRequest.SOURCE_LABEL).isEmpty()
-		? currentLabel
-		: request.read(PutSourceRequest.SOURCE_LABEL).get().toString();
+	String label = request.readString(PutSourceRequest.SOURCE_LABEL).orElse(currentLabel);
 
 	List<String> sourceDep = request.read(PutSourceRequest.SOURCE_DEPLOYMENT).isEmpty()
 		? currentDep
-		: Arrays.asList(request.read(PutSourceRequest.SOURCE_DEPLOYMENT).get().toString().split(","));
+		: request.readStrings(PutSourceRequest.SOURCE_DEPLOYMENT);
 
 	return buildFromSourceType(sourceType, sourceID, label, sourceEndpoint, sourceDep);
     }
@@ -100,17 +93,16 @@ public class HarvestingSettingUtils {
      */
     public static HarvestingSetting build(PutSourceRequest request) {
 
-	String type = request.read(PutSourceRequest.SERVICE_TYPE).get().toString();
+	String type = request.readString(PutSourceRequest.SERVICE_TYPE).get();
 
 	SourceType sourceType = LabeledEnum.valueOf(SourceType.class, type).get();
 
-	String sourceEndpoint = request.read(PutSourceRequest.SOURCE_ENDPOINT).get().toString();
-	String sourceID = request.read(PutSourceRequest.SOURCE_ID).get().toString();
+	String sourceEndpoint = request.readString(PutSourceRequest.SOURCE_ENDPOINT).get();
+	String sourceID = request.readString(PutSourceRequest.SOURCE_ID).get();
 
-	String label = request.read(PutSourceRequest.SOURCE_LABEL).get().toString();
+	String label = request.readString(PutSourceRequest.SOURCE_LABEL).get();
 
-	List<String> sourceDep = request.read(PutSourceRequest.SOURCE_DEPLOYMENT).map(v -> Arrays.asList(v.toString().split(",")))
-		.orElse(List.of());
+	List<String> sourceDep = request.readStrings(PutSourceRequest.SOURCE_DEPLOYMENT);
 
 	return buildFromSourceType(sourceType, sourceID, label, sourceEndpoint, sourceDep);
     }
@@ -122,10 +114,10 @@ public class HarvestingSettingUtils {
      */
     public static void udpate(HarvestSchedulingRequest request, Scheduling scheduling) {
 
-	Optional<String> startTime = request.read(HarvestSchedulingRequest.START_TIME).map(v -> v.toString());
+	Optional<String> startTime = request.readString(HarvestSchedulingRequest.START_TIME);
 
-	Optional<String> interval = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL).map(v -> v.toString());
-	Optional<String> unit = request.read(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT).map(v -> v.toString());
+	Optional<String> interval = request.readString(HarvestSchedulingRequest.REPEAT_INTERVAL);
+	Optional<String> unit = request.readString(HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT);
 
 	scheduling.setEnabled(true);
 
@@ -135,21 +127,22 @@ public class HarvestingSettingUtils {
 
 	    HarvestSchedulingRequest.RepeatIntervalUnit intUnit = LabeledEnum.valueOf(HarvestSchedulingRequest.RepeatIntervalUnit.class,
 		    unit.get()).get();
+
 	    switch (intUnit) {
 	    case MINUTES:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.MINUTES);
+		scheduling.setRepeatInterval(Integer.parseInt(interval.get()), TimeUnit.MINUTES);
 		break;
 	    case DAYS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.DAYS);
+		scheduling.setRepeatInterval(Integer.parseInt(interval.get()), TimeUnit.DAYS);
 		break;
 	    case HOURS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()), TimeUnit.HOURS);
+		scheduling.setRepeatInterval(Integer.parseInt(interval.get()), TimeUnit.HOURS);
 		break;
 	    case MONTHS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 30, TimeUnit.DAYS);
+		scheduling.setRepeatInterval(Integer.parseInt(interval.get()) * 30, TimeUnit.DAYS);
 		break;
 	    case WEEKS:
-		scheduling.setRepeatInterval(Integer.valueOf(interval.get().toString()) * 7, TimeUnit.DAYS);
+		scheduling.setRepeatInterval(Integer.parseInt(interval.get()) * 7, TimeUnit.DAYS);
 		break;
 	    }
 
@@ -319,11 +312,11 @@ public class HarvestingSettingUtils {
      */
     public static SettingFinder<HarvestingSetting> getHarvestingSettingFinder(ConfigRequest request) {
 
-	Optional<String> optSourceId = request.read(PutSourceRequest.SOURCE_ID).map(v -> v.toString());
+	Optional<String> optSourceId = request.readString(PutSourceRequest.SOURCE_ID);
 
 	HarvestingSetting setting = null;
 
-	if (!optSourceId.isPresent()) {
+	if (optSourceId.isEmpty()) {
 
 	    return new SettingFinder<HarvestingSetting>(
 		    ConfigRequest.buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing source identifier"));
@@ -332,11 +325,9 @@ public class HarvestingSettingUtils {
 
 	    String sourceId = optSourceId.get();
 
-	    if (!ConfigurationWrapper.getAllSources().//
+	    if (ConfigurationWrapper.getAllSources().//
 		    stream().//
-		    filter(s -> s.getUniqueIdentifier().equals(sourceId)).//
-		    findFirst().//
-		    isPresent()) {
+		    noneMatch(s -> s.getUniqueIdentifier().equals(sourceId))) {
 
 		return new SettingFinder<HarvestingSetting>(
 			ConfigRequest.buildErrorResponse(Status.NOT_FOUND, "Source with id '" + sourceId + "' not found"));

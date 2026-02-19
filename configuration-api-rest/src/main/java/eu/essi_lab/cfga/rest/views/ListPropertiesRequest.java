@@ -1,7 +1,6 @@
 package eu.essi_lab.cfga.rest.views;
 
 import eu.essi_lab.cfga.rest.*;
-import eu.essi_lab.cfga.rest.source.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.*;
 import org.json.*;
@@ -9,9 +8,7 @@ import org.json.*;
 import java.util.*;
 
 /**
- *
  * @author Fabrizio
- *
  */
 public class ListPropertiesRequest extends ConfigRequest {
 
@@ -21,9 +18,7 @@ public class ListPropertiesRequest extends ConfigRequest {
     public static final String ENUM_NAME = "enumName";
 
     /**
-     *
      * @author Fabrizio
-     *
      */
     public enum EnumName implements LabeledEnum {
 
@@ -79,10 +74,7 @@ public class ListPropertiesRequest extends ConfigRequest {
 
 	ArrayList<Parameter> list = new ArrayList<>();
 
-	Parameter parameter = Parameter.of(ENUM_NAME, Queryable.ContentType.TEXTUAL, EnumName.class, false);
-	parameter.setMultiValue();
-
-	list.add(parameter);
+	list.add(Parameter.of(ENUM_NAME, Queryable.ContentType.TEXTUAL, EnumName.class, false));
 
 	return list;
     }

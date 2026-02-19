@@ -51,7 +51,7 @@ public class PutViewRequest extends ConfigRequest {
     @Override
     public void validate() {
 
-	Optional<String> stringValue = read(VIEW).map(Object::toString);
+	Optional<String> stringValue = readString(VIEW);
 
 	if (stringValue.isEmpty()) {
 
