@@ -22,7 +22,6 @@ package eu.essi_lab.cfga.gui.components.grid;
  */
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.vaadin.flow.component.Component;
@@ -57,6 +56,7 @@ import eu.essi_lab.cfga.setting.Setting;
 public class GridComponent extends Grid<HashMap<String, String>> {
 
     private final GridInfo gridInfo;
+    private final TabContent tabContent;
     private HeaderRow filterRow;
     private GridFilter gridFilter;
     private final ListDataProvider<HashMap<String, String>> dataProvider;
@@ -66,7 +66,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
      * @param gridInfo
      * @param list
      * @param configuration
-     * @param content
+     * @param tabContent
      * @param readOnly
      * @param refresh
      * @param withTabSheet
@@ -76,7 +76,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	    GridInfo gridInfo, //
 	    List<Setting> list, //
 	    Configuration configuration, //
-	    TabContent content, //
+	    TabContent tabContent, //
 	    boolean readOnly, //
 	    boolean refresh, //
 	    boolean withTabSheet) {
@@ -86,10 +86,11 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 
 	this.gridInfo = gridInfo;
+	this.tabContent = tabContent;
 
 	if (!refresh) {
 
-	    GridFilter.clearSelection();
+	    GridFilter.clear();
 	    ColumnsHider.clearValuesCache();
 	}
 
@@ -134,7 +135,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		    if (eventItem.isPresent()) {
 
-			menuItem.setEnabled(gmih.isEnabled(eventItem.get(), content, configuration, setting.get(), map));
+			menuItem.setEnabled(gmih.isEnabled(eventItem.get(), tabContent, configuration, setting.get(), map));
 
 		    } else {
 
@@ -167,7 +168,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    // since they are enabled also if no context is selected
 		    Optional<Setting> setting = findEventSetting(configuration, eventItem);
 
-		    gmih.onClick(event, content, configuration, setting, map);
+		    gmih.onClick(event, tabContent, configuration, setting, map);
 		});
 
 		// set the identifier according to its handler
@@ -207,7 +208,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	//
 	// shows the setting component when the user clicks on a row
 	//
-	setItemDetailsRenderer(createItemDetailsRenderer(configuration, readOnly, content));
+	setItemDetailsRenderer(createItemDetailsRenderer(configuration, readOnly, tabContent));
 
 	//
 	//
@@ -225,7 +226,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		column = addColumn(renderer);
 
-		renderer.getLegend().ifPresent(content::addLegend);
+		renderer.getLegend().ifPresent(tabContent::addLegend);
 
 		legendsViewer = renderer.getLegend().isPresent();
 
@@ -492,7 +493,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 	filterField.addValueChangeListener(event -> {
 
-	    gridFilter.filter(descriptor.getColumnName(), event.getValue());
+	    gridFilter.filter(tabContent.getTabDesc().getLabel(), descriptor.getColumnName(), event.getValue());
 
 	    dataProvider.refreshAll();
 	});
@@ -505,8 +506,10 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 	filterField.setPlaceholder("Filter");
 	filterField.getElement().setAttribute("focus-target", "");
 
-	Optional<String> value = GridFilter.getValue(descriptor.getColumnName());
-	value.ifPresent(filterField::setValue);
+	GridFilter.get(
+		tabContent.getTabDesc().getLabel(),//
+		descriptor.getColumnName()).//
+		ifPresent(filterField::setValue);
     }
 
     /**
