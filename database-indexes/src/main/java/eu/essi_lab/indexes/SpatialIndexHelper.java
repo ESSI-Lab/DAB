@@ -28,8 +28,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
-import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.index.jaxb.BoundingBox;
@@ -55,11 +54,11 @@ public class SpatialIndexHelper {
 
 	ArrayList<Double[]> values = new ArrayList<>();
 
-	List<DataIdentification> dataIdList = Lists
-		.newArrayList(resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDataIdentifications());
+	List<Identification> dataIdList = Lists
+		.newArrayList(resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getIdentifications());
 	List<GeographicBoundingBox> bboxes = new ArrayList<>();
 
-	for (DataIdentification dataId : dataIdList) {
+	for (Identification dataId : dataIdList) {
 	    bboxes.addAll(Lists.newArrayList(dataId.getGeographicBoundingBoxes()));
 	}
 

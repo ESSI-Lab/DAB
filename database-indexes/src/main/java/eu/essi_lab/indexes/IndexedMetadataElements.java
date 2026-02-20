@@ -21,7 +21,6 @@ package eu.essi_lab.indexes;
  * #L%
  */
 
-import com.google.common.collect.*;
 import eu.essi_lab.api.database.Database.*;
 import eu.essi_lab.indexes.marklogic.*;
 import eu.essi_lab.iso.datamodel.classes.*;
@@ -175,10 +174,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
-	    Iterator<DataIdentification> identifications = miMetadata.getDataIdentifications();
-	    while (identifications.hasNext()) {
-		DataIdentification id = identifications.next();
+	    for (Identification id : getIdentifications(resource)) {
 		String title = id.getCitationTitle();
 		if (checkStringValue(title)) {
 		    addValue(title);
@@ -203,10 +199,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
-	    Iterator<DataIdentification> identifications = miMetadata.getDataIdentifications();
-	    while (identifications.hasNext()) {
-		DataIdentification id = identifications.next();
+	    for (Identification id : getIdentifications(resource)) {
 		String abs = id.getAbstract();
 		if (checkStringValue(abs)) {
 		    addValue(abs);
@@ -228,17 +221,13 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> dataIds = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    for (Identification id : getIdentifications(resource)) {
 
-	    while (dataIds.hasNext()) {
-		DataIdentification dataId = (DataIdentification) dataIds.next();
-
-		Iterator<TemporalExtent> extents = dataId.getTemporalExtents();
+		Iterator<TemporalExtent> extents = id.getTemporalExtents();
 
 		while (extents.hasNext()) {
 
-		    TemporalExtent te = (TemporalExtent) extents.next();
+		    TemporalExtent te = extents.next();
 
 		    if (te.isBeforeNowBeginPosition()) {
 
@@ -255,18 +244,16 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> dataIds = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    List<Identification> dataIds = getIdentifications(resource);
 
-	    if (!dataIds.hasNext()) {
+	    if (dataIds.isEmpty()) {
 		resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_BEGIN_NULL);
 		return;
 	    }
 
-	    while (dataIds.hasNext()) {
-		DataIdentification dataId = (DataIdentification) dataIds.next();
+	    for (Identification id : dataIds) {
 
-		Iterator<TemporalExtent> extents = dataId.getTemporalExtents();
+		Iterator<TemporalExtent> extents = id.getTemporalExtents();
 		if (!extents.hasNext()) {
 		    resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_BEGIN_NULL);
 		    return;
@@ -274,7 +261,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		while (extents.hasNext()) {
 
-		    TemporalExtent te = (TemporalExtent) extents.next();
+		    TemporalExtent te = extents.next();
 
 		    if (te.isBeginPositionIndeterminate() && te.getIndeterminateBeginPosition() == TimeIndeterminateValueType.NOW) {
 
@@ -308,18 +295,15 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> dataIds = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-
-	    if (!dataIds.hasNext()) {
-		resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_END_NULL);
+	    List<Identification> dataIds = getIdentifications(resource);
+	    if (dataIds.isEmpty()) {
+		resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_BEGIN_NULL);
 		return;
 	    }
 
-	    while (dataIds.hasNext()) {
-		DataIdentification dataId = (DataIdentification) dataIds.next();
+	    for (Identification id : dataIds) {
 
-		Iterator<TemporalExtent> extents = dataId.getTemporalExtents();
+		Iterator<TemporalExtent> extents = id.getTemporalExtents();
 		if (!extents.hasNext()) {
 		    resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_END_NULL);
 		    return;
@@ -327,7 +311,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 		while (extents.hasNext()) {
 
-		    TemporalExtent te = (TemporalExtent) extents.next();
+		    TemporalExtent te = extents.next();
 
 		    if (te.isEndPositionIndeterminate() && te.getIndeterminateEndPosition() == TimeIndeterminateValueType.NOW) {
 
@@ -547,20 +531,15 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-	    while (identifications.hasNext()) {
+	    for (Identification id : getIdentifications(resource)) {
 
-		DataIdentification next = identifications.next();
-
-		Iterator<String> dates = next.getCitationDates();
+		Iterator<String> dates = id.getCitationDates();
 		while (dates.hasNext()) {
-		    String date = (String) dates.next();
+		    String date = dates.next();
 		    if (checkStringValue(date)) {
 			addValue(date);
 		    }
 		}
-
 	    }
 	}
     };
@@ -571,9 +550,12 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	    Iterator<DataIdentification> dataIdentifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
 		    .getDataIdentifications();
+
 	    while (dataIdentifications.hasNext()) {
+
 		DataIdentification dataId = dataIdentifications.next();
 		Iterator<String> topics = dataId.getTopicCategoriesStrings();
+
 		while (topics.hasNext()) {
 		    String topic = topics.next();
 		    if (checkStringValue(topic)) {
@@ -659,11 +641,8 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    for (Identification dataId : getIdentifications(resource)) {
 
-	    while (identifications.hasNext()) {
-		DataIdentification dataId = identifications.next();
 		ResponsibleParty party = dataId.getPointOfContact("author");
 		if (party != null) {
 		    String individualName = party.getIndividualName();
@@ -932,11 +911,8 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    for (Identification dataId : getIdentifications(resource)) {
 
-	    while (identifications.hasNext()) {
-		DataIdentification dataId = identifications.next();
 		Iterator<String> codes = dataId.getGeographicDescriptionCodes();
 		while (codes.hasNext()) {
 		    String code = codes.next();
@@ -952,12 +928,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    for (Identification id : getIdentifications(resource)) {
 
-	    while (identifications.hasNext()) {
-		DataIdentification dataId = identifications.next();
-		String alternateTitle = dataId.getCitationAlternateTitle();
+		String alternateTitle = id.getCitationAlternateTitle();
 		if (checkStringValue(alternateTitle)) {
 		    addValue(alternateTitle);
 		}
@@ -1524,62 +1497,86 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedElement HAS_ACCESS_LEGAL_CONSTRAINTS = new IndexedMetadataElement(
+	    MetadataElement.HAS_ACCESS_LEGAL_CONSTRAINTS) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    boolean match = resource.getHarmonizedMetadata(). //
+		    getCoreMetadata().//
+		    getMIMetadata().//
+		    getIdentifications().//
+		    stream().//
+		    anyMatch(Identification::hasAccessLegalConstraints);
+
+	    addValue(String.valueOf(match));
+	}
+    };
+
+    public static final IndexedElement HAS_OTHER_LEGAL_CONSTRAINTS = new IndexedMetadataElement(
+	    MetadataElement.HAS_OTHER_LEGAL_CONSTRAINTS) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    boolean match = resource.getHarmonizedMetadata(). //
+		    getCoreMetadata().//
+		    getMIMetadata().//
+		    getIdentifications().//
+		    stream().//
+		    anyMatch(Identification::hasOtherLegalConstraints);
+
+	    addValue(String.valueOf(match));
+	}
+    };
+
     public static final IndexedElement HAS_SECURITY_CONSTRAINTS = new IndexedMetadataElement(MetadataElement.HAS_SECURITY_CONSTRAINTS) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    boolean match = resource.getHarmonizedMetadata(). //
+		    getCoreMetadata().//
+		    getMIMetadata().//
+		    getIdentifications().//
+		    stream().//
+		    anyMatch(Identification::hasSecurityConstraints);
 
-	    boolean found = false;
-	    while (iterator.hasNext()) {
-		if (iterator.next().hasSecurityConstraints()) {
-		    found = true;
-		    break;
-		}
-	    }
-	    addValue(String.valueOf(found));
+	    addValue(String.valueOf(match));
 	}
     };
     public static final IndexedElement HAS_USE_LEGAL_CONSTRAINTS = new IndexedMetadataElement(MetadataElement.HAS_USE_LEGAL_CONSTRAINTS) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    boolean match = resource.getHarmonizedMetadata(). //
+		    getCoreMetadata().//
+		    getMIMetadata().//
+		    getIdentifications().//
+		    stream().//
+		    anyMatch(Identification::hasUseLegalConstraints);
 
-	    boolean found = false;
-	    while (iterator.hasNext()) {
-		if (iterator.next().hasUseLegalConstraints()) {
-		    found = true;
-		    break;
-		}
-	    }
-	    addValue(String.valueOf(found));
+	    addValue(String.valueOf(match));
 	}
     };
     public static final IndexedElement USE_LEGAL_CONSTRAINTS = new IndexedMetadataElement(MetadataElement.USE_LEGAL_CONSTRAINTS) {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    List<Identification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getIdentifications();
 
-	    while (iterator.hasNext()) {
-		DataIdentification next = iterator.next();
-		Iterator<LegalConstraints> constraints = next.getLegalConstraints();
+	    for (Identification id : iterator) {
+
+		Iterator<LegalConstraints> constraints = id.getLegalConstraints();
 		while (constraints.hasNext()) {
-		    LegalConstraints legalConstraints = (LegalConstraints) constraints.next();
+		    LegalConstraints legalConstraints = constraints.next();
 		    List<CharacterStringPropertyType> others = legalConstraints.getElementType().getOtherConstraints();
 		    for (CharacterStringPropertyType cspt : others) {
 			String text = DataIdentification.getStringFromCharacterString(cspt);
 			if (text != null && !text.isEmpty()) {
-			    addValue(String.valueOf(text));
+			    addValue(text);
 			}
 		    }
 		}
 	    }
-
 	}
     };
 
@@ -1587,12 +1584,11 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	@Override
 	public void defineValues(GSResource resource) {
 
-	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
+	    List<Identification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getIdentifications();
 
-	    while (iterator.hasNext()) {
-		DataIdentification next = iterator.next();
-		Iterator<LegalConstraints> constraints = next.getLegalConstraints();
+	    for (Identification id : iterator) {
+
+		Iterator<LegalConstraints> constraints = id.getLegalConstraints();
 		while (constraints.hasNext()) {
 		    LegalConstraints legalConstraints = (LegalConstraints) constraints.next();
 		    List<CharacterStringPropertyType> others = legalConstraints.getElementType().getOtherConstraints();
@@ -1604,43 +1600,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    }
 		}
 	    }
-
-	}
-    };
-    public static final IndexedElement HAS_ACCESS_LEGAL_CONSTRAINTS = new IndexedMetadataElement(
-	    MetadataElement.HAS_ACCESS_LEGAL_CONSTRAINTS) {
-	@Override
-	public void defineValues(GSResource resource) {
-
-	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-
-	    boolean found = false;
-	    while (iterator.hasNext()) {
-		if (iterator.next().hasAccessLegalConstraints()) {
-		    found = true;
-		    break;
-		}
-	    }
-	    addValue(String.valueOf(found));
-	}
-    };
-    public static final IndexedElement HAS_OTHER_LEGAL_CONSTRAINTS = new IndexedMetadataElement(
-	    MetadataElement.HAS_OTHER_LEGAL_CONSTRAINTS) {
-	@Override
-	public void defineValues(GSResource resource) {
-
-	    Iterator<DataIdentification> iterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .getDataIdentifications();
-
-	    boolean found = false;
-	    while (iterator.hasNext()) {
-		if (iterator.next().hasOtherLegalConstraints()) {
-		    found = true;
-		    break;
-		}
-	    }
-	    addValue(String.valueOf(found));
 	}
     };
 
@@ -2491,10 +2450,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-    //
-    // composed elements: TO BE DEFINED
-    //
-
     public static final IndexedMetadataElement ORGANIZATON = new IndexedMetadataElement(MetadataElement.ORGANIZATION) {
 
 	@Override
@@ -2563,6 +2518,10 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	}
     };
+
+    //
+    // composed elements: TO BE DEFINED
+    //
 
     public static final IndexedMetadataElement KEYWORD_SA = new IndexedMetadataElement(MetadataElement.KEYWORD_SA) {
 
@@ -2661,13 +2620,14 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
-    //    public static final IndexedMetadataElement PROJECT_SA = new IndexedMetadataElement(MetadataElement.PROJECT_SA) {
-    //
-    //	@Override
-    //	public void defineValues(GSResource resource) {
-    //
-    //	}
-    //    };
+    /**
+     * @param resource
+     * @return
+     */
+    private static List<Identification> getIdentifications(GSResource resource) {
+
+	return resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getIdentifications();
+    }
 
     static {
 
@@ -2679,7 +2639,6 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	for (IndexedMetadataElement index : getIndexes()) {
 
-	    System.out.println(index.getElementName());
 	    switch (index.getMetadataElement().get().getContentType()) {
 	    /**
 	     * this is in fact not directly indexed, it is indexed through its accessory indexes
