@@ -102,12 +102,6 @@ public enum JVMOption {
     /**
      * - Boolean
      */
-    DEBUG_OPENSEARCH_QUERIES("debugOpenSearchQueries", "OpenSearch queries debugging enabled", "OpenSearch queries debugging disabled",
-	    false),
-
-    /**
-     * - Boolean
-     */
     INIT_OPENSEARCH_INDEXES("initIndexes", "OpenSearch indexes init enabled", "OpenSearch indexes init disabled", false),
 
     /**

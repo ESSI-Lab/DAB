@@ -141,7 +141,6 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    descField.setWidthFull();
 	    descField.setReadOnly(true);
 	    descField.addClassName("text-field-no-border");
-
 	    descField.getStyle().set("margin-left", "4px");
 	    descField.getStyle().set("font-size", "14px");
 	    descField.getStyle().set("color", "black");
@@ -173,20 +172,13 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	    if (addDirective.isPresent() && tabContentDesc.isReloadable()) { // add & reload
 
-		descLayout.setMaxWidth("1070px");
 		maxDescLength = 180;
 
 	    } else if (addDirective.isPresent() && !tabContentDesc.isReloadable()) { // only add
 
-		descLayout.setMaxWidth("1240px");
-		descField.setMaxWidth("1200px");
-
 		maxDescLength = 200;
 
 	    } else if (addDirective.isEmpty() && tabContentDesc.isReloadable()) { // only reload
-
-		descLayout.setMaxWidth("1165px");
-		descField.setMaxWidth("1150px");
 
 		maxDescLength = 190;
 	    }

@@ -582,7 +582,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 			ResourceProperty.SOURCE_ID, //
 			sourceIds.size(), //
 			true, // binaries excluded
-			OpenSearchDatabase.debugQueries//
+			OpenSearchDatabase.debugQueries()//
 		);
 
 		List<String> incrementalSourceIds = ConfigurationWrapper.//
@@ -682,7 +682,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    if (OpenSearchDatabase.debugQueries) {
+	    if (OpenSearchDatabase.debugQueries()) {
 
 		GSLoggerFactory.getLogger(getClass()).debug(count ? "\n\n--- COUNT ---\n" : "\n\n--- DISCOVER ---\n");
 	    }

@@ -261,11 +261,11 @@ public abstract class ProfilerSetting extends Setting implements KeyValueOptionD
 	 */
 	public DescriptorProvider() {
 
-	    String desc = "Manage DAB profilers. Profilers can be added, "
-		    + "and removed; furthermore, their configuration, path and state can be modified. "
+	    String desc = "Manage DAB profilers.\n\nProfilers can be added, "
+		    + "and removed.\nThey can be configured with the 'Key-value options', and the path and state can be modified.\n\n"
 		    + "You can also add several profilers of the same type (e.g: OAI-PMH), making sure "
-		    + "they have a different path and possibly, a different configuration. "
-		    + "Once added, the profiler state is \"Online\"; if set to \"Offline\", "
+		    + "they have a different path and possibly, a different configuration."
+		    + "\n\nOnce added, the profiler state is \"Online\"; if set to \"Offline\", "
 		    + "its capabilities will no longer be available and each request will return " + "a 404 error code";
 
 	    descriptor = TabContentDescriptorBuilder.get(ProfilerSetting.class).//

@@ -10,17 +10,18 @@ package eu.essi_lab.indexes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
+import com.google.common.collect.*;
 import eu.essi_lab.api.database.Database.*;
 import eu.essi_lab.indexes.marklogic.*;
 import eu.essi_lab.iso.datamodel.classes.*;
@@ -508,17 +509,16 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
      */
     private static void defineCodeListValues(IndexedMetadataElement el, GSResource resource, String codeListValue) {
 
-	Iterator<DataIdentification> identifications = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		.getDataIdentifications();
+	MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 
-	while (identifications.hasNext()) {
+	List<Identification> identifications = miMetadata.getIdentifications();
 
-	    DataIdentification next = identifications.next();
+	identifications.forEach(id -> {
 
 	    String date = switch (codeListValue) {
-		case "revision" -> next.getCitationRevisionDate();
-		case "publication" -> next.getCitationPublicationDate();
-		case "creation" -> next.getCitationCreationDate();
+		case "revision" -> id.getCitationRevisionDate();
+		case "publication" -> id.getCitationPublicationDate();
+		case "creation" -> id.getCitationCreationDate();
 		default -> null;
 	    };
 
@@ -529,9 +529,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    } else {
 
 		XMLGregorianCalendar dateTime = switch (codeListValue) {
-		    case "revision" -> next.getCitationRevisionDateTime();
-		    case "publication" -> next.getCitationPublicationDateTime();
-		    case "creation" -> next.getCitationCreationDateTime();
+		    case "revision" -> id.getCitationRevisionDateTime();
+		    case "publication" -> id.getCitationPublicationDateTime();
+		    case "creation" -> id.getCitationCreationDateTime();
 		    default -> null;
 		};
 
@@ -540,7 +540,7 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 		    el.addValue(dateTime.toString());
 		}
 	    }
-	}
+	});
     }
 
     public static final IndexedElement REFERENCE_DATE = new IndexedMetadataElement(MetadataElement.REFERENCE_DATE) {
@@ -801,16 +801,14 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    parties.add(responsibleParty);
 	}
 
-	Iterator<DataIdentification> dataIds = miMetadata.getDataIdentifications();
+	List<Identification> identifications = miMetadata.getIdentifications();
 
-	while (dataIds != null && dataIds.hasNext()) {
+	identifications.forEach(id -> {
 
-	    DataIdentification dataId = dataIds.next();
+	    parties.addAll(id.getCitedParty());
 
-	    parties.addAll(dataId.getCitedParty());
-
-	    dataId.getPointOfContacts().forEachRemaining(parties::add);
-	}
+	    id.getPointOfContacts().forEachRemaining(parties::add);
+	});
 
 	parties.addAll(miMetadata.getDistribution().getDistributorParties());
 
