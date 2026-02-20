@@ -13,34 +13,25 @@ package eu.essi_lab.lib.net.smtp;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.*;
-import java.net.http.*;
-import java.time.*;
-import java.util.Properties;
-import java.util.concurrent.*;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
 import dev.failsafe.*;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.*;
+
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.time.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -55,7 +46,7 @@ public class SMTPClient {
 
     private static final int RETRY_DELAY_SECONDS = 60;
 
-    private static final int MAX_RETRY_ATTEMTPS = 5;
+    private static final int MAX_RETRY_ATTEMPTS = 5;
 
     /**
      *
@@ -89,7 +80,7 @@ public class SMTPClient {
 	properties.put("mail.smtp.port", port);
 	properties.put("mail.smtp.host", host);
 
-	properties.put("mail.smtp.connectiontimeout", String.valueOf(TIMEOUT)); 
+	properties.put("mail.smtp.connectiontimeout", String.valueOf(TIMEOUT));
 	properties.put("mail.smtp.timeout", String.valueOf(TIMEOUT));
 	properties.put("mail.smtp.writetimeout", String.valueOf(TIMEOUT));
 
@@ -146,20 +137,36 @@ public class SMTPClient {
 		    builder().//
 		    handleResultIf(sent -> !sent).//
 		    withDelay(Duration.ofSeconds(RETRY_DELAY_SECONDS)).//
-		    withMaxAttempts(MAX_RETRY_ATTEMTPS).//
+		    withMaxAttempts(MAX_RETRY_ATTEMPTS).//
 		    onRetry(e -> {
 
-		GSLoggerFactory.getLogger(getClass()).error(e.getLastException());
+		Throwable lastException = e.getLastException();
+
+		if (lastException != null) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(lastException);
+		}
+
+		String error = Optional.ofNullable(lastException).map(Throwable::getMessage).orElse("unknown error");
 
 		GSLoggerFactory.getLogger(getClass()).warn("Failure #{}: '{}'. Retrying...", //
 			e.getAttemptCount(), //
-			e.getLastException().getMessage());//
+			error);//
 	    }).//
 		    onRetriesExceeded(e -> {
 
-		GSLoggerFactory.getLogger(getClass()).error(e.getException());
+		Throwable exception = e.getException();
 
-		GSLoggerFactory.getLogger(getClass()).warn("Failed to connect: '{}'. Max retries exceeded", e.getException().getMessage());
+		if (exception != null) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(exception);
+		}
+
+		String error = Optional.ofNullable(exception).map(Throwable::getMessage).orElse("unknown error");
+
+		GSLoggerFactory.getLogger(getClass()). //
+			warn("Failed to connect: '{}'. Max retries exceeded", //
+			error);//
 	    }).//
 		    build();
 
