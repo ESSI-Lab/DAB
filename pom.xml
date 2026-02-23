@@ -335,7 +335,7 @@
         <!-- OpenSearch client -->
         <opensearch-rest-high-level-client.version>2.19.4</opensearch-rest-high-level-client.version>
 
-        <!-- Snale YAML -->
+        <!-- Snake YAML - VULN-UPDATE -->
         <snakeyaml.version>1.33.0.SP1-redhat-00001</snakeyaml.version>
 
         <!-- LogicNG -->
@@ -344,10 +344,10 @@
         <!-- SPRING Framework - VULN-UPDATE -->
         <org.springframework.version>5.3.39-wso2v4</org.springframework.version>
 
-        <!-- Apache commons - VULN-UPDATE -->
+        <!-- Apache Commons - VULN-UPDATE -->
         <apache.commons.version>1.15.0</apache.commons.version>
 
-        <!-- Apache commons beanutils - VULN-UPDATE -->
+        <!-- Apache Commons beanutils - VULN-UPDATE -->
         <apache.commons.beanutils.version>1.11.0</apache.commons.beanutils.version>
 
         <!-- ORG JSON -->
@@ -450,8 +450,13 @@
 
         <!--required to make Tomcat happpy after VULN-UPDATE -->
         <jakarta.validation-api.version>2.0.2</jakarta.validation-api.version>
+
+        <!--VULN-UPDATE 2025-->
         <guava.version>30.1-jre</guava.version>
+
+        <!--VULN-UPDATE 2025-->
         <sun.mail.version>1.6.2</sun.mail.version>
+
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
