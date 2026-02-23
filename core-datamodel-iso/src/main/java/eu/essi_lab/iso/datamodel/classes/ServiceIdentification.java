@@ -21,43 +21,19 @@ package eu.essi_lab.iso.datamodel.classes;
  * #L%
  */
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.bind.JAXBElement;
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.iso.datamodel.ISOMetadata;
-import eu.essi_lab.iso.datamodel.todo.OperationMetadata;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import net.opengis.gml.v_3_2_0.CodeType;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gco.v_20060504.GenericNamePropertyType;
-import net.opengis.iso19139.gmd.v_20060504.AbstractEXGeographicExtentType;
-import net.opengis.iso19139.gmd.v_20060504.EXBoundingPolygonType;
-import net.opengis.iso19139.gmd.v_20060504.EXExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXExtentType;
-import net.opengis.iso19139.gmd.v_20060504.EXGeographicBoundingBoxType;
-import net.opengis.iso19139.gmd.v_20060504.EXGeographicDescriptionType;
-import net.opengis.iso19139.gmd.v_20060504.EXGeographicExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXTemporalExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXTemporalExtentType;
-import net.opengis.iso19139.gmd.v_20060504.EXVerticalExtentPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.EXVerticalExtentType;
-import net.opengis.iso19139.gmd.v_20060504.MDDataIdentificationPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDBrowseGraphicPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierPropertyType;
-import net.opengis.iso19139.gmd.v_20060504.MDIdentifierType;
+import com.google.common.collect.*;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.iso.datamodel.todo.*;
+import eu.essi_lab.jaxb.common.*;
+import net.opengis.gml.v_3_2_0.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
-import net.opengis.iso19139.srv.v_20060504.SVCoupledResourcePropertyType;
-import net.opengis.iso19139.srv.v_20060504.SVCoupledResourceType;
-import net.opengis.iso19139.srv.v_20060504.SVCouplingTypePropertyType;
-import net.opengis.iso19139.srv.v_20060504.SVOperationMetadataPropertyType;
-import net.opengis.iso19139.srv.v_20060504.SVOperationMetadataType;
-import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
+import net.opengis.iso19139.srv.v_20060504.*;
+
+import javax.xml.bind.*;
+import java.math.*;
+import java.util.*;
 
 /**
  * SV_ServiceIdentification
@@ -468,71 +444,21 @@ public class ServiceIdentification extends Identification {
 
     /**
      * @return
-     * @XPathDirective(target = "./srv:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
      */
+    @Override
     public Iterator<GeographicBoundingBox> getGeographicBoundingBoxes() {
 
-	ArrayList<GeographicBoundingBox> out = new ArrayList<>();
-
-	List<EXExtentPropertyType> extent = getElementType().getExtent();
-	for (EXExtentPropertyType exExtentPropertyType : extent) {
-	    EXExtentType exExtent = exExtentPropertyType.getEXExtent();
-	    if (exExtent != null) {
-		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
-		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
-
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
-		    if (abstractEXGeographicExtent != null) {
-			AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
-			if (value instanceof EXGeographicBoundingBoxType) {
-			    EXGeographicBoundingBoxType t = (EXGeographicBoundingBoxType) value;
-			    GeographicBoundingBox geographicBoundingBox = new GeographicBoundingBox(t);
-			    out.add(geographicBoundingBox);
-			}
-		    }
-		}
-	    }
-	}
-
-	return out.iterator();
+	return super.getGeographicBoundingBoxes(getElementType().getExtent());
     }
 
-    public GeographicBoundingBox getGeographicBoundingBox() {
+    /**
+     * @XPathDirective(target = ".//*:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
+     */
+    @Override
+    public Iterator<String> getGeographicDescriptionCodes() {
 
-	Iterator<GeographicBoundingBox> geographicBoundingBoxes = getGeographicBoundingBoxes();
-	if (geographicBoundingBoxes.hasNext()) {
-	    return geographicBoundingBoxes.next();
-	}
-
-	return null;
-    }
-
-    public Double[] getWS() {
-
-	GeographicBoundingBox geographicBoundingBox = getGeographicBoundingBox();
-	if (geographicBoundingBox != null) {
-
-	    Double south = geographicBoundingBox.getSouth();
-	    Double west = geographicBoundingBox.getWest();
-
-	    return new Double[] { west, south };
-	}
-
-	return null;
-    }
-
-    public Double[] getEN() {
-
-	GeographicBoundingBox geographicBoundingBox = getGeographicBoundingBox();
-	if (geographicBoundingBox != null) {
-
-	    Double north = geographicBoundingBox.getNorth();
-	    Double east = geographicBoundingBox.getEast();
-
-	    return new Double[] { east, north };
-	}
-
-	return null;
+	return super.getGeographicDescriptionCodes(getElementType().getExtent());
     }
 
     /**
@@ -696,36 +622,5 @@ public class ServiceIdentification extends Identification {
     public void clearSpatialResolution() {
 	// TODO Auto-generated method stub
 
-    }
-
-    /**
-     * @XPathDirective(target = ".//srv:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
-     */
-    public Iterator<String> getGeographicDescriptionCodes() {
-
-	ArrayList<String> arrayList = new ArrayList<>();
-
-	try {
-	    List<EXExtentPropertyType> extent = getElementType().getExtent();
-	    for (EXExtentPropertyType exExtentPropertyType : extent) {
-		EXExtentType exExtent = exExtentPropertyType.getEXExtent();
-		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
-		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
-		    AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
-		    if (value instanceof EXGeographicDescriptionType) {
-			EXGeographicDescriptionType type = (EXGeographicDescriptionType) value;
-			MDIdentifierPropertyType geographicIdentifier = type.getGeographicIdentifier();
-			JAXBElement<? extends MDIdentifierType> mdIdentifier = geographicIdentifier.getMDIdentifier();
-			MDIdentifierType mdIdentifierType = mdIdentifier.getValue();
-			String code = getStringFromCharacterString(mdIdentifierType.getCode());
-			arrayList.add(code);
-		    }
-		}
-	    }
-	} catch (NullPointerException | IndexOutOfBoundsException ex) {
-	}
-
-	return arrayList.iterator();
     }
 }

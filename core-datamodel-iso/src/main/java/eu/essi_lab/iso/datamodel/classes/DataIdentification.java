@@ -431,98 +431,16 @@ public class DataIdentification extends Identification {
     @Override
     public Iterator<GeographicBoundingBox> getGeographicBoundingBoxes() {
 
-	ArrayList<GeographicBoundingBox> out = new ArrayList<GeographicBoundingBox>();
-
-	List<EXExtentPropertyType> extent = getElementType().getExtent();
-	for (EXExtentPropertyType exExtentPropertyType : extent) {
-	    EXExtentType exExtent = exExtentPropertyType.getEXExtent();
-	    if (exExtent != null) {
-		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
-		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
-
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
-		    if (abstractEXGeographicExtent != null) {
-			AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
-			if (value instanceof EXGeographicBoundingBoxType) {
-			    EXGeographicBoundingBoxType t = (EXGeographicBoundingBoxType) value;
-			    GeographicBoundingBox geographicBoundingBox = new GeographicBoundingBox(t);
-			    out.add(geographicBoundingBox);
-			}
-		    }
-		}
-	    }
-	}
-
-	return out.iterator();
-    }
-
-    public GeographicBoundingBox getGeographicBoundingBox() {
-
-	Iterator<GeographicBoundingBox> geographicBoundingBoxes = getGeographicBoundingBoxes();
-	if (geographicBoundingBoxes.hasNext()) {
-	    return geographicBoundingBoxes.next();
-	}
-
-	return null;
-    }
-
-    public Double[] getWS() {
-
-	GeographicBoundingBox geographicBoundingBox = getGeographicBoundingBox();
-	if (geographicBoundingBox != null) {
-
-	    Double south = geographicBoundingBox.getSouth();
-	    Double west = geographicBoundingBox.getWest();
-
-	    return new Double[] { west, south };
-	}
-
-	return null;
-    }
-
-    public Double[] getEN() {
-
-	GeographicBoundingBox geographicBoundingBox = getGeographicBoundingBox();
-	if (geographicBoundingBox != null) {
-
-	    Double north = geographicBoundingBox.getNorth();
-	    Double east = geographicBoundingBox.getEast();
-
-	    return new Double[] { east, north };
-	}
-
-	return null;
+	return super.getGeographicBoundingBoxes(getElementType().getExtent());
     }
 
     /**
      * @XPathDirective(target = ".//*:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
      */
+    @Override
     public Iterator<String> getGeographicDescriptionCodes() {
 
-	ArrayList<String> arrayList = new ArrayList<>();
-
-	try {
-	    List<EXExtentPropertyType> extent = getElementType().getExtent();
-	    for (EXExtentPropertyType exExtentPropertyType : extent) {
-		EXExtentType exExtent = exExtentPropertyType.getEXExtent();
-		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
-		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
-		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
-		    AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
-		    if (value instanceof EXGeographicDescriptionType) {
-			EXGeographicDescriptionType type = (EXGeographicDescriptionType) value;
-			MDIdentifierPropertyType geographicIdentifier = type.getGeographicIdentifier();
-			JAXBElement<? extends MDIdentifierType> mdIdentifier = geographicIdentifier.getMDIdentifier();
-			MDIdentifierType mdIdentifierType = mdIdentifier.getValue();
-			String code = getStringFromCharacterString(mdIdentifierType.getCode());
-			arrayList.add(code);
-		    }
-		}
-	    }
-	} catch (NullPointerException | IndexOutOfBoundsException ex) {
-	}
-
-	return arrayList.iterator();
+	return super.getGeographicDescriptionCodes(getElementType().getExtent());
     }
 
     // ----------------------------
@@ -703,6 +621,7 @@ public class DataIdentification extends Identification {
      * @return
      * @XPathDirective(target = "gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode/@codeListValue")
      */
+    @Override
     public String getSpatialRepresentationTypeCodeListValue() {
 
 	List<String> list = getSpatialRepresentationTypeCodeListValueList();

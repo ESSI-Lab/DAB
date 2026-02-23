@@ -95,10 +95,16 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    if (idx < 0) {
 		logger.warn("Resumption token (DOI) '{}' not found in collection cache; starting from first collection", token);
 		index = 0;
-	    } else {
+	} else {
 		index = idx;
 	    }
 	}
+
+	int total = cache.size();
+	String currentDoi = cache.get(index).doi;
+	int currentNum = index + 1;
+	double percent = total > 0 ? (currentNum * 100.0 / total) : 0;
+	logger.info("Processing collection {}/{} (DOI: {}), {}%", currentNum, total, currentDoi, String.format("%.1f", percent));
 
 	if (index >= cache.size()) {
 	    ret.setResumptionToken(null);

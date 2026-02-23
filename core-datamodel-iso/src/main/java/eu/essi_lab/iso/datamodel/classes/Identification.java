@@ -21,25 +21,20 @@ package eu.essi_lab.iso.datamodel.classes;
  * #L%
  */
 
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import com.google.common.collect.Lists;
-
-import eu.essi_lab.iso.datamodel.ISOMetadata;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
-import net.opengis.iso19139.gco.v_20060504.DatePropertyType;
+import com.google.common.collect.*;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.utils.*;
+import net.opengis.iso19139.gco.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.*;
-import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
+import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
+import net.opengis.iso19139.srv.v_20060504.*;
+
+import javax.xml.bind.*;
+import javax.xml.datatype.*;
+import java.io.*;
+import java.math.*;
+import java.util.*;
 
 /**
  * AbstractMD_Identification
@@ -61,6 +56,82 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     public Identification(InputStream stream) throws JAXBException {
 
 	this.type = (AbstractMDIdentificationType) fromStream(stream);
+    }
+
+    /**
+     * @return
+     */
+    public Iterator<GeographicBoundingBox> getGeographicBoundingBoxes() {
+
+	return new ArrayList<GeographicBoundingBox>().iterator();
+    }
+
+    /**
+     * @return
+     * @XPathDirective(target = "./*:extent/gmd:EX_Extent/gmd:geographicElement//gmd:EX_GeographicBoundingBox")
+     */
+    protected Iterator<GeographicBoundingBox> getGeographicBoundingBoxes(List<EXExtentPropertyType> extent) {
+
+	ArrayList<GeographicBoundingBox> out = new ArrayList<GeographicBoundingBox>();
+
+	for (EXExtentPropertyType exExtentPropertyType : extent) {
+	    EXExtentType exExtent = exExtentPropertyType.getEXExtent();
+	    if (exExtent != null) {
+		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
+		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
+
+		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
+		    if (abstractEXGeographicExtent != null) {
+			AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
+			if (value instanceof EXGeographicBoundingBoxType) {
+			    EXGeographicBoundingBoxType t = (EXGeographicBoundingBoxType) value;
+			    GeographicBoundingBox geographicBoundingBox = new GeographicBoundingBox(t);
+			    out.add(geographicBoundingBox);
+			}
+		    }
+		}
+	    }
+	}
+
+	return out.iterator();
+    }
+
+    public GeographicBoundingBox getGeographicBoundingBox() {
+
+	Iterator<GeographicBoundingBox> geographicBoundingBoxes = getGeographicBoundingBoxes();
+	if (geographicBoundingBoxes.hasNext()) {
+	    return geographicBoundingBoxes.next();
+	}
+
+	return null;
+    }
+
+    public Double[] getWS() {
+
+	GeographicBoundingBox geographicBoundingBox = getGeographicBoundingBox();
+	if (geographicBoundingBox != null) {
+
+	    Double south = geographicBoundingBox.getSouth();
+	    Double west = geographicBoundingBox.getWest();
+
+	    return new Double[] { west, south };
+	}
+
+	return null;
+    }
+
+    public Double[] getEN() {
+
+	GeographicBoundingBox geographicBoundingBox = getGeographicBoundingBox();
+	if (geographicBoundingBox != null) {
+
+	    Double north = geographicBoundingBox.getNorth();
+	    Double east = geographicBoundingBox.getEast();
+
+	    return new Double[] { east, north };
+	}
+
+	return null;
     }
 
     /**
@@ -707,6 +778,46 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
 	return out.iterator();
     }
 
+    /**
+     * @XPathDirective(target = ".//*:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicDescription/gmd:geographicIdentifier/
+     */
+    public Iterator<String> getGeographicDescriptionCodes() {
+
+	return new ArrayList<String>().iterator();
+    }
+
+    /**
+     * @param extent
+     * @return
+     */
+    protected Iterator<String> getGeographicDescriptionCodes(List<EXExtentPropertyType> extent) {
+
+	ArrayList<String> arrayList = new ArrayList<>();
+
+	try {
+
+	    for (EXExtentPropertyType exExtentPropertyType : extent) {
+		EXExtentType exExtent = exExtentPropertyType.getEXExtent();
+		List<EXGeographicExtentPropertyType> geographicElement = exExtent.getGeographicElement();
+		for (EXGeographicExtentPropertyType exGeographicExtentPropertyType : geographicElement) {
+		    JAXBElement<? extends AbstractEXGeographicExtentType> abstractEXGeographicExtent = exGeographicExtentPropertyType.getAbstractEXGeographicExtent();
+		    AbstractEXGeographicExtentType value = abstractEXGeographicExtent.getValue();
+		    if (value instanceof EXGeographicDescriptionType) {
+			EXGeographicDescriptionType type = (EXGeographicDescriptionType) value;
+			MDIdentifierPropertyType geographicIdentifier = type.getGeographicIdentifier();
+			JAXBElement<? extends MDIdentifierType> mdIdentifier = geographicIdentifier.getMDIdentifier();
+			MDIdentifierType mdIdentifierType = mdIdentifier.getValue();
+			String code = getStringFromCharacterString(mdIdentifierType.getCode());
+			arrayList.add(code);
+		    }
+		}
+	    }
+	} catch (NullPointerException | IndexOutOfBoundsException ex) {
+	}
+
+	return arrayList.iterator();
+    }
+
     public ResponsibleParty getPointOfContact(String role) {
 	if (!type.getPointOfContact().isEmpty()) {
 	    for (CIResponsiblePartyPropertyType poc : type.getPointOfContact()) {
@@ -1320,14 +1431,6 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     /**
      * @return
      */
-    public Iterator<GeographicBoundingBox> getGeographicBoundingBoxes() {
-
-	return new ArrayList<GeographicBoundingBox>().iterator();
-    }
-
-    /**
-     * @return
-     */
     public Iterator<VerticalExtent> getVerticalExtents() {
 
 	return new ArrayList<VerticalExtent>().iterator();
@@ -1363,6 +1466,14 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     public List<String> getSpatialRepresentationTypeCodeListValueList() {
 
 	return List.of();
+    }
+
+    /**
+     * @return
+     */
+    public String getSpatialRepresentationTypeCodeListValue() {
+
+	return null;
     }
 
     //
