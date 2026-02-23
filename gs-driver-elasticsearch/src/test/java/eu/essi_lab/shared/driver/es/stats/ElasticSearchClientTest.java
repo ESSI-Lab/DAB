@@ -120,7 +120,7 @@ public class ElasticSearchClientTest {
 	    took = System.currentTimeMillis() - took;
 	    averageSearch += took / max;
 
-	    System.out.println("Total hits: " + totalHits.value + " took " + took + " ms");
+	    System.out.println("Total hits: " + totalHits.value() + " took " + took + " ms");
 
 	    took = System.currentTimeMillis();
 

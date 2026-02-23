@@ -230,8 +230,7 @@
         <!-- Expression Language 3.0 -->
         <org.glassfish-javax.el.version>3.0.1-b12</org.glassfish-javax.el.version>
 
-        <!-- Hibernate's Jakarta Bean Validation reference implementation (J11
-        UPDATED) -->
+        <!-- Hibernate's Jakarta Bean Validation reference implementation (J11 UPDATED) -->
         <org.hibernate.version>6.2.5.Final</org.hibernate.version>
 
         <!-- AWS IoT Device SDK Java -->
@@ -256,12 +255,8 @@
         <xcc.version>11.1.0</xcc.version>
         <marklogic-client-api.version>6.5.0</marklogic-client-api.version>
 
-        <!-- OpenSearch -->
-        <opensearch.client-opensearch-java.version>2.19.0</opensearch.client-opensearch-java.version>
-        <opensearch.client-opensearch-rest-client.version>2.18.0</opensearch.client-opensearch-rest-client.version>
-
-        <!-- Vaadin -->
-        <vaadin.version>23.4.0</vaadin.version>
+        <!-- Vaadin VULN-UPDATE 2026 -->
+        <vaadin.version>23.6.7</vaadin.version>
         <vaadin.togglebutton.version>3.0.0</vaadin.togglebutton.version>
 
         <!-- GeoTools -->
@@ -291,8 +286,8 @@
         <!-- ROME -->
         <com.rometools.rome.version>2.1.0</com.rometools.rome.version>
 
-        <!-- Apache Kafka Clients -->
-        <kafka-clients.version>4.1.0</kafka-clients.version>
+        <!-- Apache Kafka Clients VULN-UPDATE 2026 -->
+        <kafka-clients.version>4.2.0</kafka-clients.version>
 
         <!-- Javax mail -->
         <!-- Relocated to Jakarta Mail API -->
@@ -332,8 +327,12 @@
         <!-- Eclipse Paho Client Mqttv3 -->
         <org.eclipse.paho.client.mqttv3.version>1.2.5</org.eclipse.paho.client.mqttv3.version>
 
-        <!-- OpenSearch client -->
-        <opensearch-rest-high-level-client.version>2.19.4</opensearch-rest-high-level-client.version>
+        <!-- OpenSearch client - VULN-UPDATE 2026 -->
+        <opensearch-rest-high-level-client.version>3.4.0</opensearch-rest-high-level-client.version>
+
+        <!-- OpenSearch -->
+        <opensearch.client-opensearch-java.version>2.19.0</opensearch.client-opensearch-java.version>
+        <opensearch.client-opensearch-rest-client.version>2.18.0</opensearch.client-opensearch-rest-client.version>
 
         <!-- Snake YAML - VULN-UPDATE -->
         <snakeyaml.version>1.33.0.SP1-redhat-00001</snakeyaml.version>
@@ -347,6 +346,9 @@
         <!-- Apache Commons - VULN-UPDATE -->
         <apache.commons.version>1.15.0</apache.commons.version>
 
+        <!-- Apache Commons - VULN-UPDATE 2026 -->
+        <apache.commons.codec.version>1.21.0</apache.commons.codec.version>
+
         <!-- Apache Commons beanutils - VULN-UPDATE -->
         <apache.commons.beanutils.version>1.11.0</apache.commons.beanutils.version>
 
@@ -359,8 +361,8 @@
         <!-- SLF4J  -->
         <slf4j.version>2.0.12</slf4j.version>
 
-        <!-- LOG4J -->
-        <log4j.version>2.23.1</log4j.version>
+        <!-- LOG4J VULN-UPDATE 2026 -->
+        <log4j.version>2.25.3</log4j.version>
 
         <!-- Mockito -->
         <mockito.version>5.2.0</mockito.version>
@@ -400,8 +402,8 @@
         <docker.keycloak>keycloak/keycloak:26.4.1</docker.keycloak>
         <docker.redis>redis:8.2.2</docker.redis>
 
-        <!-- Apache Parquet -->
-        <apache.parquet.version>1.15.1</apache.parquet.version>
+        <!-- Apache Parquet VULN-UPDATE FEB-2026-->
+        <apache.parquet.version>1.17.0</apache.parquet.version>
 
         <!-- Micrometer Application Metrics -->
         <micrometer.version>1.12.13</micrometer.version>
@@ -444,7 +446,6 @@
         <!-- required by Vaadin  VULN-UPDATE-->
         <nimbus-jose-jwt.version>9.37.4</nimbus-jose-jwt.version>
 
-
         <!--required for vulnerability in SupportService  VULN-UPDATE -->
         <owasp.encoder.version>1.4.0</owasp.encoder.version>
 
@@ -471,11 +472,20 @@
 
     <dependencyManagement>
         <dependencies>
+
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${apache.commons.codec.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>com.sun.mail</groupId>
                 <artifactId>javax.mail</artifactId>
                 <version>${sun.mail.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
@@ -1284,242 +1294,244 @@
                 <type>pom</type>
             </dependency>
 
+            <!--
             <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>flow-server-production-mode</artifactId>
-                <version>${vaadin.version}</version>
+               <groupId>com.vaadin</groupId>
+               <artifactId>flow-server-production-mode</artifactId>
+               <version>${vaadin.version}</version>
             </dependency>
+            -->
 
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-core</artifactId>
-                <version>${vaadin.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.validation</groupId>
-                        <artifactId>validation-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+           <dependency>
+               <groupId>com.vaadin</groupId>
+               <artifactId>vaadin-core</artifactId>
+               <version>${vaadin.version}</version>
+               <exclusions>
+                   <exclusion>
+                       <groupId>javax.validation</groupId>
+                       <artifactId>validation-api</artifactId>
+                   </exclusion>
+               </exclusions>
+           </dependency>
 
-            <dependency>
-                <groupId>com.vaadin.componentfactory</groupId>
-                <artifactId>togglebutton</artifactId>
-                <version>${vaadin.togglebutton.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>com.vaadin.componentfactory</groupId>
+               <artifactId>togglebutton</artifactId>
+               <version>${vaadin.togglebutton.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>com.google.apis</groupId>
-                <artifactId>google-api-services-sheets</artifactId>
-                <version>${google-api-services-sheets.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>com.google.apis</groupId>
+               <artifactId>google-api-services-sheets</artifactId>
+               <version>${google-api-services-sheets.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.jfree</groupId>
-                <artifactId>jfreechart</artifactId>
-                <version>${jfreechart.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.jfree</groupId>
+               <artifactId>jfreechart</artifactId>
+               <version>${jfreechart.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${org.apache.poi-poi.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.apache.poi</groupId>
+               <artifactId>poi</artifactId>
+               <version>${org.apache.poi-poi.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${org.apache.poi-poi.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>stax</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+           <dependency>
+               <groupId>org.apache.poi</groupId>
+               <artifactId>poi-ooxml</artifactId>
+               <version>${org.apache.poi-poi.version}</version>
+               <exclusions>
+                   <exclusion>
+                       <groupId>stax</groupId>
+                       <artifactId>stax-api</artifactId>
+                   </exclusion>
+               </exclusions>
+           </dependency>
 
-            <dependency>
-                <groupId>org.geonames</groupId>
-                <artifactId>geonames-ws-client</artifactId>
-                <version>${geonames.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.geonames</groupId>
+               <artifactId>geonames-ws-client</artifactId>
+               <version>${geonames.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.quartz-scheduler</groupId>
-                <artifactId>quartz</artifactId>
-                <version>${quartz.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.quartz-scheduler</groupId>
+               <artifactId>quartz</artifactId>
+               <version>${quartz.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.quartz-scheduler</groupId>
-                <artifactId>quartz-jobs</artifactId>
-                <version>${quartz.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.quartz-scheduler</groupId>
+               <artifactId>quartz-jobs</artifactId>
+               <version>${quartz.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>com.mysql</groupId>
-                <artifactId>mysql-connector-j</artifactId>
-                <version>${mysql.connector.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>com.mysql</groupId>
+               <artifactId>mysql-connector-j</artifactId>
+               <version>${mysql.connector.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.mybatis</groupId>
-                <artifactId>mybatis</artifactId>
-                <version>${org.mybatis.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.mybatis</groupId>
+               <artifactId>mybatis</artifactId>
+               <version>${org.mybatis.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-compress</artifactId>
-                <version>${org.apache.commons-commons-compress.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.apache.commons</groupId>
+               <artifactId>commons-compress</artifactId>
+               <version>${org.apache.commons-commons-compress.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.knowm.xchart</groupId>
-                <artifactId>xchart</artifactId>
-                <version>${org.knowm.xchart-xchart.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.knowm.xchart</groupId>
+               <artifactId>xchart</artifactId>
+               <version>${org.knowm.xchart-xchart.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-math3</artifactId>
-                <version>${org.apache.commons-commons-math.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.apache.commons</groupId>
+               <artifactId>commons-math3</artifactId>
+               <version>${org.apache.commons-commons-math.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>gml-v_3_2_1</artifactId>
-                <version>${org.jvnet.ogc-gml-v_3_2_1.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.jvnet.ogc</groupId>
+               <artifactId>gml-v_3_2_1</artifactId>
+               <version>${org.jvnet.ogc-gml-v_3_2_1.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.hisrc.w3c</groupId>
-                <artifactId>xlink-v_1_0</artifactId>
-                <version>${org.hisrc.w3c-xlink-v_1_0.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.hisrc.w3c</groupId>
+               <artifactId>xlink-v_1_0</artifactId>
+               <version>${org.hisrc.w3c-xlink-v_1_0.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.ogc-schemas</groupId>
-                <artifactId>wfs-v_1_1_0</artifactId>
-                <version>${org.ogc-schemas-wfs-v_1_1_0.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.ogc-schemas</groupId>
+               <artifactId>wfs-v_1_1_0</artifactId>
+               <version>${org.ogc-schemas-wfs-v_1_1_0.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>software.amazon.awssdk.iotdevicesdk</groupId>
-                <artifactId>aws-iot-device-sdk</artifactId>
-                <version>${aws-iot-device-sdk.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>software.amazon.awssdk.iotdevicesdk</groupId>
+               <artifactId>aws-iot-device-sdk</artifactId>
+               <version>${aws-iot-device-sdk.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-reload4j</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-simple</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.slf4j</groupId>
+               <artifactId>slf4j-api</artifactId>
+               <version>${slf4j.version}</version>
+           </dependency>
+           <dependency>
+               <groupId>org.slf4j</groupId>
+               <artifactId>slf4j-reload4j</artifactId>
+               <version>${slf4j.version}</version>
+           </dependency>
+           <dependency>
+               <groupId>org.slf4j</groupId>
+               <artifactId>slf4j-simple</artifactId>
+               <version>${slf4j.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>org.apache.ftpserver</groupId>
-                <artifactId>ftpserver-core</artifactId>
-                <version>${ftpserver-core.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>org.apache.ftpserver</groupId>
+               <artifactId>ftpserver-core</artifactId>
+               <version>${ftpserver-core.version}</version>
+           </dependency>
 
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson-core.version}</version>
-            </dependency>
+           <dependency>
+               <groupId>com.fasterxml.jackson.core</groupId>
+               <artifactId>jackson-core</artifactId>
+               <version>${jackson-core.version}</version>
+           </dependency>
 
-              <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>${kafka-clients.version}</version>
-            </dependency>
+             <dependency>
+               <groupId>org.apache.kafka</groupId>
+               <artifactId>kafka-clients</artifactId>
+               <version>${kafka-clients.version}</version>
+           </dependency>
 
-        </dependencies>
+       </dependencies>
 
-    </dependencyManagement>
+   </dependencyManagement>
 
-    <dependencies>
+   <dependencies>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson-core.version}</version>
-        </dependency>
+       <dependency>
+           <groupId>com.fasterxml.jackson.core</groupId>
+           <artifactId>jackson-databind</artifactId>
+           <version>${jackson-core.version}</version>
+       </dependency>
 
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson-core.version}</version>
-        </dependency>
+       <dependency>
+           <groupId>com.fasterxml.jackson.core</groupId>
+           <artifactId>jackson-annotations</artifactId>
+           <version>${jackson-core.version}</version>
+       </dependency>
 
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-        </dependency>
+       <dependency>
+           <groupId>net.java.dev.jna</groupId>
+           <artifactId>jna</artifactId>
+       </dependency>
 
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna-platform</artifactId>
-        </dependency>
+       <dependency>
+           <groupId>net.java.dev.jna</groupId>
+           <artifactId>jna-platform</artifactId>
+       </dependency>
 
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
+       <dependency>
+           <groupId>javax.xml.bind</groupId>
+           <artifactId>jaxb-api</artifactId>
+       </dependency>
 
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
+       <dependency>
+           <groupId>com.sun.xml.bind</groupId>
+           <artifactId>jaxb-impl</artifactId>
+       </dependency>
 
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
+       <dependency>
+           <groupId>com.sun.xml.bind</groupId>
+           <artifactId>jaxb-core</artifactId>
+       </dependency>
 
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+       <dependency>
+           <groupId>junit</groupId>
+           <artifactId>junit</artifactId>
+           <scope>test</scope>
+       </dependency>
 
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
+       <dependency>
+           <groupId>org.mockito</groupId>
+           <artifactId>mockito-core</artifactId>
+           <version>${mockito.version}</version>
+           <scope>test</scope>
+       </dependency>
 
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
+       <dependency>
+           <groupId>org.mockito</groupId>
+           <artifactId>mockito-inline</artifactId>
+           <version>${mockito.version}</version>
+           <scope>test</scope>
+       </dependency>
 
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>${com.google.protobuf-protobuf-java.version}</version>
-        </dependency>
+       <dependency>
+           <groupId>com.google.protobuf</groupId>
+           <artifactId>protobuf-java</artifactId>
+           <version>${com.google.protobuf-protobuf-java.version}</version>
+       </dependency>
 
-        <dependency>
-            <groupId>org.sonarsource.java</groupId>
-            <artifactId>sonar-jacoco-listeners</artifactId>
-            <scope>test</scope>
-        </dependency>
+       <dependency>
+           <groupId>org.sonarsource.java</groupId>
+           <artifactId>sonar-jacoco-listeners</artifactId>
+           <scope>test</scope>
+       </dependency>
 
-        <!-- Validation -->
+       <!-- Validation -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>

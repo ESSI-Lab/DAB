@@ -527,7 +527,7 @@ public class ElasticsearchClient {
 	    sourceBuilder.query(query2);
 	    try {
 		SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-		long v = searchResponse.getHits().getTotalHits().value;
+		long v = searchResponse.getHits().getTotalHits().value();
 		value += south + "," + west + "," + north + "," + east + "ITEMSEP" + v + " ";
 	    } catch (IOException e) {
 		e.printStackTrace();
