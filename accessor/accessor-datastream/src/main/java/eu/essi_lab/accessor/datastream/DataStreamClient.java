@@ -29,8 +29,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -338,6 +340,55 @@ public class DataStreamClient {
      */
     public Set<String> getCharacteristicNames(String doi, int locationId) throws IOException, InterruptedException {
 	return getCharacteristicNames(doi, locationId, -1);
+    }
+
+    /**
+     * Returns distinct CharacteristicName values with their ResultUnit for the given DOI and location.
+     * Same semantics as {@link #getCharacteristicNames(String, int, int)} but also extracts unit (first occurrence per name).
+     *
+     * @param maxCharacteristics max number of characteristics to consider; -1 or 0 = no limit
+     * @return map from characteristic name to result unit (unit may be null if not present)
+     */
+    public Map<String, String> getCharacteristicNamesWithUnits(String doi, int locationId, int maxCharacteristics)
+	    throws IOException, InterruptedException {
+	Map<String, String> nameToUnit = new HashMap<>();
+
+	String filter = "DOI%20eq%20'" + URLEncoder.encode(doi, StandardCharsets.UTF_8) + "'%20and%20LocationId%20eq%20'"
+		+ locationId + "'";
+	String select = "%24select=CharacteristicName,ResultUnit";
+	String baseUrl = endpoint + "/Observations?%24filter=" + filter + "&" + select + "&%24top=" + maxCharacteristics;
+
+	if (maxCharacteristics > 0) {
+	    JSONObject page = executeGet(baseUrl);
+	    JSONArray value = page.optJSONArray("value");
+	    if (value != null) {
+		for (int i = 0; i < value.length(); i++) {
+		    JSONObject obj = value.getJSONObject(i);
+		    String name = obj.optString("CharacteristicName", null);
+		    if (name != null && !name.isEmpty() && !nameToUnit.containsKey(name)) {
+			nameToUnit.put(name, obj.optString("ResultUnit", null));
+		    }
+		}
+	    }
+	    return nameToUnit;
+	}
+
+	String next = baseUrl;
+	while (next != null) {
+	    JSONObject page = executeGet(next);
+	    JSONArray value = page.optJSONArray("value");
+	    if (value != null) {
+		for (int i = 0; i < value.length(); i++) {
+		    JSONObject obj = value.getJSONObject(i);
+		    String name = obj.optString("CharacteristicName", null);
+		    if (name != null && !name.isEmpty() && !nameToUnit.containsKey(name)) {
+			nameToUnit.put(name, obj.optString("ResultUnit", null));
+		    }
+		}
+	    }
+	    next = page.optString("@odata.nextLink", null);
+	}
+	return nameToUnit;
     }
 
     /**
