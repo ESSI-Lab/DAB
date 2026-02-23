@@ -67,7 +67,7 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSetting> {
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "TRIGGERConnector";
 
@@ -86,7 +86,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
     private static final String TOKEN_REQUEST_URL = "https://trigger-io.difa.unibo.it/api/";
     private static final String REFRESH_REQUEST_URL = "https://app.meteotracker.com/auth/refreshtoken";
-    
+
     public static final String BASE_URL = "https://trigger-io.difa.unibo.it/api/";
     private static final String MYAIR_URL = "myair/?";
     private static final String ECG_URL = "ecg/?";
@@ -95,10 +95,14 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
     private static final String SLEEP_URL = "sleep/?";
     private static final String SMARTWATCHHIGH_URL = "smartwatchhigh/?";
     private static final String SMARTWATCHLOW_URL = "smartwatchlow/?";
+    private static final String ACCOUNTS_URL = "accounts/?";
 
     private static final String DEVICE_ID = "deviceId";
+    private static final String EMAIL = "email";
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
+
+    private List<String> stationList = new ArrayList<>();
 
     Map<String, List<String>> deviceMap = new HashMap<String, List<String>>();
 
@@ -112,16 +116,16 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
     public enum TRIGGER_VARIABLES {
 	// MYAIR
-	TEMPERATURE("2m temperature", "myair", "°C"), HUMIDITY("2m rel. humidity", "myair", "%"), PRESSURE("Pressure", "myair", "mbar"),
-	// HDX("Humidex", "°C"),
-	SOUND("Sound", "myair", "km/h"), LIGHT("Solar Radiation Index", "myair", "#"), UVB("Ultraviolet B", "myair", "#"),
-	// CO2("CO2", "ppm"),
+	TEMPERATURE("2m temperature", "myair", "°C"), HUMIDITY("2m rel. humidity", "myair", "%"), PRESSURE("Pressure", "myair",
+		"mbar"), // HDX("Humidex", "°C"),
+	SOUND("Sound", "myair", "km/h"), LIGHT("Solar Radiation Index", "myair", "#"), UVB("Ultraviolet B", "myair",
+		"#"), // CO2("CO2", "ppm"),
 	PM1("Mass Concentration PM1.0", "myair", "μg/m³"), PM25("Mass Concentration PM2.5", "myair", "μg/m³"), PM10(
 		"Mass Concentration PM10", "myair", "μg/m³"), PC03("Number of particulate concentration PC0.3", "myair", "#/cm³"), PC05(
-			"Number of particulate concentration PM0.5", "myair", "#/cm³"), PC1("Number of particulate concentration PC1.0",
-				"myair", "#/cm³"), PC25("Number of particulate concentration PC2.5", "myair", "#/cm³"), PC5(
-					"Number of particulate concentration PC5.0", "myair",
-					"#/cm³"), PC10("Number of particulate concentration PC10", "myair", "#/cm³"),
+		"Number of particulate concentration PM0.5", "myair", "#/cm³"), PC1("Number of particulate concentration PC1.0", "myair",
+		"#/cm³"), PC25("Number of particulate concentration PC2.5", "myair", "#/cm³"), PC5(
+		"Number of particulate concentration PC5.0", "myair", "#/cm³"), PC10("Number of particulate concentration PC10", "myair",
+		"#/cm³"),
 
 	// ECG
 	ECG("Electrocardiography (ECG)", "ecg", "mV"),
@@ -132,8 +136,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	// SLEEP
 
 	// SMARTWATCHLOW
-	BPHIGH("Systolic Blood Pressure", "smartwatchlow", "mmHg"), BPLOW("Diastolic Blood Pressure", "smartwatchlow",
-		"mmHg"), BODYTEMP("Body Temperature", "smartwatchlow", "°C"), SKINTEMP("Skin Temperature", "smartwatchlow", "°C"),
+	BPHIGH("Systolic Blood Pressure", "smartwatchlow", "mmHg"), BPLOW("Diastolic Blood Pressure", "smartwatchlow", "mmHg"), BODYTEMP(
+		"Body Temperature", "smartwatchlow", "°C"), SKINTEMP("Skin Temperature", "smartwatchlow", "°C"),
 
 	// SMARTWATCHHIGH
 	HEARTRATE("Heart Rate", "smartwatchhigh", "BPM"), SLEEPRATE("Sleep Rate", "smartwatchhigh", "#"), OXYGENS("Oxygen",
@@ -204,15 +208,11 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
     // }
 
     /**
-     * T0 air temperature [°C] H relative humidity [%] a altitude [m] P pressure
-     * [mbar] td dew point [°C] HDX humidex [°C] i vertical temperature gradient
-     * [°C/100m] s speed [km/h] L solar radiation index bt bluetooth RSSI [dBm] CO2
-     * [ppm] m1 mass concentration PM1.0 [μg/m3] m2 mass concentration PM2.5 [μg/m3]
-     * m4 mass concentration PM4.0 [μg/m3] m10 mass concentration PM10 [μg/m3] n0
-     * number concentration PM0.5 [#/cm3] n1 number concentration PM1.0 [#/cm3] n2
-     * number concentration PM2.5 [#/cm3] n4 number concentration PM4.0 [#/cm3] n10
-     * number concentration PM10 [#/cm3] tps typical part size [μm] EAQ EPA Air
-     * Quality FAQ Fast Air Quality O3 [ppb]
+     * T0 air temperature [°C] H relative humidity [%] a altitude [m] P pressure [mbar] td dew point [°C] HDX humidex [°C] i vertical
+     * temperature gradient [°C/100m] s speed [km/h] L solar radiation index bt bluetooth RSSI [dBm] CO2 [ppm] m1 mass concentration PM1.0
+     * [μg/m3] m2 mass concentration PM2.5 [μg/m3] m4 mass concentration PM4.0 [μg/m3] m10 mass concentration PM10 [μg/m3] n0 number
+     * concentration PM0.5 [#/cm3] n1 number concentration PM1.0 [#/cm3] n2 number concentration PM2.5 [#/cm3] n4 number concentration PM4.0
+     * [#/cm3] n10 number concentration PM10 [#/cm3] tps typical part size [μm] EAQ EPA Air Quality FAQ Fast Air Quality O3 [ppb]
      */
 
     @Override
@@ -225,6 +225,10 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
+
+	if (stationList.isEmpty()) {
+	    stationList = getStationList();
+	}
 
 	// Start date: January 2025
 	YearMonth startMonth = YearMonth.of(2025, 1);
@@ -282,7 +286,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 		for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusMonths(1)) {
 
 		    String url = getSourceURL().endsWith("/")
-			    ? getSourceURL() + queryPath + "year=" + current.getYear() + "&month=" + current.getMonthValue()// +
+			    ? getSourceURL() + queryPath + "year=" + current.getYear() + "&month=" + current.getMonthValue()
+			    // +
 
 			    : getSourceURL() + "/" + queryPath + "year=" + current.getYear() + "&month=" + current.getMonthValue();
 
@@ -374,12 +379,65 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	} else {
 	    response.setResumptionToken(null);
 	    TRIGGER_TOKEN = null;
-	    GSLoggerFactory.getLogger(TRIGGERConnector.class).debug("Added Collection records: {} . TOTAL STATION SIZE: {}", partialNumbers,
-		    recordsCount);
+	    GSLoggerFactory.getLogger(TRIGGERConnector.class)
+		    .debug("Added Collection records: {} . TOTAL STATION SIZE: {}", partialNumbers, recordsCount);
 	    return response;
 	}
 
 	return response;
+    }
+
+    private List<String> getStationList() {
+
+	List<String> ret = new ArrayList<String>();
+	try {
+	    if (TRIGGER_TOKEN == null) {
+		TRIGGER_TOKEN = getBearerToken();
+	    }
+
+	    String url = BASE_URL + ACCOUNTS_URL + "&limit=1000";
+	    HashMap<String, String> params = new HashMap<String, String>();
+	    params.put("token", TRIGGER_TOKEN);
+
+	    HttpResponse<InputStream> triggerResponse = new Downloader().downloadResponse(//
+		    url.trim(), //
+		    HttpHeaderUtils.build("token", TRIGGER_TOKEN));
+
+	    int statusCode = triggerResponse.statusCode();
+	    if (statusCode > 400) {
+		// token expired - refresh token
+		getBearerToken();
+
+		triggerResponse = new Downloader().downloadResponse(//
+			url.trim(), //
+			HttpHeaderUtils.build("token", TRIGGER_TOKEN));
+
+	    }
+	    InputStream stream = triggerResponse.body();
+	    GSLoggerFactory.getLogger(TRIGGERConnector.class).info("Got " + url);
+
+	    if (stream != null) {
+
+		ClonableInputStream clone = new ClonableInputStream(stream);
+
+		JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
+
+		for (int i = 0; i < array.length(); i++) {
+		    JSONObject obj = array.getJSONObject(i);
+		    String email = obj.optString(EMAIL);
+		    if (email != null) {
+			ret.add(email);
+		    }
+		}
+
+		if (stream != null)
+		    stream.close();
+	    }
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}
+
+	return ret;
     }
 
     private Map<String, List<TRIGGERTimePosition>> getGPSValues(YearMonth startMonth, YearMonth todayMonth) {
@@ -389,7 +447,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 	    for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusYears(1)) {
 
-		String url = BASE_URL + GPS_URL + "year=" + current.getYear()+ "&limit=1000&offset=0";
+		String url = BASE_URL + GPS_URL + "year=" + current.getYear() + "&limit=1000&offset=0";
 
 		// add authorization token
 		if (TRIGGER_TOKEN == null) {

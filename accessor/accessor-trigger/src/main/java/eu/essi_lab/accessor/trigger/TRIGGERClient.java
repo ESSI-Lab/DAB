@@ -339,7 +339,7 @@ public class TRIGGERClient {
 
 	List<JSONObject> list = new ArrayList<JSONObject>();
 
-	String response = getResponse(getEndpoint() + "/service/estaciones");
+	String response = getResponse(getEndpoint() + "/accounts&limit=1000");
 
 	JSONArray stationsArray = new JSONArray(response);
 
