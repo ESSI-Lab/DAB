@@ -99,6 +99,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
     private static final String DEVICE_ID = "deviceId";
     private static final String EMAIL = "email";
+    private static final String USER_ID = "userId";
     private static final String LONGITUDE = "longitude";
     private static final String LATITUDE = "latitude";
 
@@ -109,23 +110,23 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
     public static String TRIGGER_TOKEN = null;
     public static String METEOTRACKER_REFRESH_TOKEN = null;
     // private boolean isLastSearchTerm = false;
-    private String[] SEARCH_TERMS = { MYAIR_URL, ECG_URL, PPG_URL, SMARTWATCHHIGH_URL, SMARTWATCHLOW_URL };
+    private String[] SEARCH_TERMS = { ECG_URL, PPG_URL, SMARTWATCHHIGH_URL, SMARTWATCHLOW_URL };
     private static int searchIndex = 0;
 
     protected Map<String, List<TRIGGERTimePosition>> latLonMap = new HashMap<String, List<TRIGGERTimePosition>>();
 
     public enum TRIGGER_VARIABLES {
 	// MYAIR
-	TEMPERATURE("2m temperature", "myair", "°C"), HUMIDITY("2m rel. humidity", "myair", "%"), PRESSURE("Pressure", "myair",
-		"mbar"), // HDX("Humidex", "°C"),
-	SOUND("Sound", "myair", "km/h"), LIGHT("Solar Radiation Index", "myair", "#"), UVB("Ultraviolet B", "myair",
-		"#"), // CO2("CO2", "ppm"),
+	TEMPERATURE("2m temperature", "myair", "°C"), HUMIDITY("2m rel. humidity", "myair", "%"), PRESSURE("Pressure", "myair", "mbar"), // HDX("Humidex",
+																	 // "°C"),
+	SOUND("Sound", "myair", "km/h"), LIGHT("Solar Radiation Index", "myair", "#"), UVB("Ultraviolet B", "myair", "#"), // CO2("CO2",
+															   // "ppm"),
 	PM1("Mass Concentration PM1.0", "myair", "μg/m³"), PM25("Mass Concentration PM2.5", "myair", "μg/m³"), PM10(
 		"Mass Concentration PM10", "myair", "μg/m³"), PC03("Number of particulate concentration PC0.3", "myair", "#/cm³"), PC05(
-		"Number of particulate concentration PM0.5", "myair", "#/cm³"), PC1("Number of particulate concentration PC1.0", "myair",
-		"#/cm³"), PC25("Number of particulate concentration PC2.5", "myair", "#/cm³"), PC5(
-		"Number of particulate concentration PC5.0", "myair", "#/cm³"), PC10("Number of particulate concentration PC10", "myair",
-		"#/cm³"),
+			"Number of particulate concentration PM0.5", "myair", "#/cm³"), PC1("Number of particulate concentration PC1.0",
+				"myair", "#/cm³"), PC25("Number of particulate concentration PC2.5", "myair", "#/cm³"), PC5(
+					"Number of particulate concentration PC5.0", "myair",
+					"#/cm³"), PC10("Number of particulate concentration PC10", "myair", "#/cm³"),
 
 	// ECG
 	ECG("Electrocardiography (ECG)", "ecg", "mV"),
@@ -136,8 +137,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	// SLEEP
 
 	// SMARTWATCHLOW
-	BPHIGH("Systolic Blood Pressure", "smartwatchlow", "mmHg"), BPLOW("Diastolic Blood Pressure", "smartwatchlow", "mmHg"), BODYTEMP(
-		"Body Temperature", "smartwatchlow", "°C"), SKINTEMP("Skin Temperature", "smartwatchlow", "°C"),
+	BPHIGH("Systolic Blood Pressure", "smartwatchlow", "mmHg"), BPLOW("Diastolic Blood Pressure", "smartwatchlow",
+		"mmHg"), BODYTEMP("Body Temperature", "smartwatchlow", "°C"), SKINTEMP("Skin Temperature", "smartwatchlow", "°C"),
 
 	// SMARTWATCHHIGH
 	HEARTRATE("Heart Rate", "smartwatchhigh", "BPM"), SLEEPRATE("Sleep Rate", "smartwatchhigh", "#"), OXYGENS("Oxygen",
@@ -208,11 +209,16 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
     // }
 
     /**
-     * T0 air temperature [°C] H relative humidity [%] a altitude [m] P pressure [mbar] td dew point [°C] HDX humidex [°C] i vertical
-     * temperature gradient [°C/100m] s speed [km/h] L solar radiation index bt bluetooth RSSI [dBm] CO2 [ppm] m1 mass concentration PM1.0
-     * [μg/m3] m2 mass concentration PM2.5 [μg/m3] m4 mass concentration PM4.0 [μg/m3] m10 mass concentration PM10 [μg/m3] n0 number
-     * concentration PM0.5 [#/cm3] n1 number concentration PM1.0 [#/cm3] n2 number concentration PM2.5 [#/cm3] n4 number concentration PM4.0
-     * [#/cm3] n10 number concentration PM10 [#/cm3] tps typical part size [μm] EAQ EPA Air Quality FAQ Fast Air Quality O3 [ppb]
+     * T0 air temperature [°C] H relative humidity [%] a altitude [m] P pressure [mbar] td dew point [°C] HDX humidex
+     * [°C] i vertical
+     * temperature gradient [°C/100m] s speed [km/h] L solar radiation index bt bluetooth RSSI [dBm] CO2 [ppm] m1 mass
+     * concentration PM1.0
+     * [μg/m3] m2 mass concentration PM2.5 [μg/m3] m4 mass concentration PM4.0 [μg/m3] m10 mass concentration PM10
+     * [μg/m3] n0 number
+     * concentration PM0.5 [#/cm3] n1 number concentration PM1.0 [#/cm3] n2 number concentration PM2.5 [#/cm3] n4 number
+     * concentration PM4.0
+     * [#/cm3] n10 number concentration PM10 [#/cm3] tps typical part size [μm] EAQ EPA Air Quality FAQ Fast Air Quality
+     * O3 [ppb]
      */
 
     @Override
@@ -230,13 +236,13 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	    stationList = getStationList();
 	}
 
-	// Start date: January 2025
-	YearMonth startMonth = YearMonth.of(2025, 1);
+	// Start date: January 2026
+	YearMonth startMonth = YearMonth.of(2026, 1);
 	// Get current year and month
 	YearMonth todayMonth = YearMonth.now();
 
 	if (latLonMap.isEmpty())
-	    latLonMap = getGPSValues(startMonth, todayMonth);
+	    latLonMap = getGPSValues(startMonth, todayMonth, stationList);
 
 	String token = request.getResumptionToken();
 	int start = 0;
@@ -282,43 +288,49 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 		// int currentYear = currentDateTime.getYear();
 
 		Map<String, TRIGGERDevice> results = new HashMap<String, TRIGGERDevice>();
-		// current month for 2025
-		for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusMonths(1)) {
+		// current month for 2026
+		for (Map.Entry<String, List<TRIGGERTimePosition>> stationMap : latLonMap.entrySet()) {
+		    
+		    
+		    String userId = stationMap.getKey();
+		    
+		    for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusMonths(1)) {
 
-		    String url = getSourceURL().endsWith("/")
-			    ? getSourceURL() + queryPath + "year=" + current.getYear() + "&month=" + current.getMonthValue()
-			    // +
+			String url = getSourceURL().endsWith("/")
+				? getSourceURL() + queryPath + "where=userId=" + userId +",year>=" + current.getYear() + ",month=" + current.getMonthValue() + "&order=ASC&limit=1000"
+				// +
 
-			    : getSourceURL() + "/" + queryPath + "year=" + current.getYear() + "&month=" + current.getMonthValue();
+				: getSourceURL() + "/" + queryPath + "where=userId=" + userId +",year>=" + current.getYear() + ",month=" + current.getMonthValue() + "&order=ASC&limit=1000";
 
-		    GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
+			GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 
-		    Map<String, TRIGGERDevice> partialResults = getResultList(url);
+			Map<String, TRIGGERDevice> partialResults = getResultList(url);
 
-		    for (Map.Entry<String, TRIGGERDevice> entry : partialResults.entrySet()) {
-			String id = entry.getKey();
-			TRIGGERDevice device = entry.getValue();
-			if (results.containsKey(id)) {
-			    TRIGGERDevice resDevice = results.get(id);
-			    LocalDateTime startDate = resDevice.getBeginDate();
-			    LocalDateTime endDate = resDevice.getEndDate();
-			    if (startDate.isAfter(device.getBeginDate())) {
-				startDate = device.getBeginDate();
+			for (Map.Entry<String, TRIGGERDevice> entry : partialResults.entrySet()) {
+			    String id = entry.getKey();
+			    TRIGGERDevice device = entry.getValue();
+			    if (results.containsKey(id)) {
+				TRIGGERDevice resDevice = results.get(id);
+				LocalDateTime startDate = resDevice.getBeginDate();
+				LocalDateTime endDate = resDevice.getEndDate();
+				if (startDate.isAfter(device.getBeginDate())) {
+				    startDate = device.getBeginDate();
+				}
+				if (endDate.isBefore(device.getEndDate())) {
+				    endDate = device.getEndDate();
+				}
+				device.setBeginDate(startDate);
+				device.setEndDate(endDate);
+				results.put(id, device);
+			    } else {
+				results.put(id, device);
 			    }
-			    if (endDate.isBefore(device.getEndDate())) {
-				endDate = device.getEndDate();
-			    }
-			    device.setBeginDate(startDate);
-			    device.setEndDate(endDate);
-			    results.put(id, device);
-			} else {
-			    results.put(id, device);
 			}
+
+			boolean hasResults = partialResults.size() > 0;
+
+			Optional<Integer> maxRecords = getSetting().getMaxRecords();
 		    }
-
-		    boolean hasResults = partialResults.size() > 0;
-
-		    Optional<Integer> maxRecords = getSetting().getMaxRecords();
 		}
 
 		for (Map.Entry<String, TRIGGERDevice> entry : results.entrySet()) {
@@ -379,8 +391,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	} else {
 	    response.setResumptionToken(null);
 	    TRIGGER_TOKEN = null;
-	    GSLoggerFactory.getLogger(TRIGGERConnector.class)
-		    .debug("Added Collection records: {} . TOTAL STATION SIZE: {}", partialNumbers, recordsCount);
+	    GSLoggerFactory.getLogger(TRIGGERConnector.class).debug("Added Collection records: {} . TOTAL STATION SIZE: {}", partialNumbers,
+		    recordsCount);
 	    return response;
 	}
 
@@ -425,6 +437,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 		for (int i = 0; i < array.length(); i++) {
 		    JSONObject obj = array.getJSONObject(i);
 		    String email = obj.optString(EMAIL);
+		    String userId = obj.optString(USER_ID);
 		    if (email != null) {
 			ret.add(email);
 		    }
@@ -440,14 +453,15 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	return ret;
     }
 
-    private Map<String, List<TRIGGERTimePosition>> getGPSValues(YearMonth startMonth, YearMonth todayMonth) {
+    private Map<String, List<TRIGGERTimePosition>> getGPSValues(YearMonth startMonth, YearMonth todayMonth, List<String> stationList) {
 	Map<String, List<TRIGGERTimePosition>> ret = new HashMap<String, List<TRIGGERTimePosition>>();
 
 	try {
 
-	    for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusYears(1)) {
+	    for (String s : stationList) {
 
-		String url = BASE_URL + GPS_URL + "year=" + current.getYear() + "&limit=1000&offset=0";
+		String url = BASE_URL + GPS_URL + "&where=year=" + startMonth.getYear() + ",email=" + s
+			+ "&orderBy=month&order=ASC&limit=10000";
 
 		// add authorization token
 		if (TRIGGER_TOKEN == null) {
@@ -487,30 +501,35 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 		    JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
 
-		    for (int i = 0; i < array.length(); i++) {
+		    if (array != null && !array.isEmpty()) {
 
-			JSONObject obj = array.getJSONObject(i);
-			String deviceId = obj.optString(DEVICE_ID);
-			Double lon = obj.optDoubleObject(LONGITUDE);
-			Double lat = obj.optDoubleObject(LATITUDE);
-			int year = obj.optInt("year");
-			int month = obj.optInt("month");
-			int day = obj.optInt("day");
-			int hour = obj.optInt("hour");
-			int minute = obj.optInt("minute");
-			int second = obj.optInt("second");
-			LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
-			TRIGGERTimePosition tp = new TRIGGERTimePosition(lon, lat, dateTime);
-			List<TRIGGERTimePosition> timePositionList = new ArrayList<TRIGGERTimePosition>();
-			if (ret.containsKey(deviceId)) {
-			    timePositionList = ret.get(deviceId);
-			    timePositionList.add(tp);
-			    ret.put(deviceId, timePositionList);
-			} else {
-			    // first element
-			    timePositionList.add(tp);
-			    ret.put(deviceId, timePositionList);
+			for (int i = 0; i < array.length(); i++) {
+
+			    JSONObject obj = array.getJSONObject(i);
+			    String userId = obj.optString(USER_ID);
+			    Double lon = obj.optDoubleObject(LONGITUDE);
+			    Double lat = obj.optDoubleObject(LATITUDE);
+			    int year = obj.optInt("year");
+			    int month = obj.optInt("month");
+			    int day = obj.optInt("day");
+			    int hour = obj.optInt("hour");
+			    int minute = obj.optInt("minute");
+			    int second = obj.optInt("second");
+			    LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
+			    TRIGGERTimePosition tp = new TRIGGERTimePosition(lon, lat, dateTime);
+			    List<TRIGGERTimePosition> timePositionList = new ArrayList<TRIGGERTimePosition>();
+			    if (ret.containsKey(userId)) {
+				timePositionList = ret.get(userId);
+				timePositionList.add(tp);
+				ret.put(userId, timePositionList);
+			    } else {
+				// first element
+				timePositionList.add(tp);
+				ret.put(userId, timePositionList);
+			    }
 			}
+		    } else {
+			GSLoggerFactory.getLogger(TRIGGERConnector.class).info("NO GPS available for email {}", s);
 		    }
 		    if (stream != null)
 			stream.close();
@@ -652,7 +671,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 	    for (int i = 0; i < array.length(); i++) {
 
 		JSONObject object = array.getJSONObject(i);
-		String deviceId = object.optString(DEVICE_ID);
+		String userId = object.optString(USER_ID);
 		int year = object.optInt("year");
 		int month = object.optInt("month");
 		int day = object.optInt("day");
@@ -661,8 +680,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 		int second = object.optInt("second");
 		LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
 
-		if (map.containsKey(deviceId)) {
-		    TRIGGERDevice device = map.get(deviceId);
+		if (map.containsKey(userId)) {
+		    TRIGGERDevice device = map.get(userId);
 		    LocalDateTime beginDate = device.getBeginDate();
 		    LocalDateTime endDate = device.getEndDate();
 		    if (dateTime.isBefore(beginDate)) {
@@ -673,11 +692,11 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 			// take last object
 			device.setJSONObject(object);
 		    }
-		    map.put(deviceId, device);
+		    map.put(userId, device);
 		} else {
 		    // first time
 		    TRIGGERDevice device = new TRIGGERDevice(dateTime, dateTime, object);
-		    map.put(deviceId, device);
+		    map.put(userId, device);
 		}
 
 	    }
