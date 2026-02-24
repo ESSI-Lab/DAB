@@ -442,7 +442,7 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	    tempExtent.setEndPosition(end);
 	}
 	mi.getDataIdentification().addTemporalExtent(tempExtent);
-
+	setIndeterminatePosition(dataset);
 	//
 	// Reference system (WGS84)
 	//
