@@ -22,10 +22,12 @@ package eu.essi_lab.accessor.datastream;
  */
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -55,6 +57,8 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 
     private static final String DATASTREAM_READ_ERROR = "Unable to retrieve DataStream content";
     private static final String DATASTREAM_URL_NOT_FOUND_ERROR = "DATASTREAM_URL_NOT_FOUND_ERROR";
+    /** Max locations per resumption token (one block per request). */
+    private static final int LOCATION_BLOCK_SIZE = 1000;
 
     private final Logger logger = GSLoggerFactory.getLogger(getClass());
 
@@ -86,27 +90,26 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    return ret;
 	}
 
-	String token = request.getResumptionToken();
-	int index; // index of the collection to process (token = DOI of that collection; null = first)
-	if (token == null || token.isEmpty()) {
+	TokenParts tokenParts = parseResumptionToken(request.getResumptionToken());
+	int index;
+	int locationOffset;
+	if (tokenParts.doi == null || tokenParts.doi.isEmpty()) {
 	    index = 0;
+	    locationOffset = 0;
 	} else {
-	    int idx = findCollectionIndexByDoi(cache, token);
+	    int idx = findCollectionIndexByDoi(cache, tokenParts.doi);
 	    if (idx < 0) {
-		logger.warn("Resumption token (DOI) '{}' not found in collection cache; starting from first collection", token);
+		logger.warn("Resumption token '{}' not found in collection cache; starting from first collection", request.getResumptionToken());
 		index = 0;
-	} else {
+		locationOffset = 0;
+	    } else {
 		index = idx;
+		locationOffset = tokenParts.locationOffset;
 	    }
 	}
 
-	int total = cache.size();
-	String currentDoi = cache.get(index).doi;
-	int currentNum = index + 1;
-	double percent = total > 0 ? (currentNum * 100.0 / total) : 0;
-	logger.info("Processing collection {}/{} (DOI: {}), {}%", currentNum, total, currentDoi, String.format("%.1f", percent));
-
-	if (index >= cache.size()) {
+	int totalCollections = cache.size();
+	if (index >= totalCollections) {
 	    ret.setResumptionToken(null);
 	    logger.debug("DataStream listRecords completed. Total records emitted: {}", partialNumbers);
 	    partialNumbers = 0;
@@ -122,8 +125,19 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    return ret;
 	}
 
-	List<String> recordsForCollection = getOriginalMetadataForCollection(cache.get(index), remainingBudget);
-	for (String om : recordsForCollection) {
+	String currentDoi = cache.get(index).doi;
+	CollectionHarvestResult result = getOriginalMetadataForCollection(cache.get(index), remainingBudget, locationOffset,
+		LOCATION_BLOCK_SIZE);
+
+	int locationEnd = Math.min(locationOffset + LOCATION_BLOCK_SIZE, result.totalLocations);
+	int currentNum = index + 1;
+	double collectionPercent = totalCollections > 0 ? (currentNum * 100.0 / totalCollections) : 0;
+	double locationPercent = result.totalLocations > 0 ? (locationEnd * 100.0 / result.totalLocations) : 0;
+	logger.info("Processing collection {}/{} (DOI: {}), locations {}-{} of {} ({}% within collection), collections {}%",
+		currentNum, totalCollections, currentDoi, locationOffset, locationEnd, result.totalLocations,
+		String.format("%.1f", locationPercent), String.format("%.1f", collectionPercent));
+
+	for (String om : result.records) {
 	    if (om != null && !om.isEmpty()) {
 		OriginalMetadata metadata = new OriginalMetadata();
 		metadata.setSchemeURI(CommonNameSpaceContext.DATASTREAM_NS_URI);
@@ -136,17 +150,19 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    }
 	}
 
-	// Next resumption token = DOI of the next collection, or null if this was the last or maxRecords reached
+	// Next token: same collection next location block (DOI:offset), or next collection (nextDoi:0), or null
 	String nextToken = null;
 	if (maxRecords <= 0 || partialNumbers < maxRecords) {
-	    if (index + 1 < cache.size()) {
-		nextToken = cache.get(index + 1).doi;
+	    if (locationOffset + LOCATION_BLOCK_SIZE < result.totalLocations) {
+		nextToken = currentDoi + ":" + (locationOffset + LOCATION_BLOCK_SIZE);
+	    } else if (index + 1 < cache.size()) {
+		nextToken = cache.get(index + 1).doi + ":0";
 	    }
 	}
 	ret.setResumptionToken(nextToken);
 
-	logger.debug("ADDED {} records for collection {} (DOI: {}). Next token: {}", recordsForCollection.size(),
-		cache.get(index).id, cache.get(index).doi, nextToken);
+	logger.debug("ADDED {} records for collection {} (DOI: {}), locations {}-{}. Next token: {}", result.records.size(),
+		cache.get(index).id, currentDoi, locationOffset, locationEnd, nextToken);
 
 	return ret;
     }
@@ -195,41 +211,94 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
     }
 
     /**
-     * Fetches original metadata (collection record + all time-series records) for a single dataset
-     * collection. Does not load all collections into memory.
+     * Parses a resumption token into DOI and location offset.
+     * Format: {@code DOI} (treated as offset 0) or {@code DOI:offset} (e.g. DOI1:1000, DOI1:2000).
+     */
+    private static TokenParts parseResumptionToken(String token) {
+	TokenParts parts = new TokenParts();
+	if (token == null || token.isEmpty()) {
+	    parts.doi = null;
+	    parts.locationOffset = 0;
+	    return parts;
+	}
+	int colon = token.indexOf(':');
+	if (colon < 0) {
+	    parts.doi = token;
+	    parts.locationOffset = 0;
+	    return parts;
+	}
+	parts.doi = token.substring(0, colon);
+	try {
+	    parts.locationOffset = colon < token.length() - 1 ? Integer.parseInt(token.substring(colon + 1)) : 0;
+	} catch (NumberFormatException e) {
+	    parts.locationOffset = 0;
+	}
+	return parts;
+    }
+
+    private static class TokenParts {
+	String doi;
+	int locationOffset;
+    }
+
+    private static class CollectionHarvestResult {
+	List<String> records = new ArrayList<>();
+	int totalLocations;
+    }
+
+    /**
+     * Fetches original metadata (collection record + time-series records) for a single dataset
+     * collection, for a block of locations [locationOffset, locationOffset+locationLimit).
      *
      * @param remainingRecordBudget max records to add (0 = no limit). Used when maxRecords is set globally.
+     * @param locationOffset        index of first location to process in this collection.
+     * @param locationLimit         max number of locations to process in this block (e.g. 1000).
      */
-    private List<String> getOriginalMetadataForCollection(DataStreamClient.DatasetMetadata collectionMinimal,
-	    int remainingRecordBudget) throws GSException {
+    private CollectionHarvestResult getOriginalMetadataForCollection(DataStreamClient.DatasetMetadata collectionMinimal,
+	    int remainingRecordBudget, int locationOffset, int locationLimit) throws GSException {
 
-	List<String> ret = new ArrayList<>();
+	CollectionHarvestResult result = new CollectionHarvestResult();
 	try {
 	    DataStreamClient.DatasetMetadata dataset = client.getMetadataByDoi(collectionMinimal.doi);
 	    if (dataset == null || dataset.doi == null || dataset.doi.isEmpty()) {
-		return ret;
-	    }
-
-	    // Collection-level record
-	    JSONObject collectionJson = new JSONObject();
-	    collectionJson.put("type", "collection");
-	    collectionJson.put("doi", dataset.doi);
-	    collectionJson.put("datasetId", dataset.id);
-	    collectionJson.put("datasetName", dataset.name);
-	    collectionJson.put("metadata", dataset.raw);
-	    ret.add(collectionJson.toString());
-
-	    int emitted = 1;
-	    if (remainingRecordBudget > 0 && emitted >= remainingRecordBudget) {
-		return ret;
+		return result;
 	    }
 
 	    List<DataStreamClient.Location> locations = client.listLocationsByDoi(dataset.doi);
+	    result.totalLocations = locations.size();
+
+	    // Collection-level record only when starting from the first location block
+	    if (locationOffset == 0) {
+		JSONObject collectionJson = new JSONObject();
+		collectionJson.put("type", "collection");
+		collectionJson.put("doi", dataset.doi);
+		collectionJson.put("datasetId", dataset.id);
+		collectionJson.put("datasetName", dataset.name);
+		collectionJson.put("metadata", dataset.raw);
+		result.records.add(collectionJson.toString());
+	    }
+
+	    int emitted = result.records.size();
+	    if (remainingRecordBudget > 0 && emitted >= remainingRecordBudget) {
+		return result;
+	    }
+
+	    int fromIndex = Math.min(locationOffset, result.totalLocations);
+	    int toIndex = Math.min(locationOffset + locationLimit, result.totalLocations);
+	    List<DataStreamClient.Location> block = locations.subList(fromIndex, toIndex);
 	    int observationSampleSet = getSetting().getObservationSampleSet();
 
-	    for (DataStreamClient.Location location : locations) {
-		Set<String> characteristicNames = client.getCharacteristicNames(dataset.doi, location.id, observationSampleSet);
-		for (String cn : characteristicNames) {
+	    LocalDate now = LocalDate.now();
+	    LocalDate oneYearAgo = now.minusYears(1);
+	    String defaultFirstDate = oneYearAgo.toString();
+	    String defaultLastDate = now.toString();
+
+	    for (DataStreamClient.Location location : block) {
+		Map<String, String> characteristicNamesToUnits = client.getCharacteristicNamesWithUnits(dataset.doi, location.id,
+			observationSampleSet);
+		for (Map.Entry<String, String> entry : characteristicNamesToUnits.entrySet()) {
+		    String cn = entry.getKey();
+		    String unit = entry.getValue();
 		    JSONObject seriesJson = new JSONObject();
 		    seriesJson.put("type", "dataset");
 		    seriesJson.put("doi", dataset.doi);
@@ -238,31 +307,16 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 		    seriesJson.put("metadata", dataset.raw);
 		    seriesJson.put("characteristicName", cn);
 		    seriesJson.put("location", location.raw);
-
-		    DataStreamClient.ObservationDateRange dateRange = client
-			    .getObservationDateRange(dataset.doi, location.id, cn, observationSampleSet);
-		    if (dateRange != null) {
-			if (dateRange.firstActivityStartDate != null) {
-			    seriesJson.put("firstObservationDate", dateRange.firstActivityStartDate);
-			}
-			if (dateRange.firstActivityStartTime != null) {
-			    seriesJson.put("firstObservationTime", dateRange.firstActivityStartTime);
-			}
-			if (dateRange.lastActivityStartDate != null) {
-			    seriesJson.put("lastObservationDate", dateRange.lastActivityStartDate);
-			}
-			if (dateRange.lastActivityStartTime != null) {
-			    seriesJson.put("lastObservationTime", dateRange.lastActivityStartTime);
-			}
-			if (dateRange.resultUnit != null && !dateRange.resultUnit.isEmpty()) {
-			    seriesJson.put("resultUnit", dateRange.resultUnit);
-			}
+		    seriesJson.put("firstObservationDate", defaultFirstDate);
+		    seriesJson.put("lastObservationDate", defaultLastDate);
+		    if (unit != null && !unit.isEmpty()) {
+			seriesJson.put("resultUnit", unit);
 		    }
 
-		    ret.add(seriesJson.toString());
+		    result.records.add(seriesJson.toString());
 		    emitted++;
 		    if (remainingRecordBudget > 0 && emitted >= remainingRecordBudget) {
-			return ret;
+			return result;
 		    }
 		}
 	    }
@@ -270,7 +324,7 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    logger.warn("Skipping collection {} (DOI: {}) due to error: {}", collectionMinimal.id, collectionMinimal.doi,
 		    e.getMessage(), e);
 	}
-	return ret;
+	return result;
     }
 
     @Override
