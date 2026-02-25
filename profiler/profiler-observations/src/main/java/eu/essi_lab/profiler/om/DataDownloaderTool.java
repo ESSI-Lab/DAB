@@ -268,11 +268,11 @@ public class DataDownloaderTool {
 			downloadURL = removeParameter(downloadURL, "asynchDownloadName", format);
 			downloadURL = removeParameter(downloadURL, "eMailNotifications", format);
 
-			File sourceDir = new File(tempPath.toFile(), sourceId);
+			File sourceDir = new File(tempPath.toFile(), FileUtils.sanitizeForNtfs(sourceId));
 			if (!sourceDir.exists()) {
 			    sourceDir.mkdir();
 			}
-			File propertyDir = new File(sourceDir, observedPropertyTitle);
+			File propertyDir = new File(sourceDir, FileUtils.sanitizeForNtfs(observedPropertyTitle));
 			if (!propertyDir.exists()) {
 			    propertyDir.mkdir();
 			}
