@@ -13,7 +13,7 @@
 	"layersSelectorButtonVisibility" : true,
 	"zoomSlider" : false,
 	"defaultLayer" : "OpenStreetMap",
-	"filters" : "source,organisationName,platformTitle,attributeURI,timeInterpolation,intendedObservationSpacing,aggregationDuration",
+	"filters" : "source,platformTitle,attributeURI,timeInterpolation,intendedObservationSpacing,aggregationDuration",
 	"instrumentSearch" : false,
 	"logo-left" : "logo_HISCentral.png,logo-left.png,logo_label.png",
 	"logo-right" : "logo-right-full.png",

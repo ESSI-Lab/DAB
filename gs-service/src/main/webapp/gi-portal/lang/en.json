@@ -242,6 +242,7 @@
 	"download_name_label" : "Download name:",
 	"download_name_placeholder" : "Enter a name for this download",
 	"select_data_format" : "Select data format:",
+	"download_query_constraints" : "Query constraints for this download",
 	"email_notifications_label" : "Send me email notifications about the download status",
 	"status_completed" : "Completed",
 	"status_completed_with_limit" : "Completed (size limit reached)",

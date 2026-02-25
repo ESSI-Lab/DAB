@@ -276,6 +276,7 @@
   "download_name_label": "Nome download:",
   "download_name_placeholder": "Inserisci un nome per questo download",
   "select_data_format": "Seleziona formato dati:",
+  "download_query_constraints": "Vincoli di ricerca per questo download",
   "email_notifications_label": "Inviami notifiche via email sullo stato del download",
   "status_completed": "Completato",
   "status_completed_with_limit": "Completato (limite dimensione raggiunto)",
