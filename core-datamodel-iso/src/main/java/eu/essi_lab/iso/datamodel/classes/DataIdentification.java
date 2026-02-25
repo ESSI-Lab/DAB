@@ -140,7 +140,7 @@ public class DataIdentification extends Identification {
 	}
 	// Try to find matching enum value
 	try {
-	    MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.fromValue(topicCategoryString.toLowerCase());
+	    MDTopicCategoryCodeType topic = MDTopicCategoryCodeType.fromValue(topicCategoryString);
 	    MDTopicCategoryCodePropertyType topicProp = new MDTopicCategoryCodePropertyType();
 	    topicProp.setMDTopicCategoryCode(topic);
 	    getElementType().getTopicCategory().add(topicProp);

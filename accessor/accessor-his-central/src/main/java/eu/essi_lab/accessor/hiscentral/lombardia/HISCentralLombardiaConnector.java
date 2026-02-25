@@ -10,18 +10,19 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -70,425 +71,421 @@ import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
  */
 public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCentralLombardiaConnectorSetting> {
 
-	/**
-	 * 
-	 */
-	public static final String TYPE = "HISCentralLombardiaConnector";
+    /**
+     *
+     */
+    public static final String TYPE = "HISCentralLombardiaConnector";
 
-	private Logger logger = GSLoggerFactory.getLogger(this.getClass());
+    private Logger logger = GSLoggerFactory.getLogger(this.getClass());
 
-	public HISCentralLombardiaConnector() {
+    public HISCentralLombardiaConnector() {
 
+    }
+
+    @Override
+    public boolean supports(GSSource source) {
+	String url = source.getEndpoint();
+	return url.contains("lombardia");
+    }
+
+    private static String NS = "arpalombardia.it";
+
+    @Override
+    public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
+
+	String token = request.getResumptionToken();
+
+	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+
+	Optional<GSSource> source = ConfigurationWrapper.//
+		getHarvestedSources().//
+		stream().//
+		filter(s -> this.supports(s)).//
+		findFirst();
+
+	if (!source.isPresent()) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "Unable to find connector source", //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.ERRORTYPE_SERVICE, //
+		    "connector source not found");
 	}
 
-	@Override
-	public boolean supports(GSSource source) {
-		String url = source.getEndpoint();
-		return url.contains("lombardia");
-	}
+	try {
 
-	private static String NS = "arpalombardia.it";
+	    HISCentralLombardiaClient client = new HISCentralLombardiaClient(new URL(getSourceURL()));
 
-	@Override
-	public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
+	    List<String> stationsIdentifiers = client.getStationIdentifiers();
 
-		String token = request.getResumptionToken();
+	    int stationsCount = stationsIdentifiers.size();
+	    int stationIndex;
+	    int addedRecords = 0;
 
-		ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+	    if (token == null) {
+		stationIndex = 0;
+	    } else {
+		stationIndex = Integer.parseInt(token);
+	    }
 
-		Optional<GSSource> source = ConfigurationWrapper.//
-				getHarvestedSources().//
-				stream().//
-				filter(s -> this.supports(s)).//
-				findFirst();
+	    if (stationIndex < (stationsCount - 1)) {
+		ret.setResumptionToken("" + (stationIndex + 1));
+	    } else if (stationIndex > (stationsCount - 1)) {
+		// outside, immediately returns
+		ret.setResumptionToken(null);
+		return ret;
+	    } else {
+		// last one
+		ret.setResumptionToken(null);
 
-		if (!source.isPresent()) {
+	    }
 
-			throw GSException.createException(//
-					getClass(), //
-					"Unable to find connector source", //
-					ErrorInfo.ERRORTYPE_INTERNAL, //
-					ErrorInfo.ERRORTYPE_SERVICE, //
-					"connector source not found");
+	    String stationId = stationsIdentifiers.get(stationIndex);
+
+	    GSLoggerFactory.getLogger(getClass()).info("Handling station [" + stationIndex + "/" + stationsCount + "] STARTED");
+
+	    Stazione station = client.getStazione(stationId);
+	    Comune comune = station.getComune();
+	    String statoStazione = station.getStato();
+	    String tipoStazione = station.getTipoStazione();
+	    String indirizzo = station.getIndirizzo();
+	    String nomeStazione = station.getNome();
+	    BigDecimal quotaStazione = station.getQuota();
+	    BigDecimal utm32Est = station.getUtm32TEst();
+	    BigDecimal utm32Nord = station.getUtm32TNord();
+
+	    if (utm32Est == null) {
+		GSLoggerFactory.getLogger(getClass())
+			.error("Empty BBOX for station with id: " + stationId + " and name " + nomeStazione + "] ");
+		//				return ret;
+	    }
+
+	    List<Sensore> sensors = client.elencoSensori(stationId);
+
+	    for (Sensore sensor : sensors) {
+
+		String sensorId = sensor.getId();
+		String nomeSensore = sensor.getNome();
+		String stato = sensor.getStato();
+		String tipo = sensor.getTipoSensore();
+		String idTipoSensore = sensor.getIdTipoSensore();
+		String unita = sensor.getUnitaMisura();
+		String frequenza = sensor.getFrequenza();
+		BigDecimal quota = sensor.getQuota();
+
+		ID_FUNZIONE funzione = sensor.getFunzione();
+		ID_OPERATORE operatore = sensor.getOperatore();
+		ID_PERIODO periodo = sensor.getPeriodo();
+
+		Date from = sensor.getFrom();
+		Date to = sensor.getTo();
+		Double lat = null;
+		Double lon = null;
+		if (utm32Est != null && utm32Nord != null) {
+		    SimpleEntry<Double, Double> coordinates = new SimpleEntry<>(utm32Est.doubleValue(), utm32Nord.doubleValue());
+		    CRS sourceCRS = new EPSGCRS(7791);
+		    CRS targetCRS = CRS.EPSG_4326();
+		    SimpleEntry<Double, Double> latlon = CRSUtils.translatePoint(coordinates, sourceCRS, targetCRS);
+		    lat = latlon.getKey();
+		    lon = latlon.getValue();
+		    if (lat > 90 || lat < -90) {
+			String warn = "Invalid latitude for station: " + stationId;
+			GSLoggerFactory.getLogger(getClass()).warn(warn);
+		    }
+		    if (lon > 180 || lon < -180) {
+			String warn = "Invalid longitude for station: " + stationId;
+			GSLoggerFactory.getLogger(getClass()).warn(warn);
+		    }
+		}
+		Dataset dataset = new Dataset();
+		dataset.setSource(source.get());
+
+		String missingValue = "-999.0";
+		dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
+
+		String parameterIdentifier = NS + ":" + idTipoSensore;
+		CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
+
+		MIMetadata miMetadata = dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+
+		miMetadata.setCharacterSetCode("utf8");
+
+		miMetadata.addHierarchyLevelScopeCodeListValue("dataset");
+
+		MIPlatform platform = new MIPlatform();
+		platform.setMDIdentifierCode(stationId);
+		platform.setDescription(statoStazione + " " + tipoStazione);
+		Citation citation = new Citation();
+		citation.setTitle(nomeStazione);
+		platform.setCitation(citation);
+
+		miMetadata.addMIPlatform(platform);
+		if (lat != null && lon != null) {
+		    BigDecimal latDecimal = BigDecimal.valueOf(lat)              // safe conversion from double
+			    .setScale(3, RoundingMode.HALF_DOWN);  // 3 decimal digits
+		    BigDecimal lonDecimal = BigDecimal.valueOf(lon)              // safe conversion from double
+			    .setScale(3, RoundingMode.HALF_DOWN);  // 3 decimal digits
+		    coreMetadata.getMIMetadata().getDataIdentification().addGeographicBoundingBox(latDecimal, lonDecimal, latDecimal, lonDecimal);
+		}
+		if (quotaStazione != null) {
+		    double dv = quotaStazione.doubleValue();
+		    coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(dv, dv);
 		}
 
-		try {
+		ReferenceSystem referenceSystem = new ReferenceSystem();
+		referenceSystem.setCode("EPSG:7791");
+		referenceSystem.setCodeSpace("EPSG");
+		coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
-			HISCentralLombardiaClient client = new HISCentralLombardiaClient(new URL(getSourceURL()));
+		CoverageDescription coverageDescription = new CoverageDescription();
 
-			List<String> stationsIdentifiers = client.getStationIdentifiers();
+		coverageDescription.setAttributeIdentifier(parameterIdentifier);
 
-			int stationsCount = stationsIdentifiers.size();
-			int stationIndex;
-			int addedRecords = 0;
+		coverageDescription.setAttributeTitle(tipo);
+		coverageDescription.setAttributeDescription(tipo);
 
-			if (token == null) {
-				stationIndex = 0;
-			} else {
-				stationIndex = Integer.parseInt(token);
-			}
+		String frequenzaString = sensor.getFrequenza();
+		Integer sensorResolutionInMinutes = null;
+		if (frequenzaString != null) {
+		    sensorResolutionInMinutes = Integer.parseInt(frequenzaString);
+		}
 
-			if (stationIndex < (stationsCount - 1)) {
-				ret.setResumptionToken("" + (stationIndex + 1));
-			} else if (stationIndex > (stationsCount - 1)) {
-				// outside, immediately returns
-				ret.setResumptionToken(null);
-				return ret;
-			} else {
-				// last one
-				ret.setResumptionToken(null);
+		InterpolationType interpolation = null;
+		String operatoreId = "null";
+		if (operatore != null) {
+		    operatoreId = "" + operatore.getId();
+		    switch (operatore) {
+		    case ID_1_MEDIA:
+			interpolation = InterpolationType.AVERAGE;
+			break;
+		    case ID_2_MINIMO:
+			interpolation = InterpolationType.MIN;
+			break;
+		    case ID_3_MASSIMO:
+			interpolation = InterpolationType.MAX;
+			break;
+		    case ID_4_CUMULATA:
+			interpolation = InterpolationType.TOTAL;
+			break;
+		    case ID_10_MEDIA_MOBILE_8_ORE:
+			interpolation = InterpolationType.AVERAGE;
+			break;
+		    case ID_12_MASSIMO_MEDI_GIORNALIERO:
+			interpolation = InterpolationType.MAX_DAILY_AVERAGES;
+			break;
+		    case ID_13_MINIMO_MEDI_GIORNALIERO:
+			interpolation = InterpolationType.MIN_DAILY_AVERAGES;
+			break;
+		    default:
+			break;
+		    }
+		    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
+		}
 
-			}
+		String periodoId = "null";
+		if (periodo != null) {
+		    periodoId = "" + periodo.getId();
+		    switch (periodo) {
+		    case ID_5_T1M:
+			dataset.getExtensionHandler().setTimeUnits("minutes");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1M");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT1M");
 
-			String stationId = stationsIdentifiers.get(stationIndex);
+			break;
+		    case ID_10_T5M:
+			dataset.getExtensionHandler().setTimeUnits("minutes");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT5M");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT5M");
+			break;
+		    case ID_1_T10M:
+			dataset.getExtensionHandler().setTimeUnits("minutes");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT10M");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT10M");
+			break;
+		    case ID_2_T30M:
+			dataset.getExtensionHandler().setTimeUnits("minutes");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT30M");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT30M");
+			break;
+		    case ID_3_T60M:
+			dataset.getExtensionHandler().setTimeUnits("hour");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT1H");
+			break;
+		    case ID_8_T2H:
+			dataset.getExtensionHandler().setTimeUnits("hour");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT2H");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT2H");
+			break;
+		    case ID_6_T3H:
+			dataset.getExtensionHandler().setTimeUnits("hour");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT3H");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT3H");
+			break;
+		    case ID_9_T4H:
+			dataset.getExtensionHandler().setTimeUnits("hour");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT4H");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT4H");
+			break;
+		    case ID_4_T1D:
+			dataset.getExtensionHandler().setTimeUnits("day");
+			dataset.getExtensionHandler().setTimeUnitsAbbreviation("d");
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
+			break;
+		    default:
+			break;
+		    }
+		}
 
-			GSLoggerFactory.getLogger(getClass())
-					.info("Handling station [" + stationIndex + "/" + stationsCount + "] STARTED");
+		coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
-			Stazione station = client.getStazione(stationId);
-			Comune comune = station.getComune();
-			String statoStazione = station.getStato();
-			String tipoStazione = station.getTipoStazione();
-			String indirizzo = station.getIndirizzo();
-			String nomeStazione = station.getNome();
-			BigDecimal quotaStazione = station.getQuota();
-			BigDecimal utm32Est = station.getUtm32TEst();
-			BigDecimal utm32Nord = station.getUtm32TNord();
+		TemporalExtent temporalExtent = new TemporalExtent();
+		temporalExtent.setBeginPosition(ISO8601DateTimeUtils.getISO8601DateTime(from));
+		temporalExtent.setEndPosition(ISO8601DateTimeUtils.getISO8601DateTime(to));
+		coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
+		AbstractResourceMapper.setIndeterminatePosition(dataset);
 
-			if (utm32Est == null) {
-			    GSLoggerFactory.getLogger(getClass())
-				    .error("Empty BBOX for station with id: " + stationId + " and name " + nomeStazione + "] ");
-//				return ret;
-			}
+		dataset.getExtensionHandler().setAttributeUnits(unita);
+		dataset.getExtensionHandler().setAttributeUnitsAbbreviation(unita);
 
-			List<Sensore> sensors = client.elencoSensori(stationId);
+		if (tipoStazione != null) {
+		    if (tipoStazione.toLowerCase().contains("meteo")) {
+			coreMetadata.getMIMetadata().getDataIdentification()
+				.addTopicCategory(MDTopicCategoryCodeType.CLIMATOLOGY_METEOROLOGY_ATMOSPHERE);
+		    }
+		    if (tipoStazione.toLowerCase().contains("idro")) {
+			coreMetadata.getMIMetadata().getDataIdentification().addTopicCategory(MDTopicCategoryCodeType.INLAND_WATERS);
+		    }
+		    if (tipoStazione.toLowerCase().contains("nivo")) {
+			coreMetadata.getMIMetadata().getDataIdentification().addTopicCategory(MDTopicCategoryCodeType.INLAND_WATERS);
+		    }
+		}
 
-			for (Sensore sensor : sensors) {
+		ResponsibleParty datasetContact = new ResponsibleParty();
+		datasetContact.setOrganisationName("ARPA Lombardia");
+		datasetContact.setRoleCode("publisher");
 
-				String sensorId = sensor.getId();
-				String nomeSensore = sensor.getNome();
-				String stato = sensor.getStato();
-				String tipo = sensor.getTipoSensore();
-				String idTipoSensore = sensor.getIdTipoSensore();
-				String unita = sensor.getUnitaMisura();
-				String frequenza = sensor.getFrequenza();
-				BigDecimal quota = sensor.getQuota();
+		coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(datasetContact);
 
-				ID_FUNZIONE funzione = sensor.getFunzione();
-				ID_OPERATORE operatore = sensor.getOperatore();
-				ID_PERIODO periodo = sensor.getPeriodo();
+		String title = nomeSensore + " - " + operatore + " - " + periodo.getLabel();
+		coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(title);
 
-				Date from = sensor.getFrom();
-				Date to = sensor.getTo();
-				Double lat = null;
-				Double lon = null;
-				if (utm32Est != null && utm32Nord != null) {
-					SimpleEntry<Double, Double> coordinates = new SimpleEntry<>(utm32Est.doubleValue(),
-							utm32Nord.doubleValue());
-					CRS sourceCRS = new EPSGCRS(7791);
-					CRS targetCRS = CRS.EPSG_4326();
-					SimpleEntry<Double, Double> latlon = CRSUtils.translatePoint(coordinates, sourceCRS, targetCRS);
-					lat = latlon.getKey();
-					lon = latlon.getValue();
-					if (lat > 90 || lat < -90) {
-						String warn = "Invalid latitude for station: " + stationId;
-						GSLoggerFactory.getLogger(getClass()).warn(warn);
-					}
-					if (lon > 180 || lon < -180) {
-						String warn = "Invalid longitude for station: " + stationId;
-						GSLoggerFactory.getLogger(getClass()).warn(warn);
-					}
-				}
-				Dataset dataset = new Dataset();
-				dataset.setSource(source.get());
+		coreMetadata.getMIMetadata().getDataIdentification().setAbstract(
+			title + "\nThe dataset leverages a sensor frequency of " + sensorResolutionInMinutes + " minutes.\nThe station address is " + station.getIndirizzo() + "\nStation state is: " + station.getStato() + "\nStatoin type: " + tipoStazione + "\nStation municipality: " + station.getComune()
+				.getNome());
 
-				String missingValue = "-999.0";
-				dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
+		GridSpatialRepresentation grid = new GridSpatialRepresentation();
+		grid.setNumberOfDimensions(1);
+		grid.setCellGeometryCode("point");
+		Dimension time = new Dimension();
+		time.setDimensionNameTypeCode("time");
+		grid.addAxisDimension(time);
+		coreMetadata.getMIMetadata().addGridSpatialRepresentation(grid);
 
-				String parameterIdentifier = NS + ":" + idTipoSensore;
-				CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
+		HISCentralLombardiaIdentifierMangler mangler = new HISCentralLombardiaIdentifierMangler();
 
-				MIMetadata miMetadata = dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+		String funzioneId = "null";
+		if (funzione != null) {
+		    funzioneId = "" + funzione.getId();
+		}
 
-				miMetadata.setCharacterSetCode("utf8");
+		mangler.setSensorIdentifier(sensor.getId());
+		mangler.setFunctionIdentifier(funzioneId);
+		mangler.setOperatorIdentifier(operatoreId);
+		mangler.setPeriodIdentifier(periodoId);
 
-				miMetadata.addHierarchyLevelScopeCodeListValue("dataset");
+		String identifier = mangler.getMangling();
 
-				MIPlatform platform = new MIPlatform();
-				platform.setMDIdentifierCode(stationId);
-				platform.setDescription(statoStazione + " " + tipoStazione);
-				Citation citation = new Citation();
-				citation.setTitle(nomeStazione);
-				platform.setCitation(citation);
+		coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(), NetProtocolWrapper.ARPA_LOMBARDIA.getCommonURN(),
+			"download");
 
-				miMetadata.addMIPlatform(platform);
-				if (lat != null && lon != null) {
-					coreMetadata.getMIMetadata().getDataIdentification().addGeographicBoundingBox(lat, lon, lat, lon);
-				}
-				if (quotaStazione != null) {
-					double dv = quotaStazione.doubleValue();
-					coreMetadata.getMIMetadata().getDataIdentification().addVerticalExtent(dv, dv);
-				}
+		String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, identifier);
 
-				ReferenceSystem referenceSystem = new ReferenceSystem();
-				referenceSystem.setCode("EPSG:7791");
-				referenceSystem.setCodeSpace("EPSG");
-				coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
+		coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
-				CoverageDescription coverageDescription = new CoverageDescription();
+		coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
-				coverageDescription.setAttributeIdentifier(parameterIdentifier);
+		dataset.getExtensionHandler().setCountry(Country.ITALY.getShortName());
 
-				coverageDescription.setAttributeTitle(tipo);
-				coverageDescription.setAttributeDescription(tipo);
+		//
+		//
+		//
 
-				String frequenzaString = sensor.getFrequenza();
-				Integer sensorResolutionInMinutes = null;
-				if (frequenzaString != null) {
-					sensorResolutionInMinutes = Integer.parseInt(frequenzaString);
-				}
+		OriginalMetadata record = new OriginalMetadata();
+		record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
+		record.setMetadata(dataset.asString(true));
 
-				InterpolationType interpolation = null;
-				String operatoreId = "null";
-				if (operatore != null) {
-					operatoreId = "" + operatore.getId();
-					switch (operatore) {
-					case ID_1_MEDIA:
-						interpolation = InterpolationType.AVERAGE;
-						break;
-					case ID_2_MINIMO:
-						interpolation = InterpolationType.MIN;
-						break;
-					case ID_3_MASSIMO:
-						interpolation = InterpolationType.MAX;
-						break;
-					case ID_4_CUMULATA:
-						interpolation = InterpolationType.TOTAL;
-						break;
-					case ID_10_MEDIA_MOBILE_8_ORE:
-						interpolation = InterpolationType.AVERAGE;
-						break;
-					case ID_12_MASSIMO_MEDI_GIORNALIERO:
-						interpolation = InterpolationType.MAX_DAILY_AVERAGES;
-						break;
-					case ID_13_MINIMO_MEDI_GIORNALIERO:
-						interpolation = InterpolationType.MIN_DAILY_AVERAGES;
-						break;
-					default:
-						break;
-					}
-					dataset.getExtensionHandler().setTimeInterpolation(interpolation);
-				}
+		ret.addRecord(record);
 
-				String periodoId = "null";
-				if (periodo != null) {
-					periodoId = "" + periodo.getId();
-					switch (periodo) {
-					case ID_5_T1M:
-						dataset.getExtensionHandler().setTimeUnits("minutes");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
-						dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1M");
-					    	dataset.getExtensionHandler().setTimeAggregationDuration8601("PT1M");
+		addedRecords++;
 
-						break;
-					case ID_10_T5M:
-						dataset.getExtensionHandler().setTimeUnits("minutes");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT5M");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT5M");
-						break;
-					case ID_1_T10M:
-						dataset.getExtensionHandler().setTimeUnits("minutes");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT10M");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT10M");
-						break;
-					case ID_2_T30M:
-						dataset.getExtensionHandler().setTimeUnits("minutes");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT30M");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT30M");
-						break;
-					case ID_3_T60M:
-						dataset.getExtensionHandler().setTimeUnits("hour");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT1H");
-						break;
-					case ID_8_T2H:
-						dataset.getExtensionHandler().setTimeUnits("hour");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT2H");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT2H");
-						break;
-					case ID_6_T3H:
-						dataset.getExtensionHandler().setTimeUnits("hour");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT3H");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT3H");
-						break;
-					case ID_9_T4H:
-						dataset.getExtensionHandler().setTimeUnits("hour");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT4H");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("PT4H");
-						break;
-					case ID_4_T1D:
-						dataset.getExtensionHandler().setTimeUnits("day");
-						dataset.getExtensionHandler().setTimeUnitsAbbreviation("d");
-					    dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
-					    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
-						break;
-					default:
-						break;
-					}
-				}
+		if (getSetting().getMaxRecords().isPresent() && addedRecords == getSetting().getMaxRecords().get()) {
 
-				coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
+		    GSLoggerFactory.getLogger(getClass())
+			    .info("Max number of records [" + getSetting().getMaxRecords().get() + "] reached");
+		    return ret;
+		}
 
-				TemporalExtent temporalExtent = new TemporalExtent();
-				temporalExtent.setBeginPosition(ISO8601DateTimeUtils.getISO8601DateTime(from));
-				temporalExtent.setEndPosition(ISO8601DateTimeUtils.getISO8601DateTime(to));
-				coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
-				AbstractResourceMapper.setIndeterminatePosition(dataset);
+	    }
 
-				dataset.getExtensionHandler().setAttributeUnits(unita);
-				dataset.getExtensionHandler().setAttributeUnitsAbbreviation(unita);
+	    GSLoggerFactory.getLogger(getClass()).info("Handling station [" + stationIndex + "/" + stationsCount + "] ENDED");
+	    stationIndex++;
 
-				if (tipoStazione != null) {
-					if (tipoStazione.toLowerCase().contains("meteo")) {
-						coreMetadata.getMIMetadata().getDataIdentification()
-								.addTopicCategory(MDTopicCategoryCodeType.CLIMATOLOGY_METEOROLOGY_ATMOSPHERE);
-					}
-					if (tipoStazione.toLowerCase().contains("idro")) {
-						coreMetadata.getMIMetadata().getDataIdentification()
-								.addTopicCategory(MDTopicCategoryCodeType.INLAND_WATERS);
-					}
-					if (tipoStazione.toLowerCase().contains("nivo")) {
-						coreMetadata.getMIMetadata().getDataIdentification()
-								.addTopicCategory(MDTopicCategoryCodeType.INLAND_WATERS);
-					}
-				}
-
-				ResponsibleParty datasetContact = new ResponsibleParty();
-				datasetContact.setOrganisationName("ARPA Lombardia");
-				datasetContact.setRoleCode("publisher");
-
-				coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(datasetContact);
-
-				String title = nomeSensore + " - " + operatore + " - " + periodo.getLabel();
-				coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(title);
-
-				coreMetadata.getMIMetadata().getDataIdentification().setAbstract(
-						title + "\nThe dataset leverages a sensor frequency of " + sensorResolutionInMinutes
-								+ " minutes.\nThe station address is " + station.getIndirizzo() + "\nStation state is: "
-								+ station.getStato() + "\nStatoin type: " + tipoStazione + "\nStation municipality: "
-								+ station.getComune().getNome());
-
-				GridSpatialRepresentation grid = new GridSpatialRepresentation();
-				grid.setNumberOfDimensions(1);
-				grid.setCellGeometryCode("point");
-				Dimension time = new Dimension();
-				time.setDimensionNameTypeCode("time");
-				grid.addAxisDimension(time);
-				coreMetadata.getMIMetadata().addGridSpatialRepresentation(grid);
-
-				HISCentralLombardiaIdentifierMangler mangler = new HISCentralLombardiaIdentifierMangler();
-
-				String funzioneId = "null";
-				if (funzione != null) {
-					funzioneId = "" + funzione.getId();
-				}
-
-				mangler.setSensorIdentifier(sensor.getId());
-				mangler.setFunctionIdentifier(funzioneId);
-				mangler.setOperatorIdentifier(operatoreId);
-				mangler.setPeriodIdentifier(periodoId);
-
-				String identifier = mangler.getMangling();
-
-				coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(),
-						NetProtocolWrapper.ARPA_LOMBARDIA.getCommonURN(), "download");
-
-				String resourceIdentifier = AbstractResourceMapper.generateCode(dataset, identifier);
-
-				coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
-
-				coreMetadata.getMIMetadata().getDistribution().getDistributionOnline()
-						.setIdentifier(resourceIdentifier);
-
-				dataset.getExtensionHandler().setCountry(Country.ITALY.getShortName());
-
-				//
-				//
-				//
-
-				OriginalMetadata record = new OriginalMetadata();
-				record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
-				record.setMetadata(dataset.asString(true));
-
-				ret.addRecord(record);
-
-				addedRecords++;
-
-				if (getSetting().getMaxRecords().isPresent() && addedRecords == getSetting().getMaxRecords().get()) {
-
-					GSLoggerFactory.getLogger(getClass())
-							.info("Max number of records [" + getSetting().getMaxRecords().get() + "] reached");
-					return ret;
-				}
-
-			}
-
-			GSLoggerFactory.getLogger(getClass())
-					.info("Handling station [" + stationIndex + "/" + stationsCount + "] ENDED");
-			stationIndex++;
-
-		} catch (
+	} catch (
 
 		GSException gsex) {
 
-			throw gsex;
+	    throw gsex;
 
-		} catch (Exception e) {
+	} catch (Exception e) {
 
-			throw GSException.createException(//
-					getClass(), //
-					"HIS Central Lombardia connector error", //
-					e);
-		}
-
-		return ret;
-
+	    throw GSException.createException(//
+		    getClass(), //
+		    "HIS Central Lombardia connector error", //
+		    e);
 	}
 
-	@Override
-	public List<String> listMetadataFormats() throws GSException {
-		List<String> ret = new ArrayList<>();
-		ret.add(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
-		return ret;
-	}
+	return ret;
 
-	@Override
-	public String getType() {
+    }
 
-		return TYPE;
-	}
+    @Override
+    public List<String> listMetadataFormats() throws GSException {
+	List<String> ret = new ArrayList<>();
+	ret.add(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
+	return ret;
+    }
 
-	@Override
-	protected HISCentralLombardiaConnectorSetting initSetting() {
+    @Override
+    public String getType() {
 
-		return new HISCentralLombardiaConnectorSetting();
-	}
+	return TYPE;
+    }
 
-	public static void main(String[] args) throws Exception {
-		// EAST - NORTH
-		SimpleEntry<Double, Double> coordinates = new SimpleEntry<Double, Double>(564213.42, 5130098.33);
-		CRS sourceCRS = new EPSGCRS(7791);
-		CRS targetCRS = CRS.EPSG_4326();
-		SimpleEntry<Double, Double> latlon = CRSUtils.translatePoint(coordinates, sourceCRS, targetCRS);
-		System.out.println(latlon.getKey());
-		System.out.println(latlon.getValue());
-	}
+    @Override
+    protected HISCentralLombardiaConnectorSetting initSetting() {
+
+	return new HISCentralLombardiaConnectorSetting();
+    }
+
+    public static void main(String[] args) throws Exception {
+	// EAST - NORTH
+	SimpleEntry<Double, Double> coordinates = new SimpleEntry<Double, Double>(564213.42, 5130098.33);
+	CRS sourceCRS = new EPSGCRS(7791);
+	CRS targetCRS = CRS.EPSG_4326();
+	SimpleEntry<Double, Double> latlon = CRSUtils.translatePoint(coordinates, sourceCRS, targetCRS);
+	System.out.println(latlon.getKey());
+	System.out.println(latlon.getValue());
+    }
 
 }
