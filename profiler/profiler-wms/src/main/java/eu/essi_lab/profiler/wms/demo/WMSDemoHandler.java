@@ -27,7 +27,7 @@ package eu.essi_lab.profiler.wms.demo;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
 

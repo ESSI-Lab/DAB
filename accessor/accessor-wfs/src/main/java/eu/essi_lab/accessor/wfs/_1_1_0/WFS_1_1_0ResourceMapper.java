@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.XmlTransient;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPathExpressionException;
 

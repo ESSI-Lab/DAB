@@ -29,8 +29,8 @@ package eu.essi_lab.jaxb.sos._2_0.fes._2;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**

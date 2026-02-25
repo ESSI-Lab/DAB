@@ -5,7 +5,7 @@
 // Generated on: 2020.11.03 at 12:55:12 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.thredds._1_0_6;
 
 /*-

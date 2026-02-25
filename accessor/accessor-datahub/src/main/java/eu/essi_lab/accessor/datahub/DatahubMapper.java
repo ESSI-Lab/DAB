@@ -38,8 +38,8 @@ import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.json.*;
 import org.slf4j.*;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.datatype.*;
 import java.io.File;
 import java.math.*;

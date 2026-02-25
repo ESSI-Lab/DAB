@@ -26,8 +26,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBElement;
 
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.ObjectFactories;

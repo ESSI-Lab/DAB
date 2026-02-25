@@ -21,7 +21,7 @@ package eu.essi_lab.pdk.rsf;
  * #L%
  */
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import eu.essi_lab.messages.ResultSet;
 

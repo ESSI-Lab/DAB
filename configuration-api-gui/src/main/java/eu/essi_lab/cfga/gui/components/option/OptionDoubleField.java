@@ -42,9 +42,9 @@ public class OptionDoubleField extends NumberField implements OnKeyUpValidationL
 
 	getStyle().set("font-size","14px");
 
-	setHasControls(true);
-
-	setPreventInvalidInput(true);
+//	setHasControls(true);
+//
+//	setPreventInvalidInput(true);
 
 	addValueChangeListener(new OptionValueChangeListener(option));
 
@@ -113,7 +113,7 @@ public class OptionDoubleField extends NumberField implements OnKeyUpValidationL
 	    gtThanMax = value > maxValue;
 	}
 
-	return (ltThanMin || gtThanMax || (isRequiredBoolean() && value == null));
+	return (ltThanMin || gtThanMax || value == null);
 
     }
 

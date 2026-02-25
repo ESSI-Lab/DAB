@@ -28,12 +28,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAnyElement;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlAnyElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -153,7 +153,7 @@ class Indexes {
     /**
      * <p>
      * Extract local name from <code>obj</code>, whether it's
-     * javax.xml.bind.JAXBElement or org.w3c.dom.Element;
+     * jakarta.xml.bind.JAXBElement or org.w3c.dom.Element;
      * </p>
      * 
      * @param obj
@@ -170,7 +170,7 @@ class Indexes {
     /**
      * <p>
      * Extract text content from <code>obj</code>, whether it's
-     * javax.xml.bind.JAXBElement or org.w3c.dom.Element;
+     * jakarta.xml.bind.JAXBElement or org.w3c.dom.Element;
      * </p>
      * 
      * @param obj

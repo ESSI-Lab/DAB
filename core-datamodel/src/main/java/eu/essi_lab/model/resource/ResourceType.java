@@ -23,7 +23,7 @@ package eu.essi_lab.model.resource;
 
 import java.util.Arrays;
 
-import javax.xml.bind.annotation.XmlEnumValue;
+import jakarta.xml.bind.annotation.XmlEnumValue;
 
 /**
  * @author Fabrizio

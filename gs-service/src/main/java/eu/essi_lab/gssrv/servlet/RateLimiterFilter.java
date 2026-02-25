@@ -34,9 +34,9 @@ import eu.essi_lab.pdk.*;
 import eu.essi_lab.rip.*;
 import eu.essi_lab.shared.driver.es.stats.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.ws.rs.core.Response.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.ws.rs.core.Response.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;

@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.pubsub.handler;
 import java.io.PrintWriter;
 import java.util.Date;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ValidationMessage;

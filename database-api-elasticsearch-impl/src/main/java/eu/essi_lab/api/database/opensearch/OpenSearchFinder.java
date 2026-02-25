@@ -49,7 +49,7 @@ import org.opensearch.client.opensearch.core.search.*;
 import org.w3c.dom.Node;
 import org.xml.sax.*;
 
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 import javax.xml.parsers.*;
 import java.io.*;
 import java.math.*;

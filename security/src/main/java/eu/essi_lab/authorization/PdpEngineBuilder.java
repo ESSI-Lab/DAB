@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.ow2.authzforce.core.pdp.api.CloseablePdpEngine;
 import org.ow2.authzforce.core.pdp.impl.BasePdpEngine;

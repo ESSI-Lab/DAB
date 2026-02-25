@@ -23,7 +23,7 @@ package eu.essi_lab.accessor.oaipmh;
 
 import java.util.Optional;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.w3c.dom.Element;
 

@@ -27,7 +27,7 @@ package eu.essi_lab.gssrv.rest.conf;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import eu.essi_lab.cdk.harvest.wrapper.ConnectorWrapperSetting;
 import eu.essi_lab.cfga.SelectionUtils;

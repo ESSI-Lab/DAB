@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import eu.essi_lab.cdk.query.IDistributedQueryConnector;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;

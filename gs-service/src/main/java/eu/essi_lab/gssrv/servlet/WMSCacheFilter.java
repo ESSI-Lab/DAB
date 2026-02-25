@@ -32,9 +32,9 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.web.*;
 import eu.essi_lab.pdk.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.ws.rs.core.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import jakarta.ws.rs.core.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;

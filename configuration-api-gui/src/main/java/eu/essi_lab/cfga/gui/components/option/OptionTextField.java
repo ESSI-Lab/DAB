@@ -41,7 +41,7 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
      */
     public OptionTextField() {
 
-	setPreventInvalidInput(true);
+//	setPreventInvalidInput(true);
 	setClearButtonVisible(true);
 	getStyle().set("font-size","14px");
 

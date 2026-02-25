@@ -4,7 +4,7 @@
 //import java.util.Comparator;
 //import java.util.List;
 //
-//import javax.ws.rs.core.MediaType;
+//import jakarta.ws.rs.core.MediaType;
 //
 //import eu.essi_lab.jaxb.oaipmh.SetType;
 //import eu.essi_lab.lib.utils.GSLoggerFactory;

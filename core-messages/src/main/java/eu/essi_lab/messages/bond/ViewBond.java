@@ -23,7 +23,7 @@ package eu.essi_lab.messages.bond;
 
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * Implementation of {@link Bond} connected with a view, through its identifier

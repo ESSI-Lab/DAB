@@ -5,7 +5,7 @@
 // Generated on: 2023.11.27 at 01:47:52 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/1999/xlink", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/1999/xlink", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.wigos._1_0.xlink;
 
 /*-

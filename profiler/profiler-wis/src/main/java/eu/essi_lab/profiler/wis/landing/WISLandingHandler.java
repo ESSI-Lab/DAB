@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.wis.landing;
  * #L%
  */
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.json.JSONObject;
 

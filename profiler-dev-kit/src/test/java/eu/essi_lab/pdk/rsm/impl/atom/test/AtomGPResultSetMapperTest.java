@@ -6,7 +6,7 @@ package eu.essi_lab.pdk.rsm.impl.atom.test;
 import java.io.IOException;
 import java.util.Date;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Assert;

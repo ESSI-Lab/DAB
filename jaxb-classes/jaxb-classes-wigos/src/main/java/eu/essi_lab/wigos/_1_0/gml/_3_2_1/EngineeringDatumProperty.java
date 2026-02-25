@@ -29,7 +29,7 @@ package eu.essi_lab.wigos._1_0.gml._3_2_1;
  * #L%
  */
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 public class EngineeringDatumProperty

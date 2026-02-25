@@ -5,7 +5,7 @@
 // Generato il: 2015.06.08 alle 02:21:50 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://purl.org/dc/elements/1.1/", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://purl.org/dc/elements/1.1/", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.jaxb.csw._2_0_2.org.purl.dc.elements._1;
 
 /*-

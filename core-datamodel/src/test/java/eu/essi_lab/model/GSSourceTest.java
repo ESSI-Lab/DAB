@@ -3,7 +3,7 @@ package eu.essi_lab.model;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

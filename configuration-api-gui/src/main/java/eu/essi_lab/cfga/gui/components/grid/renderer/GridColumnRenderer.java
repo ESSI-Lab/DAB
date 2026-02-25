@@ -46,7 +46,7 @@ public abstract class GridColumnRenderer<C extends Component> extends ComponentR
     * 
     */
     public GridColumnRenderer() {
-
+        super(() -> null);
     }
 
     /**

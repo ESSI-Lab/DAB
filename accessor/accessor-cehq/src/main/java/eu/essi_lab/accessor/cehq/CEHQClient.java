@@ -43,7 +43,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import javax.xml.*;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;

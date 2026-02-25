@@ -27,7 +27,7 @@ package eu.essi_lab.shared.serializer;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.exceptions.ErrorInfo;

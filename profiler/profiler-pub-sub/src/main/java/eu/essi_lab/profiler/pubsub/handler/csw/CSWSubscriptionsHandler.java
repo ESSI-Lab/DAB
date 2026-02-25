@@ -24,8 +24,8 @@ package eu.essi_lab.profiler.pubsub.handler.csw;
 import java.util.Arrays;
 import java.util.Date;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBElement;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

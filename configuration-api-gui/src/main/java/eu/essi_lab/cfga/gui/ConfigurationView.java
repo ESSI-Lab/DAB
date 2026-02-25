@@ -39,7 +39,7 @@ import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.web.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;

@@ -5,7 +5,7 @@ import org.junit.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 import javax.xml.parsers.*;
 import java.io.*;
 

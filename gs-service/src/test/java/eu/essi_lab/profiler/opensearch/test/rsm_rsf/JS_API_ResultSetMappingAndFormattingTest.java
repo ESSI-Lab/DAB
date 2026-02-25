@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.xml.bind.JAXBException;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.RuntimeDelegate;
+import jakarta.xml.bind.JAXBException;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

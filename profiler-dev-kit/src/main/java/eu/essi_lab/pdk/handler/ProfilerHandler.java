@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.AbstractMap.SimpleEntry;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 

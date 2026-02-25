@@ -23,9 +23,9 @@ package eu.essi_lab.gssrv.servlet;
 
 import java.io.File;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.quartz.SchedulerException;
 

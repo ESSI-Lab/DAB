@@ -29,7 +29,7 @@ package eu.essi_lab.ncml._2_2;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 import java.util.AbstractMap.SimpleEntry;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import java.util.Date;
 import java.util.HashMap;

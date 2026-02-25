@@ -63,8 +63,8 @@ import eu.essi_lab.request.executor.schedule.*;
 import eu.essi_lab.shared.driver.es.stats.*;
 import org.quartz.*;
 
-import javax.ws.rs.ext.*;
-import javax.xml.bind.*;
+import jakarta.ws.rs.ext.*;
+import jakarta.xml.bind.*;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -911,7 +911,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization ENDED");
 
-	} catch (JAXBException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, context could not be initialized", e);
 

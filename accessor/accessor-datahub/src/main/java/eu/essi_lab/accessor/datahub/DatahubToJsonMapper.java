@@ -26,7 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import net.opengis.iso19139.gco.v_20060504.BooleanPropertyType;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;

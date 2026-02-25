@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import eu.essi_lab.authorization.rps.GEOSSPrivateWriteRolePolicySet;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;

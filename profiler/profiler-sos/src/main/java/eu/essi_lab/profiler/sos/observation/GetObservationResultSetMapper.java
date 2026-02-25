@@ -25,7 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import eu.essi_lab.jaxb.sos._2_0.GetObservationResponseType;
 import eu.essi_lab.jaxb.sos._2_0.GetObservationResponseType.ObservationData;

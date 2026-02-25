@@ -1,6 +1,6 @@
 package eu.essi_lab.demo.profiler;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.json.JSONObject;
 

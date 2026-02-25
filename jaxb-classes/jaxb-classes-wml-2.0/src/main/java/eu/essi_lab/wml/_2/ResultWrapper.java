@@ -21,7 +21,7 @@ package eu.essi_lab.wml._2;
  * #L%
  */
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.w3c.dom.Element;
 

@@ -23,7 +23,7 @@ package eu.essi_lab.profiler.pubsub.handler;
 
 import java.util.ArrayList;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.json.JSONArray;
 

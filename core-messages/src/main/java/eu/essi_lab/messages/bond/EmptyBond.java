@@ -21,7 +21,7 @@ package eu.essi_lab.messages.bond;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import eu.essi_lab.model.resource.ResourceProperty;
 

@@ -6,8 +6,8 @@
 //import java.io.ByteArrayOutputStream;
 //import java.io.InputStream;
 //
-//import javax.xml.bind.JAXBException;
-//import javax.xml.bind.Marshaller;
+//import jakarta.xml.bind.JAXBException;
+//import jakarta.xml.bind.Marshaller;
 //
 //import org.junit.Test;
 //

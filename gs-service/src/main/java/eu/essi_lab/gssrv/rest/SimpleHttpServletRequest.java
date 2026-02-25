@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.rest;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -38,20 +38,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
+import jakarta.servlet.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.Part;
 
 public class SimpleHttpServletRequest implements HttpServletRequest {
 
@@ -287,12 +280,6 @@ public class SimpleHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public String getRealPath(String path) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    @Override
     public int getRemotePort() {
 	// TODO Auto-generated method stub
 	return 0;
@@ -355,6 +342,21 @@ public class SimpleHttpServletRequest implements HttpServletRequest {
     @Override
     public DispatcherType getDispatcherType() {
 	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public String getRequestId() {
+	return "";
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+	return "";
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
 	return null;
     }
 
@@ -499,12 +501,6 @@ public class SimpleHttpServletRequest implements HttpServletRequest {
 
     @Override
     public boolean isRequestedSessionIdFromURL() {
-	// TODO Auto-generated method stub
-	return false;
-    }
-
-    @Override
-    public boolean isRequestedSessionIdFromUrl() {
 	// TODO Auto-generated method stub
 	return false;
     }

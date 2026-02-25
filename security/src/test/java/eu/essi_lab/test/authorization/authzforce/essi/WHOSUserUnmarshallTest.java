@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContext;
 
 import org.junit.Before;
 

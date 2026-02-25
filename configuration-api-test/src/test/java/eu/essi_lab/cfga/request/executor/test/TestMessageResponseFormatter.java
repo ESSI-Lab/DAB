@@ -1,6 +1,6 @@
 package eu.essi_lab.cfga.request.executor.test;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import eu.essi_lab.messages.MessageResponse;
 import eu.essi_lab.messages.RequestMessage;

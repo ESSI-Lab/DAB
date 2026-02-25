@@ -3,13 +3,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-	<groupId>eu.essi_lab</groupId>
-	<artifactId>DAB</artifactId>
-	<version>1.0-SNAPSHOT</version> 
-	<packaging>pom</packaging>
+    <groupId>eu.essi_lab</groupId>
+    <artifactId>DAB</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<name>Discovery and Access Broker (DAB)</name>
-	<description><![CDATA[The DAB is a brokering software framework for the mediation and harmonization of geospatial data with particular reference to Earth observation data, both satellite and non-satellite. DAB makes it possible to connect heterogeneous data sources and make them discoverable and accessible through homogeneous and standard interfaces by different data user tools and applications. The DAB is capable of implementing data discovery and access functionalities by implementing multiple standard interfaces (e.g. OGC, ISO, ...), and Application Programming Interfaces (API)]]></description>
+    <name>Discovery and Access Broker (DAB)</name>
+    <description>
+        <![CDATA[The DAB is a brokering software framework for the mediation and harmonization of geospatial data with particular reference to Earth observation data, both satellite and non-satellite. DAB makes it possible to connect heterogeneous data sources and make them discoverable and accessible through homogeneous and standard interfaces by different data user tools and applications. The DAB is capable of implementing data discovery and access functionalities by implementing multiple standard interfaces (e.g. OGC, ISO, ...), and Application Programming Interfaces (API)]]></description>
 
     <url>https://github.com/ESSI-Lab/DAB</url>
 
@@ -170,21 +171,21 @@
         <docker.plugin.version>0.48.0</docker.plugin.version>
 
         <!-- Apache CXF VULN-UPDATE -->
-        <cxf.version>3.6.9</cxf.version>
+        <cxf.version>4.2.0</cxf.version>
 
         <!-- JAX WS RS API-->
-        <jax-ws-rs-api.version>2.1.1</jax-ws-rs-api.version>
+        <jax-ws-rs-api.version>4.0.0</jax-ws-rs-api.version>
 
         <!-- JAX WS API (commented Jakarta EE 9 dep) -->
         <!-- <jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version > -->
-        <jax-ws-api.version>2.3.1</jax-ws-api.version>
+        <jax-ws-api.version>4.0.3</jax-ws-api.version>
 
         <!-- JAX XML SOAP API-->
         <jax-xml-soap-api.version>1.4.0</jax-xml-soap-api.version>
 
         <!-- JAVA Servlet API (commented Jakarta EE 9 dep) -->
         <!-- <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version> -->
-        <java.servlet-api.version>4.0.1</java.servlet-api.version>
+        <java.servlet-api.version>6.1.0</java.servlet-api.version>
 
         <!-- Google Sheets API -->
         <google-api-services-sheets.version>v4-rev20240416-2.0.0</google-api-services-sheets.version>
@@ -256,7 +257,7 @@
         <marklogic-client-api.version>6.5.0</marklogic-client-api.version>
 
         <!-- Vaadin VULN-UPDATE 2026 -->
-        <vaadin.version>23.6.7</vaadin.version>
+        <vaadin.version>24.9.12</vaadin.version>
         <vaadin.togglebutton.version>3.0.0</vaadin.togglebutton.version>
 
         <!-- GeoTools -->
@@ -291,7 +292,7 @@
 
         <!-- Javax mail -->
         <!-- Relocated to Jakarta Mail API -->
-        <javax.mail-api.version>1.6.2</javax.mail-api.version>
+        <javax.mail-api.version>2.1.5</javax.mail-api.version>
 
         <!-- Jfree chart -->
         <jfreechart.version>1.5.4</jfreechart.version>
@@ -341,7 +342,7 @@
         <org.logicng.version>2.4.3</org.logicng.version>
 
         <!-- SPRING Framework - VULN-UPDATE -->
-        <org.springframework.version>5.3.39-wso2v4</org.springframework.version>
+        <org.springframework.version>7.0.5</org.springframework.version>
 
         <!-- Apache Commons - VULN-UPDATE -->
         <apache.commons.version>1.15.0</apache.commons.version>
@@ -381,10 +382,14 @@
         <jvnet.ogc.version>2.6.1</jvnet.ogc.version>
 
         <!-- JAXB API and JAXB impl (commented Jakarta EE 9 dep)-->
-        <jaxb-api.version>2.3.0</jaxb-api.version>
-        <jaxb-impl.version>2.3.0</jaxb-impl.version>
-        <jaxb-core.version>2.3.0</jaxb-core.version>
-        <!-- <jakarta.xml.bind-api.version>4.0.2</jakarta.xml.bind-api.version>	-->
+        <jaxb-api.version>4.0.5</jaxb-api.version>
+
+        <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
+
+        <!--
+        <jaxb-impl.version>4.0.5</jaxb-impl.version>
+        <jaxb-core.version>4.0.5</jaxb-core.version>
+        -->
 
         <!-- Jacoco -->
         <jacoco.version>0.8.11</jacoco.version>
@@ -429,7 +434,7 @@
         <io.netty.version>4.2.9.Final</io.netty.version>
 
         <!-- Jetty servlets VULN-UPDATE -->
-        <eclipse.jetty.version>9.4.58.v20250814</eclipse.jetty.version>
+        <eclipse.jetty.version>11.0.20</eclipse.jetty.version>
 
         <!-- Commons IO VULN-UPDATE-->
         <commons-io.version>2.21.0</commons-io.version>
@@ -830,46 +835,86 @@
             </dependency>
 
             <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
                 <version>${jaxb-api.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${jaxb-impl.version}</version>
-            </dependency>
+            <!--
+           <dependency>
+               <groupId>com.sun.xml.bind</groupId>
+               <artifactId>jaxb-impl</artifactId>
+               <version>${jaxb-impl.version}</version>
+           </dependency>
+
+           <dependency>
+               <groupId>com.sun.xml.bind</groupId>
+               <artifactId>jaxb-core</artifactId>
+               <version>${jaxb-core.version}</version>
+           </dependency>
+
+           <dependency>
+               <groupId>javax.mail</groupId>
+               <artifactId>javax.mail-api</artifactId>
+               <version>${javax.mail-api.version}</version>
+           </dependency>
+           -->
 
             <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>${jaxb-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.mail</groupId>
-                <artifactId>javax.mail-api</artifactId>
+                <groupId>jakarta.mail</groupId>
+                <artifactId>jakarta.mail-api</artifactId>
                 <version>${javax.mail-api.version}</version>
             </dependency>
 
+
+            <!--
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${java.servlet-api.version}</version>
                 <scope>provided</scope>
             </dependency>
+            -->
 
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>${java.servlet-api.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!--
             <dependency>
                 <groupId>javax.xml.ws</groupId>
                 <artifactId>jaxws-api</artifactId>
                 <version>${jax-ws-api.version}</version>
             </dependency>
+            -->
 
+            <dependency>
+                <groupId>jakarta.xml.ws</groupId>
+                <artifactId>jakarta.xml.ws-api</artifactId>
+                <version>${jax-ws-api.version}</version>
+            </dependency>
+
+            <!--
             <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${jax-ws-rs-api.version}</version>
+            </dependency>
+            -->
+
+            <dependency>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${jax-ws-rs-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${jaxb-runtime.version}</version>
             </dependency>
 
             <!-- This is used for annotating objects to be serialized as json -->
@@ -1175,12 +1220,7 @@
                 <groupId>com.marklogic</groupId>
                 <artifactId>marklogic-client-api</artifactId>
                 <version>${marklogic-client-api.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.ws.rs</groupId>
-                        <artifactId>javax.ws.rs-api</artifactId>
-                    </exclusion>
-                </exclusions>
+
             </dependency>
 
             <dependency>
@@ -1294,244 +1334,266 @@
                 <type>pom</type>
             </dependency>
 
-            <!--
+
             <dependency>
-               <groupId>com.vaadin</groupId>
-               <artifactId>flow-server-production-mode</artifactId>
-               <version>${vaadin.version}</version>
+                <groupId>com.vaadin</groupId>
+                <artifactId>flow-server-production-mode</artifactId>
+                <version>${vaadin.version}</version>
             </dependency>
-            -->
 
-           <dependency>
-               <groupId>com.vaadin</groupId>
-               <artifactId>vaadin-core</artifactId>
-               <version>${vaadin.version}</version>
-               <exclusions>
-                   <exclusion>
-                       <groupId>javax.validation</groupId>
-                       <artifactId>validation-api</artifactId>
-                   </exclusion>
-               </exclusions>
-           </dependency>
 
-           <dependency>
-               <groupId>com.vaadin.componentfactory</groupId>
-               <artifactId>togglebutton</artifactId>
-               <version>${vaadin.togglebutton.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-core</artifactId>
+                <version>${vaadin.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.validation</groupId>
+                        <artifactId>validation-api</artifactId>
+                    </exclusion>
 
-           <dependency>
-               <groupId>com.google.apis</groupId>
-               <artifactId>google-api-services-sheets</artifactId>
-               <version>${google-api-services-sheets.version}</version>
-           </dependency>
+                    <!--
+                    <exclusion>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>license-checker</artifactId>
+                    </exclusion>
+                    -->
 
-           <dependency>
-               <groupId>org.jfree</groupId>
-               <artifactId>jfreechart</artifactId>
-               <version>${jfreechart.version}</version>
-           </dependency>
+                </exclusions>
+            </dependency>
 
-           <dependency>
-               <groupId>org.apache.poi</groupId>
-               <artifactId>poi</artifactId>
-               <version>${org.apache.poi-poi.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>com.vaadin.componentfactory</groupId>
+                <artifactId>togglebutton</artifactId>
+                <version>${vaadin.togglebutton.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.apache.poi</groupId>
-               <artifactId>poi-ooxml</artifactId>
-               <version>${org.apache.poi-poi.version}</version>
-               <exclusions>
-                   <exclusion>
-                       <groupId>stax</groupId>
-                       <artifactId>stax-api</artifactId>
-                   </exclusion>
-               </exclusions>
-           </dependency>
+            <dependency>
+                <groupId>com.google.apis</groupId>
+                <artifactId>google-api-services-sheets</artifactId>
+                <version>${google-api-services-sheets.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.geonames</groupId>
-               <artifactId>geonames-ws-client</artifactId>
-               <version>${geonames.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.jfree</groupId>
+                <artifactId>jfreechart</artifactId>
+                <version>${jfreechart.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.quartz-scheduler</groupId>
-               <artifactId>quartz</artifactId>
-               <version>${quartz.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>${org.apache.poi-poi.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.quartz-scheduler</groupId>
-               <artifactId>quartz-jobs</artifactId>
-               <version>${quartz.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${org.apache.poi-poi.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>stax</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
-           <dependency>
-               <groupId>com.mysql</groupId>
-               <artifactId>mysql-connector-j</artifactId>
-               <version>${mysql.connector.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.geonames</groupId>
+                <artifactId>geonames-ws-client</artifactId>
+                <version>${geonames.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.mybatis</groupId>
-               <artifactId>mybatis</artifactId>
-               <version>${org.mybatis.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz</artifactId>
+                <version>${quartz.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.apache.commons</groupId>
-               <artifactId>commons-compress</artifactId>
-               <version>${org.apache.commons-commons-compress.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.quartz-scheduler</groupId>
+                <artifactId>quartz-jobs</artifactId>
+                <version>${quartz.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.knowm.xchart</groupId>
-               <artifactId>xchart</artifactId>
-               <version>${org.knowm.xchart-xchart.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
+                <version>${mysql.connector.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.apache.commons</groupId>
-               <artifactId>commons-math3</artifactId>
-               <version>${org.apache.commons-commons-math.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${org.mybatis.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.jvnet.ogc</groupId>
-               <artifactId>gml-v_3_2_1</artifactId>
-               <version>${org.jvnet.ogc-gml-v_3_2_1.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${org.apache.commons-commons-compress.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.hisrc.w3c</groupId>
-               <artifactId>xlink-v_1_0</artifactId>
-               <version>${org.hisrc.w3c-xlink-v_1_0.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.knowm.xchart</groupId>
+                <artifactId>xchart</artifactId>
+                <version>${org.knowm.xchart-xchart.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.ogc-schemas</groupId>
-               <artifactId>wfs-v_1_1_0</artifactId>
-               <version>${org.ogc-schemas-wfs-v_1_1_0.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${org.apache.commons-commons-math.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>software.amazon.awssdk.iotdevicesdk</groupId>
-               <artifactId>aws-iot-device-sdk</artifactId>
-               <version>${aws-iot-device-sdk.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.jvnet.ogc</groupId>
+                <artifactId>gml-v_3_2_1</artifactId>
+                <version>${org.jvnet.ogc-gml-v_3_2_1.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.slf4j</groupId>
-               <artifactId>slf4j-api</artifactId>
-               <version>${slf4j.version}</version>
-           </dependency>
-           <dependency>
-               <groupId>org.slf4j</groupId>
-               <artifactId>slf4j-reload4j</artifactId>
-               <version>${slf4j.version}</version>
-           </dependency>
-           <dependency>
-               <groupId>org.slf4j</groupId>
-               <artifactId>slf4j-simple</artifactId>
-               <version>${slf4j.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.hisrc.w3c</groupId>
+                <artifactId>xlink-v_1_0</artifactId>
+                <version>${org.hisrc.w3c-xlink-v_1_0.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>org.apache.ftpserver</groupId>
-               <artifactId>ftpserver-core</artifactId>
-               <version>${ftpserver-core.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.ogc-schemas</groupId>
+                <artifactId>wfs-v_1_1_0</artifactId>
+                <version>${org.ogc-schemas-wfs-v_1_1_0.version}</version>
+            </dependency>
 
-           <dependency>
-               <groupId>com.fasterxml.jackson.core</groupId>
-               <artifactId>jackson-core</artifactId>
-               <version>${jackson-core.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk.iotdevicesdk</groupId>
+                <artifactId>aws-iot-device-sdk</artifactId>
+                <version>${aws-iot-device-sdk.version}</version>
+            </dependency>
 
-             <dependency>
-               <groupId>org.apache.kafka</groupId>
-               <artifactId>kafka-clients</artifactId>
-               <version>${kafka-clients.version}</version>
-           </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-reload4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
 
-       </dependencies>
+            <dependency>
+                <groupId>org.apache.ftpserver</groupId>
+                <artifactId>ftpserver-core</artifactId>
+                <version>${ftpserver-core.version}</version>
+            </dependency>
 
-   </dependencyManagement>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson-core.version}</version>
+            </dependency>
 
-   <dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson-core.version}</version>
+            </dependency>
 
-       <dependency>
-           <groupId>com.fasterxml.jackson.core</groupId>
-           <artifactId>jackson-databind</artifactId>
-           <version>${jackson-core.version}</version>
-       </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson-core.version}</version>
+            </dependency>
 
-       <dependency>
-           <groupId>com.fasterxml.jackson.core</groupId>
-           <artifactId>jackson-annotations</artifactId>
-           <version>${jackson-core.version}</version>
-       </dependency>
 
-       <dependency>
-           <groupId>net.java.dev.jna</groupId>
-           <artifactId>jna</artifactId>
-       </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka-clients.version}</version>
+            </dependency>
 
-       <dependency>
-           <groupId>net.java.dev.jna</groupId>
-           <artifactId>jna-platform</artifactId>
-       </dependency>
+        </dependencies>
 
-       <dependency>
-           <groupId>javax.xml.bind</groupId>
-           <artifactId>jaxb-api</artifactId>
-       </dependency>
+    </dependencyManagement>
 
-       <dependency>
-           <groupId>com.sun.xml.bind</groupId>
-           <artifactId>jaxb-impl</artifactId>
-       </dependency>
+    <dependencies>
 
-       <dependency>
-           <groupId>com.sun.xml.bind</groupId>
-           <artifactId>jaxb-core</artifactId>
-       </dependency>
 
-       <dependency>
-           <groupId>junit</groupId>
-           <artifactId>junit</artifactId>
-           <scope>test</scope>
-       </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
 
-       <dependency>
-           <groupId>org.mockito</groupId>
-           <artifactId>mockito-core</artifactId>
-           <version>${mockito.version}</version>
-           <scope>test</scope>
-       </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+        </dependency>
 
-       <dependency>
-           <groupId>org.mockito</groupId>
-           <artifactId>mockito-inline</artifactId>
-           <version>${mockito.version}</version>
-           <scope>test</scope>
-       </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
 
-       <dependency>
-           <groupId>com.google.protobuf</groupId>
-           <artifactId>protobuf-java</artifactId>
-           <version>${com.google.protobuf-protobuf-java.version}</version>
-       </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+        </dependency>
 
-       <dependency>
-           <groupId>org.sonarsource.java</groupId>
-           <artifactId>sonar-jacoco-listeners</artifactId>
-           <scope>test</scope>
-       </dependency>
+        <!--
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
 
-       <!-- Validation -->
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-core</artifactId>
+        </dependency>
+        -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${com.google.protobuf-protobuf-java.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.sonarsource.java</groupId>
+            <artifactId>sonar-jacoco-listeners</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Validation -->
         <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
@@ -1815,7 +1877,8 @@
                         <configuration>
                             <licenseName>agpl_v3</licenseName>
                             <inceptionYear>2021</inceptionYear>
-                            <organizationName><![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
+                            <organizationName>
+                                <![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
                             <projectName><![CDATA[Discovery and Access Broker (DAB)]]></projectName>
                             <canUpdateCopyright>true</canUpdateCopyright>
                             <canUpdateDescription>true</canUpdateDescription>
@@ -1831,7 +1894,8 @@
                         <configuration>
                             <licenseName>agpl_v3</licenseName>
                             <inceptionYear>2021</inceptionYear>
-                            <organizationName><![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
+                            <organizationName>
+                                <![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
                             <projectName><![CDATA[Discovery and Access Broker (DAB)]]></projectName>
                         </configuration>
                     </execution>

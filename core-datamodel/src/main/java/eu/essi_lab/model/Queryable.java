@@ -24,7 +24,7 @@ package eu.essi_lab.model;
 import java.util.*;
 import java.util.stream.*;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 
 import eu.essi_lab.model.index.IndexedElement;
 import eu.essi_lab.model.ontology.OntologyObjectProperty;

@@ -57,9 +57,9 @@ import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
 import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.quartz.*;
 
-import javax.servlet.http.*;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.servlet.http.*;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 import java.io.File;
 import java.util.*;
 
