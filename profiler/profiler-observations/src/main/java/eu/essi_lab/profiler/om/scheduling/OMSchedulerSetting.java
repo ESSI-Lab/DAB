@@ -29,6 +29,8 @@ import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 
+import java.util.concurrent.*;
+
 /**
  * @author Fabrizio
  */
@@ -50,6 +52,9 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
     public OMSchedulerSetting() {
 
 	setConfigurableType(OMSchedulerWorker.CONFIGURABLE_TYPE);
+
+	getScheduling().setRunIndefinitely();
+	getScheduling().setRepeatInterval(Integer.MAX_VALUE, TimeUnit.DAYS);
 
 	setGroup(SchedulingGroup.ASYNCH_ACCESS);
 
