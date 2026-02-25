@@ -26,8 +26,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>iso19139-v_20060504</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-iso19139-v_2006504</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 			
 	</dependencies>

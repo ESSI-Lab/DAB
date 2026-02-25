@@ -1,0 +1,35 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>eu.essi_lab</groupId>
+        <artifactId>jaxb-classes</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>jaxb-classes-iso19139-v_2006504</artifactId>
+    <description>ESSI-Lab ISO-19139 classes with Jakarta namespace</description>
+    <name>ESSI-Lab ISO-19139 classes</name>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.jvnet.jaxb2_commons</groupId>
+            <artifactId>jaxb2-basics</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.w3c-schemas</groupId>
+            <artifactId>xlink-v_1_0</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jvnet.ogc</groupId>
+            <artifactId>gml-v_3_2_0</artifactId>
+        </dependency>
+
+
+    </dependencies>
+
+</project>

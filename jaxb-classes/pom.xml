@@ -32,6 +32,7 @@
 		<module>jaxb-classes-sos-2.0</module>
 		<module>jaxb-classes-wml-2.0</module>
 		<module>jaxb-classes-wms-1.1.1</module>
+		<module>jaxb-classes-iso19139-v_2006504</module>
 	</modules>
 	
 </project>
