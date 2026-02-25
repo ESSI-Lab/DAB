@@ -1478,11 +1478,6 @@
                 <version>${org.jvnet.ogc-gml-v_3_2_1.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>gml-v_3_2_0</artifactId>
-                <version>${org.jvnet.ogc-gml-v_3_2_0.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.hisrc.w3c</groupId>
