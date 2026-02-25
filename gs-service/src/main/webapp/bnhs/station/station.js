@@ -786,8 +786,9 @@ var renderOrganizations = function($container, organizations) {
 
 
 
-// Build OM API URL for a given time series and time window
-var buildOmApiUrl = function(timeseriesId, startTime, endTime) {
+// Build OM API URL for a given time series and time window.
+// format: optional; when set, used for download (no limit). When omitted, limit=1 for plot.
+var buildOmApiUrl = function(timeseriesId, startTime, endTime, format) {
 	// Use relative path so token/view are inherited from the current URL.
 	// Current page is typically .../view/<viewId>/annali/bnhs/station/<stationCode>
 	// OM API lives at .../view/<viewId>/annali/om-api/observations
@@ -803,7 +804,11 @@ var buildOmApiUrl = function(timeseriesId, startTime, endTime) {
 		params.push("endPosition=" + encodeURIComponent(endTime));
 	}
 	params.push("includeData=true");
-	params.push("limit=1");
+	if (format) {
+		params.push("format=" + encodeURIComponent(format));
+	} else {
+		params.push("limit=1");
+	}
 	return baseUrl + "?" + params.join("&");
 };
 
@@ -1918,13 +1923,17 @@ var download = function(button, event, data) {
 
 				var dataId = button.id.substring(button.id.indexOf('_') + 1, button.id.length);
 
-				var query = "../../cuahsi_1_1.asmx?";
+				var timeseriesId = findValue(data, dataId, 'timeseries_id');
+				if (!timeseriesId) {
+					alert(t('no_data_available') + ' (missing timeseries_id)');
+					return;
+				}
 
-				query += "request=GetValuesObject&site=" + data[dataId].platform_id.value + "&variable=" + data[dataId].attribute_id.value;
-
+				var startTime = cutDate(data[dataId].time_start.value);
+				var endTime = cutDate(data[dataId].time_end.value);
 				var format = $("#format").val();
 
-				query += "&beginDate=" + data[dataId].time_start.value + "&endDate=" + data[dataId].time_end.value + "&format=" + format;
+				var query = buildOmApiUrl(timeseriesId, startTime, endTime, format);
 
 				$(this).dialog("close");
 
