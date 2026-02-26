@@ -3394,10 +3394,21 @@ export function initializePortal(config) {
 								var interpolationKvp = constraints.kvp.find(function(kvp) { return kvp.key === 'timeInterpolation'; });
 								if (interpolationKvp && interpolationKvp.value) lines.push({ label: 'Time interpolation', value: interpolationKvp.value });
 							}
+							// Sources panel selection (Sources tab)
+							var selectedSourceIds = GIAPI.search.dab && GIAPI.search.dab.findSources ? GIAPI.search.dab.findSources(null) : null;
+							if (selectedSourceIds && Array.isArray(selectedSourceIds) && selectedSourceIds.length > 0) {
+								var idToTitle = GIAPI.search._sourcesIdToTitle || {};
+								var sourceLabels = selectedSourceIds.map(function(id) { return idToTitle[id] || id; });
+								lines.push({ label: 'Source(s)', value: sourceLabels.join(', ') });
+							} else if (selectedSourceIds === null && GIAPI.search._sourcesIdToTitle) {
+								// null means all sources selected
+								var allCount = Object.keys(GIAPI.search._sourcesIdToTitle).length;
+								if (allCount > 0) lines.push({ label: 'Source(s)', value: 'All (' + allCount + ')' });
+							}
 							var sourceCheckedItems = getCheckedItems('source');
 							if (sourceCheckedItems && sourceCheckedItems.length > 0) {
 								var sourceIds = sourceCheckedItems.map(function(item) { return item.sourceId || item.term; });
-								lines.push({ label: 'Provider(s)', value: sourceIds.join(', ') });
+								lines.push({ label: 'Provider(s) (from filters)', value: sourceIds.join(', ') });
 							}
 							var platformTitleCheckedItems = getCheckedItems('platformTitle');
 							if (platformTitleCheckedItems && platformTitleCheckedItems.length > 0) {
@@ -3758,15 +3769,19 @@ export function initializePortal(config) {
 												return null;
 											};
 											
-											// Get source filter (provider)
+											// Provider: from filter panel first, else from Sources panel selection
 											var sourceCheckedItems = getCheckedItems('source');
 											if (sourceCheckedItems && sourceCheckedItems.length > 0) {
-												// Extract source IDs from checked items
 												var sourceIds = sourceCheckedItems.map(function(item) {
 													return item.sourceId || item.term;
 												});
-												// Join multiple sources with comma
 												params.set('provider', sourceIds.join(','));
+											} else {
+												// Sources panel (Sources tab): selected data sources
+												var selectedSourceIds = GIAPI.search.dab && GIAPI.search.dab.findSources ? GIAPI.search.dab.findSources(null) : null;
+												if (selectedSourceIds && Array.isArray(selectedSourceIds) && selectedSourceIds.length > 0) {
+													params.set('provider', selectedSourceIds.join(','));
+												}
 											}
 											
 											// Get platformTitle filter (featureName/station)
@@ -3932,6 +3947,14 @@ export function initializePortal(config) {
 			},
 
 			'onSourcesReady': function(sources) {
+				// Store id -> title for use in constraints panel (bulk download dialog)
+				GIAPI.search._sourcesIdToTitle = {};
+				if (sources && sources.length) {
+					sources.forEach(function(s) {
+						var r = s.report();
+						if (r && r.id) GIAPI.search._sourcesIdToTitle[r.id] = r.title || r.id;
+					});
+				}
 				// Remove scrollbar and constrain height: SourcesWidget creates a div with inline overflow-y: scroll and fixed height
 				jQuery('#sources-tab div[style*="overflow-y"]').css({
 					'overflow': 'hidden',
