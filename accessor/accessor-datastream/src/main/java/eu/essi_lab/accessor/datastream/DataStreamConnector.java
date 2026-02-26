@@ -58,7 +58,7 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
     private static final String DATASTREAM_READ_ERROR = "Unable to retrieve DataStream content";
     private static final String DATASTREAM_URL_NOT_FOUND_ERROR = "DATASTREAM_URL_NOT_FOUND_ERROR";
     /** Max locations per resumption token (one block per request). */
-    private static final int LOCATION_BLOCK_SIZE = 1000;
+    private static final int LOCATION_BLOCK_SIZE = 100;
 
     private final Logger logger = GSLoggerFactory.getLogger(getClass());
 
