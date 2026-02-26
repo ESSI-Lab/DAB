@@ -21,15 +21,18 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  * #L%
  */
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.lib.utils.StringUtils;
 import org.slf4j.Logger;
 
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_FUNZIONE;
@@ -199,6 +202,9 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 		    }
 		}
 		Dataset dataset = new Dataset();
+
+
+
 		dataset.setSource(source.get());
 
 		String missingValue = "-999.0";
@@ -206,6 +212,8 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 
 		String parameterIdentifier = NS + ":" + idTipoSensore;
 		CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
+
+
 
 		MIMetadata miMetadata = dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 
@@ -405,6 +413,21 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 		mangler.setPeriodIdentifier(periodoId);
 
 		String identifier = mangler.getMangling();
+
+		// IDENTIFIER
+		String id = null;
+		try {
+		    id = StringUtils.hashSHA1messageDigest(identifier);
+		    coreMetadata.setIdentifier(id);
+		    coreMetadata.getMIMetadata().setFileIdentifier(id);
+		    // coreMetadata.getDataIdentification().setResourceIdentifier(stationCode);
+		} catch (NoSuchAlgorithmException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		}
 
 		coreMetadata.addDistributionOnlineResource(identifier, getSourceURL(), NetProtocolWrapper.ARPA_LOMBARDIA.getCommonURN(),
 			"download");
