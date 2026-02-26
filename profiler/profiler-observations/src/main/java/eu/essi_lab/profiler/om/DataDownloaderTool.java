@@ -262,6 +262,7 @@ public class DataDownloaderTool {
 			String downloadURL = baseRequestURL;
 			downloadURL = addParameter(downloadURL, "observationIdentifier", id);
 			downloadURL = addParameter(downloadURL, "includeData", "true");
+			downloadURL = addParameter(downloadURL, "limit", "1");
 			if (format != null) {
 			    downloadURL = addParameter(downloadURL, "format", format);
 			}
