@@ -622,6 +622,7 @@ public class HISCentralLombardiaClient {
     }
 
     private synchronized void deleteToken(String token) throws IOException {
+	
 	String tmpdir = System.getProperty("java.io.tmpdir");
 	File file = new File(tmpdir, TOKEN_FILE);
 	if (file.exists()) {

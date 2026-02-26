@@ -122,13 +122,10 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	    String queryParams = "";
 
-	    String ontology = request.getServletParameter(SemanticSearchSupport.ONTOLOGY_IDS_PARAM);
-	    String attributeTitle = request.getServletParameter(SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM);
-	    String semantics = request.getServletParameter(SemanticSearchSupport.SEMANTIC_SEARCH_PARAM);
-
-	    if (ontology != null && attributeTitle != null && semantics != null) {
-		queryParams += SemanticSearchSupport.ONTOLOGY_IDS_PARAM+"=" + ontology + "&"+SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM+"=" + attributeTitle + "&"+SemanticSearchSupport.SEMANTIC_SEARCH_PARAM+"=" + semantics + "&";
-	    }
+	    // Add ontology/attribute/semantic params when present (each independently so link preserves all current filters)
+	    queryParams += getParamIfPresent(request, SemanticSearchSupport.ONTOLOGY_IDS_PARAM);
+	    queryParams += getParamIfPresent(request, SemanticSearchSupport.ATTRIBUTE_TITLE_PARAM);
+	    queryParams += getParamIfPresent(request, SemanticSearchSupport.SEMANTIC_SEARCH_PARAM);
 
 	    queryParams += getParamIfPresent(request, MetadataElement.INSTRUMENT_TITLE_EL_NAME);
 	    queryParams += getParamIfPresent(request, "intendedObservationSpacing");

@@ -4344,7 +4344,23 @@ export function initializePortal(config) {
 				{ 'key': 'bboxUnion', 'value': 'true' }
 			);
 		}
-		 
+
+		// Ensure advanced constraint values (e.g. aggregationDuration) are in constraints so the WMS layer
+		// and station info link include them. Constraint widget may store them in form fields; add to kvp if missing.
+		var advKeys = ['attributeTitle', 'aggregationDuration', 'timeInterpolation', 'intendedObservationSpacing', 'observedPropertyURI', 'instrumentTitle'];
+		advKeys.forEach(function(key) {
+			if (constraints.kvp.some(function(kvp) { return kvp.key === key; })) {
+				return;
+			}
+			var id = GIAPI.search.constWidget && GIAPI.search.constWidget.getId ? GIAPI.search.constWidget.getId(key) : null;
+			if (id && jQuery('#' + id).length) {
+				var val = jQuery('#' + id).val();
+				if (val && (typeof val === 'string' ? val.trim() : val)) {
+					constraints.kvp.push({ key: key, value: (typeof val === 'string' ? val.trim() : val) });
+				}
+			}
+		});
+
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';
