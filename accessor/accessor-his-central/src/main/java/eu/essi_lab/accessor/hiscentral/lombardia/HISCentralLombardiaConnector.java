@@ -420,6 +420,7 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 		    id = StringUtils.hashSHA1messageDigest(identifier);
 		    coreMetadata.setIdentifier(id);
 		    coreMetadata.getMIMetadata().setFileIdentifier(id);
+		    dataset.setOriginalId(id);
 		    // coreMetadata.getDataIdentification().setResourceIdentifier(stationCode);
 		} catch (NoSuchAlgorithmException e) {
 		    // TODO Auto-generated catch block
