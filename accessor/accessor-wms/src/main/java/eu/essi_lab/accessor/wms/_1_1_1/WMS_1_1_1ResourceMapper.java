@@ -214,7 +214,8 @@ public class WMS_1_1_1ResourceMapper extends OriginalIdentifierMapper {
 
 	if (ret instanceof DatasetCollection) {
 	    metadata.addHierarchyLevelScopeCodeListValue("series");
-
+	}else{
+	    metadata.addHierarchyLevelScopeCodeListValue("dataset");
 	}
 	coreMetadata.setMIMetadata(metadata);
 

@@ -195,6 +195,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 	CoreMetadata coreMetadata = harmonizedMetadata.getCoreMetadata();
 
 	coreMetadata.setMIMetadata(metadata);
+	metadata.addHierarchyLevelScopeCodeListValue("dataset");
 
 	ServiceProvider serviceProvider = capabilities.getServiceProvider();
 	if (serviceProvider != null) {
