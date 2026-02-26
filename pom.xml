@@ -374,14 +374,18 @@
         <jna.version>5.14.0</jna.version>
 
         <!-- JAXB and schemas -->
+        <org.jvnet.ogc.version>2.6.1</org.jvnet.ogc.version>
         <org.jvnet.ogc-gml-v_3_2_1.version>2.4.0</org.jvnet.ogc-gml-v_3_2_1.version>
-        <org.jvnet.ogc-gml-v_3_2_0.version>2.6.1</org.jvnet.ogc-gml-v_3_2_0.version>
         <org.jvnet.ogc-iso19139-v_20060504.version>2.6.1</org.jvnet.ogc-iso19139-v_20060504.version>
+
+
+
+
         <org.hisrc.w3c-xlink-v_1_0.version>1.3.0</org.hisrc.w3c-xlink-v_1_0.version>
+
+
+
         <org.ogc-schemas-wfs-v_1_1_0.version>3.0.0</org.ogc-schemas-wfs-v_1_1_0.version>
-
-
-        <jvnet.ogc.version>2.6.1</jvnet.ogc.version>
 
         <org.jvnet.jaxb2_commons.version>1.11.1</org.jvnet.jaxb2_commons.version>
 
@@ -1058,11 +1062,6 @@
             <!-- OGC Schemas from Aleksei Valikov -->
 
             <!-- Source: https://mvnrepository.com/artifact/org.w3c-schemas/xlink-v_1_0 -->
-            <dependency>
-                <groupId>org.w3c-schemas</groupId>
-                <artifactId>xlink-v_1_0</artifactId>
-                <version>${xlink.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.jvnet.jaxb2_commons</groupId>
@@ -1073,37 +1072,25 @@
             <dependency>
                 <groupId>org.jvnet.ogc</groupId>
                 <artifactId>waterml-v_2_0</artifactId>
-                <version>${jvnet.ogc.version}</version>
+                <version>${org.jvnet.ogc.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.jvnet.ogc</groupId>
                 <artifactId>wfs-v_1_1_0</artifactId>
-                <version>${jvnet.ogc.version}</version>
+                <version>${org.jvnet.ogc.version}</version>
             </dependency>
 
-            <!--
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>iso19139-v_20060504</artifactId>
-                <version>${jvnet.ogc.version}</version>
-            </dependency>
-            -->
-
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>gml-v_3_2_0</artifactId>
-                <version>${jvnet.ogc.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.jvnet.ogc</groupId>
                 <artifactId>sensorML-v_2_0</artifactId>
-                <version>${jvnet.ogc.version}</version>
+                <version>${org.jvnet.ogc.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.jvnet.ogc</groupId>
                 <artifactId>sos-v_2_0</artifactId>
-                <version>${jvnet.ogc.version}</version>
+                <version>${org.jvnet.ogc.version}</version>
             </dependency>
 
             <dependency>
@@ -1193,12 +1180,12 @@
                         <artifactId>opendap</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>org.glassfish.jaxb</groupId>
-                        <artifactId>jaxb-runtime</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>net.java.dev.jna</groupId>
                         <artifactId>jna</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1207,6 +1194,12 @@
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-coverage</artifactId>
                 <version>${geotools-version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!-- Saxon Home Edition and Woodstox are imported by GS-XML -->

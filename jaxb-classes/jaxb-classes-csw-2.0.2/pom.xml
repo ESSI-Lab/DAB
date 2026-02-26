@@ -32,11 +32,13 @@
 			<artifactId>jaxb-classes-ows-1.0.0</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>gml-v_3_2_0</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-gml-v_3_2_0-2.6.1</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
-	
+
 	</dependencies>
 
 </project>
