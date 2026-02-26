@@ -28,25 +28,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.essi_lab.authorization.builder.*;
 import jakarta.xml.bind.JAXBElement;
 
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
 import org.ow2.authzforce.core.pdp.api.func.FirstOrderBagFunctions.AtLeastOneMemberOf;
 import org.ow2.authzforce.core.pdp.api.func.FirstOrderBagFunctions.PrimitiveToBag;
 import org.ow2.authzforce.core.pdp.api.value.StandardDatatypes;
+import org.ow2.authzforce.core.pdp.impl.combining.*;
 import org.ow2.authzforce.core.pdp.impl.func.StandardFunction;
 
 import eu.essi_lab.jaxb.common.ObjectFactories;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AllOf;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AnyOf;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeDesignatorType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeValueType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ExpressionType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.FunctionType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.IdReferenceType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Match;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Target;
 
 /**
  * @author Fabrizio
@@ -373,11 +365,22 @@ public class XACML_JAXBUtils {
 
 	ArrayList<Serializable> refList = new ArrayList<>();
 
-	IdReferenceType idReferenceType = new IdReferenceType(policySetIdReference, null, null, null);
 
-	JAXBElement<IdReferenceType> ref = ObjectFactories.XACML().createPolicySetIdReference(idReferenceType);
+	PPSBuilder ppsBuilder = new PPSBuilder(policySetIdReference);
 
-	refList.add(ref);
+
+	PPSPolicyBuilder ppsPolicyBuilder = new PPSPolicyBuilder(//
+		policySetIdReference, //
+		StandardCombiningAlgorithm.XACML_3_0_RULE_COMBINING_PERMIT_OVERRIDES.getId());
+
+
+	Policy policy = ppsPolicyBuilder.build();
+
+//	IdReferenceType idReferenceType = new IdReferenceType(policySetIdReference, null, null, null);
+//
+//	JAXBElement<IdReferenceType> ref = ObjectFactories.XACML().createPolicySetIdReference(idReferenceType);
+
+	refList.add(policy);
 
 	return createPolicySet(target, policySetId, refList, algorithm);
     }

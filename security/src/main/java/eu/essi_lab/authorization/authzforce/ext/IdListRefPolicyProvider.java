@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.authzforce.ext;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.authorization.authzforce.ext;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -34,10 +34,7 @@ import org.ow2.authzforce.core.pdp.api.IndeterminateEvaluationException;
 import org.ow2.authzforce.core.pdp.api.XmlUtils.XmlnsFilteringParserFactory;
 import org.ow2.authzforce.core.pdp.api.combining.CombiningAlgRegistry;
 import org.ow2.authzforce.core.pdp.api.expression.ExpressionFactory;
-import org.ow2.authzforce.core.pdp.api.policy.BaseStaticRefPolicyProvider;
-import org.ow2.authzforce.core.pdp.api.policy.CloseableRefPolicyProvider;
-import org.ow2.authzforce.core.pdp.api.policy.PolicyVersionPatterns;
-import org.ow2.authzforce.core.pdp.api.policy.StaticTopLevelPolicyElementEvaluator;
+import org.ow2.authzforce.core.pdp.api.policy.*;
 import org.ow2.authzforce.core.pdp.impl.policy.PolicyEvaluators;
 import org.ow2.authzforce.xacml.identifiers.XacmlStatusCode;
 
@@ -50,25 +47,24 @@ import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
 /**
  * @author Fabrizio
  */
-public class IdListRefPolicyProvider extends BaseStaticRefPolicyProvider {
+public class IdListRefPolicyProvider extends BaseStaticPolicyProvider {
 
     private final ExpressionFactory expressionFactory;
     private final CombiningAlgRegistry combiningAlgRegistry;
     private static PolicySetLoader loader;
-    
+
     /**
-     * 
+     *
      * @param loader
      */
     public static void setPolicySetLoader(PolicySetLoader loader) {
-	
-	IdListRefPolicyProvider.loader = loader;	
+
+	IdListRefPolicyProvider.loader = loader;
     }
 
     private IdListRefPolicyProvider(
 
 	    final ExpressionFactory expressionFactory, //
-	    final XmlnsFilteringParserFactory xacmlParserFactory, //
 	    final CombiningAlgRegistry combiningAlgRegistry) {
 
 	super(UNLIMITED_POLICY_REF_DEPTH);
@@ -77,7 +73,7 @@ public class IdListRefPolicyProvider extends BaseStaticRefPolicyProvider {
 	this.combiningAlgRegistry = combiningAlgRegistry;
     }
 
-    public static class Factory extends CloseableRefPolicyProvider.Factory<IdListPolicyProvider> {
+    public static class Factory extends CloseablePolicyProvider.Factory<IdListPolicyProvider> {
 
 	private static final IllegalArgumentException ILLEGAL_COMBINING_ALG_REGISTRY_ARGUMENT_EXCEPTION = new IllegalArgumentException(
 		"Undefined CombiningAlgorithm registry");
@@ -96,35 +92,57 @@ public class IdListRefPolicyProvider extends BaseStaticRefPolicyProvider {
 	    return IdListPolicyProvider.class;
 	}
 
+//	public CloseablePolicyProvider getInstance(
+//
+//		final IdListPolicyProvider idListProvider, //
+//		final XmlnsFilteringParserFactory xmlParserFactory, //
+//		final int maxPolicySetRefDepth, //
+//		final ExpressionFactory expressionFactory, //
+//		final CombiningAlgRegistry combiningAlgRegistry, //
+//		final EnvironmentProperties environmentProperties) throws IllegalArgumentException {
+//
+//	    if (idListProvider == null) {
+//		throw NULL_CONF_ARGUMENT_EXCEPTION;
+//	    }
+//
+//	    rootPolicySet = idListProvider.getRootPolicySet();
+//
+//	    if (xmlParserFactory == null) {
+//		throw ILLEGAL_XACML_PARSER_FACTORY_ARGUMENT_EXCEPTION;
+//	    }
+//
+//	    if (expressionFactory == null) {
+//		throw ILLEGAL_EXPRESSION_FACTORY_ARGUMENT_EXCEPTION;
+//	    }
+//
+//	    if (combiningAlgRegistry == null) {
+//		throw ILLEGAL_COMBINING_ALG_REGISTRY_ARGUMENT_EXCEPTION;
+//	    }
+//
+//	    return new IdListRefPolicyProvider(expressionFactory, combiningAlgRegistry);
+//	}
+
 	@Override
-	public CloseableRefPolicyProvider getInstance(
+	public CloseablePolicyProvider<?> getInstance(IdListPolicyProvider idListPolicyProvider,
+		XmlnsFilteringParserFactory xmlnsFilteringParserFactory, int i, ExpressionFactory expressionFactory,
+		CombiningAlgRegistry combiningAlgRegistry, EnvironmentProperties environmentProperties,
+		Optional<PolicyProvider<?>> optional) throws IllegalArgumentException {
 
-		final IdListPolicyProvider idListProvider, //
-		final XmlnsFilteringParserFactory xmlParserFactory, //
-		final int maxPolicySetRefDepth, //
-		final ExpressionFactory expressionFactory, //
-		final CombiningAlgRegistry combiningAlgRegistry, //
-		final EnvironmentProperties environmentProperties) throws IllegalArgumentException {
-
-	    if (idListProvider == null) {
+	    if (idListPolicyProvider == null) {
 		throw NULL_CONF_ARGUMENT_EXCEPTION;
 	    }
 
-	    rootPolicySet = idListProvider.getRootPolicySet();
-
-	    if (xmlParserFactory == null) {
-		throw ILLEGAL_XACML_PARSER_FACTORY_ARGUMENT_EXCEPTION;
-	    }
+	    rootPolicySet = idListPolicyProvider.getRootPolicySet();
 
 	    if (expressionFactory == null) {
-		throw ILLEGAL_EXPRESSION_FACTORY_ARGUMENT_EXCEPTION;
+		throw ILLEGAL_XACML_PARSER_FACTORY_ARGUMENT_EXCEPTION;
 	    }
 
 	    if (combiningAlgRegistry == null) {
 		throw ILLEGAL_COMBINING_ALG_REGISTRY_ARGUMENT_EXCEPTION;
 	    }
 
-	    return new IdListRefPolicyProvider(expressionFactory, xmlParserFactory, combiningAlgRegistry);
+	    return new IdListRefPolicyProvider(expressionFactory, combiningAlgRegistry);
 	}
     }
 
@@ -147,10 +165,11 @@ public class IdListRefPolicyProvider extends BaseStaticRefPolicyProvider {
 
 		return PolicyEvaluators.getInstance(//
 			policy.get(), //
-			null, //
-			new HashMap<String, String>(), //
 			expressionFactory, //
-			combiningAlgRegistry);
+			combiningAlgRegistry,
+		        Optional.empty(), //
+			new HashMap<>()//
+		);
 
 	    } catch (final IllegalArgumentException e) {
 
@@ -181,7 +200,7 @@ public class IdListRefPolicyProvider extends BaseStaticRefPolicyProvider {
 		    loader.loadPermissionPolicySets(), //
 		    policyId);
 
-	    if (!policySet.isPresent()) {
+	    if (policySet.isEmpty()) {
 
 		policySet = PolicySetWrapper.getPolicySet(//
 			loader.loadRolePolicySets(), //
@@ -189,15 +208,17 @@ public class IdListRefPolicyProvider extends BaseStaticRefPolicyProvider {
 	    }
 	}
 
+
 	try {
 	    return PolicyEvaluators.getInstanceStatic(//
 		    policySet.get(), //
-		    null, //
-		    new HashMap<String, String>(), //
 		    expressionFactory, //
-		    combiningAlgRegistry, //
-		    this, //
-		    policySetRefChain);
+		    combiningAlgRegistry,
+                    this, //
+		    policySetRefChain, //
+		    null, //
+		    null  //
+	    );
 
 	} catch (final IllegalArgumentException e) {
 
