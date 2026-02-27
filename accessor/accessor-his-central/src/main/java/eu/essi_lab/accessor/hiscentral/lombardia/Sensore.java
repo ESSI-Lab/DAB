@@ -217,4 +217,12 @@ public class Sensore {
 	}
     }
 
+    @Override
+    public String toString() {
+	return "Sensore [id=" + id + ", nome=" + nome + ", idStato=" + idStato + ", idTipoSensore=" + idTipoSensore
+		+ ", idStazione=" + idStazione + ", unitaMisura=" + unitaMisura + ", frequenza=" + frequenza
+		+ ", quota=" + quota + ", utmNord=" + utmNord + ", utmEst=" + utmEst + ", funzione=" + funzione
+		+ ", operatore=" + operatore + ", periodo=" + periodo + ", from=" + from + ", to=" + to + "]";
+    }
+
 }

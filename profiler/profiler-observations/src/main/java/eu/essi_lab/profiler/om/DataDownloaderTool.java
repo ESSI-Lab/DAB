@@ -296,6 +296,8 @@ public class DataDownloaderTool {
 
 			File dataFile = new File(propertyDir, FileUtils.sanitizeForNtfs(baseName + "_" + id + "_data" + extension));
 
+			GSLoggerFactory.getLogger(getClass()).info("Single download request for download {}: {}",downloadName,downloadURL);
+
 			WebRequest get2 = WebRequest.createGET(downloadURL);
 			resources++;
 

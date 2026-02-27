@@ -524,10 +524,8 @@ public class OMHandler extends StreamingRequestHandler {
 		for (JSONObservation observation : observations) {
 		    identifier = observation.getId();
 		}
-		GSLoggerFactory.getLogger(getClass()).info("getting data");
 
 		tempSize += observations.size();
-		GSLoggerFactory.getLogger(getClass()).info("formatting");
 
 		if (first) {
 		    resultWriter.writeHeader();
@@ -551,6 +549,9 @@ public class OMHandler extends StreamingRequestHandler {
 			    .equals("true")))) {
 
 			if (useCache && identifier != null) {
+
+
+			    GSLoggerFactory.getLogger(getClass()).info("Getting data from cache");
 			    ResultWriter finalWriter = resultWriter;
 			    ResponseListener<DataRecord> listener = new ResponseListener<DataRecord>() {
 				boolean completed = false;
@@ -577,7 +578,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    }
 
 			} else {
-
+			    GSLoggerFactory.getLogger(getClass()).info("Getting data from remote service. Online: {}, Begin: {}, End {} ",observation.getId(),begin,end);
 			    // real time access request
 
 			    AccessMessage accessMessage = new AccessMessage();

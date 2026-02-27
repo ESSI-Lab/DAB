@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -357,6 +357,7 @@ public class HISCentralLombardiaClient {
     private static HashMap<String, String> province = new HashMap<>(); // sigla -> nome
     private static HashMap<String, Comune> comuni = new HashMap<>(); // id -> comune
     private static ExpiringCache<Stazione> stazioni = new ExpiringCache<>();
+
     static {
 	stazioni.setDuration(1000 * 60 * 60 * 24l);
     }
@@ -577,7 +578,8 @@ public class HISCentralLombardiaClient {
 
     private void login() throws Exception {
 	LoginResult ret = null;
-	main: for (int i = 0; i < 10; i++) {
+	main:
+	for (int i = 0; i < 10; i++) {
 	    ret = loginExecution();
 	    switch (ret.getExitCode()) {
 	    case "0":
@@ -599,7 +601,7 @@ public class HISCentralLombardiaClient {
 	token = ret.getToken();
 	if (exit.equals("0")) {
 	    writeToken(token);
-	    // GSLoggerFactory.getLogger(getClass()).info("Successful login, token: {}", token);
+	    GSLoggerFactory.getLogger(getClass()).info("Successful login, token: {}", token);
 	} else {
 	    String error = "Error during login. " + msg;
 	    GSLoggerFactory.getLogger(getClass()).error(error);
@@ -622,7 +624,7 @@ public class HISCentralLombardiaClient {
     }
 
     private synchronized void deleteToken(String token) throws IOException {
-	
+
 	String tmpdir = System.getProperty("java.io.tmpdir");
 	File file = new File(tmpdir, TOKEN_FILE);
 	if (file.exists()) {
@@ -883,18 +885,35 @@ public class HISCentralLombardiaClient {
 	}
     }
 
-    public void elencoSensori() throws Exception {
-	elencoSensori(null);
+    public List<Sensore> elencoSensori() throws Exception {
+	return elencoSensori(null);
     }
 
     public List<Sensore> elencoSensori(String stationId) throws Exception {
+	List<String> stationIdentifiers = new ArrayList<>();
+	stationIdentifiers.add(stationId);
+	return elencoSensori(stationIdentifiers, null);
+    }
+
+    public List<Sensore> elencoSensori(List<String> stationIdentifiers, List<String> sensorTypes) throws Exception {
+
 	login();
 	try {
 	    String stationXML = "";
-	    if (stationId != null) {
-		stationXML = "<Stazioni>\n" //
-			+ "<IdStazione>" + stationId + "</IdStazione>\n" //
-			+ "</Stazioni>";
+	    if (stationIdentifiers != null && !stationIdentifiers.isEmpty()) {
+		stationXML = "<Stazioni>\n"; //
+		for (String stationIdentifier : stationIdentifiers) {
+		    stationXML += "<IdStazione>" + stationIdentifier + "</IdStazione>\n";
+		}
+		stationXML += "</Stazioni>";
+	    }
+	    String sensorTypesXML = "";
+	    if (sensorTypes != null && sensorTypes.size() > 0) {
+		sensorTypesXML = "<TipoSensore>\n";
+		for (String sensorType : sensorTypes) {
+		    sensorTypesXML += "<IdTipoSensore>" + sensorType + "</IdTipoSensore>\n";
+		}
+		sensorTypesXML += "</TipoSensore>";
 	    }
 	    String body = getSOAPHeader() //
 		    + "<ElencoSensori xmlns=\"http://tempuri.org/\"\n" //
@@ -904,6 +923,7 @@ public class HISCentralLombardiaClient {
 		    + "        <ElencoSensori>\n" //
 		    + getTokenXML() //
 		    + stationXML //
+		    + sensorTypesXML //
 		    + "        </ElencoSensori>\n" //
 		    + "    </xInput>\n" //
 		    + "</ElencoSensori>" //
@@ -971,6 +991,7 @@ public class HISCentralLombardiaClient {
     }
 
     public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     static {
 	sdf.setTimeZone(TimeZone.getTimeZone(ZoneOffset.ofHours(1)));
     }
@@ -1089,7 +1110,7 @@ public class HISCentralLombardiaClient {
 	    // HTTP POST
 	    url = proxyEndpoint + "/post?url=" + url + "&keystorePassword=" + keystorePassword;
 
-	    request = HttpRequestUtils.build(MethodWithBody.POST, 
+	    request = HttpRequestUtils.build(MethodWithBody.POST,
 
 		    url, body.asString().getBytes(StandardCharsets.UTF_8),
 
@@ -1106,8 +1127,7 @@ public class HISCentralLombardiaClient {
     }
 
     private String getSOAPHeader() {
-	return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:inc=\"http://www.service-now.com/incident\" xmlns:tem=\"http://tempuri.org/\">\n"
-		+ "<soapenv:Header/>\n"//
+	return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:inc=\"http://www.service-now.com/incident\" xmlns:tem=\"http://tempuri.org/\">\n" + "<soapenv:Header/>\n"//
 		+ "<soapenv:Body>\n";
 
     }
