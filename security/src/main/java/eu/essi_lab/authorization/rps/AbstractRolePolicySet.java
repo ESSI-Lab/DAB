@@ -42,7 +42,7 @@ public abstract class AbstractRolePolicySet implements PolicySetWrapper {
     public AbstractRolePolicySet(String role) {
 
 	this.role = role;
-//	this.policySet = RPSBuilder.build(role);
+	this.policySet = RPSBuilder.build(role);
     }
 
     /**

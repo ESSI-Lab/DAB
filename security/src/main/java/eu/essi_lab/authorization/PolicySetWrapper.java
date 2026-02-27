@@ -194,14 +194,4 @@ public interface PolicySetWrapper {
      * @return
      */
     PolicySet getPolicySet();
-
-    /**
-     *
-     * @return
-     */
-    default Optional<Policy> getPolicy(){
-
-	return Optional.empty();
-    }
-
 }

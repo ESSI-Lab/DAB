@@ -40,7 +40,6 @@ import eu.essi_lab.authorization.DefaultPdpEngineBuilder;
 import eu.essi_lab.authorization.MessageAuthorizer;
 import eu.essi_lab.authorization.PdpEngineBuilder;
 import eu.essi_lab.authorization.PolicySetWrapper.Action;
-import eu.essi_lab.authorization.authzforce.ext.IdListRefPolicyProvider;
 import eu.essi_lab.authorization.pps.AbstractGEOSSViewPermissionPolicySet;
 import eu.essi_lab.authorization.pps.AbstractPermissionPolicySet;
 import eu.essi_lab.authorization.pps.GEOSSPrivateWritePermissionPolicySet;
@@ -418,8 +417,6 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	PolicySetLoader loader = new DefaultPolicySetLoader();
 
 	loader.setPermissionPolicySet(pps);
-
-	IdListRefPolicyProvider.setPolicySetLoader(loader);
 
 	builder = new PdpEngineBuilder();
 

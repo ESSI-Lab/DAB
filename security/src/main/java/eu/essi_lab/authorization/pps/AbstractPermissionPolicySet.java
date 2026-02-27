@@ -68,7 +68,6 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
      *
      */
     public static final String VIEW_CREATOR_MISSING_VALUE = "viewCreatorMissing";
-    private Policy policy;
 
     /**
      * @param role
@@ -111,9 +110,9 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		    "PPS:" + role + ":role:policy", //
 		    ruleCombiningAlgorithm);
 
-	    buildersMap.entrySet().forEach(b -> ppsPolicyBuilder.addRule(b.getValue().build()));
+	    buildersMap.forEach((key, value) -> ppsPolicyBuilder.addRule(value.build()));
 
-	    policy = ppsPolicyBuilder.build();
+	    Policy policy = ppsPolicyBuilder.build();
 
 	    ppsBuilder.addPolicy(policy);
 
@@ -121,14 +120,6 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 	}
 
 	return policySet;
-    }
-
-    @Override
-    public Optional<Policy> getPolicy() {
-
-	getPolicySet();
-
-	return Optional.ofNullable(policy);
     }
 
     /**
