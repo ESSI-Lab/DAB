@@ -205,7 +205,14 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 		JSONObject jsonObj = getData(linkage);
 
 		if (jsonObj != null && !jsonObj.isEmpty()) {
+	if (jsonObj.has("code")) {
+	    int code = jsonObj.getInt("code");
+	    if (code==500){
+		String message = jsonObj.optString("message");
 
+		GSLoggerFactory.getLogger(getClass()).error("ERROR with dates "+ISO8601DateTimeUtils.getISO8601DateTime(d[0])+","+ISO8601DateTimeUtils.getISO8601DateTime(d[1])+": "+message);
+	    }
+	}
 		    JSONArray valuesData = jsonObj.optJSONArray("data");
 
 		    DateFormat iso8601OutputFormat = null;
@@ -330,36 +337,39 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 
     private List<Date[]> buildDates(Date startDate, Date endDate) {
 	List<Date[]> dateRanges = new ArrayList<>();
-
-	// Calculate the difference in days between the two dates
-	long diffInMillies = Math.abs(endDate.getTime() - startDate.getTime());
-	long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-	// If the difference is 30 days or less, return the original range
-	if (diffInDays <= 30) {
-	    dateRanges.add(new Date[] { startDate, endDate });
+	int maxDaysPerBlock = 28;
+	if (startDate == null || endDate == null) {
 	    return dateRanges;
 	}
 
-	// Otherwise, split the dates into ranges of at most 30 days
-	Date currentStartDate = startDate;
-	boolean maxRequestsReached = false;
-	int count = 0;
-	while (diffInDays > 30) {
-	    Date currentEndDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(30, TimeUnit.DAYS));
-	    dateRanges.add(new Date[] { currentStartDate, currentEndDate });
-	    currentStartDate = new Date(currentEndDate.getTime() + TimeUnit.MILLISECONDS.convert(1, TimeUnit.DAYS));
-	    diffInDays -= 30;
-
-	    // if (diff > 2) {
-	    // maxRequestsReached = true;
-	    // endDate = new Date(currentStartDate.getTime() + TimeUnit.MILLISECONDS.convert(10, TimeUnit.DAYS));
-	    // }
+	// ensure startDate is not after endDate
+	if (startDate.after(endDate)) {
+	    Date tmp = startDate;
+	    startDate = endDate;
+	    endDate = tmp;
 	}
 
-	// Add the final range
-	dateRanges.add(new Date[] { currentStartDate, endDate });
+	long millisPerDay = TimeUnit.DAYS.toMillis(1);
+	long maxBlockMillis = maxDaysPerBlock * millisPerDay;
 
+	Date currentStart = startDate;
+	while (!currentStart.after(endDate)) {
+
+	    long tentativeEndMillis = currentStart.getTime() + maxBlockMillis - 1; // inclusive block
+	    if (tentativeEndMillis > endDate.getTime()) {
+		tentativeEndMillis = endDate.getTime();
+	    }
+
+	    Date currentEnd = new Date(tentativeEndMillis);
+	    dateRanges.add(new Date[] { currentStart, currentEnd });
+
+	    if (!currentEnd.before(endDate)) {
+		break;
+	    }
+
+	    // next block starts immediately after currentEnd
+	    currentStart = new Date(currentEnd.getTime() + 1);
+	}
 	return dateRanges;
     }
 

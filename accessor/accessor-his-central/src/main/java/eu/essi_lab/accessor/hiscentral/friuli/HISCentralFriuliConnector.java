@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.hiscentral.friuli;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -55,19 +55,19 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 public class HISCentralFriuliConnector extends HarvestedQueryConnector<HISCentralFriuliConnectorSetting> {
 
     /**
-     * 
+     *
      */
     static final String TYPE = "HISCentralFriuliConnector";
 
     /**
-     * 
+     *
      */
     public HISCentralFriuliConnector() {
 
     }
 
     /**
-     * 
+     *
      */
 
     public static final String LOGIN_URL = "login";
@@ -77,7 +77,7 @@ public class HISCentralFriuliConnector extends HarvestedQueryConnector<HISCentra
     static final String IDRO_STATIONS_URL = "stations?group[]=idro_fvg";
 
     /**
-     * 
+     *
      */
     static final String SENSOR_URL = "measures?station_id=";
 
@@ -88,12 +88,14 @@ public class HISCentralFriuliConnector extends HarvestedQueryConnector<HISCentra
     private int countDataset = 0;
 
     /**
-     * 
+     *
      */
 
     private int maxRecords;
 
     public static String BEARER_TOKEN = null;
+    public static String USER = null;
+    public static String PASSWORD = null;
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
@@ -284,8 +286,12 @@ public class HISCentralFriuliConnector extends HarvestedQueryConnector<HISCentra
 	    // httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
 	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put("email", ConfigurationWrapper.getCredentialsSetting().getFriuliClientId().orElse(null));
-	    params.put("password", ConfigurationWrapper.getCredentialsSetting().getFriuliClientPassword().orElse(null));
+	    String user = USER != null ? USER : ConfigurationWrapper.getCredentialsSetting().getFriuliClientId().orElse(null);
+	    params.put("email", user);
+	    String password = PASSWORD != null
+		    ? PASSWORD
+		    : ConfigurationWrapper.getCredentialsSetting().getFriuliClientPassword().orElse(null);
+	    params.put("password", password);
 
 	    HttpRequest request = HttpRequestUtils.build(//
 		    MethodWithBody.POST, //

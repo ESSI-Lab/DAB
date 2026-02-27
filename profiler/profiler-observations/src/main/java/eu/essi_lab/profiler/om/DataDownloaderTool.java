@@ -136,12 +136,19 @@ public class DataDownloaderTool {
 
 	GSLoggerFactory.getLogger(getClass()).info("Temporary directory created at: {}", tempPath.toAbsolutePath());
 
-	File userRequestFile = new File(tempPath.toFile(), "log.txt");
+	File requestLogFile = new File(tempPath.toFile(), "log-request.txt");
+	File processLogFile = new File(tempPath.toFile(), "log-process.txt");
 	Date dateStart = new Date();
 
 	String baseRequestURL = requestURL.replace("downloads?", "observations?");
 	baseRequestURL = removeParameter(baseRequestURL, "asynchDownload", "true");
 	baseRequestURL = removeParameter(baseRequestURL, "includeData", "true");
+
+
+	StringBuilder requestLogContent = new StringBuilder();
+	requestLogContent.append("request: ").append(baseRequestURL).append("\n");
+	requestLogContent.append("date start: ").append(ISO8601DateTimeUtils.getISO8601DateTime(dateStart)).append("\n");
+	write(requestLogContent.toString(), requestLogFile);
 
 	URI uri;
 	String format = null;
@@ -382,6 +389,7 @@ public class DataDownloaderTool {
 	}
 
 	boolean isFinalPart = (maxSizeReached || resumptionToken == null);
+
 	StringBuilder logContent = new StringBuilder();
 	logContent.append("request: ").append(baseRequestURL).append("\n");
 	logContent.append("date start: ").append(ISO8601DateTimeUtils.getISO8601DateTime(dateStart)).append("\n");
@@ -392,7 +400,7 @@ public class DataDownloaderTool {
 	for (String name : downloadedFileNames) {
 	    logContent.append("  ").append(name).append("\n");
 	}
-	write(logContent.toString(), userRequestFile);
+	write(logContent.toString(), processLogFile);
 
 	try {
 	    GSLoggerFactory.getLogger(getClass()).info("Zipping folder {}", tempPath);
