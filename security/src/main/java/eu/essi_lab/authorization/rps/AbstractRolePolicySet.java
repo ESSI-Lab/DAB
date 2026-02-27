@@ -26,7 +26,7 @@ package eu.essi_lab.authorization.rps;
 
 import eu.essi_lab.authorization.PolicySetWrapper;
 import eu.essi_lab.authorization.builder.RPSBuilder;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
 
 /**
  * @author Fabrizio
@@ -42,7 +42,7 @@ public abstract class AbstractRolePolicySet implements PolicySetWrapper {
     public AbstractRolePolicySet(String role) {
 
 	this.role = role;
-	this.policySet = RPSBuilder.build(role);
+//	this.policySet = RPSBuilder.build(role);
     }
 
     /**

@@ -24,31 +24,22 @@ package eu.essi_lab.authorization;
  * #L%
  */
 
+import eu.essi_lab.authorization.builder.*;
+import eu.essi_lab.authorization.psloader.*;
+import eu.essi_lab.authorization.xacml.*;
+import jakarta.xml.bind.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.ow2.authzforce.core.pdp.api.*;
+import org.ow2.authzforce.core.pdp.impl.*;
+import org.ow2.authzforce.core.pdp.impl.combining.*;
+
+import javax.xml.namespace.*;
 import java.io.*;
 import java.nio.charset.*;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
-
-import jakarta.xml.bind.*;
-
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
-import org.ow2.authzforce.core.pdp.api.*;
-import org.ow2.authzforce.core.pdp.impl.BasePdpEngine;
-import org.ow2.authzforce.core.pdp.impl.DefaultEnvironmentProperties;
-import org.ow2.authzforce.core.pdp.impl.PdpEngineConfiguration;
-import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
-import org.ow2.authzforce.core.xmlns.pdp.Pdp;
-import org.ow2.authzforce.core.xmlns.pdp.StaticPolicyProvider;
-
-import eu.essi_lab.authorization.authzforce.ext.IdListPolicyProvider;
-import eu.essi_lab.authorization.psloader.PolicySetLoader;
-import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-
-import javax.xml.namespace.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -60,16 +51,16 @@ public class PdpEngineBuilder {
      */
     public static final String ROOT_POLICY_SET_ID = "root";
 
-    private List<PolicySet> rpsList;
-    private List<PolicySet> ppsList;
+    private List<PolicySetWrapper> rpsList;
+    private List<PolicySetWrapper> ppsList;
 
     /**
      *
      */
     public PdpEngineBuilder() {
 
-	rpsList = new ArrayList<PolicySet>();
-	ppsList = new ArrayList<PolicySet>();
+	rpsList = new ArrayList<PolicySetWrapper>();
+	ppsList = new ArrayList<PolicySetWrapper>();
     }
 
     /**
@@ -100,8 +91,8 @@ public class PdpEngineBuilder {
      */
     public void addPolicies(PolicySetWrapper rps, PolicySetWrapper pps) {
 
-	rpsList.add(rps.getPolicySet());
-	ppsList.add(pps.getPolicySet());
+	rpsList.add(rps);
+	ppsList.add(pps);
     }
 
     /**
@@ -142,7 +133,7 @@ public class PdpEngineBuilder {
      * @return
      * @throws Exception
      */
-    private File createPDPFile(PolicySet root, List<PolicySet> ppsList, List<PolicySet> rpsList) throws Exception {
+    private File createPDPFile(PolicySet root, List<PolicySetWrapper> ppsList, List<PolicySetWrapper> rpsList) throws Exception {
 
 	Path baseDir = Files.createTempDirectory("authzforce-pdp-");
 	//	Path policiesDir = Files.createDirectory(baseDir.resolve("policies"));
@@ -155,7 +146,6 @@ public class PdpEngineBuilder {
 	BiConsumer<PolicySet, Path> writePolicy = (policySet, path) -> {
 
 	    try {
-
 
 		QName qName = new QName("urn:oasis:names:tc:xacml:3.0:core:schema:wd-17", "PolicySet");
 
@@ -172,16 +162,15 @@ public class PdpEngineBuilder {
 	String rootFileName = root.getPolicySetId() + ".xml";
 	writePolicy.accept(root, baseDir.resolve(rootFileName));
 
-
-//	for (PolicySet pps : ppsList) {
-//	    String fileName = pps.getPolicySetId().replace(":", "_") + ".xml";
-//	    writePolicy.accept(pps, baseDir.resolve(fileName));
-//	}
-//
-//	for (PolicySet rps : rpsList) {
-//	    String fileName = rps.getPolicySetId().replace(":", "_") + ".xml";
-//	    writePolicy.accept(rps, baseDir.resolve(fileName));
-//	}
+	//	for (PolicySet pps : ppsList) {
+	//	    String fileName = pps.getPolicySetId().replace(":", "_") + ".xml";
+	//	    writePolicy.accept(pps, baseDir.resolve(fileName));
+	//	}
+	//
+	//	for (PolicySet rps : rpsList) {
+	//	    String fileName = rps.getPolicySetId().replace(":", "_") + ".xml";
+	//	    writePolicy.accept(rps, baseDir.resolve(fileName));
+	//	}
 
 	String pdpXml = """
 		<pdp xmlns="http://authzforce.github.io/core/xmlns/pdp/8"
@@ -261,14 +250,16 @@ public class PdpEngineBuilder {
 
 	ArrayList<Serializable> wrapperList = new ArrayList<>();
 
-	for (PolicySet rps : rpsList) {
+	for (PolicySetWrapper pps : ppsList) {
 
-//	    String policySetId = rps.getPolicySetId();
-//	    IdReferenceType idReferenceType = new IdReferenceType(policySetId, null, null, null);
+	    PolicySet build = RPSBuilder.build(pps.getRole(), pps.getPolicy().get());
 
-//	    JAXBElement<IdReferenceType> ref = ObjectFactories.XACML().createPolicySetIdReference(idReferenceType);
+	    //	    String policySetId = rps.getPolicySetId();
+	    //	    IdReferenceType idReferenceType = new IdReferenceType(policySetId, null, null, null);
 
-	    wrapperList.add(rps);
+	    //	    JAXBElement<IdReferenceType> ref = ObjectFactories.XACML().createPolicySetIdReference(idReferenceType);
+
+	    wrapperList.add(build);
 
 	}
 

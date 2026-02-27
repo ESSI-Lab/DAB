@@ -90,19 +90,7 @@ public class XACML_JAXBUtils {
 	List<JAXBElement<? extends ExpressionType>> outerList = new ArrayList<>();
 	ApplyType outerApply = null;
 
-	{
 
-	    JAXBElement<AttributeDesignatorType> attributeDesignator = ObjectFactories.XACML()
-		    .createAttributeDesignator(attributeDesignatorType);
-
-	    outerList.add(attributeDesignator);
-
-	    String nameSuffixAtLeastOneMemberOf = AtLeastOneMemberOf.NAME_SUFFIX_AT_LEAST_ONE_MEMBER_OF;
-
-	    String functionId = xacmlNs10 + "string" + nameSuffixAtLeastOneMemberOf;
-
-	    outerApply = new ApplyType(null, outerList, functionId);
-	}
 
 	{
 	    List<JAXBElement<? extends ExpressionType>> innerList = new ArrayList<>();
@@ -121,6 +109,20 @@ public class XACML_JAXBUtils {
 	    ApplyType innerApplyType = new ApplyType(null, innerList, functionId);
 
 	    outerList.add(ObjectFactories.XACML().createApply(innerApplyType));
+	}
+
+	{
+
+	    JAXBElement<AttributeDesignatorType> attributeDesignator = ObjectFactories.XACML()
+		    .createAttributeDesignator(attributeDesignatorType);
+
+	    outerList.add(attributeDesignator);
+
+	    String nameSuffixAtLeastOneMemberOf = AtLeastOneMemberOf.NAME_SUFFIX_AT_LEAST_ONE_MEMBER_OF;
+
+	    String functionId = xacmlNs10 + "string" + nameSuffixAtLeastOneMemberOf;
+
+	    outerApply = new ApplyType(null, outerList, functionId);
 	}
 
 	return outerApply;
@@ -361,20 +363,25 @@ public class XACML_JAXBUtils {
      * @param algorithm
      * @return
      */
-    public static PolicySet createPolicySet(Target target, String policySetId, String policySetIdReference, String algorithm) {
+    public static PolicySet createPolicySet(
+	    Target target, //
+	    String policySetId, //
+	    String policySetIdReference, //
+	    Policy policy, //
+	    String algorithm) {//
 
 	ArrayList<Serializable> refList = new ArrayList<>();
 
 
-	PPSBuilder ppsBuilder = new PPSBuilder(policySetIdReference);
+//	PPSBuilder ppsBuilder = new PPSBuilder(policySetIdReference);
 
 
-	PPSPolicyBuilder ppsPolicyBuilder = new PPSPolicyBuilder(//
-		policySetIdReference, //
-		StandardCombiningAlgorithm.XACML_3_0_RULE_COMBINING_PERMIT_OVERRIDES.getId());
-
-
-	Policy policy = ppsPolicyBuilder.build();
+//	PPSPolicyBuilder ppsPolicyBuilder = new PPSPolicyBuilder(//
+//		policySetIdReference, //
+//		StandardCombiningAlgorithm.XACML_3_0_RULE_COMBINING_PERMIT_OVERRIDES.getId());
+//
+//
+//	Policy policy = ppsPolicyBuilder.build();
 
 //	IdReferenceType idReferenceType = new IdReferenceType(policySetIdReference, null, null, null);
 //

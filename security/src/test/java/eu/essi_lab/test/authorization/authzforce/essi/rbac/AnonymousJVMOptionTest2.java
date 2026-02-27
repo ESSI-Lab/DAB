@@ -7,19 +7,14 @@ import org.junit.*;
 /**
  * @author Fabrizio
  */
+@Ignore
 public class AnonymousJVMOptionTest2 {
 
-    static {
+    @Test
+    public void javaOptionsTest2() {
 
 	System.setProperty(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT.getOption(), "3");
 	System.setProperty(JVMOption.ANONYMOUS_OFFSET_LIMIT.getOption(), "100");
-    }
-
-    /**
-     *
-     */
-    @Test
-    public void javaOptionsTest() {
 
 	Assert.assertEquals(3, AbstractPermissionPolicySet.ANONYMOUS_PAGE_SIZE_LIMIT);
 

@@ -37,6 +37,8 @@ import oasis.names.tc.xacml._3_0.core.schema.wd_17.Rule;
  */
 public class PPSPolicyBuilder {
 
+    private final String policyId;
+    private final String ruleCombiningAlgorithm;
     private Policy policy;
     private List<Serializable> rulesList;
 
@@ -44,6 +46,9 @@ public class PPSPolicyBuilder {
      * 
      */
     public PPSPolicyBuilder(String policyId, String ruleCombiningAlgorithm) {
+
+	this.policyId = policyId;
+	this.ruleCombiningAlgorithm = ruleCombiningAlgorithm;
 
 	rulesList = new ArrayList<Serializable>();
 
@@ -75,6 +80,19 @@ public class PPSPolicyBuilder {
      * @return
      */
     public Policy build() {
+
+	policy = new Policy(//
+		null, //
+		null, //
+		null, //
+		ObjectFactories.XACML().createTarget(), //
+		rulesList, //
+		null, //
+		null, //
+		policyId, //
+		"1.0", //
+		ruleCombiningAlgorithm, //
+		null); //
 
 	return policy;
     }

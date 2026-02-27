@@ -26,6 +26,7 @@ package eu.essi_lab.authorization.builder;
 
 import java.util.ArrayList;
 
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
 import org.ow2.authzforce.core.pdp.api.value.StandardDatatypes;
 import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
 import org.ow2.authzforce.core.pdp.impl.func.StandardFunction;
@@ -33,9 +34,6 @@ import org.ow2.authzforce.xacml.identifiers.XacmlAttributeCategory;
 import org.ow2.authzforce.xacml.identifiers.XacmlAttributeId;
 
 import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AnyOf;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Target;
 
 /**
  * @author Fabrizio
@@ -51,7 +49,7 @@ public class RPSBuilder {
     /**
      * @return
      */
-    public static PolicySet build(String role) {
+    public static PolicySet build(String role, Policy policy) {
 
 	ArrayList<AnyOf> anyOfList = new ArrayList<AnyOf>();
 
@@ -73,6 +71,7 @@ public class RPSBuilder {
 		target, //
 		"RPS:" + role + ":role", //
 		"PPS:" + role + ":role", //
+		policy, //
 		StandardCombiningAlgorithm.XACML_3_0_POLICY_COMBINING_PERMIT_OVERRIDES.getId());
     }
 }
