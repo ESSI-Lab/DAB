@@ -177,7 +177,7 @@ public class GetFeatureResultSetFormatter extends DiscoveryResultSetFormatter<No
 	    fapt.setFeature(features);
 	    FeatureCollectionType fct = new FeatureCollectionType();
 
-	    fct.setFeatureMembers(members);
+	    fct.setFeatureMembers(members.getValue());
 	    JAXBElement<FeatureCollectionType> fc = factory.createFeatureCollection(fct);
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    JAXBWFS.getInstance().getMarshaller().marshal(fc, baos);

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.profiler.wfs.capabilities;
 
@@ -13,83 +13,42 @@ package eu.essi_lab.profiler.wfs.capabilities;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.ServiceLoader;
-import java.util.Set;
-
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriInfo;
-import jakarta.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
-import org.apache.commons.io.IOUtils;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.ValidationMessage.ValidationResult;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.stats.ComputationResult;
-import eu.essi_lab.messages.stats.ResponseItem;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsResponse;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.index.jaxb.CardinalValues;
-import eu.essi_lab.pdk.handler.DefaultRequestHandler;
-import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.profiler.wfs.JAXBWFS;
-import eu.essi_lab.profiler.wfs.WFSProfilerSetting;
-import eu.essi_lab.profiler.wfs.feature.FeatureType;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
-import eu.essi_lab.jaxb.filter._1_1_0.ComparisonOperatorType;
-import eu.essi_lab.jaxb.filter._1_1_0.ComparisonOperatorsType;
-import eu.essi_lab.jaxb.filter._1_1_0.FilterCapabilities;
-import eu.essi_lab.jaxb.filter._1_1_0.GeometryOperandsType;
-import eu.essi_lab.jaxb.filter._1_1_0.ScalarCapabilitiesType;
-import eu.essi_lab.jaxb.filter._1_1_0.SpatialCapabilitiesType;
-import eu.essi_lab.jaxb.filter._1_1_0.SpatialOperatorNameType;
-import eu.essi_lab.jaxb.filter._1_1_0.SpatialOperatorType;
-import eu.essi_lab.jaxb.filter._1_1_0.SpatialOperatorsType;
-import net.opengis.ows.v_1_0_0.AddressType;
-import net.opengis.ows.v_1_0_0.CodeType;
-import net.opengis.ows.v_1_0_0.ContactType;
-import net.opengis.ows.v_1_0_0.DCP;
-import net.opengis.ows.v_1_0_0.DomainType;
-import net.opengis.ows.v_1_0_0.KeywordsType;
-import net.opengis.ows.v_1_0_0.Operation;
-import net.opengis.ows.v_1_0_0.OperationsMetadata;
-import net.opengis.ows.v_1_0_0.RequestMethodType;
-import net.opengis.ows.v_1_0_0.ResponsiblePartySubsetType;
-import net.opengis.ows.v_1_0_0.ServiceIdentification;
-import net.opengis.ows.v_1_0_0.ServiceProvider;
-import net.opengis.ows.v_1_0_0.WGS84BoundingBoxType;
-import net.opengis.wfs.v_1_1_0.FeatureTypeListType;
-import net.opengis.wfs.v_1_1_0.FeatureTypeType;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.jaxb.filter._1_1_0.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.ValidationMessage.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.stats.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.index.jaxb.*;
+import eu.essi_lab.pdk.handler.*;
+import eu.essi_lab.pdk.wrt.*;
+import eu.essi_lab.profiler.wfs.*;
+import eu.essi_lab.profiler.wfs.feature.*;
+import eu.essi_lab.request.executor.*;
+import jakarta.ws.rs.core.*;
+import jakarta.xml.bind.*;
+import net.opengis.ows.v_1_0_0.*;
+import net.opengis.wfs.v_1_1_0.*;
 import net.opengis.wfs.v_1_1_0.ObjectFactory;
-import net.opengis.wfs.v_1_1_0.OperationsType;
-import net.opengis.wfs.v_1_1_0.WFSCapabilitiesType;
+import org.apache.commons.io.*;
+
+import javax.xml.namespace.*;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author boldrini
@@ -304,7 +263,7 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 		    // "text/javascript", //
 		    "text/xml; subtype=gml/2.1.2", //
 		    "text/xml; subtype=gml/3.2"//
-	    //
+		    //
 	    );
 	    addParameter(feaDtps, "srsName", "EPSG:4326", "EPSG:3857");
 
@@ -416,7 +375,9 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 	    GeometryOperandsType geometricOperands = new GeometryOperandsType();
 	    List<QName> gops = new ArrayList<QName>();
 	    gops.add(new QName("http://www.opengis.net/gml", "Envelope", "gml"));
-	    geometricOperands.setGeometryOperand(gops);
+
+	    gops.forEach(op -> geometricOperands.getGeometryOperand().add(op));
+
 	    spatialCapabilitiesType.setGeometryOperands(geometricOperands);
 
 	    SpatialOperatorsType sotype = new SpatialOperatorsType();
@@ -426,7 +387,7 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 	    sot.setName(SpatialOperatorNameType.BBOX);
 	    sot.setName(SpatialOperatorNameType.CONTAINS);
 	    sots.add(sot);
-	    sotype.setSpatialOperator(sots);
+	    sotype.getSpatialOperator().add(sot);
 	    spatialCapabilitiesType.setSpatialOperators(sotype);
 
 	    filterCapabilities.setSpatialCapabilities(spatialCapabilitiesType);
@@ -441,7 +402,9 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 	    copts.add(ComparisonOperatorType.LESS_THAN_EQUAL_TO);
 	    copts.add(ComparisonOperatorType.LIKE);
 	    copts.add(ComparisonOperatorType.NOT_EQUAL_TO);
-	    comparisonTypes.setComparisonOperator(copts);
+
+	    copts.forEach(op -> comparisonTypes.getComparisonOperator().add(op));
+
 	    scalarCapabilitiesType.setComparisonOperators(comparisonTypes);
 	    // scalarCapabilitiesType.setArithmeticOperators(null)
 	    filterCapabilities.setScalarCapabilities(scalarCapabilitiesType);
@@ -458,7 +421,7 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 
 	} catch (
 
-	Exception e) {
+		Exception e) {
 	    e.printStackTrace();
 	    List<ErrorInfo> error = new ArrayList<>();
 	    ErrorInfo err = new ErrorInfo();
