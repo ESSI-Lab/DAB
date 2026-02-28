@@ -54,7 +54,7 @@ public class PdpEngineBuilder {
 
     private List<PolicySet> rpsList;
     private List<PolicySet> ppsList;
-    private File pdpFile;
+    private static BasePdpEngine basePdpEngine;
 
     /**
      *
@@ -103,11 +103,31 @@ public class PdpEngineBuilder {
      */
     public CloseablePdpEngine build() throws Exception {
 
-	File pdpFile = createPDPFile(createRootPolicySet(), ppsList, rpsList);
+	return build(false);
+    }
 
-	PdpEngineConfiguration conf = PdpEngineConfiguration.getInstance(pdpFile.getAbsolutePath(), null, null);
+    /**
+     * @param reinit
+     * @return
+     * @throws Exception
+     */
+    public CloseablePdpEngine build(boolean reinit) throws Exception {
 
-	return new BasePdpEngine(conf);
+	if (basePdpEngine == null || reinit) {
+
+	    File pdpFile = createPDPFile(createRootPolicySet(), ppsList, rpsList);
+
+	    PdpEngineConfiguration conf = PdpEngineConfiguration.getInstance(pdpFile.getAbsolutePath(), null, null);
+
+	    if (reinit) {
+
+		return new BasePdpEngine(conf);
+	    }
+
+	    basePdpEngine = new BasePdpEngine(conf);
+	}
+
+	return basePdpEngine;
     }
 
     /**

@@ -102,8 +102,6 @@ public class XACMLTest {
 
 	DecisionType decision = wrapper.evaluate();
 
-	System.out.println(decision);
-
 	Assert.assertEquals(expectedType, decision);
 
     }
@@ -111,6 +109,6 @@ public class XACMLTest {
     @After
     public void close() throws IOException {
 
-	wrapper.close();
+//	wrapper.close();
     }
 }

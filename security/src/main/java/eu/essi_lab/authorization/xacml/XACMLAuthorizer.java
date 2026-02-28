@@ -13,63 +13,39 @@ package eu.essi_lab.authorization.xacml;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.authorization.PolicySetWrapper.*;
+import eu.essi_lab.authorization.pps.*;
+import eu.essi_lab.authorization.psloader.*;
+import eu.essi_lab.authorization.rps.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.View.*;
+import eu.essi_lab.messages.view.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.exceptions.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.ow2.authzforce.core.pdp.api.*;
 
-import org.ow2.authzforce.core.pdp.api.CloseablePdpEngine;
-
-import eu.essi_lab.authorization.BasicRole;
-import eu.essi_lab.authorization.DefaultPdpEngineBuilder;
-import eu.essi_lab.authorization.MessageAuthorizer;
-import eu.essi_lab.authorization.PdpEngineBuilder;
-import eu.essi_lab.authorization.PolicySetWrapper.Action;
-import eu.essi_lab.authorization.pps.AbstractGEOSSViewPermissionPolicySet;
-import eu.essi_lab.authorization.pps.AbstractPermissionPolicySet;
-import eu.essi_lab.authorization.pps.GEOSSPrivateWritePermissionPolicySet;
-import eu.essi_lab.authorization.pps.GEOSSReadPermissionPolicySet;
-import eu.essi_lab.authorization.pps.GEOSSWritePermissionPolicySet;
-import eu.essi_lab.authorization.psloader.DefaultPolicySetLoader;
-import eu.essi_lab.authorization.psloader.PolicySetLoader;
-import eu.essi_lab.authorization.rps.GEOSSPrivateWriteRolePolicySet;
-import eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet;
-import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.AccessMessage;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.JVMOption;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.View.ViewVisibility;
-import eu.essi_lab.messages.view.CreateViewMessage;
-import eu.essi_lab.messages.view.DeleteViewMessage;
-import eu.essi_lab.messages.view.ReadViewMessage;
-import eu.essi_lab.messages.view.UpdateViewMessage;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.exceptions.GSException;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
  */
-public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMessage> {
+public class XACMLAuthorizer implements MessageAuthorizer<RequestMessage> {
 
     private PdpEngineWrapper wrapper;
     private StringBuilder logBuilder;
@@ -170,16 +146,6 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	return result;
     }
 
-    @Override
-    public void close() throws IOException {
-
-	// GSLoggerFactory.getLogger(getClass()).debug("Closing STARTED");
-
-	wrapper.close();
-
-	// GSLoggerFactory.getLogger(getClass()).debug("Closing ENDED");
-    }
-
     /**
      * @param pdp
      * @throws Exception
@@ -187,6 +153,14 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
     public void setPdpEngine(CloseablePdpEngine pdp) throws Exception {
 
 	this.wrapper = new PdpEngineWrapper(pdp);
+    }
+
+    /**
+     * @return
+     */
+    public PdpEngineWrapper getWrapper() {
+
+	return wrapper;
     }
 
     /**
@@ -199,23 +173,15 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	Action action = null;
 
-	if (role.equals(GEOSSReadRolePolicySet.ROLE)) {
+	AbstractGEOSSViewPermissionPolicySet pps = null;
 
-	    GEOSSReadPermissionPolicySet pps = new GEOSSReadPermissionPolicySet();
-
-	    reinitWrapper(message, pps);
+	switch (role) {
+	case GEOSSReadRolePolicySet.ROLE -> pps = new GEOSSReadPermissionPolicySet();
+	case GEOSSPrivateWriteRolePolicySet.ROLE -> pps = new GEOSSPrivateWritePermissionPolicySet();
+	case GEOSSWriteRolePolicySet.ROLE -> pps = new GEOSSWritePermissionPolicySet();
 	}
 
-	if (role.equals(GEOSSPrivateWriteRolePolicySet.ROLE)) {
-
-	    GEOSSPrivateWritePermissionPolicySet pps = new GEOSSPrivateWritePermissionPolicySet();
-
-	    reinitWrapper(message, pps);
-	}
-
-	if (role.equals(GEOSSWriteRolePolicySet.ROLE)) {
-
-	    GEOSSWritePermissionPolicySet pps = new GEOSSWritePermissionPolicySet();
+	if (pps != null) {
 
 	    reinitWrapper(message, pps);
 	}
@@ -423,7 +389,7 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 	builder.addPolicies(loader);
 
 	try {
-	    wrapper = new PdpEngineWrapper(builder.build());
+	    wrapper = new PdpEngineWrapper(builder.build(true));
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 	}
@@ -447,4 +413,5 @@ public class XACMLAuthorizer implements Closeable, MessageAuthorizer<RequestMess
 
 	return decision == DecisionType.PERMIT;
     }
+
 }

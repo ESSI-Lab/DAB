@@ -357,6 +357,6 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
 
 	builder.addPolicies(loader);
 
-	return new PdpEngineWrapper(builder.build());
+	return new PdpEngineWrapper(builder.build(true));
     }
 }

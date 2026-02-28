@@ -54,8 +54,6 @@ public abstract class AbstractAuthorizedExecutor {
 
 	    authorized = authorizer.isAuthorized(message);
 
-	    authorizer.close();
-
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
