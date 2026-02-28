@@ -38,6 +38,7 @@
 		<module>jaxb-classes-jaxb2-basics-runtime-1.1.11</module>
         <module>jaxb-classes-wfs-v_1_1_0-2.6.1</module>
         <module>jaxb-classes-ows-v_1_0_0-3.0.0</module>
+        <module>jaxb-classes-gml-v_3_1_1-2.6.1</module>
     </modules>
 	
 </project>
