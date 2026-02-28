@@ -292,7 +292,7 @@
 
         <!-- Javax mail -->
         <!-- Relocated to Jakarta Mail API -->
-        <javax.mail-api.version>2.1.5</javax.mail-api.version>
+        <jakarta.mail-api.version>2.1.5</jakarta.mail-api.version>
 
         <!-- Jfree chart -->
         <jfreechart.version>1.5.4</jfreechart.version>
@@ -375,19 +375,10 @@
 
         <!-- JAXB and schemas -->
         <org.jvnet.ogc.version>2.6.1</org.jvnet.ogc.version>
-        <org.jvnet.ogc-gml-v_3_2_1.version>2.4.0</org.jvnet.ogc-gml-v_3_2_1.version>
-        <org.jvnet.ogc-iso19139-v_20060504.version>2.6.1</org.jvnet.ogc-iso19139-v_20060504.version>
-
-
-        <org.hisrc.w3c-xlink-v_1_0.version>1.3.0</org.hisrc.w3c-xlink-v_1_0.version>
-
-
-        <org.ogc-schemas-wfs-v_1_1_0.version>3.0.0</org.ogc-schemas-wfs-v_1_1_0.version>
 
         <org.jvnet.jaxb2_commons.version>1.11.1</org.jvnet.jaxb2_commons.version>
 
         <xlink.version>3.0.1</xlink.version>
-
 
         <!-- JAXB API and JAXB impl (commented Jakarta EE 9 dep)-->
         <jaxb-api.version>4.0.5</jaxb-api.version>
@@ -848,71 +839,26 @@
                 <version>${jaxb-api.version}</version>
             </dependency>
 
-            <!--
-           <dependency>
-               <groupId>com.sun.xml.bind</groupId>
-               <artifactId>jaxb-impl</artifactId>
-               <version>${jaxb-impl.version}</version>
-           </dependency>
-
-           <dependency>
-               <groupId>com.sun.xml.bind</groupId>
-               <artifactId>jaxb-core</artifactId>
-               <version>${jaxb-core.version}</version>
-           </dependency>
-
-           <dependency>
-               <groupId>javax.mail</groupId>
-               <artifactId>javax.mail-api</artifactId>
-               <version>${javax.mail-api.version}</version>
-           </dependency>
-           -->
 
             <dependency>
                 <groupId>jakarta.mail</groupId>
                 <artifactId>jakarta.mail-api</artifactId>
-                <version>${javax.mail-api.version}</version>
+                <version>${jakarta.mail-api.version}</version>
             </dependency>
-
-
-            <!--
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${java.servlet-api.version}</version>
-                <scope>provided</scope>
-            </dependency>
-            -->
-
+            
             <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>${java.servlet-api.version}</version>
                 <scope>provided</scope>
             </dependency>
-
-            <!--
-            <dependency>
-                <groupId>javax.xml.ws</groupId>
-                <artifactId>jaxws-api</artifactId>
-                <version>${jax-ws-api.version}</version>
-            </dependency>
-            -->
-
+            
             <dependency>
                 <groupId>jakarta.xml.ws</groupId>
                 <artifactId>jakarta.xml.ws-api</artifactId>
                 <version>${jax-ws-api.version}</version>
             </dependency>
-
-            <!--
-            <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>${jax-ws-rs-api.version}</version>
-            </dependency>
-            -->
-
+            
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
@@ -1454,25 +1400,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-math3</artifactId>
                 <version>${org.apache.commons-commons-math.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>gml-v_3_2_1</artifactId>
-                <version>${org.jvnet.ogc-gml-v_3_2_1.version}</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>org.hisrc.w3c</groupId>
-                <artifactId>xlink-v_1_0</artifactId>
-                <version>${org.hisrc.w3c-xlink-v_1_0.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.ogc-schemas</groupId>
-                <artifactId>wfs-v_1_1_0</artifactId>
-                <version>${org.ogc-schemas-wfs-v_1_1_0.version}</version>
             </dependency>
 
             <dependency>

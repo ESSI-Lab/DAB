@@ -13,8 +13,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.IOUtils;
