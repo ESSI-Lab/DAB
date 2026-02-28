@@ -39,9 +39,10 @@
         </dependency>
 
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>wfs-v_1_1_0</artifactId>
-		</dependency>	
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-wfs-v_1_1_0-2.6.1</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
             
       	<dependency>
             <groupId>org.eclipse.rdf4j</groupId>

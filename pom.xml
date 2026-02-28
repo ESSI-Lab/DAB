@@ -379,10 +379,7 @@
         <org.jvnet.ogc-iso19139-v_20060504.version>2.6.1</org.jvnet.ogc-iso19139-v_20060504.version>
 
 
-
-
         <org.hisrc.w3c-xlink-v_1_0.version>1.3.0</org.hisrc.w3c-xlink-v_1_0.version>
-
 
 
         <org.ogc-schemas-wfs-v_1_1_0.version>3.0.0</org.ogc-schemas-wfs-v_1_1_0.version>
@@ -1072,12 +1069,6 @@
             <dependency>
                 <groupId>org.jvnet.ogc</groupId>
                 <artifactId>waterml-v_2_0</artifactId>
-                <version>${org.jvnet.ogc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>wfs-v_1_1_0</artifactId>
                 <version>${org.jvnet.ogc.version}</version>
             </dependency>
 

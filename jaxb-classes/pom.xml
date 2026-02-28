@@ -36,6 +36,7 @@
 		<module>jaxb-classes-w3c-xlink-v_1_0-1.3.0</module>
 		<module>jaxb-classes-gml-v_3_2_0-2.6.1</module>
 		<module>jaxb-classes-jaxb2-basics-runtime-1.1.11</module>
-	</modules>
+        <module>jaxb-classes-wfs-v_1_1_0-2.6.1</module>
+    </modules>
 	
 </project>
