@@ -21,7 +21,7 @@ package eu.essi_lab.profiler.wfs;
  * #L%
  */
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 public class JAXBWFSPrefixMapper extends NamespacePrefixMapper {
 

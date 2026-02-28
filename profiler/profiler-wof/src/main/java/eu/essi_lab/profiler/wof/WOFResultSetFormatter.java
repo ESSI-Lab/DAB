@@ -33,7 +33,7 @@ import jakarta.xml.bind.Marshaller;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.cuahsi.waterml._1.essi.JAXBWML;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 import eu.essi_lab.lib.xml.NameSpace;
 import eu.essi_lab.lib.xml.XMLStreamWriterUtils;

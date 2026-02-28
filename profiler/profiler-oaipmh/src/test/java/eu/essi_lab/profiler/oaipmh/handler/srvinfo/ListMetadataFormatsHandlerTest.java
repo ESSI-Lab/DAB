@@ -10,7 +10,7 @@ import jakarta.xml.bind.Marshaller;
 
 import org.junit.Test;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 import eu.essi_lab.jaxb.common.CommonContext;
 import eu.essi_lab.jaxb.common.schemas.CommonSchemas;
