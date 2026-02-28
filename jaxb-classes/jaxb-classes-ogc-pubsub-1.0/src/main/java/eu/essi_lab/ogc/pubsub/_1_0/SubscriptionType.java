@@ -38,7 +38,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
 
-import net.opengis.gml.v_3_2_1.TimeInstantType;
+import net.opengis.gml.v_3_2_0.TimeInstantType;
 
 
 /**
