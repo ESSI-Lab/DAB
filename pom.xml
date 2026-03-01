@@ -1020,12 +1020,6 @@
 
             <dependency>
                 <groupId>org.jvnet.ogc</groupId>
-                <artifactId>sensorML-v_2_0</artifactId>
-                <version>${org.jvnet.ogc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
                 <artifactId>sos-v_2_0</artifactId>
                 <version>${org.jvnet.ogc.version}</version>
             </dependency>

@@ -40,6 +40,8 @@
         <module>jaxb-classes-ows-v_1_0_0-3.0.0</module>
         <module>jaxb-classes-gml-v_3_1_1-2.6.1</module>
 		<module>jaxb-classes-filter-v_1_1_0-3.0.0</module>
+		<module>jaxb-classes-sensorML-v_2_0-2.6.1</module>
+		<module>jaxb-classes-sweCommon-v_2_0-2.6.1</module>
 	</modules>
 	
 </project>
