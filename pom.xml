@@ -174,18 +174,16 @@
         <cxf.version>4.2.0</cxf.version>
 
         <!-- JAX WS RS API-->
-        <jax-ws-rs-api.version>4.0.0</jax-ws-rs-api.version>
+        <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
 
-        <!-- JAX WS API (commented Jakarta EE 9 dep) -->
-        <!-- <jakarta.xml.ws-api.version>4.0.1</jakarta.xml.ws-api.version > -->
-        <jax-ws-api.version>4.0.3</jax-ws-api.version>
+        <!-- JAX WS API -->
+        <jakarta.xml.ws-api.version>4.0.3</jakarta.xml.ws-api.version>
 
         <!-- JAX XML SOAP API-->
         <jax-xml-soap-api.version>1.4.0</jax-xml-soap-api.version>
 
-        <!-- JAVA Servlet API (commented Jakarta EE 9 dep) -->
-        <!-- <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version> -->
-        <java.servlet-api.version>6.1.0</java.servlet-api.version>
+        <!-- JAVA Servlet API -->
+        <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
 
         <!-- Google Sheets API -->
         <google-api-services-sheets.version>v4-rev20240416-2.0.0</google-api-services-sheets.version>
@@ -243,10 +241,7 @@
         <!-- AWS Common Runtime Libraries -->
         <aws-crt.version>0.34.0</aws-crt.version>
 
-        <!-- S3 Transfer Manager -->
-        <!--s3-transfer-manager.version>2.29.46</s3-transfer-manager.version-->
-
-        <!-- Authzforce (to update it, some code changes are required) -->
+        <!-- Authzforce -->
         <authzforce.version>21.0.1</authzforce.version>
 
         <!-- Cloud Localstack  -->
@@ -290,8 +285,7 @@
         <!-- Apache Kafka Clients VULN-UPDATE 2026 -->
         <kafka-clients.version>4.2.0</kafka-clients.version>
 
-        <!-- Javax mail -->
-        <!-- Relocated to Jakarta Mail API -->
+        <!-- Jakarta mail -->
         <jakarta.mail-api.version>2.1.5</jakarta.mail-api.version>
 
         <!-- Jfree chart -->
@@ -366,7 +360,7 @@
         <log4j.version>2.25.3</log4j.version>
 
         <!-- Mockito -->
-        <mockito.version>5.2.0</mockito.version>
+        <mockito.version>5.22.0</mockito.version>
 
         <!-- GDAL -->
         <org.gdal.version>2.1.0</org.gdal.version>
@@ -380,32 +374,10 @@
 
         <xlink.version>3.0.1</xlink.version>
 
-        <!-- JAXB API and JAXB impl (commented Jakarta EE 9 dep)-->
-        <jaxb-api.version>4.0.5</jaxb-api.version>
-
+        <!-- JAXB API and JAXB impl -->
+        <jakarta.xml.bind-api.version>4.0.5</jakarta.xml.bind-api.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
-
-        <!--
-        <jaxb-impl.version>4.0.5</jaxb-impl.version>
-        <jaxb-core.version>4.0.5</jaxb-core.version>
-        -->
-
-        <!-- Jacoco -->
-        <jacoco.version>0.8.11</jacoco.version>
-        <jacoco.outputDir>${project.build.directory}/target</jacoco.outputDir>
-        <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
-        <essi.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</essi.jacoco.reportPath>
-        <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
-        <essi.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</essi.jacoco.itReportPath>
-        <jacoco.plugin.version>0.8.7</jacoco.plugin.version>
-        <org.sonarsource.java-sonar-jacoco-listeners.version>3.8</org.sonarsource.java-sonar-jacoco-listeners.version>
-
-        <!-- Docker images -->
-        <mySQLDocker.registry>mysql:9.5.0</mySQLDocker.registry>
-        <docker.elasticsearch>opensearchproject/opensearch:1.3.5</docker.elasticsearch>
-        <docker.keycloak>keycloak/keycloak:26.4.1</docker.keycloak>
-        <docker.redis>redis:8.2.2</docker.redis>
-
+        
         <!-- Apache Parquet VULN-UPDATE FEB-2026-->
         <apache.parquet.version>1.17.0</apache.parquet.version>
 
@@ -472,6 +444,23 @@
             --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
             --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp.datatype=ALL-UNNAMED
         </surefire.arglineopen>
+
+        <!-- Jacoco -->
+        <jacoco.version>0.8.11</jacoco.version>
+        <jacoco.outputDir>${project.build.directory}/target</jacoco.outputDir>
+        <jacoco.out.ut.file>jacoco-ut.exec</jacoco.out.ut.file>
+        <essi.jacoco.reportPath>${jacoco.outputDir}/${jacoco.out.ut.file}</essi.jacoco.reportPath>
+        <jacoco.out.it.file>jacoco-it.exec</jacoco.out.it.file>
+        <essi.jacoco.itReportPath>${jacoco.outputDir}/${jacoco.out.it.file}</essi.jacoco.itReportPath>
+        <jacoco.plugin.version>0.8.7</jacoco.plugin.version>
+        <org.sonarsource.java-sonar-jacoco-listeners.version>3.8</org.sonarsource.java-sonar-jacoco-listeners.version>
+
+        <!-- Docker images -->
+        <mySQLDocker.registry>mysql:9.5.0</mySQLDocker.registry>
+        <docker.elasticsearch>opensearchproject/opensearch:1.3.5</docker.elasticsearch>
+        <docker.keycloak>keycloak/keycloak:26.4.1</docker.keycloak>
+        <docker.redis>redis:8.2.2</docker.redis>
+        
     </properties>
 
     <dependencyManagement>
@@ -836,7 +825,7 @@
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>${jaxb-api.version}</version>
+                <version>${jakarta.xml.bind-api.version}</version>
             </dependency>
 
 
@@ -845,24 +834,24 @@
                 <artifactId>jakarta.mail-api</artifactId>
                 <version>${jakarta.mail-api.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
-                <version>${java.servlet-api.version}</version>
+                <version>${jakarta.servlet-api.version}</version>
                 <scope>provided</scope>
             </dependency>
-            
+
             <dependency>
                 <groupId>jakarta.xml.ws</groupId>
                 <artifactId>jakarta.xml.ws-api</artifactId>
-                <version>${jax-ws-api.version}</version>
+                <version>${jakarta.xml.ws-api.version}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>jakarta.ws.rs</groupId>
                 <artifactId>jakarta.ws.rs-api</artifactId>
-                <version>${jax-ws-rs-api.version}</version>
+                <version>${jakarta.ws.rs-api.version}</version>
             </dependency>
 
             <dependency>
@@ -1010,18 +999,6 @@
                 <groupId>org.jvnet.jaxb2_commons</groupId>
                 <artifactId>jaxb2-basics</artifactId>
                 <version>${org.jvnet.jaxb2_commons.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>waterml-v_2_0</artifactId>
-                <version>${org.jvnet.ogc.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jvnet.ogc</groupId>
-                <artifactId>sos-v_2_0</artifactId>
-                <version>${org.jvnet.ogc.version}</version>
             </dependency>
 
             <dependency>
@@ -1270,12 +1247,6 @@
                 <version>${authzforce.version}</version>
             </dependency>
 
-            <!--<dependency>
-                <groupId>org.ow2.authzforce</groupId>
-                <artifactId>authzforce-ce-xacml-model</artifactId>
-                <version>${authzforce.version}</version>
-            </dependency>-->
-
             <!-- https://mvnrepository.com/artifact/com.vaadin/vaadin-bom -->
             <dependency>
                 <groupId>com.vaadin</groupId>
@@ -1301,14 +1272,6 @@
                         <groupId>javax.validation</groupId>
                         <artifactId>validation-api</artifactId>
                     </exclusion>
-
-                    <!--
-                    <exclusion>
-                        <groupId>com.vaadin</groupId>
-                        <artifactId>license-checker</artifactId>
-                    </exclusion>
-                    -->
-
                 </exclusions>
             </dependency>
 
@@ -1455,7 +1418,6 @@
 
     <dependencies>
 
-
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
@@ -1471,28 +1433,10 @@
             <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-        -->
 
         <dependency>
             <groupId>junit</groupId>
@@ -1503,13 +1447,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
             <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
