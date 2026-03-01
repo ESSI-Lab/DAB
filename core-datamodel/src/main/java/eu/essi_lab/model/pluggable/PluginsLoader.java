@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
+import java.nio.charset.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,10 +69,7 @@ public class PluginsLoader<T extends Pluggable> {
 	    return;
 	}
 	String pluginPath = null;
-	try {
-	    pluginPath = URLDecoder.decode(pluginUrl.getPath(), "UTF-8");
-	} catch (UnsupportedEncodingException e) {
-	}
+	pluginPath = URLDecoder.decode(pluginUrl.getPath(), StandardCharsets.UTF_8);
 
 	File pluginFile = new File(pluginPath);
 	pluginsFolder = new File(pluginFile.getParent());
@@ -101,10 +99,10 @@ public class PluginsLoader<T extends Pluggable> {
 	if (pluginsFolder != null) {
 	    File[] listFiles = pluginsFolder.listFiles();
 	    if (listFiles != null) {
-		newPlugins = Arrays.asList(pluginsFolder.listFiles()).//
-			stream().//
+		//
+		newPlugins = Arrays.stream(pluginsFolder.listFiles()).//
 			filter(file -> file.getPath().toLowerCase().endsWith(".jar")).//
-			map(file -> toURL(file)).//
+			map(this::toURL).//
 			filter(Objects::nonNull).//
 			collect(Collectors.toList());
 	    }
@@ -113,6 +111,7 @@ public class PluginsLoader<T extends Pluggable> {
 	URLClassLoader ucl = new URLClassLoader(//
 		newPlugins.toArray(new URL[] {}), //
 		Thread.currentThread().getContextClassLoader());
+
 	ServiceLoader<T> loader = ServiceLoader.load(type, ucl);
 
 	ArrayList<T> out = new ArrayList<T>();

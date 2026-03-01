@@ -1,55 +1,18 @@
 package eu.essi_lab.gssrv.servlet.wmscache;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
-
-import com.amazonaws.util.IOUtils;
-
-import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.gssrv.rest.ESSIProfilerService;
-import eu.essi_lab.gssrv.rest.SimpleHttpServletRequest;
-import eu.essi_lab.gssrv.rest.SimpleUriInfo;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import com.amazonaws.util.*;
+import eu.essi_lab.authorization.userfinder.*;
+import eu.essi_lab.gssrv.rest.*;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.auth.GSUser;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.auth.*;
+import jakarta.ws.rs.core.*;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.Map.*;
 
 public class WMSCache {
 
@@ -127,7 +90,6 @@ public class WMSCache {
 	    storage.putCachedResponse(view, layer, hash, tmpFile);
 	    tmpFile.delete();
 	} catch (Exception e) {
-	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
@@ -137,7 +99,7 @@ public class WMSCache {
 	Optional<String> qs = request.getOptionalQueryString();
 	Optional<String> optionalView = request.extractViewId();
 	String fullUrl = request.getServletRequest().getRequestURL()
-		.append(request.getQueryString() != null ? "?" + request.getQueryString() : "").toString();
+		.append(request.getOptionalQueryString().isPresent() ? "?" + request.getOptionalQueryString().get() : "").toString();
 	String view = null;
 	if (optionalView.isPresent()) {
 	    view = optionalView.get();
@@ -183,8 +145,19 @@ public class WMSCache {
 			String request = stats.loadRequest(view, layer, hash);
 			GSLoggerFactory.getLogger(getClass()).info("Refreshing " + hash + " " + value);
 
-			URL oldUrl = new URL(request);
-			URL url = new URL(oldUrl.getProtocol(), CACHE_HOST, oldUrl.getPort(), oldUrl.getFile());
+			URI oldUri = new URI(request);
+
+			URI newUri = new URI( //
+				oldUri.getScheme(),//
+				oldUri.getUserInfo(),//
+				CACHE_HOST,//
+				oldUri.getPort(),//
+				oldUri.getPath(),//
+				oldUri.getQuery(),//
+				oldUri.getFragment()//
+			);
+
+			URL url = newUri.toURL();
 
 			String path = url.getPath();
 			if (path.endsWith("/")) {
@@ -260,9 +233,9 @@ public class WMSCache {
     public void initRedisS3(String redisHostname, String s3hostName, String s3Username, String s3Password, String s3Bucket) {
 	URL url;
 	try {
-	    url = new URL(redisHostname);
-	} catch (MalformedURLException e) {
-	    e.printStackTrace();
+	    url = new URI(redisHostname).toURL();
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return;
 	}
 	if (stats == null) {

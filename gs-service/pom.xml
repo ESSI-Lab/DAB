@@ -19,6 +19,7 @@
 
 		<jetty.port>9090</jetty.port>
 		<jetty.stop_port>9091</jetty.stop_port>
+		<jetty.version>11.0.20</jetty.version>
 
 		<contextPath>gs-service</contextPath>
 
@@ -28,7 +29,6 @@
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<build.timestamp>${maven.build.timestamp}</build.timestamp>
     	<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ssZ</maven.build.timestamp.format>
-		<jetty.version>11.0.20</jetty.version>
 		<configuration.url />
 	    <maven.compiler.source>21</maven.compiler.source>
 		<maven.compiler.target>21</maven.compiler.target>
@@ -140,11 +140,9 @@
 					<stopPort>${jetty.stop_port}</stopPort>
 					<stopKey>stop</stopKey>
 
-
 					<httpConnector>
 						<port>${jetty.port}</port>
 					</httpConnector>
-
 
 					<webApp>
 						<contextPath>/${contextPath}</contextPath>
