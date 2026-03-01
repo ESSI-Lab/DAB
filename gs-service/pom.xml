@@ -141,27 +141,23 @@
 
 					<stopPort>${jetty.stop_port}</stopPort>
 					<stopKey>stop</stopKey>
-					<webAppConfig>
+
+					<webApp>
 						<contextPath>/${contextPath}</contextPath>
 
-						<webInfIncludeJarPattern>
-							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</webInfIncludeJarPattern>
-						<containerIncludeJarPattern>
-							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$|.*/togglebutton-[^/]*\.jar$|.*/multiselect-combo-box-flow-[^/]*\.jar$</containerIncludeJarPattern>
-
-						<!-- Use war output directory to get the webpack files -->
 						<allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-						
-					</webAppConfig>
 
-					<useTestClasspath>false</useTestClasspath>
-					<dumpOnStart>false</dumpOnStart>
+						<webInfIncludeJarPattern>
+							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$
+						</webInfIncludeJarPattern>
 
-					<scanIntervalSeconds>0</scanIntervalSeconds>
-					<jettyXml>
-						${project.basedir}/src/main/webapp/WEB-INF/jetty.xml,
-						${project.basedir}/src/main/webapp/WEB-INF/jetty-http.xml
-					</jettyXml>
+						<containerIncludeJarPattern>
+							.*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$
+						</containerIncludeJarPattern>
+
+					</webApp>
+
+					<scan>0</scan>
 	  				
 	  				<!-- Remove comment to disable set to false the property 'useFileMappedBuffer' -->
      				<contextXml>${project.basedir}/src/main/webapp/WEB-INF/jetty-config.xml</contextXml>
@@ -218,7 +214,7 @@
 						</resource>
 
 						<resource>
-							<directory>target/frontend</directory>
+							<directory>${basedir}/frontend</directory>
 							<targetPath>frontend</targetPath>
 						</resource>
 				
