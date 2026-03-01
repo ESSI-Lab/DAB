@@ -20,7 +20,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>jaxb-classes-gml-v_3_1_1-2.6.1</artifactId>
+			<artifactId>jaxb-classes-gml-v_3_2_0-2.6.1</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>

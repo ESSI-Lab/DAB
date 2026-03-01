@@ -47,8 +47,8 @@ import eu.essi_lab.profiler.pubsub.PubSubRequestParser.PubSubRequestParam;
 import eu.essi_lab.profiler.pubsub.Subscription;
 import eu.essi_lab.profiler.pubsub.handler.SubscriptionsHandler;
 import eu.essi_lab.profiler.pubsub.handler.csw.CSWSubscribeHandler.PublicationType;
-import net.opengis.gml.v_3_2_1.TimeInstantType;
-import net.opengis.gml.v_3_2_1.TimePositionType;
+import net.opengis.gml.v_3_2_0.TimeInstantType;
+import net.opengis.gml.v_3_2_0.TimePositionType;
 
 /**
  * @author Fabrizio

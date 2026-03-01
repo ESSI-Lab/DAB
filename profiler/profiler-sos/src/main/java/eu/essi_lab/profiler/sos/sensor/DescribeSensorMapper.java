@@ -192,7 +192,7 @@ public class DescribeSensorMapper extends DiscoveryResultSetMapper<String> {
 	    net.opengis.sensorml.v_2_0.ObjectFactory sensorFactory = new net.opengis.sensorml.v_2_0.ObjectFactory();
 
 	    PhysicalSystemType pst = new PhysicalSystemType();
-	    net.opengis.gml.v_3_2_1.CodeWithAuthorityType psIdentifier = new net.opengis.gml.v_3_2_1.CodeWithAuthorityType();
+	    net.opengis.gml.v_3_2_0.CodeWithAuthorityType psIdentifier = new net.opengis.gml.v_3_2_0.CodeWithAuthorityType();
 	    psIdentifier.setValue(procedureId);
 	    pst.setIdentifier(psIdentifier);
 
@@ -261,7 +261,7 @@ public class DescribeSensorMapper extends DiscoveryResultSetMapper<String> {
 	    flt.setDefinition("http://www.opengis.net/def/featureOfInterest/identifier");
 	    flt.setLabel("featuresOfInterest");
 
-	    net.opengis.gml.v_3_2_1.FeaturePropertyType fpt = new net.opengis.gml.v_3_2_1.FeaturePropertyType();
+	    net.opengis.gml.v_3_2_0.FeaturePropertyType fpt = new net.opengis.gml.v_3_2_0.FeaturePropertyType();
 	    fpt.setHref(platformCode);
 	    fpt.setTitle(platformName);
 	    flt.getFeature().add(fpt);
@@ -330,8 +330,8 @@ public class DescribeSensorMapper extends DiscoveryResultSetMapper<String> {
 
 	    if (object instanceof JAXBElement) {
 		JAXBElement<?> jaxb = (JAXBElement) object;
-		if (jaxb.getValue() instanceof net.opengis.gml.v_3_2_1.TimePeriodType) {
-		    net.opengis.gml.v_3_2_1.TimePeriodType gtpt = (net.opengis.gml.v_3_2_1.TimePeriodType) jaxb.getValue();
+		if (jaxb.getValue() instanceof net.opengis.gml.v_3_2_0.TimePeriodType) {
+		    net.opengis.gml.v_3_2_0.TimePeriodType gtpt = (net.opengis.gml.v_3_2_0.TimePeriodType) jaxb.getValue();
 		    validTime.setTimePeriod(gtpt);
 		}
 	    }
