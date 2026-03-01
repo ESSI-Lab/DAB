@@ -21,15 +21,21 @@ package eu.essi_lab.downloader.hiscentral;
  * #L%
  */
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -74,6 +80,9 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 
     private static final String HISCENTRAL_LIGURIA_DOWNLOAD_ERROR = "HISCENTRAL_LIGURIA_DOWNLOAD_ERROR";
+
+    /** Max lines per chunk for external sort (bounded memory). */
+    private static final int EXTERNAL_SORT_CHUNK_SIZE = 50_000;
 
     private HISCentralLiguriaConnector connector;
     private Downloader downloader;
@@ -206,7 +215,18 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 
 	    }
 	    // if (streamResp != null) {
-	    try (InputStream cachedStream = new FileInputStream(tempFile)) {
+	File sortedFile = null;
+	try {
+	    sortedFile = File.createTempFile(getClass().getSimpleName() + "_sorted", ".json");
+	    sortedFile.deleteOnExit();
+	    sortJsonArrayByDtrf(tempFile, sortedFile);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Failed to sort observations by time: " + e.getMessage());
+	    throw GSException.createException(getClass(), e.getMessage(), null,
+		    ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_ERROR, HISCENTRAL_LIGURIA_DOWNLOAD_ERROR);
+	}
+	File fileToParse = sortedFile != null ? sortedFile : tempFile;
+	try (InputStream cachedStream = new FileInputStream(fileToParse)) {
 
 		JSONArrayStreamParser parser = new JSONArrayStreamParser();
 
@@ -283,12 +303,12 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 
 	    }
 
-	    // Now it is safe to delete the file
+	    // Now it is safe to delete the temp files
 	    if (tempFile != null && tempFile.exists()) {
-		boolean deleted = tempFile.delete();
-		if (!deleted) {
-		    GSLoggerFactory.getLogger(getClass()).debug("Could not delete temp file: " + tempFile.getAbsolutePath());
-		}
+		tempFile.delete();
+	    }
+	    if (sortedFile != null && sortedFile.exists()) {
+		sortedFile.delete();
 	    }
 
 	    return template.getDataFile();
@@ -309,6 +329,184 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 		ErrorInfo.SEVERITY_ERROR, //
 		HISCENTRAL_LIGURIA_DOWNLOAD_ERROR);
 
+    }
+
+    /**
+     * Produces a second file with the same JSON array structure but observations
+     * sorted by DTRF (oldest to newest). Uses external sort to avoid loading the
+     * whole file in memory.
+     *
+     * @param inputJsonArray  file containing a JSON array of objects with DTRF
+     * @param outputSortedJsonArray output file (same structure, sorted by DTRF)
+     */
+    private void sortJsonArrayByDtrf(File inputJsonArray, File outputSortedJsonArray) throws Exception {
+	File linesFile = File.createTempFile(getClass().getSimpleName() + "_lines", ".txt");
+	linesFile.deleteOnExit();
+	List<File> runFiles = new ArrayList<>();
+	try {
+	    // 1) Stream input: one object at a time, write "DTRF\tJSON" per line
+	    try (InputStream is = new FileInputStream(inputJsonArray);
+		    BufferedWriter lineWriter = new BufferedWriter(
+			    new FileWriter(linesFile, StandardCharsets.UTF_8))) {
+		JSONArrayStreamParser parser = new JSONArrayStreamParser();
+		parser.parse(is, new JSONArrayStreamParserListener() {
+		    @Override
+		    public void notifyJSONObject(JSONObject object) {
+			try {
+			    String dtrf = object.optString("DTRF", "");
+			    lineWriter.write(dtrf);
+			    lineWriter.write('\t');
+			    lineWriter.write(object.toString());
+			    lineWriter.newLine();
+			} catch (IOException e) {
+			    throw new RuntimeException(e);
+			}
+		    }
+
+		    @Override
+		    public void finished() {}
+
+		    @Override
+		    public void notifyJSONArray(JSONArray object) {}
+		});
+	    }
+
+	    // 2) External sort: read in chunks, sort by DTRF, write runs
+	    List<String> chunk = new ArrayList<>(EXTERNAL_SORT_CHUNK_SIZE);
+	    try (BufferedReader reader = new BufferedReader(
+		    new FileReader(linesFile, StandardCharsets.UTF_8))) {
+		String line;
+		while ((line = reader.readLine()) != null) {
+		    chunk.add(line);
+		    if (chunk.size() >= EXTERNAL_SORT_CHUNK_SIZE) {
+			runFiles.add(sortChunkAndWriteRun(chunk));
+			chunk.clear();
+		    }
+		}
+		if (!chunk.isEmpty()) {
+		    runFiles.add(sortChunkAndWriteRun(chunk));
+		}
+	    }
+
+	    // 3) Build sorted JSON array: merge runs then write output, or write "[]" if empty
+	    if (runFiles.isEmpty()) {
+		try (BufferedWriter out = new BufferedWriter(
+			new FileWriter(outputSortedJsonArray, StandardCharsets.UTF_8))) {
+		    out.write("[]");
+		}
+		return;
+	    }
+
+	    File mergedFile = File.createTempFile(getClass().getSimpleName() + "_merged", ".txt");
+	    mergedFile.deleteOnExit();
+	    try {
+		mergeRunFiles(runFiles, mergedFile);
+
+		// 4) Write final JSON array from merged lines (strip DTRF prefix)
+		try (BufferedReader merged = new BufferedReader(
+			new FileReader(mergedFile, StandardCharsets.UTF_8));
+			BufferedWriter out = new BufferedWriter(
+				new FileWriter(outputSortedJsonArray, StandardCharsets.UTF_8))) {
+		    out.write('[');
+		    String line;
+		    boolean first = true;
+		    while ((line = merged.readLine()) != null) {
+			int tab = line.indexOf('\t');
+			String json = tab >= 0 ? line.substring(tab + 1) : line;
+			if (!first) {
+			    out.write(',');
+			}
+			out.newLine();
+			out.write(json);
+			first = false;
+		    }
+		    if (first) {
+			out.newLine();
+		    }
+		    out.write(']');
+		}
+	    } finally {
+		mergedFile.delete();
+	    }
+	} finally {
+	    linesFile.delete();
+	    for (File run : runFiles) {
+		run.delete();
+	    }
+	}
+    }
+
+    private File sortChunkAndWriteRun(List<String> chunk) throws IOException {
+	chunk.sort(Comparator.comparing(line -> {
+	    int t = line.indexOf('\t');
+	    return t >= 0 ? line.substring(0, t) : line;
+	}));
+	File run = File.createTempFile(getClass().getSimpleName() + "_run", ".txt");
+	run.deleteOnExit();
+	try (BufferedWriter w = new BufferedWriter(new FileWriter(run, StandardCharsets.UTF_8))) {
+	    for (String line : chunk) {
+		w.write(line);
+		w.newLine();
+	    }
+	}
+	return run;
+    }
+
+    private void mergeRunFiles(List<File> runFiles, File mergedFile) throws IOException {
+	class RunReader {
+	    final BufferedReader reader;
+	    String dtrf;
+	    String line;
+
+	    RunReader(File f) throws IOException {
+		this.reader = new BufferedReader(new FileReader(f, StandardCharsets.UTF_8));
+		this.line = reader.readLine();
+		this.dtrf = line != null ? (line.indexOf('\t') >= 0 ? line.substring(0, line.indexOf('\t')) : line) : null;
+	    }
+
+	    boolean hasNext() {
+		return line != null;
+	    }
+
+	    void advance() throws IOException {
+		line = reader.readLine();
+		dtrf = line != null ? (line.indexOf('\t') >= 0 ? line.substring(0, line.indexOf('\t')) : line) : null;
+	    }
+	}
+	List<RunReader> readers = new ArrayList<>();
+	try {
+	    for (File f : runFiles) {
+		readers.add(new RunReader(f));
+	    }
+	    try (BufferedWriter out = new BufferedWriter(new FileWriter(mergedFile, StandardCharsets.UTF_8))) {
+		while (!readers.isEmpty()) {
+		    int minIdx = 0;
+		    String minDtrf = readers.get(0).dtrf;
+		    for (int i = 1; i < readers.size(); i++) {
+			String d = readers.get(i).dtrf;
+			if (d != null && (minDtrf == null || d.compareTo(minDtrf) < 0)) {
+			    minDtrf = d;
+			    minIdx = i;
+			}
+		    }
+		    RunReader r = readers.get(minIdx);
+		    out.write(r.line);
+		    out.newLine();
+		    r.advance();
+		    if (!r.hasNext()) {
+			r.reader.close();
+			readers.remove(minIdx);
+		    }
+		}
+	    }
+	} finally {
+	    for (RunReader r : readers) {
+		try {
+		    r.reader.close();
+		} catch (IOException ignored) {
+		}
+	    }
+	}
     }
 
     private String transform(String startString) {

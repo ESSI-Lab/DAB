@@ -3339,6 +3339,127 @@ export function initializePortal(config) {
 							dialogContent.append($('<p>').text(t('bulk_download_initiate_message', { size: resultSet.size })));
 							dialogContent.append($('<p>').text(t('bulk_download_monitor_message')));
 
+							// Read-only panel: query constraints that will be used for the download
+							var constraints = GIAPI.search.constWidget.constraints();
+							var where = GIAPI.search.resultsMapWidget.where();
+							var getCheckedItems = function(target) {
+								if (GIAPI && GIAPI.search && GIAPI.search.tfWidget && GIAPI.search.tfWidget.tfObject) {
+									if (typeof GIAPI.search.tfWidget.tfObject.checkedItems === 'function') {
+										try {
+											var items = GIAPI.search.tfWidget.tfObject.checkedItems(target);
+											if (items && Array.isArray(items) && items.length > 0) return items;
+										} catch (e) {}
+									}
+								}
+								if (GIAPI && GIAPI.tfHelper && GIAPI.tfHelper.checkedItems) {
+									var items = GIAPI.tfHelper.checkedItems[target];
+									if (items && Array.isArray(items) && items.length > 0) return items;
+								}
+								return null;
+							};
+							var lines = [];
+							if (constraints.when && constraints.when.from) lines.push({ label: 'Begin date', value: constraints.when.from });
+							if (constraints.when && constraints.when.to) lines.push({ label: 'End date', value: constraints.when.to });
+							if (where) {
+								if (where.predefinedLayer) lines.push({ label: 'Predefined layer', value: where.predefinedLayer });
+								if (where.south != null && where.west != null && where.north != null && where.east != null) {
+									lines.push({ label: 'Bounding box', value: [where.west, where.south, where.east, where.north].join(', ') });
+								}
+							}
+							if (constraints.kvp && Array.isArray(constraints.kvp)) {
+								var kvpMap = {};
+								constraints.kvp.forEach(function(kvp) { kvpMap[kvp.key] = kvp.value; });
+								if (kvpMap.attributeTitle) lines.push({ label: 'Observed property (from search)', value: kvpMap.attributeTitle });
+								if (kvpMap.platformTitle) lines.push({ label: 'Station (from search)', value: kvpMap.platformTitle });
+							}
+							// Intended observation spacing, aggregation duration, time interpolation: from filter panel first, else from search form
+							var spacingChecked = getCheckedItems('intendedObservationSpacing');
+							if (spacingChecked && spacingChecked.length > 0) {
+								lines.push({ label: 'Intended observation spacing', value: spacingChecked.map(function(item) { return item.term; }).join(', ') });
+							} else if (constraints.kvp && Array.isArray(constraints.kvp)) {
+								var spacingKvp = constraints.kvp.find(function(kvp) { return kvp.key === 'intendedObservationSpacing'; });
+								if (spacingKvp && spacingKvp.value) lines.push({ label: 'Intended observation spacing', value: spacingKvp.value });
+							}
+							var durationChecked = getCheckedItems('aggregationDuration');
+							if (durationChecked && durationChecked.length > 0) {
+								lines.push({ label: 'Aggregation duration', value: durationChecked.map(function(item) { return item.term; }).join(', ') });
+							} else if (constraints.kvp && Array.isArray(constraints.kvp)) {
+								var durationKvp = constraints.kvp.find(function(kvp) { return kvp.key === 'aggregationDuration'; });
+								if (durationKvp && durationKvp.value) lines.push({ label: 'Aggregation duration', value: durationKvp.value });
+							}
+							var interpolationChecked = getCheckedItems('timeInterpolation');
+							if (interpolationChecked && interpolationChecked.length > 0) {
+								lines.push({ label: 'Time interpolation', value: interpolationChecked.map(function(item) { return item.term; }).join(', ') });
+							} else if (constraints.kvp && Array.isArray(constraints.kvp)) {
+								var interpolationKvp = constraints.kvp.find(function(kvp) { return kvp.key === 'timeInterpolation'; });
+								if (interpolationKvp && interpolationKvp.value) lines.push({ label: 'Time interpolation', value: interpolationKvp.value });
+							}
+							// Sources panel selection (Sources tab)
+							var selectedSourceIds = GIAPI.search.dab && GIAPI.search.dab.findSources ? GIAPI.search.dab.findSources(null) : null;
+							if (selectedSourceIds && Array.isArray(selectedSourceIds) && selectedSourceIds.length > 0) {
+								var idToTitle = GIAPI.search._sourcesIdToTitle || {};
+								var sourceLabels = selectedSourceIds.map(function(id) { return idToTitle[id] || id; });
+								lines.push({ label: 'Source(s)', value: sourceLabels.join(', ') });
+							} else if (selectedSourceIds === null && GIAPI.search._sourcesIdToTitle) {
+								// null means all sources selected
+								var allCount = Object.keys(GIAPI.search._sourcesIdToTitle).length;
+								if (allCount > 0) lines.push({ label: 'Source(s)', value: 'All (' + allCount + ')' });
+							}
+							var sourceCheckedItems = getCheckedItems('source');
+							if (sourceCheckedItems && sourceCheckedItems.length > 0) {
+								var sourceIds = sourceCheckedItems.map(function(item) { return item.sourceId || item.term; });
+								lines.push({ label: 'Provider(s) (from filters)', value: sourceIds.join(', ') });
+							}
+							var platformTitleCheckedItems = getCheckedItems('platformTitle');
+							if (platformTitleCheckedItems && platformTitleCheckedItems.length > 0) {
+								lines.push({ label: 'Station(s)', value: platformTitleCheckedItems.map(function(item) { return item.term; }).join(', ') });
+							}
+							var attributeURICheckedItems = getCheckedItems('attributeURI');
+							var observedPropertyURICheckedItems = getCheckedItems('observedPropertyURI');
+							var allObservedPropertyURIs = [];
+							if (attributeURICheckedItems && attributeURICheckedItems.length > 0) {
+								allObservedPropertyURIs = allObservedPropertyURIs.concat(attributeURICheckedItems.map(function(item) { return item.term; }));
+							}
+							if (observedPropertyURICheckedItems && observedPropertyURICheckedItems.length > 0) {
+								allObservedPropertyURIs = allObservedPropertyURIs.concat(observedPropertyURICheckedItems.map(function(item) { return item.term; }));
+							}
+							if (allObservedPropertyURIs.length > 0) {
+								lines.push({ label: 'Observed property URI(s)', value: allObservedPropertyURIs.join(', ') });
+							}
+							var constraintsPanel = $('<div>').css({
+								'margin-top': '15px',
+								'margin-bottom': '15px',
+								'padding': '10px',
+								'background-color': '#f0f0f0',
+								'border': '1px solid #bdc3c7',
+								'border-radius': '4px',
+								'max-height': '180px',
+								'overflow-y': 'auto'
+							});
+							constraintsPanel.append(
+								$('<div>')
+									.text(t('download_query_constraints'))
+									.css({
+										'font-weight': 'bold',
+										'margin-bottom': '8px',
+										'color': '#2c3e50'
+									})
+							);
+							if (lines.length === 0) {
+								constraintsPanel.append($('<div>').text('None').css({ 'color': '#7f8c8d', 'font-style': 'italic' }));
+							} else {
+								var list = $('<div>').css({ 'font-size': '13px' });
+								lines.forEach(function(line) {
+									list.append(
+										$('<div>').css({ 'margin-bottom': '4px' })
+											.append($('<span>').text(line.label + ': ').css('font-weight', '500'))
+											.append($('<span>').text(line.value))
+									);
+								});
+								constraintsPanel.append(list);
+							}
+							dialogContent.append(constraintsPanel);
+
 							// Add download name input
 							const nameDiv = $('<div>').css({
 								'margin-top': '15px',
@@ -3648,15 +3769,19 @@ export function initializePortal(config) {
 												return null;
 											};
 											
-											// Get source filter (provider)
+											// Provider: from filter panel first, else from Sources panel selection
 											var sourceCheckedItems = getCheckedItems('source');
 											if (sourceCheckedItems && sourceCheckedItems.length > 0) {
-												// Extract source IDs from checked items
 												var sourceIds = sourceCheckedItems.map(function(item) {
 													return item.sourceId || item.term;
 												});
-												// Join multiple sources with comma
 												params.set('provider', sourceIds.join(','));
+											} else {
+												// Sources panel (Sources tab): selected data sources
+												var selectedSourceIds = GIAPI.search.dab && GIAPI.search.dab.findSources ? GIAPI.search.dab.findSources(null) : null;
+												if (selectedSourceIds && Array.isArray(selectedSourceIds) && selectedSourceIds.length > 0) {
+													params.set('provider', selectedSourceIds.join(','));
+												}
 											}
 											
 											// Get platformTitle filter (featureName/station)
@@ -3693,6 +3818,20 @@ export function initializePortal(config) {
 											if (allObservedPropertyURIs.length > 0) {
 												// Join multiple URIs with comma
 												params.set('observedProperty', allObservedPropertyURIs.join(','));
+											}
+
+											// Intended observation spacing, aggregation duration, time interpolation: filter panel overrides constraints.kvp
+											var intendedObservationSpacingCheckedItems = getCheckedItems('intendedObservationSpacing');
+											if (intendedObservationSpacingCheckedItems && intendedObservationSpacingCheckedItems.length > 0) {
+												params.set('intendedObservationSpacing', intendedObservationSpacingCheckedItems.map(function(item) { return item.term; }).join(','));
+											}
+											var aggregationDurationCheckedItems = getCheckedItems('aggregationDuration');
+											if (aggregationDurationCheckedItems && aggregationDurationCheckedItems.length > 0) {
+												params.set('aggregationDuration', aggregationDurationCheckedItems.map(function(item) { return item.term; }).join(','));
+											}
+											var timeInterpolationCheckedItems = getCheckedItems('timeInterpolation');
+											if (timeInterpolationCheckedItems && timeInterpolationCheckedItems.length > 0) {
+												params.set('timeInterpolation', timeInterpolationCheckedItems.map(function(item) { return item.term; }).join(','));
 											}
 
 											// Add fixed parameters
@@ -3808,6 +3947,14 @@ export function initializePortal(config) {
 			},
 
 			'onSourcesReady': function(sources) {
+				// Store id -> title for use in constraints panel (bulk download dialog)
+				GIAPI.search._sourcesIdToTitle = {};
+				if (sources && sources.length) {
+					sources.forEach(function(s) {
+						var r = s.report();
+						if (r && r.id) GIAPI.search._sourcesIdToTitle[r.id] = r.title || r.id;
+					});
+				}
 				// Remove scrollbar and constrain height: SourcesWidget creates a div with inline overflow-y: scroll and fixed height
 				jQuery('#sources-tab div[style*="overflow-y"]').css({
 					'overflow': 'hidden',
@@ -4197,7 +4344,23 @@ export function initializePortal(config) {
 				{ 'key': 'bboxUnion', 'value': 'true' }
 			);
 		}
-		 
+
+		// Ensure advanced constraint values (e.g. aggregationDuration) are in constraints so the WMS layer
+		// and station info link include them. Constraint widget may store them in form fields; add to kvp if missing.
+		var advKeys = ['attributeTitle', 'aggregationDuration', 'timeInterpolation', 'intendedObservationSpacing', 'observedPropertyURI', 'instrumentTitle'];
+		advKeys.forEach(function(key) {
+			if (constraints.kvp.some(function(kvp) { return kvp.key === key; })) {
+				return;
+			}
+			var id = GIAPI.search.constWidget && GIAPI.search.constWidget.getId ? GIAPI.search.constWidget.getId(key) : null;
+			if (id && jQuery('#' + id).length) {
+				var val = jQuery('#' + id).val();
+				if (val && (typeof val === 'string' ? val.trim() : val)) {
+					constraints.kvp.push({ key: key, value: (typeof val === 'string' ? val.trim() : val) });
+				}
+			}
+		});
+
 		GIAPI.search.resultsMapWidget.updateWMSClusterLayers(constraints);
 		// set the termFrequency option
 		options.termFrequency = 'source,keyword,format,protocol';

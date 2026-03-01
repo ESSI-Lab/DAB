@@ -183,6 +183,10 @@ public class HISCentralVenetoDownloader extends WMLDataDownloader {
 		beginYear = ISO8601DateTimeUtils.getXMLGregorianCalendar(begin).getYear();
 		endYear = ISO8601DateTimeUtils.getXMLGregorianCalendar(end).getYear();
 
+		GSLoggerFactory.getLogger(getClass()).info("Requested to download from date {} to {}",begin,end);
+		GSLoggerFactory.getLogger(getClass()).info("Will download from year {} to {}",beginYear,endYear);
+	    }else{
+		GSLoggerFactory.getLogger(getClass()).info("Requested to download full series");
 	    }
 
 	    // if (startString == null || endString == null) {

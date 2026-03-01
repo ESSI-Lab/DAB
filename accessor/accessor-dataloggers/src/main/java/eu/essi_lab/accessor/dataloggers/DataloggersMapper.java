@@ -118,6 +118,7 @@ public class DataloggersMapper extends FileIdentifierMapper {
 	    }
 
 	    // Keywords
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword("SIM internal resource");
 	    if (dataloggerCod != null) {
 		coreMetadata.getMIMetadata().getDataIdentification().addKeyword(dataloggerCod);
 	    }

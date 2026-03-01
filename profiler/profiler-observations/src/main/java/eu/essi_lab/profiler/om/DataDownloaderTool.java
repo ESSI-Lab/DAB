@@ -136,12 +136,19 @@ public class DataDownloaderTool {
 
 	GSLoggerFactory.getLogger(getClass()).info("Temporary directory created at: {}", tempPath.toAbsolutePath());
 
-	File userRequestFile = new File(tempPath.toFile(), "log.txt");
+	File requestLogFile = new File(tempPath.toFile(), "log-request.txt");
+	File processLogFile = new File(tempPath.toFile(), "log-process.txt");
 	Date dateStart = new Date();
 
 	String baseRequestURL = requestURL.replace("downloads?", "observations?");
 	baseRequestURL = removeParameter(baseRequestURL, "asynchDownload", "true");
 	baseRequestURL = removeParameter(baseRequestURL, "includeData", "true");
+
+
+	StringBuilder requestLogContent = new StringBuilder();
+	requestLogContent.append("request: ").append(baseRequestURL).append("\n");
+	requestLogContent.append("date start: ").append(ISO8601DateTimeUtils.getISO8601DateTime(dateStart)).append("\n");
+	write(requestLogContent.toString(), requestLogFile);
 
 	URI uri;
 	String format = null;
@@ -262,17 +269,18 @@ public class DataDownloaderTool {
 			String downloadURL = baseRequestURL;
 			downloadURL = addParameter(downloadURL, "observationIdentifier", id);
 			downloadURL = addParameter(downloadURL, "includeData", "true");
+			downloadURL = addParameter(downloadURL, "limit", "1");
 			if (format != null) {
 			    downloadURL = addParameter(downloadURL, "format", format);
 			}
 			downloadURL = removeParameter(downloadURL, "asynchDownloadName", format);
 			downloadURL = removeParameter(downloadURL, "eMailNotifications", format);
 
-			File sourceDir = new File(tempPath.toFile(), sourceId);
+			File sourceDir = new File(tempPath.toFile(), FileUtils.sanitizeForNtfs(sourceId));
 			if (!sourceDir.exists()) {
 			    sourceDir.mkdir();
 			}
-			File propertyDir = new File(sourceDir, observedPropertyTitle);
+			File propertyDir = new File(sourceDir, FileUtils.sanitizeForNtfs(observedPropertyTitle));
 			if (!propertyDir.exists()) {
 			    propertyDir.mkdir();
 			}
@@ -287,6 +295,8 @@ public class DataDownloaderTool {
 			File logFile = new File(propertyDir, FileUtils.sanitizeForNtfs(baseName + "_" + id + "_log.txt"));
 
 			File dataFile = new File(propertyDir, FileUtils.sanitizeForNtfs(baseName + "_" + id + "_data" + extension));
+
+			GSLoggerFactory.getLogger(getClass()).info("Single download request for download {}: {}",downloadName,downloadURL);
 
 			WebRequest get2 = WebRequest.createGET(downloadURL);
 			resources++;
@@ -381,6 +391,7 @@ public class DataDownloaderTool {
 	}
 
 	boolean isFinalPart = (maxSizeReached || resumptionToken == null);
+
 	StringBuilder logContent = new StringBuilder();
 	logContent.append("request: ").append(baseRequestURL).append("\n");
 	logContent.append("date start: ").append(ISO8601DateTimeUtils.getISO8601DateTime(dateStart)).append("\n");
@@ -391,7 +402,7 @@ public class DataDownloaderTool {
 	for (String name : downloadedFileNames) {
 	    logContent.append("  ").append(name).append("\n");
 	}
-	write(logContent.toString(), userRequestFile);
+	write(logContent.toString(), processLogFile);
 
 	try {
 	    GSLoggerFactory.getLogger(getClass()).info("Zipping folder {}", tempPath);
