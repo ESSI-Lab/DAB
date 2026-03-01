@@ -17,11 +17,9 @@
 	<properties> 
 		<hostname>localhost</hostname>
 
-		<!-- To override this port value when starting jetty:run: - open the
-		jetty:run 
-			Maven Build in the Eclipse "Debug Configurations" menu - in the Main tab 
-			add "Parameter name": jetty.port with the number of the desired port -->
+		<jetty.port>9090</jetty.port>
 		<jetty.stop_port>9091</jetty.stop_port>
+
 		<contextPath>gs-service</contextPath>
 
 		<!-- baseAppServerURL is used in the generate profile, to hack the
@@ -141,6 +139,12 @@
 
 					<stopPort>${jetty.stop_port}</stopPort>
 					<stopKey>stop</stopKey>
+
+
+					<httpConnector>
+						<port>${jetty.port}</port>
+					</httpConnector>
+
 
 					<webApp>
 						<contextPath>/${contextPath}</contextPath>
