@@ -1996,6 +1996,75 @@ public class DatahubMapper extends FileIdentifierMapper {
             coreMetadata.getMIMetadata().getDataIdentification().setEquivalentScale(equivalentScale.intValue());
         }
 
+        // Spatial representation info (grid)
+        JSONObject spatialRepInfo = json.optJSONObject("spatial_representation_info");
+        if (spatialRepInfo != null) {
+            JSONObject gridRep = spatialRepInfo.optJSONObject("grid_spatial_representation");
+            if (gridRep != null) {
+                GridSpatialRepresentation grid = new GridSpatialRepresentation();
+                String numDimStr = gridRep.optString("number_of_dimensions", null);
+                if (numDimStr != null && !numDimStr.isEmpty()) {
+                    try {
+                        grid.setNumberOfDimensions(Integer.parseInt(numDimStr));
+                    } catch (NumberFormatException e) {
+                        // ignore
+                    }
+                }
+                JSONObject cellGeometryObj = gridRep.optJSONObject("cell_geometry");
+                if (cellGeometryObj != null) {
+                    String cellVal = cellGeometryObj.optString("value", null);
+                    if (cellVal != null) grid.setCellGeometryCode(cellVal);
+                }
+                String transParamAvail = gridRep.optString("transformation_parameter_availability", null);
+                if (transParamAvail != null) {
+                    boolean transParam = "true".equalsIgnoreCase(transParamAvail) || "True".equals(transParamAvail);
+                    BooleanPropertyType boolProp = new BooleanPropertyType();
+                    boolProp.setBoolean(transParam);
+                    grid.getElementType().setTransformationParameterAvailability(boolProp);
+                }
+                JSONArray axisProps = gridRep.optJSONArray("axis_dimension_properties");
+                if (axisProps != null) {
+                    for (int i = 0; i < axisProps.length(); i++) {
+                        JSONObject axisObj = axisProps.optJSONObject(i);
+                        if (axisObj == null) continue;
+                        Dimension dim = new Dimension();
+                        JSONObject dimNameObj = axisObj.optJSONObject("dimension_name");
+                        if (dimNameObj != null) {
+                            String dimNameVal = dimNameObj.optString("value", null);
+                            if (dimNameVal != null) dim.setDimensionNameTypeCode(dimNameVal);
+                        }
+                        String dimSizeStr = axisObj.optString("dimension_size", null);
+                        if (dimSizeStr != null && !dimSizeStr.isEmpty()) {
+                            try {
+                                dim.setDimensionSize(new BigInteger(dimSizeStr));
+                            } catch (NumberFormatException e) {
+                                dim.setDimensionSize(BigInteger.ZERO);
+                            }
+                        } else {
+                            dim.setDimensionSize(BigInteger.ZERO);
+                        }
+                        JSONObject resObj = axisObj.optJSONObject("resolution");
+                        if (resObj != null) {
+                            String uom = resObj.optString("uom", null);
+                            Object valObj = resObj.opt("value");
+                            double resVal = Double.NaN;
+                            if (valObj instanceof Number) resVal = ((Number) valObj).doubleValue();
+                            else if (valObj instanceof String) {
+                                try {
+                                    resVal = Double.parseDouble((String) valObj);
+                                } catch (NumberFormatException e) {
+                                    // ignore
+                                }
+                            }
+                            if (!Double.isNaN(resVal)) dim.setResolution(uom != null ? uom : "", resVal);
+                        }
+                        grid.addAxisDimension(dim);
+                    }
+                }
+                coreMetadata.getMIMetadata().addGridSpatialRepresentation(grid);
+            }
+        }
+
         // Raster nodata value
         Double rasterNodataValue = json.optDouble("raster_nodata_value", Double.NaN);
         if (!rasterNodataValue.isNaN()) {
