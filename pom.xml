@@ -1253,6 +1253,18 @@
                 <artifactId>vaadin-bom</artifactId>
                 <version>${vaadin.version}</version>
                 <type>pom</type>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>copilot-project</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>copilot</artifactId>
+                    </exclusion>
+
+
+                </exclusions>
             </dependency>
 
 
@@ -1268,10 +1280,17 @@
                 <artifactId>vaadin-core</artifactId>
                 <version>${vaadin.version}</version>
                 <exclusions>
+
                     <exclusion>
-                        <groupId>javax.validation</groupId>
-                        <artifactId>validation-api</artifactId>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>copilot-project</artifactId>
                     </exclusion>
+
+                    <exclusion>
+                        <groupId>com.vaadin</groupId>
+                        <artifactId>copilot</artifactId>
+                    </exclusion>
+
                 </exclusions>
             </dependency>
 
