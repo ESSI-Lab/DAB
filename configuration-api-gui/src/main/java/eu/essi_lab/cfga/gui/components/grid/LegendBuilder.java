@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -122,12 +122,12 @@ public class LegendBuilder {
 	layout.getStyle().set("padding-left", "3px");
 	layout.getStyle().set("padding-right", "15px");
 
-	Label legendLabel = ComponentFactory.createLabel(legendName, false, 12);
-	legendLabel.getStyle().set("font-weight", "bold");
-	legendLabel.getStyle().set("margin-right", "5px");
-	legendLabel.getStyle().set("margin-top", "-2px");
+	Span legendSpan = ComponentFactory.createSpan(legendName, false, 12);
+	legendSpan.getStyle().set("font-weight", "bold");
+	legendSpan.getStyle().set("margin-right", "5px");
+	legendSpan.getStyle().set("margin-top", "-2px");
 
-	layout.add(legendLabel);
+	layout.add(legendSpan);
 
 	legendParts.forEach(layout::add);
 
@@ -148,7 +148,7 @@ public class LegendBuilder {
 	if (marginLeft != 0) {
 	    vl.getStyle().set("margin-left", marginLeft + "px");
 	}
-	vl.add(ComponentFactory.createLabel(name, false, 10));
+	vl.add(ComponentFactory.createSpan(name, false, 10));
 	vl.add(icon);
 
 	return vl;

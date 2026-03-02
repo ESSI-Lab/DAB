@@ -31,7 +31,7 @@ import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -267,41 +267,41 @@ public class ComponentFactory {
     }
 
     /**
-     * @param label
+     * @param text
      * @param widthFull
      * @param fontSize
      * @return
      */
-    public static Label createLabel(String label, boolean widthFull, int fontSize) {
+    public static Span createSpan(String text, boolean widthFull, int fontSize) {
 
-	Label out = new Label(label);
+	Span span = new Span(text);
 	if (widthFull) {
-	    out.setWidthFull();
+	    span.setWidthFull();
 	}
 
 	if (fontSize > 0) {
-	    out.getStyle().set("font-size", fontSize + "px");
+	    span.getStyle().set("font-size", fontSize + "px");
 	}
 
-	return out;
+	return span;
     }
 
     /**
      * @param label
      * @return
      */
-    public static Label createLabel() {
+    public static Span createSpan() {
 
-	return createLabel("", -1);
+	return createSpan("", -1);
     }
 
     /**
-     * @param label
+     * @param text
      * @return
      */
-    public static Label createLabel(String label) {
+    public static Span createSpan(String text) {
 
-	return createLabel(label, -1);
+	return createSpan(text, -1);
     }
 
     /**
@@ -309,9 +309,9 @@ public class ComponentFactory {
      * @param sizePx
      * @return
      */
-    public static Label createLabel(String label, int sizePx) {
+    public static Span createSpan(String label, int sizePx) {
 
-	return createLabel(label, true, sizePx);
+	return createSpan(label, true, sizePx);
     }
 
     /**

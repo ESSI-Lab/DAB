@@ -21,7 +21,6 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.util.Comparator;
 import java.util.List;
 
 import com.vaadin.componentfactory.ToggleButton;
@@ -33,7 +32,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
 import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -271,11 +270,11 @@ public class SettingComponentFactory {
      * @param parent
      * @return
      */
-    public static Label createSettingNameLabel(Setting setting, Setting parent) {
+    public static Span createSettingNameSpan(Setting setting, Setting parent) {
 
 	String name = parent != null ? "[ " + setting.getName() + " ]" : setting.getName();
 
-	Label label = ComponentFactory.createLabel(name);
+	Span label = ComponentFactory.createSpan(name);
 	label.getStyle().set("font-weight", "bold");
 	//	label.getStyle().set("margin-top", "10px");
 

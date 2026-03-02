@@ -36,8 +36,7 @@ import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -462,7 +461,7 @@ public class SettingComponent extends Div {
 	    //
 	    if (!setting.isFoldedModeEnabled()) {
 
-		Label label = handleLabel(parent, setting, headerLayout);
+		Span label = handleLabel(parent, setting, headerLayout);
 
 		if (label != null) {
 
@@ -607,11 +606,11 @@ public class SettingComponent extends Div {
      * @param setting
      * @param headerLayout
      */
-    private Label handleLabel(Setting parent, Setting setting, HorizontalLayout headerLayout) {
+    private Span handleLabel(Setting parent, Setting setting, HorizontalLayout headerLayout) {
 
 	if (setting.isShowHeaderSet()) {
 
-	    Label label = SettingComponentFactory.createSettingNameLabel(setting, parent);
+	    Span label = SettingComponentFactory.createSettingNameSpan(setting, parent);
 
 	    headerLayout.add(label);
 

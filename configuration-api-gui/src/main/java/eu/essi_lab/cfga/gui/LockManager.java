@@ -276,11 +276,11 @@ public class LockManager extends UITask {
 	    switch (result.get()) {
 	    case SUCCEEDED:
 
-		view.infoLabel.setText(LOCK_ACQUIRED_MESSAGE);
+		view.infoSpan.setText(LOCK_ACQUIRED_MESSAGE);
 
-		view.infoLabel.getStyle().set("background-color", "white");
-		view.infoLabel.getStyle().set("color", "green");
-		view.infoLabel.getStyle().set("border", "1px solid green");
+		view.infoSpan.getStyle().set("background-color", "white");
+		view.infoSpan.getStyle().set("color", "green");
+		view.infoSpan.getStyle().set("border", "1px solid green");
 
 		EnabledGroupManager.getInstance().setEnabled(true);
 
@@ -309,11 +309,11 @@ public class LockManager extends UITask {
 		break;
 	    case REJECTED:
 
-		view.infoLabel.setText(LOCK_REJECTED_MESSAGE);
+		view.infoSpan.setText(LOCK_REJECTED_MESSAGE);
 
-		view.infoLabel.getStyle().set("background-color", "white");
-		view.infoLabel.getStyle().set("color", "red");
-		view.infoLabel.getStyle().set("border", "1px solid red");
+		view.infoSpan.getStyle().set("background-color", "white");
+		view.infoSpan.getStyle().set("color", "red");
+		view.infoSpan.getStyle().set("border", "1px solid red");
 
 		EnabledGroupManager.getInstance().setEnabled(false);
 
@@ -321,11 +321,11 @@ public class LockManager extends UITask {
 	    }
 	} else {
 
-	    view.infoLabel.setText(LOCK_RELEASED_MESSAGE);
+	    view.infoSpan.setText(LOCK_RELEASED_MESSAGE);
 
-	    view.infoLabel.getStyle().set("background-color", "white");
-	    view.infoLabel.getStyle().set("color", "lightgray");
-	    view.infoLabel.getStyle().set("border", "1px solid lightgray");
+	    view.infoSpan.getStyle().set("background-color", "white");
+	    view.infoSpan.getStyle().set("color", "lightgray");
+	    view.infoSpan.getStyle().set("border", "1px solid lightgray");
 
 	    EnabledGroupManager.getInstance().setEnabled(false);
 	}

@@ -100,6 +100,7 @@ public class AboutTabDescriptor extends TabDescriptor {
 	layout.setWidthFull();
 
 	Span titleField = new Span();
+	titleField.getStyle().set("font-size", "14px");
 	titleField.setText("• " + title + ": ");
 	titleField.setWidth("165px");
 	titleField.getStyle().set("font-weight", "bold");
@@ -107,6 +108,7 @@ public class AboutTabDescriptor extends TabDescriptor {
 	layout.add(titleField);
 
 	Span contentField = new Span();
+	contentField.getStyle().set("font-size", "14px");
 	contentField.setText(content);
 	contentField.setWidthFull();
 	layout.add(contentField);

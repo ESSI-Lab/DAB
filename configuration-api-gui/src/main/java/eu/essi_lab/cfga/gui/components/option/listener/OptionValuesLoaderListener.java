@@ -31,7 +31,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
@@ -214,10 +214,10 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 	    VerticalLayout layout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
 	    setContent(layout);
 
-	    Label inputLabel = ComponentFactory.createLabel(loader.getRequestInputText());
-	    inputLabel.setWidthFull();
+	    Span inputSpan = ComponentFactory.createSpan(loader.getRequestInputText());
+	    inputSpan.setWidthFull();
 
-	    layout.add(inputLabel);
+	    layout.add(inputSpan);
 
 	    TextField textField = new TextField();
 	    textField.getStyle().set("font-size", "14px");
