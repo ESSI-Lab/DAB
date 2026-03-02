@@ -21,6 +21,7 @@ package eu.essi_lab.accessor.datahub;
  * #L%
  */
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -1220,8 +1221,88 @@ public final class DatahubToJsonMapper {
                 sr.put("uom", "m");
                 out.put("spatial_resolution", sr);
             }
+            JSONObject spatialRepInfo = spatialRepresentationInfoToJson(core.getMIMetadata());
+            if (spatialRepInfo != null) putOpt(out, "spatial_representation_info", spatialRepInfo);
         } catch (Exception e) {
             // ignore
+        }
+    }
+
+    private static JSONObject spatialRepresentationInfoToJson(eu.essi_lab.iso.datamodel.classes.MDMetadata mi) {
+        try {
+            eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation grid = mi.getGridSpatialRepresentation();
+            if (grid == null) return null;
+            JSONObject gridRep = new JSONObject();
+            Integer numDim = grid.getNumberOfDimensions();
+            if (numDim != null) gridRep.put("number_of_dimensions", String.valueOf(numDim));
+            String cellGeometry = grid.getCellGeometryCode();
+            if (cellGeometry != null) {
+                String cellUri = gridCellGeometryUri(grid);
+                gridRep.put("cell_geometry", codeObj(cellGeometry, cellUri));
+            }
+            BooleanPropertyType transParam = grid.getElementType().getTransformationParameterAvailability();
+            if (transParam != null) gridRep.put("transformation_parameter_availability", transParam.isBoolean());
+            JSONArray axisArr = new JSONArray();
+            Iterator<eu.essi_lab.iso.datamodel.classes.Dimension> dimIt = grid.getAxisDimensions();
+            if (dimIt != null) {
+                while (dimIt.hasNext()) {
+                    JSONObject axisObj = axisDimensionToJson(dimIt.next());
+                    if (axisObj != null) axisArr.put(axisObj);
+                }
+            }
+            if (axisArr.length() > 0) gridRep.put("axis_dimension_properties", axisArr);
+            JSONObject spatialRepInfo = new JSONObject();
+            spatialRepInfo.put("grid_spatial_representation", gridRep);
+            return spatialRepInfo;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String gridCellGeometryUri(eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation grid) {
+        try {
+            net.opengis.iso19139.gmd.v_20060504.MDCellGeometryCodePropertyType prop = grid.getElementType().getCellGeometry();
+            if (prop == null) return null;
+            Object code = prop.getMDCellGeometryCode();
+            if (code instanceof CodeListValueType) return ((CodeListValueType) code).getCodeList();
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static JSONObject axisDimensionToJson(eu.essi_lab.iso.datamodel.classes.Dimension dim) {
+        try {
+            JSONObject o = new JSONObject();
+            String dimNameVal = dim.getDimensionNameTypeCode();
+            String dimNameUri = dimensionNameTypeCodeUri(dim);
+            if (dimNameVal != null) o.put("dimension_name", codeObj(dimNameVal, dimNameUri));
+            BigInteger size = dim.getDimensionSize();
+            if (size != null) o.put("dimension_size", size.intValue() == 0 ? "unknown" : size.toString());
+            Double resVal = dim.getResolutionValue();
+            String resUom = dim.getResolutionUOM();
+            if (resVal != null || resUom != null) {
+                JSONObject res = new JSONObject();
+                if (resUom != null) res.put("uom", resUom);
+                if (resVal != null) res.put("value", resVal == Math.floor(resVal) ? String.valueOf(resVal.intValue()) : String.valueOf(resVal));
+                o.put("resolution", res);
+            }
+            return o.length() > 0 ? o : null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String dimensionNameTypeCodeUri(eu.essi_lab.iso.datamodel.classes.Dimension dim) {
+        try {
+            net.opengis.iso19139.gmd.v_20060504.MDDimensionNameTypeCodePropertyType prop = dim.getElementType().getDimensionName();
+            if (prop == null) return null;
+            Object code = prop.getMDDimensionNameTypeCode();
+            if (code instanceof JAXBElement) code = ((JAXBElement<?>) code).getValue();
+            if (code instanceof CodeListValueType) return ((CodeListValueType) code).getCodeList();
+            return null;
+        } catch (Exception e) {
+            return null;
         }
     }
 
