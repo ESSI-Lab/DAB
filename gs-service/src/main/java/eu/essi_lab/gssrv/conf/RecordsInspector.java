@@ -15,38 +15,31 @@ import java.util.*;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.provider.*;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.value.ValueChangeMode;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -56,63 +49,39 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class RecordsInspector {
+public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.GridData> {
 
     private final TabContentDescriptor descriptor;
-    private final VerticalLayout verticalLayout;
-    private final Grid<GridData> grid;
-    private final GridFilter gridFilter;
 
     private static final String NAME_COLUMN = "Name";
     private static final String ID_COLUMN = "Source id";
+    private static final String SOURCE_DEP_COLUMN = "Source deployment";
     private static final String SIZE_COLUMN = "Size";
+    private static final String PERCENTAGE_COLUMN = "%";
 
     /**
      *
      */
     public RecordsInspector() {
 
-	verticalLayout = new VerticalLayout();
-	verticalLayout.getStyle().set("margin-top", "15px");
-
-	verticalLayout.setWidthFull();
-	verticalLayout.setHeightFull();
-
-	//
-	//
-	//
-
-	grid = new Grid<>(GridData.class, false);
-
-	grid.getStyle().set("font-size", "13px");
-
-	grid.addColumn(GridData::getPosition).//
+	getGrid().addColumn(GridData::getPosition).//
 		setWidth("60px").//
 		setFlexGrow(0);
 
-	Column<GridData> nameColumn = grid.addColumn(GridData::getSourceName).//
-		setHeader(NAME_COLUMN).//
-		setKey(NAME_COLUMN).//
-		setWidth("350px").//
-		setSortable(true).//
-		setResizable(true);//
+	Column<GridData> nameColumn = addSortableResizableColumn(NAME_COLUMN, GridData::getSourceName, 350);
 
-	Column<GridData> idColumn = grid.addColumn(GridData::getSourceId).//
-		setHeader(ID_COLUMN).//
-		setKey(ID_COLUMN).//
-		setWidth("350px").//
-		setSortable(true).//
-		setResizable(true);//
+	Column<GridData> idColumn = addSortableResizableColumn(ID_COLUMN, GridData::getIdentifier, 300);
 
-	grid.addColumn(GridData::getFormattedSize).//
+	Column<GridData> deploymentColumn = addSortableResizableColumn(SOURCE_DEP_COLUMN, GridData::getSourceDeployment, 300);
+
+	getGrid().addColumn(GridData::getFormattedSize).//
 		setHeader(SIZE_COLUMN).//
 		setKey(SIZE_COLUMN).//
 		setWidth("100px").//
-		setFlexGrow(0).//
 		setSortable(true).//
-		setComparator((sd1, sd2) -> sd1.getSize().compareTo(sd2.getSize()));
+		setComparator(Comparator.comparing(GridData::getSize));
 
-	grid.addColumn(new ComponentRenderer<>(gd -> {
+	getGrid().addColumn(new ComponentRenderer<>(gd -> {
 
 	    Label label = new Label();
 	    label.setText(gd.getDataFolder());
@@ -122,42 +91,23 @@ public class RecordsInspector {
 
 	})).setHeader("Data #").//
 		setWidth("100px").//
-		setFlexGrow(0).//
 		setSortable(true);//
 
-	grid.addColumn(GridData::getPercentage).//
-		setKey("%").//
+	getGrid().addColumn(GridData::getPercentage).//
+		setKey(PERCENTAGE_COLUMN).//
 		setWidth("100px").//
-		setFlexGrow(0).//
-		setHeader("%").//
+		setHeader(PERCENTAGE_COLUMN).//
 		setSortable(true);
 
-	grid.setWidthFull();
-
-	grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
-
-	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
-
-	    int screenHeight = receiver.getScreenHeight();
-	    grid.setHeight(screenHeight - ComponentFactory.MIN_HEIGHT_OFFSET - 400, Unit.PIXELS);
-	});
-
 	//
 	//
 	//
 
-	HeaderRow filterRow = grid.appendHeaderRow();
-
-	gridFilter = new GridFilter();
+	HeaderRow filterRow = getGrid().appendHeaderRow();
 
 	addFilterField(filterRow, nameColumn);
 	addFilterField(filterRow, idColumn);
-
-	//
-	//
-	//
-
-	verticalLayout.add(grid);
+	addFilterField(filterRow, deploymentColumn);
 
 	//
 	//
@@ -170,9 +120,15 @@ public class RecordsInspector {
 		+ "name and identifier, along with the number of harvested records (\"Size\") and the percentage related to the total "
 		+ "number of records in the database (visible at the bottom of the \"Size\" column).\n\n\"Data #\" indicates the logical data folder (#1 or #2) where the "
 		+ "source records are stored", false).//
-		withComponent(verticalLayout).//
-		reloadable(() -> update(verticalLayout)).//
+		withComponent(getVerticalLayout()).//
+		reloadable(() -> update(getVerticalLayout())).//
 		build();
+    }
+
+    @Override
+    protected List<GridData> getItems() {
+
+	return List.of();
     }
 
     /**
@@ -187,7 +143,8 @@ public class RecordsInspector {
      * @param verticalLayout
      * @return
      */
-    private void update(VerticalLayout verticalLayout) {
+    @Override
+    protected void update(VerticalLayout verticalLayout) {
 
 	final List<GridData> sdList = Collections.synchronizedList(new ArrayList<>());
 
@@ -197,56 +154,70 @@ public class RecordsInspector {
 
 	ConfigurationWrapper.getHarvestedAndMixedSources().//
 		parallelStream().//
-		// filter(sourceFilter).//
-			forEach(s -> {//
+		forEach(s -> {//
 
-		    sdList.addAll(dataFolders.stream().//
-			    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
-			    map(f -> new GridData(f, s)).//
-			    toList());
-		});
+	    sdList.addAll(dataFolders.stream().//
+		    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
+		    map(f -> new GridData(f, s)).//
+		    toList());
+	});
 
 	double total = sdList.stream().mapToInt(sd -> sd.getSize().intValue()).sum();
 
-	grid.getColumnByKey(SIZE_COLUMN).setFooter(StringUtils.format(total));
+	updateTotalFooter(total);
+
+	updatePercentageFooter(100);
 
 	List<GridData> sortedList = sdList.stream().//
 		sorted((sd1, sd2) -> sd2.getSize().compareTo(sd1.getSize())).//
 		peek(sd -> sd.setTotal(total)).//
 		collect(Collectors.toList());
 
-	grid.setItems(sortedList);
+	getGrid().setItems(sortedList);
 
 	//
 	//
 	//
 
 	@SuppressWarnings("unchecked")
-	ListDataProvider<GridData> dataProvider = (ListDataProvider<GridData>) grid.getDataProvider();
+	ListDataProvider<GridData> dataProvider = (ListDataProvider<GridData>) getGrid().getDataProvider();
 
-	dataProvider.setFilter(item -> gridFilter.test(item));
+	dataProvider.addDataProviderListener(l -> {
+
+	    Stream<GridData> stream = l.getSource().fetch(new Query<>());
+
+	    updateTotalFooter(stream.mapToDouble(GridData::getSize).sum());
+
+	    stream = l.getSource().fetch(new Query<>());
+
+	    updatePercentageFooter(stream.mapToDouble(GridData::getPercentageDouble).sum());
+	});
+
+	dataProvider.setFilter(item -> getGridFilter().test(item));
     }
 
     /**
-     * @param filterRow
-     * @param column
+     * @param total
      */
-    private void addFilterField(HeaderRow filterRow, Column<GridData> column) {
+    private void updateTotalFooter(double total) {
 
-	TextField filterField = new TextField();
+	Label label_ = new Label();
+	label_.setText(StringUtils.format(total));
+	label_.getStyle().set("font-weight", "bold");
 
-	filterField.addValueChangeListener(event -> {
+	getGrid().getColumnByKey(SIZE_COLUMN).setFooter(label_);
+    }
 
-	    gridFilter.filter(column.getKey(), event.getValue());
-	    grid.getDataProvider().refreshAll();
-	});
+    /**
+     * @param total
+     */
+    private void updatePercentageFooter(double total) {
 
-	filterField.setValueChangeMode(ValueChangeMode.EAGER);
-	filterField.setSizeFull();
-	filterField.setPlaceholder("Filter");
-	filterField.getElement().setAttribute("focus-target", "");
+	Label label_ = new Label();
+	label_.setText(StringUtils.format(total));
+	label_.getStyle().set("font-weight", "bold");
 
-	filterRow.getCell(column).setComponent(filterField);
+	getGrid().getColumnByKey(PERCENTAGE_COLUMN).setFooter(label_);
     }
 
     /**
@@ -297,65 +268,40 @@ public class RecordsInspector {
     /**
      * @author Fabrizio
      */
-    private class GridFilter {
+    protected static class GridFilter extends AbstractGridFilter<GridData> {
 
-	private final HashMap<String, String> valuesMap;
+	@Override
+	protected String getItemValue(String colum, GridData gridData) {
 
-	/**
-	 *
-	 */
-	private GridFilter() {
-
-	    valuesMap = new HashMap<>();
+	    return switch (colum) {
+		case NAME_COLUMN -> gridData.getSourceName();
+		case ID_COLUMN -> gridData.getIdentifier();
+		case SOURCE_DEP_COLUMN -> gridData.getSourceDeployment();
+		default -> null;
+	    };
 	}
+    }
 
-	/**
-	 * @param gridData
-	 * @return
-	 */
-	public boolean test(GridData gridData) {
+    @Override
+    protected GridFilter createGridFilter() {
 
-	    String sourceName = valuesMap.get(NAME_COLUMN);
-	    String sourceId = valuesMap.get(ID_COLUMN);
+	return new GridFilter();
+    }
 
-	    boolean nameMatch = sourceName != null && gridData.getSourceName().toLowerCase().contains(sourceName);
-	    boolean idMatch = sourceId != null && gridData.getSourceId().toLowerCase().contains(sourceId);
+    @Override
+    protected Class<GridData> getGridDataModel() {
 
-	    if (sourceName != null && sourceId != null) { // both selected
-
-		return nameMatch && idMatch;
-	    }
-
-	    if (sourceName != null) { // only name
-
-		return nameMatch;
-	    }
-
-	    if (sourceId != null) { // only id
-
-		return idMatch;
-	    }
-
-	    return true; // none
-	}
-
-	/**
-	 * @param columnKey
-	 * @param value
-	 */
-	public void filter(String columnKey, String value) {
-
-	    valuesMap.put(columnKey, value.isEmpty() ? null : value);
-	}
+	return GridData.class;
     }
 
     /**
      * @author Fabrizio
      */
-    private class GridData {
+    protected class GridData implements GridDataModel {
 
 	private final String sourceLabel;
 	private final double size;
+	private final String sourceDeployment;
 	private double total;
 	private final String dataFolder;
 	private final String sourceId;
@@ -370,6 +316,7 @@ public class RecordsInspector {
 	    this.sourceLabel = source.getLabel();
 	    this.sourceId = source.getUniqueIdentifier();
 	    this.size = getFolderSize(folder);
+	    this.sourceDeployment = String.join(",", source.getDeployment());
 	    this.dataFolder = folder.getName().contains("data-1") ? "1" : "2";
 	    try {
 		this.writingFolder = folder.getBinary(SourceStorageWorker.WRITING_FOLDER_TAG) != null;
@@ -400,7 +347,7 @@ public class RecordsInspector {
 	public String getPosition() {
 
 	    return String.valueOf(//
-		    grid.getListDataView().//
+		    getGrid().getListDataView().//
 			    getItems().//
 			    toList().//
 			    indexOf(this) + 1);
@@ -426,6 +373,15 @@ public class RecordsInspector {
 	/**
 	 * @return
 	 */
+	public double getPercentageDouble() {
+
+	    return (size / total) * 100;
+	}
+
+
+	/**
+	 * @return
+	 */
 	public String getSourceName() {
 
 	    return sourceLabel;
@@ -434,9 +390,18 @@ public class RecordsInspector {
 	/**
 	 * @return
 	 */
-	public String getSourceId() {
+	@Override
+	public String getIdentifier() {
 
 	    return sourceId;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getSourceDeployment() {
+
+	    return Optional.ofNullable(sourceDeployment).orElse("");
 	}
 
 	/**

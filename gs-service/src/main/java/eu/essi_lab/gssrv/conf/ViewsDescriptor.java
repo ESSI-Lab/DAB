@@ -4,7 +4,6 @@ import com.vaadin.componentfactory.*;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.grid.*;
-import com.vaadin.flow.component.grid.contextmenu.*;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.*;
@@ -12,9 +11,7 @@ import com.vaadin.flow.component.tabs.*;
 import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.component.upload.*;
 import com.vaadin.flow.component.upload.receivers.*;
-import com.vaadin.flow.data.provider.*;
 import com.vaadin.flow.data.renderer.*;
-import com.vaadin.flow.data.value.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.gs.*;
@@ -31,13 +28,8 @@ import eu.essi_lab.model.exceptions.*;
 import javax.xml.bind.*;
 import java.io.*;
 import java.util.*;
-import java.util.stream.*;
 
-public class ViewsDescriptor extends TabDescriptor {
-
-    private final VerticalLayout verticalLayout;
-    private final Grid<ViewsDescriptor.GridData> grid;
-    private final ViewsDescriptor.GridFilter gridFilter;
+public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.GridData> {
 
     private static final String ID_COLUMN = "Id";
     private static final String LABEL_COLUMN = "Label";
@@ -52,86 +44,31 @@ public class ViewsDescriptor extends TabDescriptor {
 
 	setLabel("Views");
 
-	verticalLayout = new VerticalLayout();
-	verticalLayout.getStyle().set("margin-top", "-5px");
+	getGrid().setSelectionMode(Grid.SelectionMode.MULTI);
 
-	verticalLayout.setWidthFull();
-	verticalLayout.setHeightFull();
-
-	//
-	//
-	//
-
-	grid = new Grid<>(ViewsDescriptor.GridData.class, false);
-
-	grid.setSelectionMode(Grid.SelectionMode.MULTI);
-
-	grid.getStyle().set("font-size", "13px");
-
-	grid.addColumn(ViewsDescriptor.GridData::getPosition).//
+	getGrid().addColumn(ViewsDescriptor.GridData::getPosition).//
 		setHeader("").//
 		setKey("#").//
 		setWidth("30px");
 
-	Grid.Column<ViewsDescriptor.GridData> idCol = grid.addColumn(ViewsDescriptor.GridData::getId).//
-		setHeader(ID_COLUMN).//
-		setKey(ID_COLUMN).//
-		setWidth("300px").//
-		setSortable(true).//
-		setResizable(true);//
+	Grid.Column<ViewsDescriptor.GridData> idCol = addSortableResizableColumn(ID_COLUMN, ViewsDescriptor.GridData::getIdentifier, 300);
 
-	Grid.Column<ViewsDescriptor.GridData> labelCol = grid.addColumn(ViewsDescriptor.GridData::getLabel).//
-		setHeader(LABEL_COLUMN).//
-		setKey(LABEL_COLUMN).//
-		setWidth("300px").//
-		setSortable(true).//
-		setResizable(true);//
+	Grid.Column<ViewsDescriptor.GridData> labelCol = addSortableResizableColumn(LABEL_COLUMN, ViewsDescriptor.GridData::getLabel, 300);
 
-	Grid.Column<ViewsDescriptor.GridData> depCol = grid.addColumn(ViewsDescriptor.GridData::getDeployment).//
-		setHeader(SOURCE_DEPLOYMENT_COLUMN).//
-		setKey(SOURCE_DEPLOYMENT_COLUMN).//
-		setWidth("300px").//
-		setFlexGrow(0).//
-		setSortable(true).//
-		setResizable(true);//
+	Grid.Column<ViewsDescriptor.GridData> depCol = addSortableResizableColumn(SOURCE_DEPLOYMENT_COLUMN,
+		ViewsDescriptor.GridData::getDeployment, 300);
 
-	Grid.Column<ViewsDescriptor.GridData> creatorCol = grid.addColumn(ViewsDescriptor.GridData::getCreator).//
-		setHeader(CREATOR_COLUMN).//
-		setKey(CREATOR_COLUMN).//
-		setWidth("200px").//
-		setFlexGrow(0).//
-		setSortable(true).//
-		setResizable(true);//
+	Grid.Column<ViewsDescriptor.GridData> creatorCol = addSortableResizableColumn(CREATOR_COLUMN, ViewsDescriptor.GridData::getCreator,
+		200);
 
-	Grid.Column<ViewsDescriptor.GridData> creationCol = grid.addColumn(ViewsDescriptor.GridData::getCreationTime).//
-		setHeader(CREATION_COLUMN).//
-		setKey(CREATION_COLUMN).//
-		setWidth("150px").//
-		setFlexGrow(0).//
-		setSortable(true);//
+	Grid.Column<ViewsDescriptor.GridData> creationCol = addSortableColumn(CREATION_COLUMN, ViewsDescriptor.GridData::getCreationTime,
+		150);
 
 	//
 	//
 	//
 
-	grid.setWidthFull();
-	grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
-
-	grid.setItemDetailsRenderer(createItemDetailsRenderer());
-
-	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
-
-	    int screenHeight = receiver.getScreenHeight();
-	    grid.setHeight(screenHeight - ComponentFactory.MIN_HEIGHT_OFFSET - 100, Unit.PIXELS);
-	});
-
-	//
-	//
-	//
-
-	HeaderRow filterRow = grid.appendHeaderRow();
-
-	gridFilter = new ViewsDescriptor.GridFilter();
+	HeaderRow filterRow = getGrid().appendHeaderRow();
 
 	addFilterField(filterRow, creatorCol);
 	addFilterField(filterRow, creationCol);
@@ -143,13 +80,28 @@ public class ViewsDescriptor extends TabDescriptor {
 	//
 	//
 
-	addContextMenu();
+	addContextMenu(selectionMap -> {
 
-	//
-	//
-	//
+	    try {
 
-	verticalLayout.add(grid);
+		List<String> ids = selectionMap.keySet().stream().filter(selectionMap::get).toList();
+
+		for (String id : ids) {
+
+		    getWriter().removeView(id);
+		}
+
+		update(getVerticalLayout());
+
+		NotificationDialog.getInfoDialog(ids.size() == 1 ? "View correctly removed" : "Views correctly removed").open();
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+
+		NotificationDialog.getErrorDialog("Error occurred, unable to remove views: " + e.getMessage(), 700).open();
+	    }
+	});
 
 	//
 	//
@@ -161,12 +113,11 @@ public class ViewsDescriptor extends TabDescriptor {
 	desc += "To remove one or more views, use the checkbox to select and click the mouse right button to open the contextual ";
 	desc += "menu, than click 'Remove selected views'";
 
-
 	TabContentDescriptor descriptor = TabContentDescriptorBuilder.get().//
 		withCustomAddDirective(e -> openAddViewDialog()).//
 		withShowDirective(desc, false).//
-		withComponent(verticalLayout).//
-		reloadable(() -> update(verticalLayout)).//
+		withComponent(getVerticalLayout()).//
+		reloadable(() -> update(getVerticalLayout())).//
 		build();
 
 	setIndex(GSTabIndex.VIEWS.getIndex());
@@ -176,72 +127,13 @@ public class ViewsDescriptor extends TabDescriptor {
 	//
 	//
 
-	GridFilter.SELECTION_MAP.clear();
-
-	update(verticalLayout);
+	update(getVerticalLayout());
     }
 
-    /**
-     *
-     */
-    private void addContextMenu() {
+    @Override
+    protected Class<GridData> getGridDataModel() {
 
-	GridContextMenu<ViewsDescriptor.GridData> menu = grid.addContextMenu();
-
-	menu.addGridContextMenuOpenedListener(event -> {
-
-	    GridContextMenu<ViewsDescriptor.GridData> source = event.getSource();
-
-	    GridMenuItem<ViewsDescriptor.GridData> menuItem = source.getItems().getFirst();
-
-	    Optional<ViewsDescriptor.GridData> eventItem = event.getItem();
-
-	    if (eventItem.isPresent()) {
-
-		String viewId = eventItem.get().getId();
-
-		HashMap<String, Boolean> selectionMap = createSelectionMap(grid);
-
-		menuItem.setEnabled(selectionMap.get(viewId));
-	    }
-	});
-
-	GridMenuItem<ViewsDescriptor.GridData> removeViewItem = menu.addItem("Remove selected views", event -> {
-
-	    HashMap<String, Boolean> selectionMap = createSelectionMap(grid);
-
-	    ConfirmationDialog dialog = new ConfirmationDialog(
-
-		    "Click 'Confirm' to permanently deleted the selected views", evt -> {
-
-		try {
-
-		    List<String> ids = selectionMap.keySet().stream().filter(selectionMap::get).toList();
-
-		    for (String id : ids) {
-
-			getWriter().removeView(id);
-		    }
-
-		    update(verticalLayout);
-
-		    NotificationDialog.getInfoDialog(ids.size() == 1 ? "View correctly removed" : "Views correctly removed").open();
-
-		} catch (Exception e) {
-
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-
-		    NotificationDialog.getErrorDialog("Error occurred, unable to removeviews: " + e.getMessage(), 700).open();
-		}
-	    });
-
-	    dialog.setWidth(670, Unit.PIXELS);
-	    dialog.setTitle("Views removal");
-	    dialog.getContentLayout().getStyle().set("font-size", "14px");
-	    dialog.open();
-	});
-
-	removeViewItem.setId("remove-view");
+	return GridData.class;
     }
 
     /**
@@ -279,7 +171,7 @@ public class ViewsDescriptor extends TabDescriptor {
 
 		getWriter().store(view);
 
-		update(verticalLayout);
+		update(getVerticalLayout());
 
 		dialog.close();
 
@@ -314,38 +206,6 @@ public class ViewsDescriptor extends TabDescriptor {
     }
 
     /**
-     * @param grid
-     * @return
-     */
-    private HashMap<String, Boolean> createSelectionMap(Grid<ViewsDescriptor.GridData> grid) {
-
-	List<String> selIds = grid.getSelectedItems().//
-		stream().//
-		map(GridData::getId).//
-		toList();
-
-	Stream<ViewsDescriptor.GridData> items = grid.getListDataView().getItems();
-
-	HashMap<String, Boolean> map = new HashMap<>();
-
-	items.forEach(item -> {
-
-	    String identifier = item.getId();
-
-	    if (selIds.contains(identifier)) {
-
-		map.put(identifier, true);
-
-	    } else {
-
-		map.put(identifier, false);
-	    }
-	});
-
-	return map;
-    }
-
-    /**
      * @return
      */
     private List<View> getViews() {
@@ -363,23 +223,16 @@ public class ViewsDescriptor extends TabDescriptor {
     }
 
     /**
-     * @param verticalLayout
      * @return
      */
-    private void update(VerticalLayout verticalLayout) {
+    @Override
+    protected List<GridData> getItems() {
 
-	List<ViewsDescriptor.GridData> list = getViews(). //
+	return getViews(). //
 		stream().//
-		map(v -> new GridData(v, grid)).//
-		sorted((v1, v2) -> v2.getId().compareTo(v1.getId())).//
+		map(v -> new GridData(v, getGrid())).//
+		sorted((v1, v2) -> v2.getIdentifier().compareTo(v1.getIdentifier())).//
 		toList();
-
-	grid.setItems(list);
-
-	@SuppressWarnings("unchecked")
-	ListDataProvider<ViewsDescriptor.GridData> dataProvider = (ListDataProvider<ViewsDescriptor.GridData>) grid.getDataProvider();
-
-	dataProvider.setFilter(gridFilter::test);
     }
 
     /**
@@ -388,13 +241,14 @@ public class ViewsDescriptor extends TabDescriptor {
      * @param container
      * @return
      */
-    private Renderer<ViewsDescriptor.GridData> createItemDetailsRenderer() {
+    @Override
+    protected Optional<Renderer<GridData>> createItemDetailsRenderer() {
 
-	return new ComponentRenderer<>((gridData) -> {
+	return Optional.of(new ComponentRenderer<>((gridData) -> {
 
 	    try {
 
-		View view = getReader().getView(gridData.getId()).get();
+		View view = getReader().getView(gridData.getIdentifier()).get();
 
 		TextArea jsonArea = createTextArea(ViewFactory.toJSONObject(view).toString(3));
 		TextArea xmlArea = createTextArea(ViewFactory.toXMLString(view));
@@ -463,14 +317,13 @@ public class ViewsDescriptor extends TabDescriptor {
 
 			readOnlyLabel.setText("Read-only");
 
-			update(verticalLayout);
+			update(getVerticalLayout());
 
 		    } catch (UnmarshalException ex) {
 
 			NotificationDialog.getErrorDialog("Error occurred, unable to update view: " + ex.getLinkedException()).open();
 
 			GSLoggerFactory.getLogger(getClass()).error(ex);
-
 
 		    } catch (Exception ex) {
 
@@ -542,7 +395,7 @@ public class ViewsDescriptor extends TabDescriptor {
 	    }
 
 	    return null;
-	});
+	}));
     }
 
     /**
@@ -564,80 +417,34 @@ public class ViewsDescriptor extends TabDescriptor {
     }
 
     /**
-     * @param filterRow
-     * @param column
+     * @author Fabrizio
      */
-    private void addFilterField(HeaderRow filterRow, Grid.Column<ViewsDescriptor.GridData> column) {
+    protected static class GridFilter extends AbstractGridFilter<GridData> {
 
-	TextField filterField = new TextField();
-	filterField.getStyle().set("font-size", "13px");
+	@Override
+	protected String getItemValue(String colum, GridData gridData) {
 
-	filterField.addValueChangeListener(event -> {
+	    return switch (colum) {
+		case CREATOR_COLUMN -> gridData.getCreator();
+		case ID_COLUMN -> gridData.getIdentifier();
+		case LABEL_COLUMN -> gridData.getLabel();
+		case SOURCE_DEPLOYMENT_COLUMN -> gridData.getDeployment();
+		case CREATION_COLUMN -> gridData.getCreationTime();
+		default -> null;
+	    };
+	}
+    }
 
-	    gridFilter.filter(column.getKey(), event.getValue());
-	    grid.getDataProvider().refreshAll();
-	});
+    @Override
+    protected GridFilter createGridFilter() {
 
-	filterField.setValueChangeMode(ValueChangeMode.EAGER);
-	filterField.setSizeFull();
-	filterField.setPlaceholder("Filter");
-	filterField.getElement().setAttribute("focus-target", "");
-
-	filterRow.getCell(column).setComponent(filterField);
+	return new GridFilter();
     }
 
     /**
      * @author Fabrizio
      */
-    private static class GridFilter {
-
-	private static final HashMap<String, String> SELECTION_MAP = new HashMap<>();
-
-	/**
-	 *
-	 */
-	private GridFilter() {
-	}
-
-	/**
-	 * @param gridData
-	 * @return
-	 */
-	public boolean test(ViewsDescriptor.GridData gridData) {
-
-	    boolean match = true;
-
-	    for (String colum : SELECTION_MAP.keySet()) {
-
-		String itemValue = switch (colum) {
-		    case CREATOR_COLUMN -> gridData.getCreator();
-		    case ID_COLUMN -> gridData.getId();
-		    case LABEL_COLUMN -> gridData.getLabel();
-		    case SOURCE_DEPLOYMENT_COLUMN -> gridData.getDeployment();
-		    case CREATION_COLUMN -> gridData.getCreationTime();
-		    default -> null;
-		};
-
-		match &= itemValue == null || itemValue.toLowerCase().contains(SELECTION_MAP.get(colum).toLowerCase());
-	    }
-
-	    return match;
-	}
-
-	/**
-	 * @param columnKey
-	 * @param value
-	 */
-	public void filter(String columnKey, String value) {
-
-	    SELECTION_MAP.put(columnKey, value);
-	}
-    }
-
-    /**
-     * @author Fabrizio
-     */
-    private static class GridData {
+    protected static class GridData implements GridDataModel {
 
 	private final View view;
 	private final Grid<ViewsDescriptor.GridData> grid;
@@ -661,14 +468,12 @@ public class ViewsDescriptor extends TabDescriptor {
 		    grid.getListDataView().//
 			    getItems().//
 			    toList().//
-			    stream().map(GridData::getId).toList().//
+			    stream().map(GridData::getIdentifier).toList().//
 			    indexOf(view.getId()) + 1);
 	}
 
-	/**
-	 * @return
-	 */
-	public String getId() {
+	@Override
+	public String getIdentifier() {
 
 	    return Optional.ofNullable(view.getId()).orElse("");
 	}
@@ -733,23 +538,14 @@ public class ViewsDescriptor extends TabDescriptor {
 	@Override
 	public String toString() {
 
-	    return getId() + ":" + getLabel();
+	    return getIdentifier() + ":" + getLabel();
 	}
 
 	@Override
 	public boolean equals(Object o) {
 
-	    return o instanceof ViewsDescriptor.GridData && ((ViewsDescriptor.GridData) o).getId().equals(this.getId());
+	    return o instanceof ViewsDescriptor.GridData && ((ViewsDescriptor.GridData) o).getIdentifier().equals(this.getIdentifier());
 	}
-    }
-
-    /**
-     * @param text
-     * @return
-     */
-    private static String escape(String text) {
-
-	return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /**
