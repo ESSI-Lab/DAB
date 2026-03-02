@@ -325,12 +325,10 @@
         <!-- Eclipse Paho Client Mqttv3 -->
         <org.eclipse.paho.client.mqttv3.version>1.2.5</org.eclipse.paho.client.mqttv3.version>
 
-        <!-- OpenSearch client - VULN-UPDATE 2026 -->
-        <opensearch-rest-high-level-client.version>3.4.0</opensearch-rest-high-level-client.version>
-
-        <!-- OpenSearch -->
+        <!-- OpenSearch - VULN-UPDATE 2026 -->
         <opensearch.client-opensearch-java.version>2.19.0</opensearch.client-opensearch-java.version>
-        <opensearch.client-opensearch-rest-client.version>2.18.0</opensearch.client-opensearch-rest-client.version>
+        <opensearch.client-opensearch-rest-client.version>2.19.0</opensearch.client-opensearch-rest-client.version>
+        <opensearch-rest-high-level-client.version>2.19.0</opensearch-rest-high-level-client.version>
 
         <!-- Snake YAML - VULN-UPDATE -->
         <snakeyaml.version>1.33.0.SP1-redhat-00001</snakeyaml.version>
@@ -414,8 +412,9 @@
         <!-- Jackson dataformat-cbor VULN-UPDATE-->
         <jackson-dataformat-cbor.version>2.20.1</jackson-dataformat-cbor.version>
 
-        <!-- httpclient5 VULN-UPDATE-->
+        <!-- httpclient5 VULN-UPDATE
         <httpclient5.version>5.5.1</httpclient5.version>
+        -->
 
         <!-- commons file upload required by Vaadin  VULN-UPDATE-->
         <commons-fileupload.version>1.6.0</commons-fileupload.version>
@@ -551,13 +550,37 @@
                 <groupId>org.opensearch.client</groupId>
                 <artifactId>opensearch-java</artifactId>
                 <version>${opensearch.client-opensearch-java.version}</version>
+
             </dependency>
 
             <dependency>
                 <groupId>org.opensearch.client</groupId>
                 <artifactId>opensearch-rest-client</artifactId>
                 <version>${opensearch.client-opensearch-rest-client.version}</version>
+
             </dependency>
+
+            <dependency>
+                <groupId>org.opensearch.client</groupId>
+                <artifactId>opensearch-rest-high-level-client</artifactId>
+                <version>${opensearch-rest-high-level-client.version}</version>
+
+            </dependency>
+
+
+
+            <!-- Apache HttpComponents 5 coerente
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>5.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents.core5</groupId>
+                <artifactId>httpcore5</artifactId>
+                <version>5.2.1</version>
+            </dependency>
+            -->
 
             <!-- required after CXF version VULN-UPDATE -->
             <dependency>
@@ -585,11 +608,11 @@
                 <version>${commons-fileupload.version}</version>
             </dependency>
 
-            <dependency>
+          <!--  <dependency>
                 <groupId>org.apache.httpcomponents.client5</groupId>
                 <artifactId>httpclient5</artifactId>
                 <version>${httpclient5.version}</version>
-            </dependency>
+            </dependency>-->
 
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -900,11 +923,7 @@
                 <version>${org.eclipse.paho.client.mqttv3.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.opensearch.client</groupId>
-                <artifactId>opensearch-rest-high-level-client</artifactId>
-                <version>${opensearch-rest-high-level-client.version}</version>
-            </dependency>
+
 
             <!-- Snake YAML version with security patches from red hat repo-->
             <dependency>
