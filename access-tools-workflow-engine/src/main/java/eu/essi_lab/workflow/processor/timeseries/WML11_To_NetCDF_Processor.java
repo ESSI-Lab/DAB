@@ -285,8 +285,11 @@ public class WML11_To_NetCDF_Processor extends DataProcessor {
 			    censorCode.add(innerValue.getCensorCode());
 			if (innerValue.getMethodCode() != null)
 			    methodCode.add(innerValue.getMethodCode());
-			if (innerValue.getQualityControlLevelCode() != null)
+			if (innerValue.getQualityControlLevelCode() != null) {
 			    qualityControlLevelCode.add(innerValue.getQualityControlLevelCode());
+			}else{
+			    qualityControlLevelCode.add("");
+			}
 			if (innerValue.getSourceCode() != null)
 			    sourceCode.add(innerValue.getSourceCode());
 

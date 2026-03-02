@@ -71,7 +71,7 @@ public class Dato {
     public void setValue(String value) {
 	if (value != null && !value.isEmpty()) {
 	    try {
-		this.value = new BigDecimal(value);
+		this.value = new BigDecimal(value.replace(",","."));
 	    } catch (Exception e) {
 	    }
 	}

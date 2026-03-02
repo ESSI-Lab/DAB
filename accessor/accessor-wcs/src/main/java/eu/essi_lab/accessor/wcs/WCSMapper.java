@@ -106,7 +106,7 @@ public abstract class WCSMapper extends OriginalIdentifierMapper {
 	}
 
 	MIMetadata miMetadata = dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
-
+	miMetadata.addHierarchyLevelScopeCodeListValue("dataset");
 	// --------------
 	//
 	// identifier

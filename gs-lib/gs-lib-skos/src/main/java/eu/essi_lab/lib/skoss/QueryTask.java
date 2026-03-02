@@ -1,5 +1,10 @@
-package eu.essi_lab.gssrv.conf;
+/**
+ * 
+ */
+package eu.essi_lab.lib.skoss;
 
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.SKOSConcept;
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -21,13 +26,18 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
+import java.util.List;
+
 /**
  * @author Fabrizio
  */
-public interface GridDataModel {
+public interface QueryTask {
 
     /**
+     * @param endpointUrl
+     * @param query
+     * @param concepts
      * @return
      */
-    String getIdentifier();
+    SKOSResponse query(String endpointUrl, String query, List<SKOSConcept> concepts);
 }

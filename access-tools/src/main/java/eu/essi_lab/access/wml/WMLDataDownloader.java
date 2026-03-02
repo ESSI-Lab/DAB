@@ -218,12 +218,18 @@ public abstract class WMLDataDownloader extends DataDownloader {
 
 	VariableCode variableCode2 = new VariableCode();
 	variableCode2.setVocabulary("WHOS");
-	variableCode2.setValue(resource.getExtensionHandler().getUniqueAttributeIdentifier().get());
+	Optional<String> uniqueAttributeIdentifier = resource.getExtensionHandler().getUniqueAttributeIdentifier();
+	if (uniqueAttributeIdentifier.isPresent()) {
+		variableCode2.setValue(uniqueAttributeIdentifier.get());
+	}
 	variableInfo.getVariableCode().add(variableCode2);
 
 	try {
+	    Optional<String> missingValue = extensions.getAttributeMissingValue();
+	    if (missingValue.isPresent()) {
 	    Double noDataValue = Double.parseDouble(extensions.getAttributeMissingValue().get());
 	    variableInfo.setNoDataValue(noDataValue);
+	    }
 	} catch (Exception e) {
 	}
 
