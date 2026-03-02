@@ -47,10 +47,6 @@
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlets</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>com.indeed</groupId>

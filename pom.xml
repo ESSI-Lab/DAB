@@ -167,6 +167,9 @@
         <sonar.plugin.version>3.9.0.2155</sonar.plugin.version>
         <maven-jaxb-plugin.version>2.5.0</maven-jaxb-plugin.version>
 
+        <!-- Jetty -->
+        <jetty.version>12.1.6</jetty.version>
+
         <!--  Docker plugin -->
         <docker.plugin.version>0.48.0</docker.plugin.version>
 
@@ -404,8 +407,6 @@
         <!-- Netty project VULN-UPDATE -->
         <io.netty.version>4.2.9.Final</io.netty.version>
 
-        <!-- Jetty servlets VULN-UPDATE -->
-        <eclipse.jetty.version>11.0.20</eclipse.jetty.version>
 
         <!-- Commons IO VULN-UPDATE-->
         <commons-io.version>2.21.0</commons-io.version>
@@ -466,6 +467,55 @@
     <dependencyManagement>
         <dependencies>
 
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-bom</artifactId>
+                <version>${jetty.version}</version>
+                <type>pom</type>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty.ee11.websocket</groupId>
+                <artifactId>jetty-ee11-websocket-jakarta-server</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty.ee11</groupId>
+                <artifactId>jetty-ee11-webapp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty.ee11</groupId>
+                <artifactId>jetty-ee11-servlet</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty.ee11</groupId>
+                <artifactId>jetty-ee11-apache-jsp</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty.ee11</groupId>
+                <artifactId>jetty-ee11-annotations</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty.ee11</groupId>
+                <artifactId>jetty-ee11-servlets</artifactId>
+                <version>${jetty.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -559,60 +609,6 @@
                 <version>${com.change.c3p0.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlets</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-continuation</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-util</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-servlet</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-io</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-security</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-util-ajax</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-server</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-http</artifactId>
-                <version>${eclipse.jetty.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>io.netty</groupId>
@@ -839,7 +835,8 @@
                 <groupId>jakarta.servlet</groupId>
                 <artifactId>jakarta.servlet-api</artifactId>
                 <version>${jakarta.servlet-api.version}</version>
-                <scope>provided</scope>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <dependency>
