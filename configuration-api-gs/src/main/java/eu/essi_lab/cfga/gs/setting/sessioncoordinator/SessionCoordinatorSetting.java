@@ -36,7 +36,7 @@ import eu.essi_lab.cfga.gui.components.tabs.descriptor.TabContentDescriptorBuild
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
- * Global setting for distributed session coordination when running on multiple nodes (e.g. ARPA Lombardia).
+ * Global setting for distributed session coordination when running on multiple nodes (e.g. for ARPA Lombardia).
  * When enabled, uses Redis for distributed token acquisition (queue + heartbeat).
  */
 public class SessionCoordinatorSetting extends Setting implements EditableSetting {
