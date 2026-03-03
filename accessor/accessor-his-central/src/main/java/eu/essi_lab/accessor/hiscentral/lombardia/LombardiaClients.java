@@ -3,6 +3,8 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
 import java.net.URL;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -47,7 +49,7 @@ public final class LombardiaClients {
      * @throws Exception if client construction fails
      */
     public static HISCentralLombardiaClient createFromConfiguration(URL endpoint) throws Exception {
-	var setting = ConfigurationWrapper.getLombardiaSessionCoordinatorSetting();
+	var setting = ConfigurationWrapper.getSessionCoordinatorSetting();
 	if (!setting.isDistributedSessionCoordinator()) {
 	    return new HISCentralLombardiaClient(endpoint);
 	}
@@ -59,11 +61,22 @@ public final class LombardiaClients {
 	String host = parts.length > 0 ? parts[0].trim() : "localhost";
 	int port = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 6379;
 	JedisPool pool = new JedisPool(new JedisPoolConfig(), host, port);
-	return createWithRedisCoordinator(endpoint,
-		ConfigurationWrapper.getCredentialsSetting().getLombardiaKeystorePassword().orElse(null),
-		ConfigurationWrapper.getCredentialsSetting().getLombardiaUsername().orElse(null),
-		ConfigurationWrapper.getCredentialsSetting().getLombardiaPassword().orElse(null),
-		pool);
+	try {
+	    try (Jedis jedis = pool.getResource()) {
+		jedis.ping();
+	    }
+	    return createWithRedisCoordinator(endpoint,
+		    ConfigurationWrapper.getCredentialsSetting().getLombardiaKeystorePassword().orElse(null),
+		    ConfigurationWrapper.getCredentialsSetting().getLombardiaUsername().orElse(null),
+		    ConfigurationWrapper.getCredentialsSetting().getLombardiaPassword().orElse(null),
+		    pool);
+	} catch (Exception e) {
+	    pool.close();
+	    GSLoggerFactory.getLogger(LombardiaClients.class).warn(
+		    "Redis session coordinator unavailable ({}), falling back to file-based single-node: {}",
+		    host + ":" + port, e.getMessage());
+	    return new HISCentralLombardiaClient(endpoint);
+	}
     }
 
     /**

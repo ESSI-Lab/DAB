@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gs.setting.lombardiasession;
+package eu.essi_lab.cfga.gs.setting.sessioncoordinator;
 
 /*-
  * #%L
@@ -36,26 +36,26 @@ import eu.essi_lab.cfga.gui.components.tabs.descriptor.TabContentDescriptorBuild
 import eu.essi_lab.lib.utils.LabeledEnum;
 
 /**
- * Global setting for ARPA Lombardia session coordination when running on multiple nodes.
+ * Global setting for distributed session coordination when running on multiple nodes (e.g. ARPA Lombardia).
  * When enabled, uses Redis for distributed token acquisition (queue + heartbeat).
  */
-public class LombardiaSessionCoordinatorSetting extends Setting implements EditableSetting {
+public class SessionCoordinatorSetting extends Setting implements EditableSetting {
 
     private static final String DISTRIBUTED_SESSION_COORDINATOR_OPTION_KEY = "distributedSessionCoordinator";
     private static final String REDIS_ENDPOINT_OPTION_KEY = "redisEndpoint";
     private static final String REDIS_USERNAME_OPTION_KEY = "redisUsername";
     private static final String REDIS_PASSWORD_OPTION_KEY = "redisPassword";
 
-    public LombardiaSessionCoordinatorSetting(JSONObject object) {
+    public SessionCoordinatorSetting(JSONObject object) {
 	super(object);
     }
 
-    public LombardiaSessionCoordinatorSetting(String object) {
+    public SessionCoordinatorSetting(String object) {
 	super(object);
     }
 
-    public LombardiaSessionCoordinatorSetting() {
-	setName("Lombardia session coordinator settings");
+    public SessionCoordinatorSetting() {
+	setName("Session coordinator settings");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
 	setShowHeader(false);
@@ -104,8 +104,8 @@ public class LombardiaSessionCoordinatorSetting extends Setting implements Edita
 	private final TabContentDescriptor descriptor;
 
 	public DescriptorProvider() {
-	    descriptor = TabContentDescriptorBuilder.get(LombardiaSessionCoordinatorSetting.class).//
-		    withLabel("Lombardia session coordinator").//
+	    descriptor = TabContentDescriptorBuilder.get(SessionCoordinatorSetting.class).//
+		    withLabel("Session coordinator").//
 		    build();
 	}
 
@@ -115,7 +115,9 @@ public class LombardiaSessionCoordinatorSetting extends Setting implements Edita
     }
 
     public boolean isDistributedSessionCoordinator() {
-	return BooleanChoice.toBoolean(getOption(DISTRIBUTED_SESSION_COORDINATOR_OPTION_KEY, BooleanChoice.class).get().getSelectedValue());
+	return getOption(DISTRIBUTED_SESSION_COORDINATOR_OPTION_KEY, BooleanChoice.class).//
+		map(opt -> BooleanChoice.toBoolean(opt.getSelectedValue())).//
+		orElse(false);
     }
 
     public void setDistributedSessionCoordinator(boolean value) {

@@ -1,12 +1,12 @@
 <%@page import="eu.essi_lab.cfga.gs.ConfigurationWrapper"%>
-<%@page import="eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting"%>
+<%@page import="eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting"%>
 <%@page import="redis.clients.jedis.Jedis"%>
 <%@page import="redis.clients.jedis.JedisPool"%>
 <%@page import="redis.clients.jedis.JedisPoolConfig"%>
 <%@page import="java.util.List"%>
 <html>
 <head>
-<title>Lombardia session coordinator</title>
+<title>Session coordinator</title>
 <style>
 body { font-family: sans-serif; margin: 1em; }
 h1 { color: #333; }
@@ -20,13 +20,13 @@ li { padding: 0.25em 0; }
 </style>
 </head>
 <body>
-	<h1>Lombardia session coordinator</h1>
+	<h1>Session coordinator</h1>
 	<%
 		try {
-			LombardiaSessionCoordinatorSetting setting = ConfigurationWrapper.getLombardiaSessionCoordinatorSetting();
+			SessionCoordinatorSetting setting = ConfigurationWrapper.getSessionCoordinatorSetting();
 			if (!setting.isDistributedSessionCoordinator()) {
 				out.println("<p class='inactive'>Distributed session coordinator is <b>disabled</b>. Using file-based single-node strategy.</p>");
-				out.println("<p>Enable it in System &rarr; Lombardia session coordinator to see queue and active node.</p>");
+				out.println("<p>Enable it in System &rarr; Session coordinator to see queue and active node.</p>");
 			} else {
 				String redisEndpoint = setting.getRedisEndpoint();
 				if (redisEndpoint == null || redisEndpoint.isEmpty()) {
@@ -37,41 +37,49 @@ li { padding: 0.25em 0; }
 				int port = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 6379;
 
 				JedisPool pool = new JedisPool(new JedisPoolConfig(), host, port);
-				try (Jedis jedis = pool.getResource()) {
-					String activeNodeId = jedis.get("arpa-lombardia:active");
-					List<String> queue = jedis.lrange("arpa-lombardia:queue", 0, -1);
+				try {
+					try (Jedis jedis = pool.getResource()) {
+						jedis.ping();
+						String activeNodeId = jedis.get("arpa-lombardia:active");
+						List<String> queue = jedis.lrange("arpa-lombardia:queue", 0, -1);
 
-					out.println("<p>Redis: " + host + ":" + port + "</p>");
+						out.println("<p>Redis: " + host + ":" + port + "</p>");
 
-					out.println("<div class='section active'>");
-					out.println("<h2>Active node</h2>");
-					if (activeNodeId == null || activeNodeId.isEmpty()) {
-						out.println("<p>None</p>");
-					} else {
-						Long ttl = jedis.ttl("arpa-lombardia:alive:" + activeNodeId);
-						boolean alive = ttl != null && ttl > 0;
-						out.println("<p><b>" + activeNodeId + "</b> " + (alive ? "(alive, TTL " + ttl + "s)" : "<span class='error'>DEAD</span>") + "</p>");
-					}
-					out.println("</div>");
-
-					out.println("<div class='section queue'>");
-					out.println("<h2>Queue</h2>");
-					if (queue == null || queue.isEmpty()) {
-						out.println("<p>Empty</p>");
-					} else {
-						out.println("<ul>");
-						for (int i = 0; i < queue.size(); i++) {
-							String nodeId = queue.get(i);
-							Long ttl = jedis.ttl("arpa-lombardia:alive:" + nodeId);
+						out.println("<div class='section active'>");
+						out.println("<h2>Active node</h2>");
+						if (activeNodeId == null || activeNodeId.isEmpty()) {
+							out.println("<p>None</p>");
+						} else {
+							Long ttl = jedis.ttl("arpa-lombardia:alive:" + activeNodeId);
 							boolean alive = ttl != null && ttl > 0;
-							String pos = (i == 0) ? " (first)" : "";
-							out.println("<li>" + (i + 1) + ". " + nodeId + pos + " " + (alive ? "(alive, TTL " + ttl + "s)" : "<span class='error'>DEAD</span>") + "</li>");
+							out.println("<p><b>" + activeNodeId + "</b> " + (alive ? "(alive, TTL " + ttl + "s)" : "<span class='error'>DEAD</span>") + "</p>");
 						}
-						out.println("</ul>");
+						out.println("</div>");
+
+						out.println("<div class='section queue'>");
+						out.println("<h2>Queue</h2>");
+						if (queue == null || queue.isEmpty()) {
+							out.println("<p>Empty</p>");
+						} else {
+							out.println("<ul>");
+							for (int i = 0; i < queue.size(); i++) {
+								String nodeId = queue.get(i);
+								Long ttl = jedis.ttl("arpa-lombardia:alive:" + nodeId);
+								boolean alive = ttl != null && ttl > 0;
+								String pos = (i == 0) ? " (first)" : "";
+								out.println("<li>" + (i + 1) + ". " + nodeId + pos + " " + (alive ? "(alive, TTL " + ttl + "s)" : "<span class='error'>DEAD</span>") + "</li>");
+							}
+							out.println("</ul>");
+						}
+						out.println("</div>");
 					}
-					out.println("</div>");
+				} catch (Exception redisEx) {
+					out.println("<p class='inactive'>Redis session coordinator is configured but <b>unavailable</b> (" + host + ":" + port + ").</p>");
+					out.println("<p>Clients fall back to file-based single-node mode. Check Redis is running and reachable.</p>");
+					out.println("<p class='error'>" + redisEx.getMessage() + "</p>");
+				} finally {
+					pool.close();
 				}
-				pool.close();
 			}
 		} catch (Exception e) {
 			out.println("<p class='error'>Error: " + e.getMessage() + "</p>");

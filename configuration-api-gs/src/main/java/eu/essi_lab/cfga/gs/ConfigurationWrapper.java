@@ -50,7 +50,7 @@ import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
@@ -833,11 +833,18 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    public static LombardiaSessionCoordinatorSetting getLombardiaSessionCoordinatorSetting() {
+    public static SessionCoordinatorSetting getSessionCoordinatorSetting() {
+	Optional<SessionCoordinatorSetting> setting = configuration.get(//
+		SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel(), //
+		SessionCoordinatorSetting.class);
+	if (setting.isPresent()) {
+	    SessionCoordinatorSetting ret = setting.get();
+	    if (ret.isDistributedSessionCoordinator()){
 
-	return configuration.get(//
-		SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel(), //
-		LombardiaSessionCoordinatorSetting.class).get();
+	    }
+	    return ret;
+	}
+	return new SessionCoordinatorSetting();
     }
 
     /**

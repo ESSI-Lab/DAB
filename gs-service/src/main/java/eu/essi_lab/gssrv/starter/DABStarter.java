@@ -34,7 +34,7 @@ import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
-import eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.patch.*;
@@ -563,12 +563,12 @@ public class DABStarter implements ConfigurationChangeListener {
 	    //
 	    // add Lombardia session coordinator setting if missing (e.g. upgraded from older config)
 	    //
-	    if (configuration.get(SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel(),
-		    LombardiaSessionCoordinatorSetting.class).isEmpty()) {
+	    if (configuration.get(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel(),
+		    SessionCoordinatorSetting.class).isEmpty()) {
 
-		LombardiaSessionCoordinatorSetting lombardiaSetting = new LombardiaSessionCoordinatorSetting();
-		lombardiaSetting.setIdentifier(SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel());
-		configuration.put(lombardiaSetting);
+		SessionCoordinatorSetting sessionCoordinatorSetting = new SessionCoordinatorSetting();
+		sessionCoordinatorSetting.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
+		configuration.put(sessionCoordinatorSetting);
 	    }
 
 	    //
