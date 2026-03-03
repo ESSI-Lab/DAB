@@ -59,6 +59,27 @@ public class ViewFactory {
     /**
      *
      */
+    public static void initContext() {
+
+	try {
+	    jaxbContext = JAXBContext.newInstance(//
+		    View.class, //
+		    WKT.class, //
+		    ViewBond.class, //
+		    LogicalBond.class, //
+		    ResourcePropertyBond.class, //
+		    SimpleValueBond.class, //
+		    SpatialBond.class);
+
+	} catch (JAXBException e) {
+
+	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	}
+    }
+
+    /**
+     *
+     */
     private ViewFactory() {
     }
 
@@ -70,6 +91,7 @@ public class ViewFactory {
 	synchronized (ViewFactory.class) {
 
 	    try {
+
 		Marshaller m = getContext().createMarshaller();
 		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
@@ -88,6 +110,7 @@ public class ViewFactory {
      * @return
      */
     public static Unmarshaller createUnmarshaller() {
+
 	synchronized (ViewFactory.class) {
 
 	    try {
@@ -293,20 +316,7 @@ public class ViewFactory {
 	synchronized (ViewFactory.class) {
 	    if (jaxbContext == null) {
 
-		try {
-		    jaxbContext = JAXBContext.newInstance(//
-			    View.class, //
-			    WKT.class, //
-			    ViewBond.class, //
-			    LogicalBond.class, //
-			    ResourcePropertyBond.class, //
-			    SimpleValueBond.class, //
-			    SpatialBond.class);
-
-		} catch (JAXBException e) {
-
-		    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
-		}
+		initContext();
 	    }
 
 	    return jaxbContext;

@@ -52,6 +52,14 @@ public class XACMLAuthorizer implements MessageAuthorizer<RequestMessage> {
     private PdpEngineBuilder builder;
 
     /**
+     * Initializes the {@link PdpEngine} exploiting its lazy initialization with the {@link PdpEngineBuilder#build()} method
+     */
+    public static void initEngine() throws Exception {
+
+	new XACMLAuthorizer();
+    }
+
+    /**
      * @throws Exception
      */
     public XACMLAuthorizer() throws Exception {
