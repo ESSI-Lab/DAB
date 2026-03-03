@@ -88,12 +88,16 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    SEMANTICS(8, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+    VIEWS(8),
+    /**
+     *
+     */
+    SEMANTICS(9, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
 
     /**
      *
      */
-    SYSTEM(9, false,//
+    SYSTEM(10, false,//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SCHEDULER_SETTING.getLabel())),//
@@ -104,7 +108,7 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    ABOUT(9);
+    ABOUT(11);
 
     private final int index;
     private final boolean required;

@@ -104,7 +104,6 @@ public class ConfigImporter extends VerticalLayout {
 
 	upload.setMaxFiles(1);
 	upload.setDropAllowed(true);
-	upload.setDropLabel(new Label("Import configuration file"));
 	upload.setAcceptedFileTypes("application/json", ".json");
 	upload.setDropLabel(new Label("Drop file here"));
 

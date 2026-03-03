@@ -66,6 +66,36 @@ public class AddDirective extends Directive {
     }
 
     /**
+     *
+     * @param name
+     * @param description
+     * @param settingClass
+     */
+    public AddDirective(String name, String description, Class<? extends Setting> settingClass) {
+
+	super(name);
+	this.settingClassName = settingClass.getName();
+
+	setDescription(description);
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+    }
+
+    /**
+     *
+     * @param name
+     * @param description
+     * @param settingClassName
+     */
+    public AddDirective(String name, String description, String settingClassName) {
+
+	super(name);
+	this.settingClassName = settingClassName;
+
+	setDescription(description);
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+    }
+
+    /**
      * @return the settingClass
      */
     public Class<? extends Setting> getSettingClass() {

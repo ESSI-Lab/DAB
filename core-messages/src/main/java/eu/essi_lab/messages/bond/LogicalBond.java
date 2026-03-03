@@ -21,6 +21,8 @@ package eu.essi_lab.messages.bond;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -165,6 +167,7 @@ public class LogicalBond implements Bond {
     /**
      * @return
      */
+    @JsonIgnore
     public Bond getFirstOperand() {
 
 	return getOperands().getFirst();

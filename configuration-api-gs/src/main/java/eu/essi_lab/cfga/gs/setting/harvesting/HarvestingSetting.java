@@ -192,10 +192,11 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		    SortDirection.ASCENDING).//
 
 		    withAddDirective(//
+		    "ADD",//
 		    "Add harvested/mixed accessor", //
 		    "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
-		    withRemoveDirective("Remove accessor", true, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
-		    withEditDirective("Edit harvested source").//
+		    withRemoveDirective("REMOVE","Remove accessor", true, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
+		    withEditDirective("EDIT","Edit harvested/mixed accessor").//
 
 		    withGridInfo(Arrays.asList(//
 

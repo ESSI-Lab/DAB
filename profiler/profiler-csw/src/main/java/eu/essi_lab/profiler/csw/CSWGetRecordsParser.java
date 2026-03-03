@@ -485,7 +485,7 @@ public class CSWGetRecordsParser {
 		throw new IllegalArgumentException("Missing Envelope of BBOX Spatial operator");
 	    }
 
-	    areaOperator = BondOperator.BBOX;
+	    areaOperator = BondOperator.INTERSECTS;
 	}
 
 	// ---------------------------------

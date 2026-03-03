@@ -110,7 +110,7 @@ public class PackageListHandler extends StreamingRequestHandler {
 
 		ResultSet<TermFrequencyItem> results = null;
 		try {
-		    results = executor.getIndexValues(discoveryMessage, ResourceProperty.PUBLIC_ID, max, null);
+		    results = executor.getIndexValues(discoveryMessage, MetadataElement.IDENTIFIER, max, null);
 		} catch (GSException e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();

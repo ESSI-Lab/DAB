@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -204,13 +204,15 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 
 	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(CustomTaskSetting.class).//
 
- 		    withShowDirective("Manage custom tasks. Click \"Reload\" to update the scheduler information\n", SortDirection.ASCENDING).//
+		    withShowDirective("Manage custom tasks. Click \"Reload\" to update the scheduler information\n",
+		    SortDirection.ASCENDING).//
 
 		    withAddDirective(//
-		    "Add task", //
+		    "ADD",//
+		    "Add custom task", //
 		    CustomTaskSetting.class.getCanonicalName()).//
-		    withRemoveDirective("Remove task", false, CustomTaskSetting.class.getCanonicalName()).//
-		    withEditDirective("Edit custom task", ConfirmationPolicy.ON_WARNINGS).//
+		    withRemoveDirective("REMOVE", "Remove custom task", false, CustomTaskSetting.class.getCanonicalName()).//
+		    withEditDirective("EDIT","Edit custom task", ConfirmationPolicy.ON_WARNINGS).//
 
 		    withGridInfo(Arrays.asList(//
 

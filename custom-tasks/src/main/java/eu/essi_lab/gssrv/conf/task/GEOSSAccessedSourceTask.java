@@ -10,30 +10,27 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.List;
-import java.util.stream.Collectors;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.messages.bond.*;
+import org.quartz.*;
 
-import org.quartz.JobExecutionContext;
-
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.views.DefaultViewManager;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -53,16 +50,16 @@ public class GEOSSAccessedSourceTask extends AbstractCustomTask {
 
 	DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
 
-	DefaultViewManager viewManager = new DefaultViewManager();
+	ViewManager viewManager = new ViewManager();
 	viewManager.setDatabaseReader(reader);
 
 	List<String> sourceIds = ((LogicalBond) viewManager.getView("geoss").//
 		get().//
 		getBond()).//
-			getOperands().//
-			stream().//
-			map(o -> ((ResourcePropertyBond) o).getPropertyValue()).//
-			collect(Collectors.toList());
+		getOperands().//
+		stream().//
+		map(o -> ((ResourcePropertyBond) o).getPropertyValue()).//
+		collect(Collectors.toList());
 
 	//
 	//
@@ -77,10 +74,8 @@ public class GEOSSAccessedSourceTask extends AbstractCustomTask {
 
 		filter(s -> s.getSelectedAugmenterSettings().stream().anyMatch(as -> as.getName().toLowerCase().contains("access"))).//
 
-		peek(s -> s.getSelectedAugmenterSettings()
-			.forEach(as -> System.out.println(" Source: " + s.getSelectedAccessorSetting().getGSSourceSetting().getSourceLabel()
-				+ " - Augmenter: " + as.getName())))
-		.//
+		peek(s -> s.getSelectedAugmenterSettings().forEach(as -> System.out.println(
+		" Source: " + s.getSelectedAccessorSetting().getGSSourceSetting().getSourceLabel() + " - Augmenter: " + as.getName()))).//
 
 		map(s -> s.getSelectedAccessorSetting().getGSSourceSetting().getSourceLabel()).//
 

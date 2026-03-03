@@ -287,9 +287,7 @@ public class MarkLogicReader implements DatabaseReader {
 
 	    MarkLogicWrapper wrapper = getDatabase().getWrapper();
 
-	    ViewFactory factory = new ViewFactory();
-
-	    Unmarshaller unmarshaller = factory.createUnmarshaller();
+	    Unmarshaller unmarshaller = ViewFactory.createUnmarshaller();
 
 	    ResultSequence resultSequence = wrapper.submit(viewQuery);
 

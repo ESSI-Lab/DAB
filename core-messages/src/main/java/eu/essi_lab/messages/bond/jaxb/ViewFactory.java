@@ -21,13 +21,17 @@ package eu.essi_lab.messages.bond.jaxb;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.databind.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.bond.spatial.*;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 
 import eu.essi_lab.jaxb.common.*;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.xml.*;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.LogicalBond;
@@ -37,59 +41,152 @@ import eu.essi_lab.messages.bond.SpatialBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.bond.View.ViewVisibility;
 import eu.essi_lab.messages.bond.ViewBond;
+import org.json.*;
+
+import java.io.*;
+import java.nio.charset.*;
 
 /**
  *
  */
 public class ViewFactory {
 
-    public ViewFactory() {
+    /**
+     *
+     */
+    private static JAXBContext jaxbContext;
+
+    /**
+     *
+     */
+    private ViewFactory() {
     }
 
     /**
      * @return
      */
     public static Marshaller createMarshaller() {
-	try {
-	    JAXBContext jc = createContext();
-	    Marshaller m = jc.createMarshaller();
-	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-	    m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
 
-	    return m;
-	} catch (JAXBException e) {
-	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	synchronized (ViewFactory.class) {
+
+	    try {
+		Marshaller m = getContext().createMarshaller();
+		m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		m.setProperty(NameSpace.NAMESPACE_PREFIX_MAPPER_IMPL, new CommonNameSpaceContext());
+
+		return m;
+
+	    } catch (JAXBException e) {
+
+		GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	    }
+	    return null;
 	}
-	// this shouldn't happen as JAXBFactory test is used to check it will not happen
-	return null;
     }
 
     /**
      * @return
      */
     public static Unmarshaller createUnmarshaller() {
-	try {
-	    JAXBContext jc = createContext();
-	    return jc.createUnmarshaller();
-	} catch (JAXBException e) {
-	    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	synchronized (ViewFactory.class) {
+
+	    try {
+		return getContext().createUnmarshaller();
+
+	    } catch (JAXBException e) {
+
+		GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+	    }
+	    return null;
 	}
-	// this shouldn't happen as JAXBFactory test is used to check it will not happen
-	return null;
     }
 
     /**
+     * @param obj
+     * @return
+     * @throws JsonProcessingException
+     */
+    public static View fromJSONObject(String obj) throws JsonProcessingException {
+
+	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+	return jsonMapper.readValue(obj, View.class);
+    }
+
+    /**
+     * @param obj
+     * @return
+     * @throws JsonProcessingException
+     */
+    public static View fromJSONObject(JSONObject obj) throws JsonProcessingException {
+
+	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+	return jsonMapper.readValue(obj.toString(), View.class);
+    }
+
+    /**
+     * @param stream
+     * @return
+     * @throws JsonProcessingException
+     */
+    public static View fromJSONStream(InputStream stream) throws IOException {
+
+	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+	String utf8String = IOStreamUtils.asUTF8String(stream);
+
+	return jsonMapper.readValue(utf8String, View.class);
+    }
+
+    /**
+     * @param view
+     * @return
+     */
+    public static JSONObject toJSONObject(View view) throws JsonProcessingException {
+
+	ObjectMapper jsonMapper = new ObjectMapper();
+	jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+	return new JSONObject(jsonMapper.writeValueAsString(view));
+    }
+
+    /**
+     * @param view
+     * @return
+     */
+    public static String toXMLString(View view) throws JAXBException {
+
+	ByteArrayOutputStream stream = new ByteArrayOutputStream();
+	ViewFactory.createMarshaller().marshal(view, stream);
+	return stream.toString(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * @param is
      * @return
      * @throws JAXBException
      */
-    private static JAXBContext createContext() throws JAXBException {
-	return JAXBContext.newInstance(//
-		View.class, //
-		ViewBond.class, //
-		LogicalBond.class, //
-		ResourcePropertyBond.class, //
-		SimpleValueBond.class, // FS
-		SpatialBond.class);
+    public static View fromXMLString(String stringView) throws JAXBException {
+
+	Unmarshaller unmarshaller = createUnmarshaller();
+
+	return (View) unmarshaller.unmarshal(new ByteArrayInputStream(stringView.getBytes(StandardCharsets.UTF_8)));
+    }
+
+    /**
+     * @param streamView
+     * @return
+     * @throws JAXBException
+     */
+    public static View fromXMLStream(InputStream streamView) throws JAXBException {
+
+	Unmarshaller unmarshaller = createUnmarshaller();
+
+	return (View) unmarshaller.unmarshal(streamView);
     }
 
     /**
@@ -98,9 +195,20 @@ public class ViewFactory {
      * @param bond
      * @return
      */
-    public View createView(String id, String label, Bond bond) {
+    public static View createView(String id, String label, Bond bond) {
 
 	return createView(id, label, bond, null, null, null, null);
+    }
+
+    /**
+     * @param id
+     * @param label
+     * @param bond
+     * @return
+     */
+    public static View createView(String id, Bond bond) {
+
+	return createView(id, null, bond, null, null, null, null);
     }
 
     /**
@@ -110,7 +218,7 @@ public class ViewFactory {
      * @param bond
      * @return
      */
-    public View createView(String id, String label, String creator, Bond bond) {
+    public static View createView(String id, String label, String creator, Bond bond) {
 
 	return createView(id, label, bond, creator, null, null, null);
     }
@@ -123,7 +231,7 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public View createView(String id, String label, String creator, Bond bond, ViewVisibility viewVisibility) {
+    public static View createView(String id, String label, String creator, Bond bond, ViewVisibility viewVisibility) {
 
 	return createView(id, label, bond, creator, null, viewVisibility, null);
     }
@@ -137,7 +245,7 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public View createView(String id, String label, String creator, String owner, Bond bond, ViewVisibility viewVisibility) {
+    public static View createView(String id, String label, String creator, String owner, Bond bond, ViewVisibility viewVisibility) {
 
 	return createView(id, label, bond, creator, owner, viewVisibility, null);
     }
@@ -151,7 +259,7 @@ public class ViewFactory {
      * @param viewVisibility
      * @return
      */
-    public View createView(//
+    public static View createView(//
 	    String id, //
 	    String label, //
 	    Bond bond, //
@@ -162,7 +270,9 @@ public class ViewFactory {
 
 	View ret = new View();
 	ret.setId(id);
-	ret.setLabel(label);
+	if (label != null) {
+	    ret.setLabel(label);
+	}
 	ret.setBond(bond);
 	ret.setCreator(creator);
 	ret.setOwner(owner);
@@ -175,4 +285,32 @@ public class ViewFactory {
 	return ret;
     }
 
+    /**
+     * @return
+     */
+    private static JAXBContext getContext() {
+
+	synchronized (ViewFactory.class) {
+	    if (jaxbContext == null) {
+
+		try {
+		    jaxbContext = JAXBContext.newInstance(//
+			    View.class, //
+			    WKT.class, //
+			    ViewBond.class, //
+			    LogicalBond.class, //
+			    ResourcePropertyBond.class, //
+			    SimpleValueBond.class, //
+			    SpatialBond.class);
+
+		} catch (JAXBException e) {
+
+		    GSLoggerFactory.getLogger(ViewFactory.class).error(e);
+		}
+	    }
+
+	    return jaxbContext;
+
+	}
+    }
 }

@@ -119,9 +119,9 @@ public class DistributionSetting extends Setting implements BrokeringSetting {
 	    descriptor = TabContentDescriptorBuilder.get(DistributionSetting.class).//
 		    withLabel("Distribution").//
 		    withShowDirective("Manage DAB distributed sources", SortDirection.ASCENDING).//
-		    withAddDirective("Add distributed accessor", DistributionSetting.class).//
-		    withRemoveDirective("Remove accessor", true, DistributionSetting.class).//
-		    withEditDirective("Edit distributed source").//
+		    withAddDirective("ADD","Add distributed accessor", DistributionSetting.class).//
+		    withRemoveDirective("REMOVE","Remove accessor", true, DistributionSetting.class).//
+		    withEditDirective("EDIT","Edit distributed source").//
 		    build();
 	}
 

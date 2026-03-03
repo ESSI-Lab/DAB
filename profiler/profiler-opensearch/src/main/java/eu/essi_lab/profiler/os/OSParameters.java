@@ -589,7 +589,6 @@ public abstract class OSParameters {
 	    BondOperator operator = BondOperator.decode(timeRelation);
 
 	    switch (operator) {
-	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
 	    case INTERSECTS:
 		return Optional.of(
 			BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
@@ -713,7 +712,6 @@ public abstract class OSParameters {
 	    BondOperator operator = BondOperator.decode(timeRelation);
 
 	    switch (operator) {
-	    case BBOX: // same as not disjoint, as OGC filter encoding 09-026r2
 	    case INTERSECTS:
 		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
 

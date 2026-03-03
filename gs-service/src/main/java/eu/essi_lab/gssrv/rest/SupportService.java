@@ -24,6 +24,7 @@ import java.util.Map.Entry;
  * #L%
  */
 
+import eu.essi_lab.api.database.*;
 import jakarta.jws.WebService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -35,7 +36,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-import eu.essi_lab.api.database.GetViewIdentifiersRequest;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.views.DefaultViewManager;
 import org.json.JSONArray;
@@ -44,9 +44,6 @@ import org.json.JSONObject;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.SourceCacheStats;
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.authorization.userfinder.UserFinder;
@@ -602,7 +599,7 @@ public class SupportService {
 
 	try {
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
-	    DefaultViewManager manager = new DefaultViewManager();
+	    ViewManager manager = new ViewManager();
 	    manager.setDatabaseReader(reader);
 
 	    GetViewIdentifiersRequest vir = GetViewIdentifiersRequest.create(0, 1000, null, null, null, sourceDeployment);

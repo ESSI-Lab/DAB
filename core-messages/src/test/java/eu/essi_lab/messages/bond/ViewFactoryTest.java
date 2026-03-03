@@ -1,11 +1,8 @@
 package eu.essi_lab.messages.bond;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import eu.essi_lab.messages.bond.jaxb.ViewFactory;
+import eu.essi_lab.messages.bond.jaxb.*;
+import org.junit.*;
+import org.junit.rules.*;
 
 public class ViewFactoryTest {
 
@@ -14,7 +11,6 @@ public class ViewFactoryTest {
 
     @Before
     public void init() {
-	new ViewFactory();
     }
 
     @Test

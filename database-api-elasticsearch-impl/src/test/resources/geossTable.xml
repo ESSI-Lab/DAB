@@ -1,0 +1,904 @@
+<table class="relative-table wrapped confluenceTable">
+	<colgroup>
+		<col style="width: 2.30769%;" />
+		<col style="width: 10.7179%;" />
+		<col style="width: 13.0256%;" />
+		<col style="width: 17.1795%;" />
+		<col style="width: 15.1795%;" />
+		<col style="width: 17.1795%;" />
+		<col style="width: 5.58974%;" />
+		<col style="width: 5.58974%;" />
+		<col style="width: 13.2308%;" />
+	</colgroup>
+	<tbody>
+		<tr>
+			<td class="confluenceTd">UUID-e8f7704a-bcd1-42c4-853c-bbb9a6caadce</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">cccaID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">danubeODP</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">eartH2Observe-ID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">envidatID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">jrcdatacatalogdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">ochadbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">ukdatagovid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-18fd7338-be67-488d-8925-afafa65869b6</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">wrickanID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-c1932a12-5c08-48c1-9e1c-e90261b70ae3</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">cnesavisodbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">floodunosatdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">unoosaID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">water-switch-on</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-727f887a-fa72-414e-aac5-67377356eedd</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">copernicuscamsid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">cyprusgeoid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--dd6c9d04-63c0-480a-a296-48623bcbe234
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--fa9e4058-1651-43c3-ba6a-d835353d94eb
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--57a68231-5ca4-4433-b670-6328553595b7
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--0cc63642-602a-40ea-bb2b-c0a00f8290c7
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--43146999-0cba-4499-95f9-55b5f8f14e51
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2dbf0301-89ef-46bc-afbc-eaa3286cf8ee
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--7e0d36cb-3f0d-48eb-9b43-c84f239042dd
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--27d899ff-7ec1-470b-b471-b00e5a26b0ec
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">mesa-igad</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">rcmrdid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--618c3890-1398-4be4-8c32-ffff54422dd1
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--eabddce9-7a4e-4b6d-a7be-c3652ed3624d
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">unescoID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--a4731dec-1602-403d-9c94-5a8f75dbd50b
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">gfdrrdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">igngeoportalid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">SMHIOD</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">usnodcdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-d9a3ab80-f5e1-43c3-92cd-fbbbf005aded</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">digitalglobeid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-222afa1c-2d05-4675-a132-45284f3d41ac</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">idechile</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--4f17e4df-acd1-4bda-a8b3-2ce07b850767
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--e4de590a-772c-4141-8688-2305c795e15e
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-9056c936-ecd2-4b82-b448-f9619b9ede1c</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9e790b87-828f-42b8-a595-5ab32bc3e150
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">atlantosid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">aodnaustraliadbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">caffabdsdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">cciodpdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">geonetworkDEIMS</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">ecowasID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">eurac-research</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-456602db-4275-4410-8b68-436fd23ace69</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">finnishODP</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">faoID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--990a6cbc-7f95-47db-b580-50627f40c0bb
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--fb157f0d-a0ac-4f6d-8db7-bf0c1bfecd4b
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">geodabgeoscienceausid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">icimoddbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--370fbb6f-7401-4040-a3af-56e87a177867
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">isrogn</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-6e4ac3b1-ad07-4b11-ac92-b4aaf817aa02</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">moldovaportal</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-c28171d9-1dcc-4869-92a3-8e1390ce8c57</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-e88c1b5e-9bd6-4d62-bd87-be23beb77ed3</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">onegeologyID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--8885d85f-e0aa-4df0-9430-1b598b95fc24
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--a91e0cb8-6609-4ee7-9217-b96161e040d9
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--dad0859e-206c-480b-a080-d4eea70ee22d
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-38eef29b-e627-4660-9f23-d9b3847de09d</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--d563556b-1cdb-4031-bd5b-ce5f11abc525
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">healthsitesID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-4ee7d41f-837e-4d4b-9674-d7bb0b84a891</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-a4002f3f-862b-411c-b617-71349b711742</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-ab894bc6-b88c-4cee-9287-1b6de3dd8549</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">hydroshareid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-9b102191-5ab1-48ac-9acb-7c66f5873c4a</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nasagsfcozonewatchdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">adsdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--0bd2c3f4-96a3-4204-8d5d-01bd3b70fb23
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">rdancarucardbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-2dc3a01b-934e-4c3d-9311-527ac93ec058</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-481e6892-5874-44dc-aafd-2914b58f67ba</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">openamap</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">obisid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-e0c41cfd-87d3-4472-90a1-082a3006df34</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-0fc9f443-98f5-414d-bd65-b083e4861ae1</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">iecolabID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">chinageosatellite</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">landsat8dbidawstest</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">sentinelscihudtest</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-8994bd4b-0e93-4217-af91-d621673e8e7b</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">ecopotentialvlabid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">jamstecdbid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-176236f4-aedb-4c81-b9ab-8e7ee793e734</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--70acd24b-d638-447e-8f04-1c7f40aa0f07
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--5b110956-0d54-4781-8394-2c7a22b5dab6
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2059c8ea-26b9-46e4-af09-debdac21fb84
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--c1abb3c3-6ce6-48a1-a646-deb8d68d6954
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--3e96dea6-e43a-46ce-baaf-59e791b866f8
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--71770785-18b6-419e-96eb-085e37adea13
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--3b7aede6-a45e-4552-b6b1-ed91f36c0146
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--4586134c-4984-46c4-8427-c1484cae8b77
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--0bebff6b-07cd-4b06-b6ad-baf647702380
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--42cd3b6a-3f70-4adc-b4c0-5991f55c083a
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2a3f5529-a89b-4e2d-81e7-b33e5e4c13db
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--6c3449cc-f093-427f-89e5-c20c2e5087cb
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--1a77effa-f8f3-480e-923f-84e5223c7193
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--51fcf52f-c9a7-4c08-b6fd-951b9f93a010
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--f48a598a-9e91-4ed7-87d3-dba5e2720958
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--3fd9dbdf-8047-4e15-8fe7-5c67882d6d58
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--bed93424-066a-45c7-8c3e-be8ae5f36685
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--12b06384-83c4-4c53-8a38-beb5f6fe8f52
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--36279a77-61ef-495e-b955-c6e7177883dc
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2d11f79a-5a02-4c9d-b4a2-947f465b4c97
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--3c802922-b81f-4c18-9d4b-452e245736b6
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2c7d3c66-a1d5-437f-8da7-19ab884005d0
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--4065b6da-9952-4205-b9ae-05861c27ae81
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--ed81da3d-b03f-4f70-9055-86759d70e6d8
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--d037bf09-e5ca-4101-b80f-ee1e834ba33d
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--b3540eaf-7344-4c96-a6cc-89979e013c07
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--aa3f05f3-b5f5-4a34-9429-07463dcb7c54
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--ada25560-9728-4d1e-9e35-4f13b2de2d52
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--a790b15d-402f-4b7b-b48e-a2ffac982305
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--246ed4f0-57cf-42c8-bb61-5e89a6b5f197
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2ad65b8a-07af-49de-8526-4056590b5029
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-97596464-a74d-45e3-ba46-26213c05cd40</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--67aa210a-a3b2-487a-adc1-ff4cc59b2a6f
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--95469baa-89ab-462d-a189-939368e6f8ca
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--b1694007-963a-4f6f-8c2e-d2f65f31effc
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--3133e6e8-371f-4398-8e7b-9296c08fa50d
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--32710973-63dc-4609-881d-c0698d41032c
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--72b0babc-aa22-4961-be79-8bf48d14c365
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--aec48310-cbc2-48ae-a602-5dcb2656f3cc
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--cc3126a4-403f-4a46-b338-e4aab8f2aaa6
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--992f5751-7626-44e1-b1ff-9f68dca345a4
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--88537b00-9b03-4c8f-a9e8-32014d529c08
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--41961ec6-4ef4-470b-aed5-95fc1520c79f
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--0e212782-6c73-467a-ba6b-ab8729d37ca4
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9e36cdd1-62e5-4e89-a712-1fb25f8d8971
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--401d8453-89a2-4077-9618-fed88b4b2fde
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--03677f35-e408-49fe-8cbf-2180edee05a3
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--977f2a06-1219-45a2-89a0-d0e0cd0767ea
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--56b1d3d9-d488-4bb9-b527-5d2ac84a91d6
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--f38c33f2-860b-4958-829e-d876ea43c355
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--56b743db-60c9-427c-b145-a2ef43fc05a4
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--ea5719c3-c0b8-4b0d-992d-76edcde38369
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--91f1b739-0520-413a-a2ae-f1e532a5383a
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--550a117c-f833-438b-8b90-0c1db4e3b9ed
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-f0becf8d-fc72-4968-8bf3-ed52b53e6a01</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--dfbf3988-3c46-4889-a275-4fd52784201b
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--a561e668-cd1a-4f77-a619-29ceb32b98cb
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--7c36aafe-3f91-45d1-b711-0aa71cb553bf
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--f5e78997-ca63-4ffc-8325-e22e50cf8532
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--34f4537a-c7b3-4bc0-b55e-7521554b5359
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--d9556c1b-b352-4a99-9278-7961967266c9
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--47a896d3-a332-46a3-ad25-518ce1c374da
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--6b20de6f-d199-4341-9729-d615af5ba7c5
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--8691c731-1e90-418b-8549-9d013d57a509
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9df37a70-efd0-4fb7-9ffd-9965115f47b0
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--8b84ecf8-0d4b-493b-94a5-140b9d16add4
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--444a7669-aeef-4981-85b2-affd2eabd43e
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-add5725a-533d-4c99-803d-c648db836173</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--5f9cbc1b-ca5a-4f23-b211-a9d9e7bd4228
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--1f57a10e-41e8-46f1-a2b8-346e51f4b6c0
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--6b7632c4-8a00-42f3-a5c0-7a505b69e79d
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--2ae16ad2-894b-41f3-ab55-dcdfcda09bc5
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">caucasusID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--1605f5e3-9710-4d9c-95e3-fdfb0f7bfdd1
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--4d365321-0d08-4ffa-aca5-dda9da16c13b
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--12110cb0-eac4-41b5-b52d-53c1f5278ea3
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--bf8bf51a-86cb-4063-a48d-034e60142006
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--d278e826-9328-4d6b-ada7-44aad0b6313c
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--1982058c-065f-445b-b203-032656095ed3
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--7a18fd65-1c63-4ff7-a07e-75a75667a6e7
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--0ac41c7f-9b72-4602-88c1-34152de49ee9
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--7020feac-a35a-4693-98e7-e712ac8da584
+			</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">H01431827904</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">unescoIIWQID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">inpesat</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">marineID</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-e101622c-6ae1-4b68-bfea-8acf067e31dd</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">geodabgbifid</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">UUID-d846e020-f09d-4a7d-9963-874d8b728657</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">syke</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">arcCan</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">arcFin</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">arcNor</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">arcRus</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">arcUsa</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">arcIce</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">ftpCanada</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">usgswatersrv</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">arcDen</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaAbr</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaBas</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaBol</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaCal</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaCam</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaEmr</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaFvg</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaLaz</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaLig</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaLom</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaMar</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaMol</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaPie</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaPug</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaSar</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaSic</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaTos</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaUmb</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaVda</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">itaVen</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">savahis</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">australia-waterdata</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">brazil-ana</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">brazil-inmet</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">argentina-ina</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">aralKaza</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">aralKyrg</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">aralTaji</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">aralTurk</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">aralUzbe</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">chinaDam</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">chinaSts</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">chinaYB</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerBen</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerBur</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerCam</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerCda</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerGui</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerMal</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerNig</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerNige</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerTch</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nigerYB</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nzNet</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">nzYB</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">plataAg</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">plataBr</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">plataPa</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">plataUr</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivCan</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivCol</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivCos</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivCub</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivDom</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivEls</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivGua</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivJam</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivMex</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivNic</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivPan</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">raivUsa</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">sadcNet</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">sadcYB</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">savaBars</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">savaFedBA</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">savaHr</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">savaMe</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">savaRs</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">savaSi</td>
+		</tr>
+		<tr>
+			<td class="confluenceTd">dinagua</td>
+		</tr>
+	</tbody>
+</table>

@@ -227,7 +227,7 @@ public class TermsHandler extends StreamingRequestHandler {
 		}
 
 		discoveryMessage.setDistinctValuesElement(metadata);
-		SortedFields fields = new SortedFields(ResourceProperty.PUBLIC_ID, SortOrder.ASCENDING);
+		SortedFields fields = new SortedFields(MetadataElement.IDENTIFIER, SortOrder.ASCENDING);
 		discoveryMessage.setSortedFields(fields);
 		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 		discoveryMessage.getResourceSelector().addIndex(metadata);

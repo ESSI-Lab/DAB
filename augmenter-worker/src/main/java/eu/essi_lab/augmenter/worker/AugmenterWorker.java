@@ -21,60 +21,35 @@ package eu.essi_lab.augmenter.worker;
  * #L%
  */
 
-import java.io.InputStream;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import org.quartz.JobExecutionContext;
-
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.DatabaseFolder.EntryType;
-import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.augmenter.Augmenter;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.DatabaseFolder.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.augmenter.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
+import eu.essi_lab.cfga.scheduler.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.cfga.scheduler.SchedulerWorker;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.IterationLogger;
-import eu.essi_lab.lib.utils.PropertiesUtils;
-import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.messages.AugmenterProperties;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.JobStatus.JobPhase;
-import eu.essi_lab.messages.Page;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.JobStatus.*;
 import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.SortedFields;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.SortOrder;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.views.DefaultViewManager;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.ontology.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.api.database.ViewManager;
+import org.quartz.*;
+
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -413,7 +388,7 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
 
 	if (viewIdentifier.isPresent()) {
 
-	    DefaultViewManager manager = new DefaultViewManager();
+	    ViewManager manager = new ViewManager();
 	    manager.setDatabaseReader(dataBaseReader);
 
 	    Optional<View> resolvedView = manager.getResolvedView(viewIdentifier.get());
