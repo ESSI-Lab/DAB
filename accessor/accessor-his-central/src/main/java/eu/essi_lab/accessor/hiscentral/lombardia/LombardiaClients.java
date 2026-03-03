@@ -2,7 +2,9 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
 
 import java.net.URL;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 /*-
  * #%L
@@ -34,6 +36,34 @@ import redis.clients.jedis.JedisPool;
 public final class LombardiaClients {
 
     private LombardiaClients() {
+    }
+
+    /**
+     * Creates a client based on the global Lombardia session coordinator setting. If distributed
+     * coordination is enabled, uses Redis; otherwise uses file-based single-node strategy.
+     *
+     * @param endpoint HIS Central endpoint URL
+     * @return client configured from global settings
+     * @throws Exception if client construction fails
+     */
+    public static HISCentralLombardiaClient createFromConfiguration(URL endpoint) throws Exception {
+	var setting = ConfigurationWrapper.getLombardiaSessionCoordinatorSetting();
+	if (!setting.isDistributedSessionCoordinator()) {
+	    return new HISCentralLombardiaClient(endpoint);
+	}
+	String redisEndpoint = setting.getRedisEndpoint();
+	if (redisEndpoint == null || redisEndpoint.isEmpty()) {
+	    redisEndpoint = "localhost:6379";
+	}
+	String[] parts = redisEndpoint.split(":");
+	String host = parts.length > 0 ? parts[0].trim() : "localhost";
+	int port = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 6379;
+	JedisPool pool = new JedisPool(new JedisPoolConfig(), host, port);
+	return createWithRedisCoordinator(endpoint,
+		ConfigurationWrapper.getCredentialsSetting().getLombardiaKeystorePassword().orElse(null),
+		ConfigurationWrapper.getCredentialsSetting().getLombardiaUsername().orElse(null),
+		ConfigurationWrapper.getCredentialsSetting().getLombardiaPassword().orElse(null),
+		pool);
     }
 
     /**

@@ -50,6 +50,7 @@ import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
@@ -827,6 +828,16 @@ public class ConfigurationWrapper {
 	return configuration.get(//
 		SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
 		RateLimiterSetting.class).get();
+    }
+
+    /**
+     * @return
+     */
+    public static LombardiaSessionCoordinatorSetting getLombardiaSessionCoordinatorSetting() {
+
+	return configuration.get(//
+		SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel(), //
+		LombardiaSessionCoordinatorSetting.class).get();
     }
 
     /**

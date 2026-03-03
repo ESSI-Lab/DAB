@@ -34,6 +34,7 @@ import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.patch.*;
@@ -557,6 +558,17 @@ public class DABStarter implements ConfigurationChangeListener {
 			FileSource.switchSource(configuration);
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
+	    }
+
+	    //
+	    // add Lombardia session coordinator setting if missing (e.g. upgraded from older config)
+	    //
+	    if (configuration.get(SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel(),
+		    LombardiaSessionCoordinatorSetting.class).isEmpty()) {
+
+		LombardiaSessionCoordinatorSetting lombardiaSetting = new LombardiaSessionCoordinatorSetting();
+		lombardiaSetting.setIdentifier(SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel());
+		configuration.put(lombardiaSetting);
 	    }
 
 	    //

@@ -88,7 +88,7 @@ public class JedisLombardiaTokenAcquisitionExternalTestIT {
                             int now = inSession.incrementAndGet();
                             if (now != 1) {
                                 failures.add(new AssertionError(
-                                        "Node " + nodeId + " run " + r + ": expected 1 thread in session, got " + now));
+                                        "Node " + nodeId + " run : expected 1 thread in session, got " + now));
                             }
                             try {
                                 Thread.sleep(20);

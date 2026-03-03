@@ -118,7 +118,7 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 
 	try {
 
-	    HISCentralLombardiaClient client = new HISCentralLombardiaClient(new URL(getSourceURL()));
+	    HISCentralLombardiaClient client = LombardiaClients.createFromConfiguration(new URL(getSourceURL()));
 
 	    List<String> stationsIdentifiers = client.getStationIdentifiers();
 
