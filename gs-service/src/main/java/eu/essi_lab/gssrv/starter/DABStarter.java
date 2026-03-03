@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -34,6 +34,7 @@ import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.patch.*;
@@ -557,6 +558,17 @@ public class DABStarter implements ConfigurationChangeListener {
 			FileSource.switchSource(configuration);
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
+	    }
+
+	    //
+	    // add Lombardia session coordinator setting if missing (e.g. upgraded from older config)
+	    //
+	    if (configuration.get(SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel(),
+		    LombardiaSessionCoordinatorSetting.class).isEmpty()) {
+
+		LombardiaSessionCoordinatorSetting lombardiaSetting = new LombardiaSessionCoordinatorSetting();
+		lombardiaSetting.setIdentifier(SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel());
+		configuration.put(lombardiaSetting);
 	    }
 
 	    //

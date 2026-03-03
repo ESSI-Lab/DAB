@@ -13,12 +13,12 @@ package eu.essi_lab.lib.utils;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -121,22 +121,35 @@ public class FileUtils {
     }
 
     /**
-     * @param path
-     * @return
+     * Sanitizes a string for use as a file or directory name on common filesystems (NTFS and Unix/ext3).
+     * Removes control characters (including null), NTFS-invalid characters, and trims trailing dots/spaces.
+     *
+     * @param value raw string (e.g. from observation titles or IDs)
+     * @return sanitized string safe for file/directory names
      */
     public static String sanitizeForNtfs(String value) {
-
-	String sanitized = value.replaceAll("[\\\\/:*?\"<>|]", "_");
-
+	if (value == null || value.isEmpty()) {
+	    return "_";
+	}
+	// Remove control characters (0x00-0x1F, 0x7F) and other chars invalid on ext3/NTFS
+	String sanitized = value.replaceAll("[\\p{Cntrl}]", "_");
+	// Replace non-ASCII (e.g. Latin-1/UTF-8 mojibake like "Ã") to avoid path/encoding issues
+	sanitized = sanitized.replaceAll("[^\\x00-\\x7F]", "_");
+	sanitized = sanitized.replaceAll("[\\\\/:*?\"<>|]", "_");
+	// Collapse multiple underscores from replacements
+	sanitized = sanitized.replaceAll("_+", "_");
 	sanitized = sanitized.replaceAll("[\\. ]+$", "");
-
+	// Avoid empty after trim
+	if (sanitized.isEmpty()) {
+	    sanitized = "_";
+	}
 	String baseName = sanitized.contains(".") ? sanitized.substring(0, sanitized.indexOf('.')) : sanitized;
-
+	if (baseName.isEmpty()) {
+	    baseName = sanitized;
+	}
 	if (RESERVED_NAMES.contains(baseName.toUpperCase())) {
-
 	    sanitized = "_" + sanitized;
 	}
-
 	return sanitized;
     }
 

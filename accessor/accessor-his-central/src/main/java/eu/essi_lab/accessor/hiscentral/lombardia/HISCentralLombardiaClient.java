@@ -21,13 +21,8 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -349,6 +344,9 @@ public class HISCentralLombardiaClient {
     private String username;
     private String password;
 
+    private final LombardiaTokenStore tokenStore;
+    private final LombardiaSessionCoordinator coordinator;
+
     private static HashMap<Operation, String> soapActions = new HashMap<>();
     private static HashMap<Path, XMLDocumentReader> wsdls = new HashMap<>();
     private static HashMap<String, String> statiStazione = new HashMap<>(); // id -> nome
@@ -357,6 +355,7 @@ public class HISCentralLombardiaClient {
     private static HashMap<String, String> province = new HashMap<>(); // sigla -> nome
     private static HashMap<String, Comune> comuni = new HashMap<>(); // id -> comune
     private static ExpiringCache<Stazione> stazioni = new ExpiringCache<>();
+
     static {
 	stazioni.setDuration(1000 * 60 * 60 * 24l);
     }
@@ -409,14 +408,26 @@ public class HISCentralLombardiaClient {
     public HISCentralLombardiaClient(URL endpoint) throws Exception {
 	this(endpoint, ConfigurationWrapper.getCredentialsSetting().getLombardiaKeystorePassword().orElse(null), //
 		ConfigurationWrapper.getCredentialsSetting().getLombardiaUsername().orElse(null), //
-		ConfigurationWrapper.getCredentialsSetting().getLombardiaPassword().orElse(null));
+		ConfigurationWrapper.getCredentialsSetting().getLombardiaPassword().orElse(null), null, null);
     }
 
     public HISCentralLombardiaClient(URL endpoint, String keystorePassword, String username, String password) throws Exception {
+	this(endpoint, keystorePassword, username, password, null, null);
+    }
+
+    /**
+     * Constructor with optional token store and session coordinator for multi-node coordination.
+     * If both are null, file-based single-node strategy is used. For multiple nodes, pass a
+     * {@link RedisLombardiaTokenStore} and {@link JedisLombardiaSessionCoordinator} (e.g. built from a JedisPool).
+     */
+    public HISCentralLombardiaClient(URL endpoint, String keystorePassword, String username, String password,
+	    LombardiaTokenStore tokenStore, LombardiaSessionCoordinator coordinator) throws Exception {
 	this.endpoint = endpoint;
 	this.keystorePassword = keystorePassword;
 	this.username = username;
 	this.password = password;
+	this.tokenStore = tokenStore != null ? tokenStore : new FileLombardiaTokenStore();
+	this.coordinator = coordinator != null ? coordinator : new FileLombardiaSessionCoordinator();
 
 	GSLoggerFactory.getLogger(getClass()).info("Creating Soap actions cache");
 	synchronized (soapActions) {
@@ -577,7 +588,8 @@ public class HISCentralLombardiaClient {
 
     private void login() throws Exception {
 	LoginResult ret = null;
-	main: for (int i = 0; i < 10; i++) {
+	main:
+	for (int i = 0; i < 30; i++) {
 	    ret = loginExecution();
 	    switch (ret.getExitCode()) {
 	    case "0":
@@ -586,10 +598,11 @@ public class HISCentralLombardiaClient {
 		break main;
 	    case "3":
 		GSLoggerFactory.getLogger(getClass()).info("Another session is open, trying to close it");
-		String previousToken = readToken();
+		String previousToken = readToken();		
 		if (previousToken != null) {
 		    logout(previousToken);
 		}
+		Thread.sleep(1000);
 		break;
 	    }
 	}
@@ -599,7 +612,7 @@ public class HISCentralLombardiaClient {
 	token = ret.getToken();
 	if (exit.equals("0")) {
 	    writeToken(token);
-	    // GSLoggerFactory.getLogger(getClass()).info("Successful login, token: {}", token);
+	    GSLoggerFactory.getLogger(getClass()).info("Successful login, token: {}", token);
 	} else {
 	    String error = "Error during login. " + msg;
 	    GSLoggerFactory.getLogger(getClass()).error(error);
@@ -607,42 +620,24 @@ public class HISCentralLombardiaClient {
 	}
     }
 
-    private static final String TOKEN_FILE = "arpa-lombardia.token";
-
-    private synchronized void writeToken(String token) throws IOException {
-	String tmpdir = System.getProperty("java.io.tmpdir");
-	File file = new File(tmpdir, TOKEN_FILE);
-	if (file.exists()) {
-	    file.delete();
-	}
-	file.createNewFile();
-	FileOutputStream fos = new FileOutputStream(file);
-	fos.write(token.getBytes(StandardCharsets.UTF_8));
-	fos.close();
+    private void writeToken(String token) throws IOException {
+	tokenStore.writeToken(token);
     }
 
-    private synchronized void deleteToken(String token) throws IOException {
-	String tmpdir = System.getProperty("java.io.tmpdir");
-	File file = new File(tmpdir, TOKEN_FILE);
-	if (file.exists()) {
-	    file.delete();
-	}
+    private void deleteToken(String token) throws IOException {
+	tokenStore.deleteToken(token);
     }
 
-    private synchronized String readToken() throws IOException {
-	String tmpdir = System.getProperty("java.io.tmpdir");
-	File file = new File(tmpdir, TOKEN_FILE);
-	if (!file.exists()) {
-	    return null;
-	}
-	FileInputStream fis = new FileInputStream(file);
-	InputStreamReader reader = new InputStreamReader(fis);
-	BufferedReader br = new BufferedReader(reader);
-	String token = br.readLine();
-	br.close();
-	reader.close();
-	fis.close();
-	return token;
+    private String readToken() throws IOException {
+	return tokenStore.readToken();
+    }
+
+    /**
+     * Logs out using the given token (remote logout). Used by the session coordinator to close
+     * a session held by a node considered dead.
+     */
+    public void logoutWithToken(String token) throws Exception {
+	logout(token);
     }
 
     private void logout() throws Exception {
@@ -694,106 +689,106 @@ public class HISCentralLombardiaClient {
     }
 
     public XMLDocumentReader elencoStatiStazione() throws Exception {
-	login();
-	try {
-	    String body = getSOAPHeader() //
-		    + "<ElencoStatiStazione xmlns=\"http://tempuri.org/\"\n" //
-		    + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
-		    + "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <ElencoStatiStazione>" //
-		    + getTokenXML() //
-		    + "        </ElencoStatiStazione>\n" //
-		    + "    </xInput>\n" //
-		    + "</ElencoStatiStazione>" //
-		    + getSOAPFooter();
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String body = getSOAPHeader() //
+			+ "<ElencoStatiStazione xmlns=\"http://tempuri.org/\"\n" //
+			+ "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
+			+ "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <ElencoStatiStazione>" //
+			+ getTokenXML() //
+			+ "        </ElencoStatiStazione>\n" //
+			+ "    </xInput>\n" //
+			+ "</ElencoStatiStazione>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.ELENCO_STATI_STAZIONE, bodyReader);
-	    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-	    return reader;
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.ELENCO_STATI_STAZIONE, bodyReader);
+		XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		return reader;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
     public XMLDocumentReader elencoTipiStazione() throws Exception {
-	login();
-	try {
-	    String body = getSOAPHeader() //
-		    + "<ElencoTipiStazione xmlns=\"http://tempuri.org/\"\n" //
-		    + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
-		    + "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <ElencoTipiStazione>" //
-		    + getTokenXML() //
-		    + "        </ElencoTipiStazione>\n" //
-		    + "    </xInput>\n" //
-		    + "</ElencoTipiStazione>" //
-		    + getSOAPFooter();
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String body = getSOAPHeader() //
+			+ "<ElencoTipiStazione xmlns=\"http://tempuri.org/\"\n" //
+			+ "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
+			+ "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <ElencoTipiStazione>" //
+			+ getTokenXML() //
+			+ "        </ElencoTipiStazione>\n" //
+			+ "    </xInput>\n" //
+			+ "</ElencoTipiStazione>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.ELENCO_TIPI_STAZIONE, bodyReader);
-	    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-	    return reader;
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.ELENCO_TIPI_STAZIONE, bodyReader);
+		XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		return reader;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
     public XMLDocumentReader elencoProvince() throws Exception {
-	login();
-	try {
-	    String body = getSOAPHeader() //
-		    + "<ElencoProvince xmlns=\"http://tempuri.org/\"\n" //
-		    + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
-		    + "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <ElencoProvince>\n" + getTokenXML() //
-		    + "        </ElencoProvince>\n" //
-		    + "    </xInput>\n" //
-		    + "</ElencoProvince>" //
-		    + getSOAPFooter();
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String body = getSOAPHeader() //
+			+ "<ElencoProvince xmlns=\"http://tempuri.org/\"\n" //
+			+ "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
+			+ "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <ElencoProvince>\n" + getTokenXML() //
+			+ "        </ElencoProvince>\n" //
+			+ "    </xInput>\n" //
+			+ "</ElencoProvince>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.ELENCO_PROVINCE, bodyReader);
-	    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-	    return reader;
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.ELENCO_PROVINCE, bodyReader);
+		XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		return reader;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
     public XMLDocumentReader elencoComuni() throws Exception {
-	login();
-	try {
-	    String body = getSOAPHeader() //
-		    + "<ElencoComuni xmlns=\"http://tempuri.org/\"\n" //
-		    + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
-		    + "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <ElencoComuni>" //
-		    + getTokenXML() //
-		    + "        </ElencoComuni>\n" //
-		    + "    </xInput>\n" //
-		    + "</ElencoComuni>" //
-		    + getSOAPFooter();
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String body = getSOAPHeader() //
+			+ "<ElencoComuni xmlns=\"http://tempuri.org/\"\n" //
+			+ "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
+			+ "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <ElencoComuni>" //
+			+ getTokenXML() //
+			+ "        </ElencoComuni>\n" //
+			+ "    </xInput>\n" //
+			+ "</ElencoComuni>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.ELENCO_COMUNI, bodyReader);
-	    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-	    return reader;
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.ELENCO_COMUNI, bodyReader);
+		XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		return reader;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
     public Set<Entry<String, Stazione>> elencoStazioni() throws Exception {
@@ -802,47 +797,47 @@ public class HISCentralLombardiaClient {
 		return stazioni.entrySet();
 	    }
 	}
-	login();
-	try {
-	    String body = getSOAPHeader() //
-		    + "<ElencoStazioni xmlns=\"http://tempuri.org/\"\n" //
-		    + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
-		    + "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <ElencoStazioni>\n" + getTokenXML() //
-		    + "        </ElencoStazioni>\n" //
-		    + "    </xInput>\n" //
-		    + "</ElencoStazioni>" //
-		    + getSOAPFooter();
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String body = getSOAPHeader() //
+			+ "<ElencoStazioni xmlns=\"http://tempuri.org/\"\n" //
+			+ "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
+			+ "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <ElencoStazioni>\n" + getTokenXML() //
+			+ "        </ElencoStazioni>\n" //
+			+ "    </xInput>\n" //
+			+ "</ElencoStazioni>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.ELENCO_STAZIONI, bodyReader);
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.ELENCO_STAZIONI, bodyReader);
 
-	    StAXDocumentParser sdp = new StAXDocumentParser(response.body());
-	    List<String> founds = sdp.find(new QName("Stazione"));
-	    synchronized (stazioni) {
-		for (String found : founds) {
-		    Stazione stazione = new Stazione();
-		    StAXDocumentParser childSdp = new StAXDocumentParser(found);
-		    childSdp.add(new QName("IdStazione"), v -> stazione.setId(v));
-		    childSdp.add(new QName("NomeStazione"), v -> stazione.setNome(v));
-		    childSdp.add(new QName("Stato"), "IdStato", v -> stazione.setIdStato(v));
-		    childSdp.add(new QName("Comune"), "IdComune", v -> stazione.setIdComune(v));
-		    childSdp.add(new QName("TipoStazione"), "idTipoStazione", v -> stazione.setIdTipoStazione(v));
-		    childSdp.add(new QName("Indirizzo"), v -> stazione.setIndirizzo(v));
-		    childSdp.add(new QName("Quota"), v -> stazione.setQuota(v));
-		    childSdp.add(new QName("UTM_Nord"), v -> stazione.setUtm32TNord(v));
-		    childSdp.add(new QName("UTM_Est"), v -> stazione.setUtm32TEst(v));
-		    childSdp.parse();
-		    stazioni.put(stazione.getId(), stazione);
+		StAXDocumentParser sdp = new StAXDocumentParser(response.body());
+		List<String> founds = sdp.find(new QName("Stazione"));
+		synchronized (stazioni) {
+		    for (String found : founds) {
+			Stazione stazione = new Stazione();
+			StAXDocumentParser childSdp = new StAXDocumentParser(found);
+			childSdp.add(new QName("IdStazione"), v -> stazione.setId(v));
+			childSdp.add(new QName("NomeStazione"), v -> stazione.setNome(v));
+			childSdp.add(new QName("Stato"), "IdStato", v -> stazione.setIdStato(v));
+			childSdp.add(new QName("Comune"), "IdComune", v -> stazione.setIdComune(v));
+			childSdp.add(new QName("TipoStazione"), "idTipoStazione", v -> stazione.setIdTipoStazione(v));
+			childSdp.add(new QName("Indirizzo"), v -> stazione.setIndirizzo(v));
+			childSdp.add(new QName("Quota"), v -> stazione.setQuota(v));
+			childSdp.add(new QName("UTM_Nord"), v -> stazione.setUtm32TNord(v));
+			childSdp.add(new QName("UTM_Est"), v -> stazione.setUtm32TEst(v));
+			childSdp.parse();
+			stazioni.put(stazione.getId(), stazione);
+		    }
 		}
+		return stazioni.entrySet();
+	    } finally {
+		logout();
 	    }
-	    return stazioni.entrySet();
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+	});
     }
 
     public XMLDocumentReader elencoTipologieSensore() throws Exception {
@@ -850,197 +845,214 @@ public class HISCentralLombardiaClient {
     }
 
     public XMLDocumentReader elencoTipologieSensore(String stationId) throws Exception {
-	login();
-	try {
-	    String stationXML = "";
-	    if (stationId != null) {
-		stationXML = "<Stazioni>\n" //
-			+ "<IdStazione>" + stationId + "</IdStazione>\n" //
-			+ "</Stazioni>";
-	    }
-	    String body = getSOAPHeader() //
-		    + "<ElencoTipologieSensore xmlns=\"http://tempuri.org/\"\n" //
-		    + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
-		    + "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <ElencoTipologieSensore>\n" //
-		    + getTokenXML() //
-		    + stationXML //
-		    + "        </ElencoTipologieSensore>\n" //
-		    + "    </xInput>\n" //
-		    + "</ElencoTipologieSensore>" //
-		    + getSOAPFooter();
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String stationXML = "";
+		if (stationId != null) {
+		    stationXML = "<Stazioni>\n" //
+			    + "<IdStazione>" + stationId + "</IdStazione>\n" //
+			    + "</Stazioni>";
+		}
+		String body = getSOAPHeader() //
+			+ "<ElencoTipologieSensore xmlns=\"http://tempuri.org/\"\n" //
+			+ "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
+			+ "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <ElencoTipologieSensore>\n" //
+			+ getTokenXML() //
+			+ stationXML //
+			+ "        </ElencoTipologieSensore>\n" //
+			+ "    </xInput>\n" //
+			+ "</ElencoTipologieSensore>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.ELENCO_TIPOLOGIE_SENSORE, bodyReader);
-	    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-	    return reader;
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.ELENCO_TIPOLOGIE_SENSORE, bodyReader);
+		XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		return reader;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
-    public void elencoSensori() throws Exception {
-	elencoSensori(null);
+    public List<Sensore> elencoSensori() throws Exception {
+	return elencoSensori(null);
     }
 
     public List<Sensore> elencoSensori(String stationId) throws Exception {
-	login();
-	try {
-	    String stationXML = "";
-	    if (stationId != null) {
-		stationXML = "<Stazioni>\n" //
-			+ "<IdStazione>" + stationId + "</IdStazione>\n" //
-			+ "</Stazioni>";
-	    }
-	    String body = getSOAPHeader() //
-		    + "<ElencoSensori xmlns=\"http://tempuri.org/\"\n" //
-		    + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
-		    + "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <ElencoSensori>\n" //
-		    + getTokenXML() //
-		    + stationXML //
-		    + "        </ElencoSensori>\n" //
-		    + "    </xInput>\n" //
-		    + "</ElencoSensori>" //
-		    + getSOAPFooter();
+	List<String> stationIdentifiers = new ArrayList<>();
+	stationIdentifiers.add(stationId);
+	return elencoSensori(stationIdentifiers, null);
+    }
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.ELENCO_SENSORI, bodyReader);
-	    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-	    // System.out.println(reader.toString());
-	    List<Sensore> ret = new ArrayList<>();
-	    Node[] sensoreNodes = reader.evaluateNodes("//*:Sensore");
-	    for (Node sensoreNode : sensoreNodes) {
-		String id = reader.evaluateString(sensoreNode, "*:Anagrafica/*:IdSensore");
-		String nome = reader.evaluateString(sensoreNode, "*:Anagrafica/*:NomeSensore");
-		String idStato = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Stato/@IdStato");
-		String idTipoSensore = reader.evaluateString(sensoreNode, "*:Anagrafica/*:TipoSensore/@IdTipoSensore");
-		String idStazione = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Stazione/@IdStazione");
-		String unitaMisura = reader.evaluateString(sensoreNode, "*:Anagrafica/*:UnitaMisura");
-		String frequenza = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Frequenza");
-		String quota = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Quota");
-		String utmNord = reader.evaluateString(sensoreNode, "*:Anagrafica/*:UTM_Nord");
-		String utmEst = reader.evaluateString(sensoreNode, "*:Anagrafica/*:UTM_Est");
-
-		Node[] datiNodes = reader.evaluateNodes(sensoreNode, "*:DatiDisponibili/*:Standard/*:Dato");
-		for (Node datiNode : datiNodes) {
-		    Sensore sensore = new Sensore();
-		    String idFunzione = reader.evaluateString(datiNode, "@IdFunzione");
-		    String idOperatore = reader.evaluateString(datiNode, "@IdOperatore");
-		    String idPeriodo = reader.evaluateString(datiNode, "@IdPeriodo");
-		    String da = reader.evaluateString(datiNode, "*:Disponibile/@Da");
-		    String a = reader.evaluateString(datiNode, "*:Disponibile/@A");
-		    if (da == null || da.isEmpty()) {
-			GSLoggerFactory.getLogger(getClass()).warn("Empty start date");
-			continue;
+    public List<Sensore> elencoSensori(List<String> stationIdentifiers, List<String> sensorTypes) throws Exception {
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String stationXML = "";
+		if (stationIdentifiers != null && !stationIdentifiers.isEmpty()) {
+		    stationXML = "<Stazioni>\n"; //
+		    for (String stationIdentifier : stationIdentifiers) {
+			stationXML += "<IdStazione>" + stationIdentifier + "</IdStazione>\n";
 		    }
-		    if (a == null || a.isEmpty()) {
-			GSLoggerFactory.getLogger(getClass()).warn("Empty end date");
-			continue;
-		    }
-		    sensore.setId(id);
-		    sensore.setNome(nome);
-		    sensore.setIdStato(idStato);
-		    sensore.setIdTipoSensore(idTipoSensore);
-		    sensore.setIdStazione(idStazione);
-		    sensore.setUnitaMisura(unitaMisura);
-		    sensore.setFrequenza(frequenza);
-		    sensore.setQuota(quota);
-		    sensore.setUtm32TNord(utmNord);
-		    sensore.setUtm32TEst(utmEst);
-		    sensore.setIdFunzione(idFunzione);
-		    sensore.setIdOperatore(idOperatore);
-		    sensore.setIdPeriodo(idPeriodo);
-		    sensore.setFrom(da);
-		    sensore.setTo(a);
-		    ret.add(sensore);
+		    stationXML += "</Stazioni>";
 		}
-	    }
+		String sensorTypesXML = "";
+		if (sensorTypes != null && sensorTypes.size() > 0) {
+		    sensorTypesXML = "<TipoSensore>\n";
+		for (String sensorType : sensorTypes) {
+		    sensorTypesXML += "<IdTipoSensore>" + sensorType + "</IdTipoSensore>\n";
+		}
+		sensorTypesXML += "</TipoSensore>";
+		}
+		String body = getSOAPHeader() //
+			+ "<ElencoSensori xmlns=\"http://tempuri.org/\"\n" //
+			+ "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" //
+			+ "    xsi:schemaLocation=\"http://tempuri.org/ file:/home/boldrini/his-central/xsd20.xsd\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <ElencoSensori>\n" //
+			+ getTokenXML() //
+			+ stationXML //
+			+ sensorTypesXML //
+			+ "        </ElencoSensori>\n" //
+			+ "    </xInput>\n" //
+			+ "</ElencoSensori>" //
+			+ getSOAPFooter();
 
-	    return ret;
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.ELENCO_SENSORI, bodyReader);
+		XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		List<Sensore> ret = new ArrayList<>();
+		Node[] sensoreNodes = reader.evaluateNodes("//*:Sensore");
+		for (Node sensoreNode : sensoreNodes) {
+		    String id = reader.evaluateString(sensoreNode, "*:Anagrafica/*:IdSensore");
+		    String nome = reader.evaluateString(sensoreNode, "*:Anagrafica/*:NomeSensore");
+		    String idStato = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Stato/@IdStato");
+		    String idTipoSensore = reader.evaluateString(sensoreNode, "*:Anagrafica/*:TipoSensore/@IdTipoSensore");
+		    String idStazione = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Stazione/@IdStazione");
+		    String unitaMisura = reader.evaluateString(sensoreNode, "*:Anagrafica/*:UnitaMisura");
+		    String frequenza = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Frequenza");
+		    String quota = reader.evaluateString(sensoreNode, "*:Anagrafica/*:Quota");
+		    String utmNord = reader.evaluateString(sensoreNode, "*:Anagrafica/*:UTM_Nord");
+		    String utmEst = reader.evaluateString(sensoreNode, "*:Anagrafica/*:UTM_Est");
+
+		    Node[] datiNodes = reader.evaluateNodes(sensoreNode, "*:DatiDisponibili/*:Standard/*:Dato");
+		    for (Node datiNode : datiNodes) {
+			Sensore sensore = new Sensore();
+			String idFunzione = reader.evaluateString(datiNode, "@IdFunzione");
+			String idOperatore = reader.evaluateString(datiNode, "@IdOperatore");
+			String idPeriodo = reader.evaluateString(datiNode, "@IdPeriodo");
+			String da = reader.evaluateString(datiNode, "*:Disponibile/@Da");
+			String a = reader.evaluateString(datiNode, "*:Disponibile/@A");
+			if (da == null || da.isEmpty()) {
+			    GSLoggerFactory.getLogger(getClass()).warn("Empty start date");
+			    continue;
+			}
+			if (a == null || a.isEmpty()) {
+			    GSLoggerFactory.getLogger(getClass()).warn("Empty end date");
+			    continue;
+			}
+			sensore.setId(id);
+			sensore.setNome(nome);
+			sensore.setIdStato(idStato);
+			sensore.setIdTipoSensore(idTipoSensore);
+			sensore.setIdStazione(idStazione);
+			sensore.setUnitaMisura(unitaMisura);
+			sensore.setFrequenza(frequenza);
+			sensore.setQuota(quota);
+			sensore.setUtm32TNord(utmNord);
+			sensore.setUtm32TEst(utmEst);
+			sensore.setIdFunzione(idFunzione);
+			sensore.setIdOperatore(idOperatore);
+			sensore.setIdPeriodo(idPeriodo);
+			sensore.setFrom(da);
+			sensore.setTo(a);
+			ret.add(sensore);
+		    }
+		}
+		return ret;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
     public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
     static {
 	sdf.setTimeZone(TimeZone.getTimeZone(ZoneOffset.ofHours(1)));
     }
 
     public void rendiDatiTempoReale(String sensorId, ID_FUNZIONE functionId, ID_OPERATORE operatorId, ID_PERIODO periodId, Date start,
 	    Date end) throws Exception {
-	login();
-	try {
-	    String body = getSOAPHeader() //
-		    + "<RendiDatiTempoReale xmlns=\"http://tempuri.org/\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <RendiDatiTempoReale>\n" //
-		    + getTokenXML() //
-		    + "<Sensore>\n" //
-		    + "<IdSensore>" + sensorId + "</IdSensore>\n" //
-		    + "<IdFunzione>" + functionId.getId() + "</IdFunzione>\n" //
-		    + "<IdOperatore>" + operatorId.getId() + "</IdOperatore>\n" //
-		    + "<IdPeriodo>" + periodId.getId() + "</IdPeriodo>\n" //
-		    + "<DataInizio>" + sdf.format(start) + "</DataInizio>\n" //
-		    + "<DataFine>" + sdf.format(end) + "</DataFine>" //
-		    + "</Sensore>\n" //
-		    + "        </RendiDatiTempoReale>\n" //
-		    + "    </xInput>\n" //
-		    + "</RendiDatiTempoReale>" //
-		    + getSOAPFooter();
+	coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String body = getSOAPHeader() //
+			+ "<RendiDatiTempoReale xmlns=\"http://tempuri.org/\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <RendiDatiTempoReale>\n" //
+			+ getTokenXML() //
+			+ "<Sensore>\n" //
+			+ "<IdSensore>" + sensorId + "</IdSensore>\n" //
+			+ "<IdFunzione>" + functionId.getId() + "</IdFunzione>\n" //
+			+ "<IdOperatore>" + operatorId.getId() + "</IdOperatore>\n" //
+			+ "<IdPeriodo>" + periodId.getId() + "</IdPeriodo>\n" //
+			+ "<DataInizio>" + sdf.format(start) + "</DataInizio>\n" //
+			+ "<DataFine>" + sdf.format(end) + "</DataFine>" //
+			+ "</Sensore>\n" //
+			+ "        </RendiDatiTempoReale>\n" //
+			+ "    </xInput>\n" //
+			+ "</RendiDatiTempoReale>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.RENDI_DATI_TEMPO_REALE, bodyReader);
-	    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-	    System.out.println(reader.asString());
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.RENDI_DATI_TEMPO_REALE, bodyReader);
+		XMLDocumentReader reader = new XMLDocumentReader(response.body());
+		System.out.println(reader.asString());
+		return null;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
     public RendiDatiResult rendiDati(String sensorId, ID_FUNZIONE functionId, ID_OPERATORE operatorId, ID_PERIODO periodId, Date start,
 	    Date end) throws Exception {
-	login();
-	try {
-	    String functionIdString = functionId == null ? "" : "" + functionId.getId();
-	    String operatorIdString = operatorId == null ? "" : "" + operatorId.getId();
-	    String periodIdString = periodId == null ? "" : "" + periodId.getId();
-	    String body = getSOAPHeader() //
-		    + "<RendiDati xmlns=\"http://tempuri.org/\">\n" //
-		    + "    <xInput>\n" //
-		    + "        <RendiDati>\n" //
-		    + getTokenXML() //
-		    + "<Sensore>\n" //
-		    + "<IdSensore>" + sensorId + "</IdSensore>\n" //
-		    + "<IdFunzione>" + functionIdString + "</IdFunzione>\n" //
-		    + "<IdOperatore>" + operatorIdString + "</IdOperatore>\n" //
-		    + "<IdPeriodo>" + periodIdString + "</IdPeriodo>\n" //
-		    + "<DataInizio>" + sdf.format(start) + "</DataInizio>\n" //
-		    + "<DataFine>" + sdf.format(end) + "</DataFine>" //
-		    + "</Sensore>\n" //
-		    + "        </RendiDati>\n" //
-		    + "    </xInput>\n" //
-		    + "</RendiDati>" //
-		    + getSOAPFooter();
+	return coordinator.runWithExclusiveSession(this, () -> {
+	    login();
+	    try {
+		String functionIdString = functionId == null ? "" : "" + functionId.getId();
+		String operatorIdString = operatorId == null ? "" : "" + operatorId.getId();
+		String periodIdString = periodId == null ? "" : "" + periodId.getId();
+		String body = getSOAPHeader() //
+			+ "<RendiDati xmlns=\"http://tempuri.org/\">\n" //
+			+ "    <xInput>\n" //
+			+ "        <RendiDati>\n" //
+			+ getTokenXML() //
+			+ "<Sensore>\n" //
+			+ "<IdSensore>" + sensorId + "</IdSensore>\n" //
+			+ "<IdFunzione>" + functionIdString + "</IdFunzione>\n" //
+			+ "<IdOperatore>" + operatorIdString + "</IdOperatore>\n" //
+			+ "<IdPeriodo>" + periodIdString + "</IdPeriodo>\n" //
+			+ "<DataInizio>" + sdf.format(start) + "</DataInizio>\n" //
+			+ "<DataFine>" + sdf.format(end) + "</DataFine>" //
+			+ "</Sensore>\n" //
+			+ "        </RendiDati>\n" //
+			+ "    </xInput>\n" //
+			+ "</RendiDati>" //
+			+ getSOAPFooter();
 
-	    XMLDocumentReader bodyReader = new XMLDocumentReader(body);
-	    HttpResponse<InputStream> response = submit(Operation.RENDI_DATI, bodyReader);
-	    RendiDatiResult ret = new RendiDatiResult(response.body());
-	    return ret;
-	} catch (Exception e) {
-	    throw e;
-	} finally {
-	    logout();
-	}
+		XMLDocumentReader bodyReader = new XMLDocumentReader(body);
+		HttpResponse<InputStream> response = submit(Operation.RENDI_DATI, bodyReader);
+		RendiDatiResult ret = new RendiDatiResult(response.body());
+		return ret;
+	    } finally {
+		logout();
+	    }
+	});
     }
 
     private String getEndpoint(String path) {
@@ -1088,7 +1100,7 @@ public class HISCentralLombardiaClient {
 	    // HTTP POST
 	    url = proxyEndpoint + "/post?url=" + url + "&keystorePassword=" + keystorePassword;
 
-	    request = HttpRequestUtils.build(MethodWithBody.POST, 
+	    request = HttpRequestUtils.build(MethodWithBody.POST,
 
 		    url, body.asString().getBytes(StandardCharsets.UTF_8),
 
@@ -1105,8 +1117,7 @@ public class HISCentralLombardiaClient {
     }
 
     private String getSOAPHeader() {
-	return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:inc=\"http://www.service-now.com/incident\" xmlns:tem=\"http://tempuri.org/\">\n"
-		+ "<soapenv:Header/>\n"//
+	return "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:inc=\"http://www.service-now.com/incident\" xmlns:tem=\"http://tempuri.org/\">\n" + "<soapenv:Header/>\n"//
 		+ "<soapenv:Body>\n";
 
     }

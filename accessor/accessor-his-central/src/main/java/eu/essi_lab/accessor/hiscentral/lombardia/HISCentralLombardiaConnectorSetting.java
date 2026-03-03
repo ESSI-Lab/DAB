@@ -30,7 +30,6 @@ import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
  */
 public class HISCentralLombardiaConnectorSetting extends HarvestedConnectorSetting {
 
-  
     /**
      * 
      */

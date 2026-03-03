@@ -46,6 +46,7 @@ import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_OP
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_PERIODO;
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaClient.ID_VALIDITY_FLAG;
 import eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaIdentifierMangler;
+import eu.essi_lab.accessor.hiscentral.lombardia.LombardiaClients;
 import eu.essi_lab.accessor.hiscentral.lombardia.RendiDatiResult;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -72,7 +73,7 @@ public class HISCentralLombardiaDownloader extends WMLDataDownloader {
     @Override
     public boolean canConnect() {
 	try {
-	    HISCentralLombardiaClient client = new HISCentralLombardiaClient(new URL(online.getLinkage()));
+	    HISCentralLombardiaClient client = LombardiaClients.createFromConfiguration(new URL(online.getLinkage()));
 	    XMLDocumentReader comuni = client.elencoComuni();
 	    return (comuni != null);
 	} catch (Exception e) {
@@ -156,7 +157,7 @@ public class HISCentralLombardiaDownloader extends WMLDataDownloader {
 
     public void initClient() {
 	try {
-	    this.client = new HISCentralLombardiaClient(new URL(online.getLinkage()));
+	    this.client = LombardiaClients.createFromConfiguration(new URL(online.getLinkage()));
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).error(e);

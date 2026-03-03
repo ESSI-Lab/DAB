@@ -10,12 +10,12 @@ package eu.essi_lab.iso.datamodel.classes;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -344,26 +344,34 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
 
     public void addKeyword(String keyword) {
 
-	GSLoggerFactory.getLogger(getClass()).warn("Deprecated.. use addKeywords or reimplement, as this method may cause problems");
-	// as it can add keyword to group of keywords from different thesaurii
-
 	List<MDKeywordsPropertyType> descriptiveKeywords = type.getDescriptiveKeywords();
-	MDKeywordsPropertyType mdKeywordsPropertyType = null;
+	MDKeywordsPropertyType selectedKeywordsPropertyType = null;
 
 	if (!descriptiveKeywords.isEmpty()) {
 
-	    mdKeywordsPropertyType = descriptiveKeywords.get(0);
 
-	} else {
-
-	    mdKeywordsPropertyType = new MDKeywordsPropertyType();
-	    descriptiveKeywords.add(mdKeywordsPropertyType);
+	    for (MDKeywordsPropertyType kwd : descriptiveKeywords) {
+		MDKeywordsType mdk = kwd.getMDKeywords();
+		if (mdk!=null){
+		    MDKeywordTypeCodePropertyType mdkType = mdk.getType();
+		    CICitationPropertyType mkdThesaurus = mdk.getThesaurusName();
+		    if (mkdThesaurus ==null && mdkType==null){
+			selectedKeywordsPropertyType = kwd;
+		    }
+		}
+	    }
 	}
 
-	MDKeywordsType mdKeywords = mdKeywordsPropertyType.getMDKeywords();
+	if  (selectedKeywordsPropertyType == null) {
+
+	    selectedKeywordsPropertyType = new MDKeywordsPropertyType();
+	    descriptiveKeywords.add(selectedKeywordsPropertyType);
+	}
+
+	MDKeywordsType mdKeywords = selectedKeywordsPropertyType.getMDKeywords();
 	if (mdKeywords == null) {
 	    mdKeywords = new MDKeywordsType();
-	    mdKeywordsPropertyType.setMDKeywords(mdKeywords);
+	    selectedKeywordsPropertyType.setMDKeywords(mdKeywords);
 	}
 
 	mdKeywords.getKeyword().add(createCharacterStringPropertyType(keyword));
