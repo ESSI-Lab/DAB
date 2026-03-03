@@ -561,17 +561,6 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 
 	    //
-	    // add Lombardia session coordinator setting if missing (e.g. upgraded from older config)
-	    //
-	    if (configuration.get(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel(),
-		    SessionCoordinatorSetting.class).isEmpty()) {
-
-		SessionCoordinatorSetting sessionCoordinatorSetting = new SessionCoordinatorSetting();
-		sessionCoordinatorSetting.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
-		configuration.put(sessionCoordinatorSetting);
-	    }
-
-	    //
 	    //
 	    // ---------------------------------------------------------------
 
