@@ -11,6 +11,7 @@ import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.component.upload.*;
 import com.vaadin.flow.component.upload.receivers.*;
 import com.vaadin.flow.data.renderer.*;
+import com.vaadin.flow.server.streams.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.gs.*;
@@ -144,16 +145,15 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 	dialog.setTitle("Add view");
 	dialog.open();
 
-	MemoryBuffer memoryBuffer = new MemoryBuffer();
+	Upload upload = new Upload();
 
-	Upload upload = new Upload(memoryBuffer);
-	upload.addFinishedListener(event -> {
+	InMemoryUploadHandler handler = UploadHandler.inMemory((metadata, bytes) -> {
 
 	    try {
 
-		String mimeType = memoryBuffer.getFileData().getMimeType();
+		String mimeType = metadata.contentType();
 
-		InputStream viewStream = memoryBuffer.getInputStream();
+		InputStream viewStream = new ByteArrayInputStream(bytes);
 
 		View view = mimeType.equals("application/json")
 			? ViewFactory.fromJSONStream(viewStream)
@@ -185,7 +185,9 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 
 		upload.interruptUpload();
 	    }
-	});
+	} );
+
+	upload.setUploadHandler(handler);
 
 	upload.setMaxFiles(1);
 	upload.setDropAllowed(true);

@@ -30,7 +30,7 @@ import java.util.stream.*;
 
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.*;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -83,7 +83,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 
 	getGrid().addColumn(new ComponentRenderer<>(gd -> {
 
-	    Label label = new Label();
+	    Span label = new Span();
 	    label.setText(gd.getDataFolder());
 	    label.getStyle().set("font-weight", gd.isWritingFolder() ? "bold" : "normal");
 
@@ -201,7 +201,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
      */
     private void updateTotalFooter(double total) {
 
-	Label label_ = new Label();
+	Span label_ = new Span();
 	label_.setText(StringUtils.format(total));
 	label_.getStyle().set("font-weight", "bold");
 
@@ -213,7 +213,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
      */
     private void updatePercentageFooter(double total) {
 
-	Label label_ = new Label();
+	Span label_ = new Span();
 	label_.setText(StringUtils.format(total));
 	label_.getStyle().set("font-weight", "bold");
 
