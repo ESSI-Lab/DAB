@@ -41,10 +41,37 @@ vaadin-checkbox.booleanChoice[disabled]::part(checkbox) {
   box-sizing: border-box;
 }
 
+/* ------------- */
+/* Toggle button */
+/* ------------- */
+
+/* Outside */
+
 vaadin-checkbox[theme~="switch"]::part(checkbox) {
     border-radius: 9999px;
     width: var(--lumo-size-m);
 }
+
+/* Outside not checked */
+
+vaadin-checkbox[theme~="switch"]:not([checked])::part(checkbox) {
+    border: 1px solid gray;
+    background-color: white;
+}
+
+/* Outside checked / disabled */
+
+vaadin-checkbox[theme~="switch"][checked][disabled]::part(checkbox) {
+    border: 1px solid var(--lumo-contrast-30pct);
+}
+
+/* Outside not checked / disabled */
+
+vaadin-checkbox[theme~="switch"]:not([checked])[disabled]::part(checkbox) {
+    border: 1px solid var(--lumo-contrast-30pct);
+}
+
+/* Inside */
 
 vaadin-checkbox[theme~="switch"]::part(checkbox)::after {
     content: "";
@@ -58,7 +85,21 @@ vaadin-checkbox[theme~="switch"]::part(checkbox)::after {
     width: calc(var(--lumo-size-m) / 3);
 }
 
+/* Inside checked */
+
 vaadin-checkbox[theme~="switch"][checked]::part(checkbox)::after {
     background-color: var(--lumo-primary-contrast-color);
     transform: translateX(calc(var(--lumo-size-m) / 2));
+}
+
+/* Inside checked / disabled */
+
+vaadin-checkbox[theme~="switch"][checked][disabled]::part(checkbox)::after {
+    background-color: hsl(213.33deg 12.22% 43.33% / 62%);
+}
+
+/* Inside not checked / disabled */
+
+vaadin-checkbox[theme~="switch"]:not([checked])[disabled]::part(checkbox)::after {
+   background-color: hsl(213.33deg 12.22% 43.33% / 62%);
 }
