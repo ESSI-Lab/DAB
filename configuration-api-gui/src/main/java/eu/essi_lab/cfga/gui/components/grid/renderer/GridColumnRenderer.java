@@ -24,12 +24,11 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
-import java.io.Serial;
-import java.util.HashMap;
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.data.renderer.*;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio

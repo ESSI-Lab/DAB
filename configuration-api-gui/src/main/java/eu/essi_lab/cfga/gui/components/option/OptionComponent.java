@@ -21,20 +21,15 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import java.util.Optional;
-
-import eu.essi_lab.cfga.gui.components.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasEnabled;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.Selectable.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
 
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.gui.components.OptionComponentFactory;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
 
 /**
  * <info>

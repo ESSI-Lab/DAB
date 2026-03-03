@@ -21,17 +21,14 @@ package eu.essi_lab.cfga.gui;
  * #L%
  */
 
-import java.util.Optional;
-import java.util.Timer;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import com.vaadin.flow.component.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.ConfigurationSource.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.lib.utils.*;
 
-import com.vaadin.flow.component.UI;
-
-import eu.essi_lab.cfga.ConfigurationSource;
-import eu.essi_lab.cfga.ConfigurationSource.LockAcquisitionResult;
-import eu.essi_lab.cfga.gui.components.EnabledGroupManager;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio

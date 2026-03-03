@@ -21,7 +21,7 @@ package eu.essi_lab.cfga.gui.directive;
  * #L%
  */
 
-import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.*;
 
 /**
  * @author Fabrizio

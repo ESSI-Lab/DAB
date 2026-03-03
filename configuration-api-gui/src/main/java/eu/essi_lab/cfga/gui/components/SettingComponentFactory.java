@@ -210,7 +210,6 @@ public class SettingComponentFactory {
      * @param content
      * @return
      */
-    @SuppressWarnings("serial")
     public static Details createSettingCompactModeComponent(Component content) {
 
 	Details details = ComponentFactory.createDetails("View options", content);

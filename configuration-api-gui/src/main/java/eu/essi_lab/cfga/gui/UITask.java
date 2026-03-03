@@ -21,9 +21,9 @@ package eu.essi_lab.cfga.gui;
  * #L%
  */
 
-import java.util.TimerTask;
+import com.vaadin.flow.component.*;
 
-import com.vaadin.flow.component.UI;
+import java.util.*;
 
 /**
  * @author Fabrizio

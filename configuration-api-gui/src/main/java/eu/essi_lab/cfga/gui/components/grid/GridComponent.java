@@ -21,33 +21,24 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.grid.*;
+import com.vaadin.flow.component.grid.contextmenu.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.data.provider.*;
+import com.vaadin.flow.data.renderer.*;
+import com.vaadin.flow.data.value.*;
+import com.vaadin.flow.function.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.grid.renderer.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.setting.*;
+
 import java.util.*;
-import java.util.stream.Stream;
-
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.grid.contextmenu.GridContextMenu;
-import com.vaadin.flow.component.grid.contextmenu.GridMenuItem;
-import com.vaadin.flow.component.html.Hr;
-import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.function.ValueProvider;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.tabs.TabContent;
-import eu.essi_lab.cfga.gui.components.grid.renderer.GridColumnRenderer;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -154,7 +145,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		if (gmih.withTopDivider()) {
 
 		    Hr hr = ComponentFactory.createHr();
-		    menu.add(hr);
+		    menu.addComponent(hr);
 		}
 
 		// adds the item and set its id according to the related handler

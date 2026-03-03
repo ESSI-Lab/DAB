@@ -21,10 +21,9 @@ package eu.essi_lab.cfga.gui;
  * #L%
  */
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.button.Button;
-
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
 
 /**
  * @author Fabrizio

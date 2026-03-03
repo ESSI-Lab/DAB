@@ -21,12 +21,10 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.orderedlayout.*;
 
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import java.util.*;
 
 /**
  * @author Fabrizio

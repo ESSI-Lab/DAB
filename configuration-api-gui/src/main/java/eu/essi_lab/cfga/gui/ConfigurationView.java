@@ -61,7 +61,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     final Span infoSpan;
     Button logoutButton;
     private final String requestURL;
-    private static String ownerBrowserAdress;
     private Configuration configuration;
 
     /**
@@ -217,7 +216,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 	//
 
-	ownerBrowserAdress = address;
+	String ownerBrowserAdress = address;
 	GSLoggerFactory.getLogger(getClass()).info("Current session owner address: {}", ownerBrowserAdress);
 
 	//

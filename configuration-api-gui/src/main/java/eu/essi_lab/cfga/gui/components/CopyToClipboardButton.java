@@ -2,7 +2,6 @@ package eu.essi_lab.cfga.gui.components;
 
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.*;
-import com.vaadin.flow.component.dependency.*;
 import com.vaadin.flow.component.icon.*;
 
 import java.util.function.*;

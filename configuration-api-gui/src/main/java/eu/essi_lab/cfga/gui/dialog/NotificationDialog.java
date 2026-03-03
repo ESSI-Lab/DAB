@@ -21,10 +21,9 @@ package eu.essi_lab.cfga.gui.dialog;
  * #L%
  */
 
-import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.html.*;
-
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
+import eu.essi_lab.cfga.gui.components.*;
 
 @SuppressWarnings("serial")
 public class NotificationDialog extends ConfirmationDialog {

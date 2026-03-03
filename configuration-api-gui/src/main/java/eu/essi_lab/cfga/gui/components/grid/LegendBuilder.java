@@ -24,17 +24,14 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.icon.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.lib.utils.*;
 
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.lib.utils.StringUtils;
+import java.util.*;
 
 /**
  * @author Fabrizio

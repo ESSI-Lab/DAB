@@ -21,11 +21,10 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import com.vaadin.flow.component.textfield.TextArea;
-
-import eu.essi_lab.cfga.gui.components.StringValuesReader;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionValueChangeListener;
-import eu.essi_lab.cfga.option.Option;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.option.listener.*;
+import eu.essi_lab.cfga.option.*;
 
 /**
  * @author Fabrizio

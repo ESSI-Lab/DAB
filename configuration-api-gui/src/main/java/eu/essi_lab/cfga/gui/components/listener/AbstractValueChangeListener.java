@@ -21,10 +21,8 @@ package eu.essi_lab.cfga.gui.components.listener;
  * #L%
  */
 
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-import com.vaadin.flow.component.HasValue.ValueChangeListener;
-
-import eu.essi_lab.cfga.gui.IdleTracker;
+import com.vaadin.flow.component.HasValue.*;
+import eu.essi_lab.cfga.gui.*;
 
 @SuppressWarnings("serial")
 public abstract class AbstractValueChangeListener implements ValueChangeListener<ValueChangeEvent<?>> {

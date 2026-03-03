@@ -21,29 +21,22 @@ package eu.essi_lab.cfga.gui.components.option.listener;
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.HasValue.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.combobox.*;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.select.*;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.lib.utils.*;
 
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.listener.AbstractValueChangeListener;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.components.listener.OnKeyUpValidationListener;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.ValuesLoader;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio

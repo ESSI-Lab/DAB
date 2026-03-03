@@ -21,10 +21,8 @@ package eu.essi_lab.cfga.gui.components.setting.group;
  * #L%
  */
 
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
-
-import eu.essi_lab.cfga.gui.components.setting.group.listener.RadioComponentsHandlerListener;
+import com.vaadin.flow.component.radiobutton.*;
+import eu.essi_lab.cfga.gui.components.setting.group.listener.*;
 
 /**
  * @author Fabrizio

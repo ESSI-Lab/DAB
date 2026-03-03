@@ -21,15 +21,13 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.vaadin.flow.component.select.*;
+import eu.essi_lab.cfga.Selectable.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.lib.utils.*;
 
-import com.vaadin.flow.component.select.Select;
-
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.lib.utils.LabeledEnum;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * Reads as {@link String} the values and selected values of an {@link Option} with {@link SelectionMode#SINGLE}

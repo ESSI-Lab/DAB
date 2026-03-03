@@ -21,19 +21,17 @@ package eu.essi_lab.cfga.gui.components.setting.edit_put;
  * #L%
  */
 
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.setting.listener.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
 
-import com.vaadin.flow.component.Component;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.gui.components.tabs.TabContent;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.components.setting.listener.SettingEditButtonConfirmationListener;
-import eu.essi_lab.cfga.gui.directive.EditDirective;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
+import java.util.*;
 
 /**
  * @author Fabrizio

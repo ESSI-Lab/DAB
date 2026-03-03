@@ -24,16 +24,13 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
-import java.io.Serial;
-import java.util.HashMap;
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.icon.*;
+import eu.essi_lab.cfga.gui.components.grid.*;
+import eu.essi_lab.messages.JobStatus.*;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-
-import eu.essi_lab.cfga.gui.components.grid.LegendBuilder;
-import eu.essi_lab.messages.JobStatus.JobPhase;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio

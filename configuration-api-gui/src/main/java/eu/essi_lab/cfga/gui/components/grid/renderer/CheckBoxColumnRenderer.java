@@ -24,11 +24,11 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * #L%
  */
 
-import java.io.Serial;
-import java.util.HashMap;
-import java.util.function.Consumer;
+import com.vaadin.flow.component.checkbox.*;
 
-import com.vaadin.flow.component.checkbox.Checkbox;
+import java.io.*;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * Not used

@@ -21,9 +21,9 @@ package eu.essi_lab.cfga.gui.directive;
  * #L%
  */
 
-import java.util.Optional;
+import com.vaadin.flow.data.provider.*;
 
-import com.vaadin.flow.data.provider.SortDirection;
+import java.util.*;
 
 /**
  * @author Fabrizio
