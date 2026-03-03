@@ -186,6 +186,21 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 	    stream = getStationResponse.body();
 	    
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
+	    
+	    int responseCode = getStationResponse.statusCode();
+	    if (responseCode >= 400) {
+		// repeat again
+		HISCentralValdaostaConnector.BEARER_TOKEN = HISCentralValdaostaConnector.getBearerToken(getSourceURL());
+
+		getStationResponse = downloader.downloadResponse(//
+			url.trim(), //
+			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralValdaostaConnector.BEARER_TOKEN));
+
+		stream = getStationResponse.body();
+
+		GSLoggerFactory.getLogger(getClass()).info("Got " + url);
+	    }
+	    
 
 	    if (stream != null) {
 		JSONObject jsonResult = new JSONObject(IOStreamUtils.asUTF8String(stream));
@@ -239,6 +254,20 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 	    stream = getStationResponse.body();
 	    	    
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
+	    
+	    int responseCode = getStationResponse.statusCode();
+	    if (responseCode >= 400) {
+		// repeat again
+		HISCentralValdaostaConnector.BEARER_TOKEN = HISCentralValdaostaConnector.getBearerToken(getSourceURL());
+
+		getStationResponse = downloader.downloadResponse(//
+			url.trim(), //
+			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralValdaostaConnector.BEARER_TOKEN));
+
+		stream = getStationResponse.body();
+
+		GSLoggerFactory.getLogger(getClass()).info("Got " + url);
+	    }
 
 	    if (stream != null) {
 		JSONObject jsonResult = new JSONObject(IOStreamUtils.asUTF8String(stream));
@@ -283,6 +312,20 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 	    stream = getStationResponse.body();
 	        
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
+	   
+	    int responseCode = getStationResponse.statusCode();
+	    if (responseCode >= 400) {
+		// repeat again
+		HISCentralValdaostaConnector.BEARER_TOKEN = HISCentralValdaostaConnector.getBearerToken(getSourceURL());
+
+		getStationResponse = downloader.downloadResponse(//
+			url.trim(), //
+			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralValdaostaConnector.BEARER_TOKEN));
+
+		stream = getStationResponse.body();
+
+		GSLoggerFactory.getLogger(getClass()).info("Got " + url);
+	    }
 
 	    if (stream != null) {
 		JSONObject jsonResult = new JSONObject(IOStreamUtils.asUTF8String(stream));
