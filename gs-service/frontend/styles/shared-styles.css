@@ -40,3 +40,25 @@ vaadin-checkbox.booleanChoice[disabled]::part(checkbox) {
   width: 100%;
   box-sizing: border-box;
 }
+
+vaadin-checkbox[theme~="switch"]::part(checkbox) {
+    border-radius: 9999px;
+    width: var(--lumo-size-m);
+}
+
+vaadin-checkbox[theme~="switch"]::part(checkbox)::after {
+    content: "";
+    height: calc(var(--lumo-size-m) / 3);
+    background-color: var(--lumo-secondary-text-color);
+    border-radius: 9999px;
+    inset: 0;
+    margin: calc(var(--lumo-size-m) / 12);
+    opacity: 1;
+    transition: transform 0.2s;
+    width: calc(var(--lumo-size-m) / 3);
+}
+
+vaadin-checkbox[theme~="switch"][checked]::part(checkbox)::after {
+    background-color: var(--lumo-primary-contrast-color);
+    transform: translateX(calc(var(--lumo-size-m) / 2));
+}

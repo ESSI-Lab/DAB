@@ -14,15 +14,9 @@
 
 	<dependencies>
 
-		<!-- https://mvnrepository.com/artifact/com.vaadin/vaadin-core -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-core</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>com.vaadin.componentfactory</groupId>
-			<artifactId>togglebutton</artifactId>
 		</dependency>
 
 		<dependency>

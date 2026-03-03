@@ -21,7 +21,6 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import com.vaadin.componentfactory.*;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.accordion.*;
 import com.vaadin.flow.component.button.*;
@@ -31,9 +30,6 @@ import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.details.*;
-import com.vaadin.flow.component.details.Details.*;
-import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;

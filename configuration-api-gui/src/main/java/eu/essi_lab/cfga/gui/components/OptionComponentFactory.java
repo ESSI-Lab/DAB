@@ -21,41 +21,24 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.checkbox.*;
+import com.vaadin.flow.component.combobox.*;
+import com.vaadin.flow.component.datetimepicker.*;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.*;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.select.*;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.gui.components.option.*;
+import eu.essi_lab.cfga.gui.components.option.listener.*;
+import eu.essi_lab.cfga.option.*;
 
-import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.TextField;
-
-import eu.essi_lab.cfga.gui.components.option.OptionComponent;
-import eu.essi_lab.cfga.gui.components.option.OptionDoubleField;
-import eu.essi_lab.cfga.gui.components.option.OptionIntegerField;
-import eu.essi_lab.cfga.gui.components.option.OptionTextArea;
-import eu.essi_lab.cfga.gui.components.option.OptionTextField;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionToggleButtonListener;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionValueChangeListener;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionValuesLoaderListener;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.ISODateTime;
-import eu.essi_lab.cfga.option.Option;
+import java.time.*;
+import java.util.*;
 
 /**
  * @author Fabrizio

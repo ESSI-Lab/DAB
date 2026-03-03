@@ -1311,12 +1311,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.vaadin.componentfactory</groupId>
-                <artifactId>togglebutton</artifactId>
-                <version>${vaadin.togglebutton.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.google.apis</groupId>
                 <artifactId>google-api-services-sheets</artifactId>
                 <version>${google-api-services-sheets.version}</version>

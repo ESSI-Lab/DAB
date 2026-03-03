@@ -21,37 +21,6 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.util.List;
-
-import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.components.option.OptionComponent;
-import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingPutDialog;
-import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
-import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
-import eu.essi_lab.cfga.gui.components.setting.listener.SettingRemoveButtonListener;
-import eu.essi_lab.cfga.gui.components.setting.listener.SettingToggleButtonListener;
-import com.vaadin.componentfactory.*;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.details.*;
@@ -63,17 +32,16 @@ import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.textfield.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.Selectable.*;
-import eu.essi_lab.cfga.gui.components.listener.*;
 import eu.essi_lab.cfga.gui.components.option.*;
 import eu.essi_lab.cfga.gui.components.setting.*;
 import eu.essi_lab.cfga.gui.components.setting.edit_put.*;
 import eu.essi_lab.cfga.gui.components.setting.group.*;
 import eu.essi_lab.cfga.gui.components.setting.listener.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
-import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.option.*;
 import eu.essi_lab.cfga.setting.*;
+
 import java.util.*;
 
 /**
@@ -169,7 +137,7 @@ public class SettingComponentFactory {
 		filter(o -> !o.isAdvanced()).//
 		forEach(o -> {
 
-	    OptionComponent optionComponent = new OptionComponent(configuration, setting, o, forceReadonly);
+	    OptionComponent optionComponent = new OptionComponent(o, forceReadonly);
 
 	    optionsLayout.add(optionComponent);
 	    mainLayout.getOptionComponents().add(optionComponent);
@@ -202,7 +170,7 @@ public class SettingComponentFactory {
 
 	    advancedOptions.forEach(o -> {
 
-		OptionComponent optionComponent = new OptionComponent(configuration, setting, o, forceReadonly);
+		OptionComponent optionComponent = new OptionComponent(o, forceReadonly);
 
 		advLayout.add(optionComponent);
 		mainLayout.getOptionComponents().add(optionComponent);

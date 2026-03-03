@@ -23,14 +23,13 @@ package eu.essi_lab.cfga.gui.components.option;
 
 import java.util.Optional;
 
-import com.vaadin.componentfactory.ToggleButton;
+import eu.essi_lab.cfga.gui.components.ToggleButton;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasEnabled;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.Selectable.SelectionMode;
 import eu.essi_lab.cfga.gui.components.OptionComponentFactory;
 import eu.essi_lab.cfga.option.BooleanChoice;
@@ -116,7 +115,7 @@ public class OptionComponent extends VerticalLayout {
      * @param option
      * @param forceReadonly
      */
-    public OptionComponent(Configuration configuration, Setting owner, Option<?> option, boolean forceReadonly) {
+    public OptionComponent(Option<?> option, boolean forceReadonly) {
 
 	this.option = option;
 

@@ -1,6 +1,5 @@
 package eu.essi_lab.gssrv.conf;
 
-import com.vaadin.componentfactory.*;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.grid.*;
@@ -25,7 +24,6 @@ import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.model.exceptions.*;
 
-import javax.xml.bind.*;
 import java.io.*;
 import java.util.*;
 
@@ -192,7 +190,7 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 	upload.setMaxFiles(1);
 	upload.setDropAllowed(true);
 	upload.setAcceptedFileTypes("application/json", ".json", "application/xml", ".xml");
-	upload.setDropLabel(new Label("Drop file here"));
+	upload.setDropLabel(ComponentFactory.createSpan("Drop file here"));
 
 	Button localUploadButton = new Button("Select view file (JSON or XML)");
 	localUploadButton.getStyle().set("font-size", "14px");
@@ -202,7 +200,6 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 	upload.setUploadButton(localUploadButton);
 
 	dialog.setContent(upload);
-
     }
 
     /**

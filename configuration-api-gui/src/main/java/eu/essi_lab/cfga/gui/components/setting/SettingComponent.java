@@ -30,7 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.vaadin.componentfactory.ToggleButton;
+import eu.essi_lab.cfga.gui.components.ToggleButton;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.HasValue.ValueChangeEvent;
