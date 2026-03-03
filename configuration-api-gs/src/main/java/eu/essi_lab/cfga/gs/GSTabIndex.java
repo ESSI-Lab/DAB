@@ -99,8 +99,10 @@ public enum GSTabIndex implements TabIndex {
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SCHEDULER_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getSettingClass().getSuperclass().equals(DriverSetting.class)),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DOWNLOAD_SETTING.getLabel())),//
+	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel())),//
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.RATE_LIMITER_SETTING.getLabel()))//
     ),
+
     /**
      *
      */
