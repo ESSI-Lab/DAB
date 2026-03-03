@@ -339,7 +339,7 @@ public class ConfigImporter extends VerticalLayout {
 	    Upload upload, //
 	    Div messageDiv) throws Exception {
 
-	if (openSearchConfigExists(setting.getSelectedStorageInfo().get(), configStream.clone())) {
+	if (openSearchConfigExists(setting.getSelectedStorageInfo().get())) {
 
 	    ConfirmationDialog confirmationDialog = new ConfirmationDialog(
 		    "A configuration with the given name is already stored in the database.\n\n"
@@ -421,8 +421,7 @@ public class ConfigImporter extends VerticalLayout {
      * @param configStream
      * @throws Exception
      */
-    private boolean openSearchConfigExists(StorageInfo info, InputStream configStream) throws Exception {
-
+    private boolean openSearchConfigExists(StorageInfo info) throws Exception {
 
 	OpenSearchDatabase database = new OpenSearchDatabase();
 	database.initialize(info);

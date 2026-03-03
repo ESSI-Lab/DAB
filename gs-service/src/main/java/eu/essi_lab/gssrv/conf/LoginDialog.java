@@ -32,7 +32,6 @@ import eu.essi_lab.cfga.gui.dialog.*;
 /**
  * @author Fabrizio
  */
-@SuppressWarnings("serial")
 class LoginDialog extends EnhancedDialog {
 
     /**
@@ -107,15 +106,11 @@ class LoginDialog extends EnhancedDialog {
 	button.setTooltipText(provider);
 	button.setWidth("60px");
 	button.setHeight("60px");
-	button.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
+	button.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
+	    String url = "../../../gs-service/auth/user/login/" + provider.toLowerCase() + "?url=" + requestURL;
 
-		String url = "../../../gs-service/auth/user/login/" + provider.toLowerCase() + "?url=" + requestURL;
-
-		UI.getCurrent().getPage().open(url, "_self");
-	    }
+	    UI.getCurrent().getPage().open(url, "_self");
 	});
 
 	return button;

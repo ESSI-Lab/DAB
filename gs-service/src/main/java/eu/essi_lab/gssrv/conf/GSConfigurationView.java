@@ -53,14 +53,9 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.auth.*;
 import eu.essi_lab.model.exceptions.*;
-import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
-import org.apache.cxf.common.jaxb.JAXBUtils;
+import jakarta.servlet.http.*;
 import org.quartz.*;
 
-import jakarta.servlet.http.*;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import java.io.File;
 import java.util.*;
 
 /**

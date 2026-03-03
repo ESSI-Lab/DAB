@@ -185,7 +185,7 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 
 		upload.interruptUpload();
 	    }
-	} );
+	});
 
 	upload.setUploadHandler(handler);
 
@@ -295,15 +295,8 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 
 		    try {
 			switch (tabSheet.getSelectedIndex()) {
-			case 0 -> {
-
-			    modified = ViewFactory.fromJSONObject(jsonArea.getValue());
-
-			}
-			case 1 -> {
-
-			    modified = ViewFactory.fromXMLString(xmlArea.getValue());
-			}
+			case 0 -> modified = ViewFactory.fromJSONObject(jsonArea.getValue());
+			case 1 -> modified = ViewFactory.fromXMLString(xmlArea.getValue());
 			}
 
 			getWriter().store(modified);

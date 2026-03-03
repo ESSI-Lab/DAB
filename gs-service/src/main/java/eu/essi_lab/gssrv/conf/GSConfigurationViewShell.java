@@ -31,7 +31,6 @@ import com.vaadin.flow.shared.communication.PushMode;
  * Use the @PWA annotation make the application installable on phones, tablets
  * and some desktop browsers.
  */
-@SuppressWarnings("serial")
 @PWA(name = "DAB configuration GUI", shortName = "DAB Configurator")
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @Push(PushMode.MANUAL)
