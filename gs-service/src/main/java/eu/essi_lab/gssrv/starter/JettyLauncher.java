@@ -25,6 +25,8 @@ public class JettyLauncher {
      */
     public static void main(String[] args) throws Exception {
 
+	Thread.currentThread().setName("JettyLauncher");
+
 	Server server = new Server();
 
 	HttpConfiguration httpConfig = new HttpConfiguration();
