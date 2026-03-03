@@ -110,7 +110,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
     public static String TRIGGER_TOKEN = null;
     public static String METEOTRACKER_REFRESH_TOKEN = null;
     // private boolean isLastSearchTerm = false;
-    private String[] SEARCH_TERMS = { ECG_URL, PPG_URL, SMARTWATCHHIGH_URL, SMARTWATCHLOW_URL };
+    private String[] SEARCH_TERMS = { SMARTWATCHHIGH_URL, SMARTWATCHLOW_URL };
     private static int searchIndex = 0;
 
     protected Map<String, List<TRIGGERTimePosition>> latLonMap = new HashMap<String, List<TRIGGERTimePosition>>();
@@ -138,7 +138,8 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 	// SMARTWATCHLOW
 	BPHIGH("Systolic Blood Pressure", "smartwatchlow", "mmHg"), BPLOW("Diastolic Blood Pressure", "smartwatchlow",
-		"mmHg"), BODYTEMP("Body Temperature", "smartwatchlow", "°C"), SKINTEMP("Skin Temperature", "smartwatchlow", "°C"),
+		"mmHg"), BODYTEMP("Body Temperature", "smartwatchlow", "°C"), 
+	SKINTEMP("Skin Temperature", "smartwatchlow", "°C"),
 
 	// SMARTWATCHHIGH
 	HEARTRATE("Heart Rate", "smartwatchhigh", "BPM"), SLEEPRATE("Sleep Rate", "smartwatchhigh", "#"), OXYGENS("Oxygen",
@@ -288,19 +289,19 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 		// int currentYear = currentDateTime.getYear();
 
 		Map<String, TRIGGERDevice> results = new HashMap<String, TRIGGERDevice>();
-		// current month for 2026
+		
 		for (Map.Entry<String, List<TRIGGERTimePosition>> stationMap : latLonMap.entrySet()) {
 		    
 		    
 		    String userId = stationMap.getKey();
 		    
-		    for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusMonths(1)) {
-
+		    //for (YearMonth current = startMonth; !current.isAfter(todayMonth); current = current.plusMonths(1)) {
+			// current month for 2026
 			String url = getSourceURL().endsWith("/")
-				? getSourceURL() + queryPath + "where=userId=" + userId +",year>=" + current.getYear() + ",month=" + current.getMonthValue() + "&order=ASC&limit=1000"
+				? getSourceURL() + queryPath + "&where=userId=" + userId +",year=" + startMonth.getYear() +  "&order=ASC&limit=1000"
 				// +
 
-				: getSourceURL() + "/" + queryPath + "where=userId=" + userId +",year>=" + current.getYear() + ",month=" + current.getMonthValue() + "&order=ASC&limit=1000";
+				: getSourceURL() + "/" + queryPath + "&where=userId=" + userId +",year=" + startMonth.getYear() + "&order=ASC&limit=1000";
 
 			GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 
@@ -331,7 +332,7 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 			Optional<Integer> maxRecords = getSetting().getMaxRecords();
 		    }
-		}
+		//}
 
 		for (Map.Entry<String, TRIGGERDevice> entry : results.entrySet()) {
 
