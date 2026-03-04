@@ -2,7 +2,7 @@ package eu.essi_lab.accessor.sos;
 
 import java.io.InputStream;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Test;
 

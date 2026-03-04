@@ -32,11 +32,11 @@ package eu.essi_lab.jaxb.sos._2_0.iso2005.gco;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSeeAlso;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlType;
 
 import eu.essi_lab.jaxb.sos._2_0.iso2005.gmd.LocalisedCharacterStringPropertyType;
 import eu.essi_lab.jaxb.sos._2_0.xlink.ActuateType;

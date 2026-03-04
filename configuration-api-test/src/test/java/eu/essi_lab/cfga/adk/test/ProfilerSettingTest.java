@@ -36,7 +36,9 @@ public class ProfilerSettingTest {
 
 	Assert.assertFalse(setting.getConsumer().isPresent());
 
-	Assert.assertEquals(ProfilerSetting.DEFAULT_RSM_THREADS_COUNT, setting.getResultSetMapperThreadsCount().get().toString());
+	Assert.assertEquals(
+		Integer.valueOf(ProfilerSetting.DEFAULT_RSM_THREADS_COUNT),  //
+		Integer.valueOf(setting.getResultSetMapperThreadsCount().get())); //
 
 	//
 	//

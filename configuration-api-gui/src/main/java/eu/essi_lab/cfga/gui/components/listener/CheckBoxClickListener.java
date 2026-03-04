@@ -21,11 +21,9 @@ package eu.essi_lab.cfga.gui.components.listener;
  * #L%
  */
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.checkbox.Checkbox;
-
-import eu.essi_lab.cfga.gui.IdleTracker;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.checkbox.*;
+import eu.essi_lab.cfga.gui.*;
 
 /**
  * @author Fabrizio

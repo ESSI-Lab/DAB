@@ -21,7 +21,7 @@ package eu.essi_lab.accessor.apitempo;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import org.json.JSONObject;
 

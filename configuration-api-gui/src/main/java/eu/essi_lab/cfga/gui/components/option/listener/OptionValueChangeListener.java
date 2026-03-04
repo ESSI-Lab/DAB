@@ -1,43 +1,14 @@
 package eu.essi_lab.cfga.gui.components.option.listener;
 
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.HasValue.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.option.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.lib.utils.*;
+
 import java.util.*;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.stream.Collectors;
-
-import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-
-import eu.essi_lab.cfga.gui.components.listener.AbstractValueChangeListener;
-import eu.essi_lab.cfga.gui.components.option.OptionDoubleField;
-import eu.essi_lab.cfga.gui.components.option.OptionIntegerField;
-import eu.essi_lab.cfga.gui.components.option.OptionTextArea;
-import eu.essi_lab.cfga.gui.components.option.OptionTextField;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.ISODateTime;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.LabeledEnum;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio

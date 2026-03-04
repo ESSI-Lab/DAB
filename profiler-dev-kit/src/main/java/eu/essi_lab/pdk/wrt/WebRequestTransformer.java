@@ -21,27 +21,22 @@ package eu.essi_lab.pdk.wrt;
  * #L%
  */
 
-import java.util.Optional;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.pdk.*;
+import eu.essi_lab.pdk.validation.*;
 
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.Pluggable;
-import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.validation.WebRequestValidator;
-import eu.essi_lab.views.DefaultViewManager;
+import java.util.*;
 
 /**
  * Validates and transforms a {@link WebRequest} in the correspondent {@link RequestMessage}
@@ -189,7 +184,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
-	    DefaultViewManager manager = new DefaultViewManager();
+	    ViewManager manager = new ViewManager();
 	    manager.setDatabaseReader(reader);
 
 	    return manager.getResolvedView(viewIdentifier);

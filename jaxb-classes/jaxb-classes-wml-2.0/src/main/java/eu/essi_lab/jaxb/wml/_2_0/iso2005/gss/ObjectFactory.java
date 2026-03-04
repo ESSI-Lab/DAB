@@ -29,7 +29,7 @@ package eu.essi_lab.jaxb.wml._2_0.iso2005.gss;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

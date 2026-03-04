@@ -28,6 +28,9 @@ import net.opengis.iso19139.gmd.v_20060504.AbstractMDIdentificationType;
 import net.opengis.iso19139.gmd.v_20060504.MDDataIdentificationType;
 import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
 public class DataIdentificationTest extends MetadataTest<DataIdentification, AbstractMDIdentificationType> {
 
     public DataIdentificationTest() {
@@ -155,39 +158,39 @@ public class DataIdentificationTest extends MetadataTest<DataIdentification, Abs
 
     @Override
     public void checkProperties(DataIdentification dataId) {
-	Assert.assertEquals(dataId.getAbstract(), "abs");
+	assertEquals("abs", dataId.getAbstract());
 
 	String characterSetCode = dataId.getCharacterSetCode();
-	Assert.assertEquals("characterSetCode", characterSetCode);
+	assertEquals("characterSetCode", characterSetCode);
 
-	Assert.assertEquals(dataId.getCitationAlternateTitle(), "altTitle");
-	Assert.assertEquals(dataId.getCitationEditionDate(), "DATE");
-	Assert.assertEquals(dataId.getCitationCreationDate(), "DATE");
+	assertEquals("altTitle", dataId.getCitationAlternateTitle());
+	assertEquals("DATE", dataId.getCitationEditionDate());
+	assertEquals("DATE", dataId.getCitationCreationDate());
 	ArrayList<String> dates = Lists.newArrayList(dataId.getCitationDates("creation"));
-	Assert.assertEquals("My date", dates.get(1));
-	Assert.assertEquals(2, dates.size());
+	assertEquals("My date", dates.get(1));
+	assertEquals(2, dates.size());
 	dates = Lists.newArrayList(dataId.getCitationDates());
-	Assert.assertEquals(5, dates.size());
-	Assert.assertEquals(dataId.getCitationPublicationDate(), "DATE");
-	Assert.assertEquals(dataId.getCitationRevisionDate(), "DATE");
+	assertEquals(5, dates.size());
+	assertEquals("DATE", dataId.getCitationPublicationDate());
+	assertEquals("DATE", dataId.getCitationRevisionDate());
 	// Assert.assertEquals(dataId.getCitationCreationDateTime(), calendar);
 
-	Assert.assertEquals(1, Lists.newArrayList(dataId.getLanguages()).size());
-	Assert.assertEquals("eng", Lists.newArrayList(dataId.getLanguages()).get(0));
+	assertEquals(1, Lists.newArrayList(dataId.getLanguages()).size());
+	assertEquals("eng", Lists.newArrayList(dataId.getLanguages()).getFirst());
 
-	Assert.assertEquals("Individual", dataId.getPointOfContact().getIndividualName());
+	assertEquals("Individual", dataId.getPointOfContact().getIndividualName());
 
-	Assert.assertEquals("Individual", dataId.getPointOfContact("custodian").getIndividualName());
+	assertEquals("Individual", dataId.getPointOfContact("custodian").getIndividualName());
 
-	Assert.assertEquals("CitationParty", dataId.getCitationResponsibleParties().get(0).getOrganisationName());
+	assertEquals("CitationParty", dataId.getCitationResponsibleParties().getFirst().getOrganisationName());
 
 	// Assert.assertEquals(dataId.getCitationPublicationDateTime(), calendar);
 	//
 	// Assert.assertEquals(dataId.getCitationRevisionDateTime(), calendar);
 
-	Assert.assertEquals(dataId.getCitationTitle(), "TITLE");
+	assertEquals("TITLE", dataId.getCitationTitle());
 
-	Assert.assertEquals(dataId.getResourceIdentifier(), "ID");
+	assertEquals("ID", dataId.getResourceIdentifier());
 
 	// ----------------------------
 	//
@@ -196,21 +199,23 @@ public class DataIdentificationTest extends MetadataTest<DataIdentification, Abs
 
 	Iterator<GeographicBoundingBox> boxesIterator = dataId.getGeographicBoundingBoxes();
 	GeographicBoundingBox next = boxesIterator.next();
-	Assert.assertEquals(next.getSouth(), new Double(0));
+	assertEquals(Double.valueOf(0), next.getSouth());
 	next = boxesIterator.next();
-	Assert.assertEquals(next.getSouth(), new Double(1));
+	assertEquals(Double.valueOf(1), next.getSouth());
 	next = boxesIterator.next();
-	Assert.assertEquals(next.getSouth(), new Double(2));
+	assertEquals(Double.valueOf(2), next.getSouth());
 
 	GeographicBoundingBox geographicBoundingBox = dataId.getGeographicBoundingBox();
-	Assert.assertEquals(geographicBoundingBox.getSouth(), new Double(0));
+	assertEquals(Double.valueOf(0), geographicBoundingBox.getSouth());
 
-	Assert.assertEquals(new Double(dataId.getEN()[0]), new Double(0));
-	Assert.assertEquals(new Double(dataId.getWS()[0]), new Double(0));
+	assertEquals(Double.valueOf(0), Double.valueOf(dataId.getEN()[0]));
+	assertEquals(Double.valueOf(0), Double.valueOf(dataId.getWS()[0]));
 
 	BoundingPolygon polygon = dataId.getBoundingPolygons().next();
+
 	ArrayList<Double> coordinates = Lists.newArrayList(polygon.getCoordinates());
-	Assert.assertEquals(coordinates, Arrays.asList(new Double[] { 0.0, 0.1 }));
+
+	assertEquals(coordinates, Arrays.asList(new Double[] { 0.0, 0.1 }));
 
 	// ----------------------------
 	//
@@ -218,13 +223,13 @@ public class DataIdentificationTest extends MetadataTest<DataIdentification, Abs
 	//
 	Iterator<TemporalExtent> temporalExtents = dataId.getTemporalExtents();
 	TemporalExtent next2 = temporalExtents.next();
-	Assert.assertEquals(next2.getBeginPosition(), "BEGIN");
+	assertEquals("BEGIN", next2.getBeginPosition());
 	next2 = temporalExtents.next();
-	Assert.assertEquals(next2.getBeginPosition(), "BEGIN2");
+	assertEquals("BEGIN2", next2.getBeginPosition());
 	next2 = temporalExtents.next();
-	Assert.assertEquals(next2.getBeginPosition(), "BEGIN3");
+	assertEquals("BEGIN3", next2.getBeginPosition());
 
-	Assert.assertEquals(dataId.getTemporalExtent().getBeginPosition(), "BEGIN");
+	assertEquals("BEGIN", dataId.getTemporalExtent().getBeginPosition());
 
 	// ----------------------------
 	//
@@ -232,62 +237,62 @@ public class DataIdentificationTest extends MetadataTest<DataIdentification, Abs
 	//
 	Iterator<Keywords> kwdIterator = dataId.getKeywords();
 	Keywords kwd = kwdIterator.next();
-	Assert.assertEquals(kwd.getKeywords().next(), "kwd1");
+	assertEquals("kwd1", kwd.getKeywords().next());
 	kwd = kwdIterator.next();
-	Assert.assertEquals(kwd.getKeywords().next(), "kwd2");
-	Assert.assertEquals(kwd.getThesaurusNameCitationTitle(), "thesaurus");
+	assertEquals("kwd2", kwd.getKeywords().next());
+	assertEquals("thesaurus", kwd.getThesaurusNameCitationTitle());
 
 	Iterator<String> kwdIterator2 = dataId.getKeywords("thesaurus");
-	Assert.assertEquals(kwdIterator2.next(), "kwd2");
+	assertEquals("kwd2", kwdIterator2.next());
 
 	ArrayList<String> keys = Lists.newArrayList(dataId.getKeywordsValues());
-	Assert.assertEquals(2, keys.size());
+	assertEquals(2, keys.size());
 
 	// -----------------------------
 	//
 	// vertical extent
 	//
 
-	Assert.assertEquals(dataId.getVerticalExtent().getMaximumValue(), new Double(23));
-	Assert.assertEquals(dataId.getVerticalExtent().getMinimumValue(), new Double(-18.0));
+	assertEquals(Double.valueOf(23), dataId.getVerticalExtent().getMaximumValue());
+	assertEquals(Double.valueOf(-18.0), dataId.getVerticalExtent().getMinimumValue());
 
 	Assert.assertTrue(dataId.getVerticalExtents().hasNext());
 
-	Assert.assertEquals(Lists.newArrayList(dataId.getVerticalExtents()).size(), 2);
+	assertEquals(2, Lists.newArrayList(dataId.getVerticalExtents()).size());
 
 	// ----------------------------
 	//
 	// topic category
 	//
-	Assert.assertEquals(dataId.getTopicCategoryString(), MDTopicCategoryCodeType.BIOTA.value());
-	Assert.assertEquals(dataId.getTopicCategoriesStrings().next(), MDTopicCategoryCodeType.BIOTA.value());
-	Assert.assertEquals(dataId.getTopicCategory(), MDTopicCategoryCodeType.BIOTA);
-	Assert.assertEquals(dataId.getTopicCategories().next(), MDTopicCategoryCodeType.BIOTA);
+	assertEquals(MDTopicCategoryCodeType.BIOTA.value(), dataId.getTopicCategoryString());
+	assertEquals(MDTopicCategoryCodeType.BIOTA.value(), dataId.getTopicCategoriesStrings().next());
+	assertEquals(MDTopicCategoryCodeType.BIOTA, dataId.getTopicCategory());
+	assertEquals(MDTopicCategoryCodeType.BIOTA, dataId.getTopicCategories().next());
 
 	// spatial representation
-	Assert.assertEquals("vector", dataId.getSpatialRepresentationTypeCodeListValue());
+	assertEquals("vector", dataId.getSpatialRepresentationTypeCodeListValue());
 
-	Assert.assertEquals("My Constraints", dataId.getLegalConstraints().next().getOtherConstraint());
-	Assert.assertEquals("My Constraints", dataId.getLegalConstraintsOthers().next());
-	Assert.assertEquals("patent", dataId.getLegalConstraints().next().getAccessConstraintCode());
-	Assert.assertEquals("patent", dataId.getLegalConstraintsAccessCodes().next());
-	Assert.assertEquals("trademark", dataId.getLegalConstraints().next().getUseConstraintsCode());
-	Assert.assertEquals("trademark", dataId.getLegalConstraintsUseCodes().next());
-	Assert.assertEquals("My Use Limitation", dataId.getLegalConstraints().next().getUseLimitation());
-	Assert.assertEquals("My Use Limitation", dataId.getLegalConstraintsUseLimitations().next());
+	assertEquals("My Constraints", dataId.getLegalConstraints().next().getOtherConstraint());
+	assertEquals("My Constraints", dataId.getLegalConstraintsOthers().next());
+	assertEquals("patent", dataId.getLegalConstraints().next().getAccessConstraintCode());
+	assertEquals("patent", dataId.getLegalConstraintsAccessCodes().next());
+	assertEquals("trademark", dataId.getLegalConstraints().next().getUseConstraintsCode());
+	assertEquals("trademark", dataId.getLegalConstraintsUseCodes().next());
+	assertEquals("My Use Limitation", dataId.getLegalConstraints().next().getUseLimitation());
+	assertEquals("My Use Limitation", dataId.getLegalConstraintsUseLimitations().next());
 
 	Assert.assertTrue(dataId.hasAccessLegalConstraints());
 	Assert.assertTrue(dataId.hasOtherLegalConstraints());
 	Assert.assertTrue(dataId.hasUseLegalConstraints());
 
-	Assert.assertEquals("filename.png", dataId.getGraphicOverview().getFileName());
-	Assert.assertEquals("filename.png", dataId.getGraphicOverviews().next().getFileName());
-	Assert.assertEquals("supplemental info", dataId.getSupplementalInformation());
+	assertEquals("filename.png", dataId.getGraphicOverview().getFileName());
+	assertEquals("filename.png", dataId.getGraphicOverviews().next().getFileName());
+	assertEquals("supplemental info", dataId.getSupplementalInformation());
 
 	MDResolution res = dataId.getSpatialResolution();
-	Assert.assertEquals("m", res.getDistanceUOM());
-	Assert.assertEquals(10., res.getDistanceValue(), 10 ^ -7);
-	Assert.assertEquals(new BigInteger("1000"), res.getEquivalentScale());
+	assertEquals("m", res.getDistanceUOM());
+	assertEquals(10., res.getDistanceValue(), 10 ^ -7);
+	assertEquals(new BigInteger("1000"), res.getEquivalentScale());
     }
 
     @Override
@@ -357,13 +362,13 @@ public class DataIdentificationTest extends MetadataTest<DataIdentification, Abs
 	//
 
 	Iterator<GeographicBoundingBox> boxesIterator = dataId.getGeographicBoundingBoxes();
-	Assert.assertEquals(boxesIterator.hasNext(), false);
+	assertFalse(boxesIterator.hasNext());
 	Assert.assertNull(dataId.getGeographicBoundingBox());
 	Assert.assertNull(dataId.getWS());
 	Assert.assertNull(dataId.getEN());
 
 	Iterator<BoundingPolygon> polyIterator = dataId.getBoundingPolygons();
-	Assert.assertEquals(polyIterator.hasNext(), false);
+	assertFalse(polyIterator.hasNext());
 
 	// ----------------------------
 	//
@@ -371,7 +376,7 @@ public class DataIdentificationTest extends MetadataTest<DataIdentification, Abs
 	//
 
 	Iterator<TemporalExtent> temporalExtents = dataId.getTemporalExtents();
-	Assert.assertEquals(temporalExtents.hasNext(), false);
+	assertFalse(temporalExtents.hasNext());
 	Assert.assertNull(dataId.getTemporalExtent());
 
 	// ----------------------------

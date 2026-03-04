@@ -29,8 +29,8 @@ import java.io.ByteArrayOutputStream;
 import java.math.BigInteger;
 import java.util.AbstractMap.SimpleEntry;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriInfo;
 
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;

@@ -30,7 +30,6 @@ import eu.essi_lab.cfga.gui.LogOutButtonListener;
 /**
  * @author Fabrizio
  */
-@SuppressWarnings("serial")
 public class GSLogoutButtonListener extends LogOutButtonListener {
 
     /**

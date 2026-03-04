@@ -5,7 +5,7 @@
 // Generated on: 2019.05.14 at 04:45:11 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/ows/1.1", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/ows/1.1", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.jaxb.sos._2_0.ows_1;
 
 /*-

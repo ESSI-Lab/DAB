@@ -30,7 +30,7 @@ import java.util.stream.*;
 
 import com.vaadin.flow.component.grid.Grid.Column;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.provider.*;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -83,7 +83,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 
 	getGrid().addColumn(new ComponentRenderer<>(gd -> {
 
-	    Label label = new Label();
+	    Span label = new Span();
 	    label.setText(gd.getDataFolder());
 	    label.getStyle().set("font-weight", gd.isWritingFolder() ? "bold" : "normal");
 
@@ -116,10 +116,13 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 	descriptor = TabContentDescriptorBuilder.get().//
 
 		withLabel("Records inspection").//
-		withShowDirective("Click \"Reload\" to show the list of all the harvested sources, referenced by "
-		+ "name and identifier, along with the number of harvested records (\"Size\") and the percentage related to the total "
-		+ "number of records in the database (visible at the bottom of the \"Size\" column).\n\n\"Data #\" indicates the logical data folder (#1 or #2) where the "
-		+ "source records are stored", false).//
+		withShowDirective("""
+		Click "Reload" to show the list of all the harvested sources, referenced by \
+		name and identifier, along with the number of harvested records ("Size") and the percentage related to the total \
+		number of records in the database (visible at the bottom of the "Size" column).
+		
+		"Data #" indicates the logical data folder (#1 or #2) where the \
+		source records are stored""", false).//
 		withComponent(getVerticalLayout()).//
 		reloadable(() -> update(getVerticalLayout())).//
 		build();
@@ -201,7 +204,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
      */
     private void updateTotalFooter(double total) {
 
-	Label label_ = new Label();
+	Span label_ = new Span();
 	label_.setText(StringUtils.format(total));
 	label_.getStyle().set("font-weight", "bold");
 
@@ -213,7 +216,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
      */
     private void updatePercentageFooter(double total) {
 
-	Label label_ = new Label();
+	Span label_ = new Span();
 	label_.setText(StringUtils.format(total));
 	label_.getStyle().set("font-weight", "bold");
 

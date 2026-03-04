@@ -21,7 +21,7 @@ package eu.essi_lab.wml._2;
  * #L%
  */
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 public class JAXBWML2PrefixMapper extends NamespacePrefixMapper {
 

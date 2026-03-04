@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseReader;

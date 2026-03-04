@@ -160,7 +160,7 @@ public class CachedCollections {
 
 			
 			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-			SortedFields sortedFields = new SortedFields(Arrays.asList(new SimpleEntry(ResourceProperty.PUBLIC_ID,SortOrder.ASCENDING)));
+			SortedFields sortedFields = new SortedFields(Arrays.asList(new SimpleEntry(MetadataElement.IDENTIFIER,SortOrder.ASCENDING)));
 			discoveryMessage.setSortedFields(sortedFields );
 			tmpResultSet = executor.retrieveNodes(discoveryMessage);
 

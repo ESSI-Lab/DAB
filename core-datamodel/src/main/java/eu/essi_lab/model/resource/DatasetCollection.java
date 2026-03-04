@@ -26,8 +26,8 @@ package eu.essi_lab.model.resource;
 
 import java.io.InputStream;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import eu.essi_lab.lib.xml.NameSpace;
 

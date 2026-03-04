@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import com.google.common.io.ByteStreams;

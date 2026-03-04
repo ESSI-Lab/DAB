@@ -35,7 +35,7 @@ import org.apache.http.impl.client.*;
 import org.apache.http.message.*;
 import org.json.*;
 
-import javax.servlet.http.*;
+import jakarta.servlet.http.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.*;

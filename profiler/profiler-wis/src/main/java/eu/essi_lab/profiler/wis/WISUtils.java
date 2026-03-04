@@ -35,7 +35,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.UriInfo;
 
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;

@@ -21,10 +21,9 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import com.vaadin.flow.component.*;
 
-import com.vaadin.flow.component.HasEnabled;
+import java.util.*;
 
 /**
  * @author Fabrizio

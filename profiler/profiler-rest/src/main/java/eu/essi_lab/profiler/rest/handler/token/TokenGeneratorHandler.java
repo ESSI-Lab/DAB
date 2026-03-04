@@ -23,7 +23,7 @@ package eu.essi_lab.profiler.rest.handler.token;
 
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.json.JSONObject;
 

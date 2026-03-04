@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.MessageResponse;

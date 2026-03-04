@@ -5,7 +5,7 @@
 // Generated on: 2016.02.26 at 04:55:57 PM AST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.isotc211.org/2005/gmi", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.isotc211.org/2005/gmi", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
 
 /*-

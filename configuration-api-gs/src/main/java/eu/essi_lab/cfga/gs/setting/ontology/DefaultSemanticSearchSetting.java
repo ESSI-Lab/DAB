@@ -207,7 +207,7 @@ public class DefaultSemanticSearchSetting extends Setting {
 
 	    descriptor = TabContentDescriptorBuilder.get(DefaultSemanticSearchSetting.class).//
 		    withLabel("Settings").//
-		    withEditDirective("Edit default semantic search settings").//
+		    withEditDirective("EDIT","Edit default semantic search settings").//
 		    build();
 	}
 

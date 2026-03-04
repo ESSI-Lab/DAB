@@ -24,7 +24,7 @@ package eu.essi_lab.gssrv.conf;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 import eu.essi_lab.cfga.gui.components.ComponentFactory;
@@ -72,92 +72,92 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 
 	if (!GSConfigurationView.putSettingList.isEmpty()) {
 
-	    Label label = ComponentFactory.createLabel("New settings", 15);
+	    Span label = ComponentFactory.createSpan("New settings", 15);
 	    label.getStyle().set("font-weight", "bold");
 
 	    verticalLayout.add(label);
 
-	    GSConfigurationView.putSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+	    GSConfigurationView.putSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.editedSettingList.isEmpty()) {
 
-	    Label label = ComponentFactory.createLabel("Edited settings", 15);
+	    Span label = ComponentFactory.createSpan("Edited settings", 15);
 	    label.getStyle().set("font-weight", "bold");
 
 	    verticalLayout.add(label);
 
-	    GSConfigurationView.editedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+	    GSConfigurationView.editedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.removedSettingList.isEmpty()) {
 
 	    {
 
-		Label label = ComponentFactory.createLabel("Removed settings", 15);
+		Span label = ComponentFactory.createSpan("Removed settings", 15);
 		label.getStyle().set("font-weight", "bold");
 
 		verticalLayout.add(label);
 
-		GSConfigurationView.removedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+		GSConfigurationView.removedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	    }
 
 	    {
 		if (!GSConfigurationView.additionalRemovalInfo.isEmpty()) {
 
-		    Label label = ComponentFactory.createLabel("Deselected settings", 15);
+		    Span label = ComponentFactory.createSpan("Deselected settings", 15);
 		    label.getStyle().set("font-weight", "bold");
 
 		    verticalLayout.add(label);
 
-		    GSConfigurationView.additionalRemovalInfo.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s, 14)));
+		    GSConfigurationView.additionalRemovalInfo.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s, 14)));
 		}
 	    }
 	}
 
 	if (!GSConfigurationView.newWorkerSettingList.isEmpty()) {
 
-	    Label label = ComponentFactory.createLabel("New scheduled jobs", 15);
+	    Span label = ComponentFactory.createSpan("New scheduled jobs", 15);
 	    label.getStyle().set("font-weight", "bold");
 
 	    verticalLayout.add(label);
 
-	    GSConfigurationView.newWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+	    GSConfigurationView.newWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.pausedWorkerSettingList.isEmpty()) {
 
-	    Label label = ComponentFactory.createLabel("Paused/disabled scheduled jobs", 15);
+	    Span label = ComponentFactory.createSpan("Paused/disabled scheduled jobs", 15);
 	    label.getStyle().set("font-weight", "bold");
 
 	    verticalLayout.add(label);
 
-	    GSConfigurationView.pausedWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+	    GSConfigurationView.pausedWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.rescheduledWorkerSettingList.isEmpty()) {
 
-	    Label label = ComponentFactory.createLabel("Rescheduled/enabled jobs", 15);
+	    Span label = ComponentFactory.createSpan("Rescheduled/enabled jobs", 15);
 	    label.getStyle().set("font-weight", "bold");
 
 	    verticalLayout.add(label);
 
 	    GSConfigurationView.rescheduledWorkerSettingList
-		    .forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+		    .forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.unscheduledWorkerSettingList.isEmpty()) {
 
-	    Label label = ComponentFactory.createLabel("Unscheduled jobs", 15);
+	    Span label = ComponentFactory.createSpan("Unscheduled jobs", 15);
 	    label.getStyle().set("font-weight", "bold");
 
 	    verticalLayout.add(label);
 
 	    GSConfigurationView.unscheduledWorkerSettingList
-		    .forEach(s -> verticalLayout.add(ComponentFactory.createLabel(s.getName(), 14)));
+		    .forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
-	Label label = ComponentFactory.createLabel("Click 'confirm' to save the configuration and apply all the changes'", 15);
+	Span label = ComponentFactory.createSpan("Click 'confirm' to save the configuration and apply all the changes'", 15);
 
 	label.getStyle().set("margin-top", "20px");
 	label.getStyle().set("margin-bottom", "5px");

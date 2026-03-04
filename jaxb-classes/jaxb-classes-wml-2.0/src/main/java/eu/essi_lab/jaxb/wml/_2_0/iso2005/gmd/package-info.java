@@ -5,7 +5,7 @@
 // Generated on: 2019.04.17 at 03:51:45 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.isotc211.org/2005/gmd", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.isotc211.org/2005/gmd", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.jaxb.wml._2_0.iso2005.gmd;
 
 /*-

@@ -21,17 +21,14 @@ package eu.essi_lab.cfga.gui.components.tabs;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.Tabs.SelectedChangeEvent;
-
-import eu.essi_lab.cfga.ConfigurationChangeListener;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.tabs.*;
+import com.vaadin.flow.component.tabs.Tabs.*;
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gui.components.*;
+
+import java.util.*;
 
 /**
  * In Vaadin tabs are just tabs, they have no control on the tab content.<br> This component allows to set a content to the tabs, and to

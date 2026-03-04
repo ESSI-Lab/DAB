@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.cuahsi.waterml._1.GeogLocationType;

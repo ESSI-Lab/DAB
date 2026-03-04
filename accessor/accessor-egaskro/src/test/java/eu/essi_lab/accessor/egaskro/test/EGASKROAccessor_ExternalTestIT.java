@@ -3,7 +3,7 @@ package eu.essi_lab.accessor.egaskro.test;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.json.JSONObject;
 import org.junit.Assert;

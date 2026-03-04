@@ -28,9 +28,9 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
 
 import com.amazonaws.util.IOUtils;
 

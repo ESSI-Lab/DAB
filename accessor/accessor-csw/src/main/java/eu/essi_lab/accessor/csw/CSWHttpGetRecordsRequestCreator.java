@@ -28,7 +28,7 @@ import java.net.URL;
 import java.net.http.HttpRequest;
 import java.util.Optional;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;

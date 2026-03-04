@@ -21,17 +21,14 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.option.listener.*;
+import eu.essi_lab.cfga.option.*;
 
-import com.vaadin.flow.component.textfield.TextField;
-
-import eu.essi_lab.cfga.gui.components.StringValuesReader;
-import eu.essi_lab.cfga.gui.components.listener.OnKeyUpValidationListener;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionValueChangeListener;
-import eu.essi_lab.cfga.option.InputPattern;
-import eu.essi_lab.cfga.option.Option;
+import java.util.*;
+import java.util.regex.*;
 
 @SuppressWarnings("serial")
 public class OptionTextField extends TextField implements OnKeyUpValidationListener<String> {
@@ -41,7 +38,7 @@ public class OptionTextField extends TextField implements OnKeyUpValidationListe
      */
     public OptionTextField() {
 
-	setPreventInvalidInput(true);
+//	setPreventInvalidInput(true);
 	setClearButtonVisible(true);
 	getStyle().set("font-size","14px");
 

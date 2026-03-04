@@ -25,8 +25,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;

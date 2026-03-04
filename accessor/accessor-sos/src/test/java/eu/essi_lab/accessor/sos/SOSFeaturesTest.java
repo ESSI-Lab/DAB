@@ -4,8 +4,8 @@ import static org.junit.Assert.fail;
 
 import java.io.InputStream;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Test;
 

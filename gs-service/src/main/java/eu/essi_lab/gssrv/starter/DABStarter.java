@@ -24,6 +24,7 @@ package eu.essi_lab.gssrv.starter;
 import eu.essi_lab.api.database.cfg.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.augmenter.worker.*;
+import eu.essi_lab.authorization.xacml.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
 import eu.essi_lab.cfga.check.CheckResponse.*;
@@ -54,6 +55,7 @@ import eu.essi_lab.lib.net.downloader.*;
 import eu.essi_lab.lib.net.s3.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.profiler.esri.feature.*;
@@ -64,8 +66,8 @@ import eu.essi_lab.request.executor.schedule.*;
 import eu.essi_lab.shared.driver.es.stats.*;
 import org.quartz.*;
 
-import javax.ws.rs.ext.*;
-import javax.xml.bind.*;
+import jakarta.ws.rs.ext.*;
+import jakarta.xml.bind.*;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -905,14 +907,22 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    JAXBWMS.getInstance().getMarshaller();
 
+	    XACMLAuthorizer.initEngine();
+
+	    // ---------------------------------------------------------------------------------------------
+ 	    //
 	    // this is done here to guarantee that is done in the right thread
 	    // in some cases we notice that this call is firstly done by threads with a context class loader
 	    // devoid of the necessary classes to load
 	    ConfigurableLoader.load();
 
+	    ViewFactory.initContext();
+	    //
+	    // ----------------------------------------------------------------------------------------------
+
 	    GSLoggerFactory.getLogger(DABStarter.class).debug("Context initialization ENDED");
 
-	} catch (JAXBException e) {
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).error("Fatal error on startup, context could not be initialized", e);
 

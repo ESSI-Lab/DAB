@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;

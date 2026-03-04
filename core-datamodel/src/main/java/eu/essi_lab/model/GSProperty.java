@@ -24,7 +24,7 @@ package eu.essi_lab.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import eu.essi_lab.lib.xml.NameSpace;
 

@@ -26,11 +26,11 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.xml.bind.JAXBElement;
 
 import org.w3c.dom.Node;
 
@@ -137,7 +137,7 @@ public class GetFeatureResultSetFormatter extends DiscoveryResultSetFormatter<No
 	    fapt.setFeature(features);
 	    FeatureCollectionType fct = new FeatureCollectionType();
 
-	    fct.setFeatureMembers(members);
+	    fct.setFeatureMembers(members.getValue());
 	    JAXBElement<FeatureCollectionType> fc = factory.createFeatureCollection(fct);
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    JAXBWFS.getInstance().getMarshaller().marshal(fc, baos);

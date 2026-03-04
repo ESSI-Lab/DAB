@@ -10,53 +10,39 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Comparator;
-import java.util.List;
-
-import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.Details.OpenedChangeEvent;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.components.option.OptionComponent;
-import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingPutDialog;
-import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
-import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
-import eu.essi_lab.cfga.gui.components.setting.listener.SettingRemoveButtonListener;
-import eu.essi_lab.cfga.gui.components.setting.listener.SettingToggleButtonListener;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.details.Details.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.*;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.Selectable.*;
+import eu.essi_lab.cfga.gui.components.option.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.setting.edit_put.*;
+import eu.essi_lab.cfga.gui.components.setting.group.*;
+import eu.essi_lab.cfga.gui.components.setting.listener.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.directive.AddDirective;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -151,7 +137,7 @@ public class SettingComponentFactory {
 		filter(o -> !o.isAdvanced()).//
 		forEach(o -> {
 
-	    OptionComponent optionComponent = new OptionComponent(configuration, setting, o, forceReadonly);
+	    OptionComponent optionComponent = new OptionComponent(o, forceReadonly);
 
 	    optionsLayout.add(optionComponent);
 	    mainLayout.getOptionComponents().add(optionComponent);
@@ -184,7 +170,7 @@ public class SettingComponentFactory {
 
 	    advancedOptions.forEach(o -> {
 
-		OptionComponent optionComponent = new OptionComponent(configuration, setting, o, forceReadonly);
+		OptionComponent optionComponent = new OptionComponent(o, forceReadonly);
 
 		advLayout.add(optionComponent);
 		mainLayout.getOptionComponents().add(optionComponent);
@@ -224,7 +210,6 @@ public class SettingComponentFactory {
      * @param content
      * @return
      */
-    @SuppressWarnings("serial")
     public static Details createSettingCompactModeComponent(Component content) {
 
 	Details details = ComponentFactory.createDetails("View options", content);
@@ -271,11 +256,11 @@ public class SettingComponentFactory {
      * @param parent
      * @return
      */
-    public static Label createSettingNameLabel(Setting setting, Setting parent) {
+    public static Span createSettingNameSpan(Setting setting, Setting parent) {
 
 	String name = parent != null ? "[ " + setting.getName() + " ]" : setting.getName();
 
-	Label label = ComponentFactory.createLabel(name);
+	Span label = ComponentFactory.createSpan(name);
 	label.getStyle().set("font-weight", "bold");
 	//	label.getStyle().set("margin-top", "10px");
 
@@ -333,7 +318,16 @@ public class SettingComponentFactory {
 	    SettingComponent currentSettingComponent, //
 	    TabContent tabContent) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("EDIT", VaadinIcon.EDIT.create());
+	Optional<EditDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getEditDirective();
+
+	String name = editDirective.map(EditDirective::getName).orElse("EDIT");
+	String desc = editDirective.flatMap(EditDirective::getDescription).orElse("EDIT");
+
+	ConfigurationViewButton button = new ConfigurationViewButton( //
+		name, //
+		VaadinIcon.EDIT.create());//
+
+	button.setTooltip(desc);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(100, Unit.PIXELS);
 
@@ -367,7 +361,8 @@ public class SettingComponentFactory {
 	    TabContent tabContent, //
 	    AddDirective addDirective) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("ADD", VaadinIcon.PLUS_SQUARE_O.create());
+	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
+	button.setTooltip(addDirective.getDescription().orElse("Add setting"));
 	button.setWidth(100, Unit.PIXELS);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.getStyle().set("margin-left", "3px");
@@ -401,7 +396,12 @@ public class SettingComponentFactory {
 	    TabContent tabContent,//
 	    SettingComponent settingComponent) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton("REMOVE", VaadinIcon.MINUS_SQUARE_O.create());
+	Optional<RemoveDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getRemoveDirective();
+
+	String name = editDirective.map(RemoveDirective::getName).orElse("REMOVE");
+
+	ConfigurationViewButton button = new ConfigurationViewButton(name, VaadinIcon.MINUS_SQUARE_O.create());
+
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.setWidth(150, Unit.PIXELS);
 	button.getStyle().set("margin-left", "3px");
@@ -424,19 +424,6 @@ public class SettingComponentFactory {
 	EnabledGroupManager.getInstance().add(button);
 
 	return button;
-    }
-
-    /**
-     * @param onConfirmListener
-     * @return
-     */
-    public static ConfirmationDialog createSettingRemoveDialog(ButtonChangeListener onConfirmListener) {
-
-	ConfirmationDialog dialog = new ConfirmationDialog("Are you sure you want to remove this setting?", onConfirmListener);
-
-	dialog.addToCloseAll();
-
-	return dialog;
     }
 
     /**

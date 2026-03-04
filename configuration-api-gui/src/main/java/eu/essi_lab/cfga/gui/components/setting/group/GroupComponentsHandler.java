@@ -21,16 +21,14 @@ package eu.essi_lab.cfga.gui.components.setting.group;
  * #L%
  */
 
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.checkbox.*;
+import com.vaadin.flow.component.radiobutton.*;
+import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.setting.*;
+
 import java.util.*;
-import java.util.stream.Collectors;
-
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.checkbox.CheckboxGroup;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.data.provider.AbstractListDataView;
-import com.vaadin.flow.data.provider.HasListDataView;
-
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio

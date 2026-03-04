@@ -53,14 +53,9 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.auth.*;
 import eu.essi_lab.model.exceptions.*;
-import net.opengis.iso19139.srv.v_20060504.SVServiceIdentificationType;
-import org.apache.cxf.common.jaxb.JAXBUtils;
+import jakarta.servlet.http.*;
 import org.quartz.*;
 
-import javax.servlet.http.*;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.util.*;
 
 /**
@@ -80,6 +75,8 @@ import java.util.*;
 @CssImport(value = "./styles/vaadin-text-area-no-border.css", themeFor = "vaadin-text-area")
 @CssImport(value = "./styles/vaadin-text-area-no-margin-top.css", themeFor = "vaadin-text-area")
 @CssImport(value = "./styles/vaadin-text-field-no-border.css", themeFor = "vaadin-text-field")
+@CssImport(value = "./styles/vaadin-text-area-readonly.css", themeFor = "vaadin-text-area")
+@CssImport(value = "./styles/vaadin-text-area-default.css", themeFor = "vaadin-text-area")
 
 public class GSConfigurationView extends ConfigurationView {
 
@@ -500,6 +497,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	return Arrays.asList(//
 		new AsynchDownloadDescriptor(),//
+		new ViewsDescriptor(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//

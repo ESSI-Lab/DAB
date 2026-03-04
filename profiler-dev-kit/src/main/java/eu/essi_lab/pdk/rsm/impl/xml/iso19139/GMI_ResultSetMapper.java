@@ -24,7 +24,7 @@ package eu.essi_lab.pdk.rsm.impl.xml.iso19139;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;

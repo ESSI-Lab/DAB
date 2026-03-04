@@ -13,12 +13,12 @@ package eu.essi_lab.authorization.pps;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -86,6 +86,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 	this.role = role;
 	this.ruleCombiningAlgorithm = ruleCombiningAlgorithm;
 	this.buildersMap = new HashMap<String, PPSRuleBuilder>();
+
     }
 
     /**
@@ -109,7 +110,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		    "PPS:" + role + ":role:policy", //
 		    ruleCombiningAlgorithm);
 
-	    buildersMap.entrySet().forEach(b -> ppsPolicyBuilder.addRule(b.getValue().build()));
+	    buildersMap.forEach((key, value) -> ppsPolicyBuilder.addRule(value.build()));
 
 	    Policy policy = ppsPolicyBuilder.build();
 

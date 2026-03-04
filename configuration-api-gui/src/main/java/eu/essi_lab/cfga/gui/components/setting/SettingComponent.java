@@ -21,43 +21,27 @@ package eu.essi_lab.cfga.gui.components.setting;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import com.vaadin.componentfactory.ToggleButton;
+import com.vaadin.flow.component.AbstractField.*;
 import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.HasValue.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.Selectable.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.option.*;
+import eu.essi_lab.cfga.gui.components.setting.group.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.lib.utils.*;
 
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.tabs.TabContent;
-import eu.essi_lab.cfga.gui.components.option.OptionComponent;
-import eu.essi_lab.cfga.gui.components.option.OptionComponentLayout;
-import eu.essi_lab.cfga.gui.components.option.OptionTextField;
-import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
-import eu.essi_lab.cfga.gui.components.setting.group.RadioComponentsHandler;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.ConfigurationObject;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.Scheduling;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * <info>
@@ -462,7 +446,7 @@ public class SettingComponent extends Div {
 	    //
 	    if (!setting.isFoldedModeEnabled()) {
 
-		Label label = handleLabel(parent, setting, headerLayout);
+		Span label = handleLabel(parent, setting, headerLayout);
 
 		if (label != null) {
 
@@ -607,11 +591,11 @@ public class SettingComponent extends Div {
      * @param setting
      * @param headerLayout
      */
-    private Label handleLabel(Setting parent, Setting setting, HorizontalLayout headerLayout) {
+    private Span handleLabel(Setting parent, Setting setting, HorizontalLayout headerLayout) {
 
 	if (setting.isShowHeaderSet()) {
 
-	    Label label = SettingComponentFactory.createSettingNameLabel(setting, parent);
+	    Span label = SettingComponentFactory.createSettingNameSpan(setting, parent);
 
 	    headerLayout.add(label);
 

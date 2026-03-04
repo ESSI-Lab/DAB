@@ -21,11 +21,10 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import com.vaadin.flow.component.textfield.IntegerField;
-
-import eu.essi_lab.cfga.gui.components.listener.OnKeyUpValidationListener;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionValueChangeListener;
-import eu.essi_lab.cfga.option.Option;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.option.listener.*;
+import eu.essi_lab.cfga.option.*;
 
 @SuppressWarnings("serial")
 public class OptionIntegerField extends IntegerField implements OnKeyUpValidationListener<Integer> {
@@ -41,9 +40,9 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
 
 	getStyle().set("font-size","14px");
 
-	setHasControls(true);
-
-	setPreventInvalidInput(true);
+//	setHasControls(true);
+//
+//	setPreventInvalidInput(true);
 
 	addValueChangeListener(new OptionValueChangeListener(option));
 
@@ -112,6 +111,6 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
 	    gtThanMax = value > maxValue;
 	}
 
-	return (ltThanMin || gtThanMax || (isRequiredBoolean() && value == null));
+	return (ltThanMin || gtThanMax || value == null);
     }
 }

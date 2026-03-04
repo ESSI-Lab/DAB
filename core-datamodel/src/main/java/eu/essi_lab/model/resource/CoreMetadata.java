@@ -26,9 +26,9 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.MIMetadataType;

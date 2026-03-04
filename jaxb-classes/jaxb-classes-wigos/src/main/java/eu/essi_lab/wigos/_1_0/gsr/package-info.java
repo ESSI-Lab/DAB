@@ -5,7 +5,7 @@
 // Generated on: 2023.11.27 at 01:47:52 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.isotc211.org/2005/gsr", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.isotc211.org/2005/gsr", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.wigos._1_0.gsr;
 
 /*-

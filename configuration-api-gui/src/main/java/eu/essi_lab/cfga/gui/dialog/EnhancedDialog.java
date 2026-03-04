@@ -21,22 +21,15 @@ package eu.essi_lab.cfga.gui.dialog;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.dialog.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gui.components.*;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -49,7 +42,7 @@ public class EnhancedDialog extends Dialog {
     private final VerticalLayout footer;
     private final VerticalLayout content;
     private final Button closeButton;
-    private final Label titleLabel;
+    private final Span titleSpan;
 
     private ComponentEventListener<ClickEvent<Button>> onCloseListener;
 
@@ -121,10 +114,10 @@ public class EnhancedDialog extends Dialog {
 	//
 	//
 
-	titleLabel = ComponentFactory.createLabel();
-	titleLabel.getStyle().set("font-weight", "bold");
+	titleSpan = ComponentFactory.createSpan();
+	titleSpan.getStyle().set("font-weight", "bold");
 
-	header.add(titleLabel);
+	header.add(titleSpan);
 
 	closeButton = new Button(new Icon(VaadinIcon.CLOSE_SMALL), e -> {
 
@@ -191,7 +184,7 @@ public class EnhancedDialog extends Dialog {
      */
     public void setTitle(String text) {
 
-	titleLabel.setText(text);
+	titleSpan.setText(text);
     }
 
     /**
@@ -249,9 +242,9 @@ public class EnhancedDialog extends Dialog {
     /**
      * @return
      */
-    public Label getTitleLabel() {
+    public Span getTitleSpan() {
 
-	return titleLabel;
+	return titleSpan;
     }
 
     /**

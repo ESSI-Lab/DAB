@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 
@@ -381,8 +381,6 @@ public class RestViewsHandler extends DefaultRequestHandler {
 	//
 	if (method.equals("GET") && !optViewId.isPresent()) {
 
-	    authorizer.close();
-
 	    return true;
 	}
 
@@ -436,11 +434,7 @@ public class RestViewsHandler extends DefaultRequestHandler {
 	    setMessageView(optViewToUdpate.get().getOwner(), bodyView, message);
 	}
 
-	boolean authorized = authorizer.isAuthorized(message);
-
-	authorizer.close();
-
-	return authorized;
+	return authorizer.isAuthorized(message);
     }
 
     /**

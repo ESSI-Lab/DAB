@@ -1,23 +1,18 @@
 package eu.essi_lab.test.authorization.authzforce.essi.rbac.geossview.read;
 
-import java.io.IOException;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.authorization.PolicySetWrapper.*;
+import eu.essi_lab.authorization.pps.*;
+import eu.essi_lab.authorization.psloader.*;
+import eu.essi_lab.authorization.rps.*;
+import eu.essi_lab.authorization.xacml.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.bond.View.*;
+import eu.essi_lab.test.authorization.authzforce.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.junit.*;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import eu.essi_lab.authorization.PdpEngineBuilder;
-import eu.essi_lab.authorization.PolicySetWrapper.Action;
-import eu.essi_lab.authorization.authzforce.ext.IdListRefPolicyProvider;
-import eu.essi_lab.authorization.pps.AbstractGEOSSViewPermissionPolicySet;
-import eu.essi_lab.authorization.pps.GEOSSReadPermissionPolicySet;
-import eu.essi_lab.authorization.psloader.DefaultPolicySetLoader;
-import eu.essi_lab.authorization.psloader.PolicySetLoader;
-import eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet;
-import eu.essi_lab.authorization.xacml.PdpEngineWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.bond.View.ViewVisibility;
-import eu.essi_lab.test.authorization.authzforce.XACMLTest;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
+import java.io.*;
 
 /**
  * @author Fabrizio
@@ -37,11 +32,8 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Permit:
-     * - discovery path OK
-     * - view creator OK
-     * - view visibility public
-     * - view owner not required, since the view visibility is public
+     * Permit: - discovery path OK - view creator OK - view visibility public - view owner not required, since the view visibility is
+     * public
      *
      * @throws IOException
      */
@@ -64,11 +56,8 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Deny:
-     * - discovery path NOT supported
-     * - view creator OK
-     * - view visibility public
-     * - view owner not required, since the view visibility is public
+     * Deny: - discovery path NOT supported - view creator OK - view visibility public - view owner not required, since the view visibility
+     * is public
      *
      * @throws IOException
      */
@@ -89,11 +78,8 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Deny:
-     * - discovery path OK
-     * - view creator NOT supported
-     * - view visibility public
-     * - view owner not required, since the view visibility is public
+     * Deny: - discovery path OK - view creator NOT supported - view visibility public - view owner not required, since the view visibility
+     * is public
      *
      * @throws IOException
      */
@@ -116,13 +102,8 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Deny:
-     * - discovery path OK
-     * - view creator OK
-     * - view visibility private
-     * - view owner set in the request, but the related value in the PPS
-     * {@link GEOSSReadPermissionPolicySet#setUserIdentifier(String)} is not set
-     * so the comparison fails
+     * Deny: - discovery path OK - view creator OK - view visibility private - view owner set in the request, but the related value in the
+     * PPS {@link GEOSSReadPermissionPolicySet#setUserIdentifier(String)} is not set so the comparison fails
      *
      * @throws IOException
      */
@@ -147,12 +128,9 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Permit:
-     * - discovery path OK
-     * - view creator OK
-     * - view visibility private
-     * - view owner set in the request and the pps is updated with the same user id
-     * 
+     * Permit: - discovery path OK - view creator OK - view visibility private - view owner set in the request and the pps is updated with
+     * the same user id
+     *
      * @throws Exception
      */
     @Test
@@ -192,12 +170,9 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Deny:
-     * - discovery path OK
-     * - view creator OK
-     * - view visibility private
-     * - view owner set in the request and the pps is updated with a different user id
-     * 
+     * Deny: - discovery path OK - view creator OK - view visibility private - view owner set in the request and the pps is updated with a
+     * different user id
+     *
      * @throws Exception
      */
     @Test
@@ -237,12 +212,9 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Deny:
-     * - discovery path NOT allowed
-     * - view creator OK
-     * - view visibility private
-     * - view owner set in the request and the pps is updated with the same user id
-     * 
+     * Deny: - discovery path NOT allowed - view creator OK - view visibility private - view owner set in the request and the pps is updated
+     * with the same user id
+     *
      * @throws Exception
      */
     @Test
@@ -282,12 +254,9 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
     }
 
     /**
-     * Deny:
-     * - discovery path OK
-     * - view creator NOT allowed
-     * - view visibility private
-     * - view owner set in the request and the pps is updated with the same user id
-     * 
+     * Deny: - discovery path OK - view creator NOT allowed - view visibility private - view owner set in the request and the pps is updated
+     * with the same user id
+     *
      * @throws Exception
      */
     @Test
@@ -384,12 +353,10 @@ public class GEOSSReadDiscoveryPPS_Test extends XACMLTest {
 
 	loader.setPermissionPolicySet(pps);
 
-	IdListRefPolicyProvider.setPolicySetLoader(loader);
-
 	PdpEngineBuilder builder = new PdpEngineBuilder();
 
 	builder.addPolicies(loader);
 
-	return new PdpEngineWrapper(builder.build());
+	return new PdpEngineWrapper(builder.build(true));
     }
 }

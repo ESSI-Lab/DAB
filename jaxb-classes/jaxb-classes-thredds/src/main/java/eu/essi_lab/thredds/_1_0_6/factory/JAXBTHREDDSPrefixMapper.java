@@ -21,7 +21,7 @@ package eu.essi_lab.thredds._1_0_6.factory;
  * #L%
  */
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 public class JAXBTHREDDSPrefixMapper extends NamespacePrefixMapper {
 

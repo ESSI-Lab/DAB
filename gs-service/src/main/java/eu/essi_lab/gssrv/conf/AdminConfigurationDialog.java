@@ -21,26 +21,21 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.gssrv.starter.DABStarter;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.oauth.*;
+import eu.essi_lab.cfga.gui.components.setting.edit_put.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
+import eu.essi_lab.gssrv.starter.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
  */
-@SuppressWarnings("serial")
 class AdminConfigurationDialog extends SettingEditDialog {
 
     private String requestURL;

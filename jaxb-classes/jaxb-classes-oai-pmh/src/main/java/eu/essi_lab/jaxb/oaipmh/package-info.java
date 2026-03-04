@@ -5,7 +5,7 @@
 // Generato il: 2017.01.05 alle 09:41:18 AM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.openarchives.org/OAI/2.0/", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.openarchives.org/OAI/2.0/", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.jaxb.oaipmh;
 
 /*-

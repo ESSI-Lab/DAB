@@ -28,7 +28,7 @@ import net.opengis.iso19139.gco.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
 
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 import java.io.*;
 import java.math.*;
 import java.util.*;
@@ -114,7 +114,6 @@ public class DataIdentification extends Identification {
 	while (topicCategories.hasNext()) {
 	    MDTopicCategoryCodeType type = topicCategories.next();
 	    out.add(type.value());
-
 	}
 
 	return out.iterator();
@@ -125,7 +124,7 @@ public class DataIdentification extends Identification {
      */
     public void addTopicCategory(MDTopicCategoryCodeType type) {
 
-	addTopicCategory(type.name());
+	addTopicCategory(type.value());
     }
 
     /**

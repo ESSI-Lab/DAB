@@ -1,6 +1,6 @@
 package eu.essi_lab.request.executor.schedule;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import eu.essi_lab.messages.MessageResponse;
 import eu.essi_lab.messages.RequestMessage;

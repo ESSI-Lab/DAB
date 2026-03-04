@@ -1,7 +1,7 @@
 package eu.essi_lab.model.resource;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.*;
 
 /*-
  * #%L
@@ -23,9 +23,6 @@ import java.util.List;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.index.IndexedMetadataElement;
@@ -50,14 +47,7 @@ public enum ResourceProperty implements Queryable {
      * Mandatory property
      */
     PRIVATE_ID("privateId", false),
-
-    /**
-     * Mandatory property.<br>
-     * This property has no related {@link IndexedResourceProperty} since the value is the same of the
-     * {@link MetadataElement#IDENTIFIER} property which has its own {@link IndexedMetadataElement}
-     */
-    PUBLIC_ID("publicId"),
-
+    
     /**
      * 
      */
@@ -323,6 +313,17 @@ public enum ResourceProperty implements Queryable {
     public static List<ResourceProperty> listValues() {
 
 	return Arrays.asList(values());
+    }
+
+    /**
+     * Returns the ordered list of these {@link ResourceProperty}s
+     */
+    public static List<ResourceProperty> listOrderedValues() {
+
+        //
+        return Arrays.stream(values()).//
+                sorted(Comparator.comparing(ResourceProperty::getName)).//
+                collect(Collectors.toList());//
     }
 
     /**

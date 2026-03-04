@@ -21,24 +21,19 @@ package eu.essi_lab.cfga.gui.components.setting.edit_put;
  * #L%
  */
 
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.gui.directive.Directive.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.Unit;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.Selector;
-import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.tabs.TabContent;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.directive.Directive;
-import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
+import java.util.*;
 
 /**
  * @author Fabrizio

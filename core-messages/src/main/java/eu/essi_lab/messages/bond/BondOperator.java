@@ -43,9 +43,8 @@ public enum BondOperator {
 
     INTERSECTS,
     DISJOINT, 
-    BBOX, // BBOX is "NOT DISJOINT"
     CONTAINS, // target bbox contains resources bbox
-    CONTAINED, // resources bbox contains target bbox
+    WITHIN, // target bbox contained in the resources bbox
     /**
      * Target bbox intersects resources bboxes only with at least one corner (south, west, east or north) of the
      * resource bboxes, which are not entirely contained in the requested bbox
@@ -88,7 +87,7 @@ public enum BondOperator {
 	    return CONTAINS;
 	}
 	if (operation.matches("(?i).*Contained.*")) {
-	    return CONTAINED;
+	    return WITHIN;
 	}
 	if (operation.matches("(?i).*IntersectsAnyPointNotContains.*")) {
 	    return INTERSECTS_ANY_POINT_NOT_CONTAINS;

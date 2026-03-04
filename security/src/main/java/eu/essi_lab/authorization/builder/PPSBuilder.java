@@ -39,6 +39,7 @@ import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
  */
 public class PPSBuilder {
 
+    private final String role;
     private PolicySet pps;
     private List<Serializable> list;
     
@@ -46,6 +47,8 @@ public class PPSBuilder {
      * @param role
      */
     public PPSBuilder(String role) {
+
+	this.role = role;
 
 	list = new ArrayList<Serializable>();
 	
@@ -69,6 +72,11 @@ public class PPSBuilder {
      * @return
      */
     public PolicySet build() {
+
+	pps = XACML_JAXBUtils.createPolicySet(//
+		"PPS:" + role + ":role", //
+		list,//
+		StandardCombiningAlgorithm.XACML_3_0_POLICY_COMBINING_PERMIT_OVERRIDES.getId());
 
 	return pps;
     }

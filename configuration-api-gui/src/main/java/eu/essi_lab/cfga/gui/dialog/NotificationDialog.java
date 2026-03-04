@@ -21,10 +21,9 @@ package eu.essi_lab.cfga.gui.dialog;
  * #L%
  */
 
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.html.Label;
-
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.html.*;
+import eu.essi_lab.cfga.gui.components.*;
 
 @SuppressWarnings("serial")
 public class NotificationDialog extends ConfirmationDialog {
@@ -197,7 +196,7 @@ public class NotificationDialog extends ConfirmationDialog {
 	    text = "No message available";
 	}
 
-	Label label = ComponentFactory.createLabel(text);
+	Span label = ComponentFactory.createSpan(text);
 	// label.getStyle().set("color", "red");
 	label.getStyle().set("font-size","14px");
 

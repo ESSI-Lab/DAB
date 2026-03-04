@@ -21,12 +21,10 @@ package eu.essi_lab.cfga.gui.components.setting.group;
  * #L%
  */
 
-import java.util.Set;
+import com.vaadin.flow.component.checkbox.*;
+import eu.essi_lab.cfga.gui.components.setting.group.listener.*;
 
-import com.vaadin.flow.component.checkbox.CheckboxGroup;
-import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
-
-import eu.essi_lab.cfga.gui.components.setting.group.listener.CheckComponentsHandlerListener;
+import java.util.*;
 
 /**
  * @author Fabrizio

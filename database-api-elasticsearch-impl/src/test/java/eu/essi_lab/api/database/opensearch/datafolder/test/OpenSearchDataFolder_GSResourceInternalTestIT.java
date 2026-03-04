@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch.datafolder.test;
 
@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
+
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
@@ -48,7 +49,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class OpenSearchDataFolder_GSResourceInternalTestIT extends OpenSearchTest {
 
     /*
-     * 
+     *
      */
     private OpenSearchFolder createDataFolder(//
 	    OpenSearchDatabase database, //
@@ -89,7 +90,7 @@ public class OpenSearchDataFolder_GSResourceInternalTestIT extends OpenSearchTes
     @Test
     public void listIdentifiersTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	OpenSearchFolder folder1 = createDataFolder(database, "sourceId_1");
 	OpenSearchFolder folder2 = createDataFolder(database, "sourceId_2");
@@ -114,11 +115,11 @@ OpenSearchDatabase database = createDataBase();
 	test(folder1, folder1Entries);
 	test(folder2, folder2Entries);
 	test(folder3, folder3Entries);
-	
+
 	//
 	//
 	//
-	
+
 	folder1.clear();
 	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.ORIGINAL).size());
 	Assert.assertEquals(0, folder1.listIdentifiers(IdentifierType.PRIVATE).size());
@@ -152,7 +153,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void getByIdentifierTest() throws ParserConfigurationException, JAXBException, SAXException, IOException, Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -358,7 +359,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void minMaxTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -397,7 +398,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void removeTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -444,7 +445,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void sourceTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -524,7 +525,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void searchResourcesTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 
@@ -668,7 +669,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void removeResourcesTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = TestUtils.getDataFolderName(database);
 

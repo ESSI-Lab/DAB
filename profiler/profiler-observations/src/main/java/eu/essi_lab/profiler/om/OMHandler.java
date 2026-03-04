@@ -1,152 +1,71 @@
 package eu.essi_lab.profiler.om;
 
-import java.io.ByteArrayOutputStream;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.io.File;
-import java.net.URLDecoder;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.Characters;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
-import javax.xml.transform.stream.StreamSource;
-
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.GetViewIdentifiersRequest;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.api.database.opensearch.*;
-import eu.essi_lab.lib.xml.*;
-import eu.essi_lab.messages.count.CountSet;
-import eu.essi_lab.views.DefaultViewManager;
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import com.google.common.base.Charsets;
-
-import eu.essi_lab.access.DataValidatorErrorCode;
-import eu.essi_lab.access.datacache.DataCacheConnector;
-import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
-import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.access.*;
+import eu.essi_lab.access.datacache.*;
 import eu.essi_lab.access.datacache.Response;
-import eu.essi_lab.access.datacache.ResponseListener;
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
-import eu.essi_lab.cfga.scheduler.Scheduler;
-import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
-import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.AccessMessage;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
-import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.ValidationMessage.ValidationResult;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.spatial.SpatialEntity;
-import eu.essi_lab.messages.bond.spatial.SpatialExtent;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.GSProperty;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.data.CRS;
-import eu.essi_lab.model.resource.data.DataDescriptor;
-import eu.essi_lab.model.resource.data.DataFormat;
-import eu.essi_lab.model.resource.data.DataObject;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.api.database.opensearch.*;
+import eu.essi_lab.authorization.userfinder.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.*;
+import eu.essi_lab.cfga.gs.setting.dc_connector.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.lib.net.s3.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.ResourceSelector.*;
+import eu.essi_lab.messages.ValidationMessage.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.spatial.*;
+import eu.essi_lab.messages.count.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.data.*;
 import eu.essi_lab.model.resource.data.DataType;
-import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
-import eu.essi_lab.model.resource.data.dimension.DataDimension;
-import eu.essi_lab.netcdf.timeseries.NetCDFUtils;
-import eu.essi_lab.pdk.handler.StreamingRequestHandler;
-import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.profiler.om.JSONObservation.ObservationType;
-import eu.essi_lab.profiler.om.OMRequest.APIParameters;
+import eu.essi_lab.model.resource.data.dimension.ContinueDimension.*;
+import eu.essi_lab.model.resource.data.dimension.*;
+import eu.essi_lab.netcdf.timeseries.*;
+import eu.essi_lab.pdk.handler.*;
+import eu.essi_lab.pdk.wrt.*;
+import eu.essi_lab.profiler.om.JSONObservation.*;
+import eu.essi_lab.profiler.om.OMRequest.*;
 import eu.essi_lab.profiler.om.ObservationMapper.Property;
-import eu.essi_lab.profiler.om.resultwriter.EmptyResultWriter;
-import eu.essi_lab.profiler.om.resultwriter.JSONObservationResultWriter;
-import eu.essi_lab.profiler.om.resultwriter.ResultWriter;
-import eu.essi_lab.profiler.om.scheduling.OMSchedulerSetting;
-import ucar.ma2.Array;
-import ucar.ma2.Index;
-import ucar.ma2.StructureData;
-import ucar.nc2.Variable;
-import ucar.nc2.constants.AxisType;
-import ucar.nc2.constants.FeatureType;
-import ucar.nc2.dataset.CoordinateAxis;
-import ucar.nc2.dataset.CoordinateAxis1DTime;
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dataset.NetcdfDataset.Enhance;
-import ucar.nc2.ft.DsgFeatureCollection;
-import ucar.nc2.ft.FeatureDataset;
-import ucar.nc2.ft.FeatureDatasetFactoryManager;
-import ucar.nc2.ft.PointFeature;
-import ucar.nc2.ft.PointFeatureCollection;
-import ucar.nc2.ft.PointFeatureCollectionIterator;
-import ucar.nc2.ft.point.PointDatasetImpl;
-import ucar.nc2.ft.point.StationPointFeature;
-import ucar.nc2.ft.point.standard.StandardTrajectoryCollectionImpl;
+import eu.essi_lab.profiler.om.resultwriter.*;
+import eu.essi_lab.profiler.om.scheduling.*;
+import jakarta.servlet.http.*;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.*;
+import org.apache.commons.io.*;
+import org.json.*;
+import ucar.ma2.*;
+import ucar.nc2.*;
+import ucar.nc2.constants.*;
+import ucar.nc2.dataset.*;
+import ucar.nc2.dataset.NetcdfDataset.*;
+import ucar.nc2.ft.*;
+import ucar.nc2.ft.point.*;
+import ucar.nc2.ft.point.standard.*;
+
+import javax.xml.namespace.*;
+import javax.xml.stream.*;
+import javax.xml.stream.events.*;
+import javax.xml.stream.events.Attribute;
+import javax.xml.transform.stream.*;
+import java.io.*;
+import java.math.*;
+import java.net.*;
+import java.nio.charset.*;
+import java.nio.file.*;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.Optional;
 
 public class OMHandler extends StreamingRequestHandler {
 
@@ -167,7 +86,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
 	    message.setError(
-		    "Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE + " but was " + (limit + offset));
+		    "Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE
+			    + " but was " + (limit + offset));
 	    message.setErrorCode("400");
 	}
 
@@ -205,7 +125,7 @@ public class OMHandler extends StreamingRequestHandler {
 	if (optView.isPresent()) {
 
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
-	    DefaultViewManager manager = new DefaultViewManager();
+	    ViewManager manager = new ViewManager();
 	    manager.setDatabaseReader(reader);
 	    View view = manager.getView(optView.get()).get();
 
@@ -411,8 +331,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 		String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 
-		if (asynchDownloadRequest || (includeValues != null && (includeValues.toLowerCase()
-			.equals("yes") || includeValues.toLowerCase().equals("true")))) {
+		if (asynchDownloadRequest || (includeValues != null && (includeValues.toLowerCase().equals("yes")
+			|| includeValues.toLowerCase().equals("true")))) {
 
 		    if (asynchDownloadRequest) {
 
@@ -718,7 +638,7 @@ public class OMHandler extends StreamingRequestHandler {
 	if (countResponse != null) {
 	    count = countResponse.getCount();
 	}
-	resultWriter.writeFooter(resumptionToken,count);
+	resultWriter.writeFooter(resumptionToken, count);
 
 	writer.flush();
 	writer.close();

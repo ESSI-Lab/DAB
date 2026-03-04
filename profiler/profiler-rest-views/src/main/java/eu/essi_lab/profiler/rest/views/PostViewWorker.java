@@ -21,7 +21,7 @@ package eu.essi_lab.profiler.rest.views;
  * #L%
  */
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.json.JSONObject;
 

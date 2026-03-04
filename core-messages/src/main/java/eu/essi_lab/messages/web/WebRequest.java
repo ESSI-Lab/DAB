@@ -40,28 +40,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.ReadListener;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
+import jakarta.servlet.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.Part;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.PathSegment;
+import jakarta.ws.rs.core.UriBuilder;
+import jakarta.ws.rs.core.UriInfo;
+import jakarta.xml.ws.WebServiceContext;
+import jakarta.xml.ws.handler.MessageContext;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Message;
@@ -1594,11 +1587,7 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 		return null;
 	    }
 
-	    @Override
-	    public String getRealPath(String path) {
-		// TODO Auto-generated method stub
-		return null;
-	    }
+
 
 	    @Override
 	    public BufferedReader getReader() {
@@ -1712,6 +1701,21 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 
 	    @Override
+	    public String getRequestId() {
+		return "";
+	    }
+
+	    @Override
+	    public String getProtocolRequestId() {
+		return "";
+	    }
+
+	    @Override
+	    public ServletConnection getServletConnection() {
+		return null;
+	    }
+
+	    @Override
 	    public String getContentType() {
 		// TODO Auto-generated method stub
 		return null;
@@ -1787,11 +1791,6 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 		return false;
 	    }
 
-	    @Override
-	    public boolean isRequestedSessionIdFromUrl() {
-		// TODO Auto-generated method stub
-		return false;
-	    }
 
 	    @Override
 	    public boolean isRequestedSessionIdFromURL() {
@@ -2082,6 +2081,11 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    public List<String> getMatchedURIs() {
 		// TODO Auto-generated method stub
 		return new ArrayList<>();
+	    }
+
+	    @Override
+	    public String getMatchedResourceTemplate() {
+		return "";
 	    }
 
 	    @Override

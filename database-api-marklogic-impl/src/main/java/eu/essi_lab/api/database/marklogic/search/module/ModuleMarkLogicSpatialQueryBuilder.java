@@ -60,7 +60,6 @@ public class ModuleMarkLogicSpatialQueryBuilder extends DefaultMarkLogicSpatialQ
 	String west = String.valueOf(extent.getWest());
 
 	switch (op) {
-	case BBOX:
 	case INTERSECTS:
 
 	    return MarkLogicModuleQueryBuilder.getInstance().getSpatialIntersectsQuery(south, west, north, east);

@@ -27,8 +27,8 @@ package eu.essi_lab.lib.net.smtp;
 import dev.failsafe.*;
 import eu.essi_lab.lib.utils.*;
 
-import javax.mail.*;
-import javax.mail.internet.*;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -111,7 +111,7 @@ public class SMTPClient {
 
 	for (String recipient : recipients) {
 
-	    Session session = Session.getInstance(properties, new javax.mail.Authenticator() {
+	    Session session = Session.getInstance(properties, new jakarta.mail.Authenticator() {
 
 		protected PasswordAuthentication getPasswordAuthentication() {
 

@@ -21,8 +21,8 @@ package eu.essi_lab.cfga.gui.directive;
  * #L%
  */
 
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -62,6 +62,36 @@ public class AddDirective extends Directive {
 	super(name);
 	this.settingClassName = settingClassName;
 
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+    }
+
+    /**
+     *
+     * @param name
+     * @param description
+     * @param settingClass
+     */
+    public AddDirective(String name, String description, Class<? extends Setting> settingClass) {
+
+	super(name);
+	this.settingClassName = settingClass.getName();
+
+	setDescription(description);
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+    }
+
+    /**
+     *
+     * @param name
+     * @param description
+     * @param settingClassName
+     */
+    public AddDirective(String name, String description, String settingClassName) {
+
+	super(name);
+	this.settingClassName = settingClassName;
+
+	setDescription(description);
 	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
     }
 

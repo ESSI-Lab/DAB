@@ -1,50 +1,40 @@
 package eu.essi_lab.messages.bond;
 
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.messages.bond.spatial.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.Queryable.*;
+import eu.essi_lab.model.ontology.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.composed.*;
+
 import java.util.*;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.stream.Collectors;
-
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.messages.bond.spatial.SpatialEntity;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.Queryable.ContentType;
-import eu.essi_lab.model.RuntimeInfoElement;
-import eu.essi_lab.model.ontology.OntologyObjectProperty;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.model.resource.ResourceType;
-import eu.essi_lab.model.resource.composed.ComposedElementItem;
+import java.util.stream.*;
 
 /**
- * A factory to create all types of {@link Bond}s provide by the GI-suite
+ * A factory with several facility methods to create all types of {@link Bond}s
  *
  * @author Fabrizio
  */
 public class BondFactory {
 
     private BondFactory() {
+    }
+
+    /**
+     * @return
+     */
+    public static Bond getFalseBond() {
+
+	return new FalseBond();
+    }
+
+    /**
+     * @return
+     */
+    public static Bond getTrueBond() {
+
+	return new TrueBond();
     }
 
     /**
@@ -721,8 +711,8 @@ public class BondFactory {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
+     * <li>{@link BondOperator#WITHIN}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
      * </ul>
@@ -733,8 +723,10 @@ public class BondFactory {
      */
     public static SpatialBond createSpatialEntityBond(BondOperator operator, SpatialEntity extent) {
 
-	if (operator != BondOperator.BBOX && operator != BondOperator.CONTAINS && operator != BondOperator.INTERSECTS
-		&& operator != BondOperator.DISJOINT) {
+	if (operator != BondOperator.CONTAINS &&  //
+		operator != BondOperator.WITHIN &&  //
+		operator != BondOperator.INTERSECTS &&  //
+		operator != BondOperator.DISJOINT) {
 
 	    throw new IllegalArgumentException("Not spatial operator: " + operator);
 	}
@@ -945,6 +937,17 @@ public class BondFactory {
 	    throws IllegalArgumentException {
 
 	return new ResourcePropertyBond(operator, property, null);
+    }
+
+    /**
+     * Applies this bond to resources having the minimum or maximum value of the given <code>element</code>
+     *
+     * @param operator {@link BondOperator#MIN} or {@link BondOperator#MAX}
+     */
+    public static SimpleValueBond createMinMaxSimpleValueBond(MetadataElement element, BondOperator operator)
+	    throws IllegalArgumentException {
+
+	return new SimpleValueBond(operator, element, null);
     }
 
     /**

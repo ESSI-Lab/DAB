@@ -1,0 +1,26 @@
+{
+    "id": "viewIdentifier",
+    "label": "The view description",
+    "bond": {
+        "operands": [
+            {
+                "property": [
+                    "metadataElement",
+                    "TITLE"
+                ],
+                "type": "simpleValueBond",
+                "operator": "EXISTS"
+            },
+            {
+                "property": [
+                    "metadataElement",
+                    "ABSTRACT"
+                ],
+                "type": "simpleValueBond",
+                "operator": "NOT_EXISTS"
+            }
+        ],
+        "logicalOperator": "OR",
+        "type": "logicalBond"
+    }
+}

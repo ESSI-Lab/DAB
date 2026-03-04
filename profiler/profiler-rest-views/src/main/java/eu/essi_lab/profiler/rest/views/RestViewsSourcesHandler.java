@@ -27,8 +27,8 @@ package eu.essi_lab.profiler.rest.views;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

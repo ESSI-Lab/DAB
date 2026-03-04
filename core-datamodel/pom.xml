@@ -31,19 +31,14 @@
             <artifactId>gs-lib-xml</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
-        
+
         <dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>iso19139-v_20060504</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>gml-v_3_2_0</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>wfs-v_1_1_0</artifactId>
-		</dependency>	
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>jaxb-classes-iso19139-v_2006504</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+
             
       	<dependency>
             <groupId>org.eclipse.rdf4j</groupId>

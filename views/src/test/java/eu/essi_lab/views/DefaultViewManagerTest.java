@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Optional;
 
+import eu.essi_lab.api.database.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;

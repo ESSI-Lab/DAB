@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.access.DataValidatorImpl;

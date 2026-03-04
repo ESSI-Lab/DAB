@@ -34,8 +34,8 @@ import eu.essi_lab.model.pluggable.*;
 import eu.essi_lab.pdk.rsf.*;
 import org.json.*;
 
-import javax.ws.rs.core.*;
-import javax.ws.rs.core.Response.*;
+import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.core.Response.*;
 import java.io.*;
 import java.util.*;
 

@@ -36,7 +36,7 @@ import java.util.*;
 public class TabContentDescriptor {
 
     private String label;
-    private DirectiveManager directiveManager;
+    private DirectiveHolder directiveHolder;
     private GridInfo gridInfo;
     private boolean reloadable;
     private Runnable tabReloadHandler;
@@ -48,7 +48,7 @@ public class TabContentDescriptor {
      */
     public TabContentDescriptor() {
 
-	directiveManager = new DirectiveManager();
+	directiveHolder = new DirectiveHolder();
     }
 
     /**
@@ -69,11 +69,11 @@ public class TabContentDescriptor {
 
 
     /**
-     * @return the directiveManager
+     * @return the
      */
-    public DirectiveManager getDirectiveManager() {
+    public DirectiveHolder getDirectiveHolder() {
 
-	return directiveManager;
+	return directiveHolder;
     }
 
     /**

@@ -5,7 +5,7 @@
 // Generated on: 2023.11.27 at 01:47:52 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/gml/3.2", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/gml/3.2", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.wigos._1_0.gml._3_2_1;
 
 /*-

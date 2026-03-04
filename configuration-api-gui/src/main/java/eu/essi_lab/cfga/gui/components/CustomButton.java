@@ -21,13 +21,10 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.button.Button;
+import java.util.*;
 
 /**
  * @author Fabrizio

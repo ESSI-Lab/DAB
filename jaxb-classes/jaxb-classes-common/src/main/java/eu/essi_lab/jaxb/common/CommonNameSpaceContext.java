@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 import javax.xml.namespace.NamespaceContext;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

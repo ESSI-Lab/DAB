@@ -29,7 +29,7 @@ package eu.essi_lab.jaxb.wml._2_0.om__2;
  * #L%
  */
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 public class Result

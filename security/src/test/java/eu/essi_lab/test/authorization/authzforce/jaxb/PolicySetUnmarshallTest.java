@@ -3,9 +3,9 @@
  */
 package eu.essi_lab.test.authorization.authzforce.jaxb;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
 import eu.essi_lab.authorization.rps.WHOSRolePolicySet;
 import eu.essi_lab.test.authorization.authzforce.XACMLTest;

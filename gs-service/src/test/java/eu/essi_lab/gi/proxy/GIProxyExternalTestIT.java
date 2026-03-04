@@ -4,8 +4,8 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
 
 import org.junit.Test;
 

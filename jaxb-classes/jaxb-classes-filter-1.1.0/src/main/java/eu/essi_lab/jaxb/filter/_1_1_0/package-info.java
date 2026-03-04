@@ -5,7 +5,7 @@
 // Generato il: 2015.06.08 alle 02:33:20 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/ogc", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/ogc", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.jaxb.filter._1_1_0;
 
 /*-

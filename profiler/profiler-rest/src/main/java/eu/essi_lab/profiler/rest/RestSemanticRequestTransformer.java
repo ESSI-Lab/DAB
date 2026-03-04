@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ValidationMessage;

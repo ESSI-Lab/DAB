@@ -21,18 +21,16 @@ package eu.essi_lab.cfga.gui.components.setting.listener;
  * #L%
  */
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.button.Button;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.tabs.TabContent;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.components.setting.edit_put.SettingEditDialog;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.setting.Setting;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.setting.edit_put.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.setting.*;
 
 /**
  * @author Fabrizio

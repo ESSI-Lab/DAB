@@ -6,7 +6,7 @@ package eu.essi_lab.accessor.csw;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

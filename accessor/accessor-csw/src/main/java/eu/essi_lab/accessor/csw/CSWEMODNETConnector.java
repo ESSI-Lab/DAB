@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Node;

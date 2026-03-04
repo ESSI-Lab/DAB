@@ -42,9 +42,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.UnmarshalException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.UnmarshalException;
 import javax.xml.namespace.QName;
 
 import org.apache.commons.io.IOUtils;

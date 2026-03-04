@@ -63,7 +63,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setOffset(1);
 
-	wrapper.setMaxRecords(JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get() + 1);
+	wrapper.setMaxRecords(300);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 
@@ -73,18 +73,18 @@ public class Anonymous_Test extends XACMLTest {
     }
 
     /**
-     * Deny: offset > 200
+     * Allow: defaul offset is Integer.MAX_VALUE
      *
      * @throws IOException
      */
     @Test
-    public void anonymousDiscoveryDenyTest2() throws IOException {
+    public void anonymousDiscoveryAllowTest2() throws IOException {
 
 	wrapper.setAction(Action.DISCOVERY.getId());
 
 	wrapper.setPath("opensearch");
 
-	wrapper.setOffset(JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get() + 1);
+	wrapper.setOffset(10000);
 
 	wrapper.setMaxRecords(1);
 
@@ -92,7 +92,7 @@ public class Anonymous_Test extends XACMLTest {
 
 	wrapper.setViewCreator(AbstractPermissionPolicySet.VIEW_CREATOR_MISSING_VALUE);
 
-	evaluate(DecisionType.DENY);
+	evaluate(DecisionType.PERMIT);
     }
 
     /**
@@ -371,29 +371,6 @@ public class Anonymous_Test extends XACMLTest {
 	wrapper.setOffset(1);
 
 	wrapper.setMaxRecords(JVMOption.getIntValue(JVMOption.ANONYMOUS_PAGE_SIZE_LIMIT).get() + 1);
-
-	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
-
-	wrapper.setViewCreator(AbstractPermissionPolicySet.VIEW_CREATOR_MISSING_VALUE);
-
-	evaluate(DecisionType.DENY);
-    }
-
-    /**
-     * Deny: offset > 200
-     *
-     * @throws IOException
-     */
-    @Test
-    public void anonymousAccessDenyTest2() throws IOException {
-
-	wrapper.setAction(Action.ACCESS.getId());
-
-	wrapper.setPath("wms");
-
-	wrapper.setOffset(JVMOption.getIntValue(JVMOption.ANONYMOUS_OFFSET_LIMIT).get() + 1);
-
-	wrapper.setMaxRecords(1);
 
 	wrapper.setViewIdentifier(AbstractPermissionPolicySet.VIEW_ID_MISSING_VALUE);
 

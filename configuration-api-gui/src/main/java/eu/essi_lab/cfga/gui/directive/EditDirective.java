@@ -56,4 +56,31 @@ public class EditDirective extends Directive {
 
 	super(name, confirmationPolicy);
     }
+
+    /**
+     *
+     * @param name
+     * @param description
+     */
+    public EditDirective(String name, String description) {
+
+	super(name);
+
+	setDescription(description);
+	setConfirmationPolicy(ConfirmationPolicy.ON_WARNINGS);
+
+    }
+
+    /**
+     *
+     * @param name
+     * @param description
+     * @param confirmationPolicy
+     */
+    public EditDirective(String name,  String description, ConfirmationPolicy confirmationPolicy) {
+
+	super(name, confirmationPolicy);
+
+	setDescription(description);
+    }
 }

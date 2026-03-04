@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.cuahsi.waterml._1.SeriesCatalogType;

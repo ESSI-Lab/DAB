@@ -21,7 +21,7 @@ package eu.essi_lab.profiler.os.handler.discover.datahub;
  * #L%
  */
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import eu.essi_lab.accessor.datahub.DatahubToJsonMapper;
 import eu.essi_lab.messages.DiscoveryMessage;
