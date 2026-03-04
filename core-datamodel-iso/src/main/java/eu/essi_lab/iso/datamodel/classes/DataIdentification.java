@@ -114,7 +114,6 @@ public class DataIdentification extends Identification {
 	while (topicCategories.hasNext()) {
 	    MDTopicCategoryCodeType type = topicCategories.next();
 	    out.add(type.value());
-
 	}
 
 	return out.iterator();
@@ -125,7 +124,7 @@ public class DataIdentification extends Identification {
      */
     public void addTopicCategory(MDTopicCategoryCodeType type) {
 
-	addTopicCategory(type.name());
+	addTopicCategory(type.value());
     }
 
     /**

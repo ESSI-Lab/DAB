@@ -27,28 +27,36 @@ public class PutSourceRequestTest {
 
 	List<Parameter> parameters = request.getSupportedParameters();
 
-	Assert.assertEquals(8, parameters.size());
+	Assert.assertEquals(9, parameters.size());
 
 	Assert.assertEquals(
 		Parameter.of(PutSourceRequest.SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false),
 		parameters.get(0));
+
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_LABEL, ContentType.TEXTUAL, true), parameters.get(1));
+
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SOURCE_ENDPOINT, ContentType.TEXTUAL, true), parameters.get(2));
+
 	Assert.assertEquals(Parameter.of(PutSourceRequest.SERVICE_TYPE, ContentType.TEXTUAL, PutSourceRequest.SourceType.class, true),
 		parameters.get(3));
 
+	Parameter sourceDep = Parameter.of(PutSourceRequest.SOURCE_DEPLOYMENT, ContentType.TEXTUAL, false);
+	sourceDep.setMultiValue();
+
+	Assert.assertEquals(sourceDep, parameters.get(4));
+
 	Assert.assertEquals(
 		Parameter.of(PutSourceRequest.HARVEST_SCHEDULING, false, HarvestSchedulingRequest.START_TIME, ContentType.ISO8601_DATE_TIME,
-			false), parameters.get(4));
+			false), parameters.get(5));
 	Assert.assertEquals(
 		Parameter.of(PutSourceRequest.HARVEST_SCHEDULING, false, HarvestSchedulingRequest.REPEAT_COUNT, ContentType.TEXTUAL,
-			HarvestSchedulingRequest.RepeatCount.class, true), parameters.get(5));
+			HarvestSchedulingRequest.RepeatCount.class, true), parameters.get(6));
 	Assert.assertEquals(
 		Parameter.of(PutSourceRequest.HARVEST_SCHEDULING, false, HarvestSchedulingRequest.REPEAT_INTERVAL, ContentType.INTEGER,
-			false), parameters.get(6));
+			false), parameters.get(7));
 	Assert.assertEquals(
 		Parameter.of(PutSourceRequest.HARVEST_SCHEDULING, false, HarvestSchedulingRequest.REPEAT_INTERVAL_UNIT, ContentType.TEXTUAL,
-			HarvestSchedulingRequest.RepeatIntervalUnit.class, false), parameters.get(7));
+			HarvestSchedulingRequest.RepeatIntervalUnit.class, false), parameters.get(8));
 
     }
 

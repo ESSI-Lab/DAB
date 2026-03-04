@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch.viewsfolder.test;
 
@@ -41,7 +41,7 @@ public class OpenSearchViewsFolderInternalTestIT extends OpenSearchTest {
     @Test
     public void sourceTest1() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -104,7 +104,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void sourceTest2() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -165,7 +165,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void folderTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -202,7 +202,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void searchViewsTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -329,7 +329,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void getViewIdentifiersSublistTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 
@@ -436,7 +436,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void getViewIdentifiersFilterTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.VIEWS_FOLDER;
 

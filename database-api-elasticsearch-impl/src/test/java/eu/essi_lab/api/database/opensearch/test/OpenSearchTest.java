@@ -5,6 +5,7 @@ package eu.essi_lab.api.database.opensearch.test;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
+import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
 import java.io.IOException;
@@ -43,6 +44,8 @@ public class OpenSearchTest {
 
     @Before
     public void before() throws GSException, IOException {
+
+	ConfigurationWrapper.setConfiguration(new SimpleConfiguration());
 
 	System.setProperty("initIndexes", "true");
 

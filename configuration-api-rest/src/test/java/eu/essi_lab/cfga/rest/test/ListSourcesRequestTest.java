@@ -16,7 +16,7 @@ import java.util.*;
 public class ListSourcesRequestTest {
 
     @Test
-    public void getSupportedPametersTest() {
+    public void getSupportedParametersTest() {
 
 	ListSourcesRequest request = new ListSourcesRequest();
 
@@ -24,11 +24,15 @@ public class ListSourcesRequestTest {
 
 	Assert.assertEquals(1, parameters.size());
 
-	Parameter parameter = Parameter.of(RemoveSourceRequest.SOURCE_ID, ContentType.TEXTUAL,
-		InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, false);
+	Parameter parameter = Parameter.of( //
+		RemoveSourceRequest.SOURCE_ID, //
+		ContentType.TEXTUAL,//
+		InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, //
+		false);//
+
 	parameter.setMultiValue();
 
-	Assert.assertEquals(parameter, parameters.get(0));
+	Assert.assertEquals(parameter, parameters.getFirst());
     }
 
     @Test

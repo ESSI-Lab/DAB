@@ -23,7 +23,7 @@ public class EditSourceRequestTest {
 
 	List<Parameter> parameters = request.getSupportedParameters();
 
-	Assert.assertEquals(4, parameters.size());
+	Assert.assertEquals(5, parameters.size());
 
 	Assert.assertEquals(
 		Parameter.of(PutSourceRequest.SOURCE_ID, ContentType.TEXTUAL, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS, true),
