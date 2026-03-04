@@ -147,59 +147,6 @@
                 </configuration>
             </plugin>
 
-
-            <!-- Jetty Plugin
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
-                <configuration>
-
-                    <stopPort>${jetty.stop_port}</stopPort>
-                    <stopKey>stop</stopKey>
-
-                    <httpConnector>
-                        <port>${jetty.port}</port>
-                    </httpConnector>
-
-                    <webApp>
-                        <contextPath>/${contextPath}</contextPath>
-
-                        <allowDuplicateFragmentNames>true</allowDuplicateFragmentNames>
-
-                        <webInfIncludeJarPattern>
-                            .*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$
-                        </webInfIncludeJarPattern>
-
-                        <containerIncludeJarPattern>
-                            .*/spring-[^/]*\.jar$|.*vaadin-[^/]*\.jar$|.*flow-[^/]*\.jar$
-                        </containerIncludeJarPattern>
-
-                    </webApp>
-
-                    <scan>0</scan>
-
-                     <contextXml>${project.basedir}/src/main/webapp/WEB-INF/jetty-config.xml</contextXml>
-
-                    <systemProperties>
-                        <systemProperty>
-                            <name>org.eclipse.jdt.core.compiler.source</name>
-                            <value>21</value>
-                        </systemProperty>
-                        <systemProperty>
-                            <name>org.eclipse.jdt.core.compiler.compliance</name>
-                            <value>21</value>
-                        </systemProperty>
-                        <systemProperty>
-                            <name>org.eclipse.jdt.core.compiler.codegen.targetPlatform</name>
-                            <value>21</value>
-                        </systemProperty>
-                    </systemProperties>
-
-                </configuration>
-            </plugin>
-            -->
-
             <!-- War plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
