@@ -141,7 +141,7 @@ public class TRIGGERMapper extends OriginalIdentifierMapper {
 
     /**
      * @param datasetInfo
-     * @param sensorInfo
+     * @param variableName
      * @return
      */
     static OriginalMetadata create(TRIGGERDevice datasetInfo, String variableName, String queryPath, List<TRIGGERTimePosition> position) {
@@ -278,8 +278,6 @@ public class TRIGGERMapper extends OriginalIdentifierMapper {
 	    String variable = retrieveVariableInfo(originalMD);
 
 	    // String interp = retrieveInterpolationCode(originalMD);
-
-	    String originalMetadata = originalMD.getMetadata();
 	    
 	    String queryPath = retrieveQueryPath(originalMD);
 
@@ -299,7 +297,7 @@ public class TRIGGERMapper extends OriginalIdentifierMapper {
 
 	    if (object != null && !object.isEmpty()) {
 
-		String deviceId = object.optString("deviceId");
+		String email = object.optString("email");
 
 		TRIGGER_VARIABLES var = TRIGGER_VARIABLES.decode(variable);
 		if (var != null) {
@@ -369,7 +367,7 @@ public class TRIGGERMapper extends OriginalIdentifierMapper {
 
 		    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
-		    coreMetadata.setTitle("Acquisitions of " + var.getLabel() + " through TRIGGER API device identifier: " + deviceId);
+		    coreMetadata.setTitle("Acquisitions of " + var.getLabel() + " through TRIGGER API device identifier: " + email);
 		    coreMetadata.setAbstract(
 			    "This dataset contains " + var.getLabel() + " timeseries from TRIGGER API, acquired by a specific device.");
 
@@ -519,16 +517,16 @@ public class TRIGGERMapper extends OriginalIdentifierMapper {
 
 		    MIPlatform platform = new MIPlatform();
 
-		    String platformIdentifier = "trigger-unibo:" + deviceId;
+		    String platformIdentifier = "trigger-unibo:" + email;
 
 		    platform.setMDIdentifierCode(platformIdentifier);
 
-		    String siteDescription = deviceId;
+		    String siteDescription = email;
 
 		    platform.setDescription(siteDescription);
 
 		    Citation platformCitation = new Citation();
-		    platformCitation.setTitle(deviceId);
+		    platformCitation.setTitle(email);
 		    platform.setCitation(platformCitation);
 
 		    coreMetadata.getMIMetadata().addMIPlatform(platform);
@@ -562,21 +560,21 @@ public class TRIGGERMapper extends OriginalIdentifierMapper {
 		    //
 		    // coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(online);
 
-		    String resourceIdentifier = generateCode(dataset, variable + ":" + deviceId);
+		    String resourceIdentifier = generateCode(dataset, variable + ":" + email);
 
 		    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
-		    String linkage = TRIGGERConnector.BASE_URL + queryPath + "deviceId=" + deviceId;// +
+		    String linkage = TRIGGERConnector.BASE_URL + queryPath + "select=year,month,day,hour,minute,second," +  variable.toLowerCase() +"&where=email=" + email;// +
 														    // station.getName()
 														    // +
 		    // buildingURL;
 		    Online o = new Online();
 		    o.setLinkage(linkage);
 		    o.setFunctionCode("download");
-		    o.setName(deviceId + ":" + variable);
-		    o.setIdentifier(deviceId + ":" + variableId);
+		    o.setName(email + ":" + variable);
+		    o.setIdentifier(email + ":" + variableId);
 		    o.setProtocol(CommonNameSpaceContext.TRIGGER);
-		    o.setDescription(var.getLabel() + " Station name: " + deviceId);
+		    o.setDescription(var.getLabel() + " Station name: " + email);
 		    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
 
 		    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
