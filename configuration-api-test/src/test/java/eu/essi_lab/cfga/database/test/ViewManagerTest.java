@@ -1,6 +1,7 @@
-package eu.essi_lab.api.database.opensearch.views.test;
+package eu.essi_lab.cfga.database.test;
 
 import eu.essi_lab.api.database.*;
+import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.model.exceptions.*;
@@ -36,6 +37,8 @@ public class ViewManagerTest {
 
     @Test
     public void testResolve() throws Exception {
+
+	ConfigurationWrapper.setConfiguration(new SimpleConfiguration());
 
 	assertEquals(view1, manager.getView("view1").get().getBond());
 	assertEquals(view1, manager.getResolvedView("view1").get().getBond());
