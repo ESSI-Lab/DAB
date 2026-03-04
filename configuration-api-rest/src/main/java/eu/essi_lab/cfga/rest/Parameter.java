@@ -330,7 +330,7 @@ public class Parameter {
 
 		&& ((Parameter) object).getName().equals(this.getName()) //
 
-		&& ((Parameter) object).getContentType() == this.getContentType() //
+		&& ((Parameter) object).getContentType().equals(this.getContentType()) //
 
 		&& ((Parameter) object).getEnum().equals(this.getEnum()) //
 
