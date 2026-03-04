@@ -21,18 +21,16 @@ package eu.essi_lab.cfga.gui.components.setting.listener;
  * #L%
  */
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.button.Button;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.SettingComponentFactory;
-import eu.essi_lab.cfga.gui.components.tabs.TabContent;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.gui.directive.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -102,10 +100,28 @@ public class SettingRemoveButtonListener implements ButtonChangeListener {
 	    }
 	}
 
-	ConfirmationDialog dialog = SettingComponentFactory.createSettingRemoveDialog(new OnConfirmListener());
+	String desc = tabContent.getRemoveDirective().flatMap(RemoveDirective::getDescription).orElse("Removal confirmation");
+
+	ConfirmationDialog dialog = createSettingRemoveDialog(desc, new OnConfirmListener());
 	
 	dialog.addToCloseAll();
 
 	dialog.open();
+    }
+
+    /**
+     *
+     * @param title
+     * @param onConfirmListener
+     * @return
+     */
+    private ConfirmationDialog createSettingRemoveDialog(String title, ButtonChangeListener onConfirmListener) {
+
+	ConfirmationDialog dialog = new ConfirmationDialog("Are you sure you want to remove this setting?", onConfirmListener);
+	dialog.setTitle(title);
+
+	dialog.addToCloseAll();
+
+	return dialog;
     }
 }

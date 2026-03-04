@@ -1,6 +1,6 @@
 package eu.essi_lab.demo.extensions.oaipmh;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.w3c.dom.Element;
 

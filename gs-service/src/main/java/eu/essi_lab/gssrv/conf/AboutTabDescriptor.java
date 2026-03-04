@@ -6,7 +6,7 @@ package eu.essi_lab.gssrv.conf;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 /*-
@@ -99,14 +99,16 @@ public class AboutTabDescriptor extends TabDescriptor {
 	HorizontalLayout layout = new HorizontalLayout();
 	layout.setWidthFull();
 
-	Label titleField = new Label();
+	Span titleField = new Span();
+	titleField.getStyle().set("font-size", "14px");
 	titleField.setText("• " + title + ": ");
 	titleField.setWidth("165px");
 	titleField.getStyle().set("font-weight", "bold");
 
 	layout.add(titleField);
 
-	Label contentField = new Label();
+	Span contentField = new Span();
+	contentField.getStyle().set("font-size", "14px");
 	contentField.setText(content);
 	contentField.setWidthFull();
 	layout.add(contentField);

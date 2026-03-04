@@ -23,7 +23,7 @@ package eu.essi_lab.iso.datamodel.classes;
 
 import net.opengis.iso19139.gmd.v_20060504.*;
 
-import javax.xml.bind.annotation.*;
+import jakarta.xml.bind.annotation.*;
 
 @XmlRootElement(name = "EXT_CIOnlineResource", namespace = "http://www.isotc211.org/2005/gmd")
 public class EXT_CIOnlineResourceType extends CIOnlineResourceType {

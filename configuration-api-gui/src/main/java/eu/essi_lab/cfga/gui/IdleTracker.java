@@ -21,12 +21,11 @@ package eu.essi_lab.cfga.gui;
  * #L%
  */
 
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
+import com.vaadin.flow.component.*;
+import eu.essi_lab.cfga.gui.dialog.*;
 
-import com.vaadin.flow.component.UI;
-
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio

@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.accessor.sos.AbstractSOSConnector;

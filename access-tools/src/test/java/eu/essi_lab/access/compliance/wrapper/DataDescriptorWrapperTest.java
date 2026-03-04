@@ -3,7 +3,7 @@ package eu.essi_lab.access.compliance.wrapper;
 import java.io.InputStream;
 import java.text.ParseException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

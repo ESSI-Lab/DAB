@@ -101,7 +101,7 @@ public class WMSCacheStatsOnRedis implements WMSCacheStats {
 	    List<Tuple> tuples = jedis.zrevrangeWithScores(key, 0, limit - 1);
 
 	    for (Tuple t : tuples) {
-		result.add(new AbstractMap.SimpleEntry(t.getElement(), t.getScore()));
+		result.add(new AbstractMap.SimpleEntry<>(t.getElement(), t.getScore()));
 	    }
 	}
 

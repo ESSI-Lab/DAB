@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.builder;
 
@@ -13,29 +13,25 @@ package eu.essi_lab.authorization.builder;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.ArrayList;
+import eu.essi_lab.authorization.xacml.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.ow2.authzforce.core.pdp.api.value.*;
+import org.ow2.authzforce.core.pdp.impl.combining.*;
+import org.ow2.authzforce.core.pdp.impl.func.*;
+import org.ow2.authzforce.xacml.identifiers.*;
 
-import org.ow2.authzforce.core.pdp.api.value.StandardDatatypes;
-import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
-import org.ow2.authzforce.core.pdp.impl.func.StandardFunction;
-import org.ow2.authzforce.xacml.identifiers.XacmlAttributeCategory;
-import org.ow2.authzforce.xacml.identifiers.XacmlAttributeId;
-
-import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AnyOf;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Target;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -43,7 +39,7 @@ import oasis.names.tc.xacml._3_0.core.schema.wd_17.Target;
 public class RPSBuilder {
 
     /**
-     * 
+     *
      */
     public RPSBuilder() {
     }
@@ -73,6 +69,7 @@ public class RPSBuilder {
 		target, //
 		"RPS:" + role + ":role", //
 		"PPS:" + role + ":role", //
+
 		StandardCombiningAlgorithm.XACML_3_0_POLICY_COMBINING_PERMIT_OVERRIDES.getId());
     }
 }

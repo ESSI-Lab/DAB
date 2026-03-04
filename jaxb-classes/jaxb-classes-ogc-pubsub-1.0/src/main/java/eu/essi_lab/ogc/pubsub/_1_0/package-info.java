@@ -5,7 +5,7 @@
 // Generato il: 2015.09.10 alle 11:53:22 AM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/pubsub/1.0", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/pubsub/1.0", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.ogc.pubsub._1_0;
 
 /*-

@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.wps.status;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.json.JSONObject;
 

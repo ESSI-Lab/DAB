@@ -61,6 +61,7 @@ public class JedisLombardiaSessionCoordinator implements LombardiaSessionCoordin
 	try {
 	    try (Jedis jedis = pool.getResource()) {
 		jedis.rpush(KEY_QUEUE, nodeId);
+		jedis.setex(KEY_ALIVE_PREFIX + nodeId, ALIVE_TTL_SECONDS, "1");
 	    }
 	    GSLoggerFactory.getLogger(getClass()).debug("Node {} entered queue", nodeId);
 

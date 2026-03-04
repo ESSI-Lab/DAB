@@ -1,56 +1,19 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.test.authorization.authzforce;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.authorization.pps.*;
+import eu.essi_lab.authorization.psloader.*;
+import eu.essi_lab.authorization.rps.*;
+import eu.essi_lab.authorization.xacml.*;
+import eu.essi_lab.test.authorization.authzforce.essi.policies.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.junit.*;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-
-import eu.essi_lab.authorization.PdpEngineBuilder;
-import eu.essi_lab.authorization.PolicySetWrapper;
-import eu.essi_lab.authorization.authzforce.ext.IdListRefPolicyProvider;
-import eu.essi_lab.authorization.pps.AdminPermissionPolicySet;
-import eu.essi_lab.authorization.pps.AnonymousPermissionPolicySet;
-import eu.essi_lab.authorization.pps.CSW_RIPermissionPolicySet;
-import eu.essi_lab.authorization.pps.EIFFELPermissionPolicySet;
-import eu.essi_lab.authorization.pps.GEOSSPrivateWritePermissionPolicySet;
-import eu.essi_lab.authorization.pps.GEOSSReadPermissionPolicySet;
-import eu.essi_lab.authorization.pps.GEOSSWritePermissionPolicySet;
-import eu.essi_lab.authorization.pps.GWPPermissionPolicySet;
-import eu.essi_lab.authorization.pps.HISCentralPermissionPolicySet;
-import eu.essi_lab.authorization.pps.HISCentralTestPermissionPolicySet;
-import eu.essi_lab.authorization.pps.KMAPermissionPolicySet;
-import eu.essi_lab.authorization.pps.LODGEOSSPermissionPolicySet;
-import eu.essi_lab.authorization.pps.SSCPermissionPolicySet;
-import eu.essi_lab.authorization.pps.SeadatanetPermissionPolicySet;
-import eu.essi_lab.authorization.pps.WHOSPermissionPolicySet;
-import eu.essi_lab.authorization.psloader.PolicySetLoader;
-import eu.essi_lab.authorization.rps.AdminRolePolicySet;
-import eu.essi_lab.authorization.rps.AnonymousRolePolicySet;
-import eu.essi_lab.authorization.rps.CSW_RIRolePolicySet;
-import eu.essi_lab.authorization.rps.EIFFELRolePolicySet;
-import eu.essi_lab.authorization.rps.GEOSSPrivateWriteRolePolicySet;
-import eu.essi_lab.authorization.rps.GEOSSReadRolePolicySet;
-import eu.essi_lab.authorization.rps.GEOSSWriteRolePolicySet;
-import eu.essi_lab.authorization.rps.GWPRolePolicySet;
-import eu.essi_lab.authorization.rps.HISCentralRolePolicySet;
-import eu.essi_lab.authorization.rps.HISCentralTestRolePolicySet;
-import eu.essi_lab.authorization.rps.KMARolePolicySet;
-import eu.essi_lab.authorization.rps.LODGEOSSRolePolicySet;
-import eu.essi_lab.authorization.rps.SSCRolePolicySet;
-import eu.essi_lab.authorization.rps.SeadatanetRolePolicySet;
-import eu.essi_lab.authorization.rps.WHOSRolePolicySet;
-import eu.essi_lab.authorization.xacml.PdpEngineWrapper;
-import eu.essi_lab.test.authorization.authzforce.essi.policies.DefaultPermissionPolicySet;
-import eu.essi_lab.test.authorization.authzforce.essi.policies.DefaultRolePolicySet;
-import eu.essi_lab.test.authorization.authzforce.essi.policies.LimitedPermissionPolicySet;
-import eu.essi_lab.test.authorization.authzforce.essi.policies.LimitedRolePolicySet;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -125,8 +88,6 @@ public class XACMLTest {
 	    }
 	};
 
-	IdListRefPolicyProvider.setPolicySetLoader(loader);
-
 	PdpEngineBuilder builder = new PdpEngineBuilder();
 
 	builder.addPolicies(loader);
@@ -141,8 +102,6 @@ public class XACMLTest {
 
 	DecisionType decision = wrapper.evaluate();
 
-	System.out.println(decision);
-
 	Assert.assertEquals(expectedType, decision);
 
     }
@@ -150,6 +109,6 @@ public class XACMLTest {
     @After
     public void close() throws IOException {
 
-	wrapper.close();
+//	wrapper.close();
     }
 }

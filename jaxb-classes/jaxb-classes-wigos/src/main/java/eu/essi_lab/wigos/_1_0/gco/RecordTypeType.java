@@ -29,11 +29,11 @@ package eu.essi_lab.wigos._1_0.gco;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlValue;
 import eu.essi_lab.wigos._1_0.xlink.ActuateType;
 import eu.essi_lab.wigos._1_0.xlink.ShowType;
 import eu.essi_lab.wigos._1_0.xlink.TypeType;

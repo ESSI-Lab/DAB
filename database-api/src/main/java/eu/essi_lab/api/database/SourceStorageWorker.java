@@ -41,7 +41,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.collections.CollectionUtils;

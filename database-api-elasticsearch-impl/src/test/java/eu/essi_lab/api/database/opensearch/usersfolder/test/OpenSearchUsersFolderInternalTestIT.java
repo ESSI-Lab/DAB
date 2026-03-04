@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch.usersfolder.test;
 
@@ -38,7 +38,7 @@ public class OpenSearchUsersFolderInternalTestIT extends OpenSearchTest {
     @Test
     public void sourceTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -95,7 +95,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void sourceTest2() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -155,7 +155,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void folderTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 
@@ -197,7 +197,7 @@ OpenSearchDatabase database = createDataBase();
     @Test
     public void searchUsersTest() throws Exception {
 
-OpenSearchDatabase database = createDataBase();
+	OpenSearchDatabase database = createDataBase();
 
 	String folderName = Database.USERS_FOLDER;
 

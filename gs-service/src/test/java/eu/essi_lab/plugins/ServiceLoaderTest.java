@@ -31,6 +31,7 @@ import eu.essi_lab.profiler.oaipmh.profile.OAIPMHProfile;
  */
 public class ServiceLoaderTest {
 
+    @SuppressWarnings("rawtypes")
     public void testExpectedSize(Class plugin, int count) {
 	PluginsLoader<?> pluginsLoader = new PluginsLoader<>();
 	List<?> plugins = pluginsLoader.loadPlugins(plugin);
@@ -57,9 +58,10 @@ public class ServiceLoaderTest {
     }
 
     @Test
+    @SuppressWarnings("rawtypes")
     public void testProfilers() {
 
-	PluginsLoader<Profiler> pluginsLoader = new PluginsLoader<>();
+	PluginsLoader<Profiler> pluginsLoader = new PluginsLoader<Profiler>();
 	List<Profiler> profilers = pluginsLoader.loadPlugins(Profiler.class);
 	HashSet<String> expectedProfilerNames = new HashSet<String>(Arrays.asList(//
 		"SOSProfiler", //

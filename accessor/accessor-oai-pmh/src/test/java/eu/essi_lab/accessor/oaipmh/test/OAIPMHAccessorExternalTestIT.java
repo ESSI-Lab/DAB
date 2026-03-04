@@ -3,8 +3,8 @@ package eu.essi_lab.accessor.oaipmh.test;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

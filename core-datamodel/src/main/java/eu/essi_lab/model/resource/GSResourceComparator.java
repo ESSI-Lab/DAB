@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.Queryable;

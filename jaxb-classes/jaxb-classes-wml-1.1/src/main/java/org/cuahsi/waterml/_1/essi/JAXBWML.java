@@ -27,13 +27,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.ValidationEventHandler;
 import javax.xml.namespace.NamespaceContext;
 
 import org.cuahsi.waterml._1.MethodType;
@@ -45,7 +45,7 @@ import org.cuahsi.waterml._1.TimeSeriesResponseType;
 import org.cuahsi.waterml._1.TimeSeriesType;
 import org.cuahsi.waterml._1.TsValuesSingleVariableType;
 import org.cuahsi.waterml._1.VariableInfoType;
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+import org.glassfish.jaxb.runtime.marshaller.NamespacePrefixMapper;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;

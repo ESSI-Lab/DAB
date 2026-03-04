@@ -22,8 +22,9 @@
 		</dependency>
 	
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>sensorML-v_2_0</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-sensorML-v_2_0-2.6.1</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
 		
 	</dependencies>

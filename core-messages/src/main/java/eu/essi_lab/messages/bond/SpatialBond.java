@@ -21,8 +21,8 @@ package eu.essi_lab.messages.bond;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSeeAlso;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlSeeAlso;
 
 import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
@@ -49,7 +49,7 @@ public class SpatialBond extends MetadataElementBond<SpatialEntity> {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
+     * <li>{@link BondOperator#WITHIN}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
@@ -65,7 +65,7 @@ public class SpatialBond extends MetadataElementBond<SpatialEntity> {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
+     * <li>{@link BondOperator#WITHIN}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>
@@ -80,7 +80,7 @@ public class SpatialBond extends MetadataElementBond<SpatialEntity> {
     /**
      * Supported operators are spatial operators:
      * <ul>
-     * <li>{@link BondOperator#BBOX}</li>
+     * <li>{@link BondOperator#WITHIN}</li>
      * <li>{@link BondOperator#CONTAINS}</li>
      * <li>{@link BondOperator#INTERSECTS}</li>
      * <li>{@link BondOperator#DISJOINT}</li>

@@ -29,9 +29,9 @@ package eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0;
  * #L%
  */
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlElementDecl;
+import jakarta.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 
 import net.opengis.iso19139.gco.v_20060504.CodeListValueType;

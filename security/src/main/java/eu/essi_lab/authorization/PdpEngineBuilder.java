@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization;
 
@@ -13,38 +13,34 @@ package eu.essi_lab.authorization;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import eu.essi_lab.authorization.psloader.*;
+import eu.essi_lab.authorization.xacml.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.utils.*;
+import jakarta.xml.bind.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.ow2.authzforce.core.pdp.api.*;
+import org.ow2.authzforce.core.pdp.impl.*;
+import org.ow2.authzforce.core.pdp.impl.combining.*;
 
-import javax.xml.bind.JAXBElement;
-
-import org.ow2.authzforce.core.pdp.api.CloseablePdpEngine;
-import org.ow2.authzforce.core.pdp.impl.BasePdpEngine;
-import org.ow2.authzforce.core.pdp.impl.DefaultEnvironmentProperties;
-import org.ow2.authzforce.core.pdp.impl.PdpEngineConfiguration;
-import org.ow2.authzforce.core.pdp.impl.combining.StandardCombiningAlgorithm;
-import org.ow2.authzforce.core.xmlns.pdp.Pdp;
-import org.ow2.authzforce.core.xmlns.pdp.StaticRefBasedRootPolicyProvider;
-
-import eu.essi_lab.authorization.authzforce.ext.IdListPolicyProvider;
-import eu.essi_lab.authorization.psloader.PolicySetLoader;
-import eu.essi_lab.authorization.xacml.XACML_JAXBUtils;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.IdReferenceType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
+import javax.xml.namespace.*;
+import java.io.*;
+import java.nio.charset.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -52,15 +48,16 @@ import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
 public class PdpEngineBuilder {
 
     /**
-     * 
+     *
      */
     public static final String ROOT_POLICY_SET_ID = "root";
 
     private List<PolicySet> rpsList;
     private List<PolicySet> ppsList;
+    private static BasePdpEngine basePdpEngine;
 
     /**
-     * 
+     *
      */
     public PdpEngineBuilder() {
 
@@ -70,7 +67,7 @@ public class PdpEngineBuilder {
 
     /**
      * Adds all the policies loaded by the given <code>loader</code>
-     * 
+     *
      * @param loader
      */
     public void addPolicies(PolicySetLoader loader) {
@@ -78,7 +75,7 @@ public class PdpEngineBuilder {
 	List<PolicySetWrapper> rps = loader.loadRolePolicySets();
 	List<PolicySetWrapper> pps = loader.loadPermissionPolicySets();
 
-	List<String> roles = pps.stream().map(p -> p.getRole()).collect(Collectors.toList());
+	List<String> roles = pps.stream().map(PolicySetWrapper::getRole).toList();
 
 	for (String role : roles) {
 
@@ -90,7 +87,7 @@ public class PdpEngineBuilder {
 
     /**
      * Adds the specified RPS and related PPS
-     * 
+     *
      * @param rps a role policy set to add
      * @param pps a permission policy set to add
      */
@@ -106,70 +103,111 @@ public class PdpEngineBuilder {
      */
     public CloseablePdpEngine build() throws Exception {
 
-	// GSLoggerFactory.getLogger(getClass()).debug("Engine building STARTED");
-
-	//
-	// 1 ---
-	//
-
-	Pdp pdp = createPdp();
-
-	//
-	// 2 ---
-	//
-
-	PdpEngineConfiguration pdpEngineConf = new PdpEngineConfiguration(pdp, new DefaultEnvironmentProperties());
-
-	BasePdpEngine engine = new BasePdpEngine(pdpEngineConf);
-
-	// GSLoggerFactory.getLogger(getClass()).debug("Engine building ENDED");
-
-	return engine;
+	return build(false);
     }
 
     /**
-     * Creates the pdp which references to the root policy set and to all the PPS and RPS
-     * 
-     * @param rootPolicySetFile
+     * @param reinit
      * @return
      * @throws Exception
      */
-    private Pdp createPdp() throws Exception {
+    public CloseablePdpEngine build(boolean reinit) throws Exception {
 
-	Pdp pdp = new Pdp();
+	if (basePdpEngine == null || reinit) {
 
-	pdp.setVersion("6.0.0");
+	    File pdpFile = createPDPFile(createRootPolicySet(), ppsList, rpsList);
 
-	StaticRefBasedRootPolicyProvider staticRefBasedRootPolicyProvider = new StaticRefBasedRootPolicyProvider();
-	staticRefBasedRootPolicyProvider.setId("rootPolicyProvider");
-	staticRefBasedRootPolicyProvider.setPolicyRef(new IdReferenceType(ROOT_POLICY_SET_ID, null, null, null));
+	    PdpEngineConfiguration conf = PdpEngineConfiguration.getInstance(pdpFile.getAbsolutePath(), null, null);
 
-	// set the root policy provider
-	pdp.setRootPolicyProvider(staticRefBasedRootPolicyProvider);
+	    if (reinit) {
 
-	IdListPolicyProvider idListPolicyProvider = new IdListPolicyProvider(createRootPolicySet());
+		return new BasePdpEngine(conf);
+	    }
 
-	// adds the PPS
-	for (PolicySet pps : ppsList) {
-
-	    idListPolicyProvider.getIdentifiers().add(pps.getPolicySetId());
+	    basePdpEngine = new BasePdpEngine(conf);
 	}
 
-	// adds the RPS
-	for (PolicySet rps : rpsList) {
-
-	    idListPolicyProvider.getIdentifiers().add(rps.getPolicySetId());
-	}
-
-	// set the ref policy provider
-	pdp.setRefPolicyProvider(idListPolicyProvider);
-
-	return pdp;
+	return basePdpEngine;
     }
 
     /**
-     * Creates the root policy set with the wrapper policy set inside. The wrapper policy set refer only to the RPS
-     * 
+     * @param root
+     * @param ppsList
+     * @param rpsList
+     * @return
+     * @throws Exception
+     */
+    private File createPDPFile(PolicySet root, List<PolicySet> ppsList, List<PolicySet> rpsList) throws Exception {
+
+	Path baseDir = FileUtils.getTempDir("authzforce-pdp", true).toPath();
+
+	JAXBContext ctx = JAXBContext.newInstance(PolicySet.class);
+
+	Marshaller marshaller = ctx.createMarshaller();
+	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+	BiConsumer<Serializable, Path> writePolicySet = (policySet, path) -> {
+
+	    try {
+
+		QName qName = new QName("urn:oasis:names:tc:xacml:3.0:core:schema:wd-17", "PolicySet");
+
+		JAXBElement<PolicySet> element = new JAXBElement(qName, PolicySet.class, null, policySet);
+
+		marshaller.marshal(element, path.toFile());
+
+	    } catch (Exception e) {
+
+		throw new RuntimeException(e);
+	    }
+	};
+
+	String rootFileName = root.getPolicySetId() + ".xml";
+	writePolicySet.accept(root, baseDir.resolve(rootFileName));
+
+	List<String> locations = new ArrayList<>();
+	locations.add(baseDir + "/root.xml");
+
+	ArrayList<PolicySet> policySets = new ArrayList<>(ppsList);
+	policySets.addAll(rpsList);
+
+	for (PolicySet pps : policySets) {
+
+	    String fileName = pps.getPolicySetId().replace(":", "_") + ".xml";
+
+	    Path path = baseDir.resolve(fileName);
+	    locations.add(path.toString());
+
+	    writePolicySet.accept(pps, path);
+	}
+
+	String collect = locations.stream().map(path -> "<policyLocation>" + path + "</policyLocation>").collect(Collectors.joining("\n"));
+
+	String pdpXml = """
+		<pdp xmlns="http://authzforce.github.io/core/xmlns/pdp/8"
+		     version="8.0"
+		     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+		
+		     <policyProvider id="fileBased" xsi:type="StaticPolicyProvider">
+		
+		         %s
+		
+		     </policyProvider>
+		
+		  <rootPolicyRef>root</rootPolicyRef>
+		</pdp>
+		""".formatted(collect);
+
+	Path pdpFile = baseDir.resolve("pdp.xml");
+
+	Files.writeString(pdpFile, pdpXml, StandardCharsets.UTF_8);
+
+	return pdpFile.toFile();
+    }
+
+    /**
+     * Creates the root policy set
+     *
      * @param rpsList
      * @return
      */

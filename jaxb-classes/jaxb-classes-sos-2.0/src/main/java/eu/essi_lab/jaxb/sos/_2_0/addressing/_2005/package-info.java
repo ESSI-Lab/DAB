@@ -5,7 +5,7 @@
 // Generated on: 2019.05.14 at 04:45:11 PM CEST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/2005/08/addressing", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.w3.org/2005/08/addressing", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.jaxb.sos._2_0.addressing._2005;
 
 /*-

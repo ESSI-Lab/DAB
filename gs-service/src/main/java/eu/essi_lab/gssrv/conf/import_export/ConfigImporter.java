@@ -32,6 +32,7 @@ import com.vaadin.flow.component.radiobutton.*;
 import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.component.upload.*;
 import com.vaadin.flow.component.upload.receivers.*;
+import com.vaadin.flow.server.streams.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.DatabaseFolder.*;
 import eu.essi_lab.api.database.cfg.*;
@@ -76,16 +77,16 @@ public class ConfigImporter extends VerticalLayout {
 	//
 	//
 
-	MemoryBuffer memoryBuffer = new MemoryBuffer();
+	Upload upload = new Upload();
 
-	Upload upload = new Upload(memoryBuffer);
 	upload.getElement().setEnabled(false);
 
-	upload.addFinishedListener(event -> {
+	InMemoryUploadHandler handler = UploadHandler.inMemory((metadata, bytes) -> {
 
 	    try {
 
-		ClonableInputStream configStream = new ClonableInputStream(memoryBuffer.getInputStream());
+
+		ClonableInputStream configStream = new ClonableInputStream(new ByteArrayInputStream(bytes));
 
 		switch (setting.getSelectedSource()) {
 		case OPENSEARCH -> handleOpenSearchUpload(setting, configStream, upload, msgDiv);
@@ -102,11 +103,12 @@ public class ConfigImporter extends VerticalLayout {
 	    }
 	});
 
+	upload.setUploadHandler(handler);
+
 	upload.setMaxFiles(1);
 	upload.setDropAllowed(true);
-	upload.setDropLabel(new Label("Import configuration file"));
 	upload.setAcceptedFileTypes("application/json", ".json");
-	upload.setDropLabel(new Label("Drop file here"));
+	upload.setDropLabel(ComponentFactory.createSpan("Drop file here"));
 
 	Button localUploadButton = new Button("Import from local configuration file");
 	localUploadButton.getStyle().set("font-size", "14px");
@@ -337,7 +339,7 @@ public class ConfigImporter extends VerticalLayout {
 	    Upload upload, //
 	    Div messageDiv) throws Exception {
 
-	if (openSearchConfigExists(setting.getSelectedStorageInfo().get(), configStream.clone())) {
+	if (openSearchConfigExists(setting.getSelectedStorageInfo().get())) {
 
 	    ConfirmationDialog confirmationDialog = new ConfirmationDialog(
 		    "A configuration with the given name is already stored in the database.\n\n"
@@ -419,8 +421,7 @@ public class ConfigImporter extends VerticalLayout {
      * @param configStream
      * @throws Exception
      */
-    private boolean openSearchConfigExists(StorageInfo info, InputStream configStream) throws Exception {
-
+    private boolean openSearchConfigExists(StorageInfo info) throws Exception {
 
 	OpenSearchDatabase database = new OpenSearchDatabase();
 	database.initialize(info);

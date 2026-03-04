@@ -21,16 +21,15 @@ package eu.essi_lab.cfga.gui.components.setting.edit_put;
  * #L%
  */
 
-import java.util.List;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.cfga.setting.validation.*;
 
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -69,7 +68,7 @@ public class SettingConfirmationDialog extends ConfirmationDialog {
 	//
 	getFooterLayout().getStyle().set("border-top", "1px solid lightgray");
 
-	Label infoText = ComponentFactory.createLabel("Are you sure to proceed?");
+	Span infoText = ComponentFactory.createSpan("Are you sure to proceed?");
 
 	if (validationResponse != null) {
 
@@ -80,16 +79,16 @@ public class SettingConfirmationDialog extends ConfirmationDialog {
 
 	    if (!errors.isEmpty()) {
 
-		infoText = ComponentFactory.createLabel("Please fix the errors in order to proceed");
+		infoText = ComponentFactory.createSpan("Please fix the errors in order to proceed");
 
 		setTitle("Validation failed");
 
-		Label errorsLabel = ComponentFactory.createLabel("The following errors are detected:", 15);
+		Span errorsLabel = ComponentFactory.createSpan("The following errors are detected:", 15);
 		content.add(errorsLabel);
 
 		errors.forEach(error -> {
 
-		    Label label = ComponentFactory.createLabel("- " + error);
+		    Span label = ComponentFactory.createSpan("- " + error);
 		    label.getStyle().set("font-size", "15px");
 		    label.getStyle().set("color", "red");
 
@@ -107,7 +106,7 @@ public class SettingConfirmationDialog extends ConfirmationDialog {
 
 	    if (!warnings.isEmpty()) {
 
-		Label warningsLabel = ComponentFactory.createLabel("The following warnings are detected", 15);
+		Span warningsLabel = ComponentFactory.createSpan("The following warnings are detected", 15);
 
 		warningsLabel.getStyle().set("margin-top", "10px");
 
@@ -115,7 +114,7 @@ public class SettingConfirmationDialog extends ConfirmationDialog {
 
 		warnings.forEach(warn -> {
 
-		    Label label = ComponentFactory.createLabel("- " + warn, 15);
+		    Span label = ComponentFactory.createSpan("- " + warn, 15);
 		    label.getStyle().set("color", "#6f6f00");
 
 		    content.add(label);

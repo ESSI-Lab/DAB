@@ -50,7 +50,7 @@ import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
-import eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.source.FileSource;
@@ -144,7 +144,7 @@ public class DefaultConfiguration extends Configuration {
 	/**
 	 * 
 	 */
-	LOMBARDIA_SESSION_COORDINATOR_SETTING("lombardiaSessionCoordinatorSettings");
+	SESSION_COORDINATOR_SETTING("sessionCoordinatorSettings");
 
 	private final String label;
 
@@ -480,14 +480,14 @@ public class DefaultConfiguration extends Configuration {
 	put(rateLimiterSetting);
 
 	//
-	// --- Lombardia session coordinator settings ----
+	// --- Session coordinator settings ----
 	//
 
-	LombardiaSessionCoordinatorSetting lombardiaSessionCoordinatorSetting = new LombardiaSessionCoordinatorSetting();
+	SessionCoordinatorSetting sessionCoordinatorSetting = new SessionCoordinatorSetting();
 
-	lombardiaSessionCoordinatorSetting.setIdentifier(SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel());
+	sessionCoordinatorSetting.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
 
-	put(lombardiaSessionCoordinatorSetting);
+	put(sessionCoordinatorSetting);
     }
 
     /**

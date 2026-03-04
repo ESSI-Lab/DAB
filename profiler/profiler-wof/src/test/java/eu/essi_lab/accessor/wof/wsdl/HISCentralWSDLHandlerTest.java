@@ -2,9 +2,9 @@ package eu.essi_lab.accessor.wof.wsdl;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.junit.Assert;
 import org.junit.Before;

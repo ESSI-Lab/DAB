@@ -23,9 +23,9 @@ package eu.essi_lab.profiler.wof.discovery.variables;
 
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import org.cuahsi.waterml._1.VariableInfoType;

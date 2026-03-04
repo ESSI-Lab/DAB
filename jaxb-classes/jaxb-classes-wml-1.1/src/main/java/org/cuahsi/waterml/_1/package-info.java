@@ -5,7 +5,7 @@
 // Generated on: 2018.12.10 at 03:04:33 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.cuahsi.org/waterML/1.1/", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.cuahsi.org/waterML/1.1/", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.cuahsi.waterml._1;
 
 /*-

@@ -1,24 +1,19 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.test.authorization.authzforce.essi;
 
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.authorization.psloader.*;
+import eu.essi_lab.authorization.xacml.*;
+import eu.essi_lab.test.authorization.authzforce.essi.rbac.*;
+import eu.essi_lab.test.authorization.authzforce.jaxb.*;
+import jakarta.xml.bind.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.junit.*;
 
-import javax.xml.bind.JAXBContext;
-
-import org.junit.Before;
-
-import eu.essi_lab.authorization.PdpEngineBuilder;
-import eu.essi_lab.authorization.PolicySetWrapper;
-import eu.essi_lab.authorization.authzforce.ext.IdListRefPolicyProvider;
-import eu.essi_lab.authorization.psloader.PolicySetLoader;
-import eu.essi_lab.authorization.xacml.PdpEngineWrapper;
-import eu.essi_lab.test.authorization.authzforce.essi.rbac.WHOS_PPS_Test;
-import eu.essi_lab.test.authorization.authzforce.jaxb.PolicySetUnmarshallTest;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -93,8 +88,6 @@ public class WHOSUserUnmarshallTest extends WHOS_PPS_Test {
 	    public void setPermissionPolicySet(PolicySetWrapper pps) {
 	    }
 	};
-
-	IdListRefPolicyProvider.setPolicySetLoader(loader);
 
 	PdpEngineBuilder builder = new PdpEngineBuilder();
 

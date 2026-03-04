@@ -21,8 +21,8 @@ package eu.essi_lab.jaxb.wms.extension;
  * #L%
  */
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 import eu.essi_lab.jaxb.wms._1_3_0.WMSCapabilities;
 

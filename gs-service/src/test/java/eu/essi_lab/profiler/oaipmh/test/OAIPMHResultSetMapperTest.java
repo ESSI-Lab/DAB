@@ -6,9 +6,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.ws.rs.ext.RuntimeDelegate;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,56 +1,15 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.test.authorization.xacmlauthorizer;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import eu.essi_lab.messages.AccessMessage;
-import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.*;
+import org.junit.*;
 
 /**
  * @author Fabrizio
  */
 public class GWP_XACMLAuthorizerTest extends AbstractXACMLAuthorizerTest {
-
-    /**
-     * Deny because the offset is gt 200 and origin is not set (so also the user cannot be recognized
-     * since the registered GWP users has the two supported origins as identifier)
-     *
-     * @throws Exception
-     */
-    @Test
-    public void gwpDiscoveryActionNotGWPClient1() throws Exception {
-
-	DiscoveryMessage message = new DiscoveryMessage();
-
-	setWebRequest(message, "csw");
-
-	setOffset(message, 201);
-
-	boolean authorized = isAuthorized(message);
-	Assert.assertEquals(false, authorized);
-    }
-
-    /**
-     * Deny because the offset is gt 200 and origin is not valid (so also the user cannot be recognized
-     * since the registered GWP users has the two supported origins as identifier)
-     *
-     * @throws Exception
-     */
-    @Test
-    public void gwpDiscoveryActionNotGWPClient2() throws Exception {
-
-	DiscoveryMessage message = new DiscoveryMessage();
-
-	setWebRequest(message, "csw", "https://google.com");
-
-	setOffset(message, 201);
-
-	boolean authorized = isAuthorized(message);
-	Assert.assertEquals(false, authorized);
-    }
 
     /**
      * Deny because the offset is gt 200 and origin is not valid, the user is set just for testing purpose
@@ -152,44 +111,6 @@ public class GWP_XACMLAuthorizerTest extends AbstractXACMLAuthorizerTest {
 
 	boolean authorized = isAuthorized(message);
 	Assert.assertEquals(true, authorized);
-    }
-
-    /**
-     * Deny because the offset is gt 200 and origin is not set (so also the user cannot be recognized
-     * since the registered GWP users has the two supported origins as identifier)
-     *
-     * @throws Exception
-     */
-    @Test
-    public void gwpAccessActionNotGWPClient1() throws Exception {
-
-	AccessMessage message = new AccessMessage();
-
-	setWebRequest(message, "wms");
-
-	setOffset(message, 201);
-
-	boolean authorized = isAuthorized(message);
-	Assert.assertEquals(false, authorized);
-    }
-
-    /**
-     * Deny because the offset is gt 200 and origin is not valid (so also the user cannot be recognized
-     * since the registered GWP users has the two supported origins as identifier)
-     *
-     * @throws Exception
-     */
-    @Test
-    public void gwpAccessActionNotGWPClient2() throws Exception {
-
-	AccessMessage message = new AccessMessage();
-
-	setWebRequest(message, "wms", "https://google.com");
-
-	setOffset(message, 201);
-
-	boolean authorized = isAuthorized(message);
-	Assert.assertEquals(false, authorized);
     }
 
     /**

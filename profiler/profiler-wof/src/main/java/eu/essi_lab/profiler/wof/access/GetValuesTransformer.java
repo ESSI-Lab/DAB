@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.cuahsi.waterml._1.ObjectFactory;
 import org.cuahsi.waterml._1.TimeSeriesResponseType;

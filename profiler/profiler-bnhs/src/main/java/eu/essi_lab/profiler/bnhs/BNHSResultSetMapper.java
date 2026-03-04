@@ -23,7 +23,7 @@ package eu.essi_lab.profiler.bnhs;
 
 import java.util.Optional;
 
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.UriInfo;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.exceptions.GSException;

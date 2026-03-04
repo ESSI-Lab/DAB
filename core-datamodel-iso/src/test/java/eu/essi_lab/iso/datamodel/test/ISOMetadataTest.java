@@ -1,7 +1,7 @@
 package eu.essi_lab.iso.datamodel.test;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Rule;

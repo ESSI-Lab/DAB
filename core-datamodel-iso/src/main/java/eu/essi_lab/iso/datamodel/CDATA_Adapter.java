@@ -21,7 +21,7 @@ package eu.essi_lab.iso.datamodel;
  * #L%
  */
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
  * @author Fabrizio

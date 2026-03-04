@@ -34,8 +34,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBElement;
 
 import org.apache.commons.io.IOUtils;
 

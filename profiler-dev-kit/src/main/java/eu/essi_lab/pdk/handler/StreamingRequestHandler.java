@@ -27,8 +27,8 @@ import java.io.OutputStreamWriter;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
 
 import org.json.JSONObject;
 

@@ -47,7 +47,7 @@ import eu.essi_lab.profiler.os.handler.discover.eiffel.*;
 import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonMapper;
 import eu.essi_lab.profiler.os.handler.srvinfo.*;
 
-import javax.ws.rs.core.*;
+import jakarta.ws.rs.core.*;
 import java.util.*;
 import java.util.stream.*;
 

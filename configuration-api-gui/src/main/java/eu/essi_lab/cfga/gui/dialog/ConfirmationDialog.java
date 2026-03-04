@@ -21,14 +21,12 @@ package eu.essi_lab.cfga.gui.dialog;
  * #L%
  */
 
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
 
 /**
  * @author Fabrizio

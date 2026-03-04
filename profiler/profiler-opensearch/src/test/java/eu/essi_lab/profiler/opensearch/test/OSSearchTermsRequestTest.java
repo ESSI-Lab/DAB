@@ -2,7 +2,7 @@ package eu.essi_lab.profiler.opensearch.test;
 
 import static org.junit.Assert.fail;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.SimpleConfiguration;

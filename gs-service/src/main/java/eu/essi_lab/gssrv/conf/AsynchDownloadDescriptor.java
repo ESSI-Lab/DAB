@@ -165,7 +165,7 @@ public class AsynchDownloadDescriptor extends AbstractGridDescriptor<AsynchDownl
      */
     private List<OMSchedulerSetting> getSettings() {
 
-	List<OMSchedulerSetting> settings = new ArrayList<>();
+	List<OMSchedulerSetting> settings;
 
 	Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
 

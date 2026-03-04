@@ -20,7 +20,7 @@ import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.StorageInfo;
 import java.util.List;
 import java.util.UUID;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.opensearch.client.opensearch._types.OpenSearchException;

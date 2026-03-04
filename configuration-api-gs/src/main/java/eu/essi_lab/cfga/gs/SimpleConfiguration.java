@@ -41,6 +41,8 @@ import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 
+import java.util.*;
+
 /**
  * Subclass of {@link DefaultConfiguration} without all the settings which require several GIP dependencies to be loaded
  * (such as {@link HarvestingSetting}, {@link AugmenterSetting}, etc.). To be used in tests of projects that do not
@@ -87,7 +89,67 @@ public class SimpleConfiguration extends DefaultConfiguration {
 	// --- DataCacheConnectorSetting settings
 	//
 
-	DataCacheConnectorSetting dataCacheConnectorSetting = DataCacheConnectorSettingLoader.load();
+	DataCacheConnectorSetting dataCacheConnectorSetting = new DataCacheConnectorSetting() {
+	    @Override
+	    public void setDataConnectorType(String type) {
+
+	    }
+
+	    @Override
+	    public void setDatabaseUri(String uri) {
+
+	    }
+
+	    @Override
+	    public void setDatabasePassword(String password) {
+
+	    }
+
+	    @Override
+	    public void setDatabaseName(String name) {
+
+	    }
+
+	    @Override
+	    public void setDatabaseUser(String user) {
+
+	    }
+
+	    @Override
+	    public void setOptionValue(String optionName, String value) {
+
+	    }
+
+	    @Override
+	    public String getDataConnectorType() {
+		return "";
+	    }
+
+	    @Override
+	    public String getDatabaseUri() {
+		return "";
+	    }
+
+	    @Override
+	    public String getDatabasePassword() {
+		return "";
+	    }
+
+	    @Override
+	    public String getDatabaseName() {
+		return "";
+	    }
+
+	    @Override
+	    public String getDatabaseUser() {
+		return "";
+	    }
+
+	    @Override
+	    public Optional<String> getOptionValue(String optionName) {
+		return Optional.empty();
+	    }
+	};
 
 	dataCacheConnectorSetting.setIdentifier(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel());
 

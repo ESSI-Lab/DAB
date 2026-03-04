@@ -21,11 +21,10 @@ package eu.essi_lab.cfga.gui.components.option.listener;
  * #L%
  */
 
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-
-import eu.essi_lab.cfga.gui.IdleTracker;
-import eu.essi_lab.cfga.gui.components.listener.AbstractValueChangeListener;
-import eu.essi_lab.cfga.gui.components.option.OptionComponent;
+import com.vaadin.flow.component.HasValue.*;
+import eu.essi_lab.cfga.gui.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.option.*;
 
 /**
  * @author Fabrizio

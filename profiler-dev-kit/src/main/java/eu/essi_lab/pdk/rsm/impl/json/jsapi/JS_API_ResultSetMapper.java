@@ -37,7 +37,7 @@ import eu.essi_lab.pdk.rsm.*;
 import net.opengis.iso19139.gmx.v_20060504.*;
 import org.json.*;
 
-import javax.ws.rs.core.*;
+import jakarta.ws.rs.core.*;
 import javax.xml.datatype.*;
 import java.net.*;
 import java.util.*;

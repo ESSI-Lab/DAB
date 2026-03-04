@@ -28,9 +28,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.StreamingOutput;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.StreamingOutput;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -227,7 +227,7 @@ public class TermsHandler extends StreamingRequestHandler {
 		}
 
 		discoveryMessage.setDistinctValuesElement(metadata);
-		SortedFields fields = new SortedFields(ResourceProperty.PUBLIC_ID, SortOrder.ASCENDING);
+		SortedFields fields = new SortedFields(MetadataElement.IDENTIFIER, SortOrder.ASCENDING);
 		discoveryMessage.setSortedFields(fields);
 		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
 		discoveryMessage.getResourceSelector().addIndex(metadata);

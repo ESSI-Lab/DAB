@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.xacml;
 
@@ -13,40 +13,26 @@ package eu.essi_lab.authorization.xacml;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import eu.essi_lab.jaxb.common.*;
+import jakarta.xml.bind.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.ow2.authzforce.core.pdp.api.func.FirstOrderBagFunctions.*;
+import org.ow2.authzforce.core.pdp.api.value.*;
+import org.ow2.authzforce.core.pdp.impl.func.*;
 
-import javax.xml.bind.JAXBElement;
-
-import org.ow2.authzforce.core.pdp.api.func.FirstOrderBagFunctions.AtLeastOneMemberOf;
-import org.ow2.authzforce.core.pdp.api.func.FirstOrderBagFunctions.PrimitiveToBag;
-import org.ow2.authzforce.core.pdp.api.value.StandardDatatypes;
-import org.ow2.authzforce.core.pdp.impl.func.StandardFunction;
-
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AllOf;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AnyOf;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeDesignatorType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeValueType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.ExpressionType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.FunctionType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.IdReferenceType;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Match;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.Target;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -75,8 +61,8 @@ public class XACML_JAXBUtils {
     }
 
     /**
-     * At least one element provided by the request designator must match the elements in the <code>values</code> list.
-     * This kind of condition can always been used if the request has a bag of a single element<br>
+     * At least one element provided by the request designator must match the elements in the <code>values</code> list. This kind of
+     * condition can always been used if the request has a bag of a single element<br>
      * <br>
      * <code>values</code>: A,B,C - Request: A,B,C ---> OK<br>
      * <code>values</code>: A,B,C - Request: A,B ---> OK<br>
@@ -86,7 +72,7 @@ public class XACML_JAXBUtils {
      * <code>values</code>: A,B,C - Request: A,B,D ---> OK<br>
      * <code>values</code>: A,B,C - Request: A,D ---> OK<br>
      * <code>values</code>: A,B,C - Request: D ---> NO<br>
-     * 
+     *
      * @param values
      * @param attributeDesignatorType
      * @return
@@ -97,20 +83,6 @@ public class XACML_JAXBUtils {
 
 	List<JAXBElement<? extends ExpressionType>> outerList = new ArrayList<>();
 	ApplyType outerApply = null;
-
-	{
-
-	    JAXBElement<AttributeDesignatorType> attributeDesignator = ObjectFactories.XACML()
-		    .createAttributeDesignator(attributeDesignatorType);
-
-	    outerList.add(attributeDesignator);
-
-	    String nameSuffixAtLeastOneMemberOf = AtLeastOneMemberOf.NAME_SUFFIX_AT_LEAST_ONE_MEMBER_OF;
-
-	    String functionId = xacmlNs10 + "string" + nameSuffixAtLeastOneMemberOf;
-
-	    outerApply = new ApplyType(null, outerList, functionId);
-	}
 
 	{
 	    List<JAXBElement<? extends ExpressionType>> innerList = new ArrayList<>();
@@ -129,6 +101,20 @@ public class XACML_JAXBUtils {
 	    ApplyType innerApplyType = new ApplyType(null, innerList, functionId);
 
 	    outerList.add(ObjectFactories.XACML().createApply(innerApplyType));
+	}
+
+	{
+
+	    JAXBElement<AttributeDesignatorType> attributeDesignator = ObjectFactories.XACML()
+		    .createAttributeDesignator(attributeDesignatorType);
+
+	    outerList.add(attributeDesignator);
+
+	    String nameSuffixAtLeastOneMemberOf = AtLeastOneMemberOf.NAME_SUFFIX_AT_LEAST_ONE_MEMBER_OF;
+
+	    String functionId = xacmlNs10 + "string" + nameSuffixAtLeastOneMemberOf;
+
+	    outerApply = new ApplyType(null, outerList, functionId);
 	}
 
 	return outerApply;
@@ -193,10 +179,9 @@ public class XACML_JAXBUtils {
     }
 
     /**
-     * All the elements provided by the request designator must match the elements in the <code>values</code> list. This
-     * condition should be used if the request provides a bag of more than one element, or if the elements
-     * must be compared with the "contains" function instead of with the "equal" function, otherwise it is equivalent to
-     * {@link #createAtLeastAnyOfApply(List, AttributeDesignatorType)} <br>
+     * All the elements provided by the request designator must match the elements in the <code>values</code> list. This condition should be
+     * used if the request provides a bag of more than one element, or if the elements must be compared with the "contains" function instead
+     * of with the "equal" function, otherwise it is equivalent to {@link #createAtLeastAnyOfApply(List, AttributeDesignatorType)} <br>
      * <br>
      * <code>values</code>: A,B,C - Request: A,B,C ---> OK<br>
      * <code>values</code>: A,B,C - Request: A,B ---> OK<br>
@@ -206,7 +191,7 @@ public class XACML_JAXBUtils {
      * <code>values</code>: A,B,C - Request: A,B,D ---> NO<br>
      * <code>values</code>: A,B,C - Request: A,D ---> NO<br>
      * <code>values</code>: A,B,C - Request: D ---> NO<br>
-     * 
+     *
      * @param values
      * @param attributeDesignatorType
      * @param function
@@ -369,7 +354,10 @@ public class XACML_JAXBUtils {
      * @param algorithm
      * @return
      */
-    public static PolicySet createPolicySet(Target target, String policySetId, String policySetIdReference, String algorithm) {
+    public static PolicySet createPolicySet(Target target, //
+	    String policySetId, //
+	    String policySetIdReference, //
+	    String algorithm) {//
 
 	ArrayList<Serializable> refList = new ArrayList<>();
 

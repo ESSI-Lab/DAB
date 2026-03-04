@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.rest.views;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.json.JSONException;
 import org.json.JSONObject;

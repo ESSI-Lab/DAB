@@ -21,10 +21,9 @@ package eu.essi_lab.cfga.gui.components.setting.listener;
  * #L%
  */
 
-import com.vaadin.flow.component.HasValue.ValueChangeEvent;
-
-import eu.essi_lab.cfga.gui.components.listener.AbstractValueChangeListener;
-import eu.essi_lab.cfga.gui.components.setting.SettingComponent;
+import com.vaadin.flow.component.HasValue.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
 
 @SuppressWarnings("serial")
 public class SettingToggleButtonListener extends AbstractValueChangeListener {

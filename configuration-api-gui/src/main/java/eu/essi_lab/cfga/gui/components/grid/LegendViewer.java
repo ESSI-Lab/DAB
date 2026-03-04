@@ -24,10 +24,10 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.List;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.orderedlayout.*;
 
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import java.util.*;
 
 /**
  * @author Fabrizio

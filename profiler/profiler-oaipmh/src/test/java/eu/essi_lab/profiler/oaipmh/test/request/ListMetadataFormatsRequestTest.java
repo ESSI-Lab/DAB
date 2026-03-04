@@ -2,8 +2,8 @@ package eu.essi_lab.profiler.oaipmh.test.request;
 
 import static org.junit.Assert.fail;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

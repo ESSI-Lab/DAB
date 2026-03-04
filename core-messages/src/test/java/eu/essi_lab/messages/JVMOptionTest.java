@@ -13,7 +13,7 @@ public class JVMOptionTest {
 
 	Assert.assertTrue(JVMOption.CHECK_CONFIG.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.CHECK_CONFIG.getDefaultBooleanValue(), JVMOption.isEnabled(JVMOption.CHECK_CONFIG));
+	Assert.assertEquals(JVMOption.CHECK_CONFIG.getDefaultBooleanValue().get(), JVMOption.isEnabled(JVMOption.CHECK_CONFIG));
 
 	//
 	//
@@ -21,7 +21,7 @@ public class JVMOptionTest {
 
 	Assert.assertTrue(JVMOption.UPDATE_DATA_FOLDER_INDEX.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.UPDATE_DATA_FOLDER_INDEX.getDefaultBooleanValue(),
+	Assert.assertEquals(JVMOption.UPDATE_DATA_FOLDER_INDEX.getDefaultBooleanValue().get(),
 		JVMOption.isEnabled(JVMOption.UPDATE_DATA_FOLDER_INDEX));
 
 	//
@@ -30,7 +30,7 @@ public class JVMOptionTest {
 
 	Assert.assertFalse(JVMOption.INIT_CACHES.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.INIT_CACHES.getDefaultBooleanValue(), JVMOption.isEnabled(JVMOption.INIT_CACHES));
+	Assert.assertEquals(JVMOption.INIT_CACHES.getDefaultBooleanValue().get(), JVMOption.isEnabled(JVMOption.INIT_CACHES));
 
 	//
 	//
@@ -38,7 +38,7 @@ public class JVMOptionTest {
 
 	Assert.assertFalse(JVMOption.INIT_OPENSEARCH_INDEXES.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.INIT_OPENSEARCH_INDEXES.getDefaultBooleanValue(),
+	Assert.assertEquals(JVMOption.INIT_OPENSEARCH_INDEXES.getDefaultBooleanValue().get(),
 		JVMOption.isEnabled(JVMOption.INIT_OPENSEARCH_INDEXES));
 
 	//
@@ -47,7 +47,7 @@ public class JVMOptionTest {
 
 	Assert.assertFalse(JVMOption.FORCE_VOLATILE_DB.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.FORCE_VOLATILE_DB.getDefaultBooleanValue(), JVMOption.isEnabled(JVMOption.FORCE_VOLATILE_DB));
+	Assert.assertEquals(JVMOption.FORCE_VOLATILE_DB.getDefaultBooleanValue().get(), JVMOption.isEnabled(JVMOption.FORCE_VOLATILE_DB));
 
 	//
 	//
@@ -55,7 +55,7 @@ public class JVMOptionTest {
 
 	Assert.assertFalse(JVMOption.SKIP_CONFIG_AUTHORIZATION.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.SKIP_CONFIG_AUTHORIZATION.getDefaultBooleanValue(),
+	Assert.assertEquals(JVMOption.SKIP_CONFIG_AUTHORIZATION.getDefaultBooleanValue().get(),
 		JVMOption.isEnabled(JVMOption.SKIP_CONFIG_AUTHORIZATION));
 
 	//
@@ -64,7 +64,7 @@ public class JVMOptionTest {
 
 	Assert.assertFalse(JVMOption.SKIP_REQUESTS_AUTHORIZATION.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.SKIP_REQUESTS_AUTHORIZATION.getDefaultBooleanValue(),
+	Assert.assertEquals(JVMOption.SKIP_REQUESTS_AUTHORIZATION.getDefaultBooleanValue().get(),
 		JVMOption.isEnabled(JVMOption.SKIP_REQUESTS_AUTHORIZATION));
 
 	//
@@ -73,7 +73,7 @@ public class JVMOptionTest {
 
 	Assert.assertFalse(JVMOption.SKIP_HEALTH_CHECK.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.SKIP_HEALTH_CHECK.getDefaultBooleanValue(), JVMOption.isEnabled(JVMOption.SKIP_HEALTH_CHECK));
+	Assert.assertEquals(JVMOption.SKIP_HEALTH_CHECK.getDefaultBooleanValue().get(), JVMOption.isEnabled(JVMOption.SKIP_HEALTH_CHECK));
 
 	//
 	//
@@ -81,7 +81,7 @@ public class JVMOptionTest {
 
 	Assert.assertFalse(JVMOption.SKIP_GDAL_TEST.getDefaultBooleanValue().get());
 
-	Assert.assertEquals(JVMOption.SKIP_GDAL_TEST.getDefaultBooleanValue(), JVMOption.isEnabled(JVMOption.SKIP_GDAL_TEST));
+	Assert.assertEquals(JVMOption.SKIP_GDAL_TEST.getDefaultBooleanValue().get(), JVMOption.isEnabled(JVMOption.SKIP_GDAL_TEST));
 
 	//
 	//

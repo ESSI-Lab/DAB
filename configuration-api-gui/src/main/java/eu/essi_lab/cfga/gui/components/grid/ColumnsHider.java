@@ -21,13 +21,12 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.HashMap;
+import com.vaadin.flow.component.checkbox.*;
+import com.vaadin.flow.component.grid.Grid.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
 
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-
-import eu.essi_lab.cfga.gui.components.listener.CheckBoxClickListener;
+import java.util.*;
 
 /**
  * @author Fabrizio

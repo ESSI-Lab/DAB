@@ -5,7 +5,7 @@ package eu.essi_lab.iso.datamodel;
 
 import java.util.Iterator;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

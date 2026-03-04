@@ -62,20 +62,22 @@
 			<artifactId>jaxb-classes-ogc-pubsub-1.0</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
+
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>iso19139-v_20060504</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-iso19139-v_2006504</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
+
+
 		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>gml-v_3_2_0</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>jaxb-classes-wfs-v_1_1_0-2.6.1</artifactId>
+			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>wfs-v_1_1_0</artifactId>
-		</dependency>		
-		
-	
+
+
 		<!-- here only the authzforce-ce-xacml-model is required but it has different version 
 			 so we make it easier
 		-->

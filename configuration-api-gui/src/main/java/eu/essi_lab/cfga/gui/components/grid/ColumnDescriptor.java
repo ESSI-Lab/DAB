@@ -21,14 +21,11 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Optional;
+import com.vaadin.flow.function.*;
+import eu.essi_lab.cfga.gui.components.grid.renderer.*;
+import eu.essi_lab.cfga.setting.*;
 
-import com.vaadin.flow.function.ValueProvider;
-
-import eu.essi_lab.cfga.gui.components.grid.renderer.GridColumnRenderer;
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
 
 /**
  * @author Fabrizio

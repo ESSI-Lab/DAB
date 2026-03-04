@@ -194,7 +194,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	    descriptor = TabContentDescriptorBuilder.get(SourceStorageSetting.class).//
 		    withLabel("Source storage").//
-		    withEditDirective("Edit source storage settings").//
+		    withEditDirective("EDIT","Edit source storage settings").//
 		    build();
 	}
 

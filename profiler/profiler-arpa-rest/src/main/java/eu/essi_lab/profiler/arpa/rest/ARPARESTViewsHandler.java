@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.arpa.rest;
  * #L%
  */
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.web.WebRequest;

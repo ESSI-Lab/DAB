@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -50,7 +50,7 @@ import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.cfga.gs.setting.lombardiasession.LombardiaSessionCoordinatorSetting;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
@@ -150,11 +150,18 @@ public class ConfigurationWrapper {
 	    getProfilerSettings().forEach(ps -> PROFILER_ONLINE_MAP.put(ps.getServicePath(), ps.isOnline()));
 	});
 
-	allSources = getSources(null, false);
-	harvestingSettings = _getHarvestingSettings();
-	systemSetting = _getSystemSetting();
-	databaseSetting = _getDatabaseSetting();
-	distributedSources = _getDistributedSources();
+	try {
+
+	    allSources = getSources(null, false);
+	    harvestingSettings = _getHarvestingSettings();
+	    systemSetting = _getSystemSetting();
+	    databaseSetting = _getDatabaseSetting();
+	    distributedSources = _getDistributedSources();
+
+	} catch (Error e) {
+
+	    GSLoggerFactory.getLogger(ConfigurationWrapper.class).warn(e.getMessage());
+	}
 
 	getProfilerSettings().forEach(ps -> PROFILER_ONLINE_MAP.put(ps.getServicePath(), ps.isOnline()));
     }
@@ -833,11 +840,18 @@ public class ConfigurationWrapper {
     /**
      * @return
      */
-    public static LombardiaSessionCoordinatorSetting getLombardiaSessionCoordinatorSetting() {
+    public static SessionCoordinatorSetting getSessionCoordinatorSetting() {
+	Optional<SessionCoordinatorSetting> setting = configuration.get(//
+		SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel(), //
+		SessionCoordinatorSetting.class);
+	if (setting.isPresent()) {
+	    SessionCoordinatorSetting ret = setting.get();
+	    if (ret.isDistributedSessionCoordinator()){
 
-	return configuration.get(//
-		SingletonSettingsId.LOMBARDIA_SESSION_COORDINATOR_SETTING.getLabel(), //
-		LombardiaSessionCoordinatorSetting.class).get();
+	    }
+	    return ret;
+	}
+	return new SessionCoordinatorSetting();
     }
 
     /**
@@ -1058,11 +1072,11 @@ public class ConfigurationWrapper {
 	Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
 	if (keyValueOption.isPresent()) {
 	    String dsm = keyValueOption.get().getProperty("defaultMaxDownloadSizeMB");
-	    if (dsm!=null&&!dsm.isEmpty()) {
+	    if (dsm != null && !dsm.isEmpty()) {
 		try {
 		    int defaultMaxDownloadSizeMB = Integer.parseInt(dsm);
-		    return  defaultMaxDownloadSizeMB;
-		}catch (Exception e){
+		    return defaultMaxDownloadSizeMB;
+		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(ConfigurationWrapper.class).error(e);
 		}
 	    }
@@ -1071,24 +1085,24 @@ public class ConfigurationWrapper {
     }
 
     public static Integer getDefaultMaxDownloadPartSizeMB() {
-        SystemSetting systemSettings = getSystemSettings();
-        Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
-        if (keyValueOption.isPresent()) {
-            String dsm = keyValueOption.get().getProperty("defaultMaxDownloadPartSizeMB");
-            if (dsm!=null&&!dsm.isEmpty()) {
-            try {
-                int defaultMaxDownloadPartSizeMB = Integer.parseInt(dsm);
-                return  defaultMaxDownloadPartSizeMB;
-            }catch (Exception e){
-                GSLoggerFactory.getLogger(ConfigurationWrapper.class).error(e);
-            }
-            }
-        }
-        return null;
-        }
+	SystemSetting systemSettings = getSystemSettings();
+	Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+	if (keyValueOption.isPresent()) {
+	    String dsm = keyValueOption.get().getProperty("defaultMaxDownloadPartSizeMB");
+	    if (dsm != null && !dsm.isEmpty()) {
+		try {
+		    int defaultMaxDownloadPartSizeMB = Integer.parseInt(dsm);
+		    return defaultMaxDownloadPartSizeMB;
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(ConfigurationWrapper.class).error(e);
+		}
+	    }
+	}
+	return null;
+    }
 
     public static Optional<HarvestingSetting> getHarvestingSettings(String sourceId) {
-	return getHarvestingSettings().stream().
-		filter(set -> set.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier().equals(sourceId)).findFirst();
+	return getHarvestingSettings().stream()
+		.filter(set -> set.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier().equals(sourceId)).findFirst();
     }
 }

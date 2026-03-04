@@ -23,7 +23,7 @@ package eu.essi_lab.profiler.rest.handler.info;
 
 import java.util.Arrays;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.json.JSONObject;
 import org.json.XML;

@@ -1,7 +1,7 @@
 package eu.essi_lab.lib.net.smtp.test;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
 
 import org.junit.Test;
 

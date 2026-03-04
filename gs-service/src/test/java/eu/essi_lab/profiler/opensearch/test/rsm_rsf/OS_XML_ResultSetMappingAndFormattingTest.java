@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
+import jakarta.ws.rs.core.Response;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

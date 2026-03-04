@@ -31,7 +31,7 @@ import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.ObjectFactory;
 import net.opengis.iso19139.srv.v_20060504.*;
 
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 import java.math.*;
 import java.util.*;
 
@@ -95,7 +95,7 @@ public class ServiceIdentification extends Identification {
 	    GenericNamePropertyType prop = t.getServiceType();
 	    if (prop == null || !prop.isSetAbstractGenericName())
 		return null;
-	    javax.xml.bind.JAXBElement<?> el = prop.getAbstractGenericName();
+	    jakarta.xml.bind.JAXBElement<?> el = prop.getAbstractGenericName();
 	    if (el == null)
 		return null;
 	    Object val = el.getValue();

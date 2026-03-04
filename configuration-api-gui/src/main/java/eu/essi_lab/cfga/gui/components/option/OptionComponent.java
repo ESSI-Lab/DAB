@@ -21,21 +21,15 @@ package eu.essi_lab.cfga.gui.components.option;
  * #L%
  */
 
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.Selectable.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
 
-import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasEnabled;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.gui.components.OptionComponentFactory;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
 
 /**
  * <info>
@@ -116,7 +110,7 @@ public class OptionComponent extends VerticalLayout {
      * @param option
      * @param forceReadonly
      */
-    public OptionComponent(Configuration configuration, Setting owner, Option<?> option, boolean forceReadonly) {
+    public OptionComponent(Option<?> option, boolean forceReadonly) {
 
 	this.option = option;
 
@@ -163,8 +157,8 @@ public class OptionComponent extends VerticalLayout {
 	//
 	// label
 	//
-	Label label = OptionComponentFactory.createOptionLabel(option.getLabel());
-	optionLayout.add(label);
+	Span span = OptionComponentFactory.createOptionSpan(option.getLabel());
+	optionLayout.add(span);
 
 	//
 	// description
@@ -172,13 +166,13 @@ public class OptionComponent extends VerticalLayout {
 
 	Optional<String> description = option.getDescription();
 
-	Label descriptionLabel = null;
+	Span descriptionSpan = null;
 
 	if (description.isPresent()) {
 
-	    descriptionLabel = OptionComponentFactory.createOptionDescriptionLabel(description.get());
+	    descriptionSpan = OptionComponentFactory.createOptionDescriptionSpan(description.get());
 
-	    optionLayout.add(descriptionLabel);
+	    optionLayout.add(descriptionSpan);
 	}
 
 	//
@@ -195,12 +189,12 @@ public class OptionComponent extends VerticalLayout {
 
 	    if (option.getValueClass().equals(BooleanChoice.class)) {
 
-		if (descriptionLabel != null) {
+		if (descriptionSpan != null) {
 
-		    optionLayout.remove(descriptionLabel);
+		    optionLayout.remove(descriptionSpan);
 		}
 
-		optionLayout.remove(label);
+		optionLayout.remove(span);
 	    }
 
 	    optionLayout.add(valueField);
@@ -250,12 +244,12 @@ public class OptionComponent extends VerticalLayout {
 
 		if (option.getValueClass().equals(BooleanChoice.class)) {
 
-		    if (descriptionLabel != null) {
+		    if (descriptionSpan != null) {
 
-			optionLayout.remove(descriptionLabel);
+			optionLayout.remove(descriptionSpan);
 		    }
 
-		    optionLayout.remove(label);
+		    optionLayout.remove(span);
 		}
 
 		optionLayout.add(comp);

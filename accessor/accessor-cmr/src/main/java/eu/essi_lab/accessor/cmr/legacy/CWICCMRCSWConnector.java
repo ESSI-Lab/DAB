@@ -21,7 +21,7 @@
  * #L%
  */
 //
-// import javax.xml.bind.JAXBElement;
+// import jakarta.xml.bind.JAXBElement;
 //
 // import org.w3c.dom.Node;
 //

@@ -29,8 +29,8 @@ package eu.essi_lab.jaxb.filter._1_1_0;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlType;
 
 
 /**

@@ -16,7 +16,7 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.EmptyBond;
+import eu.essi_lab.messages.bond.FalseBond;
 import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -756,7 +756,7 @@ public class QueryInitializerTest {
 	doTestWithAuthorizedSources(sourceSet1);
 	// Assert.assertEquals(BondFactory.createAndBond(userBond, //
 	// source1Bond), message.getPermittedBond());
-	Assert.assertEquals(new EmptyBond(),  message.getNormalizedBond());
+	Assert.assertEquals(BondFactory.getFalseBond(),  message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet12);
 	// Assert.assertEquals(BondFactory.createAndBond( //

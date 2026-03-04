@@ -6,7 +6,7 @@ package eu.essi_lab.test.authorization.userfinder.test;
 import java.io.UnsupportedEncodingException;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;

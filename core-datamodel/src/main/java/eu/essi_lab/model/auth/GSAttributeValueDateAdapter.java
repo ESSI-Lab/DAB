@@ -24,7 +24,7 @@ package eu.essi_lab.model.auth;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class GSAttributeValueDateAdapter extends XmlAdapter<String, LocalDate> {
 

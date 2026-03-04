@@ -28,8 +28,8 @@ import eu.essi_lab.messages.web.*;
 import eu.essi_lab.model.auth.*;
 import eu.essi_lab.model.exceptions.*;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.*;
 
 /**

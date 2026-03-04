@@ -21,14 +21,12 @@ package eu.essi_lab.cfga.gui.components.setting.group.listener;
  * #L%
  */
 
-import java.util.Set;
+import com.vaadin.flow.component.checkbox.*;
+import com.vaadin.flow.data.selection.*;
+import eu.essi_lab.cfga.gui.*;
+import eu.essi_lab.cfga.gui.components.setting.group.*;
 
-import com.vaadin.flow.component.checkbox.CheckboxGroup;
-import com.vaadin.flow.data.selection.MultiSelectionEvent;
-import com.vaadin.flow.data.selection.MultiSelectionListener;
-
-import eu.essi_lab.cfga.gui.IdleTracker;
-import eu.essi_lab.cfga.gui.components.setting.group.CheckComponentsHandler;
+import java.util.*;
 
 /**
  * @author Fabrizio

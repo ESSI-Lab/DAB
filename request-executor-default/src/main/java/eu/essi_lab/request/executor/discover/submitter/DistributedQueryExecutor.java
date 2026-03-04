@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;

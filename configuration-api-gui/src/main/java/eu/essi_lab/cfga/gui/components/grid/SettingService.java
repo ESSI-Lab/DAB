@@ -21,15 +21,11 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.setting.*;
 
-import com.vaadin.flow.data.provider.Query;
-import com.vaadin.flow.data.provider.QuerySortOrder;
-
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * <code>

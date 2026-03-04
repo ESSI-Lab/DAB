@@ -26,7 +26,7 @@ package eu.essi_lab.profiler.oaipmh.handler.kma.discover;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import eu.essi_lab.iso.datamodel.MD_MetadataPatch;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;

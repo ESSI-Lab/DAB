@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

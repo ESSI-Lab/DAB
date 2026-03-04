@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.sos.availability;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.sos._2_0.gda.DataAvailabilityMemberType;

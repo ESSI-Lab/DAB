@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.w3c.dom.Node;

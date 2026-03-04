@@ -32,6 +32,16 @@
 		<module>jaxb-classes-sos-2.0</module>
 		<module>jaxb-classes-wml-2.0</module>
 		<module>jaxb-classes-wms-1.1.1</module>
+		<module>jaxb-classes-iso19139-v_2006504</module>
+		<module>jaxb-classes-w3c-xlink-v_1_0-1.3.0</module>
+		<module>jaxb-classes-gml-v_3_2_0-2.6.1</module>
+		<module>jaxb-classes-jaxb2-basics-runtime-1.1.11</module>
+        <module>jaxb-classes-wfs-v_1_1_0-2.6.1</module>
+        <module>jaxb-classes-ows-v_1_0_0-3.0.0</module>
+        <module>jaxb-classes-gml-v_3_1_1-2.6.1</module>
+		<module>jaxb-classes-filter-v_1_1_0-3.0.0</module>
+		<module>jaxb-classes-sensorML-v_2_0-2.6.1</module>
+		<module>jaxb-classes-sweCommon-v_2_0-2.6.1</module>
 	</modules>
 	
 </project>

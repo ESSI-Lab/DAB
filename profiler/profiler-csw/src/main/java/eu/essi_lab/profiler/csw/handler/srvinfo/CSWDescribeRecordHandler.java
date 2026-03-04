@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.csw.handler.srvinfo;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
 
 import com.google.common.io.ByteStreams;
 

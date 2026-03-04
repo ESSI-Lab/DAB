@@ -2,9 +2,9 @@ import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
 
 import java.io.File;
 import java.util.ServiceLoader;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBContextFactory;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBContextFactory;
+import jakarta.xml.bind.JAXBException;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
 package eu.essi_lab.turtle;
 
-import java.net.URL;
+import java.net.*;
 import java.util.Collection;
 
 import org.apache.jena.shacl.ValidationReport;
@@ -14,7 +14,8 @@ public class TurtleValidatorTest {
 	// File("/home/boldrini/git/asset-standards/DCAT-AP/dataset-example.ttl"));
 
 	ValidationReport report = TurtleValidator
-		.validate(new URL("https://s3.amazonaws.com/dataset.geodab.eu/dataset/usnodcdbid/gov.noaa.nodc:BCO-DMO.ttl"),true);
+		.validate(
+			new URI("https://s3.amazonaws.com/dataset.geodab.eu/dataset/usnodcdbid/gov.noaa.nodc:BCO-DMO.ttl").toURL(),true);
 
 	// Check if the data conforms to the SHACL shapes
 	if (report.conforms()) {

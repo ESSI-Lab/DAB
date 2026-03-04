@@ -21,7 +21,7 @@ package eu.essi_lab.pdk.rsf;
  * #L%
  */
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.MessageResponse;

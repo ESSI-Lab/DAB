@@ -21,8 +21,8 @@ package eu.essi_lab.access.compliance.wrapper;
  * #L%
  */
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
 
 import eu.essi_lab.lib.xml.NameSpace;
 

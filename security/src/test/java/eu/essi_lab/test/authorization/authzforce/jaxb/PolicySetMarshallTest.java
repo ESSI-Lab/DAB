@@ -5,8 +5,8 @@ package eu.essi_lab.test.authorization.authzforce.jaxb;
 
 import java.io.InputStream;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 import eu.essi_lab.test.authorization.authzforce.XACMLTest;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.PolicySet;

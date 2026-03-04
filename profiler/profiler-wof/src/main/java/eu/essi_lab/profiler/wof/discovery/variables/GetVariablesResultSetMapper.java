@@ -26,7 +26,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.HashSet;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.cuahsi.waterml._1.UnitsType;
 import org.cuahsi.waterml._1.VariableInfoType;

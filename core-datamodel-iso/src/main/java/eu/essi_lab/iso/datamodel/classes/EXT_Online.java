@@ -26,7 +26,7 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.xml.*;
 import org.w3c.dom.*;
 
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 import javax.xml.namespace.*;
 import java.io.*;
 import java.nio.charset.*;

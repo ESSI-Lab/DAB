@@ -21,7 +21,7 @@ package eu.essi_lab.pdk.handler;
  * #L%
  */
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;

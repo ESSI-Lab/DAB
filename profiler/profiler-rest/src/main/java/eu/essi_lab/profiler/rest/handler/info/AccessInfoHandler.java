@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import eu.essi_lab.access.compliance.DataComplianceLevel;
 import eu.essi_lab.access.compliance.DataComplianceReport;

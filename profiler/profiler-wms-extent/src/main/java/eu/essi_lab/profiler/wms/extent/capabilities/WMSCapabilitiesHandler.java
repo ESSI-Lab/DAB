@@ -31,8 +31,8 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriInfo;
 
 import eu.essi_lab.access.datacache.BBOX3857;
 import eu.essi_lab.access.datacache.BBOX4326;

@@ -7,9 +7,9 @@ import java.io.ByteArrayOutputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -183,8 +183,8 @@ public class ViewTest {
      * @throws JAXBException
      */
     private void testJAXB(Bond bond) throws JAXBException {
-	ViewFactory factory = new ViewFactory();
-	View view = factory.createView("id1", "label 1", bond);
+
+	View view = ViewFactory.createView("id1", "label 1", bond);
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	Marshaller m = ViewFactory.createMarshaller();
 	m.marshal(view, System.out);

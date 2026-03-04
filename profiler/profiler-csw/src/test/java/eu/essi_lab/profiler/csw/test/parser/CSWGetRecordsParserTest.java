@@ -5,8 +5,8 @@ import static org.junit.Assert.fail;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -136,7 +136,6 @@ public class CSWGetRecordsParserTest {
 
 	    Assert.assertEquals(BondOperator.CONTAINS, ((SpatialBond) array[7]).getOperator());
 	    Assert.assertEquals(BondOperator.INTERSECTS, ((SpatialBond) array[8]).getOperator());
-	    Assert.assertEquals(BondOperator.BBOX, ((SpatialBond) array[9]).getOperator());
 	    Assert.assertEquals(BondOperator.DISJOINT, ((SpatialBond) array[10]).getOperator());
 
 	    {
@@ -193,7 +192,6 @@ public class CSWGetRecordsParserTest {
 
 	    Assert.assertEquals(BondOperator.CONTAINS, ((SpatialBond) array[8]).getOperator());
 	    Assert.assertEquals(BondOperator.INTERSECTS, ((SpatialBond) array[9]).getOperator());
-	    Assert.assertEquals(BondOperator.BBOX, ((SpatialBond) array[10]).getOperator());
 	    Assert.assertEquals(BondOperator.DISJOINT, ((SpatialBond) array[11]).getOperator());
 
 	} catch (Exception e) {

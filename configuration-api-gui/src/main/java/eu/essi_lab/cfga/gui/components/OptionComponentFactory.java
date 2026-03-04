@@ -21,43 +21,24 @@ package eu.essi_lab.cfga.gui.components;
  * #L%
  */
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.checkbox.*;
+import com.vaadin.flow.component.combobox.*;
+import com.vaadin.flow.component.datetimepicker.*;
+import com.vaadin.flow.component.details.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.icon.*;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.select.*;
+import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.gui.components.option.*;
+import eu.essi_lab.cfga.gui.components.option.listener.*;
+import eu.essi_lab.cfga.option.*;
 
-import com.vaadin.componentfactory.ToggleButton;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.textfield.TextField;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.option.OptionComponent;
-import eu.essi_lab.cfga.gui.components.option.OptionDoubleField;
-import eu.essi_lab.cfga.gui.components.option.OptionIntegerField;
-import eu.essi_lab.cfga.gui.components.option.OptionTextArea;
-import eu.essi_lab.cfga.gui.components.option.OptionTextField;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionToggleButtonListener;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionValueChangeListener;
-import eu.essi_lab.cfga.gui.components.option.listener.OptionValuesLoaderListener;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.ISODateTime;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.Setting;
+import java.time.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -104,9 +85,9 @@ public class OptionComponentFactory {
      * @param description
      * @return
      */
-    public static Label createOptionDescriptionLabel(String description) {
+    public static Span createOptionDescriptionSpan(String description) {
 
-	Label label = ComponentFactory.createLabel(description);
+	Span label = ComponentFactory.createSpan(description);
 	label.getStyle().set("font-size", "14px");
 	label.getStyle().set("color", "gray");
 
@@ -117,9 +98,9 @@ public class OptionComponentFactory {
      * @param text
      * @return
      */
-    public static Label createOptionLabel(String text) {
+    public static Span createOptionSpan(String text) {
 
-	Label label = ComponentFactory.createLabel(text);
+	Span label = ComponentFactory.createSpan(text);
 	label.getStyle().set("font-weight", "bold");
 	label.getStyle().set("font-size", "13px");
 
@@ -162,7 +143,7 @@ public class OptionComponentFactory {
 	    // GSLoggerFactory.getLogger(ComponentFactory.class).debug("ISODateTime option value");
 
 	    if (UI.getCurrent() == null) {
-		return new Label();
+		return new Span();
 	    }
 
 	    if (!option.isEditable() || forceReadonly) {
@@ -461,20 +442,20 @@ public class OptionComponentFactory {
 
 	checkbox.addValueChangeListener(new OptionValueChangeListener(option));
 
-	Label label = OptionComponentFactory.createOptionLabel(option.getLabel());
+	Span span = OptionComponentFactory.createOptionSpan(option.getLabel());
 
-	label.getStyle().set("margin-top", "3px");
-	label.getStyle().set("margin-left", "3px");
+	span.getStyle().set("margin-top", "3px");
+	span.getStyle().set("margin-left", "3px");
 
 	Optional<String> description = option.getDescription();
 
 	horizontalLayout.add(checkbox);
 
-	horizontalLayout.add(label);
+	horizontalLayout.add(span);
 
 	if (description.isPresent()) {
 
-	    Label descriptionLabel = OptionComponentFactory.createOptionDescriptionLabel(description.get());
+	    Span descriptionLabel = OptionComponentFactory.createOptionDescriptionSpan(description.get());
 
 	    verticalLayout.add(horizontalLayout);
 

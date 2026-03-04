@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -30,6 +30,7 @@ import com.vaadin.flow.component.tabs.*;
 import com.vaadin.flow.dom.*;
 import com.vaadin.flow.dom.DomEvent;
 import com.vaadin.flow.server.*;
+import com.vaadin.flow.server.streams.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
@@ -38,8 +39,8 @@ import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.web.*;
+import jakarta.servlet.http.*;
 
-import javax.servlet.http.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -53,14 +54,13 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
     private VerticalTabs tabs;
     private final HorizontalLayout header;
-    private final Label headerLabel;
-    private final Image headerImage;
+    private final Span headerSpan;
+    private Image headerImage;
     private final Button saveButton;
     protected boolean tabAlreadyOpen;
-    final Label infoLabel;
+    final Span infoSpan;
     Button logoutButton;
     private final String requestURL;
-    private static String ownerBrowserAdress;
     private Configuration configuration;
 
     /**
@@ -129,24 +129,24 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	// headerImage.setSrc("https://i.imgur.com/GPpnszs.png");
 	// headerImage.setHeight("44px");
 
-	headerLabel = new Label();
-	headerLabel.getStyle().set("font-size", "28px");
-	headerLabel.setWidthFull();
+	headerSpan = new Span();
+	headerSpan.getStyle().set("font-size", "28px");
+	headerSpan.setWidthFull();
 
 	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
 
 	});
 
-	infoLabel = ComponentFactory.createLabel();
-	infoLabel.getStyle().set("font-size", "12px");
-	infoLabel.getStyle().set("padding", "5px");
+	infoSpan = ComponentFactory.createSpan();
+	infoSpan.getStyle().set("font-size", "12px");
+	infoSpan.getStyle().set("padding", "5px");
 
-	// infoLabel.getStyle().set("background-color", "white");
-	// infoLabel.getStyle().set("color", "green");
-	// infoLabel.getStyle().set("border", "1px solid green");
+	// infoSpan.getStyle().set("background-color", "white");
+	// infoSpan.getStyle().set("color", "green");
+	// infoSpan.getStyle().set("border", "1px solid green");
 
-	infoLabel.setWidth(560, Unit.PIXELS);
-	infoLabel.setHeight(30, Unit.PIXELS);
+	infoSpan.setWidth(560, Unit.PIXELS);
+	infoSpan.setHeight(30, Unit.PIXELS);
 
 	saveButton = ConfigurationViewFactory.createSaveButton((ComponentEventListener<ClickEvent<Button>>) this::onSaveButtonClicked);
 
@@ -156,7 +156,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	header = ConfigurationViewFactory.createHeaderLayout();
 
-	header.add(headerImage, headerLabel, saveButton);
+	header.add(headerImage, headerSpan, saveButton);
 
 	mainLayout.add(header);
 
@@ -187,7 +187,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
 	    tabAlreadyOpen = true;
 
-	    // infoLabel.setVisible(false);
+	    // infoSpan.setVisible(false);
 
 	    String msg = "If the configuration tab has been closed a little while ago,";
 	    msg += " the related session will expire in a few seconds and you will";
@@ -216,7 +216,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	//
 	//
 
-	ownerBrowserAdress = address;
+	String ownerBrowserAdress = address;
 	GSLoggerFactory.getLogger(getClass()).info("Current session owner address: {}", ownerBrowserAdress);
 
 	//
@@ -298,14 +298,6 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	    });
 	}
 
-	//
-	//
-	//
-
-	//
-	//
-	//
-
 	// LockManager.getInstance().setSource(configuration.getSource());
 	//
 	// LockManager.getInstance().setUI(UI.getCurrent(), this);
@@ -335,30 +327,30 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     public void updateInfoMessage(String message, MessageType type) {
 
-	infoLabel.setText(message);
+	infoSpan.setText(message);
 
 	switch (type) {
 	case INFO:
 
-	    infoLabel.getStyle().set("background-color", "white");
-	    infoLabel.getStyle().set("color", "green");
-	    infoLabel.getStyle().set("border", "1px solid green");
+	    infoSpan.getStyle().set("background-color", "white");
+	    infoSpan.getStyle().set("color", "green");
+	    infoSpan.getStyle().set("border", "1px solid green");
 
 	    break;
 
 	case ERROR:
 
-	    infoLabel.getStyle().set("background-color", "white");
-	    infoLabel.getStyle().set("color", "red");
-	    infoLabel.getStyle().set("border", "1px solid red");
+	    infoSpan.getStyle().set("background-color", "white");
+	    infoSpan.getStyle().set("color", "red");
+	    infoSpan.getStyle().set("border", "1px solid red");
 
 	    break;
 
 	case WARNING:
 
-	    infoLabel.getStyle().set("background-color", "white");
-	    infoLabel.getStyle().set("color", "lightgray");
-	    infoLabel.getStyle().set("border", "1px solid lightgray");
+	    infoSpan.getStyle().set("background-color", "white");
+	    infoSpan.getStyle().set("color", "lightgray");
+	    infoSpan.getStyle().set("border", "1px solid lightgray");
 	}
     }
 
@@ -444,18 +436,18 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 
     /**
      * @param index
-     * @param label
+     * @param Span
      * @param component
      * @return
      */
-    public Tab addTab(int index, String label, Renderable component) {
+    public Tab addTab(int index, String Span, Renderable component) {
 
-	return tabs.addTab(index, label, component);
+	return tabs.addTab(index, Span, component);
     }
 
     /**
      * @param index
-     * @param label
+     * @param Span
      * @param component
      * @return
      */
@@ -512,11 +504,20 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      * @param width
      * @param height
      */
-    public void setHeaderImage(InputStream source, int width, int height) {
+    public void setHeaderImage(InputStream stream, int width, int height) {
 
-	StreamResource resource = new StreamResource("icon", (InputStreamFactory) () -> source);
+	InputStreamDownloadHandler handler = DownloadHandler.fromInputStream((event) -> {
+	    try {
 
-	headerImage.setSrc(resource);
+		return new DownloadResponse(stream, null, null, -1);
+
+	    } catch (Exception e) {
+
+		return DownloadResponse.error(500);
+	    }
+	});
+
+	headerImage = new Image(handler, "icon");
 
 	if (height > 0) {
 	    headerImage.setHeight(height + "px");
@@ -549,7 +550,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     public void setHeaderText(String headerText) {
 
-	headerLabel.setText(headerText);
+	headerSpan.setText(headerText);
     }
 
     /**
@@ -558,8 +559,8 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
      */
     public void setHeaderText(String headerText, int width) {
 
-	headerLabel.setText(headerText);
-	headerLabel.getStyle().set("width", width + "px");
+	headerSpan.setText(headerText);
+	headerSpan.getStyle().set("width", width + "px");
     }
 
     /**
@@ -571,11 +572,11 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     }
 
     /**
-     * @return the headerLabel
+     * @return the headerSpan
      */
-    public Label getHeaderLabel() {
+    public Span getHeaderSpan() {
 
-	return headerLabel;
+	return headerSpan;
     }
 
     /**

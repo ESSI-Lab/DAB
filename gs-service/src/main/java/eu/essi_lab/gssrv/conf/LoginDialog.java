@@ -10,34 +10,28 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.server.StreamResource;
-
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.dialog.EnhancedDialog;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.server.streams.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.dialog.*;
 
 /**
  * @author Fabrizio
  */
-@SuppressWarnings("serial")
 class LoginDialog extends EnhancedDialog {
 
     /**
@@ -55,8 +49,8 @@ class LoginDialog extends EnhancedDialog {
 	contentLayout.getStyle().set("padding", "20px");
 	contentLayout.getStyle().set("padding-bottom", "0px");
 
-	Label label1 = ComponentFactory.createLabel("You must be logged in as administrator to view this page.");
-	Label label2 = ComponentFactory.createLabel("Please login with one of the following providers:");
+	Span label1 = ComponentFactory.createSpan("You must be logged in as administrator to view this page.");
+	Span label2 = ComponentFactory.createSpan("Please login with one of the following providers:");
 
 	contentLayout.add(label1);
 	contentLayout.add(label2);
@@ -89,7 +83,19 @@ class LoginDialog extends EnhancedDialog {
      */
     private Button create(String provider, String logoUrl, String requestURL) {
 
-	Image image = new Image(new StreamResource(provider, () -> getClass().getClassLoader().getResourceAsStream(logoUrl)), provider);
+	InputStreamDownloadHandler handler = DownloadHandler.fromInputStream((event) -> {
+	    try {
+
+		return new DownloadResponse(getClass().getClassLoader().getResourceAsStream(logoUrl), null, null, -1);
+
+	    } catch (Exception e) {
+
+		return DownloadResponse.error(500);
+	    }
+	});
+
+	Image image = new Image(handler, provider);
+
 	image.setWidth("54px");
 	image.setHeight("54px");
 
@@ -100,15 +106,11 @@ class LoginDialog extends EnhancedDialog {
 	button.setTooltipText(provider);
 	button.setWidth("60px");
 	button.setHeight("60px");
-	button.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
+	button.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 
-	    @Override
-	    public void onComponentEvent(ClickEvent<Button> event) {
+	    String url = "../../../gs-service/auth/user/login/" + provider.toLowerCase() + "?url=" + requestURL;
 
-		String url = "../../../gs-service/auth/user/login/" + provider.toLowerCase() + "?url=" + requestURL;
-
-		UI.getCurrent().getPage().open(url, "_self");
-	    }
+	    UI.getCurrent().getPage().open(url, "_self");
 	});
 
 	return button;

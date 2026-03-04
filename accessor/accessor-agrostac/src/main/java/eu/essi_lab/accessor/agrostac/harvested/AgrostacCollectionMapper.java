@@ -34,7 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import eu.essi_lab.lib.utils.*;
 import org.apache.commons.io.IOUtils;

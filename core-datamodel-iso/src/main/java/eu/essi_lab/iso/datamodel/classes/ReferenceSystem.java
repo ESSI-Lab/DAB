@@ -27,7 +27,7 @@ import net.opengis.iso19139.gco.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.gmx.v_20060504.*;
 
-import javax.xml.bind.*;
+import jakarta.xml.bind.*;
 import java.io.*;
 import java.util.*;
 

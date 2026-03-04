@@ -21,8 +21,8 @@ package eu.essi_lab.jaxb.common.schemas;
  * #L%
  */
 
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.ValidationEventHandler;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.ValidationEventHandler;
 
 /**
  * @author Fabrizio

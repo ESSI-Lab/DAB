@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.authorization.xacml;
 
@@ -13,45 +13,29 @@ package eu.essi_lab.authorization.xacml;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import static org.ow2.authzforce.xacml.identifiers.XacmlAttributeCategory.XACML_1_0_ACCESS_SUBJECT;
-import static org.ow2.authzforce.xacml.identifiers.XacmlAttributeCategory.XACML_3_0_ACTION;
-import static org.ow2.authzforce.xacml.identifiers.XacmlAttributeCategory.XACML_3_0_RESOURCE;
+import eu.essi_lab.authorization.PolicySetWrapper.*;
+import eu.essi_lab.messages.bond.View.*;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.*;
+import org.ow2.authzforce.core.pdp.api.*;
+import org.ow2.authzforce.core.pdp.api.value.*;
+import org.ow2.authzforce.xacml.identifiers.*;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
-import org.ow2.authzforce.core.pdp.api.AttributeFqn;
-import org.ow2.authzforce.core.pdp.api.AttributeFqns;
-import org.ow2.authzforce.core.pdp.api.CloseablePdpEngine;
-import org.ow2.authzforce.core.pdp.api.DecisionRequest;
-import org.ow2.authzforce.core.pdp.api.DecisionRequestBuilder;
-import org.ow2.authzforce.core.pdp.api.DecisionResult;
-import org.ow2.authzforce.core.pdp.api.value.AnyUriValue;
-import org.ow2.authzforce.core.pdp.api.value.AttributeBag;
-import org.ow2.authzforce.core.pdp.api.value.Bags;
-import org.ow2.authzforce.core.pdp.api.value.IntegerValue;
-import org.ow2.authzforce.core.pdp.api.value.MediumInteger;
-import org.ow2.authzforce.core.pdp.api.value.StandardDatatypes;
-import org.ow2.authzforce.core.pdp.api.value.StringValue;
-import org.ow2.authzforce.xacml.identifiers.XacmlAttributeId;
-
-import eu.essi_lab.authorization.PolicySetWrapper.Issuer;
-import eu.essi_lab.messages.bond.View.ViewVisibility;
-import oasis.names.tc.xacml._3_0.core.schema.wd_17.DecisionType;
+import static org.ow2.authzforce.xacml.identifiers.XacmlAttributeCategory.*;
 
 /**
  * @author Fabrizio
@@ -73,7 +57,7 @@ public class PdpEngineWrapper {
     }
 
     /**
-     * 
+     *
      */
     public void setUserRole(String role) {
 
@@ -107,7 +91,7 @@ public class PdpEngineWrapper {
     }
 
     /**
-     * 
+     *
      */
     public void setSources(String... sources) {
 
@@ -327,13 +311,17 @@ public class PdpEngineWrapper {
     }
 
     /**
-     * 
+     *
      */
     public void reset() {
 
 	requestBuilder.reset();
     }
 
+    /**
+     *
+     * @throws IOException
+     */
     public void close() throws IOException {
 
 	pdp.close();

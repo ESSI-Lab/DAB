@@ -23,8 +23,8 @@ package eu.essi_lab.profiler.pubsub.handler.csw;
 
 import java.io.StringReader;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXBElement;
 import javax.xml.parsers.DocumentBuilder;
 
 import org.json.JSONObject;

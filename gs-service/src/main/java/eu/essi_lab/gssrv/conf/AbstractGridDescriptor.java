@@ -169,10 +169,7 @@ public abstract class AbstractGridDescriptor<G extends GridDataModel> extends Ta
 
 	    ConfirmationDialog dialog = new ConfirmationDialog(
 
-		    "Click 'Confirm' to permanently delete the selected items", evt -> {
-
-		consumer.accept(selectionMap);
-	    });
+		    "Click 'Confirm' to permanently delete the selected items", evt -> consumer.accept(selectionMap));
 
 	    dialog.setWidth(670, Unit.PIXELS);
 	    dialog.setTitle("Items removal");

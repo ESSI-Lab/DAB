@@ -21,11 +21,10 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
+import com.vaadin.flow.component.grid.*;
+import com.vaadin.flow.component.grid.Grid.*;
 
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import java.util.*;
 
 /**
  * @author Fabrizio

@@ -21,15 +21,12 @@ package eu.essi_lab.cfga.gui.components.grid;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
+import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.setting.*;
 
-import com.vaadin.flow.component.grid.contextmenu.GridContextMenu.GridContextMenuItemClickEvent;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.gui.components.tabs.TabContent;
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
 
 /**
  * @author Fabrizio

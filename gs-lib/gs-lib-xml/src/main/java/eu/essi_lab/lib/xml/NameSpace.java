@@ -34,7 +34,7 @@ public enum NameSpace {
     /**
      * 
      */
-    public static final String NAMESPACE_PREFIX_MAPPER_IMPL = "com.sun.xml.bind.namespacePrefixMapper";
+    public static final String NAMESPACE_PREFIX_MAPPER_IMPL = "org.glassfish.jaxb.namespacePrefixMapper";
 
     /**
      * The GI-suite Data model schema version

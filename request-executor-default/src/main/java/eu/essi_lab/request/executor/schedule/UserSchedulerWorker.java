@@ -26,7 +26,7 @@ import java.io.FileOutputStream;
 import java.util.Date;
 import java.util.Optional;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.quartz.JobExecutionContext;
 
@@ -194,7 +194,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 
 		    GSLoggerFactory.getLogger(this.getClass()).info("Storing to {} STARTED", get);
 
-		    javax.ws.rs.core.StreamingOutput streamingOutput = response.readEntity(javax.ws.rs.core.StreamingOutput.class);
+		    jakarta.ws.rs.core.StreamingOutput streamingOutput = response.readEntity(jakarta.ws.rs.core.StreamingOutput.class);
 
 		    File tmpFile = File.createTempFile(UserSchedulerWorker.this.getClass().getSimpleName(), ".tmp");
 		    tmpFile.deleteOnExit();

@@ -43,13 +43,13 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import javax.xml.*;
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 
-import com.sun.xml.bind.*;
+import jakarta.xml.bind.*;
 import eu.essi_lab.lib.xml.*;
 import org.apache.commons.io.IOUtils;
 import org.ccil.cowan.tagsoup.Parser;

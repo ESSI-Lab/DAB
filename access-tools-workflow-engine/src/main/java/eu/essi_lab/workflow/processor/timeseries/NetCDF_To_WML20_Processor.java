@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import eu.essi_lab.jaxb.wml._2_0.*;
 import eu.essi_lab.jaxb.wml._2_0.MeasurementTimeseriesType.Point;

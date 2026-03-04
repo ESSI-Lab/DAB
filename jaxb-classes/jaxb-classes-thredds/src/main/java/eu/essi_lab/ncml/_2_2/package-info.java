@@ -5,7 +5,7 @@
 // Generated on: 2020.11.03 at 12:55:12 PM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package eu.essi_lab.ncml._2_2;
 
 /*-

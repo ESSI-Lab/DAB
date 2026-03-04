@@ -24,7 +24,7 @@ package eu.essi_lab.profiler.wfs.feature;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 import org.w3c.dom.Node;
 
