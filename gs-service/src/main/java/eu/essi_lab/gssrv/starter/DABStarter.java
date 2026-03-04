@@ -35,6 +35,7 @@ import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.patch.*;

@@ -50,6 +50,7 @@ import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
 import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.source.FileSource;
@@ -138,7 +139,12 @@ public class DefaultConfiguration extends Configuration {
 	/**
 	 * 
 	 */
-	RATE_LIMITER_SETTING("rateLimiterSettings");
+	RATE_LIMITER_SETTING("rateLimiterSettings"),
+
+	/**
+	 * 
+	 */
+	SESSION_COORDINATOR_SETTING("sessionCoordinatorSettings");
 
 	private final String label;
 
@@ -472,6 +478,16 @@ public class DefaultConfiguration extends Configuration {
 	rateLimiterSetting.setIdentifier(SingletonSettingsId.RATE_LIMITER_SETTING.getLabel());
 
 	put(rateLimiterSetting);
+
+	//
+	// --- Session coordinator settings ----
+	//
+
+	SessionCoordinatorSetting sessionCoordinatorSetting = new SessionCoordinatorSetting();
+
+	sessionCoordinatorSetting.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
+
+	put(sessionCoordinatorSetting);
     }
 
     /**

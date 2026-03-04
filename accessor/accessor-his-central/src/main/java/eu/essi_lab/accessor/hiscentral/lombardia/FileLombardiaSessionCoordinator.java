@@ -21,47 +21,13 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  * #L%
  */
 
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
-
 /**
- * @author boldrini
+ * Session coordinator for single-node: runs work directly with no queue or locking.
  */
-public class HISCentralLombardiaConnectorSetting extends HarvestedConnectorSetting {
-
-    /**
-     * 
-     */
-    public HISCentralLombardiaConnectorSetting() {
-
-    }
-
-    /**
-     * @param object
-     */
-    public HISCentralLombardiaConnectorSetting(JSONObject object) {
-
-	super(object);
-    }
-
-    /**
-     * @param object
-     */
-    public HISCentralLombardiaConnectorSetting(String object) {
-
-	super(object);
-    }
+public class FileLombardiaSessionCoordinator implements LombardiaSessionCoordinator {
 
     @Override
-    protected String initConnectorType() {
-
-	return HISCentralLombardiaConnector.TYPE;
-    }
-
-    @Override
-    protected String initSettingName() {
-
-	return "SIR Lombardia Connector settings";
+    public <T> T runWithExclusiveSession(HISCentralLombardiaClient client, SessionWork<T> work) throws Exception {
+	return work.run();
     }
 }

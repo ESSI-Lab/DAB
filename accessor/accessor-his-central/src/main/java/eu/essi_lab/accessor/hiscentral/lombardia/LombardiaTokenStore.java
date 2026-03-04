@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.lombardia;
 
+import java.io.IOException;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -21,47 +23,15 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  * #L%
  */
 
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
-
 /**
- * @author boldrini
+ * Abstraction for storing and retrieving the ARPA Lombardia session token.
+ * Implementations may use local file (single-node) or Redis (multi-node).
  */
-public class HISCentralLombardiaConnectorSetting extends HarvestedConnectorSetting {
+public interface LombardiaTokenStore {
 
-    /**
-     * 
-     */
-    public HISCentralLombardiaConnectorSetting() {
+    String readToken() throws IOException;
 
-    }
+    void writeToken(String token) throws IOException;
 
-    /**
-     * @param object
-     */
-    public HISCentralLombardiaConnectorSetting(JSONObject object) {
-
-	super(object);
-    }
-
-    /**
-     * @param object
-     */
-    public HISCentralLombardiaConnectorSetting(String object) {
-
-	super(object);
-    }
-
-    @Override
-    protected String initConnectorType() {
-
-	return HISCentralLombardiaConnector.TYPE;
-    }
-
-    @Override
-    protected String initSettingName() {
-
-	return "SIR Lombardia Connector settings";
-    }
+    void deleteToken(String token) throws IOException;
 }

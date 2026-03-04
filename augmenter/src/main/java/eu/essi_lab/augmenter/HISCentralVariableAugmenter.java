@@ -72,6 +72,15 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 		return Optional.of(resource);
 	    } else if (uri.get().contains("codes.wmo.int")) {
 		List<SKOSConcept> concepts = ontology.findConcepts(uri.get(), false, true);
+		if (concepts.isEmpty()) {
+		    if (uri.get().endsWith("ObservingMethodAtmosphere/82")) {
+			SKOSConcept concept = new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/65");
+			concepts.add(concept);
+		    }else if (uri.get().endsWith("ObservedVariableTerrestrial/629")) {
+			SKOSConcept concept = new SKOSConcept("http://his-central-ontology.geodab.eu/hydro-ontology/concept/9");
+			concepts.add(concept);
+		    }
+		}
 		if (!concepts.isEmpty()) {
 		    extensionHandler.clearObservedPropertyURI();
 		    extensionHandler.setObservedPropertyURI(concepts.get(0).getURI());
