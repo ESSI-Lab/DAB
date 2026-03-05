@@ -81,7 +81,6 @@ import java.util.*;
 public class GSConfigurationView extends ConfigurationView {
 
     static SettingLinkedList<SchedulerWorkerSetting> newWorkerSettingList;
-    static SettingLinkedList<SchedulerWorkerSetting> pausedWorkerSettingList;
     static SettingLinkedList<SchedulerWorkerSetting> rescheduledWorkerSettingList;
     static SettingLinkedList<SchedulerWorkerSetting> unscheduledWorkerSettingList;
     static SettingLinkedList<Setting> putSettingList;
@@ -336,9 +335,9 @@ public class GSConfigurationView extends ConfigurationView {
 
 	    if (!workerSetting.getScheduling().isEnabled()) {
 
-		GSLoggerFactory.getLogger(getClass()).info("Scheduling disabled, current scheduled worker will be paused");
+		GSLoggerFactory.getLogger(getClass()).info("Scheduling disabled, current scheduled worker will be unscheduled");
 
-		pausedWorkerSettingList.add(workerSetting);
+		unscheduledWorkerSettingList.add(workerSetting);
 
 		return;
 	    }
@@ -560,27 +559,6 @@ public class GSConfigurationView extends ConfigurationView {
 	    GSLoggerFactory.getLogger(getClass()).info("Rescheduling jobs ENDED");
 	}
 
-	if (!pausedWorkerSettingList.isEmpty()) {
-
-	    GSLoggerFactory.getLogger(getClass()).info("Pausing jobs STARTED");
-
-	    for (SchedulerWorkerSetting setting : pausedWorkerSettingList) {
-
-		try {
-
-		    scheduler.pause(setting);
-
-		} catch (SchedulerException e) {
-
-		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-
-		    NotificationDialog.getErrorDialog(e.getMessage(), e).open();
-		}
-	    }
-
-	    GSLoggerFactory.getLogger(getClass()).info("Pausing jobs ENDED");
-	}
-
 	if (!unscheduledWorkerSettingList.isEmpty()) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Unscheduling jobs STARTED");
@@ -611,7 +589,6 @@ public class GSConfigurationView extends ConfigurationView {
 	// GSLoggerFactory.getLogger(getClass()).debug("Initializing settings list");
 
 	newWorkerSettingList = new SettingLinkedList<>();
-	pausedWorkerSettingList = new SettingLinkedList<>();
 	rescheduledWorkerSettingList = new SettingLinkedList<>();
 	unscheduledWorkerSettingList = new SettingLinkedList<>();
 
