@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.lombardia;
 
+import eu.essi_lab.session.SessionCoordinator;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -22,12 +24,8 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  */
 
 /**
- * Coordinates exclusive access to the single ARPA Lombardia session.
- * <ul>
- * <li>File strategy: no cross-node coordination; runnable is executed directly.</li>
- * <li>Jedis strategy: nodes enter a queue, send heartbeats; first in queue runs after current
- * holder finishes or is considered dead (no heartbeat for 30s).</li>
- * </ul>
+ * Lombardia-specific session coordinator. Extends the generic {@link SessionCoordinator} with a
+ * convenience method that takes the Lombardia client directly.
  */
 public interface LombardiaSessionCoordinator {
 
@@ -35,7 +33,8 @@ public interface LombardiaSessionCoordinator {
      * Work that runs under exclusive session; may throw Exception.
      */
     @FunctionalInterface
-    interface SessionWork<T> {
+    interface SessionWork<T> extends SessionCoordinator.SessionWork<T> {
+	@Override
 	T run() throws Exception;
     }
 
@@ -45,7 +44,7 @@ public interface LombardiaSessionCoordinator {
      * such run executes at a time (cluster-wide when using Jedis).
      *
      * @param client the Lombardia client (used by Jedis coordinator to logout a dead node's token)
-     * @param work the work to run under the session (login → ... → logout)
+     * @param work  the work to run under the session (login → ... → logout)
      * @return the value returned by the work
      * @throws Exception if coordination or work fails
      */

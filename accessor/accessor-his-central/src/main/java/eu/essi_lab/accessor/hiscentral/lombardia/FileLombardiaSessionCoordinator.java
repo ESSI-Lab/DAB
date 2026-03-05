@@ -1,5 +1,7 @@
 package eu.essi_lab.accessor.hiscentral.lombardia;
 
+import eu.essi_lab.session.FileSessionCoordinator;
+
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -22,12 +24,18 @@ package eu.essi_lab.accessor.hiscentral.lombardia;
  */
 
 /**
- * Session coordinator for single-node: runs work directly with no queue or locking.
+ * Lombardia session coordinator for single-node: delegates to {@link FileSessionCoordinator}.
  */
 public class FileLombardiaSessionCoordinator implements LombardiaSessionCoordinator {
 
+    private final FileSessionCoordinator delegate = new FileSessionCoordinator();
+
     @Override
     public <T> T runWithExclusiveSession(HISCentralLombardiaClient client, SessionWork<T> work) throws Exception {
-	return work.run();
+	return delegate.runWithExclusiveSession(token -> {
+	    if (token != null) {
+		client.logoutWithToken(token);
+	    }
+	}, work);
     }
 }

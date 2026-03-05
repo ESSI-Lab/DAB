@@ -36,21 +36,26 @@ li { padding: 0.25em 0; }
 				String host = parts.length > 0 ? parts[0].trim() : "localhost";
 				int port = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 6379;
 
+				String namespace = setting.getNamespace();
+				String keyActive = namespace + ":active";
+				String keyQueue = namespace + ":queue";
+				String keyAlivePrefix = namespace + ":alive:";
+
 				JedisPool pool = new JedisPool(new JedisPoolConfig(), host, port);
 				try {
 					try (Jedis jedis = pool.getResource()) {
 						jedis.ping();
-						String activeNodeId = jedis.get("arpa-lombardia:active");
-						List<String> queue = jedis.lrange("arpa-lombardia:queue", 0, -1);
+						String activeNodeId = jedis.get(keyActive);
+						List<String> queue = jedis.lrange(keyQueue, 0, -1);
 
-						out.println("<p>Redis: " + host + ":" + port + "</p>");
+						out.println("<p>Redis: " + host + ":" + port + " &bull; Namespace: " + namespace + "</p>");
 
 						out.println("<div class='section active'>");
 						out.println("<h2>Active node</h2>");
 						if (activeNodeId == null || activeNodeId.isEmpty()) {
 							out.println("<p>None</p>");
 						} else {
-							Long ttl = jedis.ttl("arpa-lombardia:alive:" + activeNodeId);
+							Long ttl = jedis.ttl(keyAlivePrefix + activeNodeId);
 							boolean alive = ttl != null && ttl > 0;
 							out.println("<p><b>" + activeNodeId + "</b> " + (alive ? "(alive, TTL " + ttl + "s)" : "<span class='error'>DEAD</span>") + "</p>");
 						}
@@ -64,7 +69,7 @@ li { padding: 0.25em 0; }
 							out.println("<ul>");
 							for (int i = 0; i < queue.size(); i++) {
 								String nodeId = queue.get(i);
-								Long ttl = jedis.ttl("arpa-lombardia:alive:" + nodeId);
+								Long ttl = jedis.ttl(keyAlivePrefix + nodeId);
 								boolean alive = ttl != null && ttl > 0;
 								String pos = (i == 0) ? " (first)" : "";
 								out.println("<li>" + (i + 1) + ". " + nodeId + pos + " " + (alive ? "(alive, TTL " + ttl + "s)" : "<span class='error'>DEAD</span>") + "</li>");

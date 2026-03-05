@@ -1,8 +1,6 @@
 package eu.essi_lab.accessor.hiscentral.lombardia;
 
-import java.io.IOException;
-
-import redis.clients.jedis.Jedis;
+import eu.essi_lab.session.RedisTokenStore;
 import redis.clients.jedis.JedisPool;
 
 /*-
@@ -27,43 +25,22 @@ import redis.clients.jedis.JedisPool;
  */
 
 /**
- * Token store using Redis. Shared across nodes so only one session token exists cluster-wide.
+ * Lombardia token store using Redis. Delegates to {@link RedisTokenStore}.
  */
-public class RedisLombardiaTokenStore implements LombardiaTokenStore {
+public class RedisLombardiaTokenStore extends RedisTokenStore implements LombardiaTokenStore {
 
-    private static final String KEY_TOKEN = "arpa-lombardia:token";
-
-    private final JedisPool pool;
-
+    /**
+     * Uses default namespace {@value JedisLombardiaSessionCoordinator#NAMESPACE}.
+     */
     public RedisLombardiaTokenStore(JedisPool pool) {
-	this.pool = pool;
+	this(JedisLombardiaSessionCoordinator.NAMESPACE, pool);
     }
 
-    @Override
-    public String readToken() throws IOException {
-	try (Jedis jedis = pool.getResource()) {
-	    return jedis.get(KEY_TOKEN);
-	} catch (Exception e) {
-	    throw new IOException("Redis read token failed", e);
-	}
-    }
-
-    @Override
-    public void writeToken(String token) throws IOException {
-	try (Jedis jedis = pool.getResource()) {
-	    jedis.set(KEY_TOKEN, token);
-	} catch (Exception e) {
-	    throw new IOException("Redis write token failed", e);
-	}
-    }
-
-    @Override
-    public void deleteToken(String token) throws IOException {
-	try (Jedis jedis = pool.getResource()) {
-	    jedis.del(KEY_TOKEN);
-	} catch (Exception e) {
-	    throw new IOException("Redis delete token failed", e);
-	}
+    /**
+     * @param namespace identifier for Redis keys (e.g. arpa-lombardia, arpa-marche)
+     * @param pool      Redis connection pool
+     */
+    public RedisLombardiaTokenStore(String namespace, JedisPool pool) {
+	super(namespace, pool);
     }
 }
-

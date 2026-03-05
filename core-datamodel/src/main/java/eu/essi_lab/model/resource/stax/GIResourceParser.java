@@ -267,6 +267,7 @@ public class GIResourceParser extends StAXDocumentParser {
     public String east = "";
     public String north = "";
     public String south = "";
+    public String altitude = "";
     public List<String> oranizationNames = new ArrayList<String>();
     public List<String> oranizationRoles = new ArrayList<String>();
     public List<String> organizationURIs = new ArrayList<String>();
@@ -330,6 +331,10 @@ public class GIResourceParser extends StAXDocumentParser {
     private String distributionName = "";
     private String graphicOverview = "";
 
+    public String getAltitude() {
+	return altitude;
+    }
+
     public String getDistributionName() {
 	return distributionName;
     }
@@ -339,6 +344,7 @@ public class GIResourceParser extends StAXDocumentParser {
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.IDENTIFIER.getName()), v -> fileIdentifier = normalize(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, ResourceProperty.SOURCE_ID_NAME), v -> sourceId = normalize(v));
 
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Altitude"), v -> altitude = normalize(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "west"), v -> west = normalize(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "south"), v -> south = normalize(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "east"), v -> east = normalize(v));
@@ -462,5 +468,6 @@ public class GIResourceParser extends StAXDocumentParser {
     public String getGraphicOverview() {
 	return graphicOverview;
     }
+
 
 }

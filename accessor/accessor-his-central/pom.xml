@@ -19,12 +19,10 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-		<!-- Optional: for Redis-based session coordination when running on multiple nodes -->
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
 			<version>${redis.clients-jedis.version}</version>
-			<optional>true</optional>
 		</dependency>
 
 		<!-- Test -->

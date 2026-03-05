@@ -1,12 +1,6 @@
 package eu.essi_lab.accessor.hiscentral.lombardia;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import eu.essi_lab.session.FileTokenStore;
 
 /*-
  * #%L
@@ -30,45 +24,12 @@ import java.nio.charset.StandardCharsets;
  */
 
 /**
- * Token store using a file in the system temp directory. Suitable for single-node only.
+ * Lombardia token store using a file in the system temp directory. Delegates to
+ * {@link FileTokenStore} with namespace {@value JedisLombardiaSessionCoordinator#NAMESPACE}.
  */
-public class FileLombardiaTokenStore implements LombardiaTokenStore {
+public class FileLombardiaTokenStore extends FileTokenStore implements LombardiaTokenStore {
 
-    private static final String TOKEN_FILE = "arpa-lombardia.token";
-
-    @Override
-    public synchronized String readToken() throws IOException {
-	String tmpdir = System.getProperty("java.io.tmpdir");
-	File file = new File(tmpdir, TOKEN_FILE);
-	if (!file.exists()) {
-	    return null;
-	}
-	try (FileInputStream fis = new FileInputStream(file);
-		InputStreamReader reader = new InputStreamReader(fis);
-		BufferedReader br = new BufferedReader(reader)) {
-	    return br.readLine();
-	}
-    }
-
-    @Override
-    public synchronized void writeToken(String token) throws IOException {
-	String tmpdir = System.getProperty("java.io.tmpdir");
-	File file = new File(tmpdir, TOKEN_FILE);
-	if (file.exists()) {
-	    file.delete();
-	}
-	file.createNewFile();
-	try (FileOutputStream fos = new FileOutputStream(file)) {
-	    fos.write(token.getBytes(StandardCharsets.UTF_8));
-	}
-    }
-
-    @Override
-    public synchronized void deleteToken(String token) throws IOException {
-	String tmpdir = System.getProperty("java.io.tmpdir");
-	File file = new File(tmpdir, TOKEN_FILE);
-	if (file.exists()) {
-	    file.delete();
-	}
+    public FileLombardiaTokenStore() {
+	super(JedisLombardiaSessionCoordinator.NAMESPACE);
     }
 }

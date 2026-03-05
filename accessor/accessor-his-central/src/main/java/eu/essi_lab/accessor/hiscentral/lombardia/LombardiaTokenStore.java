@@ -1,6 +1,6 @@
 package eu.essi_lab.accessor.hiscentral.lombardia;
 
-import java.io.IOException;
+import eu.essi_lab.session.TokenStore;
 
 /*-
  * #%L
@@ -24,14 +24,7 @@ import java.io.IOException;
  */
 
 /**
- * Abstraction for storing and retrieving the ARPA Lombardia session token.
- * Implementations may use local file (single-node) or Redis (multi-node).
+ * Lombardia-specific token store. Extends the generic {@link TokenStore}.
  */
-public interface LombardiaTokenStore {
-
-    String readToken() throws IOException;
-
-    void writeToken(String token) throws IOException;
-
-    void deleteToken(String token) throws IOException;
+public interface LombardiaTokenStore extends TokenStore {
 }

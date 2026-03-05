@@ -42,6 +42,7 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 public class SessionCoordinatorSetting extends Setting implements EditableSetting {
 
     private static final String DISTRIBUTED_SESSION_COORDINATOR_OPTION_KEY = "distributedSessionCoordinator";
+    private static final String NAMESPACE_OPTION_KEY = "namespace";
     private static final String REDIS_ENDPOINT_OPTION_KEY = "redisEndpoint";
     private static final String REDIS_USERNAME_OPTION_KEY = "redisUsername";
     private static final String REDIS_PASSWORD_OPTION_KEY = "redisPassword";
@@ -70,6 +71,15 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		build();
 
 	addOption(distributedOption);
+
+	Option<String> namespaceOption = StringOptionBuilder.get().//
+		withKey(NAMESPACE_OPTION_KEY).//
+		withLabel("Namespace (e.g. lombardia, marche)").//
+		withValue("arpa-lombardia").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(namespaceOption);
 
 	Option<String> endpointOption = StringOptionBuilder.get().//
 		withKey(REDIS_ENDPOINT_OPTION_KEY).//
@@ -122,6 +132,15 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 
     public void setDistributedSessionCoordinator(boolean value) {
 	getOption(DISTRIBUTED_SESSION_COORDINATOR_OPTION_KEY, BooleanChoice.class).get().select(v -> v == BooleanChoice.fromBoolean(value));
+    }
+
+    public String getNamespace() {
+	String v = getOption(NAMESPACE_OPTION_KEY, String.class).get().getValue();
+	return (v == null || v.isEmpty()) ? "arpa-lombardia" : v.trim();
+    }
+
+    public void setNamespace(String namespace) {
+	getOption(NAMESPACE_OPTION_KEY, String.class).get().setValue(namespace != null ? namespace : "arpa-lombardia");
     }
 
     public String getRedisEndpoint() {

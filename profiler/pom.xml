@@ -29,6 +29,7 @@
 		<module>profiler-wps</module>
 		<module>profiler-wfs</module>
 		<module>profiler-rest</module>
+		<module>profiler-sta</module>
 		<module>profiler-rest-views</module>
 		<module>profiler-arpa-rest</module>
 		<module>profiler-observations</module>
