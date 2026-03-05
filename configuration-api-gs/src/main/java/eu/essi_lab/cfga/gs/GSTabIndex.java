@@ -6,10 +6,15 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.check.scheme.SchemeItem;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.dc_connector.*;
 import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
-import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
-import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting;
+import eu.essi_lab.cfga.gs.setting.driver.*;
+import eu.essi_lab.cfga.gs.setting.oauth.*;
+import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.TabIndex;
 
@@ -23,12 +28,12 @@ import eu.essi_lab.cfga.gui.TabIndex;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -38,47 +43,41 @@ import eu.essi_lab.cfga.gui.TabIndex;
  * @author Fabrizio
  */
 public enum GSTabIndex implements TabIndex {
-    /**
-     *
-     */
-    BROKERING(0, false,//
-	    Descriptor.of(s -> s.getSettingClass().getSimpleName().equals("HarvestingSettingImpl")),//
-	    Descriptor.of(s -> s.getSettingClass().equals(DistributionSetting.class)),//
-	    Descriptor.of(s -> s.getSettingClass().getSuperclass().equals(ProfilerSetting.class)),//
-	    Descriptor.of(s -> s.getSettingClass().getSuperclass().getSuperclass().equals(ProfilerSetting.class))//
-    ),
 
     /**
      *
      */
-    SOURCES(1, false,//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_PRIORITY_SETTING.getLabel())),//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SOURCE_STORAGE_SETTING.getLabel())),//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel()))//
-    ),
+    BROKERING(0, Descriptor.of(SourcePrioritySetting.class)),
 
     /**
      *
      */
-    AUGMENTERS(2, true, Descriptor.of(s -> s.getSettingClass().getSimpleName().equals("AugmenterWorkerSettingImpl"))),
+    SOURCES(1, Descriptor.of(SourceStorageSetting.class), Descriptor.of(GDCSourcesSetting.class)),
 
     /**
      *
      */
-    CUSTOM_TASKS(3, true, Descriptor.of(s -> s.getSettingClass().equals(CustomTaskSetting.class))),
+    AUGMENTERS(2),
 
     /**
      *
      */
-    AUTHORIZATION(4, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.OAUTH_SETTING.getLabel()))),
+    CUSTOM_TASKS(3),
+
     /**
      *
      */
-    CREDENTIALS(5, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.CREDENTIALS_SETTING.getLabel()))),
-     /**
+    AUTHORIZATION(4,
+	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.OAUTH_SETTING.getLabel()), KeycloakProviderSetting::new)),
+    /**
      *
      */
-    DATA_CACHE(6, true, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()))),
+    CREDENTIALS(5, Descriptor.of(CredentialsSetting.class)),
+    /**
+     *
+     */
+    DATA_CACHE(6, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()),
+	    DataCacheConnectorSettingLoader::load)),
 
     /**
      *
@@ -92,19 +91,20 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    SEMANTICS(9, false, Descriptor.of(s -> s.getSettingClass().equals(OntologySetting.class))),
+    SEMANTICS(9, Descriptor.of(DefaultSemanticSearchSetting.class)), //
 
     /**
      *
      */
-    SYSTEM(10, false,//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SYSTEM_SETTING.getLabel())),//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATABASE_SETTING.getLabel())),//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SCHEDULER_SETTING.getLabel())),//
-	    Descriptor.of(s -> s.getSettingClass().getSuperclass().equals(DriverSetting.class)),//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DOWNLOAD_SETTING.getLabel())),//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel())),//
-	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.RATE_LIMITER_SETTING.getLabel()))//
+    SYSTEM(10,//
+	    Descriptor.of(SystemSetting.class),//
+	    Descriptor.of(DatabaseSetting.class),//
+	    Descriptor.of(SchedulerViewSetting.class),//
+	    Descriptor.of(SharedCacheDriverSetting.class),//
+	    Descriptor.of(SharedPersistentDriverSetting.class),//
+	    Descriptor.of(DownloadSetting.class),//
+	    Descriptor.of(RateLimiterSetting.class), //
+	    Descriptor.of(SessionCoordinatorSetting.class) //
     ),
 
     /**
@@ -113,7 +113,6 @@ public enum GSTabIndex implements TabIndex {
     ABOUT(11);
 
     private final int index;
-    private final boolean required;
     private final List<Descriptor> descriptors;
 
     /**
@@ -121,10 +120,9 @@ public enum GSTabIndex implements TabIndex {
      * @param required
      * @param descriptors
      */
-    GSTabIndex(int index, boolean required, Descriptor... descriptors) {
+    GSTabIndex(int index, Descriptor... descriptors) {
 
 	this.index = index;
-	this.required = required;
 	this.descriptors = Arrays.asList(descriptors);
     }
 
@@ -134,7 +132,6 @@ public enum GSTabIndex implements TabIndex {
     GSTabIndex(int index) {
 
 	this.index = index;
-	this.required = false;
 	this.descriptors = List.of();
     }
 
@@ -144,12 +141,6 @@ public enum GSTabIndex implements TabIndex {
     public int getIndex() {
 
 	return index;
-    }
-
-    @Override
-    public boolean required() {
-
-	return this.required;
     }
 
     @Override

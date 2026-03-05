@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.check.scheme;
 
@@ -13,12 +13,12 @@ package eu.essi_lab.cfga.check.scheme;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -47,26 +47,23 @@ public class SchemeMethod implements CheckMethod {
     public enum CheckMode {
 
 	/**
-	 * This check fails if the given {@link Configuration} do not contains one or more required
-	 * {@link SchemeItem}.<br>
-	 * If this check fail, the settings returned in the {@link CheckResponse#getSettings()} must be added to the
-	 * configuration
+	 * This check fails if the given {@link Configuration} do not contains one or more required {@link SchemeItem}.<br> If this check
+	 * fail, the settings returned in the {@link CheckResponse#getSettings()} must be added to the configuration
 	 */
 	MISSING_SETTINGS,
 
 	/**
-	 * This check fails if the given {@link Configuration} contains one or more redundant {@link SchemeItem}.<br>
-	 * If this check fail, the settings returned in the {@link CheckResponse#getSettings()} must be removed from the
-	 * configuration
+	 * This check fails if the given {@link Configuration} contains one or more redundant {@link SchemeItem}.<br> If this check fail,
+	 * the settings returned in the {@link CheckResponse#getSettings()} must be removed from the configuration
 	 */
 	REDUNDANT_SETTINGS,
     }
 
     private CheckMode checkMode;
-    private List<? extends SchemeItem> descriptors;
+    private List<? extends SchemeItem> items;
 
     /**
-     * 
+     *
      */
     public SchemeMethod() {
 
@@ -78,7 +75,7 @@ public class SchemeMethod implements CheckMethod {
      */
     public void setItems(List<? extends SchemeItem> items) {
 
-	this.descriptors = items;
+	this.items = items;
     }
 
     /**
@@ -86,7 +83,7 @@ public class SchemeMethod implements CheckMethod {
      */
     public void setScheme(Scheme scheme) {
 
-	this.descriptors = scheme.getItems();
+	this.items = scheme.getItems();
     }
 
     /**
@@ -106,64 +103,57 @@ public class SchemeMethod implements CheckMethod {
 
 	List<Setting> outSettings = new ArrayList<>();
 
-	List<SchemeItem> required = descriptors.//
-		stream().//
-		filter(d -> d.required() && !d.getDescriptors().isEmpty()).//
-		collect(Collectors.toList());
-
 	switch (checkMode) {
 
 	case MISSING_SETTINGS -> {
 
-	    for (SchemeItem item : required) {
+	    for (SchemeItem item : items) {
 
-		List<Function<Setting, Boolean>> functions = item.getDescriptors().//
+		boolean missing = item.getDescriptors().//
 			stream().//
+			filter(SchemeItem.Descriptor::isSingleton).//
 			map(SchemeItem.Descriptor::describe).//
-			toList();
-
-		boolean missing = configuration.list().//
-			stream().//
-			filter(s -> functions.stream().noneMatch(f -> f.apply(s))).//
-			count() <= configuration.size();
+			anyMatch(func -> configuration.list().stream().noneMatch(func::apply));//
 
 		if (missing) {
 
-		    item.getDescriptors().stream().//
+		    item.getDescriptors().
+			    stream().//
+			    filter(SchemeItem.Descriptor::isSingleton).//
 			    filter(d -> configuration.list().stream().noneMatch(s -> d.describe().apply(s))).//
 			    forEach(d -> {
 
-				Setting setting = d.create().get().get();
+			Setting setting = d.create().get();
 
-				outSettings.add(setting);
-				response.getMessages().add("Detected missing setting: " + setting.getName());
-			    });
+			outSettings.add(setting);
+			response.getMessages().add("Detected missing setting: " + setting.getName());
+		    });
 		}
 	    }
 	}
 
 	case REDUNDANT_SETTINGS -> {
 
-	    for (Setting setting : configuration.list()) {
-
-		boolean optionalSetting = descriptors.//
-			stream().//
-			filter(d -> !d.required() && !d.getDescriptors().isEmpty()).//
-			anyMatch(i -> i.getDescriptors().stream().anyMatch(d -> d.describe().apply(setting)));
-
-		if (!optionalSetting) {
-
-		    boolean redundant = required.stream().//
-			    filter(i -> i.getDescriptors().stream().noneMatch(d -> d.describe().apply(setting))).//
-			    count() == required.size();
-
-		    if (redundant) {
-
-			outSettings.add(setting);
-			response.getMessages().add("Detected redundant setting: " + setting.getName());
-		    }
-		}
-	    }
+	    //	    for (Setting setting : configuration.list()) {
+	    //
+	    //		boolean optionalSetting = items.//
+	    //			stream().//
+	    //			filter(d -> !d.required() && !d.getDescriptors().isEmpty()).//
+	    //			anyMatch(i -> i.getDescriptors().stream().anyMatch(d -> d.describe().apply(setting)));
+	    //
+	    //		if (!optionalSetting) {
+	    //
+	    //		    boolean redundant = required.stream().//
+	    //			    filter(i -> i.getDescriptors().stream().noneMatch(d -> d.describe().apply(setting))).//
+	    //			    count() == required.size();
+	    //
+	    //		    if (redundant) {
+	    //
+	    //			outSettings.add(setting);
+	    //			response.getMessages().add("Detected redundant setting: " + setting.getName());
+	    //		    }
+	    //		}
+	    //	    }
 	}
 	}
 

@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs;
 
@@ -13,49 +13,36 @@ package eu.essi_lab.cfga.gs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.concurrent.TimeUnit;
-
-import eu.essi_lab.cfga.ConfigurableLoader;
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationSource;
-import eu.essi_lab.cfga.SelectionUtils;
-import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
-import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
-import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSettingLoader;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSettingLoader;
-import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
-import eu.essi_lab.cfga.gs.setting.driver.DriverSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
-import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.accessor.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.dc_connector.*;
+import eu.essi_lab.cfga.gs.setting.distribution.*;
+import eu.essi_lab.cfga.gs.setting.driver.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.oauth.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
-import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
-import eu.essi_lab.cfga.source.FileSource;
-import eu.essi_lab.lib.utils.LabeledEnum;
-import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.source.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.shared.SharedContent.*;
+
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -68,66 +55,66 @@ public class DefaultConfiguration extends Configuration {
     public enum SingletonSettingsId implements LabeledEnum {
 
 	/**
-	 * 
+	 *
 	 */
 	DATABASE_SETTING("database"),
 
 	/**
-	 * 
+	 *
 	 */
 	SHARED_CACHE_REPO_SETTING("sharedCacheRepo"),
 
 	/**
-	 * 
+	 *
 	 */
 	SHARED_PERSISTENT_REPO_SETTING("sharedPersistentRepo"),
 
 	/**
-	 * 
+	 *
 	 */
 	SCHEDULER_SETTING("scheduler"),
 
 	/**
-	 * 
+	 *
 	 */
 	OAUTH_SETTING("oauthSettings"),
 
 	/**
-	 * 
+	 *
 	 */
 	SYSTEM_SETTING("systemSettings"),
 
 	/**
-	 * 
+	 *
 	 */
 	CUSTOM_TASK_SETTING("customTaskSettings"),
 
 	/**
-	 * 
+	 *
 	 */
 	SOURCE_STORAGE_SETTING("sourceStorageSettings"),
 
 	/**
-	 * 
+	 *
 	 */
 	CREDENTIALS_SETTING("credentialsSettings"),
 
 	/**
-	 * 
+	 *
 	 */
 	SOURCE_PRIORITY_SETTING("sourcePrioritySettings"),
 	/**
-	 * 
+	 *
 	 */
 	GDC_SOURCES_SETTING("gdcSourceSettings"), //
 
 	/**
-	 * 
+	 *
 	 */
 	DATA_CACHE_CONNECTOR_SETTING("dataCacheConnectorSettings"), //
 
 	/**
-	 * 
+	 *
 	 */
 	DOWNLOAD_SETTING("downloadSettings"),
 
@@ -137,12 +124,12 @@ public class DefaultConfiguration extends Configuration {
 	DEFAULT_SEMANTIC_SEARCH_SETTING("defSemanticSearch"),
 
 	/**
-	 * 
+	 *
 	 */
 	RATE_LIMITER_SETTING("rateLimiterSettings"),
 
 	/**
-	 * 
+	 *
 	 */
 	SESSION_COORDINATOR_SETTING("sessionCoordinatorSettings");
 
@@ -181,7 +168,7 @@ public class DefaultConfiguration extends Configuration {
 
     /**
      * Uses {@link FileSource#ConfigurationFilesSource(String)}
-     * 
+     *
      * @param configName
      * @throws Exception
      */
@@ -193,7 +180,7 @@ public class DefaultConfiguration extends Configuration {
 
     /**
      * Uses {@link FileSource#ConfigurationFilesSource(String)}
-     * 
+     *
      * @param configName
      * @param unit
      * @param interval
@@ -228,15 +215,9 @@ public class DefaultConfiguration extends Configuration {
     }
 
     /**
-     * 
+     *
      */
     protected void init() {
-
-	//
-	// setting the scheme
-	//
-
-	setScheme(new DefaultConfigurationScheme());
 
 	//
 	// --- Profilers ---
@@ -491,7 +472,7 @@ public class DefaultConfiguration extends Configuration {
     }
 
     /**
-     * 
+     *
      */
     public void clean() {
 

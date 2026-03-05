@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.check.scheme;
 
@@ -13,23 +13,21 @@ package eu.essi_lab.cfga.check.scheme;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import eu.essi_lab.cfga.setting.*;
 
-import eu.essi_lab.cfga.setting.Setting;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * @author Fabrizio
@@ -39,18 +37,19 @@ public interface SchemeItem {
     /**
      * @author Fabrizio
      */
-    public static class Descriptor {
+    class Descriptor {
 
 	private final Function<Setting, Boolean> descriptor;
 	private final Supplier<Setting> creator;
+	private final boolean singleton;
 
 	/**
-	 * @param descriptor
+	 * @param clazz
 	 * @return
 	 */
-	public static Descriptor of(Function<Setting, Boolean> descriptor) {
+	public static Descriptor of(Class<? extends Setting> clazz) {
 
-	    return new Descriptor(descriptor, null);
+	    return new Descriptor((s) -> s.getSettingClass().equals(clazz), () -> SettingUtils.create(clazz), true);
 	}
 
 	/**
@@ -60,7 +59,7 @@ public interface SchemeItem {
 	 */
 	public static Descriptor of(Function<Setting, Boolean> descriptor, Supplier<Setting> creator) {
 
-	    return new Descriptor(descriptor, creator);
+	    return new Descriptor(descriptor, creator, true);
 	}
 
 	/**
@@ -74,36 +73,36 @@ public interface SchemeItem {
 	/**
 	 * @return
 	 */
-	public Optional<Supplier<Setting>> create() {
+	public Supplier<Setting> create() {
 
-	    return Optional.ofNullable(creator);
+	    return creator;
 	}
 
 	/**
 	 * @param descriptor
-	 * @param clazz
+	 * @param supplier
+	 * @param singleton
 	 */
-	private Descriptor(Function<Setting, Boolean> descriptor, Supplier<Setting> supplier) {
+	private Descriptor(Function<Setting, Boolean> descriptor, Supplier<Setting> supplier, boolean singleton) {
 
 	    this.descriptor = descriptor;
 	    this.creator = supplier;
-
+	    this.singleton = singleton;
 	}
 
+	/**
+	 * @return
+	 */
+	public boolean isSingleton() {
+
+	    return singleton;
+	}
     }
 
     /**
-     * Returns <code>true</code> if this item has always at least one instance of the described {@link Setting}
-     * 
-     * @see #getDescriptors()
+     * Returns a list of {@link Descriptor}s which describe and create the {@link Setting}/s of this item
+     *
      * @return
      */
-    public boolean required();
-
-    /**
-     * Returns a list of {@link Descriptor}s which describe the {@link Setting}/s of this item
-     * 
-     * @return
-     */
-    public List<Descriptor> getDescriptors();
+    List<Descriptor> getDescriptors();
 }
