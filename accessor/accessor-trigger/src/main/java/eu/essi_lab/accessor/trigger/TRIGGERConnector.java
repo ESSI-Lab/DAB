@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -632,7 +633,9 @@ public class TRIGGERConnector extends HarvestedQueryConnector<TRIGGERConnectorSe
 
 	try {
 
-	    HttpResponse<InputStream> triggerResponse = new Downloader().downloadResponse(//
+	    Downloader downloader = new Downloader();
+	    downloader.setConnectionTimeout(TimeUnit.SECONDS, 120);
+	    HttpResponse<InputStream> triggerResponse =downloader.downloadResponse(//
 		    url.trim(), //
 		    HttpHeaderUtils.build("token", TRIGGER_TOKEN));
 

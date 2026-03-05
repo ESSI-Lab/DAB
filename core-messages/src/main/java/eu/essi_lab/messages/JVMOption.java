@@ -124,7 +124,13 @@ public enum JVMOption {
     /**
      * - Integer
      */
-    ANONYMOUS_PAGE_SIZE_LIMIT("pageSizeLimit", "Maximum page size granted to the anonymous user: ", 200);
+    ANONYMOUS_PAGE_SIZE_LIMIT("pageSizeLimit", "Maximum page size granted to the anonymous user: ", 200),
+
+
+    /**
+     * - Integer
+     */
+    JETTY_LAUNCHER_PORT("jettyLauncherPort", "Jetty launcher port: ", 9090);
 
     /**
      *

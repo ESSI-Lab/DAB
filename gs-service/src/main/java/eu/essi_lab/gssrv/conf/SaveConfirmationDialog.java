@@ -125,16 +125,6 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    GSConfigurationView.newWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
-	if (!GSConfigurationView.pausedWorkerSettingList.isEmpty()) {
-
-	    Span label = ComponentFactory.createSpan("Paused/disabled scheduled jobs", 15);
-	    label.getStyle().set("font-weight", "bold");
-
-	    verticalLayout.add(label);
-
-	    GSConfigurationView.pausedWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
-	}
-
 	if (!GSConfigurationView.rescheduledWorkerSettingList.isEmpty()) {
 
 	    Span label = ComponentFactory.createSpan("Rescheduled/enabled jobs", 15);

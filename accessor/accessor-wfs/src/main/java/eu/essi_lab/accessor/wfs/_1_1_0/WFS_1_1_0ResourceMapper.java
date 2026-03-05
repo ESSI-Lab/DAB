@@ -398,7 +398,7 @@ public class WFS_1_1_0ResourceMapper extends OriginalIdentifierMapper {
 
 	    Optional<Integer> integer = HttpConnectionUtils.getOptionalResponseCode(href);
 	    if (integer.isPresent()) {
-		String status = "" + integer;
+		String status = "" + integer.get();
 		// in case of client error, such as 404 not found
 		// we try to recover using the source endpoint
 		if (status.startsWith("4")) {
