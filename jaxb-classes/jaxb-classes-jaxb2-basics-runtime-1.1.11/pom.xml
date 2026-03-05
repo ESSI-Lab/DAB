@@ -11,7 +11,7 @@
     <artifactId>jaxb-classes-jaxb2-basics-runtime-1.1.11</artifactId>
 
     <description>ESSI-Lab JAXB Classes for jaxb2-basics-runtime with Jakarta namespace</description>
-    <name>ESSI-Lab JAXB Classes for jaxb2-basics-runtime with Jakarta namespace</name>
+    <name>ESSI-Lab JAXB Classes for jaxb2-basics-runtime</name>
 
     <dependencies>
 

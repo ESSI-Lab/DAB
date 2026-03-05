@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,6 +28,7 @@ import eu.essi_lab.authorization.xacml.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
 import eu.essi_lab.cfga.check.CheckResponse.*;
+import eu.essi_lab.cfga.check.scheme.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.*;
 import eu.essi_lab.cfga.gs.demo.*;
@@ -68,6 +69,7 @@ import org.quartz.*;
 
 import jakarta.ws.rs.ext.*;
 import jakarta.xml.bind.*;
+
 import java.io.*;
 import java.security.KeyStore;
 import java.security.MessageDigest;
@@ -140,11 +142,40 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check STARTED");
 
+	    // ---------------------------------
+	    //
+	    // - SchemeCheckMethod
+	    //
+
+	    SchemeMethod schemeCheckMethod = new SchemeMethod();
+
+	    schemeCheckMethod.setScheme(new DefaultConfigurationScheme());
+
+	    schemeCheckMethod.setCheckMode(SchemeMethod.CheckMode.MISSING_SETTINGS);
+
+	    CheckResponse missingResponse = schemeCheckMethod.check(configuration);
+
+	    missingResponse.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
+
+	    schemeCheckMethod.setCheckMode(SchemeMethod.CheckMode.REDUNDANT_SETTINGS);
+
+	    CheckResponse redundantRespone = schemeCheckMethod.check(configuration);
+
+	    redundantRespone.getMessages().forEach(msg -> GSLoggerFactory.getLogger(getClass()).warn(msg));
+
+	    // ---------------------------------
+	    //
+	    // - Other checks
+	    //
+
 	    CheckResponse similarityCheckResponse = checkConfig();
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Configuration check ENDED");
 
-	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
+	    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED || //
+		    missingResponse.getCheckResult() == CheckResult.CHECK_FAILED || //
+		    redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED //
+	    ) {
 
 		switch (mode) {
 		case CONFIGURATION:
@@ -154,6 +185,24 @@ public class DABStarter implements ConfigurationChangeListener {
 		    GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Configuration fix STARTED");
 
 		    ConfigurationUtils.backup(configuration);
+
+		    if (redundantRespone.getCheckResult() == CheckResult.CHECK_FAILED) {
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings STARTED");
+
+			redundantRespone.getSettings().forEach(setting -> configuration.remove(setting.getIdentifier()));
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Removing redundant settings ENDED");
+		    }
+
+		    if (missingResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings STARTED");
+
+			missingResponse.getSettings().forEach(setting -> configuration.put(setting));
+
+			GSLoggerFactory.getLogger(ConfigurationUtils.class).warn("Adding missing settings ENDED");
+		    }
 
 		    if (similarityCheckResponse.getCheckResult() == CheckResult.CHECK_FAILED) {
 
@@ -804,7 +853,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		GSLoggerFactory.getLogger(getClass()).info("Using trust store at {}", target.getAbsolutePath());
 
-	        FileUtils.printTrustStoreCertificates(target, trustStorePwd.get());
+		FileUtils.printTrustStoreCertificates(target, trustStorePwd.get());
 
 		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
 	    }
@@ -910,7 +959,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    XACMLAuthorizer.initEngine();
 
 	    // ---------------------------------------------------------------------------------------------
- 	    //
+	    //
 	    // this is done here to guarantee that is done in the right thread
 	    // in some cases we notice that this call is firstly done by threads with a context class loader
 	    // devoid of the necessary classes to load

@@ -21,10 +21,7 @@ package eu.essi_lab.cfga.check;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import eu.essi_lab.cfga.setting.Setting;
 
@@ -72,7 +69,7 @@ public class CheckResponse {
      */
     public CheckResponse(String methodName) {
 
-	this.messages = new HashSet<>();
+	this.messages = new LinkedHashSet<>();
 	this.settings = new ArrayList<>();
 
 	this.methodName = methodName;
