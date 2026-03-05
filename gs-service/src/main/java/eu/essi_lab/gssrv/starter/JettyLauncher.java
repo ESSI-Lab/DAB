@@ -1,5 +1,6 @@
 package eu.essi_lab.gssrv.starter;
 
+import eu.essi_lab.messages.*;
 import org.eclipse.jetty.ee11.annotations.*;
 import org.eclipse.jetty.ee11.webapp.*;
 import org.eclipse.jetty.server.*;
@@ -16,7 +17,6 @@ import java.nio.file.*;
 public class JettyLauncher {
 
     private static final String	CONTEXT_PATH = "/gs-service";
-    private static final int JETTY_PORT = 9090;
     private static final int MAX_REQUEST_HEADER_SIZE = 16384;
 
     /**
@@ -34,7 +34,7 @@ public class JettyLauncher {
 
 	ServerConnector connector =
 		new ServerConnector(server, new HttpConnectionFactory(httpConfig));
-	connector.setPort(JETTY_PORT);
+	connector.setPort(JVMOption.getIntValue(JVMOption.JETTY_LAUNCHER_PORT).get());
 	server.addConnector(connector);
 
 	WebAppContext webapp = new WebAppContext();
