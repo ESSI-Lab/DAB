@@ -423,7 +423,7 @@ public class OptionComponentFactory {
 
 	checkbox.addClassName("booleanChoice");
 
-	checkbox.getStyle().set("margin-left", "-5px");
+	checkbox.getStyle().set("margin-left", "-4px");
 
 	Optional<String> selectedValue = StringValuesReader.readSelectedValue(option);
 
