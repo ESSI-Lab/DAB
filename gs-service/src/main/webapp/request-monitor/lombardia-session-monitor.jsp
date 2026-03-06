@@ -1,3 +1,4 @@
+<%@page import="eu.essi_lab.accessor.hiscentral.lombardia.JedisLombardiaSessionCoordinator"%>
 <%@page import="eu.essi_lab.cfga.gs.ConfigurationWrapper"%>
 <%@page import="eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting"%>
 <%@page import="redis.clients.jedis.Jedis"%>
@@ -36,7 +37,7 @@ li { padding: 0.25em 0; }
 				String host = parts.length > 0 ? parts[0].trim() : "localhost";
 				int port = parts.length > 1 ? Integer.parseInt(parts[1].trim()) : 6379;
 
-				String namespace = setting.getNamespace();
+				String namespace = JedisLombardiaSessionCoordinator.NAMESPACE;
 				String keyActive = namespace + ":active";
 				String keyQueue = namespace + ":queue";
 				String keyAlivePrefix = namespace + ":alive:";
