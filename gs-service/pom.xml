@@ -133,7 +133,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.6.3</version>
+                <version>${exec-maven-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -1458,10 +1458,12 @@
         </profile>
 
         <profile>
-            <!-- Production mode is activated using -Pvaadin-production -->
+
             <id>vaadin-production</id>
+
             <properties>
                 <vaadin.productionMode>true</vaadin.productionMode>
+
             </properties>
 
             <dependencies>
@@ -1473,18 +1475,65 @@
 
             <build>
                 <plugins>
+
                     <plugin>
                         <groupId>com.vaadin</groupId>
                         <artifactId>vaadin-maven-plugin</artifactId>
+
                         <executions>
+
                             <execution>
+                                <id>build-frontend</id>
+                                <phase>compile</phase>
                                 <goals>
                                     <goal>build-frontend</goal>
                                 </goals>
-                                <phase>compile</phase>
+                            </execution>
+
+                        </executions>
+
+                        <configuration>
+
+                            <frontendScanner>
+                                <enabled>true</enabled>
+
+                                 <includes>
+
+                                    <include>
+                                        <groupId>eu.essi_lab</groupId>
+                                        <artifactId>gs-service</artifactId>
+                                    </include>
+
+                                     <include>
+                                         <groupId>eu.essi_lab</groupId>
+                                         <artifactId>configuration-api-gui</artifactId>
+                                     </include>
+
+                                </includes>
+
+                            </frontendScanner>
+
+                        </configuration>
+
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.6.3</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <mainClass>eu.essi_lab.gssrv.starter.JettyLauncher</mainClass>
+                            <classpathScope>runtime</classpathScope>
+                        </configuration>
                     </plugin>
+
                 </plugins>
             </build>
         </profile>
