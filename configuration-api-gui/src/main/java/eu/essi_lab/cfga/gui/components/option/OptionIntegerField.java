@@ -40,9 +40,7 @@ public class OptionIntegerField extends IntegerField implements OnKeyUpValidatio
 
 	getStyle().set("font-size","14px");
 
-//	setHasControls(true);
-//
-//	setPreventInvalidInput(true);
+	setStepButtonsVisible(true);
 
 	addValueChangeListener(new OptionValueChangeListener(option));
 
