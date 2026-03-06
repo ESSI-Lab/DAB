@@ -22,7 +22,12 @@
 package eu.essi_lab.profiler.sta;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -64,6 +69,7 @@ public final class STAJsonWriter {
 	o.put("description", description != null ? description : "");
 	o.put("properties", new JSONObject());
 	if (baseUrl != null) {
+	    o.put("@iot.selfLink", baseUrl + "Things(" + id + ")");
 	    o.put("Locations@iot.navigationLink", baseUrl + "Things(" + id + ")/Locations");
 	    o.put("Datastreams@iot.navigationLink", baseUrl + "Things(" + id + ")/Datastreams");
 	}
@@ -92,6 +98,7 @@ public final class STAJsonWriter {
 	loc.put("coordinates", coords);
 	o.put("location", loc);
 	if (baseUrl != null) {
+	    o.put("@iot.selfLink", baseUrl + "Locations(" + id + ")");
 	    o.put("Things@iot.navigationLink", baseUrl + "Locations(" + id + ")/Things");
 	}
 	return o;
@@ -101,15 +108,30 @@ public final class STAJsonWriter {
      * Builds a STA FeatureOfInterest entity.
      */
     public static JSONObject featureOfInterest(String id, BigDecimal lon, BigDecimal lat, String name, String baseUrl) {
+	return featureOfInterest(id, lon, lat, null, name, baseUrl);
+    }
+
+    /**
+     * Builds a STA FeatureOfInterest entity (GeoJSON Point) with optional altitude.
+     */
+    public static JSONObject featureOfInterest(String id, BigDecimal lon, BigDecimal lat, BigDecimal altitude,
+	    String name, String baseUrl) {
 	JSONObject o = new JSONObject();
+	if (baseUrl != null) {
+	    o.put("@iot.selfLink", baseUrl + "FeaturesOfInterest(" + id + ")");
+	}
 	o.put("@iot.id", id);
 	o.put("name", name != null ? name : id);
 	o.put("description", "");
-	o.put("encodingType", "application/vnd.geo+json");
-	JSONObject loc = new JSONObject();
-	loc.put("type", "Point");
-	loc.put("coordinates", new JSONArray().put(lon).put(lat));
-	o.put("feature", loc);
+	o.put("encodingType", "application/geo+json");
+	JSONObject feature = new JSONObject();
+	JSONArray coords = new JSONArray().put(lon).put(lat);
+	if (altitude != null) {
+	    coords.put(altitude);
+	}
+	feature.put("coordinates", coords);
+	feature.put("type", "Point");
+	o.put("feature", feature);
 	if (baseUrl != null) {
 	    o.put("Observations@iot.navigationLink", baseUrl + "FeaturesOfInterest(" + id + ")/Observations");
 	}
@@ -126,11 +148,50 @@ public final class STAJsonWriter {
 	o.put("result", result);
 	o.put("phenomenonTime", phenomenonTime);
 	o.put("resultTime", resultTime);
-	if (datastreamId != null && baseUrl != null) {
-	    o.put("Datastream@iot.navigationLink", baseUrl + "Observations(" + id + ")/Datastream");
+	if (baseUrl != null) {
+	    o.put("@iot.selfLink", baseUrl + "Observations(" + id + ")");
+	    if (datastreamId != null) {
+		o.put("Datastream@iot.navigationLink", baseUrl + "Observations(" + id + ")/Datastream");
+	    }
+	    if (featureOfInterestId != null) {
+		o.put("FeatureOfInterest@iot.navigationLink", baseUrl + "Observations(" + id + ")/FeatureOfInterest");
+	    }
 	}
-	if (featureOfInterestId != null && baseUrl != null) {
-	    o.put("FeatureOfInterest@iot.navigationLink", baseUrl + "Observations(" + id + ")/FeatureOfInterest");
+	return o;
+    }
+
+    /**
+     * Builds a STA Datastream entity (timeseries record).
+     */
+    public static JSONObject datastream(String id, String name, String description, String observationType,
+	    String unitName, String unitSymbol, String unitDefinition, BigDecimal lon, BigDecimal lat,
+	    String phenomenonTime, JSONObject properties, String thingId, String baseUrl) {
+	JSONObject o = new JSONObject();
+	if (baseUrl != null) {
+	    o.put("@iot.selfLink", baseUrl + "Datastreams(" + id + ")");
+	}
+	o.put("@iot.id", id);
+	o.put("name", name != null ? name : id);
+	o.put("description", description != null ? description : "");
+	o.put("observationType", observationType != null ? observationType : "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement");
+	JSONObject uom = new JSONObject();
+	uom.put("name", unitName != null ? unitName : "");
+	uom.put("symbol", unitSymbol != null ? unitSymbol : "");
+	uom.put("definition", unitDefinition != null ? unitDefinition : JSONObject.NULL);
+	o.put("unitOfMeasurement", uom);
+	if (lon != null && lat != null) {
+	    JSONObject observedArea = new JSONObject();
+	    observedArea.put("coordinates", new JSONArray().put(lon).put(lat));
+	    observedArea.put("type", "Point");
+	    o.put("observedArea", observedArea);
+	}
+	o.put("phenomenonTime", phenomenonTime != null ? phenomenonTime : "");
+	o.put("properties", properties != null ? properties : new JSONObject());
+	if (baseUrl != null) {
+	    o.put("ObservedProperty@iot.navigationLink", baseUrl + "Datastreams(" + id + ")/ObservedProperty");
+	    o.put("Sensor@iot.navigationLink", baseUrl + "Datastreams(" + id + ")/Sensor");
+	    o.put("Thing@iot.navigationLink", baseUrl + "Datastreams(" + id + ")/Thing");
+	    o.put("Observations@iot.navigationLink", baseUrl + "Datastreams(" + id + ")/Observations");
 	}
 	return o;
     }
@@ -144,14 +205,19 @@ public final class STAJsonWriter {
 	    idx = base.indexOf("/Locations");
 	    if (idx >= 0) {
 		base = base.substring(0, idx);
-	    } else {
-		idx = base.indexOf("/Observations");
+	} else {
+	    idx = base.indexOf("/Observations");
 		if (idx >= 0) {
 		    base = base.substring(0, idx);
 		} else {
-		    idx = base.indexOf("/FeaturesOfInterest");
+		    idx = base.indexOf("/Datastreams");
 		    if (idx >= 0) {
 			base = base.substring(0, idx);
+		    } else {
+			idx = base.indexOf("/FeaturesOfInterest");
+			if (idx >= 0) {
+			    base = base.substring(0, idx);
+			}
 		    }
 		}
 	    }
@@ -160,5 +226,49 @@ public final class STAJsonWriter {
 	    base += "/";
 	}
 	return base;
+    }
+
+    /**
+     * Builds the @iot.nextLink URL for pagination when more results exist.
+     * Uses resumptionToken only, with value from SearchAfter.
+     *
+     * @param baseUrl         base URL (e.g. https://host/FROST-Server/v1.1/)
+     * @param entityPath      entity set path (e.g. Things, Locations)
+     * @param resumptionToken value from SearchAfter (cursor for next page)
+     * @param queryString     original query string to preserve filter params, or null
+     * @return full URL for the next page
+     */
+    public static String buildNextLink(String baseUrl, String entityPath, String resumptionToken, String queryString) {
+	String base = baseUrl + entityPath;
+	Map<String, String> params = new LinkedHashMap<>();
+	if (queryString != null && !queryString.isEmpty()) {
+	    for (String pair : queryString.split("&")) {
+		int eq = pair.indexOf('=');
+		if (eq > 0) {
+		    String key = pair.substring(0, eq);
+		    String value = eq < pair.length() - 1 ? pair.substring(eq + 1) : "";
+		    if (!"resumptionToken".equalsIgnoreCase(key) && !"$skip".equalsIgnoreCase(key)) {
+			params.put(key, value);
+		    }
+		}
+	    }
+	}
+	params.put("resumptionToken", resumptionToken);
+	try {
+	    String qs = params.entrySet().stream()
+		    .map(e -> encode(e.getKey()) + "=" + encode(e.getValue()))
+		    .collect(Collectors.joining("&"));
+	    return base + "?" + qs;
+	} catch (Exception e) {
+	    return base + "?resumptionToken=" + encode(resumptionToken);
+	}
+    }
+
+    private static String encode(String s) {
+	try {
+	    return URLEncoder.encode(s != null ? s : "", StandardCharsets.UTF_8);
+	} catch (Exception e) {
+	    return s != null ? s : "";
+	}
     }
 }

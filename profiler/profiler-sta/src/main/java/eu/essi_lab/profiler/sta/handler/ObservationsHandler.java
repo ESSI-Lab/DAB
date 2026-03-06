@@ -40,10 +40,12 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.ObservationsTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
+import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
 /**
@@ -107,12 +109,31 @@ public class ObservationsHandler extends StreamingRequestHandler {
 	    }
 	}
 
+	STARequest staRequest = new STARequest(webRequest);
+	if (staRequest.getEntityId().isPresent()) {
+	    if (observations.isEmpty()) {
+		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+	    }
+	    output.write(observations.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    return;
+	}
+
 	Integer count = null;
 	if (resultSet != null && resultSet.getCountResponse() != null) {
 	    count = resultSet.getCountResponse().getCount();
 	}
 
-	String json = STAJsonWriter.collectionResponse(observations, null, count);
+	String nextLink = null;
+	if (resultSet != null && resultSet.getSearchAfter().isPresent()) {
+	    String token = resultSet.getSearchAfter().get().getValues()
+		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
+		    .orElse(null);
+	    if (token != null) {
+		nextLink = STAJsonWriter.buildNextLink(baseUrl, "Observations", token, webRequest.getQueryString());
+	    }
+	}
+
+	String json = STAJsonWriter.collectionResponse(observations, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
     }
 }

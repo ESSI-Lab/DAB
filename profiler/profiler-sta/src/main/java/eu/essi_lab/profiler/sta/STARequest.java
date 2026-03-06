@@ -106,6 +106,17 @@ public class STARequest {
 	return Optional.ofNullable(entityId);
     }
 
+    /**
+     * Returns the entity ID with surrounding quotes stripped (e.g. '1000022519' -> 1000022519).
+     */
+    public Optional<String> getEntityIdNormalized() {
+	if (entityId == null || entityId.isEmpty()) {
+	    return Optional.empty();
+	}
+	String normalized = entityId.replaceAll("^['\"]|['\"]$", "").trim();
+	return normalized.isEmpty() ? Optional.empty() : Optional.of(normalized);
+    }
+
     public Optional<String> getNavigationProperty() {
 	return Optional.ofNullable(navigationProperty);
     }
@@ -134,6 +145,28 @@ public class STARequest {
     public Integer getSkip() {
 	String v = getQueryParam(QueryOption.SKIP.getKey());
 	return v != null ? parseInt(v) : null;
+    }
+
+    /**
+     * Resumption token for pagination (next page offset).
+     */
+    public String getResumptionToken() {
+	return getQueryParam("resumptionToken");
+    }
+
+    /**
+     * Effective skip for pagination: resumptionToken if present, else $skip, else 0.
+     */
+    public int getEffectiveSkip() {
+	String rt = getResumptionToken();
+	if (rt != null) {
+	    Integer v = parseInt(rt);
+	    if (v != null && v >= 0) {
+		return v;
+	    }
+	}
+	Integer s = getSkip();
+	return s != null ? s : 0;
     }
 
     public Boolean getCount() {

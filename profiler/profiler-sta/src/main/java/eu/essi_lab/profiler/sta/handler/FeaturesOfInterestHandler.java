@@ -45,10 +45,12 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.FeaturesOfInterestTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
+import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
 /**
@@ -120,13 +122,28 @@ public class FeaturesOfInterestHandler extends StreamingRequestHandler {
 		    }
 		    BigDecimal lon = parser.getBBOX().getBigDecimalWest();
 		    BigDecimal lat = parser.getBBOX().getBigDecimalNorth();
+		    String alt = parser.getAltitude();
+		    BigDecimal altitude = null;
+		    if (alt != null && !alt.isEmpty()) {
+			altitude = new BigDecimal(alt.trim());
+		    }
 		    if (lon != null && lat != null) {
-			JSONObject f = STAJsonWriter.featureOfInterest(id, lon, lat, name, baseUrl);
+			JSONObject f = STAJsonWriter.featureOfInterest(id, lon, lat, altitude, name, baseUrl);
 			foi.add(f);
 		    }
-		} catch (XMLStreamException | IOException e) {
+		} catch (Exception e) {
+		    e.printStackTrace();
 		}
 	    }
+	}
+
+	STARequest staRequest = new STARequest(webRequest);
+	if (staRequest.getEntityId().isPresent()) {
+	    if (foi.isEmpty()) {
+		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+	    }
+	    output.write(foi.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    return;
 	}
 
 	Integer count = null;
@@ -134,7 +151,17 @@ public class FeaturesOfInterestHandler extends StreamingRequestHandler {
 	    count = resultSet.getCountResponse().getCount();
 	}
 
-	String json = STAJsonWriter.collectionResponse(foi, null, count);
+	String nextLink = null;
+	if (resultSet != null && resultSet.getSearchAfter().isPresent()) {
+	    String token = resultSet.getSearchAfter().get().getValues()
+		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
+		    .orElse(null);
+	    if (token != null) {
+		nextLink = STAJsonWriter.buildNextLink(baseUrl, "FeaturesOfInterest", token, webRequest.getQueryString());
+	    }
+	}
+
+	String json = STAJsonWriter.collectionResponse(foi, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
     }
 }

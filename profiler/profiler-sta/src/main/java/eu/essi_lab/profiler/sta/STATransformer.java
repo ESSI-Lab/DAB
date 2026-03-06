@@ -26,6 +26,7 @@ import java.util.Set;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
@@ -43,6 +44,7 @@ import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.profiler.sta.STARequest.EntitySet;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 
 /**
@@ -72,6 +74,14 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	if (platformCode != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, platformCode));
 	}
+	staRequest.getEntityIdNormalized().ifPresent(id -> {
+	    if (staRequest.getEntitySet().orElse(null) == EntitySet.Observations
+		    || staRequest.getEntitySet().orElse(null) == EntitySet.Datastreams) {
+		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ONLINE_ID, id));
+	    } else {
+		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, id));
+	    }
+	});
 	String platformName = request.extractQueryParameter("platformName").orElse(null);
 	if (platformName != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.PLATFORM_TITLE, platformName));
@@ -104,7 +114,22 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	STARequest staRequest = new STARequest(request);
 	int skip = staRequest.getSkip() != null ? staRequest.getSkip() : 0;
 	int top = staRequest.getTop() != null ? staRequest.getTop() : DEFAULT_TOP;
+	if (staRequest.getEntityId().isPresent()) {
+	    top = 1;
+	    skip = 0;
+	}
 	return new Page(skip + 1, top);
+    }
+
+    @Override
+    protected DiscoveryMessage refineMessage(DiscoveryMessage message) throws GSException {
+	DiscoveryMessage refined = super.refineMessage(message);
+	STARequest staRequest = new STARequest(refined.getWebRequest());
+	String resumptionToken = staRequest.getResumptionToken();
+	if (resumptionToken != null && !resumptionToken.isEmpty()) {
+	    refined.setSearchAfter(SearchAfter.of(resumptionToken));
+	}
+	return refined;
     }
 
     @Override

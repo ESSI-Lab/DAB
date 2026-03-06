@@ -48,6 +48,7 @@ public class RootHandler extends DefaultRequestHandler {
 	List<JSONObject> endpoints = new ArrayList<>();
 	endpoints.add(createEndpoint("Things", baseUrl + "Things"));
 	endpoints.add(createEndpoint("Locations", baseUrl + "Locations"));
+	endpoints.add(createEndpoint("Datastreams", baseUrl + "Datastreams"));
 	endpoints.add(createEndpoint("Observations", baseUrl + "Observations"));
 	endpoints.add(createEndpoint("FeaturesOfInterest", baseUrl + "FeaturesOfInterest"));
 

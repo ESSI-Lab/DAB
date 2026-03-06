@@ -23,28 +23,26 @@ package eu.essi_lab.profiler.sta.handler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
 import org.json.JSONObject;
 
-import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.sta.DatastreamsTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
-import eu.essi_lab.profiler.sta.ThingsTransformer;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import jakarta.ws.rs.WebApplicationException;
@@ -53,20 +51,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
 /**
- * Handler for OGC STA Things entity set.
+ * Handler for OGC STA Datastreams entity set (timeseries records).
  */
-public class ThingsHandler extends StreamingRequestHandler {
-
-    private DatabaseExecutor executor;
-
-    public ThingsHandler() {
-	try {
-	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
-	    executor = DatabaseProviderFactory.getExecutor(uri);
-	} catch (GSException e) {
-	    // executor may be null if DB not configured
-	}
-    }
+public class DatastreamsHandler extends StreamingRequestHandler {
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -79,9 +66,9 @@ public class ThingsHandler extends StreamingRequestHandler {
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
 	return output -> {
 	    try {
-		writeThingsResponse(output, webRequest);
+		writeDatastreamsResponse(output, webRequest);
 	    } catch (Exception e) {
-		throw new WebApplicationException("Error handling Things request", e);
+		throw new WebApplicationException("Error handling Datastreams request", e);
 	    }
 	};
     }
@@ -92,48 +79,80 @@ public class ThingsHandler extends StreamingRequestHandler {
     }
 
     public DiscoveryRequestTransformer getTransformer() {
-	return new ThingsTransformer();
+	return new DatastreamsTransformer();
     }
 
-    private void writeThingsResponse(OutputStream output, WebRequest webRequest) throws Exception {
-	if (executor == null) {
-	    output.write("{\"value\":[]}".getBytes(StandardCharsets.UTF_8));
-	    return;
-	}
-
+    private void writeDatastreamsResponse(OutputStream output, WebRequest webRequest) throws Exception {
 	DiscoveryRequestTransformer transformer = getTransformer();
 	DiscoveryMessage message = transformer.transform(webRequest);
 
-	ResultSet<String> resultSet = executor.discoverDistinctStrings(message);
-	List<JSONObject> things = new ArrayList<>();
+	ResultSet<String> resultSet = exec(message);
+	List<JSONObject> datastreams = new ArrayList<>();
 	String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
 
 	if (resultSet != null) {
 	    for (String result : resultSet.getResultsList()) {
 		try {
 		    GIResourceParser parser = new GIResourceParser(result);
-		    String id = parser.getUniquePlatformCode();
+		    String id = parser.getOnlineId();
 		    if (id == null) {
 			continue;
 		    }
-		    String name = parser.getPlatformName();
-		    if (name == null) {
-			name = id;
+		    String platformName = parser.getPlatformName();
+		    String attributeName = parser.getAttributeName();
+		    String name = platformName != null && attributeName != null
+			    ? platformName + " - " + attributeName
+			    : (attributeName != null ? attributeName : id);
+		    String description = parser.getAttributeDescription();
+		    if (description == null || description.isEmpty()) {
+			description = attributeName != null ? attributeName : "";
 		    }
-		    JSONObject thing = STAJsonWriter.thing(id, name, "", baseUrl);
-		    things.add(thing);
+		    String phenomenonTime = "";
+		    String begin = parser.getTmpExtentBegin();
+		    String end = parser.getTmpExtentEnd();
+		    String endNow = parser.getTmpExtentEndNow();
+		    if (endNow!=null&&endNow.equals("true")){
+			end = ISO8601DateTimeUtils.getISO8601DateTime();
+		    }
+		    if (begin != null && end != null) {
+			phenomenonTime = begin + "/" + end;
+		    } else if (begin != null) {
+			phenomenonTime = begin;
+		    } else if (end != null) {
+			phenomenonTime = end;
+		    }
+		    BigDecimal lon = null;
+		    BigDecimal lat = null;
+		    if (parser.getBBOX() != null) {
+			lon = parser.getBBOX().getBigDecimalWest();
+			lat = parser.getBBOX().getBigDecimalNorth();
+		    }
+		    String unitName = parser.getUnits();
+		    String unitSymbol = parser.getUnitsAbbreviation();
+		    if (unitSymbol == null || unitSymbol.isEmpty()) {
+			unitSymbol = unitName;
+		    }
+		    JSONObject properties = new JSONObject();
+		    properties.put("resultType", "Timeseries");
+		    String platformId = parser.getUniquePlatformCode();
+		    if (platformId != null) {
+			properties.put("platformId", platformId);
+		    }
+		    JSONObject ds = STAJsonWriter.datastream(id, name, description,
+			    "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+			    unitName, unitSymbol, null, lon, lat, phenomenonTime, properties, platformId, baseUrl);
+		    datastreams.add(ds);
 		} catch (XMLStreamException | IOException e) {
-		    // skip malformed
 		}
 	    }
 	}
 
 	STARequest staRequest = new STARequest(webRequest);
 	if (staRequest.getEntityId().isPresent()) {
-	    if (things.isEmpty()) {
+	    if (datastreams.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	    }
-	    output.write(things.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    output.write(datastreams.get(0).toString().getBytes(StandardCharsets.UTF_8));
 	    return;
 	}
 
@@ -148,11 +167,11 @@ public class ThingsHandler extends StreamingRequestHandler {
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
 	    if (token != null) {
-		nextLink = STAJsonWriter.buildNextLink(baseUrl, "Things", token, webRequest.getQueryString());
+		nextLink = STAJsonWriter.buildNextLink(baseUrl, "Datastreams", token, webRequest.getQueryString());
 	    }
 	}
 
-	String json = STAJsonWriter.collectionResponse(things, nextLink, count);
+	String json = STAJsonWriter.collectionResponse(datastreams, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
     }
 }

@@ -34,11 +34,13 @@ import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
+import eu.essi_lab.profiler.sta.filter.DatastreamsFilter;
 import eu.essi_lab.profiler.sta.filter.FeaturesOfInterestFilter;
 import eu.essi_lab.profiler.sta.filter.LocationsFilter;
 import eu.essi_lab.profiler.sta.filter.ObservationsFilter;
 import eu.essi_lab.profiler.sta.filter.RootFilter;
 import eu.essi_lab.profiler.sta.filter.ThingsFilter;
+import eu.essi_lab.profiler.sta.handler.DatastreamsHandler;
 import eu.essi_lab.profiler.sta.handler.FeaturesOfInterestHandler;
 import eu.essi_lab.profiler.sta.handler.LocationsHandler;
 import eu.essi_lab.profiler.sta.handler.ObservationsHandler;
@@ -57,6 +59,7 @@ public class STAProfiler extends Profiler<STAProfilerSetting> {
 	HandlerSelector selector = new HandlerSelector();
 
 	selector.register(new RootFilter(), new RootHandler());
+	selector.register(new DatastreamsFilter(), new DatastreamsHandler());
 	selector.register(new ThingsFilter(), new ThingsHandler());
 	selector.register(new LocationsFilter(), new LocationsHandler());
 	selector.register(new ObservationsFilter(), new ObservationsHandler());
