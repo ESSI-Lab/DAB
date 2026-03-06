@@ -43,3 +43,4 @@ org.eclipse.jdt.core.prefs
 /testm2repo/
 /repository/
 .idea.broken/compiler.xml
+/gs-service/src/main/bundles/prod.bundle
