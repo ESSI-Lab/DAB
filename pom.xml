@@ -167,6 +167,8 @@
         <sonar.plugin.version>3.9.0.2155</sonar.plugin.version>
         <maven-jaxb-plugin.version>2.5.0</maven-jaxb-plugin.version>
 
+        <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
+
         <!-- Jetty -->
         <jetty.version>12.1.6</jetty.version>
 
