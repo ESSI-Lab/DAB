@@ -86,13 +86,13 @@ public class FileUtils {
 	    for (String alias : aliases) {
 
 		String type = (ks.isCertificateEntry(alias) ? "trustedCertEntry" : "keyEntry");
-		GSLoggerFactory.getLogger(FileUtils.class).info("{}: {} {}", ++i, alias, type);
+		GSLoggerFactory.getLogger(FileUtils.class).info("{}: {}", ++i, alias);
 
 		Certificate cert = ks.getCertificate(alias);
 
 		if (cert instanceof X509Certificate x) {
 
-		    GSLoggerFactory.getLogger(FileUtils.class).trace("{} {}", x.getSubjectX500Principal(), x.getIssuerX500Principal());
+//		    GSLoggerFactory.getLogger(FileUtils.class).trace("{} {}", x.getSubjectX500Principal(), x.getIssuerX500Principal());
 
 		    byte[] encoded = x.getEncoded();
 		    MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -108,9 +108,9 @@ public class FileUtils {
 			    hex.append(":");
 		    }
 
-		    GSLoggerFactory.getLogger(FileUtils.class).trace("SHA-256 Fingerprint: " + hex.toString());
+//		    GSLoggerFactory.getLogger(FileUtils.class).trace("SHA-256 Fingerprint: " + hex.toString());
 
-		    GSLoggerFactory.getLogger(FileUtils.class).trace("-----");
+//		    GSLoggerFactory.getLogger(FileUtils.class).trace("-----");
 		}
 	    }
 
