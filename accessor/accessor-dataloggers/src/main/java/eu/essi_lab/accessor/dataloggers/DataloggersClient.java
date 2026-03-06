@@ -10,34 +10,26 @@ package eu.essi_lab.accessor.dataloggers;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import eu.essi_lab.lib.utils.*;
+import org.json.*;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import java.io.*;
+import java.net.*;
+import java.net.http.*;
+import java.nio.charset.*;
+import java.time.*;
+import java.util.*;
 
 public class DataloggersClient {
 
@@ -68,7 +60,7 @@ public class DataloggersClient {
 
     /**
      * Retrieves dataloggers from the API with pagination support.
-     * 
+     *
      * @param page The page number (0-based)
      * @param size The page size
      * @return DataloggersResponse containing the dataloggers and pagination info
@@ -96,7 +88,7 @@ public class DataloggersClient {
 	}
 
 	// Create POST request with query parameters (no body)
-	GSLoggerFactory.getLogger(getClass()).info("Connecting to {}",url);
+	GSLoggerFactory.getLogger(getClass()).info("Connecting to {}", url);
 	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).POST(HttpRequest.BodyPublishers.noBody()).build();
 
 	HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -110,7 +102,7 @@ public class DataloggersClient {
 
     /**
      * Retrieves all dataloggers by automatically handling pagination.
-     * 
+     *
      * @return List of all dataloggers
      * @throws IOException if an I/O error occurs
      * @throws InterruptedException if the request is interrupted
@@ -248,7 +240,8 @@ public class DataloggersClient {
 	    datastream.setDataproviderId(json.getInt("dataprovider_id"));
 	}
 	if (json.has("datastream_step")) {
-	    datastream.setDatastreamStep(json.getInt("datastream_step"));
+
+	    datastream.setDatastreamStep(json.optInt("datastream_step"));
 	}
 	if (json.has("dataprovider_cod")) {
 	    datastream.setDataproviderCod(json.getString("dataprovider_cod"));
@@ -268,7 +261,7 @@ public class DataloggersClient {
 
     /**
      * Retrieves variables from the API with pagination support.
-     * 
+     *
      * @param page The page number (0-based)
      * @param size The page size
      * @return VariablesResponse containing the variables and pagination info
@@ -309,7 +302,7 @@ public class DataloggersClient {
 
     /**
      * Retrieves all variables by automatically handling pagination.
-     * 
+     *
      * @return List of all variables
      * @throws IOException if an I/O error occurs
      * @throws InterruptedException if the request is interrupted
@@ -334,7 +327,7 @@ public class DataloggersClient {
 
     /**
      * Retrieves variable information by variable code from the cache.
-     * 
+     *
      * @param varCod The variable code
      * @return Variable object if found, null otherwise
      */
@@ -347,7 +340,7 @@ public class DataloggersClient {
 
     /**
      * Checks if a variable exists in the cache by code.
-     * 
+     *
      * @param varCod The variable code
      * @return true if the variable exists, false otherwise
      */
@@ -424,7 +417,7 @@ public class DataloggersClient {
 
     /**
      * Retrieves data from the API with filtering and pagination support.
-     * 
+     *
      * @param varIds List of variable IDs to filter by (can be null)
      * @param dataloggerIds List of datalogger IDs to filter by (can be null)
      * @param datastreamIds List of datastream IDs to filter by (can be null)
