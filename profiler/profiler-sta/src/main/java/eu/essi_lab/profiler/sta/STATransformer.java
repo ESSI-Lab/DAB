@@ -114,7 +114,7 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	STARequest staRequest = new STARequest(request);
 	int skip = staRequest.getSkip() != null ? staRequest.getSkip() : 0;
 	int top = staRequest.getTop() != null ? staRequest.getTop() : DEFAULT_TOP;
-	if (staRequest.getEntityId().isPresent()) {
+	if (staRequest.getEntityId().isPresent() && !staRequest.getNavigationProperty().isPresent()) {
 	    top = 1;
 	    skip = 0;
 	}

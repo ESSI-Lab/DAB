@@ -21,28 +21,31 @@
 
 package eu.essi_lab.profiler.sta.handler;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
-import javax.xml.stream.XMLStreamException;
-
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
 import org.json.JSONObject;
 
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.profiler.sta.DatastreamsTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
+import eu.essi_lab.profiler.sta.ThingsLocationsTransformer;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import jakarta.ws.rs.WebApplicationException;
@@ -51,9 +54,19 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
 /**
- * Handler for OGC STA Datastreams entity set (timeseries records).
+ * Handler for Things(id)/Locations. Returns an array of locations related to the thing.
  */
-public class DatastreamsHandler extends StreamingRequestHandler {
+public class ThingsLocationsHandler extends StreamingRequestHandler {
+
+    private DatabaseExecutor executor;
+
+    public ThingsLocationsHandler() {
+	try {
+	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
+	    executor = DatabaseProviderFactory.getExecutor(uri);
+	} catch (GSException e) {
+	}
+    }
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -66,9 +79,9 @@ public class DatastreamsHandler extends StreamingRequestHandler {
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
 	return output -> {
 	    try {
-		writeDatastreamsResponse(output, webRequest);
+		writeThingsLocationsResponse(output, webRequest);
 	    } catch (Exception e) {
-		throw new WebApplicationException("Error handling Datastreams request", e);
+		throw new WebApplicationException("Error handling Things/Locations request", e);
 	    }
 	};
     }
@@ -79,82 +92,65 @@ public class DatastreamsHandler extends StreamingRequestHandler {
     }
 
     public DiscoveryRequestTransformer getTransformer() {
-	return new DatastreamsTransformer();
+	return new ThingsLocationsTransformer();
     }
 
-    private void writeDatastreamsResponse(OutputStream output, WebRequest webRequest) throws Exception {
+    private void writeThingsLocationsResponse(OutputStream output, WebRequest webRequest) throws Exception {
+	if (executor == null) {
+	    output.write("{\"value\":[]}".getBytes(StandardCharsets.UTF_8));
+	    return;
+	}
+
+	STARequest staRequest = new STARequest(webRequest);
+	String thingId = staRequest.getEntityIdNormalized().orElse(null);
+	if (thingId == null || thingId.isEmpty()) {
+	    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Missing Thing id").build());
+	}
+
 	DiscoveryRequestTransformer transformer = getTransformer();
 	DiscoveryMessage message = transformer.transform(webRequest);
 
-	ResultSet<String> resultSet = exec(message);
-	List<JSONObject> datastreams = new ArrayList<>();
+	ResultSet<String> resultSet = executor.discoverDistinctStrings(message);
+	List<JSONObject> locations = new ArrayList<>();
+	Set<String> seenKeys = new LinkedHashSet<>();
 	String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
 
 	if (resultSet != null) {
 	    for (String result : resultSet.getResultsList()) {
 		try {
 		    GIResourceParser parser = new GIResourceParser(result);
-		    String id = parser.getOnlineId();
+		    String id = parser.getUniquePlatformCode();
 		    if (id == null) {
 			continue;
 		    }
-		    String platformName = parser.getPlatformName();
-		    String attributeName = parser.getAttributeName();
-		    String name = platformName != null && attributeName != null
-			    ? platformName + " - " + attributeName
-			    : (attributeName != null ? attributeName : id);
-		    String description = parser.getAttributeDescription();
-		    if (description == null || description.isEmpty()) {
-			description = attributeName != null ? attributeName : "";
-		    }
-		    String phenomenonTime = "";
-		    String begin = parser.getTmpExtentBegin();
-		    String end = parser.getTmpExtentEnd();
-		    String endNow = parser.getTmpExtentEndNow();
-		    if (endNow!=null&&endNow.equals("true")){
-			end = ISO8601DateTimeUtils.getISO8601DateTime();
-		    }
-		    if (begin != null && end != null) {
-			phenomenonTime = begin + "/" + end;
-		    } else if (begin != null) {
-			phenomenonTime = begin;
-		    } else if (end != null) {
-			phenomenonTime = end;
-		    }
-		    BigDecimal lon = null;
+		    GeographicBoundingBox bbox = parser.getBBOX();
 		    BigDecimal lat = null;
-		    if (parser.getBBOX() != null) {
+		    BigDecimal lon = null;
+		    if (bbox != null) {
 			lon = parser.getBBOX().getBigDecimalWest();
 			lat = parser.getBBOX().getBigDecimalNorth();
 		    }
-		    String unitName = parser.getUnits();
-		    String unitSymbol = parser.getUnitsAbbreviation();
-		    if (unitSymbol == null || unitSymbol.isEmpty()) {
-			unitSymbol = unitName;
+		    if (lon == null || lat == null) {
+			continue;
 		    }
-		    JSONObject properties = new JSONObject();
-		    properties.put("resultType", "Timeseries");
-		    String platformId = parser.getUniquePlatformCode();
-		    if (platformId != null) {
-			properties.put("platformId", platformId);
+		    String alt = parser.getAltitude();
+		    BigDecimal altitude = null;
+		    if (alt != null && !alt.isEmpty()) {
+			altitude = new BigDecimal(alt.trim());
 		    }
-		    JSONObject ds = STAJsonWriter.datastream(id, name, description,
-			    "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-			    unitName, unitSymbol, null, lon, lat, phenomenonTime, properties, platformId, baseUrl);
-		    datastreams.add(ds);
-		} catch (XMLStreamException | IOException e) {
+		    String name = parser.getPlatformName();
+		    if (name == null) {
+			name = id;
+		    }
+		    String locKey = id + "|" + lon + "|" + lat + (altitude != null ? "|" + altitude : "");
+		    if (seenKeys.add(locKey)) {
+			JSONObject loc = STAJsonWriter.location(id, lon, lat, altitude, name, baseUrl);
+			locations.add(loc);
+		    }
+		} catch (Exception e) {
+		    // skip malformed
 		}
 	    }
-	}
-
-	STARequest staRequest = new STARequest(webRequest);
-	if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Datastreams
-		&& staRequest.getEntityId().isPresent()) {
-	    if (datastreams.isEmpty()) {
-		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
-	    }
-	    output.write(datastreams.get(0).toString().getBytes(StandardCharsets.UTF_8));
-	    return;
 	}
 
 	Integer count = null;
@@ -163,23 +159,17 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	}
 
 	String nextLink = null;
-	int pageSize = staRequest.getTop() != null ? staRequest.getTop() : 100;
-	boolean hasFullPage = datastreams.size() >= pageSize;
-	if (hasFullPage && resultSet != null && resultSet.getSearchAfter().isPresent()) {
+	if (resultSet != null && resultSet.getSearchAfter().isPresent()) {
 	    String token = resultSet.getSearchAfter().get().getValues()
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
 	    if (token != null) {
-		String entityPath = "Datastreams";
-		if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Things
-			&& staRequest.getEntityIdNormalized().isPresent()) {
-		    entityPath = "Things(" + staRequest.getEntityIdNormalized().get() + ")/Datastreams";
-		}
+		String entityPath = "Things(" + thingId + ")/Locations";
 		nextLink = STAJsonWriter.buildNextLink(baseUrl, entityPath, token, webRequest.getQueryString());
 	    }
 	}
 
-	String json = STAJsonWriter.collectionResponse(datastreams, nextLink, count);
+	String json = STAJsonWriter.collectionResponse(locations, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
     }
 }
