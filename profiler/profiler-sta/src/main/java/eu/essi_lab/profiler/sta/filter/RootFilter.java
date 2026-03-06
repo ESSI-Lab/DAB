@@ -40,6 +40,6 @@ public class RootFilter implements WebRequestFilter {
 	if (normalized.isEmpty()) {
 	    return true;
 	}
-	return normalized.equals("sta") || normalized.equals("v1.0") || normalized.endsWith("/v1.0");
+	return normalized.equals("sta") || normalized.equals("v1.1") || normalized.endsWith("/v1.1");
     }
 }

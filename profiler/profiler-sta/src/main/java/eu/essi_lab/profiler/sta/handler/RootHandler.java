@@ -37,7 +37,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 
 /**
- * Handler for OGC STA service root (GET / or GET /v1.0).
+ * Handler for OGC STA service root (GET / or GET /v1.1).
  * Returns a JSON array of available entity set endpoints.
  */
 public class RootHandler extends DefaultRequestHandler {
@@ -51,11 +51,20 @@ public class RootHandler extends DefaultRequestHandler {
 	endpoints.add(createEndpoint("Observations", baseUrl + "Observations"));
 	endpoints.add(createEndpoint("FeaturesOfInterest", baseUrl + "FeaturesOfInterest"));
 
-	JSONArray arr = new JSONArray();
+	JSONObject root = new JSONObject();
+
+	JSONArray value = new JSONArray();
 	for (JSONObject e : endpoints) {
-	    arr.put(e);
+	    value.put(e);
 	}
-	return arr.toString();
+	root.put("value", value);
+
+	JSONObject serverSettings = new JSONObject();
+	JSONArray conformance = new JSONArray();
+	serverSettings.put("conformance",conformance);
+	root.put("serverSettings",serverSettings);
+
+	return root.toString();
     }
 
     private JSONObject createEndpoint(String name, String url) {
@@ -74,8 +83,8 @@ public class RootHandler extends DefaultRequestHandler {
 	if (!base.endsWith("/")) {
 	    base += "/";
 	}
-	if (!base.endsWith("v1.0/")) {
-	    base += "v1.0/";
+	if (!base.endsWith("v1.1/")) {
+	    base += "v1.1/";
 	}
 	return base;
     }
