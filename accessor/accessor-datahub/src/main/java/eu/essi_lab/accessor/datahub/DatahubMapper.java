@@ -196,13 +196,13 @@ public class DatahubMapper extends FileIdentifierMapper {
         // Title
         String title = json.optString("title", null);
         if (title != null) {
-            coreMetadata.setTitle(title);
+            identification.setCitationTitle(title);
         }
 
         // Abstract
         String abstract_ = json.optString("abstract", null);
         if (abstract_ != null) {
-            coreMetadata.setAbstract(abstract_);
+            identification.setAbstract(abstract_);
         }
 
         // Character set (v3.8+: JSON object with uri and value)
