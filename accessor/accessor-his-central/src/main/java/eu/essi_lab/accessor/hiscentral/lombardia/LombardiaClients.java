@@ -94,9 +94,8 @@ public final class LombardiaClients {
      */
     public static HISCentralLombardiaClient createWithRedisCoordinator(URL endpoint, String keystorePassword,
 	    String username, String password, JedisPool jedisPool) throws Exception {
-	String namespace = ConfigurationWrapper.getSessionCoordinatorSetting().getNamespace();
-	LombardiaTokenStore tokenStore = new RedisLombardiaTokenStore(namespace, jedisPool);
-	LombardiaSessionCoordinator coordinator = new JedisLombardiaSessionCoordinator(namespace, jedisPool, tokenStore);
+	LombardiaTokenStore tokenStore = new RedisLombardiaTokenStore(jedisPool);
+	LombardiaSessionCoordinator coordinator = new JedisLombardiaSessionCoordinator(jedisPool, tokenStore);
 	return new HISCentralLombardiaClient(endpoint, keystorePassword, username, password, tokenStore, coordinator);
     }
 }
