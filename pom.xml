@@ -380,7 +380,11 @@
         <!-- JAXB API and JAXB impl -->
         <jakarta.xml.bind-api.version>4.0.5</jakarta.xml.bind-api.version>
         <jaxb-runtime.version>4.0.5</jaxb-runtime.version>
-        
+
+        <!-- Particular dependencies version required by jaxb-classes-jaxb2-basics-runtime-1.1.11 -->
+        <jaxb-runtime-for-jaxb2-basics-runtime.version>2.3.1</jaxb-runtime-for-jaxb2-basics-runtime.version>
+        <jaxb-api-for-jaxb2-basics-runtime.version>1.0.6</jaxb-api-for-jaxb2-basics-runtime.version>
+
         <!-- Apache Parquet VULN-UPDATE FEB-2026-->
         <apache.parquet.version>1.17.0</apache.parquet.version>
 
