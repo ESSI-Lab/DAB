@@ -323,7 +323,7 @@ public class SettingComponent extends Div {
 		//
 		// This is the toggle button of a child setting
 		//
-		ToggleButton toggle = (ToggleButton) comp;
+		Switch toggle = (Switch) comp;
 
 		//
 		// if the parent setting value is false, also the state of the toggle button
@@ -562,7 +562,7 @@ public class SettingComponent extends Div {
 	//
 	// disable button
 	//
-	Optional<ToggleButton> toggle = handleToggleButton(parent, setting, headerLayout, selectionMode);
+	Optional<Switch> toggle = handleToggleButton(parent, setting, headerLayout, selectionMode);
 
 	//
 	// options
@@ -714,7 +714,7 @@ public class SettingComponent extends Div {
      * @param headerLayout
      * @param multiSelectionMode
      */
-    private Optional<ToggleButton> handleToggleButton(//
+    private Optional<Switch> handleToggleButton(//
 	    Setting parent, //
 	    Setting setting, //
 	    HorizontalLayout headerLayout, //
@@ -726,7 +726,7 @@ public class SettingComponent extends Div {
 
 	    boolean enabled = !forceReadonly;
 
-	    ToggleButton toggle = SettingComponentFactory.createSettingDisableEnableButton(this, setting.isEnabled(), enabled);
+	    Switch toggle = SettingComponentFactory.createSettingSwitch(this, setting.isEnabled(), enabled);
 
 	    //
 	    //

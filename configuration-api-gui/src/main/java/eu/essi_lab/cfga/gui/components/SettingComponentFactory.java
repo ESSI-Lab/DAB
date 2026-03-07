@@ -55,18 +55,15 @@ public class SettingComponentFactory {
      * @param enabled
      * @return
      */
-    public static ToggleButton createSettingDisableEnableButton(//
+    public static Switch createSettingSwitch(//
 	    SettingComponent settingComponent,//
 	    boolean value, //
 	    boolean enabled) {//
 
-	ToggleButton toggle = ComponentFactory.createToggleButton(value, enabled);
-	// toggle.getStyle().set("margin-top", "-5px");
-	toggle.setHeightFull();
-
-	toggle.addValueChangeListener(new SettingToggleButtonListener(settingComponent));
-
-	return toggle;
+	return ComponentFactory.createSwitch( //
+		value,//
+		enabled, //
+		new SettingSwitchListener(settingComponent));//
     }
 
     /**

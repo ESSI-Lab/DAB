@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -29,6 +29,7 @@ import com.vaadin.flow.component.details.Details.*;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.directive.*;
 
@@ -229,18 +230,46 @@ public class ComponentFactory {
      * @param enabled
      * @return
      */
-    public static ToggleButton createToggleButton(boolean value, boolean enabled) {
+    public static Switch createSwitch(boolean value, boolean enabled) {
 
-	ToggleButton toggle = new ToggleButton();
+	return createSwitch(Switch.Size.NORMAL, value, enabled, null);
+    }
 
-	toggle.getStyle().set("align-items", "baseline");
-	toggle.getStyle().set("padding-bottom", "3px");
+    /**
+     *
+     * @param value
+     * @param enabled
+     * @param listener
+     * @return
+     */
+    public static Switch createSwitch(boolean value, boolean enabled, AbstractValueChangeListener listener) {
 
-	toggle.setValue(value);
+	return createSwitch(Switch.Size.NORMAL, value, enabled, listener);
+    }
 
-	toggle.setEnabled(enabled);
+    /**
+     *
+     * @param size
+     * @param value
+     * @param enabled
+     * @param listener
+     * @return
+     */
+    public static Switch createSwitch(Switch.Size size, boolean value, boolean enabled, AbstractValueChangeListener listener) {
 
-	return toggle;
+	Switch switch_ = new Switch(size);
+
+	if(listener != null) {
+	    switch_.addValueChangeListener(listener);
+	}
+
+	switch_.getStyle().set("padding-bottom", "3px");
+
+	switch_.setValue(value);
+
+	switch_.setEnabled(enabled);
+
+	return switch_;
     }
 
     /**

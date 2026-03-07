@@ -101,7 +101,7 @@ public class OptionComponent extends VerticalLayout {
 
     private HasEnabled renderedOption;
     private final Option<?> option;
-    private ToggleButton toggle;
+    private Switch toggle;
     private VerticalLayout optionLayout;
 
     /**
@@ -149,7 +149,7 @@ public class OptionComponent extends VerticalLayout {
 
 	if (canBeDisabled) {
 
-	    toggle = OptionComponentFactory.createOptionToggleButton(this, value, enabled);
+	    toggle = OptionComponentFactory.createOptionSwitch(this, value, enabled);
 
 	    mainLayout.add(toggle);
 	}

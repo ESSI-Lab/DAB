@@ -1,4 +1,4 @@
-package eu.essi_lab.cfga.gui.components.option.listener;
+package eu.essi_lab.cfga.gui.components.setting.listener;
 
 /*-
  * #%L
@@ -22,32 +22,28 @@ package eu.essi_lab.cfga.gui.components.option.listener;
  */
 
 import com.vaadin.flow.component.HasValue.*;
-import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.listener.*;
-import eu.essi_lab.cfga.gui.components.option.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
 
-/**
- * @author Fabrizio
- */
 @SuppressWarnings("serial")
-public class OptionToggleButtonListener extends AbstractValueChangeListener {
+public class SettingSwitchListener extends AbstractValueChangeListener {
 
-    private final OptionComponent optionComponent;
+    private final SettingComponent settingComponent;
 
     /**
-     * @param optionComponent
+     * @param settingComponent
      */
-    public OptionToggleButtonListener(OptionComponent optionComponent) {
+    public SettingSwitchListener(SettingComponent settingComponent) {
 
-	this.optionComponent = optionComponent;
+	this.settingComponent = settingComponent;
     }
 
+    /**
+     * @param event
+     */
     @Override
     protected void handleEvent(ValueChangeEvent<?> event) {
 
-	IdleTracker.getInstance().reset();
-
-	boolean enabled = (Boolean) event.getValue();
-	optionComponent.onToggleStateChanged(enabled);
+	settingComponent.onToggleStateChanged(event);
     }
 }

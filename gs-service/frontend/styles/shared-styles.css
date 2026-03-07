@@ -42,15 +42,37 @@ vaadin-checkbox.booleanChoice[disabled]::part(checkbox) {
 }
 
 /* ------------- */
-/* Toggle button */
+/* switch button */
 /* ------------- */
 
 /* Outside */
 
 vaadin-checkbox[theme~="switch"]::part(checkbox) {
-    border-radius: 9999px;
-    width: var(--lumo-size-m);
+    width: calc(1.5em * 2 - 12px);
+    height: 1.5em;
+    border-radius: 0.75em;
+    background-color: var(--lumo-contrast-40pct);
+    margin: 0;
+    transition: background-color 0.18s cubic-bezier(.4, 0, .2, 1);
 }
+
+/* Inside */
+
+vaadin-checkbox[theme~="switch"]::part(checkbox)::after {
+     content: "";
+     width: calc(1.5em - 10px);
+     height: calc(1.5em - 10px);
+     border-radius: 50%;
+     background-color: var(--lumo-primary-contrast-color);
+     border: none;
+     top: 2px;
+     left: 2px;
+     transform: none;
+     opacity: 1;
+     transition: transform 0.5s cubic-bezier(.4, 0, .2, 1);
+     will-change: transform;
+}
+
 
 /* Outside not checked */
 
@@ -59,10 +81,38 @@ vaadin-checkbox[theme~="switch"]:not([checked])::part(checkbox) {
     background-color: white;
 }
 
+ /* Inside not checked   */
+
+ vaadin-checkbox[theme~="switch"]:not([checked])::part(checkbox)::after {
+    background-color: gray;
+ }
+
+
+/* Outside  checked */
+
+vaadin-checkbox[theme~="switch"][checked]::part(checkbox) {
+    background-color: var(--lumo-primary-color);
+}
+
+
+/* Inside checked */
+
+vaadin-checkbox[theme~="switch"][checked]::part(checkbox)::after {
+    transform: translate(calc(100% - 8px));
+}
+
 /* Outside checked / disabled */
 
 vaadin-checkbox[theme~="switch"][checked][disabled]::part(checkbox) {
-    border: 1px solid var(--lumo-contrast-30pct);
+    background-color: var(--lumo-primary-color);
+    opacity: 0.2;
+}
+
+/* Inside checked / disabled */
+
+vaadin-checkbox[theme~="switch"][checked][disabled]::part(checkbox)::after {
+    background-color: white;
+    opacity: 1;
 }
 
 /* Outside not checked / disabled */
@@ -71,35 +121,86 @@ vaadin-checkbox[theme~="switch"]:not([checked])[disabled]::part(checkbox) {
     border: 1px solid var(--lumo-contrast-30pct);
 }
 
+/* Inside not checked / disabled */
+
+vaadin-checkbox[theme~="switch"]:not([checked])[disabled]::part(checkbox)::after {
+    background-color: hsl(213.33deg 12.22% 43.33% / 62%);
+    opacity: 0.5
+}
+
+/* ------------------- */
+/* switch button small */
+/* ------------------- */
+
+/* Outside */
+
+vaadin-checkbox[theme~="switchSmall"]::part(checkbox) {
+    border-radius: 9999px;
+    width: var(--lumo-size-m);
+    transition: background-color 0.18s cubic-bezier(.4, 0, .2, 1);
+}
+
+
 /* Inside */
 
-vaadin-checkbox[theme~="switch"]::part(checkbox)::after {
+vaadin-checkbox[theme~="switchSmall"]::part(checkbox)::after {
     content: "";
     height: calc(var(--lumo-size-m) / 3);
+    width: calc(var(--lumo-size-m) / 3);
     background-color: var(--lumo-secondary-text-color);
     border-radius: 9999px;
     inset: 0;
     margin: calc(var(--lumo-size-m) / 12);
     opacity: 1;
-    transition: transform 0.2s;
-    width: calc(var(--lumo-size-m) / 3);
+    transition: transform 0.5s cubic-bezier(.4, 0, .2, 1);
+    will-change: transform;
 }
+
+/* Outside not checked */
+
+vaadin-checkbox[theme~="switchSmall"]:not([checked])::part(checkbox) {
+    border: 1px solid gray;
+    background-color: white;
+}
+
+/* Outside  checked */
+
+vaadin-checkbox[theme~="switchSmall"][checked]::part(checkbox) {
+    background-color: var(--lumo-primary-color);
+    border: 1px solid var(--lumo-primary-color);
+}
+
 
 /* Inside checked */
 
-vaadin-checkbox[theme~="switch"][checked]::part(checkbox)::after {
+vaadin-checkbox[theme~="switchSmall"][checked]::part(checkbox)::after {
     background-color: var(--lumo-primary-contrast-color);
     transform: translateX(calc(var(--lumo-size-m) / 2));
 }
 
+/* Outside checked / disabled */
+
+vaadin-checkbox[theme~="switchSmall"][checked][disabled]::part(checkbox) {
+    background-color: var(--lumo-primary-color);
+    opacity: 0.2;
+}
+
 /* Inside checked / disabled */
 
-vaadin-checkbox[theme~="switch"][checked][disabled]::part(checkbox)::after {
-    background-color: hsl(213.33deg 12.22% 43.33% / 62%);
+vaadin-checkbox[theme~="switchSmall"][checked][disabled]::part(checkbox)::after {
+    background-color: white;
+    opacity: 1;
+}
+
+/* Outside not checked / disabled */
+
+vaadin-checkbox[theme~="switchSmall"]:not([checked])[disabled]::part(checkbox) {
+    border: 1px solid var(--lumo-contrast-30pct);
 }
 
 /* Inside not checked / disabled */
 
-vaadin-checkbox[theme~="switch"]:not([checked])[disabled]::part(checkbox)::after {
-   background-color: hsl(213.33deg 12.22% 43.33% / 62%);
+vaadin-checkbox[theme~="switchSmall"]:not([checked])[disabled]::part(checkbox)::after {
+    background-color: hsl(213.33deg 12.22% 43.33% / 62%);
+    opacity: 0.5;
 }

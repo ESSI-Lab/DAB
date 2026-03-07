@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -23,7 +23,6 @@ package eu.essi_lab.cfga.gui.components;
 
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.button.*;
-import com.vaadin.flow.component.checkbox.*;
 import com.vaadin.flow.component.combobox.*;
 import com.vaadin.flow.component.datetimepicker.*;
 import com.vaadin.flow.component.details.*;
@@ -33,6 +32,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.select.*;
 import com.vaadin.flow.component.textfield.*;
+import eu.essi_lab.cfga.gui.components.Switch.*;
 import eu.essi_lab.cfga.gui.components.option.*;
 import eu.essi_lab.cfga.gui.components.option.listener.*;
 import eu.essi_lab.cfga.option.*;
@@ -112,15 +112,12 @@ public class OptionComponentFactory {
      * @param enabled
      * @return
      */
-    public static ToggleButton createOptionToggleButton(OptionComponent optionComponent, boolean value, boolean enabled) {
+    public static Switch createOptionSwitch(OptionComponent optionComponent, boolean value, boolean enabled) {
 
-	ToggleButton toggle = ComponentFactory.createToggleButton(value, enabled);
-
-	toggle.addValueChangeListener(new OptionToggleButtonListener(optionComponent));
-
-	toggle.setHeightFull();
-
-	return toggle;
+	return ComponentFactory.createSwitch( //
+		value,//
+		enabled, //
+		new OptionSwitchListener(optionComponent));
     }
 
     /**
@@ -149,8 +146,8 @@ public class OptionComponentFactory {
 	    if (!option.isEditable() || forceReadonly) {
 
 		TextField textField = new TextField();
-		textField.setId("option-text-field-for-"+option.getKey());
-		textField.getStyle().set("font-size","14px");
+		textField.setId("option-text-field-for-" + option.getKey());
+		textField.getStyle().set("font-size", "14px");
 		textField.setReadOnly(true);
 
 		optionalValue.ifPresent(o -> textField.setValue(o.toString()));
@@ -224,8 +221,8 @@ public class OptionComponentFactory {
 	}
 
 	//
- 	// Boolean choice
- 	//
+	// Boolean choice
+	//
 	if (option.isValueOf(BooleanChoice.class)) {
 
 	    return createBooleanChoiceComponent(option, forceReadonly);
@@ -293,7 +290,7 @@ public class OptionComponentFactory {
     public static Component createOptionMultiSelectionComponent(Option<?> option, boolean forceReadOnly) {
 
 	MultiSelectComboBox<String> select = new MultiSelectComboBox<>();
-	select.getStyle().set("font-size","14px");
+	select.getStyle().set("font-size", "14px");
 
 	if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
 
@@ -358,7 +355,7 @@ public class OptionComponentFactory {
 	if (!option.isValueOf(BooleanChoice.class)) {
 
 	    Select<String> select = new Select<>();
-	    select.getStyle().set("font-size","14px");
+	    select.getStyle().set("font-size", "14px");
 
 	    if (!option.getValueClass().equals(Integer.class) && !option.getValueClass().equals(Double.class)) {
 
@@ -419,28 +416,26 @@ public class OptionComponentFactory {
 
 	HorizontalLayout horizontalLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
 
-	Checkbox checkbox = new Checkbox();
+	Switch switch_ = new Switch(Size.SMALL);
 
-	checkbox.addClassName("booleanChoice");
-
-	checkbox.getStyle().set("margin-left", "-4px");
+	switch_.getStyle().set("margin-left", "-4px");
 
 	Optional<String> selectedValue = StringValuesReader.readSelectedValue(option);
 
-	selectedValue.ifPresent(v -> checkbox.setValue(v.equals("Yes")));
+	selectedValue.ifPresent(v -> switch_.setValue(v.equals("Yes")));
 
 	if (option.canBeDisabled()) {
 
-	    checkbox.setEnabled(option.isEnabled());
+	    switch_.setEnabled(option.isEnabled());
 	}
 
 	if (!option.isEditable() || forceReadOnly) {
 
-	    checkbox.setReadOnly(true);
-	    checkbox.setEnabled(false);
+	    switch_.setReadOnly(true);
+	    switch_.setEnabled(false);
 	}
 
-	checkbox.addValueChangeListener(new OptionValueChangeListener(option));
+	switch_.addValueChangeListener(new OptionValueChangeListener(option));
 
 	Span span = OptionComponentFactory.createOptionSpan(option.getLabel());
 
@@ -449,7 +444,7 @@ public class OptionComponentFactory {
 
 	Optional<String> description = option.getDescription();
 
-	horizontalLayout.add(checkbox);
+	horizontalLayout.add(switch_);
 
 	horizontalLayout.add(span);
 

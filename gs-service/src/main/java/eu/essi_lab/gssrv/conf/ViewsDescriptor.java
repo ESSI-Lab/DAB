@@ -30,7 +30,6 @@ import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.tabs.*;
 import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.component.upload.*;
-import com.vaadin.flow.component.upload.receivers.*;
 import com.vaadin.flow.data.renderer.*;
 import com.vaadin.flow.server.streams.*;
 import eu.essi_lab.api.database.*;
@@ -299,8 +298,8 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 		readOnlyLabel.getStyle().set("margin-left", "16px");
 		readOnlyLabel.setWidth("65px");
 
-		ToggleButton toggleButton = ComponentFactory.createToggleButton(false, true);
-		toggleButton.setTooltipText("Edit view");
+		Switch switch_ = ComponentFactory.createSwitch(false, true);
+		switch_.setTooltipText("Edit view");
 
 		Button updateButton = new Button(VaadinIcon.UPLOAD.create());
 		updateButton.getStyle().set("margin-top", "-5px");
@@ -326,7 +325,7 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 
 			updateButton.setEnabled(false);
 
-			toggleButton.setValue(false);
+			switch_.setValue(false);
 
 			readOnlyLabel.setText("Read-only");
 
@@ -340,7 +339,7 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 		    }
 		});
 
-		toggleButton.addValueChangeListener(evt -> {
+		switch_.addValueChangeListener(evt -> {
 
 		    readOnlyLabel.setText(evt.getValue() ? "Editable" : "Read-only");
 		    updateButton.setEnabled(evt.getValue());
@@ -389,7 +388,7 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 		});
 
 		buttonsLayout.add(readOnlyLabel);
-		buttonsLayout.add(toggleButton);
+		buttonsLayout.add(switch_);
 		buttonsLayout.add(updateButton);
 
 		buttonsLayout.add(copyButton);
