@@ -106,6 +106,8 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 	public DescriptorProvider() {
 	    descriptor = TabContentDescriptorBuilder.get(SessionCoordinatorSetting.class).//
 		    withLabel("Session coordinator").//
+		    withShowDirective("Global setting for distributed session coordination when running on multiple nodes (e.g. for ARPA Lombardia)."
+		    + " When enabled, uses Redis for distributed token acquisition (queue + heartbeat)").
 		    build();
 	}
 
