@@ -860,7 +860,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	} else {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Trust store credentials missing");
+	    GSLoggerFactory.getLogger(getClass()).info("Trust store credentials missing, using default trust store");
 	}
     }
 
