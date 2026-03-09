@@ -1163,13 +1163,24 @@
                 <groupId>com.marklogic</groupId>
                 <artifactId>marklogic-xcc</artifactId>
                 <version>${xcc.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sun.mail</groupId>
+                        <artifactId>javax.mail</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
                 <groupId>com.marklogic</groupId>
                 <artifactId>marklogic-client-api</artifactId>
                 <version>${marklogic-client-api.version}</version>
-
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.sun.mail</groupId>
+                        <artifactId>javax.mail</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
