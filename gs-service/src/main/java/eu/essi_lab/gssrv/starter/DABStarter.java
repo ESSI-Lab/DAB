@@ -21,64 +21,72 @@ package eu.essi_lab.gssrv.starter;
  * #L%
  */
 
-import eu.essi_lab.api.database.cfg.*;
-import eu.essi_lab.api.database.factory.*;
-import eu.essi_lab.augmenter.worker.*;
-import eu.essi_lab.authorization.xacml.*;
+import eu.essi_lab.api.database.cfg.DatabaseSource;
+import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
+import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
+import eu.essi_lab.authorization.xacml.XACMLAuthorizer;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
-import eu.essi_lab.cfga.check.CheckResponse.*;
-import eu.essi_lab.cfga.check.scheme.*;
-import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.*;
-import eu.essi_lab.cfga.gs.demo.*;
-import eu.essi_lab.cfga.gs.setting.*;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
-import eu.essi_lab.cfga.gs.setting.database.*;
-import eu.essi_lab.cfga.gs.setting.harvesting.*;
-import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
-import eu.essi_lab.cfga.patch.*;
+import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
+import eu.essi_lab.cfga.check.scheme.SchemeMethod;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.DefaultConfiguration;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
+import eu.essi_lab.cfga.gs.DefaultConfigurationScheme;
+import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
+import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
+import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.setting.*;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.*;
-import eu.essi_lab.cfga.source.*;
-import eu.essi_lab.configuration.*;
-import eu.essi_lab.gssrv.conf.task.*;
-import eu.essi_lab.gssrv.health.*;
-import eu.essi_lab.gssrv.servlet.*;
-import eu.essi_lab.harvester.*;
-import eu.essi_lab.jaxb.common.*;
-import eu.essi_lab.jaxb.wms.extension.*;
-import eu.essi_lab.lib.net.downloader.*;
-import eu.essi_lab.lib.net.s3.*;
-import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.messages.*;
-import eu.essi_lab.messages.bond.jaxb.*;
-import eu.essi_lab.model.exceptions.*;
-import eu.essi_lab.model.resource.*;
-import eu.essi_lab.profiler.esri.feature.*;
-import eu.essi_lab.profiler.esri.feature.query.*;
-import eu.essi_lab.profiler.wms.extent.*;
-import eu.essi_lab.profiler.wms.extent.map.*;
-import eu.essi_lab.request.executor.schedule.*;
-import eu.essi_lab.shared.driver.es.stats.*;
-import org.quartz.*;
+import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
+import eu.essi_lab.cfga.source.FileSource;
+import eu.essi_lab.cfga.source.S3Source;
+import eu.essi_lab.configuration.ClusterType;
+import eu.essi_lab.configuration.ExecutionMode;
+import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
+import eu.essi_lab.gssrv.health.HealthCheck;
+import eu.essi_lab.gssrv.servlet.ServletListener;
+import eu.essi_lab.harvester.HarvestingReportsHandler;
+import eu.essi_lab.jaxb.common.CommonContext;
+import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
+import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.FileUtils;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.StreamUtils;
+import eu.essi_lab.messages.JVMOption;
+import eu.essi_lab.messages.bond.jaxb.ViewFactory;
+import eu.essi_lab.model.exceptions.ErrorInfo;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Dataset;
+import eu.essi_lab.profiler.esri.feature.FeatureLayer1StationsArctic;
+import eu.essi_lab.profiler.esri.feature.query.CachedCollections;
+import eu.essi_lab.profiler.wms.extent.WMSLayer;
+import eu.essi_lab.profiler.wms.extent.map.WMSGetMapHandler;
+import eu.essi_lab.request.executor.schedule.DownloadReportsHandler;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
+import jakarta.ws.rs.ext.RuntimeDelegate;
+import org.quartz.SchedulerException;
 
-import jakarta.ws.rs.ext.*;
-import jakarta.xml.bind.*;
-
-import java.io.*;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509TrustManager;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.MessageDigest;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 
-import static eu.essi_lab.cfga.ConfigurationChangeListener.ConfigurationChangeEvent.*;
 import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED;
 
 /**
@@ -803,15 +811,15 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Trust store init STARTED");
 
-	    File target = null;
+	    File customTrustStore = null;
 
 	    File trustFile = new File(trustStore.get());
 
 	    if (trustFile.exists()) {
 
-		target = trustFile;
+		customTrustStore = trustFile;
 
-		GSLoggerFactory.getLogger(getClass()).info("Loading trust store from file system: {}", target.getAbsolutePath());
+		GSLoggerFactory.getLogger(getClass()).info("Loading trust store from file system: {}", customTrustStore.getAbsolutePath());
 
 	    } else {
 
@@ -821,16 +829,16 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Loading trust store from S3 bucket: {}", trustStore.get());
 
-		    target = new File(FileUtils.getTempDir(), trustStoreName.get());
+		    customTrustStore = new File(FileUtils.getTempDir(), trustStoreName.get());
 
 		    boolean downloaded = wrapper.get().download( //
 			    trustStore.get(), //
 			    trustStoreName.get(), //
-			    target);
+			    customTrustStore);
 
 		    if (!downloaded) {
 
-			target = null;
+			customTrustStore = null;
 
 			GSLoggerFactory.getLogger(getClass()).error("Error occurred. Unable to download trust store from S3");
 		    }
@@ -841,26 +849,88 @@ public class DABStarter implements ConfigurationChangeListener {
 		}
 	    }
 
-	    if (target != null) {
+	    if (customTrustStore != null) {
 
-		System.setProperty("dab.net.ssl.trustStore", target.getAbsolutePath());
-		System.setProperty("dab.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
-		System.setProperty("dab.net.ssl.trustStorePassword", trustStorePwd.get());
+		try {
+		    File mergedTrustStore = new File(FileUtils.getTempDir(), "dab-merged-truststore.jks");
 
-		System.setProperty("javax.net.ssl.trustStore", target.getAbsolutePath());
-		System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
-		System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
+		    // --- 1. Load default JVM truststore using TrustManagerFactory ---
+		    TrustManagerFactory defaultTMF = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		    defaultTMF.init((KeyStore) null); // null = default JVM truststore
 
-		GSLoggerFactory.getLogger(getClass()).info("Using trust store at {}", target.getAbsolutePath());
+		    // Extract the X509TrustManager
+		    X509TrustManager defaultTM = null;
+		    for (var tm : defaultTMF.getTrustManagers()) {
+			if (tm instanceof X509TrustManager) {
+			    defaultTM = (X509TrustManager) tm;
+			    break;
+			}
+		    }
+		    if (defaultTM == null) {
+			GSLoggerFactory.getLogger(getClass()).error("Error loading default trust store");
+			throw new IllegalStateException("No X509TrustManager found");
+		    }
 
-		FileUtils.printTrustStoreCertificates(target, trustStorePwd.get());
+		    X509Certificate[] defaultCerts = defaultTM.getAcceptedIssuers();
+		GSLoggerFactory.getLogger(getClass()).info("Certificates from default JVM trust store: {}", defaultCerts.length);
+		    // --- 2. Load custom truststore ---
+		    KeyStore customKS = KeyStore.getInstance("JKS");
+		    try (InputStream is = new java.io.FileInputStream(customTrustStore)) {
+			customKS.load(is, trustStorePwd.get().toCharArray());
+		    }
+		    List<String> customAliases = StreamUtils.iteratorToStream(customKS.aliases().asIterator()).toList();
+		    GSLoggerFactory.getLogger(getClass()).info("Certificates from custom trust store: {}", customAliases.size());
 
-		GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
+
+		    // --- 3. Create merged KeyStore ---
+		    KeyStore mergedKS = KeyStore.getInstance("JKS");
+		    mergedKS.load(null, null); // initialize empty
+
+		    // Copy default JVM certs
+		    for (int i = 0; i < defaultCerts.length; i++) {
+			String alias = "default-" + i;
+			mergedKS.setCertificateEntry(alias, defaultCerts[i]);
+		    }
+
+		    // Copy custom certs
+		    Enumeration<String> aliases = customKS.aliases();
+		    while (aliases.hasMoreElements()) {
+			String alias = aliases.nextElement();
+			String mergedAlias = alias;
+			int i = 1;
+			while (mergedKS.containsAlias(mergedAlias)) {
+			    mergedAlias = alias + "_" + i;
+			    i++;
+			}
+			mergedKS.setCertificateEntry(mergedAlias, customKS.getCertificate(alias));
+		    }
+
+		    // --- 4. Save merged truststore ---
+		    try (FileOutputStream fos = new FileOutputStream(mergedTrustStore)) {
+			mergedKS.store(fos, trustStorePwd.get().toCharArray());
+		    }
+
+		    System.out.println("Merged truststore saved to: " + mergedTrustStore.getAbsolutePath());
+
+		    // --- 5. Set JVM system properties ---
+		    System.setProperty("javax.net.ssl.trustStore", mergedTrustStore.getAbsolutePath());
+		    System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
+		    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
+
+
+		    GSLoggerFactory.getLogger(getClass()).info("Using merged trust store at {}", mergedTrustStore.getAbsolutePath());
+
+		    FileUtils.printTrustStoreCertificates(mergedTrustStore, trustStorePwd.get());
+
+		    GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error("Error merging trust stores",e);
+		}
 	    }
 
 	} else {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Trust store credentials missing");
+	    GSLoggerFactory.getLogger(getClass()).info("Trust store credentials missing, using default trust store");
 	}
     }
 

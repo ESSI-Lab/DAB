@@ -465,7 +465,7 @@ public class Downloader {
 	    String username, //
 	    String password) throws FailsafeException, IOException, InterruptedException {
 
-	return downloadResponse(request, username, password, null, null);
+	return downloadResponse(request, username, password);
     }
 
     /**
@@ -573,9 +573,6 @@ public class Downloader {
      * @param port
      * @param username
      * @param password
-     * @param trustStoreStream
-     * @param trustStorePassword
-     * @param certificatePassword
      * @return
      */
     private HttpClient createHttpClient(//
