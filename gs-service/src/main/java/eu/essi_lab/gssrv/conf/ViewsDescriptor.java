@@ -296,6 +296,7 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 
 		Span readOnlyLabel = ComponentFactory.createSpan("Read-only", 13);
 		readOnlyLabel.getStyle().set("margin-left", "16px");
+		readOnlyLabel.getStyle().set("margin-top", "8px");
 		readOnlyLabel.setWidth("65px");
 
 		Switch switch_ = ComponentFactory.createSwitch(false, true);
