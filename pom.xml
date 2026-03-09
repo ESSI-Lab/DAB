@@ -2376,8 +2376,6 @@
 
         <module>custom-tasks</module>
 
-        <module>views</module>
-
     </modules>
 
     <repositories>
