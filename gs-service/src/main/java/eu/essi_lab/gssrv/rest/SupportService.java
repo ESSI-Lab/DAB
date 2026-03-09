@@ -1,106 +1,42 @@
 package eu.essi_lab.gssrv.rest;
 
-import java.util.*;
-import java.util.Map.Entry;
-
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
+import eu.essi_lab.access.datacache.*;
 import eu.essi_lab.api.database.*;
-import jakarta.jws.WebService;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.authorization.userfinder.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.gssrv.portal.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.odip.*;
+import eu.essi_lab.lib.odip.ODIPVocabularyHandler.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.RequestMessage.*;
+import eu.essi_lab.messages.ResourceSelector.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.stats.*;
+import eu.essi_lab.messages.termfrequency.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.index.jaxb.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.data.*;
+import eu.essi_lab.pdk.wrt.*;
+import eu.essi_lab.profiler.semantic.*;
+import eu.essi_lab.request.executor.*;
+import jakarta.jws.*;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.core.Response;
-
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.views.DefaultViewManager;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import eu.essi_lab.access.datacache.DataCacheConnector;
-import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
-import eu.essi_lab.access.datacache.SourceCacheStats;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.gssrv.portal.PortalTranslator;
-import eu.essi_lab.lib.odip.ODIPVocabularyHandler;
-import eu.essi_lab.lib.odip.ODIPVocabularyHandler.OutputFormat;
-import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Profile;
-import eu.essi_lab.lib.odip.ODIPVocabularyHandler.Target;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.AccessMessage;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.HarvestingProperties;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.RequestMessage.IterationMode;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
-import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.View.ViewVisibility;
-import eu.essi_lab.messages.stats.ComputationResult;
-import eu.essi_lab.messages.stats.ResponseItem;
-import eu.essi_lab.messages.stats.StatisticsMessage;
-import eu.essi_lab.messages.stats.StatisticsResponse;
-import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
-import eu.essi_lab.model.GSProperty;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.index.jaxb.CardinalValues;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.model.resource.data.CRS;
-import eu.essi_lab.model.resource.data.DataDescriptor;
-import eu.essi_lab.model.resource.data.DataFormat;
-import eu.essi_lab.model.resource.data.DataObject;
-import eu.essi_lab.model.resource.data.DataType;
-import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.profiler.semantic.Stats;
-import eu.essi_lab.request.executor.IAccessExecutor;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.*;
+import org.json.*;
 import org.owasp.encoder.*;
+
+import java.io.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.Map.*;
 
 @WebService
 @Path("/")

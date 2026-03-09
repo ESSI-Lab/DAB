@@ -79,12 +79,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>views</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
 		</dependency>

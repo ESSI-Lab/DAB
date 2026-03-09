@@ -34,12 +34,6 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>views</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>core-messages</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
