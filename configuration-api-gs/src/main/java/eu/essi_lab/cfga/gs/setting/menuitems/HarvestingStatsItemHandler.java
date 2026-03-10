@@ -75,16 +75,17 @@ public class HarvestingStatsItemHandler extends GridMenuItemHandler {
 	    HashMap<String, Boolean> selection) {
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
-	dialog.setTitle("Harvesting statistics");
-	dialog.setHeight(400, Unit.PIXELS);
+	dialog.getFooterLayout().getStyle().remove("height");
+	dialog.getContentLayout().getStyle().set("padding-bottom", "0px");
+	dialog.setHeader("Harvesting statistics");
+	dialog.setHeight(410, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
 	dialog.getConfirmButton().setVisible(false);
 	dialog.setCancelText("Close");
 
 	TextArea textArea = new TextArea();
-
-	textArea.setWidth(570, Unit.PIXELS);
-	textArea.setHeight(260, Unit.PIXELS);
+	textArea.setWidthFull();
+	textArea.setMaxHeight(260, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");
 	textArea.setReadOnly(true);
 

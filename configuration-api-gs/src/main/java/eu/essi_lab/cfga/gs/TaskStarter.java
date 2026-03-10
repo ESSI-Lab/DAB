@@ -164,7 +164,9 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
 	//
 
 	dialog = new ConfirmationDialog();
-	dialog.setTitle(getDialogTitle(event));
+	dialog.setHeader(getDialogTitle(event));
+	dialog.getFooterLayout().getStyle().remove("height");
+	dialog.getContentLayout().getStyle().set("padding-bottom", "0px");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(650, Unit.PIXELS);
 	dialog.setConfirmText("Start");
@@ -172,20 +174,16 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
 	dialog.setCloseOnConfirm(false);
 	dialog.setOnConfirmListener(this);
 
-	dialog.getFooterLayout().getStyle().remove("height");
-	dialog.getContentLayout().getStyle().set("padding", "0px");
-
 	textArea = new TextArea();
 	textArea.setValue(getTextAreaText(event));
 	textArea.setSizeFull();
-	textArea.setWidth(635, Unit.PIXELS);
-	textArea.setHeight(330, Unit.PIXELS);
+	textArea.setMaxHeight(320, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");
-
 	textArea.setReadOnly(true);
 
 	forceVolatileScheduler = new Checkbox("Force usage of volatile scheduler", true);
 	forceVolatileScheduler.getStyle().set("font-size", "13px");
+	forceVolatileScheduler.getStyle().set("margin-left", "14px");
 
 	Component buttons = dialog.getFooterLayout().getComponentAt(0);
 

@@ -162,7 +162,7 @@ public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.Grid
 
 	final EnhancedDialog dialog = new EnhancedDialog();
 	dialog.setHeight(200, Unit.PIXELS);
-	dialog.setTitle("Add view");
+	dialog.setHeader("Add view");
 	dialog.open();
 
 	Upload upload = new Upload();

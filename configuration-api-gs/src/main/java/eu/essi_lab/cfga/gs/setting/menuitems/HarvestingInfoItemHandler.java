@@ -68,18 +68,19 @@ public class HarvestingInfoItemHandler extends GridMenuItemHandler {
 	String values = formatRowValues(item);
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
-	dialog.setTitle("Harvesting info");
+	dialog.getFooterLayout().getStyle().remove("height");
+	dialog.getContentLayout().getStyle().set("padding-bottom", "0px");
+	dialog.setHeader("Harvesting info");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
 	dialog.getConfirmButton().setVisible(false);
 	dialog.setCancelText("Close");
 
 	TextArea textArea = new TextArea();
+	textArea.setMaxHeight(340, Unit.PIXELS);
 	textArea.setValue(values);
-	textArea.setWidth(580, Unit.PIXELS);
-	textArea.setHeight(350, Unit.PIXELS);
-	textArea.getStyle().set("font-size", "14px");
-
+	textArea.setSizeFull();
+ 	textArea.getStyle().set("font-size", "14px");
 	textArea.setReadOnly(true);
 
 	dialog.setContent(textArea);

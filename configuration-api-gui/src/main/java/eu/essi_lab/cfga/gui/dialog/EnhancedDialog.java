@@ -42,7 +42,7 @@ public class EnhancedDialog extends Dialog {
     private final VerticalLayout footer;
     private final VerticalLayout content;
     private final Button closeButton;
-    private final Span titleSpan;
+    private final Span headerSpan;
 
     private ComponentEventListener<ClickEvent<Button>> onCloseListener;
 
@@ -114,10 +114,10 @@ public class EnhancedDialog extends Dialog {
 	//
 	//
 
-	titleSpan = ComponentFactory.createSpan();
-	titleSpan.getStyle().set("font-weight", "bold");
+	headerSpan = ComponentFactory.createSpan();
+	headerSpan.getStyle().set("font-weight", "bold");
 
-	header.add(titleSpan);
+	header.add(headerSpan);
 
 	closeButton = new Button(new Icon(VaadinIcon.CLOSE_SMALL), e -> {
 
@@ -182,9 +182,9 @@ public class EnhancedDialog extends Dialog {
     /**
      * @param text
      */
-    public void setTitle(String text) {
+    public void setHeader(String text) {
 
-	titleSpan.setText(text);
+	headerSpan.setText(text);
     }
 
     /**
@@ -242,9 +242,9 @@ public class EnhancedDialog extends Dialog {
     /**
      * @return
      */
-    public Span getTitleSpan() {
+    public Span getHeaderSpan() {
 
-	return titleSpan;
+	return headerSpan;
     }
 
     /**

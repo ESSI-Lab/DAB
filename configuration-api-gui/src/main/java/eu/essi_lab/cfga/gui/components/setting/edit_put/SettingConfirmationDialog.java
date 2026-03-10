@@ -81,7 +81,7 @@ public class SettingConfirmationDialog extends ConfirmationDialog {
 
 		infoText = ComponentFactory.createSpan("Please fix the errors in order to proceed");
 
-		setTitle("Validation failed");
+		setHeader("Validation failed");
 
 		Span errorsLabel = ComponentFactory.createSpan("The following errors are detected:", 15);
 		content.add(errorsLabel);

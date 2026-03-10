@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.option.listener;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -200,11 +200,16 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
 	    setModal(false);
 	    setWidth(600, Unit.PIXELS);
-	    setTitle("Input required");
+	    setHeader("Input required");
+	    getContentLayout().getStyle().set("padding", "0px");
 
 	    addToCloseAll();
 
 	    VerticalLayout layout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	    layout.getStyle().set("padding", "0px");
+	    layout.getStyle().set("padding-top","20px");
+	    layout.getStyle().set("padding-right", "20px");
+
 	    setContent(layout);
 
 	    Span inputSpan = ComponentFactory.createSpan(loader.getRequestInputText());

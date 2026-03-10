@@ -31,7 +31,6 @@ import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.radiobutton.*;
 import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.component.upload.*;
-import com.vaadin.flow.component.upload.receivers.*;
 import com.vaadin.flow.server.streams.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.DatabaseFolder.*;
@@ -280,7 +279,7 @@ public class ConfigImporter extends VerticalLayout {
 	    confirmationDialog.setOnCancelListener(evt -> upload.clearFileList());
 	    confirmationDialog.setWidth(670, Unit.PIXELS);
 
-	    confirmationDialog.setTitle("Configuration overwriting");
+	    confirmationDialog.setHeader("Configuration overwriting");
 	    confirmationDialog.getContentLayout().getStyle().set("font-size", "14px");
 	    confirmationDialog.open();
 
@@ -370,7 +369,7 @@ public class ConfigImporter extends VerticalLayout {
 	    confirmationDialog.setOnCancelListener(evt -> upload.clearFileList());
 	    confirmationDialog.setWidth(670, Unit.PIXELS);
 
-	    confirmationDialog.setTitle("Configuration overwriting");
+	    confirmationDialog.setHeader("Configuration overwriting");
 	    confirmationDialog.open();
 
 	} else {

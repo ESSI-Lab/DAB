@@ -118,7 +118,7 @@ public class SettingRemoveButtonListener implements ButtonChangeListener {
     private ConfirmationDialog createSettingRemoveDialog(String title, ButtonChangeListener onConfirmListener) {
 
 	ConfirmationDialog dialog = new ConfirmationDialog("Are you sure you want to remove this setting?", onConfirmListener);
-	dialog.setTitle(title);
+	dialog.setHeader(title);
 
 	dialog.addToCloseAll();
 

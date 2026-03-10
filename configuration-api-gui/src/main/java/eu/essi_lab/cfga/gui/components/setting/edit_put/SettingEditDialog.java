@@ -72,7 +72,7 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
 
 	String title = editDirective.flatMap(EditDirective::getDescription).orElse("Edit setting");
 
-	setTitle(title);
+	setHeader(title);
 	setConfirmText("Apply changes");
 	setCancelText("Discard changes");
 

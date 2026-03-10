@@ -73,7 +73,7 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 		collect(Collectors.joining("\n"));
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
-	dialog.setTitle("Remove selected settings");
+	dialog.setHeader("Remove selected settings");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
 

@@ -189,7 +189,7 @@ public class NotificationDialog extends ConfirmationDialog {
      */
     private NotificationDialog(String title, String text, int width, Throwable throwable) {
 
-	setTitle(title);
+	setHeader(title);
 
 	if (text == null || text.trim().isEmpty()) {
 

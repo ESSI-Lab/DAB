@@ -39,7 +39,7 @@ class LoginDialog extends EnhancedDialog {
      */
     public LoginDialog(String requestURL) {
 
-	setTitle("Administrator login");
+	setHeader("Administrator login");
 
 	getCloseButton().getStyle().set("display", "none");
 

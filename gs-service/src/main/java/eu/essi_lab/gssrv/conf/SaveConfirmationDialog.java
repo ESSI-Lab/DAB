@@ -10,29 +10,26 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-import eu.essi_lab.cfga.gui.components.ComponentFactory;
-import eu.essi_lab.cfga.gui.components.listener.ButtonChangeListener;
-import eu.essi_lab.cfga.gui.dialog.ConfirmationDialog;
-import eu.essi_lab.cfga.gui.dialog.NotificationDialog;
-import eu.essi_lab.gssrv.starter.DABStarter;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.listener.*;
+import eu.essi_lab.cfga.gui.dialog.*;
+import eu.essi_lab.gssrv.starter.*;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -43,23 +40,32 @@ class SaveConfirmationDialog extends ConfirmationDialog {
     private GSConfigurationView view;
 
     /**
-     * 
+     *
      */
     public SaveConfirmationDialog(GSConfigurationView view) {
 
 	addToCloseAll();
 
 	this.view = view;
-	setTitle("Save confirmation");
+	setHeader("Save confirmation");
 	setWidth(500, Unit.PIXELS);
 
-	getFooterLayout().getStyle().set("border-top", "1px solid lightgray");
+	getContentLayout().getStyle().set("padding", "0px");
+	getContentLayout().getStyle().set("padding-top", "20px");
 
-	VerticalLayout verticalLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
-	verticalLayout.getStyle().set("overflow-y", "auto");
-	verticalLayout.getStyle().set("height", "400px");
+	VerticalLayout mainLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	mainLayout.getStyle().set("padding", "0px");
+	mainLayout.getStyle().set("padding-right", "15px");
+	mainLayout.getStyle().set("height", "400px");
 
-	setContent(verticalLayout);
+	setContent(mainLayout);
+
+	VerticalLayout contentLayout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
+	contentLayout.getStyle().set("padding", "0px");
+	contentLayout.getStyle().set("overflow-y", "auto");
+	contentLayout.getStyle().set("height", "360px");
+
+	mainLayout.add(contentLayout);
 
 	setOnConfirmListener(new ButtonChangeListener() {
 
@@ -75,9 +81,9 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    Span label = ComponentFactory.createSpan("New settings", 15);
 	    label.getStyle().set("font-weight", "bold");
 
-	    verticalLayout.add(label);
+	    contentLayout.add(label);
 
-	    GSConfigurationView.putSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
+	    GSConfigurationView.putSettingList.forEach(s -> contentLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.editedSettingList.isEmpty()) {
@@ -85,9 +91,9 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    Span label = ComponentFactory.createSpan("Edited settings", 15);
 	    label.getStyle().set("font-weight", "bold");
 
-	    verticalLayout.add(label);
+	    contentLayout.add(label);
 
-	    GSConfigurationView.editedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
+	    GSConfigurationView.editedSettingList.forEach(s -> contentLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.removedSettingList.isEmpty()) {
@@ -97,9 +103,9 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 		Span label = ComponentFactory.createSpan("Removed settings", 15);
 		label.getStyle().set("font-weight", "bold");
 
-		verticalLayout.add(label);
+		contentLayout.add(label);
 
-		GSConfigurationView.removedSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
+		GSConfigurationView.removedSettingList.forEach(s -> contentLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	    }
 
 	    {
@@ -108,9 +114,9 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 		    Span label = ComponentFactory.createSpan("Deselected settings", 15);
 		    label.getStyle().set("font-weight", "bold");
 
-		    verticalLayout.add(label);
+		    contentLayout.add(label);
 
-		    GSConfigurationView.additionalRemovalInfo.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s, 14)));
+		    GSConfigurationView.additionalRemovalInfo.forEach(s -> contentLayout.add(ComponentFactory.createSpan(s, 14)));
 		}
 	    }
 	}
@@ -120,9 +126,9 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    Span label = ComponentFactory.createSpan("New scheduled jobs", 15);
 	    label.getStyle().set("font-weight", "bold");
 
-	    verticalLayout.add(label);
+	    contentLayout.add(label);
 
-	    GSConfigurationView.newWorkerSettingList.forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
+	    GSConfigurationView.newWorkerSettingList.forEach(s -> contentLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.rescheduledWorkerSettingList.isEmpty()) {
@@ -130,10 +136,9 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    Span label = ComponentFactory.createSpan("Rescheduled/enabled jobs", 15);
 	    label.getStyle().set("font-weight", "bold");
 
-	    verticalLayout.add(label);
+	    contentLayout.add(label);
 
-	    GSConfigurationView.rescheduledWorkerSettingList
-		    .forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
+	    GSConfigurationView.rescheduledWorkerSettingList.forEach(s -> contentLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
 
 	if (!GSConfigurationView.unscheduledWorkerSettingList.isEmpty()) {
@@ -141,22 +146,25 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 	    Span label = ComponentFactory.createSpan("Unscheduled jobs", 15);
 	    label.getStyle().set("font-weight", "bold");
 
-	    verticalLayout.add(label);
+	    contentLayout.add(label);
 
-	    GSConfigurationView.unscheduledWorkerSettingList
-		    .forEach(s -> verticalLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
+	    GSConfigurationView.unscheduledWorkerSettingList.forEach(s -> contentLayout.add(ComponentFactory.createSpan(s.getName(), 14)));
 	}
+
+	//
+	//
+	//
 
 	Span label = ComponentFactory.createSpan("Click 'confirm' to save the configuration and apply all the changes'", 15);
 
 	label.getStyle().set("margin-top", "20px");
 	label.getStyle().set("margin-bottom", "5px");
 
-	verticalLayout.add(label);
+	mainLayout.add(label);
     }
 
     /**
-     * 
+     *
      */
     private void onConfigurationFlushConfirmed() {
 

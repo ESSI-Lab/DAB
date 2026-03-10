@@ -48,6 +48,7 @@ public class ConfirmationDialog extends EnhancedDialog {
     public ConfirmationDialog() {
 
 	this(null, null);
+
     }
 
     /**
@@ -58,16 +59,25 @@ public class ConfirmationDialog extends EnhancedDialog {
 
 	this.onConfirmListener = onConfirmListener;
 
+	getMainLayout().getStyle().set("padding", "0px");
+
+	getContentLayout().getStyle().set("padding", "15px");
+	getHeaderLayout().getStyle().set("padding", "15px");
+	getContentLayout().getStyle().set("padding-left", "20px");
+	getHeaderLayout().getStyle().set("padding-left", "20px");
+
+	getHeaderLayout().getStyle().set("background-color", "white");
+
 	setWidth(500, Unit.PIXELS);
 
 	setCloseOnConfirm(true);
 	setCloseOnCancel(true);
 
 	//
-	// Title
+	// Header
 	//
 
-	setTitle("Confirmation");
+	setHeader("Confirmation");
 
 	//
 	// Content
@@ -88,26 +98,6 @@ public class ConfirmationDialog extends EnhancedDialog {
 	// Footer
 	//
 
-	confirmButton = new Button("Confirm", e -> {
-
-	    if (this.onConfirmListener != null) {
-
-		this.onConfirmListener.onComponentEvent(e);
-	    }
-
-	    if (closeOnConfirm) {
-		close();
-	    }
-	});
-
-	confirmButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	confirmButton.getStyle().set("color", "red");
-	confirmButton.getStyle().set("border", "1px solid #80808061");
-	confirmButton.getStyle().set("padding", "0px");
-	confirmButton.getStyle().set("padding-left", "5px");
-	confirmButton.getStyle().set("padding-right", "5px");
-	confirmButton.getStyle().set("background-color", "#8080804d");
-
 	cancelButton = new Button("Cancel", e -> {
 
 	    if (this.onCancelListener != null) {
@@ -120,22 +110,41 @@ public class ConfirmationDialog extends EnhancedDialog {
 	    }
 	});
 
-	cancelButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	cancelButton.getStyle().set("margin-left", "5px");
-	cancelButton.getStyle().set("border", "1px solid #80808061");
-	cancelButton.getStyle().set("padding", "0px");
-	cancelButton.getStyle().set("padding-left", "5px");
-	cancelButton.getStyle().set("padding-right", "5px");
-	cancelButton.getStyle().set("background-color", "#8080804d");
+	cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+
+	confirmButton = new Button("Confirm", e -> {
+
+	    if (this.onConfirmListener != null) {
+
+		this.onConfirmListener.onComponentEvent(e);
+	    }
+
+	    if (closeOnConfirm) {
+		close();
+	    }
+	});
+
+	confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 	HorizontalLayout buttonsLayout = ComponentFactory.createNoSpacingNoMarginHorizontalLayout();
-	buttonsLayout.getStyle().set("padding", "5px");
-	buttonsLayout.getStyle().set("width", "auto");
-	buttonsLayout.getStyle().set("margin", "auto");
+	buttonsLayout.setWidthFull();
+	buttonsLayout.getStyle().set("background-color", "#f3f5f7");
+	buttonsLayout.getStyle().set("padding", "15px");
 
-	buttonsLayout.add(confirmButton, cancelButton);
+	Div div = ComponentFactory.createDiv();
+	div.setWidthFull();
+
+	buttonsLayout.add(cancelButton, div, confirmButton);
 
 	setFooter(buttonsLayout);
+    }
+
+    /**
+     * @param text
+     */
+    public void setHeader(String text) {
+
+	setHeader(new H3(text));
     }
 
     /**

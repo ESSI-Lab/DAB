@@ -58,7 +58,7 @@ class AdminConfigurationDialog extends SettingEditDialog {
 
 	getCancelButton().getStyle().set("display", "none");
 
-	setTitle("Administration settings");
+	setHeader("Administration settings");
 
 	VerticalLayout contentLayout = getContentLayout();
 
