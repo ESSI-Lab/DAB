@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -125,11 +125,11 @@ public class SettingComponent extends Div {
     private HashMap<String, RadioComponentsHandler> radioMap;
     private HashMap<String, CheckComponentsHandler> checkMap;
 
-    private HashMap<Setting, Integer> levelMap;
-    private HashMap<Setting, List<Setting>> childToParentsMap;
+    private HashMap<String, Integer> levelMap;
+    private HashMap<String, List<String>> childToParentsMap;
 
     private HashMap<String, List<Component>> settingNameToComponentsMap;
-    private HashMap<String, List<Component>> settingNameToToggleAndOptionsMap;
+    private HashMap<String, List<Component>> settingNameToSwitchAndOptionsMap;
 
     private final boolean forceReadonly;
     private Setting setting;
@@ -181,7 +181,7 @@ public class SettingComponent extends Div {
 	setWidthFull();
 
 	getStyle().set("background-color", "white");
- 	getStyle().set("border-radius", "5px");
+	getStyle().set("border-radius", "5px");
 	getStyle().set("margin-top", "0px");
 
 	radioMap = new HashMap<>();
@@ -189,7 +189,7 @@ public class SettingComponent extends Div {
 	levelMap = new HashMap<>();
 	childToParentsMap = new HashMap<>();
 	settingNameToComponentsMap = new HashMap<>();
-	settingNameToToggleAndOptionsMap = new HashMap<>();
+	settingNameToSwitchAndOptionsMap = new HashMap<>();
 
 	if (comparator == null) {
 
@@ -218,7 +218,7 @@ public class SettingComponent extends Div {
     /**
      * @param enabled
      */
-    public void onToggleStateChanged(ValueChangeEvent<?> event) {
+    public void onSwitchStateChanged(ValueChangeEvent<?> event) {
 
 	boolean enabled = (Boolean) event.getValue();
 
@@ -245,7 +245,7 @@ public class SettingComponent extends Div {
 	//
 	// updates the sub components
 	//
-	onToggleStateChanged(settingToUpdate, enabled);
+	onSwitchStateChanged(settingToUpdate, enabled);
     }
 
     /**
@@ -308,9 +308,9 @@ public class SettingComponent extends Div {
      * @param setting
      * @param enabled
      */
-    private void onToggleStateChanged(Setting setting, boolean enabled) {
+    private void onSwitchStateChanged(Setting setting, boolean enabled) {
 
-	List<Component> list = settingNameToToggleAndOptionsMap.get(setting.getName());
+	List<Component> list = settingNameToSwitchAndOptionsMap.get(setting.getName());
 
 	for (Component comp : list) {
 
@@ -394,7 +394,7 @@ public class SettingComponent extends Div {
 	//
 
 	int paddingLeft = computePaddingLeft(parent, setting);
-
+	
 	VerticalLayout mainLayout = SettingComponentFactory.createSettingMainLayout(//
 		parent, //
 		setting, "main-layout_" + setting.getName(), //
@@ -562,18 +562,18 @@ public class SettingComponent extends Div {
 	//
 	// disable button
 	//
-	Optional<Switch> toggle = handleToggleButton(parent, setting, headerLayout, selectionMode);
+	Optional<Switch> switch_ = handleSwith(parent, setting, headerLayout, selectionMode);
 
 	//
 	// options
 	//
 	Optional<OptionComponentLayout> optionLayout = handleOptions(parent, setting, mainLayout, configuration, selectionMode);
 
-	if (toggle.isPresent()) {
+	if (switch_.isPresent()) {
 
-	    List<Component> list = settingNameToToggleAndOptionsMap.computeIfAbsent(setting.getName(), k -> new ArrayList<>());
+	    List<Component> list = settingNameToSwitchAndOptionsMap.computeIfAbsent(setting.getName(), k -> new ArrayList<>());
 
-	    list.add(toggle.get());
+	    list.add(switch_.get());
 
 	    if (optionLayout.isPresent()) {
 
@@ -582,7 +582,7 @@ public class SettingComponent extends Div {
 		list.addAll(optionComponents);
 	    }
 
-	    onToggleStateChanged(setting, toggle.get().getValue());
+	    onSwitchStateChanged(setting, switch_.get().getValue());
 	}
     }
 
@@ -714,7 +714,7 @@ public class SettingComponent extends Div {
      * @param headerLayout
      * @param multiSelectionMode
      */
-    private Optional<Switch> handleToggleButton(//
+    private Optional<Switch> handleSwith(//
 	    Setting parent, //
 	    Setting setting, //
 	    HorizontalLayout headerLayout, //
@@ -963,14 +963,16 @@ public class SettingComponent extends Div {
 
 	if (parent != null) {
 
-	    List<Setting> list = childToParentsMap.computeIfAbsent(setting, k -> new ArrayList<>());
+	    List<String> list = childToParentsMap.computeIfAbsent(setting.getName(), k -> new ArrayList<>());
 
-	    List<Setting> superParents = childToParentsMap.get(parent);
+	    List<String> superParents = childToParentsMap.get(parent.getName());
+
 	    if (superParents != null) {
+
 		list.addAll(superParents);
 	    }
 
-	    list.add(parent);
+	    list.add(parent.getName());
 	}
     }
 
@@ -982,19 +984,18 @@ public class SettingComponent extends Div {
 
 	return childToParentsMap.//
 		keySet().//
-		stream().//
+		parallelStream().//
 		filter(child -> getParentNamesOfChild(child).contains(parentSettingName)).//
-		map(Setting::getName).//
-		collect(Collectors.toList());
+		toList();
     }
 
     /**
      * @param childSetting
      * @return
      */
-    private List<String> getParentNamesOfChild(Setting childSetting) {
+    private List<String> getParentNamesOfChild(String childSetting) {
 
-	return childToParentsMap.get(childSetting).stream().map(Setting::getName).collect(Collectors.toList());
+	return childToParentsMap.get(childSetting);
     }
 
     /**
@@ -1006,15 +1007,15 @@ public class SettingComponent extends Div {
 
 	if (parent == null) {
 
-	    levelMap.put(setting, -1);
+	    levelMap.put(setting.getIdentifier(), -1);
 
 	} else if (parent.getSelectionMode() != SelectionMode.UNSET) {
 
-	    Integer level = levelMap.getOrDefault(parent, -1);
-	    levelMap.put(setting, ++level);
+	    Integer level = levelMap.getOrDefault(parent.getIdentifier(), -1);
+	    levelMap.put(setting.getIdentifier(), ++level);
 	}
 
-	Integer level = levelMap.getOrDefault(setting, 0);
+	Integer level = levelMap.getOrDefault(setting.getIdentifier(), 0);
 
 	return (level) * LEVEL_LEFT_PADDING;
     }
