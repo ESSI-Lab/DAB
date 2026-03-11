@@ -25,7 +25,9 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
@@ -52,7 +54,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
 /**
- * Handler for OGC STA Locations entity set.
+ * Handler for OGC STA Locations entity set and Things(id)/Locations navigation.
  */
 public class LocationsHandler extends StreamingRequestHandler {
 
@@ -99,11 +101,22 @@ public class LocationsHandler extends StreamingRequestHandler {
 	    return;
 	}
 
+	STARequest staRequest = new STARequest(webRequest);
+	boolean isThingsLocations = staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Things
+		&& "Locations".equals(staRequest.getNavigationProperty().orElse(null));
+	if (isThingsLocations) {
+	    String thingId = staRequest.getEntityIdNormalized().orElse(null);
+	    if (thingId == null || thingId.isEmpty()) {
+		throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Missing Thing id").build());
+	    }
+	}
+
 	DiscoveryRequestTransformer transformer = getTransformer();
 	DiscoveryMessage message = transformer.transform(webRequest);
 
 	ResultSet<String> resultSet = executor.discoverDistinctStrings(message);
 	List<JSONObject> locations = new ArrayList<>();
+	Set<String> seenKeys = new LinkedHashSet<>();
 	String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
 
 	if (resultSet != null) {
@@ -114,34 +127,39 @@ public class LocationsHandler extends StreamingRequestHandler {
 		    if (id == null) {
 			continue;
 		    }
-		    String name = parser.getPlatformName();
-		    if (name == null) {
-			name = id;
-		    }
 		    GeographicBoundingBox bbox = parser.getBBOX();
 		    BigDecimal lat = null;
 		    BigDecimal lon = null;
-		    if (bbox!=null) {
-			 lon = parser.getBBOX().getBigDecimalWest();
-			 lat = parser.getBBOX().getBigDecimalNorth();
+		    if (bbox != null) {
+			lon = parser.getBBOX().getBigDecimalWest();
+			lat = parser.getBBOX().getBigDecimalNorth();
+		    }
+		    if (lon == null || lat == null) {
+			continue;
 		    }
 		    String alt = parser.getAltitude();
 		    BigDecimal altitude = null;
 		    if (alt != null && !alt.isEmpty()) {
 			altitude = new BigDecimal(alt.trim());
 		    }
-		    if (lon != null && lat != null) {
-			JSONObject loc = STAJsonWriter.location(id, lon, lat,altitude, name, baseUrl);
+		    String name = parser.getPlatformName();
+		    if (name == null) {
+			name = id;
+		    }
+		    String locKey = id + "|" + lon + "|" + lat + (altitude != null ? "|" + altitude : "");
+		    if (seenKeys.add(locKey)) {
+			JSONObject loc = STAJsonWriter.location(id, lon, lat, altitude, name, baseUrl);
 			locations.add(loc);
 		    }
 		} catch (Exception e) {
-		    e.printStackTrace();
+		    if (!isThingsLocations) {
+			e.printStackTrace();
+		    }
 		}
 	    }
 	}
 
-	STARequest staRequest = new STARequest(webRequest);
-	if (staRequest.getEntityId().isPresent()) {
+	if (staRequest.getEntityId().isPresent() && !isThingsLocations) {
 	    if (locations.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	    }
@@ -160,7 +178,10 @@ public class LocationsHandler extends StreamingRequestHandler {
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
 	    if (token != null) {
-		nextLink = STAJsonWriter.buildNextLink(baseUrl, "Locations", token, webRequest.getQueryString());
+		String entityPath = isThingsLocations
+			? "Things(" + staRequest.getEntityIdNormalized().get() + ")/Locations"
+			: "Locations";
+		nextLink = STAJsonWriter.buildNextLink(baseUrl, entityPath, token, webRequest.getQueryString());
 	    }
 	}
 

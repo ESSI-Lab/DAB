@@ -129,12 +129,19 @@ public class ThingsHandler extends StreamingRequestHandler {
 	}
 
 	STARequest staRequest = new STARequest(webRequest);
-	if (staRequest.getEntityId().isPresent()) {
+	// Single object only for Things(id), not for Locations(id)/Things navigation
+	boolean singleThing = staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Things
+		&& staRequest.getEntityId().isPresent()
+		&& !staRequest.getNavigationProperty().isPresent();
+	if (singleThing) {
 	    if (things.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	    }
 	    output.write(things.get(0).toString().getBytes(StandardCharsets.UTF_8));
 	    return;
+	}
+	if (things.isEmpty() && staRequest.getEntityId().isPresent()) {
+	    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	}
 
 	Integer count = null;
@@ -148,7 +155,12 @@ public class ThingsHandler extends StreamingRequestHandler {
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
 	    if (token != null) {
-		nextLink = STAJsonWriter.buildNextLink(baseUrl, "Things", token, webRequest.getQueryString());
+		String entityPath = "Things";
+		if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Locations
+			&& staRequest.getEntityIdNormalized().isPresent()) {
+		    entityPath = "Locations(" + staRequest.getEntityIdNormalized().get() + ")/Things";
+		}
+		nextLink = STAJsonWriter.buildNextLink(baseUrl, entityPath, token, webRequest.getQueryString());
 	    }
 	}
 

@@ -25,6 +25,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Optional;
 
+import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
@@ -35,9 +36,10 @@ import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.profiler.sta.STARequest.EntitySet;
 
 /**
- * Transformer for STA Locations entity set.
+ * Transformer for STA Locations entity set and Things(id)/Locations navigation.
  */
 public class LocationsTransformer extends STATransformer {
 
@@ -49,7 +51,21 @@ public class LocationsTransformer extends STATransformer {
     @Override
     protected Optional<SortedFields> getSortedFields() {
 	return Optional.of(new SortedFields(Arrays.asList(
-		new SimpleEntry<>(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING))));
+		new SimpleEntry<>(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING),
+		new SimpleEntry<>(MetadataElement.BOUNDING_BOX, SortOrder.ASCENDING))));
+    }
+
+    @Override
+    protected Page getPage(WebRequest request) throws GSException {
+	STARequest staRequest = new STARequest(request);
+	if (staRequest.getEntitySet().orElse(null) == EntitySet.Things
+		&& staRequest.getEntityId().isPresent()
+		&& "Locations".equals(staRequest.getNavigationProperty().orElse(null))) {
+	    int top = staRequest.getTop() != null ? staRequest.getTop() : 100;
+	    int skip = staRequest.getSkip() != null ? staRequest.getSkip() : 0;
+	    return new Page(skip + 1, top);
+	}
+	return super.getPage(request);
     }
 
     @Override

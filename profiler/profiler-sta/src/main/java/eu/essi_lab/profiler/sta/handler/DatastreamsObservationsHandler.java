@@ -232,6 +232,56 @@ public class DatastreamsObservationsHandler extends StreamingRequestHandler {
 	}
     }
 
+    /**
+     * Fetches observation values for a datastream in the given time window.
+     * Used by ObservationsHandler to delegate per-datastream fetching.
+     */
+    List<JSONObject> fetchObservationsForDatastream(WebRequest webRequest, DiscoveryMessage discoveryMessage,
+	    String datastreamId, String platformId, java.util.Date windowBegin, java.util.Date windowEnd,
+	    String baseUrl) throws Exception {
+	AccessMessage accessMessage = new AccessMessage();
+	accessMessage.setWebRequest(webRequest);
+	accessMessage.setOnlineId(datastreamId);
+	accessMessage.setSources(discoveryMessage.getSources());
+	accessMessage.setCurrentUser(discoveryMessage.getCurrentUser().orElse(null));
+	accessMessage.setDataBaseURI(discoveryMessage.getDataBaseURI());
+
+	DataDescriptor descriptor = new DataDescriptor();
+	descriptor.setDataFormat(DataFormat.WATERML_1_1());
+	descriptor.setDataType(DataType.TIME_SERIES);
+	descriptor.setCRS(eu.essi_lab.model.resource.data.CRS.EPSG_4326());
+	descriptor.setTemporalDimension(windowBegin, windowEnd);
+	descriptor.getTemporalDimension().getContinueDimension().setLowerType(LimitType.CONTAINS);
+	descriptor.getTemporalDimension().getContinueDimension().setUpperType(LimitType.CONTAINS);
+	accessMessage.setTargetDataDescriptor(descriptor);
+
+	ResultSet<DataObject> accessResult = exec(accessMessage);
+	if (accessResult == null || accessResult.getResultsList().isEmpty()) {
+	    return new ArrayList<>();
+	}
+
+	DataObject dataObject = accessResult.getResultsList().get(0);
+	File file = dataObject.getFile();
+	if (file == null || !file.exists()) {
+	    return new ArrayList<>();
+	}
+
+	List<DataPoint> points = parseWaterMLValues(file);
+	List<JSONObject> observations = new ArrayList<>();
+	for (DataPoint point : points) {
+	    long obsId = observationId(datastreamId, point.phenomenonTime);
+	    JSONObject obs = STAJsonWriter.observation(obsId,
+		    point.value != null ? point.value : JSONObject.NULL,
+		    point.phenomenonTime, null, datastreamId, platformId, baseUrl);
+	    observations.add(obs);
+	}
+
+	if (file.exists()) {
+	    file.delete();
+	}
+	return observations;
+    }
+
     private static long observationId(String datastreamId, String phenomenonTime) {
 	long h = (datastreamId + "|" + phenomenonTime).hashCode();
 	return h >= 0 ? h : (h & 0x7FFFFFFF);

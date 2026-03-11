@@ -62,7 +62,18 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	STARequest staRequest = new STARequest(request);
 	Set<Bond> operands = new HashSet<>();
 
-	operands.add(BondFactory.createIsExecutableBond(true));
+	// we are interested only on downloadable datasets
+	ResourcePropertyBond accessBond = BondFactory.createIsExecutableBond(true);
+	operands.add(accessBond);
+
+	// we are interested only on downloadable datasets
+	ResourcePropertyBond downBond = BondFactory.createIsDownloadableBond(true);
+	operands.add(downBond);
+
+	// we are interested only on TIME SERIES datasets
+	ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
+	operands.add(timeSeriesBond);
+	
 
 	String filter = staRequest.getFilter();
 	if (filter != null && !filter.isEmpty()) {
@@ -75,10 +86,12 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, platformCode));
 	}
 	staRequest.getEntityIdNormalized().ifPresent(id -> {
-	    if (staRequest.getEntitySet().orElse(null) == EntitySet.Observations
-		    || staRequest.getEntitySet().orElse(null) == EntitySet.Datastreams) {
+	    EntitySet es = staRequest.getEntitySet().orElse(null);
+	    if (es == EntitySet.Observations || es == EntitySet.Datastreams) {
 		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ONLINE_ID, id));
-	    } else {
+	    } else if (es == EntitySet.ObservedProperties && !id.matches("\\d+")) {
+		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, id));
+	    } else if (es != EntitySet.ObservedProperties) {
 		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, id));
 	    }
 	});

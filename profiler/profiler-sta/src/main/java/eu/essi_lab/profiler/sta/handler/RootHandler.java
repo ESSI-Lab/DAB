@@ -51,6 +51,7 @@ public class RootHandler extends DefaultRequestHandler {
 	endpoints.add(createEndpoint("Datastreams", baseUrl + "Datastreams"));
 	endpoints.add(createEndpoint("Observations", baseUrl + "Observations"));
 	endpoints.add(createEndpoint("FeaturesOfInterest", baseUrl + "FeaturesOfInterest"));
+	endpoints.add(createEndpoint("ObservedProperties", baseUrl + "ObservedProperties"));
 
 	JSONObject root = new JSONObject();
 

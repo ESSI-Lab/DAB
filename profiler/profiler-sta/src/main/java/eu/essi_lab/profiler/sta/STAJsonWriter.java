@@ -154,12 +154,12 @@ public final class STAJsonWriter {
 	o.put("phenomenonTime", phenomenonTime);
 	o.put("resultTime", resultTime);
 	if (baseUrl != null) {
-	    o.put("@iot.selfLink", baseUrl + "Observations(" + id + ")");
+//	    o.put("@iot.selfLink", baseUrl + "Observations(" + id + ")");
 	    if (datastreamId != null) {
-		o.put("Datastream@iot.navigationLink", baseUrl + "Observations(" + id + ")/Datastream");
+		o.put("Datastream@iot.navigationLink", baseUrl + "Datastreams(" + datastreamId + ")");
 	    }
 	    if (featureOfInterestId != null) {
-		o.put("FeatureOfInterest@iot.navigationLink", baseUrl + "Observations(" + id + ")/FeatureOfInterest");
+		o.put("FeatureOfInterest@iot.navigationLink", baseUrl + "FeaturesOfInterest(" + featureOfInterestId + ")");
 	    }
 	}
 	return o;
@@ -201,6 +201,24 @@ public final class STAJsonWriter {
 	return o;
     }
 
+    /**
+     * Builds a STA ObservedProperty entity.
+     */
+    public static JSONObject observedProperty(long id, String name, String description, String definition,
+	    JSONObject properties, String baseUrl) {
+	JSONObject o = new JSONObject();
+	o.put("@iot.id", id);
+	o.put("name", name != null ? name : "");
+	o.put("description", description != null ? description : "");
+	o.put("definition", definition != null ? definition : JSONObject.NULL);
+	o.put("properties", properties != null ? properties : new JSONObject());
+	if (baseUrl != null) {
+	    o.put("@iot.selfLink", baseUrl + "ObservedProperties(" + id + ")");
+	    o.put("Datastreams@iot.navigationLink", baseUrl + "ObservedProperties(" + id + ")/Datastreams");
+	}
+	return o;
+    }
+
     public static String buildBaseUrl(String requestUrl) {
 	String base = requestUrl;
 	int idx = base.indexOf("/Things");
@@ -222,6 +240,11 @@ public final class STAJsonWriter {
 			idx = base.indexOf("/FeaturesOfInterest");
 			if (idx >= 0) {
 			    base = base.substring(0, idx);
+			} else {
+			    idx = base.indexOf("/ObservedProperties");
+			    if (idx >= 0) {
+				base = base.substring(0, idx);
+			    }
 			}
 		    }
 		}

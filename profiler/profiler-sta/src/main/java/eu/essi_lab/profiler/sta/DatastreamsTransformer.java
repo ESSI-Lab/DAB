@@ -23,9 +23,14 @@ package eu.essi_lab.profiler.sta;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import eu.essi_lab.messages.ResourceSelector;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SortedFields;
@@ -34,12 +39,39 @@ import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.profiler.sta.STARequest.EntitySet;
 
 /**
  * Transformer for STA Datastreams entity set (timeseries records).
  * Uses retrieveStrings (full resources) like Observations.
+ * When parent is ObservedProperties(id)/Datastreams, adds UNIQUE_ATTRIBUTE_IDENTIFIER constraint.
  */
 public class DatastreamsTransformer extends STATransformer {
+
+    public static final String ATTR_OBSERVED_PROPERTY_CODE = "staObservedPropertyCode";
+
+    @Override
+    protected Bond getUserBond(WebRequest request) throws GSException {
+	Bond base = super.getUserBond(request);
+	STARequest staRequest = new STARequest(request);
+	if (staRequest.getEntitySet().orElse(null) == EntitySet.ObservedProperties
+		&& "Datastreams".equals(staRequest.getNavigationProperty().orElse(null))) {
+	    String attributeCode = (String) request.getServletRequest().getAttribute(ATTR_OBSERVED_PROPERTY_CODE);
+	    if (attributeCode == null || attributeCode.isEmpty()) {
+		attributeCode = staRequest.getEntityIdNormalized().filter(id -> !id.matches("\\d+")).orElse(null);
+	    }
+	    if (attributeCode != null && !attributeCode.isEmpty()) {
+		Set<Bond> operands = new HashSet<>();
+		if (base != null) {
+		    operands.add(base);
+		}
+		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER,
+			attributeCode));
+		return operands.size() == 1 ? operands.iterator().next() : BondFactory.createAndBond(operands);
+	    }
+	}
+	return base;
+    }
 
     @Override
     protected Optional<eu.essi_lab.model.Queryable> getDistinctElement(WebRequest request) {

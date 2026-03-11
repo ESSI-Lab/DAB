@@ -21,15 +21,12 @@
 
 package eu.essi_lab.profiler.sta.handler;
 
+import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
-import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
 import org.json.JSONObject;
 
@@ -41,11 +38,10 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.sta.ObservedPropertiesTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
-import eu.essi_lab.profiler.sta.ThingsLocationsTransformer;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import jakarta.ws.rs.WebApplicationException;
@@ -54,15 +50,16 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 
 /**
- * Handler for Things(id)/Locations. Returns an array of locations related to the thing.
+ * Handler for OGC STA ObservedProperties entity set.
+ * Discovery by distinct UNIQUE_ATTRIBUTE_IDENTIFIER; maps ATTRIBUTE_TITLE to name.
  */
-public class ThingsLocationsHandler extends StreamingRequestHandler {
+public class ObservedPropertiesHandler extends StreamingRequestHandler {
 
     private DatabaseExecutor executor;
 
-    public ThingsLocationsHandler() {
+    public ObservedPropertiesHandler() {
 	try {
-	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
+	    eu.essi_lab.model.StorageInfo uri = ConfigurationWrapper.getStorageInfo();
 	    executor = DatabaseProviderFactory.getExecutor(uri);
 	} catch (GSException e) {
 	}
@@ -79,9 +76,9 @@ public class ThingsLocationsHandler extends StreamingRequestHandler {
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
 	return output -> {
 	    try {
-		writeThingsLocationsResponse(output, webRequest);
+		writeObservedPropertiesResponse(output, webRequest);
 	    } catch (Exception e) {
-		throw new WebApplicationException("Error handling Things/Locations request", e);
+		throw new WebApplicationException("Error handling ObservedProperties request", e);
 	    }
 	};
     }
@@ -92,65 +89,77 @@ public class ThingsLocationsHandler extends StreamingRequestHandler {
     }
 
     public DiscoveryRequestTransformer getTransformer() {
-	return new ThingsLocationsTransformer();
+	return new ObservedPropertiesTransformer();
     }
 
-    private void writeThingsLocationsResponse(OutputStream output, WebRequest webRequest) throws Exception {
+    private static long observedPropertyId(String uniqueAttributeId) {
+	if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
+	    return 0;
+	}
+	long h = 0;
+	for (char c : uniqueAttributeId.toCharArray()) {
+	    h = 31 * h + c;
+	}
+	return Math.abs(h);
+    }
+
+    private void writeObservedPropertiesResponse(OutputStream output, WebRequest webRequest) throws Exception {
 	if (executor == null) {
 	    output.write("{\"value\":[]}".getBytes(StandardCharsets.UTF_8));
 	    return;
-	}
-
-	STARequest staRequest = new STARequest(webRequest);
-	String thingId = staRequest.getEntityIdNormalized().orElse(null);
-	if (thingId == null || thingId.isEmpty()) {
-	    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Missing Thing id").build());
 	}
 
 	DiscoveryRequestTransformer transformer = getTransformer();
 	DiscoveryMessage message = transformer.transform(webRequest);
 
 	ResultSet<String> resultSet = executor.discoverDistinctStrings(message);
-	List<JSONObject> locations = new ArrayList<>();
-	Set<String> seenKeys = new LinkedHashSet<>();
+	List<JSONObject> observedProperties = new ArrayList<>();
 	String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
+	STARequest staRequest = new STARequest(webRequest);
+	String requestedId = staRequest.getEntityIdNormalized().orElse(null);
 
 	if (resultSet != null) {
 	    for (String result : resultSet.getResultsList()) {
 		try {
 		    GIResourceParser parser = new GIResourceParser(result);
-		    String id = parser.getUniquePlatformCode();
-		    if (id == null) {
+		    String uniqueAttributeId = parser.getAttributeCode();
+		    if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
 			continue;
 		    }
-		    GeographicBoundingBox bbox = parser.getBBOX();
-		    BigDecimal lat = null;
-		    BigDecimal lon = null;
-		    if (bbox != null) {
-			lon = parser.getBBOX().getBigDecimalWest();
-			lat = parser.getBBOX().getBigDecimalNorth();
+		    long id = observedPropertyId(uniqueAttributeId);
+		    if (requestedId != null && requestedId.matches("\\d+")) {
+			if (id != Long.parseLong(requestedId)) {
+			    continue;
+			}
 		    }
-		    if (lon == null || lat == null) {
-			continue;
+		    String name = parser.getAttributeName();
+		    if (name == null || name.isEmpty()) {
+			name = uniqueAttributeId;
 		    }
-		    String alt = parser.getAltitude();
-		    BigDecimal altitude = null;
-		    if (alt != null && !alt.isEmpty()) {
-			altitude = new BigDecimal(alt.trim());
+		    String description = parser.getAttributeDescription();
+		    if (description == null) {
+			description = "";
 		    }
-		    String name = parser.getPlatformName();
-		    if (name == null) {
-			name = id;
+		    String definition = parser.getAttributeURI();
+		    if (definition == null) {
+			definition = "";
 		    }
-		    String locKey = id + "|" + lon + "|" + lat + (altitude != null ? "|" + altitude : "");
-		    if (seenKeys.add(locKey)) {
-			JSONObject loc = STAJsonWriter.location(id, lon, lat, altitude, name, baseUrl);
-			locations.add(loc);
-		    }
+		    JSONObject props = new JSONObject();
+		    props.put("variableCode", uniqueAttributeId);
+		    JSONObject op = STAJsonWriter.observedProperty(id, name, description, definition, props, baseUrl);
+		    observedProperties.add(op);
 		} catch (Exception e) {
-		    // skip malformed
+		    e.printStackTrace();
 		}
 	    }
+	}
+
+	if (staRequest.getEntityId().isPresent()) {
+	    if (observedProperties.isEmpty()) {
+		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+	    }
+	    output.write(observedProperties.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    return;
 	}
 
 	Integer count = null;
@@ -164,12 +173,11 @@ public class ThingsLocationsHandler extends StreamingRequestHandler {
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
 	    if (token != null) {
-		String entityPath = "Things(" + thingId + ")/Locations";
-		nextLink = STAJsonWriter.buildNextLink(baseUrl, entityPath, token, webRequest.getQueryString());
+		nextLink = STAJsonWriter.buildNextLink(baseUrl, "ObservedProperties", token, webRequest.getQueryString());
 	    }
 	}
 
-	String json = STAJsonWriter.collectionResponse(locations, nextLink, count);
+	String json = STAJsonWriter.collectionResponse(observedProperties, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
     }
 }

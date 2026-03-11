@@ -64,6 +64,7 @@ public class ObservationsTransformer extends STATransformer {
 	selector.addIndex(MetadataElement.ATTRIBUTE_TITLE);
 	selector.addIndex(MetadataElement.TEMP_EXTENT_BEGIN);
 	selector.addIndex(MetadataElement.TEMP_EXTENT_END);
+	selector.addIndex(MetadataElement.TEMP_EXTENT_END_NOW);
 	selector.addIndex(MetadataElement.BOUNDING_BOX);
 	return selector;
     }

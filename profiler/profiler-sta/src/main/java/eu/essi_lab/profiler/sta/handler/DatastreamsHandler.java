@@ -34,6 +34,9 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
 import org.json.JSONObject;
 
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
@@ -41,6 +44,7 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.DatastreamsTransformer;
+import eu.essi_lab.profiler.sta.ObservedPropertiesTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
@@ -52,8 +56,19 @@ import jakarta.ws.rs.core.StreamingOutput;
 
 /**
  * Handler for OGC STA Datastreams entity set (timeseries records).
+ * Also handles ObservedProperties(id)/Datastreams navigation (filters by UNIQUE_ATTRIBUTE_IDENTIFIER).
  */
 public class DatastreamsHandler extends StreamingRequestHandler {
+
+    private DatabaseExecutor executor;
+
+    public DatastreamsHandler() {
+	try {
+	    eu.essi_lab.model.StorageInfo uri = ConfigurationWrapper.getStorageInfo();
+	    executor = DatabaseProviderFactory.getExecutor(uri);
+	} catch (GSException e) {
+	}
+    }
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -82,7 +97,22 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	return new DatastreamsTransformer();
     }
 
-    private void writeDatastreamsResponse(OutputStream output, WebRequest webRequest) throws Exception {
+    protected void writeDatastreamsResponse(OutputStream output, WebRequest webRequest) throws Exception {
+	STARequest staRequest = new STARequest(webRequest);
+	if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.ObservedProperties
+		&& "Datastreams".equals(staRequest.getNavigationProperty().orElse(null))) {
+	    String entityId = staRequest.getEntityIdNormalized().orElse(null);
+	    if (entityId != null && entityId.matches("\\d+")) {
+		String attributeCode = resolveObservedPropertyIdToAttributeCode(webRequest, entityId);
+		if (attributeCode == null) {
+		    output.write("{\"value\":[]}".getBytes(StandardCharsets.UTF_8));
+		    return;
+		}
+		webRequest.getServletRequest().setAttribute(DatastreamsTransformer.ATTR_OBSERVED_PROPERTY_CODE,
+			attributeCode);
+	    }
+	}
+
 	DiscoveryRequestTransformer transformer = getTransformer();
 	DiscoveryMessage message = transformer.transform(webRequest);
 
@@ -147,7 +177,6 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	    }
 	}
 
-	STARequest staRequest = new STARequest(webRequest);
 	if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Datastreams
 		&& staRequest.getEntityId().isPresent()) {
 	    if (datastreams.isEmpty()) {
@@ -174,6 +203,10 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 		if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Things
 			&& staRequest.getEntityIdNormalized().isPresent()) {
 		    entityPath = "Things(" + staRequest.getEntityIdNormalized().get() + ")/Datastreams";
+		} else if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.ObservedProperties
+			&& staRequest.getEntityIdNormalized().isPresent()
+			&& "Datastreams".equals(staRequest.getNavigationProperty().orElse(null))) {
+		    entityPath = "ObservedProperties(" + staRequest.getEntityIdNormalized().get() + ")/Datastreams";
 		}
 		nextLink = STAJsonWriter.buildNextLink(baseUrl, entityPath, token, webRequest.getQueryString());
 	    }
@@ -181,5 +214,48 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 
 	String json = STAJsonWriter.collectionResponse(datastreams, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String resolveObservedPropertyIdToAttributeCode(WebRequest webRequest, String numericId) {
+	if (executor == null) {
+	    return null;
+	}
+	try {
+	    long targetId = Long.parseLong(numericId);
+	    DiscoveryRequestTransformer transformer = new ObservedPropertiesTransformer();
+	    DiscoveryMessage message = transformer.transform(webRequest);
+	    ResultSet<String> resultSet = executor.discoverDistinctStrings(message);
+	    if (resultSet == null) {
+		return null;
+	    }
+	    for (String result : resultSet.getResultsList()) {
+		try {
+		    GIResourceParser parser = new GIResourceParser(result);
+		    String uniqueAttributeId = parser.getAttributeCode();
+		    if (uniqueAttributeId != null && !uniqueAttributeId.isEmpty()) {
+			long id = observedPropertyId(uniqueAttributeId);
+			if (id == targetId) {
+			    return uniqueAttributeId;
+			}
+		    }
+		} catch (Exception e) {
+		    // skip
+		}
+	    }
+	} catch (Exception e) {
+	    // ignore
+	}
+	return null;
+    }
+
+    private static long observedPropertyId(String uniqueAttributeId) {
+	if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
+	    return 0;
+	}
+	long h = 0;
+	for (char c : uniqueAttributeId.toCharArray()) {
+	    h = 31 * h + c;
+	}
+	return Math.abs(h);
     }
 }
