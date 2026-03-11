@@ -10,44 +10,36 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import com.vaadin.flow.component.grid.*;
+import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.accessor.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.*;
+import eu.essi_lab.cfga.gs.setting.menuitems.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.gui.components.grid.*;
+import eu.essi_lab.cfga.gui.components.grid.menuitem.*;
+import eu.essi_lab.cfga.gui.components.grid.renderer.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import org.json.JSONObject;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.configuration.*;
+import org.json.*;
 
-import com.vaadin.flow.data.provider.SortDirection;
-
-import eu.essi_lab.cfga.gs.setting.BrokeringSetting;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
-import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
-import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingStatsItemHandler;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
-import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingEditItemHandler;
-import eu.essi_lab.cfga.gui.components.grid.menuitem.SettingsRemoveItemHandler;
-import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
-import eu.essi_lab.cfga.setting.AfterCleanFunction;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
-import eu.essi_lab.configuration.ExecutionMode;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -194,9 +186,17 @@ public abstract class HarvestingSetting extends SchedulerWorkerSetting implement
 		    withAddDirective(//
 		    "ADD",//
 		    "Add harvested/mixed accessor", //
+		    "eu.essi_lab.harvester.worker.HarvestingSettingImpl", //
+		    true).// tab view
+
+		    withRemoveDirective("REMOVE", //
+		    "Remove accessor", //
+		    true, // allow full removal
 		    "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
-		    withRemoveDirective("REMOVE","Remove accessor", true, "eu.essi_lab.harvester.worker.HarvestingSettingImpl").//
-		    withEditDirective("EDIT","Edit harvested/mixed accessor").//
+
+		    withEditDirective("EDIT",  //
+		    "Edit harvested/mixed accessor",//
+		    true).// tab view
 
 		    withGridInfo(Arrays.asList(//
 

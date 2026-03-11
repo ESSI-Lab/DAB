@@ -204,6 +204,34 @@ public class SettingComponentFactory {
     }
 
     /**
+     *
+     * @param configuration
+     * @param setting
+     * @param forceReadonly
+     * @param forceHideHeader
+     * @param tabContent
+     * @param tabView
+     * @return
+     */
+    public static SettingComponent createSettingComponent(//
+	    Configuration configuration, //
+	    Setting setting, //
+	    boolean forceReadonly, //
+	    boolean forceHideHeader,//
+	    TabContent tabContent,
+	    boolean tabView) {
+
+	return new SettingComponent( //
+		configuration,//
+		setting,//
+		forceReadonly,//
+		forceHideHeader, //
+		null,// comparator
+		tabContent,
+		tabView);
+    }
+
+    /**
      * @param content
      * @return
      */
@@ -393,9 +421,9 @@ public class SettingComponentFactory {
 	    TabContent tabContent,//
 	    SettingComponent settingComponent) {
 
-	Optional<RemoveDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getRemoveDirective();
+	Optional<RemoveDirective> removeDirective = tabContent == null ? Optional.empty() : tabContent.getRemoveDirective();
 
-	String name = editDirective.map(RemoveDirective::getName).orElse("REMOVE");
+	String name = removeDirective.map(RemoveDirective::getName).orElse("REMOVE");
 
 	ConfigurationViewButton button = new ConfigurationViewButton(name, VaadinIcon.MINUS_SQUARE_O.create());
 

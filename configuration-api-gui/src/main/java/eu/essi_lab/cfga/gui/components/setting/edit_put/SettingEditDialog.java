@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting.edit_put;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -67,8 +67,8 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
 	super(configuration, tabContent, ValidationContext.edit());
 
 	this.currentSettingComponent = currentSettingComponent;
-	
-	Optional<EditDirective> editDirective = tabContent == null? Optional.empty() : tabContent.getEditDirective();
+
+	Optional<EditDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getEditDirective();
 
 	String title = editDirective.flatMap(EditDirective::getDescription).orElse("Edit setting");
 
@@ -88,10 +88,11 @@ public class SettingEditDialog extends SettingPutOrEditDialog {
 
 	// SettingHelper.expand(settingToEdit);
 
-	Component settingToAddComponent = createSettingToAddOrEditComponent(
-		configuration,
-		this.settingToEdit,
-		dialogHeight);
+	Component settingToAddComponent = createSettingToAddOrEditComponent(configuration, //
+		this.settingToEdit, //
+		dialogHeight, //
+		editDirective.map(EditDirective::isTabView).orElse(false) //
+	);
 
 	setContent(settingToAddComponent);
     }

@@ -101,7 +101,7 @@ public class OptionComponent extends VerticalLayout {
 
     private HasEnabled renderedOption;
     private final Option<?> option;
-    private Switch toggle;
+    private Switch switch_;
     private VerticalLayout optionLayout;
 
     /**
@@ -149,9 +149,9 @@ public class OptionComponent extends VerticalLayout {
 
 	if (canBeDisabled) {
 
-	    toggle = OptionComponentFactory.createOptionSwitch(this, value, enabled);
+	    switch_ = OptionComponentFactory.createOptionSwitch(this, value, enabled);
 
-	    mainLayout.add(toggle);
+	    mainLayout.add(switch_);
 	}
 
 	//
@@ -263,11 +263,11 @@ public class OptionComponent extends VerticalLayout {
      * @param value
      * @param forceReadonly
      */
-    public void onSettingToggleStateChanged(boolean value, boolean forceReadonly) {
+    public void onSettingSwitchStateChanged(boolean value, boolean forceReadonly) {
 
 	if (!value) {
 
-	    onToggleStateChanged(false);
+	    onSwitchStateChanged(false);
 
 	    //
 	    // if the option can be disabled, it has its own toggle button
@@ -275,7 +275,7 @@ public class OptionComponent extends VerticalLayout {
 	    //
 	} else if (!option.canBeDisabled()) {
 
-	    onToggleStateChanged(true);
+	    onSwitchStateChanged(true);
 	}
 
 	//
@@ -285,13 +285,13 @@ public class OptionComponent extends VerticalLayout {
 	//
 	if (!value) {
 
-	    if (toggle != null) {
+	    if (switch_ != null) {
 
-		toggle.setEnabled(false);
-		toggle.setValue(false);
+		switch_.setEnabled(false);
+		switch_.setValue(false);
 	    }
 
-	} else if (toggle != null) {
+	} else if (switch_ != null) {
 
 	    //
 	    // if the value of the owner setting switch to true,
@@ -300,7 +300,7 @@ public class OptionComponent extends VerticalLayout {
 	    //
 	    if (!forceReadonly) {
 
-		toggle.setEnabled(true);
+		switch_.setEnabled(true);
 	    }
 	}
 
@@ -317,7 +317,7 @@ public class OptionComponent extends VerticalLayout {
     /**
      * @param enabled
      */
-    public void onToggleStateChanged(boolean enabled) {
+    public void onSwitchStateChanged(boolean enabled) {
 
 	// GSLoggerFactory.getLogger(getClass()).debug("Updating state of option: " + option.getLabel());
 	// GSLoggerFactory.getLogger(getClass()).debug("New state: " + (enabled ? "enabled" : "disabled"));

@@ -29,6 +29,7 @@ import com.vaadin.flow.component.details.*;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
 import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.component.tabs.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.Selectable.*;
 import eu.essi_lab.cfga.gui.components.*;
@@ -139,6 +140,9 @@ public class SettingComponent extends Div {
     private final TabContent tabContent;
 
     private final boolean forceHideHeader;
+    private final boolean tabView;
+
+    private TabSheet tabSheet;
 
     /**
      * @param configuration
@@ -156,11 +160,32 @@ public class SettingComponent extends Div {
 	    Comparator<Setting> comparator, //
 	    TabContent tabContent) {
 
+	this(configuration, setting, forceReadonly, forceHideHeader, comparator, tabContent, false);
+    }
+
+    /**
+     * @param configuration
+     * @param setting
+     * @param forceReadonly
+     * @param forceHideHeader
+     * @param comparator
+     * @param tabContent
+     * @param tabView
+     */
+    public SettingComponent(//
+	    Configuration configuration, //
+	    Setting setting, //
+	    boolean forceReadonly, //
+	    boolean forceHideHeader, //
+	    Comparator<Setting> comparator, //
+	    TabContent tabContent, boolean tabView) {
+
 	this.configuration = configuration;
 	this.setting = setting;
 	this.forceReadonly = forceReadonly;
 	this.tabContent = tabContent;
 	this.forceHideHeader = forceHideHeader;
+	this.tabView = tabView;
 
 	if (setting.isFoldedModeEnabled()) {
 
@@ -168,13 +193,14 @@ public class SettingComponent extends Div {
 	    this.details.setId("setting-component-" + getSetting().getName());
 	}
 
-	init(comparator);
+	init(comparator, tabView);
     }
 
     /**
      * @param comparator
+     * @param tabView
      */
-    private void init(Comparator<Setting> comparator) {
+    private void init(Comparator<Setting> comparator, boolean tabView) {
 
 	setId("setting-component-" + getSetting().getName());
 
@@ -207,6 +233,14 @@ public class SettingComponent extends Div {
 		}
 		return compareTo;
 	    };
+	}
+
+	if (tabView) {
+
+	    this.tabSheet = new TabSheet();
+	    this.tabSheet.getStyle().set("padding", "0px");
+	    this.tabSheet.getStyle().set("margin-left", "-20px");
+	    add(tabSheet);
 	}
 
 	deepRenderSetting(null, getSetting(), configuration, comparator);
@@ -316,14 +350,14 @@ public class SettingComponent extends Div {
 
 	    if (comp instanceof OptionComponent optionComp) {
 
-		optionComp.onSettingToggleStateChanged(enabled, forceReadonly);
+		optionComp.onSettingSwitchStateChanged(enabled, forceReadonly);
 
 	    } else {
 
 		//
 		// This is the toggle button of a child setting
 		//
-		Switch toggle = (Switch) comp;
+		Switch switch_ = (Switch) comp;
 
 		//
 		// if the parent setting value is false, also the state of the toggle button
@@ -331,7 +365,7 @@ public class SettingComponent extends Div {
 		//
 		if (!enabled) {
 
-		    toggle.setValue(false);
+		    switch_.setValue(false);
 		}
 
 		//
@@ -341,7 +375,7 @@ public class SettingComponent extends Div {
 		//
 		if (forceReadonly) {
 
-		    toggle.setEnabled(false);
+		    switch_.setEnabled(false);
 		}
 	    }
 	}
@@ -394,13 +428,36 @@ public class SettingComponent extends Div {
 	//
 
 	int paddingLeft = computePaddingLeft(parent, setting);
-	
+
 	VerticalLayout mainLayout = SettingComponentFactory.createSettingMainLayout(//
 		parent, //
 		setting, "main-layout_" + setting.getName(), //
 		paddingLeft);
 
-	add(mainLayout);
+	if (tabView) {
+
+	    List<String> parents = childToParentsMap.get(setting.getName());
+
+	    if (parents != null && parents.size() == 1) {
+
+		tabSheet.add(setting.getName(), mainLayout);
+
+	    } else if (parents != null) {
+
+		int tabCount = tabSheet.getTabCount();
+
+		for (int i = 0; i < tabCount; i++) {
+
+		    if (parents.contains(tabSheet.getTabAt(i).getLabel())) {
+
+			((VerticalLayout) tabSheet.getComponent(tabSheet.getTabAt(i))).add(mainLayout);
+		    }
+		}
+	    }
+	} else {
+
+	    add(mainLayout);
+	}
 
 	HorizontalLayout headerLayout = SettingComponentFactory.createSettingHeaderLayout(setting);
 
@@ -440,11 +497,20 @@ public class SettingComponent extends Div {
 
 	switch (selectionMode) {
 	case UNSET:
+
+	    String tabLabel = "";
+
+	    if (tabView) {
+
+		int tabCount = tabSheet.getTabCount();
+		tabLabel = tabCount > 0 ? tabSheet.getTabAt(tabCount - 1).getLabel() : "";
+	    }
+
 	    //
 	    // name is added to the header if the setting is not folded
 	    // if the setting is folded, the name is visible in the details component
 	    //
-	    if (!setting.isFoldedModeEnabled()) {
+	    if (!setting.isFoldedModeEnabled() && !tabLabel.equals(setting.getName())) {
 
 		Span label = handleLabel(parent, setting, headerLayout);
 
