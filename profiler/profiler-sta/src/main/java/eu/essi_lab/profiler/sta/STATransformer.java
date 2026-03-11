@@ -30,10 +30,7 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.SimpleValueBond;
+import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
@@ -73,7 +70,7 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	// we are interested only on TIME SERIES datasets
 	ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
 	operands.add(timeSeriesBond);
-	
+
 
 	String filter = staRequest.getFilter();
 	if (filter != null && !filter.isEmpty()) {
