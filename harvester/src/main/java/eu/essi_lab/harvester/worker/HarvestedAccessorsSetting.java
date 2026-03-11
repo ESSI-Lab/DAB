@@ -21,7 +21,7 @@ package eu.essi_lab.harvester.worker;
  * #L%
  */
 
-import java.util.List;
+import java.util.*;
 
 import eu.essi_lab.adk.AccessorFactory;
 import eu.essi_lab.adk.AccessorFactory.LookupPolicy;
@@ -29,6 +29,7 @@ import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -57,12 +58,12 @@ public class HarvestedAccessorsSetting extends Setting {
 
 	@SuppressWarnings("rawtypes")
 	List<IHarvestedAccessor> harvested = AccessorFactory.getHarvestedAccessors(LookupPolicy.ALL);
-	harvested.sort((a1, a2) -> a1.getSetting().getName().compareTo(a2.getSetting().getName()));
+	harvested.sort(Comparator.comparing(a -> a.getSetting().getName()));
 
 	harvested.forEach(h -> {
 
-	    AccessorSetting setting = SettingUtils.downCast(h.getSetting(), AccessorSetting.class, true);
-	    setting.setIdentifier(setting.getAccessorType());
+	    Setting setting = h.getSetting().clone();
+	    setting.setIdentifier(setting.getOption("accessorType", String.class).get().getValue());
 	    addSetting(setting);
 	});
 
@@ -72,7 +73,7 @@ public class HarvestedAccessorsSetting extends Setting {
 
 	getSettings().//
 		parallelStream().//
-		min((s1, s2) -> s1.getName().compareTo(s2.getName())).//
+		min(Comparator.comparing(Setting::getName)).//
 		get().//
 		setSelected(true);
 

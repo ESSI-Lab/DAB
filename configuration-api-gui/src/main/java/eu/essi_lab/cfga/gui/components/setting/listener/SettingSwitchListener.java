@@ -44,6 +44,6 @@ public class SettingSwitchListener extends AbstractValueChangeListener {
     @Override
     protected void handleEvent(ValueChangeEvent<?> event) {
 
-	settingComponent.onToggleStateChanged(event);
+	settingComponent.onSwitchStateChanged(event);
     }
 }

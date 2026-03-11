@@ -73,6 +73,7 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 		collect(Collectors.joining("\n"));
 
 	ConfirmationDialog dialog = new ConfirmationDialog();
+	dialog.getFooterLayout().getStyle().remove("height");
 	dialog.setHeader("Remove selected settings");
 	dialog.setHeight(500, Unit.PIXELS);
 	dialog.setWidth(600, Unit.PIXELS);
@@ -81,9 +82,9 @@ public class SettingsRemoveItemHandler extends GridMenuItemHandler {
 	text += names;
 
 	TextArea textArea = new TextArea();
-	textArea.setHeight(365, Unit.PIXELS);
+	textArea.setHeight(325, Unit.PIXELS);
 	textArea.setValue(text);
-	textArea.setWidth(580, Unit.PIXELS);
+	textArea.setWidth(560, Unit.PIXELS);
 	textArea.getStyle().set("font-size", "14px");
 	textArea.setReadOnly(true);
 
