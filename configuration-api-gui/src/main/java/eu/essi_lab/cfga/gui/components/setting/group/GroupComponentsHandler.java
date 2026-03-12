@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting.group;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -25,6 +25,7 @@ import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.checkbox.*;
 import com.vaadin.flow.component.radiobutton.*;
 import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
 import eu.essi_lab.cfga.setting.*;
 
 import java.util.*;
@@ -41,11 +42,11 @@ public abstract class GroupComponentsHandler<T extends Component> {
     public enum GroupType {
 
 	/**
-	 * 
+	 *
 	 */
 	RADIO,
 	/**
-	 * 
+	 *
 	 */
 	CHECK
     }
@@ -54,7 +55,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
     protected Setting groupSetting;
 
     /**
-     * 
+     *
      */
     public GroupComponentsHandler() {
 
@@ -76,19 +77,23 @@ public abstract class GroupComponentsHandler<T extends Component> {
 
 		if (groupChild) {
 		    if (isGroupComponent(c)) {
-			c.setVisible(key.equals(value));
+
+			setVisible(c, key.equals(value));
+
 		    } else {
-			c.setVisible(false);
+
+			setVisible(c, false);
 		    }
 		} else {
-		    c.setVisible(key.equals(value));
+
+		    setVisible(c, key.equals(value));
 		}
 	    }
 	}
     }
 
     /**
-     * 
+     *
      */
     public abstract void applySelection();
 
@@ -116,7 +121,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
 
     /**
      * Set the {@link Setting} which groups all its children {@link Setting}, that is the root {@link Setting}
-     * 
+     *
      * @param groupSetting
      */
     public void setGroupSetting(Setting groupSetting) {
@@ -130,11 +135,14 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public void addComponents(String name, List<Component> list) {
 
-	list.forEach(c -> c.setVisible(false));
+	synchronized (SettingComponent.class) {
 
-	ArrayList<Component> compList = getItemToComponentsMap().computeIfAbsent(name, k -> new ArrayList<>());
+	    list.forEach(c -> setVisible(c, false));
 
-	compList.addAll(list);
+	    ArrayList<Component> compList = getItemToComponentsMap().computeIfAbsent(name, k -> new ArrayList<>());
+
+	    compList.addAll(list);
+	}
     }
 
     /**
@@ -151,15 +159,18 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public void addItem(String name) {
 
-	AbstractListDataView<String> listDataView = getListDataView();
+	synchronized (SettingComponent.class) {
 
-	List<String> list = listDataView.getItems().collect(Collectors.toList());
+	    AbstractListDataView<String> listDataView = getListDataView();
 
-	if (!list.contains(name)) {
-	    list.add(name);
+	    List<String> list = listDataView.getItems().collect(Collectors.toList());
+
+	    if (!list.contains(name)) {
+		list.add(name);
+	    }
+
+	    setItems(list);
 	}
-
-	setItems(list);
     }
 
     /**
@@ -207,5 +218,16 @@ public abstract class GroupComponentsHandler<T extends Component> {
 
 	return (AbstractListDataView<String>) ((HasListDataView) getGroupComponent()).getListDataView();
     }
+
+    /**
+     *
+     * @param component
+     * @param visible
+     */
+    private void setVisible(Component component, boolean visible) {
+
+	component.getStyle().set("display", visible ? "block":"none");
+    }
+
 
 }

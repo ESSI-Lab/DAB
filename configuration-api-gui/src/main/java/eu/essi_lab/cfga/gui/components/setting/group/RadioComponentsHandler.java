@@ -41,6 +41,8 @@ public class RadioComponentsHandler extends GroupComponentsHandler<RadioButtonGr
 	radioButtonGroup.setLabel("");
 	radioButtonGroup.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
 	radioButtonGroup.getStyle().set("width", "100%");
+	radioButtonGroup.getStyle().set("height", "300px");
+	radioButtonGroup.getStyle().set("overflow-y", "auto");
 
 	radioButtonGroup.addValueChangeListener(new RadioComponentsHandlerListener(this));
     }
