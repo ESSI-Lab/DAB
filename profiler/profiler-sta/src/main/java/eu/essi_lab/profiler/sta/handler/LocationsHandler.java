@@ -21,6 +21,7 @@
 
 package eu.essi_lab.profiler.sta.handler;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -31,11 +32,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import eu.essi_lab.api.database.DatabaseExecutor;
+import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.count.CountSet;
+import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
-import org.ietf.jgss.GSSException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -45,12 +49,14 @@ import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
+import eu.essi_lab.profiler.sta.ExpandSubRequest;
 import eu.essi_lab.profiler.sta.LocationsTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
+import eu.essi_lab.profiler.sta.ThingsTransformer;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
+import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -62,6 +68,7 @@ import jakarta.ws.rs.core.StreamingOutput;
 public class LocationsHandler extends StreamingRequestHandler {
 
     private IDiscoveryStringExecutor executor;
+    private DatabaseExecutor databaseExecutor;
 
     public LocationsHandler() {
 	try {
@@ -70,6 +77,12 @@ public class LocationsHandler extends StreamingRequestHandler {
 	    executor = it.hasNext() ? it.next() : null;
 	} catch (Exception e) {
 	    executor = null;
+	}
+	try {
+	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
+	    databaseExecutor = DatabaseProviderFactory.getExecutor(uri);
+	} catch (GSException e) {
+	    databaseExecutor = null;
 	}
     }
 
@@ -159,6 +172,7 @@ public class LocationsHandler extends StreamingRequestHandler {
 		    String locKey = id + "|" + lon + "|" + lat + (altitude != null ? "|" + altitude : "");
 		    if (seenKeys.add(locKey)) {
 			JSONObject loc = STAJsonWriter.location(id, lon, lat, altitude, name, baseUrl);
+			addExpandedThings(loc, id, webRequest, baseUrl, staRequest);
 			locations.add(loc);
 		    }
 		} catch (Exception e) {
@@ -173,7 +187,10 @@ public class LocationsHandler extends StreamingRequestHandler {
 	    if (locations.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	    }
-	    output.write(locations.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    JSONObject singleLoc = locations.get(0);
+	    addExpandedThings(singleLoc, singleLoc.getString("@iot.id"), webRequest,
+		    STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString()), staRequest);
+	    output.write(singleLoc.toString().getBytes(StandardCharsets.UTF_8));
 	    return;
 	}
 
@@ -187,7 +204,9 @@ public class LocationsHandler extends StreamingRequestHandler {
 
 
 	String nextLink = null;
-	if (resultSet != null && resultSet.getSearchAfter().isPresent()) {
+	int pageSize = staRequest.getTop() != null ? staRequest.getTop() : 100;
+	boolean hasFullPage = locations.size() >= pageSize;
+	if (hasFullPage && resultSet != null && resultSet.getSearchAfter().isPresent()) {
 	    String token = resultSet.getSearchAfter().get().getValues()
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
@@ -201,5 +220,49 @@ public class LocationsHandler extends StreamingRequestHandler {
 
 	String json = STAJsonWriter.collectionResponse(locations, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private void addExpandedThings(JSONObject location, String locationId, WebRequest webRequest, String baseUrl,
+	    STARequest staRequest) {
+	boolean expandThings = staRequest.getExpandOptions().stream()
+		.anyMatch(o -> "Things".equals(o.getProperty()));
+	if (!expandThings || databaseExecutor == null) {
+	    return;
+	}
+	int top = staRequest.getExpandOptions().stream()
+		.filter(o -> "Things".equals(o.getProperty()))
+		.map(STARequest.ExpandOption::getTop)
+		.filter(java.util.Objects::nonNull)
+		.findFirst()
+		.orElse(100);
+	try {
+	    String path = "Locations(" + locationId + ")/Things";
+	    String query = "$top=" + top;
+	    ExpandSubRequest subReq = new ExpandSubRequest(webRequest, path, query);
+	    DiscoveryRequestTransformer thingsTransformer = new ThingsTransformer();
+	    DiscoveryMessage msg = thingsTransformer.transform(subReq);
+	    ResultSet<String> thingsResult = databaseExecutor.discoverDistinctStrings(msg);
+	    JSONArray things = new JSONArray();
+	    if (thingsResult != null) {
+		for (String result : thingsResult.getResultsList()) {
+		    try {
+			GIResourceParser parser = new GIResourceParser(result);
+			String id = parser.getUniquePlatformCode();
+			if (id != null) {
+			    String name = parser.getPlatformName();
+			    if (name == null) {
+				name = id;
+			    }
+			    things.put(STAJsonWriter.thing(id, name, "", baseUrl));
+			}
+		    } catch (Exception e) {
+			// skip malformed
+		    }
+		}
+	    }
+	    location.put("Things", things);
+	} catch (Exception e) {
+	    location.put("Things", new JSONArray());
+	}
     }
 }

@@ -25,13 +25,18 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.stream.XMLStreamException;
 
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.DatabaseExecutor;
@@ -44,6 +49,7 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.DatastreamsTransformer;
+import eu.essi_lab.profiler.sta.ExpandSubRequest;
 import eu.essi_lab.profiler.sta.ObservedPropertiesTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
@@ -171,6 +177,7 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 		    JSONObject ds = STAJsonWriter.datastream(id, name, description,
 			    "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
 			    unitName, unitSymbol, null, lon, lat, phenomenonTime, properties, platformId, baseUrl);
+		    addExpandedObservations(ds, id, platformId, begin, end, endNow, webRequest, message, baseUrl, staRequest);
 		    datastreams.add(ds);
 		} catch (XMLStreamException | IOException e) {
 		}
@@ -182,7 +189,23 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	    if (datastreams.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	    }
-	    output.write(datastreams.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    JSONObject singleDs = datastreams.get(0);
+	    String dsId = singleDs.getString("@iot.id");
+	    String platformId = singleDs.getJSONObject("properties").optString("platformId", null);
+	    String begin = null;
+	    String end = null;
+	    String endNow = null;
+	    String pt = singleDs.optString("phenomenonTime", "");
+	    if (pt.contains("/")) {
+		int slash = pt.indexOf('/');
+		begin = pt.substring(0, slash).trim();
+		end = pt.substring(slash + 1).trim();
+	    } else if (!pt.isEmpty()) {
+		begin = pt;
+		end = pt;
+	    }
+	    addExpandedObservations(singleDs, dsId, platformId, begin, end, endNow, webRequest, message, baseUrl, staRequest);
+	    output.write(singleDs.toString().getBytes(StandardCharsets.UTF_8));
 	    return;
 	}
 
@@ -257,5 +280,90 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	    h = 31 * h + c;
 	}
 	return Math.abs(h);
+    }
+
+    private void addExpandedObservations(JSONObject datastream, String datastreamId, String platformId,
+	    String beginStr, String endStr, String endNowStr, WebRequest webRequest, DiscoveryMessage message,
+	    String baseUrl, STARequest staRequest) {
+	boolean expandObs = staRequest.getExpandOptions().stream()
+		.anyMatch(o -> "Observations".equals(o.getProperty()));
+	if (!expandObs) {
+	    return;
+	}
+	STARequest.ExpandOption obsOpt = staRequest.getExpandOptions().stream()
+		.filter(o -> "Observations".equals(o.getProperty()))
+		.findFirst()
+		.orElse(null);
+	if (obsOpt == null) {
+	    return;
+	}
+	int top = obsOpt.getTop() != null ? obsOpt.getTop() : 100;
+	String filter = obsOpt.getFilter();
+	String orderBy = obsOpt.getOrderBy();
+
+	java.util.Date windowBeginDate;
+	java.util.Date windowEndDate;
+	String[] range = STARequest.ExpandOption.parsePhenomenonTimeRange(filter);
+	if (range != null && range.length == 2) {
+	    Optional<java.util.Date> geOpt = ISO8601DateTimeUtils.parseISO8601ToDate(range[0]);
+	    Optional<java.util.Date> leOpt = ISO8601DateTimeUtils.parseISO8601ToDate(range[1]);
+	    if (geOpt.isPresent() && leOpt.isPresent()) {
+		windowBeginDate = geOpt.get();
+		windowEndDate = leOpt.get();
+	    } else {
+		windowBeginDate = null;
+		windowEndDate = null;
+	    }
+	} else {
+	    if (endNowStr != null && "true".equals(endNowStr)) {
+		endStr = ISO8601DateTimeUtils.getISO8601DateTime();
+	    }
+	    if (beginStr == null || endStr == null) {
+		datastream.put("Observations", new JSONArray());
+		return;
+	    }
+	    Optional<java.util.Date> beginOpt = ISO8601DateTimeUtils.parseISO8601ToDate(beginStr);
+	    Optional<java.util.Date> endOpt = ISO8601DateTimeUtils.parseISO8601ToDate(endStr);
+	    if (!beginOpt.isPresent() || !endOpt.isPresent()) {
+		datastream.put("Observations", new JSONArray());
+		return;
+	    }
+	    ZonedDateTime phenomenonStart = ZonedDateTime.ofInstant(beginOpt.get().toInstant(), ZoneOffset.UTC);
+	    ZonedDateTime phenomenonEnd = ZonedDateTime.ofInstant(endOpt.get().toInstant(), ZoneOffset.UTC);
+	    ZonedDateTime windowEnd = phenomenonEnd;
+	    ZonedDateTime windowBegin = phenomenonEnd.minusMonths(2);
+	    if (windowBegin.isBefore(phenomenonStart)) {
+		windowBegin = phenomenonStart;
+	    }
+	    windowBeginDate = java.util.Date.from(windowBegin.toInstant());
+	    windowEndDate = java.util.Date.from(windowEnd.toInstant());
+	}
+	if (windowBeginDate == null || windowEndDate == null) {
+	    datastream.put("Observations", new JSONArray());
+	    return;
+	}
+
+	try {
+	    DatastreamsObservationsHandler dsHandler = new DatastreamsObservationsHandler();
+	    List<JSONObject> obs = dsHandler.fetchObservationsForDatastream(
+		    webRequest, message, datastreamId, platformId, windowBeginDate, windowEndDate, baseUrl);
+
+	    boolean orderDesc = orderBy != null && orderBy.toLowerCase().contains("phenomenontime")
+		    && orderBy.toLowerCase().contains("desc");
+	    if (orderDesc) {
+		obs.sort(Comparator.comparing((JSONObject o) -> o.optString("phenomenonTime", ""))
+			.reversed());
+	    }
+	    if (obs.size() > top) {
+		obs = obs.subList(0, top);
+	    }
+	    JSONArray arr = new JSONArray();
+	    for (JSONObject o : obs) {
+		arr.put(o);
+	    }
+	    datastream.put("Observations", arr);
+	} catch (Exception e) {
+	    datastream.put("Observations", new JSONArray());
+	}
     }
 }

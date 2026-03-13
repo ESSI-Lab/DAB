@@ -295,6 +295,111 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * Result of composite aggregation with pagination support.
+     */
+    public static class CompositeAggregationResult {
+
+	private final List<JSONObject> documents;
+	private final Map<String, org.opensearch.client.json.JsonData> afterKey;
+
+	public CompositeAggregationResult(List<JSONObject> documents,
+		Map<String, org.opensearch.client.json.JsonData> afterKey) {
+	    this.documents = documents;
+	    this.afterKey = afterKey;
+	}
+
+	public List<JSONObject> getDocuments() {
+	    return documents;
+	}
+
+	public Map<String, org.opensearch.client.json.JsonData> getAfterKey() {
+	    return afterKey;
+	}
+    }
+
+    /**
+     * Distinct values via composite aggregation with cursor-based pagination (after_key).
+     * Supports resumptionToken for nextLink.
+     *
+     * @param searchQuery
+     * @param sourceFields
+     * @param target
+     * @param size
+     * @param afterToken   resumption token from previous response (after_key value), or null for first page
+     * @param excludeBinaries
+     * @param logQuery
+     * @return documents and afterKey for next page
+     * @throws Exception
+     */
+    public CompositeAggregationResult aggregateWithCompositeAgg(//
+	    Query searchQuery, //
+	    List<String> sourceFields, //
+	    Queryable target, //
+	    int size, //
+	    String afterToken, //
+	    boolean excludeBinaries, //
+	    boolean logQuery) throws Exception {
+
+	String topHitsAggName = "top_hits_agg";
+	String compositeAggName = "composite_agg";
+
+	CompositeAggregationSource termsSource = new CompositeAggregationSource.Builder()
+		.terms(t -> t.field(DataFolderMapping.toKeywordField(target.getName()))).build();
+
+	org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder cab = new org.opensearch.client.opensearch._types.aggregations.CompositeAggregation.Builder();
+	cab = cab.size(size).sources(Map.of(target.getName(), termsSource));
+	if (afterToken != null && !afterToken.isEmpty()) {
+	    cab = cab.after(Map.of(target.getName(), afterToken));
+	}
+
+	Builder topHitsBuilder = new TopHitsAggregation.Builder().size(1);
+	handleSourceFields(topHitsBuilder, null, sourceFields, excludeBinaries);
+
+	Aggregation topHitsAgg = new Aggregation.Builder()
+		.topHits(topHitsBuilder.size(1).build()).build();
+
+	Aggregation compositeAgg = new Aggregation.Builder().composite(cab.build())
+		.aggregations(Map.of(topHitsAggName, topHitsAgg)).build();
+
+	SearchRequest searchRequest = new SearchRequest.Builder().//
+		index(DataFolderMapping.get().getIndex()).//
+		query(searchQuery).//
+		size(0).//
+		aggregations(compositeAggName, compositeAgg).//
+		build();
+
+	if (OpenSearchDatabase.debugQueries() && logQuery) {
+	    GSLoggerFactory.getLogger(getClass()).debug("\n\n--- COMPOSITE AGGREGATION ---\n");
+	    GSLoggerFactory.getLogger(OpenSearchFinder.class).debug(OpenSearchUtils.toJSONObject(searchRequest).toString(3));
+	}
+
+	SearchResponse<Object> response = client.search(searchRequest, Object.class);
+
+	Map<String, Aggregate> aggregations = response.aggregations();
+	Aggregate compositeAggregate = aggregations.get(compositeAggName);
+
+	List<org.opensearch.client.opensearch._types.aggregations.CompositeBucket> buckets = compositeAggregate.composite().buckets().array();
+	Map<String, org.opensearch.client.json.JsonData> resultAfterKey = compositeAggregate.composite().afterKey();
+
+	ArrayList<JSONObject> out = new ArrayList<>();
+	for (org.opensearch.client.opensearch._types.aggregations.CompositeBucket bucket : buckets) {
+	    Map<String, Aggregate> topHits = bucket.aggregations();
+	    Aggregate aggregate = topHits.get(topHitsAggName);
+	    TopHitsAggregate topHitsAggregate = aggregate.topHits();
+	    HitsMetadata<org.opensearch.client.json.JsonData> hits = topHitsAggregate.hits();
+	    if (!hits.hits().isEmpty()) {
+		Hit<org.opensearch.client.json.JsonData> hit = hits.hits().getFirst();
+		org.opensearch.client.json.JsonData source = hit.source();
+		if (source != null) {
+		    out.add(new JSONObject(source.toString()));
+		}
+	    }
+	}
+
+	return new CompositeAggregationResult(out, resultAfterKey);
+    }
+
+    /**
      * @param searchQuery
      * @param target
      * @param size
@@ -361,13 +466,7 @@ public class OpenSearchWrapper {
 
     ) throws Exception {
 
-	// pl.logPerformance(GSLoggerFactory.getLogger(getClass()));
-
 	return client.search(builder -> {
-
-	    //
-	    // optional term frequency
-	    //
 
 	    if (!termFrequencyTargets.isEmpty()) {
 
@@ -376,20 +475,12 @@ public class OpenSearchWrapper {
 			DataFolderMapping.toKeywordField(trg.getName())).size(maxFrequencyMapItems.get()))));
 	    }
 
-	    //
-	    // optional bbox union
-	    //
-
 	    if (bboxUnionIncluded) {
 
 		Aggregation bboxAgg = Aggregation.of(b -> b.geoBounds(bb -> bb.field(MetadataElement.BOUNDING_BOX.getName())));
 
 		builder.aggregations(BBOX_AGG, bboxAgg);
 	    }
-
-	    //
-	    // optional track total hits (message.countInRetrievalIncluded())
-	    //
 
 	    if (trackTotalHits) {
 

@@ -214,7 +214,10 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    if (message.getDistinctValuesElement().isPresent()) {
+	    boolean useDistinctWithComposite = message.getDistinctValuesElement().isPresent()
+		    && message.getPage() != null && message.getPage().getSize() > 0;
+
+	    if (message.getDistinctValuesElement().isPresent() && !useDistinctWithComposite) {
 
 		Query query = buildQuery(message, false);
 
@@ -232,6 +235,52 @@ public class OpenSearchFinder implements DatabaseFinder {
 			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
 			filter(Objects::nonNull).//
 			collect(Collectors.toList());
+
+		if (message.isCountInRetrievalIncluded()) {
+
+		    CountSet countSet = new CountSet();
+
+		    DiscoveryCountResponse countResponse = new DiscoveryCountResponse();
+
+		    updateCountSet(countSet, countResponse, message, resources.size());
+
+		    countSet.addCountPair(new SimpleEntry<>(Type.DATABASE.toString(), countResponse));
+
+		    resultSet.setCountResponse(countSet);
+		}
+
+	    } else if (useDistinctWithComposite) {
+
+		Query query = buildQuery(message, false);
+
+		List<Queryable> queryables = message.getResourceSelector().getIndexesQueryables();
+
+		String afterToken = null;
+		if (message.getSearchAfter().isPresent()) {
+		    Optional<java.util.List<Object>> vals = message.getSearchAfter().get().getValues();
+		    if (vals.isPresent() && !vals.get().isEmpty()) {
+			afterToken = vals.get().get(0).toString();
+		    }
+		}
+
+		OpenSearchWrapper.CompositeAggregationResult compResult = wrapper.aggregateWithCompositeAgg(//
+			query, //
+			queryables.stream().map(Queryable::getName).collect(Collectors.toList()), //
+			message.getDistinctValuesElement().get(), //
+			message.getPage().getSize(), //
+			afterToken, //
+			message.isResourceBinaryExcluded(), true);
+
+		resources = compResult.getDocuments().stream().//
+			map(s -> OpenSearchUtils.toGSResource(s).orElse(null)).//
+			filter(Objects::nonNull).//
+			collect(Collectors.toList());
+
+		if (compResult.getAfterKey() != null && !compResult.getAfterKey().isEmpty()) {
+		    List<Object> values = new ArrayList<>();
+		    values.add(compResult.getAfterKey().values().iterator().next().toString().replace("\"", ""));
+		    resultSet.setSearchAfter(new eu.essi_lab.messages.SearchAfter(values));
+		}
 
 		if (message.isCountInRetrievalIncluded()) {
 

@@ -22,6 +22,7 @@
 package eu.essi_lab.profiler.sta;
 
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
@@ -270,7 +271,13 @@ public final class STAJsonWriter {
 	String base = baseUrl + entityPath;
 	Map<String, String> params = new LinkedHashMap<>();
 	if (queryString != null && !queryString.isEmpty()) {
-	    for (String pair : queryString.split("&")) {
+	    String toParse = queryString;
+	    try {
+		toParse = URLDecoder.decode(queryString, StandardCharsets.UTF_8);
+	    } catch (Exception e) {
+		/* keep original */
+	    }
+	    for (String pair : toParse.split("&")) {
 		int eq = pair.indexOf('=');
 		if (eq > 0) {
 		    String key = pair.substring(0, eq);

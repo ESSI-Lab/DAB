@@ -23,13 +23,16 @@ package eu.essi_lab.profiler.sta.handler;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.api.database.DatabaseExecutor;
@@ -42,6 +45,8 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.profiler.sta.DatastreamsTransformer;
+import eu.essi_lab.profiler.sta.ExpandSubRequest;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.profiler.sta.ThingsTransformer;
@@ -107,6 +112,7 @@ public class ThingsHandler extends StreamingRequestHandler {
 	ResultSet<String> resultSet = executor.discoverDistinctStrings(message);
 	List<JSONObject> things = new ArrayList<>();
 	String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
+	STARequest staRequest = new STARequest(webRequest);
 
 	if (resultSet != null) {
 	    for (String result : resultSet.getResultsList()) {
@@ -121,6 +127,8 @@ public class ThingsHandler extends StreamingRequestHandler {
 			name = id;
 		    }
 		    JSONObject thing = STAJsonWriter.thing(id, name, "", baseUrl);
+		    addExpandedDatastreams(thing, id, webRequest, baseUrl, staRequest);
+		    addExpandedMultiDatastreams(thing, staRequest);
 		    things.add(thing);
 		} catch (XMLStreamException | IOException e) {
 		    // skip malformed
@@ -128,7 +136,6 @@ public class ThingsHandler extends StreamingRequestHandler {
 	    }
 	}
 
-	STARequest staRequest = new STARequest(webRequest);
 	// Single object only for Things(id), not for Locations(id)/Things navigation
 	boolean singleThing = staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Things
 		&& staRequest.getEntityId().isPresent()
@@ -137,7 +144,10 @@ public class ThingsHandler extends StreamingRequestHandler {
 	    if (things.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	    }
-	    output.write(things.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    JSONObject singleThingObj = things.get(0);
+	    addExpandedDatastreams(singleThingObj, singleThingObj.getString("@iot.id"), webRequest, baseUrl, staRequest);
+	    addExpandedMultiDatastreams(singleThingObj, staRequest);
+	    output.write(singleThingObj.toString().getBytes(StandardCharsets.UTF_8));
 	    return;
 	}
 	if (things.isEmpty() && staRequest.getEntityId().isPresent()) {
@@ -150,7 +160,9 @@ public class ThingsHandler extends StreamingRequestHandler {
 	}
 
 	String nextLink = null;
-	if (resultSet != null && resultSet.getSearchAfter().isPresent()) {
+	int pageSize = staRequest.getTop() != null ? staRequest.getTop() : 100;
+	boolean hasFullPage = things.size() >= pageSize;
+	if (hasFullPage && resultSet != null && resultSet.getSearchAfter().isPresent()) {
 	    String token = resultSet.getSearchAfter().get().getValues()
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
@@ -166,5 +178,107 @@ public class ThingsHandler extends StreamingRequestHandler {
 
 	String json = STAJsonWriter.collectionResponse(things, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private void addExpandedDatastreams(JSONObject thing, String thingId, WebRequest webRequest, String baseUrl,
+	    STARequest staRequest) {
+	boolean expandDatastreams = staRequest.getExpandOptions().stream()
+		.anyMatch(o -> "Datastreams".equals(o.getProperty()));
+	if (!expandDatastreams) {
+	    return;
+	}
+	int top = staRequest.getExpandOptions().stream()
+		.filter(o -> "Datastreams".equals(o.getProperty()))
+		.map(STARequest.ExpandOption::getTop)
+		.filter(java.util.Objects::nonNull)
+		.findFirst()
+		.orElse(100);
+	try {
+	    String path = "Things(" + thingId + ")/Datastreams";
+	    String query = "$top=" + top;
+	    ExpandSubRequest subReq = new ExpandSubRequest(webRequest, path, query);
+	    DiscoveryRequestTransformer dsTransformer = new DatastreamsTransformer();
+	    DiscoveryMessage msg = dsTransformer.transform(subReq);
+	    ResultSet<String> dsResult = exec(msg);
+	    JSONArray datastreams = new JSONArray();
+	    if (dsResult != null) {
+		for (String result : dsResult.getResultsList()) {
+		    try {
+			JSONObject ds = parseDatastreamFromResult(result, thingId, baseUrl);
+			if (ds != null) {
+			    datastreams.put(ds);
+			}
+		    } catch (Exception e) {
+			// skip malformed
+		    }
+		}
+	    }
+	    thing.put("Datastreams", datastreams);
+	} catch (Exception e) {
+	    thing.put("Datastreams", new JSONArray());
+	}
+    }
+
+    /**
+     * Adds empty MultiDatastreams array when $expand=MultiDatastreams is requested.
+     * MultiDatastreams are not supported at this time.
+     */
+    private void addExpandedMultiDatastreams(JSONObject thing, STARequest staRequest) {
+	boolean expandMultiDatastreams = staRequest.getExpandOptions().stream()
+		.anyMatch(o -> "MultiDatastreams".equals(o.getProperty()));
+	if (expandMultiDatastreams) {
+	    thing.put("MultiDatastreams", new JSONArray());
+	}
+    }
+
+    private static JSONObject parseDatastreamFromResult(String result, String platformId, String baseUrl)
+	    throws XMLStreamException, IOException {
+	GIResourceParser parser = new GIResourceParser(result);
+	String id = parser.getOnlineId();
+	if (id == null) {
+	    return null;
+	}
+	String platformName = parser.getPlatformName();
+	String attributeName = parser.getAttributeName();
+	String name = platformName != null && attributeName != null
+		? platformName + " - " + attributeName
+		: (attributeName != null ? attributeName : id);
+	String description = parser.getAttributeDescription();
+	if (description == null || description.isEmpty()) {
+	    description = attributeName != null ? attributeName : "";
+	}
+	String phenomenonTime = "";
+	String begin = parser.getTmpExtentBegin();
+	String end = parser.getTmpExtentEnd();
+	String endNow = parser.getTmpExtentEndNow();
+	if (endNow != null && endNow.equals("true")) {
+	    end = ISO8601DateTimeUtils.getISO8601DateTime();
+	}
+	if (begin != null && end != null) {
+	    phenomenonTime = begin + "/" + end;
+	} else if (begin != null) {
+	    phenomenonTime = begin;
+	} else if (end != null) {
+	    phenomenonTime = end;
+	}
+	BigDecimal lon = null;
+	BigDecimal lat = null;
+	if (parser.getBBOX() != null) {
+	    lon = parser.getBBOX().getBigDecimalWest();
+	    lat = parser.getBBOX().getBigDecimalNorth();
+	}
+	String unitName = parser.getUnits();
+	String unitSymbol = parser.getUnitsAbbreviation();
+	if (unitSymbol == null || unitSymbol.isEmpty()) {
+	    unitSymbol = unitName;
+	}
+	JSONObject properties = new JSONObject();
+	properties.put("resultType", "Timeseries");
+	if (platformId != null) {
+	    properties.put("platformId", platformId);
+	}
+	return STAJsonWriter.datastream(id, name, description,
+		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
+		unitName, unitSymbol, null, lon, lat, phenomenonTime, properties, platformId, baseUrl);
     }
 }

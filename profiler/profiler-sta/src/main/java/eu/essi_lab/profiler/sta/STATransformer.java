@@ -185,11 +185,9 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
     private void applyFilterBonds(String filter, Set<Bond> operands) {
 	String f = decodeFilter(filter);
 
-	// location/type or location/geometry/type
-	if (f.toLowerCase().contains("location")){
-	    if (!f.toLowerCase().contains("point")){
-		operands.add(BondFactory.getFalseBond());
-	    }
+	Bond filterBond = STAFilterParser.parse(f);
+	if (filterBond != null) {
+	    operands.add(filterBond);
 	}
 
 	applyEntitySpecificFilterBonds(f, operands);
