@@ -24,11 +24,13 @@ package eu.essi_lab.profiler.sta;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SortedFields;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
@@ -40,6 +42,12 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * Transformer for STA FeaturesOfInterest entity set.
  */
 public class FeaturesOfInterestTransformer extends STATransformer {
+
+    @Override
+    protected void applyEntitySpecificFilterBonds(String filter, Set<Bond> operands) {
+	addEntityIdFilter(filter, "FeatureOfInterest", MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, operands);
+	addIdFilter(filter, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, operands);
+    }
 
     @Override
     protected Optional<Queryable> getDistinctElement(WebRequest request) {

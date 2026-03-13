@@ -12,7 +12,7 @@ public class KistersExternalTestIT {
     @Test
     public void test() {
 	KISTERSClient client = new KISTERSClient(System.getProperty("kistersEndpoint"));
-	List<KISTERSEntity> stations = client.retrieveStationsBySiteName("ZA_DWA");
+	List<KISTERSEntity> stations = client.retrieveStations();
 	System.out.println(stations.size());
 	assertTrue(stations.size()>10);
 	System.out.println("{");

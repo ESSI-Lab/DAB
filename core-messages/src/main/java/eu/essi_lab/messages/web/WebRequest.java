@@ -982,16 +982,20 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 
     public static Optional<String> extractQueryParameter(String queryString, String key) {
 
-	if (queryString != null && queryString.contains(key + "=")) {
+	String separator = key+"=";
 
-	    String split = queryString.split(key + "=")[1];
+	if (queryString != null && queryString.contains(separator)) {
+
+	    String escaped = separator.replace("$","\\$");
+
+	    String split = queryString.split(escaped)[1];
 
 	    if (split.contains("&")) {
 
 		return Optional.of(split.split("&")[0]);
 	    }
 
-	    return Optional.of(queryString.split(key + "=")[1]);
+	    return Optional.of(queryString.split(escaped)[1]);
 	}
 	return Optional.empty();
     }

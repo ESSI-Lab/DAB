@@ -51,6 +51,12 @@ public class DatastreamsTransformer extends STATransformer {
     public static final String ATTR_OBSERVED_PROPERTY_CODE = "staObservedPropertyCode";
 
     @Override
+    protected void applyEntitySpecificFilterBonds(String filter, Set<Bond> operands) {
+	addEntityIdFilter(filter, "Datastream", MetadataElement.ONLINE_ID, operands);
+	addIdFilter(filter, MetadataElement.ONLINE_ID, operands);
+    }
+
+    @Override
     protected Bond getUserBond(WebRequest request) throws GSException {
 	Bond base = super.getUserBond(request);
 	STARequest staRequest = new STARequest(request);

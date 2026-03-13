@@ -21,8 +21,12 @@
 
 package eu.essi_lab.profiler.sta;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -74,8 +78,7 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 
 	String filter = staRequest.getFilter();
 	if (filter != null && !filter.isEmpty()) {
-	    // Minimal $filter support - defer full OData parsing to later
-	    // For now we pass through common query params
+	    applyFilterBonds(filter, operands);
 	}
 
 	String platformCode = request.extractQueryParameter("platformCode").orElse(null);
@@ -124,10 +127,6 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	STARequest staRequest = new STARequest(request);
 	int skip = staRequest.getSkip() != null ? staRequest.getSkip() : 0;
 	int top = staRequest.getTop() != null ? staRequest.getTop() : DEFAULT_TOP;
-	if (staRequest.getEntityId().isPresent() && !staRequest.getNavigationProperty().isPresent()) {
-	    top = 1;
-	    skip = 0;
-	}
 	return new Page(skip + 1, top);
     }
 
@@ -173,5 +172,72 @@ public abstract class STATransformer extends DiscoveryRequestTransformer {
 	ValidationMessage vm = new ValidationMessage();
 	vm.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 	return vm;
+    }
+
+    /**
+     * Parses $filter and adds corresponding bonds. Supports:
+     * <ul>
+     * <li>location/type eq 'Point' or location/geometry/type eq 'Point' → createIsTimeSeriesBond(true)</li>
+     * <li>location/type eq 'X' or location/geometry/type eq 'X' (X != Point) → getFalseBond()</li>
+     * </ul>
+     * Subclasses add entity-specific filters (Entity/id eq X, name eq, etc.) via {@link #applyEntitySpecificFilterBonds}.
+     */
+    private void applyFilterBonds(String filter, Set<Bond> operands) {
+	String f = decodeFilter(filter);
+
+	// location/type or location/geometry/type
+	if (f.toLowerCase().contains("location")){
+	    if (!f.toLowerCase().contains("point")){
+		operands.add(BondFactory.getFalseBond());
+	    }
+	}
+
+	applyEntitySpecificFilterBonds(f, operands);
+    }
+
+    private static String decodeFilter(String filter) {
+	if (filter == null || filter.isEmpty()) {
+	    return filter != null ? filter : "";
+	}
+	try {
+	    return URLDecoder.decode(filter.trim(), StandardCharsets.UTF_8);
+	} catch (IllegalArgumentException e) {
+	    return filter.trim();
+	}
+    }
+
+    /**
+     * Hook for entity-specific $filter bonds. Override in subclasses for Entity/id eq X, name eq, etc.
+     */
+    protected void applyEntitySpecificFilterBonds(String filter, Set<Bond> operands) {
+    }
+
+    /**
+     * Helper for subclasses: adds bond when filter contains EntityName/id eq X (X can be number or quoted string).
+     */
+    protected void addEntityIdFilter(String filter, String entityName, MetadataElement element, Set<Bond> operands) {
+	Pattern p = Pattern.compile(Pattern.quote(entityName) + "/id\\s+eq\\s+(?:'([^']*)'|(\\d+))", Pattern.CASE_INSENSITIVE);
+	Matcher m = p.matcher(filter);
+	if (m.find()) {
+	    String id = m.group(1) != null ? m.group(1) : m.group(2);
+	    if (id != null) {
+		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, id));
+	    }
+	}
+    }
+
+    /**
+     * Helper for subclasses: adds bond when filter contains bare id eq X (X quoted or numeric).
+     * Used when entity context is inferred from the request (e.g. Locations → id = UNIQUE_PLATFORM_IDENTIFIER).
+     */
+    protected void addIdFilter(String filter, MetadataElement element, Set<Bond> operands) {
+	Pattern p = Pattern.compile("\\bid\\s+eq\\s+(?:'([^']*)'|(\\d+))", Pattern.CASE_INSENSITIVE);
+	Matcher m = p.matcher(filter);
+	if (m.find()) {
+	    String id = m.group(1) != null ? m.group(1) : m.group(2);
+	    if (id != null) {
+		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, element, id));
+	    }
+	}
     }
 }

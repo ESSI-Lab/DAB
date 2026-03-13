@@ -24,25 +24,28 @@ package eu.essi_lab.profiler.sta.handler;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
+import org.ietf.jgss.GSSException;
 import org.json.JSONObject;
 
-import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 import eu.essi_lab.profiler.sta.LocationsTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
@@ -58,13 +61,15 @@ import jakarta.ws.rs.core.StreamingOutput;
  */
 public class LocationsHandler extends StreamingRequestHandler {
 
-    private DatabaseExecutor executor;
+    private IDiscoveryStringExecutor executor;
 
     public LocationsHandler() {
 	try {
-	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
-	    executor = DatabaseProviderFactory.getExecutor(uri);
-	} catch (GSException e) {
+	    ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
+	    Iterator<IDiscoveryStringExecutor> it = loader.iterator();
+	    executor = it.hasNext() ? it.next() : null;
+	} catch (Exception e) {
+	    executor = null;
 	}
     }
 
@@ -81,7 +86,8 @@ public class LocationsHandler extends StreamingRequestHandler {
 	    try {
 		writeLocationsResponse(output, webRequest);
 	    } catch (Exception e) {
-		throw new WebApplicationException("Error handling Locations request", e);
+		e.printStackTrace();
+		throw new WebApplicationException(e.getMessage());
 	    }
 	};
     }
@@ -114,7 +120,11 @@ public class LocationsHandler extends StreamingRequestHandler {
 	DiscoveryRequestTransformer transformer = getTransformer();
 	DiscoveryMessage message = transformer.transform(webRequest);
 
-	ResultSet<String> resultSet = executor.discoverDistinctStrings(message);
+	ResultSet<String> resultSet = new ResultSet<>();
+
+	if (message.getPage()!=null && message.getPage().getSize()>0) {
+	 resultSet =   executor.retrieveStrings(message);
+	}
 	List<JSONObject> locations = new ArrayList<>();
 	Set<String> seenKeys = new LinkedHashSet<>();
 	String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
@@ -168,9 +178,13 @@ public class LocationsHandler extends StreamingRequestHandler {
 	}
 
 	Integer count = null;
-	if (resultSet != null && resultSet.getCountResponse() != null) {
-	    count = resultSet.getCountResponse().getCount();
-	}
+
+	    if (staRequest.getCount() != null&&staRequest.getCount()) {
+		message.setPage(new Page(1,10));
+		CountSet countSet = executor.count(message);
+		count = countSet.getCount();
+	    }
+
 
 	String nextLink = null;
 	if (resultSet != null && resultSet.getSearchAfter().isPresent()) {

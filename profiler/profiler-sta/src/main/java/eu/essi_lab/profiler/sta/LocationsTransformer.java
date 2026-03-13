@@ -24,24 +24,44 @@ package eu.essi_lab.profiler.sta;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SortedFields;
+import eu.essi_lab.messages.bond.Bond;
+import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.profiler.sta.STARequest.EntitySet;
 
 /**
  * Transformer for STA Locations entity set and Things(id)/Locations navigation.
  */
 public class LocationsTransformer extends STATransformer {
+
+    @Override
+    protected void applyEntitySpecificFilterBonds(String filter, Set<Bond> operands) {
+	addEntityIdFilter(filter, "Location", MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, operands);
+	addIdFilter(filter, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, operands);
+	// name eq 'value' - Locations-specific (platform/station name)
+	Pattern namePattern = Pattern.compile("name\\s+eq\\s+'([^']*)'", Pattern.CASE_INSENSITIVE);
+	Matcher nameMatcher = namePattern.matcher(filter);
+	if (nameMatcher.find()) {
+	    String value = nameMatcher.group(1);
+	    if (value != null && !value.isEmpty()) {
+		operands.add(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PLATFORM_TITLE, value));
+	    }
+	}
+    }
 
     @Override
     protected Optional<Queryable> getDistinctElement(WebRequest request) {
@@ -55,18 +75,6 @@ public class LocationsTransformer extends STATransformer {
 		new SimpleEntry<>(MetadataElement.BOUNDING_BOX, SortOrder.ASCENDING))));
     }
 
-    @Override
-    protected Page getPage(WebRequest request) throws GSException {
-	STARequest staRequest = new STARequest(request);
-	if (staRequest.getEntitySet().orElse(null) == EntitySet.Things
-		&& staRequest.getEntityId().isPresent()
-		&& "Locations".equals(staRequest.getNavigationProperty().orElse(null))) {
-	    int top = staRequest.getTop() != null ? staRequest.getTop() : 100;
-	    int skip = staRequest.getSkip() != null ? staRequest.getSkip() : 0;
-	    return new Page(skip + 1, top);
-	}
-	return super.getPage(request);
-    }
 
     @Override
     protected ResourceSelector getSelector(WebRequest request) {
