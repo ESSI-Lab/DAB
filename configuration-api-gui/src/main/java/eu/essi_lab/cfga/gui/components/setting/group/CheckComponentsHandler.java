@@ -42,8 +42,8 @@ public class CheckComponentsHandler extends GroupComponentsHandler<CheckboxGroup
 
 	checkBoxGroup.setLabel("");
 	checkBoxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-	checkBoxGroup.getStyle().set("width", "100%");
-	checkBoxGroup.getStyle().set("height", "300px");
+	checkBoxGroup.setWidthFull();
+	checkBoxGroup.setMaxHeight("300px");
 	checkBoxGroup.getStyle().set("overflow-y", "auto");
 
 	checkBoxGroup.addSelectionListener(new CheckComponentsHandlerListener(this));

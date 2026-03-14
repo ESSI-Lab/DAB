@@ -240,13 +240,19 @@ public class SettingComponent extends Div {
 	    this.tabSheet = new TabSheet();
 	    this.tabSheet.getStyle().set("padding", "0px");
 	    this.tabSheet.getStyle().set("margin-left", "-20px");
+
 	    add(tabSheet);
 	}
 
 	deepRenderSetting(null, getSetting(), configuration, comparator);
 
+	radioMap.values().forEach(GroupComponentsHandler::setItems);
+	checkMap.values().forEach(GroupComponentsHandler::setItems);
+
 	addRadioMultiSelectionComponents();
 	addCheckMultiSelectionComponents();
+
+	radioMap.values().forEach(GroupComponentsHandler::scrollInToView);
     }
 
     /**
@@ -355,12 +361,12 @@ public class SettingComponent extends Div {
 	    } else {
 
 		//
-		// This is the toggle button of a child setting
+		// This is the switch button of a child setting
 		//
 		Switch switch_ = (Switch) comp;
 
 		//
-		// if the parent setting value is false, also the state of the toggle button
+		// if the parent setting value is false, also the state of the switch button
 		// of the children must be set to false
 		//
 		if (!enabled) {
@@ -369,7 +375,7 @@ public class SettingComponent extends Div {
 		}
 
 		//
-		// if the force readonly mode is enabled, the toggle button
+		// if the force readonly mode is enabled, the switch button
 		// cannot be used so it must be disabled. this is the only case
 		// where a toggle button of a setting component can be disabled
 		//

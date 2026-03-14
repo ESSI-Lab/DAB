@@ -25,7 +25,6 @@ import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.checkbox.*;
 import com.vaadin.flow.component.radiobutton.*;
 import com.vaadin.flow.data.provider.*;
-import eu.essi_lab.cfga.gui.components.setting.*;
 import eu.essi_lab.cfga.setting.*;
 
 import java.util.*;
@@ -52,6 +51,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
     }
 
     private final HashMap<String, ArrayList<Component>> itemToComponentsMap;
+    private Set<String> items;
     protected Setting groupSetting;
 
     /**
@@ -60,6 +60,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
     public GroupComponentsHandler() {
 
 	itemToComponentsMap = new HashMap<>();
+	items = new LinkedHashSet<>();
     }
 
     /**
@@ -135,14 +136,11 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public void addComponents(String name, List<Component> list) {
 
-	synchronized (SettingComponent.class) {
+	list.forEach(c -> setVisible(c, false));
 
-	    list.forEach(c -> setVisible(c, false));
+	ArrayList<Component> compList = getItemToComponentsMap().computeIfAbsent(name, k -> new ArrayList<>());
 
-	    ArrayList<Component> compList = getItemToComponentsMap().computeIfAbsent(name, k -> new ArrayList<>());
-
-	    compList.addAll(list);
-	}
+	compList.addAll(list);
     }
 
     /**
@@ -159,18 +157,15 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public void addItem(String name) {
 
-	synchronized (SettingComponent.class) {
+	items.add(name);
+    }
 
-	    AbstractListDataView<String> listDataView = getListDataView();
+    /**
+     *
+     */
+    public void setItems() {
 
-	    List<String> list = listDataView.getItems().collect(Collectors.toList());
-
-	    if (!list.contains(name)) {
-		list.add(name);
-	    }
-
-	    setItems(list);
-	}
+	setItems(new ArrayList<>(items));
     }
 
     /**
@@ -178,9 +173,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public List<String> getItems() {
 
-	AbstractListDataView<String> listDataView = getListDataView();
-
-	return listDataView.getItems().collect(Collectors.toList());
+	return new ArrayList<>(items);
     }
 
     /**
@@ -197,6 +190,23 @@ public abstract class GroupComponentsHandler<T extends Component> {
     public Setting getGroupSetting() {
 
 	return groupSetting;
+    }
+
+    /**
+     *
+     */
+    public void scrollInToView() {
+
+	Optional<Component> checked = getGroupComponent().//
+		getChildren().//
+		filter(c -> c.getElement().getProperty("checked", true)).//
+		findFirst();//
+
+	checked.ifPresent(component -> component.scrollIntoView(new ScrollOptions(//
+		ScrollOptions.Behavior.SMOOTH, //
+		ScrollOptions.Alignment.CENTER,//
+		ScrollOptions.Alignment.NEAREST//
+	)));
     }
 
     /**
@@ -220,14 +230,12 @@ public abstract class GroupComponentsHandler<T extends Component> {
     }
 
     /**
-     *
      * @param component
      * @param visible
      */
     private void setVisible(Component component, boolean visible) {
 
-	component.getStyle().set("display", visible ? "block":"none");
+	component.setVisible(visible);
     }
-
 
 }
