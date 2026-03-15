@@ -2243,9 +2243,9 @@ export function initializePortal(config) {
 		jQuery('#tabs-div .tabs-element').css({
 			'position': 'relative'
 		});
-		// Results tab must scroll (overflow-y: auto); sources tab no scrollbar, clip to panel
+		// Results tab must scroll (overflow-y: auto); sources tab scrolls when content overflows
 		jQuery('#results-tab').css({ 'overflow-x': 'hidden', 'overflow-y': 'auto' });
-		jQuery('#sources-tab').css({ 'overflow': 'hidden', 'overflow-x': 'hidden', 'overflow-y': 'hidden' });
+		jQuery('#sources-tab').css({ 'overflow': 'hidden', 'overflow-x': 'hidden', 'overflow-y': 'auto' });
 
 		//------------------------------------------------------------------
 		// results tab
@@ -2801,7 +2801,9 @@ export function initializePortal(config) {
 				$("#disclaimer-div").dialog({
 					resizable: false,
 					height: "auto",
+					maxHeight: $(window).height() * 0.7,
 					width: 800,
+					dialogClass: "welcome-dialog",
 					title: config.disclaimerTitle,
 					modal: true,
 					buttons: [
@@ -3955,10 +3957,9 @@ export function initializePortal(config) {
 						if (r && r.id) GIAPI.search._sourcesIdToTitle[r.id] = r.title || r.id;
 					});
 				}
-				// Remove scrollbar and constrain height: SourcesWidget creates a div with inline overflow-y: scroll and fixed height
+				// Constrain height and enable vertical scrollbar: SourcesWidget creates a div with inline overflow-y: scroll and fixed height
 				jQuery('#sources-tab div[style*="overflow-y"]').css({
-					'overflow': 'hidden',
-					'overflow-y': 'hidden',
+					'overflow-y': 'auto',
 					'height': '100%',
 					'max-height': '100%'
 				});

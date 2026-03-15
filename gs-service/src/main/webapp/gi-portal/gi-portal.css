@@ -90,7 +90,17 @@ body {
 }
 
 #disclaimer-div {
-	display: none
+	display: none;
+}
+
+/* Welcome/disclaimer dialog - max 70% of viewport height with scrollbar */
+.welcome-dialog {
+	max-height: 70vh;
+}
+
+.welcome-dialog .ui-dialog-content {
+	max-height: calc(70vh - 100px);
+	overflow-y: auto;
 }
 
 .layers-control-table-div {
@@ -473,7 +483,7 @@ body {
 
 /* -------------------------------- */
 /* sources tab                      */
-/* Override .ui-tabs-panel overflow so sources panel has no scrollbar and stays within screen */
+/* Override .ui-tabs-panel overflow so sources panel stays within screen with vertical scrollbar */
 #tabs-div .ui-tabs-panel#sources-tab {
 	overflow: hidden !important;
 	min-height: 0;
@@ -490,9 +500,10 @@ body {
 	flex-direction: column;
 }
 
-/* SourcesWidget creates an inner div with inline overflow-y: scroll and fixed height - override to remove scrollbar and constrain to panel */
+/* SourcesWidget creates an inner div with inline overflow-y: scroll and fixed height - constrain to panel and enable vertical scrollbar */
 #sources-tab [style*="overflow-y"] {
-	overflow: hidden !important;
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
 	max-height: 100% !important;
 	height: 100% !important;
 }
@@ -517,7 +528,8 @@ body {
 }
 
 #sources-tab > div table#wrapSourcesWidgetTable tbody tr:last-child td > div {
-	overflow: hidden !important;
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
 	max-height: 100% !important;
 	height: 100% !important;
 }

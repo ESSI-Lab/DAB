@@ -22,9 +22,15 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>eu.essi_lab</groupId>
-			<artifactId>access-tools</artifactId>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>request-executor-default</artifactId>
 			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>core-messages</artifactId>
+			<version>${project.parent.version}</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 

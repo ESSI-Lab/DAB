@@ -21,6 +21,8 @@
 
 package eu.essi_lab.profiler.sta;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -129,6 +131,113 @@ public class STARequest {
 	return getQueryParam(QueryOption.EXPAND.getKey());
     }
 
+    /**
+     * Parsed expand option, e.g. Things($top=100) or Observations($orderby=...;$filter=...).
+     */
+    public static class ExpandOption {
+	private final String property;
+	private final Integer top;
+	private final String options;
+
+	public ExpandOption(String property, Integer top, String options) {
+	    this.property = property;
+	    this.top = top;
+	    this.options = options != null ? options : "";
+	}
+
+	public String getProperty() {
+	    return property;
+	}
+
+	public Integer getTop() {
+	    return top;
+	}
+
+	/** Raw options string, e.g. "$orderby=phenomenonTime desc;$filter=phenomenonTime ge ..." */
+	public String getOptions() {
+	    return options;
+	}
+
+	/** Extracts $filter value from options. */
+	public String getFilter() {
+	    return extractOption(options, "\\$filter\\s*=\\s*([^;$]+)", 1);
+	}
+
+	/** Extracts $orderby value from options. */
+	public String getOrderBy() {
+	    return extractOption(options, "\\$orderby\\s*=\\s*([^;$]+)", 1);
+	}
+
+	private static String extractOption(String opts, String regex, int group) {
+	    if (opts == null || opts.isEmpty()) {
+		return null;
+	    }
+	    Matcher m = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(opts.trim());
+	    return m.find() ? m.group(group).trim() : null;
+	}
+
+	/** Parses phenomenonTime ge X and le Y from filter. Returns [begin, end] or null if not found. */
+	public static String[] parsePhenomenonTimeRange(String filter) {
+	    if (filter == null || filter.isEmpty()) {
+		return null;
+	    }
+	    String decoded = filter;
+	    try {
+		decoded = java.net.URLDecoder.decode(filter, java.nio.charset.StandardCharsets.UTF_8);
+	    } catch (Exception e) {
+		/* keep original */
+	    }
+	    String ge = null;
+	    String le = null;
+	    Matcher geM = Pattern.compile("phenomenonTime\\s+ge\\s+([^\\s]+)", Pattern.CASE_INSENSITIVE).matcher(decoded);
+	    if (geM.find()) {
+		ge = geM.group(1).replaceAll("^['\"]|['\"]$", "");
+	    }
+	    Matcher leM = Pattern.compile("phenomenonTime\\s+le\\s+([^\\s]+)", Pattern.CASE_INSENSITIVE).matcher(decoded);
+	    if (leM.find()) {
+		le = leM.group(1).replaceAll("^['\"]|['\"]$", "");
+	    }
+	    if (ge != null && le != null) {
+		return new String[] { ge, le };
+	    }
+	    return null;
+	}
+    }
+
+    private static final Pattern EXPAND_ITEM_PATTERN = Pattern.compile("([A-Za-z]+)\\s*(?:\\(([^)]*)\\))?");
+    private static final Pattern EXPAND_TOP_PATTERN = Pattern.compile("\\$top\\s*=\\s*(\\d+)", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * Parses $expand value into list of options. E.g. "Things($top=100)" -> [ExpandOption(Things, 100)].
+     */
+    public List<ExpandOption> getExpandOptions() {
+	String expand = getExpand();
+	if (expand == null || expand.isEmpty()) {
+	    return List.of();
+	}
+	List<ExpandOption> out = new ArrayList<>();
+	for (String item : expand.split(",")) {
+	    String trimmed = item.trim();
+	    if (trimmed.isEmpty()) {
+		continue;
+	    }
+	    Matcher m = EXPAND_ITEM_PATTERN.matcher(trimmed);
+	    if (m.matches()) {
+		String prop = m.group(1);
+		String opts = m.group(2);
+		Integer top = null;
+		if (opts != null && !opts.isEmpty()) {
+		    Matcher topM = EXPAND_TOP_PATTERN.matcher(opts);
+		    if (topM.find()) {
+			top = Integer.valueOf(topM.group(1));
+		    }
+		}
+		out.add(new ExpandOption(prop, top, opts));
+	    }
+	}
+	return out;
+    }
+
     public String getSelect() {
 	return getQueryParam(QueryOption.SELECT.getKey());
     }
@@ -175,7 +284,11 @@ public class STARequest {
     }
 
     private String getQueryParam(String key) {
-	return webRequest.extractQueryParameter(key).orElse(null);
+	Optional<String> value = webRequest.extractQueryParameter(key);
+	if (value.isEmpty() && webRequest.getURLDecodedQueryString().isPresent()) {
+	    value = WebRequest.extractQueryParameter(webRequest.getURLDecodedQueryString().get(), key);
+	}
+	return value.orElse(null);
     }
 
     private static Integer parseInt(String s) {

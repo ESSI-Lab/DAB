@@ -439,8 +439,6 @@ public class S3TransferWrapper {
 	    HeadObjectResponse response = client.headObject(headRequest).get();
 	    return new Date(1000l * response.lastModified().getEpochSecond());
 	} catch (Exception e) {
-
-	   GSLoggerFactory.getLogger(getClass()).error(e);
 	   return null;
 	}
     }

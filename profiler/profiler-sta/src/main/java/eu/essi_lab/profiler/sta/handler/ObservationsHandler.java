@@ -24,11 +24,15 @@ package eu.essi_lab.profiler.sta.handler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.stream.XMLStreamException;
 
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
 import org.json.JSONObject;
 
@@ -38,7 +42,7 @@ import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.profiler.sta.ObservationsTransformer;
+import eu.essi_lab.profiler.sta.ObservationsWithDataTransformer;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
@@ -50,9 +54,12 @@ import jakarta.ws.rs.core.StreamingOutput;
 
 /**
  * Handler for OGC STA Observations entity set.
- * Returns observation metadata (datastreams) - each dataset as an observation with navigational links.
+ * Retrieves real observation values by fetching datastreams in blocks and delegating
+ * to DatastreamsObservationsHandler logic for each datastream (first 2-month chunk per datastream).
  */
 public class ObservationsHandler extends StreamingRequestHandler {
+
+    private static final int PAGINATION_MONTHS = 2;
 
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
@@ -78,7 +85,7 @@ public class ObservationsHandler extends StreamingRequestHandler {
     }
 
     public DiscoveryRequestTransformer getTransformer() {
-	return new ObservationsTransformer();
+	return new ObservationsWithDataTransformer();
     }
 
     private void writeObservationsResponse(OutputStream output, WebRequest webRequest) throws Exception {
@@ -93,18 +100,41 @@ public class ObservationsHandler extends StreamingRequestHandler {
 	    for (String result : resultSet.getResultsList()) {
 		try {
 		    GIResourceParser parser = new GIResourceParser(result);
-		    String id = parser.getOnlineId();
-		    if (id == null) {
+		    String datastreamId = parser.getOnlineId();
+		    if (datastreamId == null) {
 			continue;
 		    }
 		    String platformId = parser.getUniquePlatformCode();
-		    String begin = parser.getTmpExtentBegin();
-		    String end = parser.getTmpExtentEnd();
-		    String phenomenonTime = begin != null && end != null ? begin + "/" + end : (begin != null ? begin : "");
-		    JSONObject obs = STAJsonWriter.observation(id, JSONObject.NULL, phenomenonTime, end != null ? end : "",
-			    platformId, platformId, baseUrl);
-		    observations.add(obs);
+		    String beginStr = parser.getTmpExtentBegin();
+		    String endStr = parser.getTmpExtentEnd();
+		    String endNow = parser.getTmpExtentEndNow();
+		    if (endNow != null && "true".equals(endNow)) {
+			endStr = ISO8601DateTimeUtils.getISO8601DateTime();
+		    }
+		    if (beginStr == null || endStr == null) {
+			continue;
+		    }
+		    Optional<java.util.Date> beginOpt = ISO8601DateTimeUtils.parseISO8601ToDate(beginStr);
+		    Optional<java.util.Date> endOpt = ISO8601DateTimeUtils.parseISO8601ToDate(endStr);
+		    if (!beginOpt.isPresent() || !endOpt.isPresent()) {
+			continue;
+		    }
+		    ZonedDateTime phenomenonEnd = ZonedDateTime.ofInstant(endOpt.get().toInstant(), ZoneOffset.UTC);
+		    ZonedDateTime phenomenonStart = ZonedDateTime.ofInstant(beginOpt.get().toInstant(), ZoneOffset.UTC);
+		    ZonedDateTime windowEnd = phenomenonEnd;
+		    ZonedDateTime windowBegin = phenomenonEnd.minusMonths(PAGINATION_MONTHS);
+		    if (windowBegin.isBefore(phenomenonStart)) {
+			windowBegin = phenomenonStart;
+		    }
+		    java.util.Date windowBeginDate = java.util.Date.from(windowBegin.toInstant());
+		    java.util.Date windowEndDate = java.util.Date.from(windowEnd.toInstant());
+
+		    DatastreamsObservationsHandler dsHandler = new DatastreamsObservationsHandler();
+		    List<JSONObject> obs = dsHandler.fetchObservationsForDatastream(
+			    webRequest, message, datastreamId, platformId, windowBeginDate, windowEndDate, baseUrl);
+		    observations.addAll(obs);
 		} catch (XMLStreamException | IOException e) {
+		    // skip malformed
 		}
 	    }
 	}
@@ -114,7 +144,7 @@ public class ObservationsHandler extends StreamingRequestHandler {
 	    if (observations.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
 	    }
-	    output.write(observations.get(0).toString().getBytes(StandardCharsets.UTF_8));
+	    output.write(STAJsonWriter.collectionResponse(observations, null, null).getBytes(StandardCharsets.UTF_8));
 	    return;
 	}
 

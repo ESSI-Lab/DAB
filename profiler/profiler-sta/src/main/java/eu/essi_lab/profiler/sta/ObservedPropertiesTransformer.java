@@ -24,65 +24,63 @@ package eu.essi_lab.profiler.sta;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SortedFields;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.profiler.sta.STARequest.EntitySet;
 
 /**
- * Transformer for Things(id)/Locations. Returns the location(s) associated with the thing.
- * Uses distinct by platform to get one resource per platform; bond filters by thing id.
+ * Transformer for STA ObservedProperties entity set.
+ * Uses distinct UNIQUE_ATTRIBUTE_IDENTIFIER; maps ATTRIBUTE_TITLE for name.
  */
-public class ThingsLocationsTransformer extends STATransformer {
+public class ObservedPropertiesTransformer extends STATransformer {
+
+    @Override
+    protected void applyEntitySpecificFilterBonds(String filter, Set<Bond> operands) {
+	addEntityIdFilter(filter, "ObservedProperty", MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, operands);
+	addIdFilter(filter, MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, operands);
+    }
 
     @Override
     protected Optional<Queryable> getDistinctElement(WebRequest request) {
-	return Optional.of(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+	return Optional.of(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
     }
 
     @Override
     protected Optional<SortedFields> getSortedFields() {
 	return Optional.of(new SortedFields(Arrays.asList(
-		new SimpleEntry<>(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER, SortOrder.ASCENDING),
-		new SimpleEntry<>(MetadataElement.BOUNDING_BOX, SortOrder.ASCENDING))));
+		new SimpleEntry<>(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER, SortOrder.ASCENDING))));
+    }
+
+    @Override
+    protected ResourceSelector getSelector(WebRequest request) {
+	ResourceSelector selector = super.getSelector(request);
+	selector.setSubset(ResourceSubset.CORE_EXTENDED);
+	selector.setIndexesPolicy(IndexesPolicy.ALL);
+	selector.addIndex(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
+	selector.addIndex(MetadataElement.ATTRIBUTE_TITLE);
+	selector.addIndex(MetadataElement.ATTRIBUTE_DESCRIPTION);
+	selector.addIndex(MetadataElement.OBSERVED_PROPERTY_URI);
+	return selector;
     }
 
     @Override
     protected Page getPage(WebRequest request) throws GSException {
 	STARequest staRequest = new STARequest(request);
-	if (staRequest.getEntitySet().orElse(null) == EntitySet.Things
-		&& staRequest.getEntityId().isPresent()
-		&& "Locations".equals(staRequest.getNavigationProperty().orElse(null))) {
-	    int top = staRequest.getTop() != null ? staRequest.getTop() : 100;
-	    int skip = staRequest.getSkip() != null ? staRequest.getSkip() : 0;
-	    return new Page(skip + 1, top);
+	if (staRequest.getEntitySet().orElse(null) == EntitySet.ObservedProperties
+		&& staRequest.getEntityIdNormalized().map(id -> id.matches("\\d+")).orElse(false)) {
+	    return new Page(1, 10000);
 	}
 	return super.getPage(request);
-    }
-
-    @Override
-    protected ResourceSelector getSelector(WebRequest request) {
-	ResourceSelector selector = new ResourceSelector();
-	selector.setSubset(ResourceSubset.CORE_EXTENDED);
-	selector.setIndexesPolicy(IndexesPolicy.ALL);
-	selector.setIncludeOriginal(false);
-	selector.addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-	selector.addIndex(MetadataElement.PLATFORM_TITLE);
-	selector.addIndex(MetadataElement.PLATFORM_IDENTIFIER);
-	selector.addIndex(ResourceProperty.SOURCE_ID);
-	selector.addIndex(MetadataElement.BOUNDING_BOX);
-	selector.addIndex(MetadataElement.COUNTRY);
-	selector.addIndex(MetadataElement.ONLINE_ID);
-	selector.addIndex(MetadataElement.ALTITUDE);
-	return selector;
     }
 }

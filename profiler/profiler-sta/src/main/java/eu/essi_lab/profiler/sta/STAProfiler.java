@@ -37,7 +37,10 @@ import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 import eu.essi_lab.profiler.sta.filter.DatastreamsFilter;
 import eu.essi_lab.profiler.sta.filter.DatastreamsObservationsFilter;
 import eu.essi_lab.profiler.sta.filter.FeaturesOfInterestFilter;
+import eu.essi_lab.profiler.sta.filter.ObservedPropertiesDatastreamsFilter;
+import eu.essi_lab.profiler.sta.filter.ObservedPropertiesFilter;
 import eu.essi_lab.profiler.sta.filter.LocationsFilter;
+import eu.essi_lab.profiler.sta.filter.LocationsThingsFilter;
 import eu.essi_lab.profiler.sta.filter.ObservationsFilter;
 import eu.essi_lab.profiler.sta.filter.RootFilter;
 import eu.essi_lab.profiler.sta.filter.ThingsFilter;
@@ -45,11 +48,11 @@ import eu.essi_lab.profiler.sta.filter.ThingsLocationsFilter;
 import eu.essi_lab.profiler.sta.handler.DatastreamsHandler;
 import eu.essi_lab.profiler.sta.handler.DatastreamsObservationsHandler;
 import eu.essi_lab.profiler.sta.handler.FeaturesOfInterestHandler;
+import eu.essi_lab.profiler.sta.handler.ObservedPropertiesHandler;
 import eu.essi_lab.profiler.sta.handler.LocationsHandler;
 import eu.essi_lab.profiler.sta.handler.ObservationsHandler;
 import eu.essi_lab.profiler.sta.handler.RootHandler;
 import eu.essi_lab.profiler.sta.handler.ThingsHandler;
-import eu.essi_lab.profiler.sta.handler.ThingsLocationsHandler;
 
 /**
  * Profiler for OGC SensorThings API (STA) Part 1: Sensing.
@@ -65,11 +68,14 @@ public class STAProfiler extends Profiler<STAProfilerSetting> {
 	selector.register(new RootFilter(), new RootHandler());
 	selector.register(new DatastreamsObservationsFilter(), new DatastreamsObservationsHandler());
 	selector.register(new DatastreamsFilter(), new DatastreamsHandler());
-	selector.register(new ThingsLocationsFilter(), new ThingsLocationsHandler());
+	selector.register(new ThingsLocationsFilter(), new LocationsHandler());
 	selector.register(new ThingsFilter(), new ThingsHandler());
+	selector.register(new LocationsThingsFilter(), new ThingsHandler());
 	selector.register(new LocationsFilter(), new LocationsHandler());
 	selector.register(new ObservationsFilter(), new ObservationsHandler());
 	selector.register(new FeaturesOfInterestFilter(), new FeaturesOfInterestHandler());
+	selector.register(new ObservedPropertiesDatastreamsFilter(), new DatastreamsHandler());
+	selector.register(new ObservedPropertiesFilter(), new ObservedPropertiesHandler());
 
 	return selector;
     }
