@@ -266,7 +266,8 @@ public class SettingComponentFactory {
 	textArea.setWidthFull();
 	textArea.getStyle().set("font-size", "14px");
 	textArea.getStyle().set("border-radius", "0px");
-	textArea.getStyle().set("background-color", "rgb(158 158 158 / 26%)");
+	textArea.getStyle().set("background-color", "rgb(158 158 158 / 9%)");
+	textArea.getStyle().set("border","1px solid #d3d3d394");
 
 	textArea.addClassName("text-area-no-border");
 
@@ -293,19 +294,18 @@ public class SettingComponentFactory {
 		(setting.isCompactModeEnabled() && setting.getOptions().isEmpty()) || //
 		(setting.getSelectionMode() != SelectionMode.UNSET)) {
 
-	    label.getStyle().set("border-bottom", "1px solid lightgray");
+//	    label.getStyle().set("border-bottom", "1px solid lightgray");
 	}
 
 	if (parent == null) {
 
-	    label.getStyle().set("font-size", "15px");
-	    label.getStyle().set("background-color", "#3c8df5");
+	    label.getStyle().set("font-size", "16px");
+//	    label.getStyle().set("background-color", "rgb(243 245 247)");
 	    label.getStyle().set("padding", "5px");
 	    label.getStyle().set("padding-bottom", "3px");
 	    label.getStyle().set("padding-top", "2px");
 	    label.getStyle().set("border-radius", "0px");
-	    label.getStyle().set("color", "white");
-	    label.getStyle().set("opacity", "0.9");
+	    label.getStyle().set("color", "black");
 
 	} else {
 
@@ -428,7 +428,7 @@ public class SettingComponentFactory {
 	ConfigurationViewButton button = new ConfigurationViewButton(name, VaadinIcon.MINUS_SQUARE_O.create());
 
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	button.setWidth(150, Unit.PIXELS);
+	button.setWidth(130, Unit.PIXELS);
 	button.getStyle().set("margin-left", "3px");
 
 	//
