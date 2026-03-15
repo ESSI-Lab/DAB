@@ -444,7 +444,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    configuration, //
 		    configuration.get(settingId).get(), //
 		    readOnly, //
-		    true,// forceHideHeader
+		    false,// forceHideHeader
 		    container);
 
 	    comp.getElement().getStyle().set("border", "2px solid #f4f5f8");
