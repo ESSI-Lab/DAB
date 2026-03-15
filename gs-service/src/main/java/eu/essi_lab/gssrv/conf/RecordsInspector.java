@@ -15,12 +15,12 @@ import java.util.*;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -40,6 +40,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -55,6 +56,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 
     private static final String NAME_COLUMN = "Name";
     private static final String ID_COLUMN = "Source id";
+    private static final String TYPE_COLUMN = "Source type";
     private static final String SOURCE_DEP_COLUMN = "Source deployment";
     private static final String SIZE_COLUMN = "Size";
     private static final String PERCENTAGE_COLUMN = "%";
@@ -72,7 +74,9 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 
 	Column<GridData> idColumn = addSortableResizableColumn(ID_COLUMN, GridData::getIdentifier, 300);
 
-	Column<GridData> deploymentColumn = addSortableResizableColumn(SOURCE_DEP_COLUMN, GridData::getSourceDeployment, 300);
+	Column<GridData> typeColumn = addSortableResizableColumn(TYPE_COLUMN, GridData::getType, 150);
+
+	Column<GridData> deploymentColumn = addSortableResizableColumn(SOURCE_DEP_COLUMN, GridData::getSourceDeployment, 150);
 
 	getGrid().addColumn(GridData::getFormattedSize).//
 		setHeader(SIZE_COLUMN).//
@@ -107,6 +111,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 
 	addFilterField(filterRow, nameColumn);
 	addFilterField(filterRow, idColumn);
+	addFilterField(filterRow, typeColumn);
 	addFilterField(filterRow, deploymentColumn);
 
 	//
@@ -155,12 +160,13 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 
 	List<DatabaseFolder> dataFolders = getDataFolders(db);
 
-	ConfigurationWrapper.getHarvestedAndMixedSources().//
+	ConfigurationWrapper.getHarvestingSettings().//
 		parallelStream().//
 		forEach(s -> {//
 
 	    sdList.addAll(dataFolders.stream().//
-		    filter(f -> DatabaseFolder.computeSourceId(db, f).equals(s.getUniqueIdentifier())).//
+		    filter(f -> DatabaseFolder.computeSourceId(db, f).equals( //
+			    s.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier())).//
 		    map(f -> new GridData(f, s)).//
 		    toList());
 	});
@@ -279,6 +285,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 	    return switch (colum) {
 		case NAME_COLUMN -> gridData.getSourceName();
 		case ID_COLUMN -> gridData.getIdentifier();
+		case TYPE_COLUMN -> gridData.getType();
 		case SOURCE_DEP_COLUMN -> gridData.getSourceDeployment();
 		default -> null;
 	    };
@@ -305,6 +312,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 	private final String sourceLabel;
 	private final double size;
 	private final String sourceDeployment;
+	private final String type;
 	private double total;
 	private final String dataFolder;
 	private final String sourceId;
@@ -314,10 +322,13 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 	 * @param folder
 	 * @param source
 	 */
-	private GridData(DatabaseFolder folder, GSSource source) {
+	private GridData(DatabaseFolder folder, HarvestingSetting setting) {
+
+	    GSSource source = setting.getSelectedAccessorSetting().getGSSourceSetting().asSource();
 
 	    this.sourceLabel = source.getLabel();
 	    this.sourceId = source.getUniqueIdentifier();
+	    this.type = setting.getSelectedAccessorSetting().getAccessorType();
 	    this.size = getFolderSize(folder);
 	    this.sourceDeployment = String.join(",", source.getDeployment());
 	    this.dataFolder = folder.getName().contains("data-1") ? "1" : "2";
@@ -397,6 +408,15 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 	public String getIdentifier() {
 
 	    return sourceId;
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getType() {
+
+	    return type;
 	}
 
 	/**
