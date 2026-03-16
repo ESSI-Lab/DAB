@@ -49,6 +49,7 @@ public class RootHandler extends DefaultRequestHandler {
 	endpoints.add(createEndpoint("Things", baseUrl + "Things"));
 	endpoints.add(createEndpoint("Locations", baseUrl + "Locations"));
 	endpoints.add(createEndpoint("Datastreams", baseUrl + "Datastreams"));
+	endpoints.add(createEndpoint("Sensors", baseUrl + "Sensors"));
 	endpoints.add(createEndpoint("Observations", baseUrl + "Observations"));
 	endpoints.add(createEndpoint("FeaturesOfInterest", baseUrl + "FeaturesOfInterest"));
 	endpoints.add(createEndpoint("ObservedProperties", baseUrl + "ObservedProperties"));

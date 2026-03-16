@@ -28,14 +28,18 @@ import eu.essi_lab.messages.web.WebRequest;
 /**
  * WebRequest wrapper for $expand sub-requests. Overrides path and query string for
  * STA navigation requests (e.g. Locations(id)/Things?$top=100).
+ * Preserves the original request path prefix (e.g. view/id/sta/v1.1) so view information
+ * is retained in the transformed message.
  */
 public class ExpandSubRequest extends WebRequest {
 
+    private final WebRequest delegate;
     private final String pathOverride;
     private final String queryOverride;
 
     public ExpandSubRequest(WebRequest delegate, String pathOverride, String queryOverride) throws IOException {
 	super(delegate.getServletRequest(), false);
+	this.delegate = delegate;
 	this.pathOverride = pathOverride;
 	this.queryOverride = queryOverride;
 	setQueryString(queryOverride);
@@ -43,7 +47,14 @@ public class ExpandSubRequest extends WebRequest {
 
     @Override
     public String getRequestPath() {
-	return pathOverride;
+	String delegatePath = delegate != null ? delegate.getRequestPath() : null;
+	if (delegatePath == null || delegatePath.isEmpty()) {
+	    return pathOverride;
+	}
+	String prefix = delegatePath.contains("/")
+		? delegatePath.substring(0, delegatePath.lastIndexOf("/") + 1)
+		: "";
+	return prefix + pathOverride;
     }
 
     @Override
