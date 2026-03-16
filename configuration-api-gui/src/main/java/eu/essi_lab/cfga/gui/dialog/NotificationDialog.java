@@ -205,7 +205,5 @@ public class NotificationDialog extends ConfirmationDialog {
 	setCancelText("Close");
 
 	setWidth(width, Unit.PIXELS);
-
-	getFooterLayout().getStyle().set("border-top", "1px solid lightgray");
     }
 }
