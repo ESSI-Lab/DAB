@@ -315,10 +315,7 @@
         <com.squareup.okhttp3-okhtt.version>4.12.0</com.squareup.okhttp3-okhtt.version>
 
         <!-- Jackson JAXRS: JSON -->
-        <jackson.version>2.15.0</jackson.version>
-
-        <!--Jackson core -->
-        <jackson-core.version>2.17.0</jackson-core.version>
+        <jackson.version>2.17.0</jackson.version>
 
         <!-- EclipseLink -->
         <!-- From version 3.x it depends from Jakarta XML bind -->
@@ -478,6 +475,14 @@
                 <version>${jetty.version}</version>
                 <type>pom</type>
                 <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <dependency>
@@ -886,13 +891,6 @@
                 <version>${jaxb-runtime.version}</version>
             </dependency>
 
-            <!-- This is used for annotating objects to be serialized as json -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.jaxrs</groupId>
-                <artifactId>jackson-jaxrs-json-provider</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
@@ -1145,6 +1143,12 @@
                 <version>${cxf.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-rs-extension-providers</artifactId>
+                <version>${cxf.version}</version>
             </dependency>
 
             <dependency>
@@ -1432,25 +1436,6 @@
                 <artifactId>ftpserver-core</artifactId>
                 <version>${ftpserver-core.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-core</artifactId>
-                <version>${jackson-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson-core.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${jackson-core.version}</version>
-            </dependency>
-
 
             <dependency>
                 <groupId>org.apache.kafka</groupId>
