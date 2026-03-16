@@ -11,9 +11,9 @@ import java.util.concurrent.*;
 /**
  * @author Fabrizio
  */
-public class KafkaClientExternalTestIT   {
+public class KafkaPublisherExternalTestIT {
 
-    private KafkaClient client;
+    private KafkaPublisher client;
 
     @Before
     public void before() {
@@ -24,7 +24,7 @@ public class KafkaClientExternalTestIT   {
 
 	SecurityProtocol securityProtocol = SecurityProtocol.forName(System.getProperty("kafka.security.protocol"));
 
-	KafkaClient.SaslMechanism saslMechanism = KafkaClient.SaslMechanism.of(System.getProperty("kafka.sasl.mechanism")).get();
+	KafkaPublisher.SaslMechanism saslMechanism = KafkaPublisher.SaslMechanism.of(System.getProperty("kafka.sasl.mechanism")).get();
 
 	String kafkaUser = System.getProperty("kafka.user");
 
@@ -32,7 +32,7 @@ public class KafkaClientExternalTestIT   {
 
 	int reqTimeout = Integer.parseInt(System.getProperty("kafka.request.timeout"));
 
-	client = new KafkaClient(host, port);
+	client = new KafkaPublisher(host, port);
 
 	client.setRequestTimeoutMls(reqTimeout);
 

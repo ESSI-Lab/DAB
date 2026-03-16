@@ -1,7 +1,7 @@
 package eu.essi_lab.lib.kafka.client.test;
 
-import eu.essi_lab.lib.kafka.client.KafkaClient;
-import eu.essi_lab.lib.kafka.client.KafkaClient.SaslMechanism;
+import eu.essi_lab.lib.kafka.client.KafkaPublisher;
+import eu.essi_lab.lib.kafka.client.KafkaPublisher.SaslMechanism;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -19,9 +19,9 @@ import java.util.concurrent.Future;
 /**
  * @author Fabrizio
  */
-public class KafkaClientInternalTestIT {
+public class KafkaPublisherInternalTestIT {
 
-    private KafkaClient client;
+    private KafkaPublisher client;
 
     @Before
     public void before() {
@@ -30,7 +30,7 @@ public class KafkaClientInternalTestIT {
 
 	int port = Integer.parseInt(System.getProperty("kafka.port"));
 
-	client = new KafkaClient(host, port);
+	client = new KafkaPublisher(host, port);
     }
 
     @Test
@@ -188,15 +188,15 @@ public class KafkaClientInternalTestIT {
 
 	String server = host + ":" + port;
 
-	propsTest(new KafkaClient(host, port));
-	propsTest(new KafkaClient(server));
-	propsTest(new KafkaClient(List.of(server)));
+	propsTest(new KafkaPublisher(host, port));
+	propsTest(new KafkaPublisher(server));
+	propsTest(new KafkaPublisher(List.of(server)));
     }
 
     /**
      * @param client
      */
-    private void propsTest(KafkaClient client) {
+    private void propsTest(KafkaPublisher client) {
 
 	Properties producerProps = client.getProducerProps();
 	Assert.assertFalse(producerProps.isEmpty());
@@ -271,9 +271,9 @@ public class KafkaClientInternalTestIT {
 	int linger = Integer.parseInt(producerProps.get(ProducerConfig.LINGER_MS_CONFIG).toString());
 	int requestTimeout = Integer.parseInt(producerProps.get(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG).toString());
 
-	Assert.assertEquals(KafkaClient.DEFAULT_DELIVERY_TIMEOUT_MLS, deliveryTimeout);
-	Assert.assertEquals(KafkaClient.DEFAULT_LINGER_MLS, linger);
-	Assert.assertEquals(KafkaClient.DEFAULT_REQUEST_TIMEOUT_MLS, requestTimeout);
+	Assert.assertEquals(KafkaPublisher.DEFAULT_DELIVERY_TIMEOUT_MLS, deliveryTimeout);
+	Assert.assertEquals(KafkaPublisher.DEFAULT_LINGER_MLS, linger);
+	Assert.assertEquals(KafkaPublisher.DEFAULT_REQUEST_TIMEOUT_MLS, requestTimeout);
 
 	client.setRequestTimeoutMls(10000);
 

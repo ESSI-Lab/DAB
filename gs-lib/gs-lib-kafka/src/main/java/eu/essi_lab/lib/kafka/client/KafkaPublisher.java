@@ -38,7 +38,7 @@ import java.util.concurrent.Future;
 /**
  * @author Fabrizio
  */
-public class KafkaClient implements MessagePublisher {
+public class KafkaPublisher implements MessagePublisher {
 
     /**
      *
@@ -131,7 +131,7 @@ public class KafkaClient implements MessagePublisher {
     /**
      *
      */
-    private KafkaClient() {
+    private KafkaPublisher() {
 
 	producerProps = new Properties();
 	consumerProps = new Properties();
@@ -170,7 +170,7 @@ public class KafkaClient implements MessagePublisher {
      * @param host
      * @param port
      */
-    public KafkaClient(String host, int port) {
+    public KafkaPublisher(String host, int port) {
 
 	this(List.of(host + ":" + port));
     }
@@ -178,7 +178,7 @@ public class KafkaClient implements MessagePublisher {
     /**
      * @param bootstrapServers
      */
-    public KafkaClient(String... bootstrapServers) {
+    public KafkaPublisher(String... bootstrapServers) {
 
 	this(List.of(bootstrapServers));
     }
@@ -186,7 +186,7 @@ public class KafkaClient implements MessagePublisher {
     /**
      * @param bootstrapServers
      */
-    public KafkaClient(List<String> bootstrapServers) {
+    public KafkaPublisher(List<String> bootstrapServers) {
 
 	this();
 

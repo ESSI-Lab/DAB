@@ -37,8 +37,8 @@ import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.kafka.client.KafkaClient;
-import eu.essi_lab.lib.kafka.client.KafkaClient.SaslMechanism;
+import eu.essi_lab.lib.kafka.client.KafkaPublisher;
+import eu.essi_lab.lib.kafka.client.KafkaPublisher.SaslMechanism;
 import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
 import eu.essi_lab.lib.net.publisher.MessagePublisher;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -59,7 +59,6 @@ import eu.essi_lab.model.resource.GSResourceComparator;
 import eu.essi_lab.model.resource.GSResourceComparator.ComparisonResponse;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
 import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
@@ -434,7 +433,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      */
     private String buildTopic(GSSource source, String topic, boolean modified, MessagePublisher client) {
 
-	if (client instanceof KafkaClient) {
+	if (client instanceof KafkaPublisher) {
 
 	    topic = modified ? "modified_" + topic : topic;
 
@@ -509,7 +508,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    GSLoggerFactory.getLogger(getClass()).info("Kafka client created");
 
-		    KafkaClient client = new KafkaClient(kafkaHost, Integer.parseInt(kafkaPort));
+		    KafkaPublisher client = new KafkaPublisher(kafkaHost, Integer.parseInt(kafkaPort));
 
 		    //
 		    // security
