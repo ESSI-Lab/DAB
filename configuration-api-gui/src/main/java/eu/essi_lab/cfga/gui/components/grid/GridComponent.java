@@ -447,9 +447,12 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		    false,// forceHideHeader
 		    container);
 
-	    comp.getElement().getStyle().set("border", "2px solid gray");
+	    comp.getElement().getStyle().set("border", "2px solid #f4f5f8");
 	    comp.getElement().getStyle().set("padding-left", "10px");
 	    comp.getElement().getStyle().set("padding-right", "10px");
+	    comp.getElement().getStyle().set("padding-top", "10px");
+	    comp.getElement().getStyle().set("border-radius", "0");
+
 	    comp.getElement().getStyle().set("width", "auto");
 
 	    return comp;

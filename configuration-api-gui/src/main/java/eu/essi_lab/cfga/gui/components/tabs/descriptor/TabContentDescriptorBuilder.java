@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.tabs.descriptor;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -146,9 +146,34 @@ public class TabContentDescriptorBuilder {
      * @param settingClass
      * @return
      */
+    public TabContentDescriptorBuilder withAddDirective(String name, Class<? extends Setting> settingClass, boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new AddDirective(name, settingClass, tabView));
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param settingClass
+     * @return
+     */
     public TabContentDescriptorBuilder withAddDirective(String name, String settingClass) {
 
 	descriptor.getDirectiveHolder().add(new AddDirective(name, settingClass));
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param settingClass
+     * @param tabView
+     * @return
+     */
+    public TabContentDescriptorBuilder withAddDirective(String name, String settingClass, boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new AddDirective(name, settingClass, tabView));
 
 	return this;
     }
@@ -172,9 +197,37 @@ public class TabContentDescriptorBuilder {
      * @param settingClass
      * @return
      */
+    public TabContentDescriptorBuilder withAddDirective(String name, String description, Class<? extends Setting> settingClass,
+	    boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new AddDirective(name, description, settingClass, tabView));
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param description
+     * @param settingClass
+     * @return
+     */
     public TabContentDescriptorBuilder withAddDirective(String name, String description, String settingClass) {
 
 	descriptor.getDirectiveHolder().add(new AddDirective(name, description, settingClass));
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param description
+     * @param settingClass
+     * @param tabView
+     * @return
+     */
+    public TabContentDescriptorBuilder withAddDirective(String name, String description, String settingClass, boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new AddDirective(name, description, settingClass, tabView));
 
 	return this;
     }
@@ -217,14 +270,14 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @param description
      * @param allowFullRemoval
      * @param settingClass
      * @return
      */
-    public TabContentDescriptorBuilder withRemoveDirective(String name, String description,  boolean allowFullRemoval, Class<? extends Setting> settingClass) {
+    public TabContentDescriptorBuilder withRemoveDirective(String name, String description, boolean allowFullRemoval,
+	    Class<? extends Setting> settingClass) {
 
 	descriptor.getDirectiveHolder().add(new RemoveDirective(name, description, allowFullRemoval, settingClass));
 
@@ -232,7 +285,6 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
-     *
      * @param name
      * @param description
      * @param allowFullRemoval
@@ -259,12 +311,37 @@ public class TabContentDescriptorBuilder {
 
     /**
      * @param name
+     * @param tabView
+     * @return
+     */
+    public TabContentDescriptorBuilder withEditDirective(String name, boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new EditDirective(name, tabView));
+
+	return this;
+    }
+
+    /**
+     * @param name
      * @param policy
      * @return
      */
     public TabContentDescriptorBuilder withEditDirective(String name, ConfirmationPolicy policy) {
 
 	descriptor.getDirectiveHolder().add(new EditDirective(name, policy));
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param policy
+     * @param tabView
+     * @return
+     */
+    public TabContentDescriptorBuilder withEditDirective(String name, ConfirmationPolicy policy, boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new EditDirective(name, policy, tabView));
 
 	return this;
     }
@@ -284,12 +361,39 @@ public class TabContentDescriptorBuilder {
     /**
      * @param name
      * @param description
+     * @param tabView
+     * @return
+     */
+    public TabContentDescriptorBuilder withEditDirective(String name, String description, boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new EditDirective(name, description, tabView));
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param description
      * @param policy
      * @return
      */
     public TabContentDescriptorBuilder withEditDirective(String name, String description, ConfirmationPolicy policy) {
 
 	descriptor.getDirectiveHolder().add(new EditDirective(name, description, policy));
+
+	return this;
+    }
+
+    /**
+     * @param name
+     * @param description
+     * @param policy
+     * @param tabView
+     * @return
+     */
+    public TabContentDescriptorBuilder withEditDirective(String name, String description, ConfirmationPolicy policy, boolean tabView) {
+
+	descriptor.getDirectiveHolder().add(new EditDirective(name, description, policy, tabView));
 
 	return this;
     }

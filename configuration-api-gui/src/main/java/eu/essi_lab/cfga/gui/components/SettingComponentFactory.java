@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -204,6 +204,31 @@ public class SettingComponentFactory {
     }
 
     /**
+     * @param configuration
+     * @param setting
+     * @param forceReadonly
+     * @param forceHideHeader
+     * @param tabContent
+     * @param tabView
+     * @return
+     */
+    public static SettingComponent createSettingComponent(//
+	    Configuration configuration, //
+	    Setting setting, //
+	    boolean forceReadonly, //
+	    boolean forceHideHeader,//
+	    TabContent tabContent, boolean tabView) {
+
+	return new SettingComponent( //
+		configuration,//
+		setting,//
+		forceReadonly,//
+		forceHideHeader, //
+		null,// comparator
+		tabContent, tabView);
+    }
+
+    /**
      * @param content
      * @return
      */
@@ -238,12 +263,10 @@ public class SettingComponentFactory {
 	textArea.setWidthFull();
 	textArea.getStyle().set("font-size", "14px");
 	textArea.getStyle().set("border-radius", "0px");
-	textArea.getStyle().set("background-color", "rgb(158 158 158 / 26%)");
+	textArea.getStyle().set("background-color", "rgb(158 158 158 / 9%)");
+	textArea.getStyle().set("border", "1px solid #d3d3d394");
 
 	textArea.addClassName("text-area-no-border");
-
-	//	textArea.getStyle().set("color", "gray");
-	//	textArea.getStyle().set("margin-bottom", "5px");
 
 	return textArea;
     }
@@ -259,25 +282,22 @@ public class SettingComponentFactory {
 
 	Span label = ComponentFactory.createSpan(name);
 	label.getStyle().set("font-weight", "bold");
-	//	label.getStyle().set("margin-top", "10px");
 
 	if (!setting.isCompactModeEnabled() || //
 		(setting.isCompactModeEnabled() && setting.getOptions().isEmpty()) || //
 		(setting.getSelectionMode() != SelectionMode.UNSET)) {
 
-	    label.getStyle().set("border-bottom", "1px solid lightgray");
+	    //	    label.getStyle().set("border-bottom", "1px solid lightgray");
 	}
 
 	if (parent == null) {
 
-	    label.getStyle().set("font-size", "15px");
-	    label.getStyle().set("background-color", "#3c8df5");
+	    label.getStyle().set("font-size", "16px");
 	    label.getStyle().set("padding", "5px");
 	    label.getStyle().set("padding-bottom", "3px");
 	    label.getStyle().set("padding-top", "2px");
 	    label.getStyle().set("border-radius", "0px");
-	    label.getStyle().set("color", "white");
-	    label.getStyle().set("opacity", "0.9");
+	    label.getStyle().set("color", "black");
 
 	} else {
 
@@ -320,21 +340,18 @@ public class SettingComponentFactory {
 	String name = editDirective.map(EditDirective::getName).orElse("EDIT");
 	String desc = editDirective.flatMap(EditDirective::getDescription).orElse("EDIT");
 
-	ConfigurationViewButton button = new ConfigurationViewButton( //
-		name, //
-		VaadinIcon.EDIT.create());//
+	ConfigurationViewButton button = new ConfigurationViewButton(name);//
 
 	button.setTooltip(desc);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	button.setWidth(100, Unit.PIXELS);
+	button.setWidth(110, Unit.PIXELS);
 
 	//
 	//
 	//
 
 	button.addEnabledStyle("color", "black");
-	//	button.addEnabledStyle("background-color", "rgb(255 252 0 / 41%)");
-	button.addEnabledStyle("border", "1px solid gray");
+	button.addEnabledStyle("background-color", "#ffd60094");
 
 	//
 	//
@@ -358,9 +375,9 @@ public class SettingComponentFactory {
 	    TabContent tabContent, //
 	    AddDirective addDirective) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
+	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName());
 	button.setTooltip(addDirective.getDescription().orElse("Add setting"));
-	button.setWidth(100, Unit.PIXELS);
+	button.setWidth(110, Unit.PIXELS);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.getStyle().set("margin-left", "3px");
 
@@ -368,7 +385,7 @@ public class SettingComponentFactory {
 	//
 	//
 	button.addEnabledStyle("color", "white");
-	button.addEnabledStyle("background-color", "#008ab7");
+	button.addEnabledStyle("background-color", "var(--_lumo-button-primary-background)");
 	button.addEnabledStyle("border", "none");
 
 	//
@@ -393,24 +410,22 @@ public class SettingComponentFactory {
 	    TabContent tabContent,//
 	    SettingComponent settingComponent) {
 
-	Optional<RemoveDirective> editDirective = tabContent == null ? Optional.empty() : tabContent.getRemoveDirective();
+	Optional<RemoveDirective> removeDirective = tabContent == null ? Optional.empty() : tabContent.getRemoveDirective();
 
-	String name = editDirective.map(RemoveDirective::getName).orElse("REMOVE");
+	String name = removeDirective.map(RemoveDirective::getName).orElse("REMOVE");
 
-	ConfigurationViewButton button = new ConfigurationViewButton(name, VaadinIcon.MINUS_SQUARE_O.create());
+	ConfigurationViewButton button = new ConfigurationViewButton(name);
 
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
-	button.setWidth(150, Unit.PIXELS);
+	button.setWidth(110, Unit.PIXELS);
 	button.getStyle().set("margin-left", "3px");
 
 	//
 	//
 	//
 
-	button.addEnabledStyle("color", "red");
-	button.addEnabledStyle("border", "none");
-	button.addEnabledStyle("background-color", "rgb(240 240 240)");
-	button.addEnabledStyle("border", "1px solid gray");
+	button.addEnabledStyle("color", "white");
+	button.addEnabledStyle("background-color", "#ff0000a6");
 
 	//
 	//

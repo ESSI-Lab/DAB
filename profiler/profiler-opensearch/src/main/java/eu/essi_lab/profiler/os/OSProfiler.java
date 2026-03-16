@@ -357,19 +357,19 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 
 	case NameSpace.GS_DATA_MODEL_XML_MEDIA_TYPE:
 
-	    out = OS_XML_ResultSetFormatter.getEmptyResponse(request.getOptionalQueryString().get());
-	    outputFormat = MediaType.APPLICATION_XML.toString();
+	    out = OS_XML_ResultSetFormatter.getEmptyResponse(request.getOptionalQueryString().orElse(""));
+	    outputFormat = MediaType.APPLICATION_XML;
 	    break;
 
 	case MediaType.APPLICATION_ATOM_XML:
 	case "application/atom xml":
 
-	    out = AtomGPResultSetFormatter.getEmptyFeed(request.getOptionalQueryString().get(), error);
-	    outputFormat = MediaType.APPLICATION_XML.toString();
+	    out = AtomGPResultSetFormatter.getEmptyFeed(request.getOptionalQueryString().orElse(""), error);
+	    outputFormat = MediaType.APPLICATION_XML;
 	    break;
 	}
 
-	return Response.status(Status.BAD_REQUEST).type(outputFormat).entity(out.toString()).build();
+	return Response.status(Status.BAD_REQUEST).type(outputFormat).entity(out).build();
     }
 
     @Override

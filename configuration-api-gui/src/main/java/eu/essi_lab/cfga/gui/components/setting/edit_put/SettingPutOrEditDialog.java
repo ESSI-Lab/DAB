@@ -61,7 +61,7 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 	setCloseOnConfirm(false);
 
 	dialogHeight = 800;
-	dialogWidth = 800;
+	dialogWidth = 830;
 
 	setWidth(dialogWidth, Unit.PIXELS);
 	getHeaderLayout().getStyle().set("margin-bottom", "5px");
@@ -160,7 +160,8 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
     protected Component createSettingToAddOrEditComponent(//
 	    Configuration configuration,//
 	    Setting setting,//
-	    int height) {//
+	    int height,
+	    boolean tabView) {//
 
 	int componentHeight = height - 150;
 
@@ -169,7 +170,8 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 		setting,//
 		false, //  forceReadonly
 		true,// forceHideHeader
-		null); // tabContent
+		null,
+		tabView); // tabContent
 
 	((HasSize) component).setWidthFull();
 	((HasSize) component).setHeight(componentHeight, Unit.PIXELS);

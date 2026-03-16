@@ -13,58 +13,40 @@ package eu.essi_lab.cfga.gs.setting.augmenter.worker;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.menuitems.*;
+import eu.essi_lab.cfga.gui.components.grid.*;
+import eu.essi_lab.cfga.gui.components.grid.renderer.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import org.joda.time.DateTimeZone;
-import org.json.JSONObject;
+import eu.essi_lab.cfga.gui.directive.Directive.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.model.*;
+import org.joda.time.*;
+import org.json.*;
 
-import com.vaadin.flow.data.provider.SortDirection;
-
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gs.setting.menuitems.HarvestingInfoItemHandler;
-import eu.essi_lab.cfga.gui.components.grid.ColumnDescriptor;
-import eu.essi_lab.cfga.gui.components.grid.GridMenuItemHandler;
-import eu.essi_lab.cfga.gui.components.grid.renderer.JobPhaseColumnRenderer;
-import eu.essi_lab.cfga.gui.directive.Directive.ConfirmationPolicy;
-import eu.essi_lab.cfga.option.BooleanChoice;
-import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
-import eu.essi_lab.cfga.option.IntegerOptionBuilder;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.option.ValuesLoader;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
-import eu.essi_lab.cfga.setting.scheduling.Scheduling;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.cfga.setting.validation.Validator;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.LabeledEnum;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.model.GSSource;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -253,9 +235,15 @@ public abstract class AugmenterWorkerSetting extends SchedulerWorkerSetting impl
 		    withAddDirective(//
 		    "ADD",//
 		    "Add augmentation job", //
-		    "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//
+		    "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl", //
+		    true).//
+
 		    withRemoveDirective("REMOVE", "Remove augmenter", true, "eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl").//
-		    withEditDirective("EDIT", "Edit augmenter", ConfirmationPolicy.ON_WARNINGS).//
+		    withEditDirective( //
+		    "EDIT", //
+		    "Edit augmenter", //
+		    ConfirmationPolicy.ON_WARNINGS,//
+		    true).//
 
 		    withGridInfo(Arrays.asList(//
 

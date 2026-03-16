@@ -48,6 +48,6 @@ public class OptionSwitchListener extends AbstractValueChangeListener {
 	IdleTracker.getInstance().reset();
 
 	boolean enabled = (Boolean) event.getValue();
-	optionComponent.onToggleStateChanged(enabled);
+	optionComponent.onSwitchStateChanged(enabled);
     }
 }

@@ -72,7 +72,8 @@ public class SettingPutDialog extends SettingPutOrEditDialog {
 	Component settingToAddComponent = createSettingToAddOrEditComponent(//
 		configuration,//
 		this.settingToAdd,//
-		dialogHeight);
+		dialogHeight, //
+		addDirective.isTabView());
 
 	setContent(settingToAddComponent);
     }

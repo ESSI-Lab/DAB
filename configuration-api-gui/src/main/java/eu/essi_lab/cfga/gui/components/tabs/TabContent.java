@@ -200,12 +200,13 @@ public class TabContent extends VerticalLayout implements Renderable {
 		    textArea.getStyle().set("font-size", "14px");
 		    textArea.getStyle().set("padding", "0px");
 
-		    textArea.setWidth("485px");
+		    textArea.setWidth("475px");
 		    textArea.setHeight("300px");
 		    textArea.setReadOnly(true);
 		    textArea.setValue(desc);
 
 		    NotificationDialog dialog = NotificationDialog.getNotificationDialog("Description", desc);
+		    dialog.getContentLayout().getStyle().set("padding-left", "12px");
 		    dialog.setContent(textArea);
 
 		    dialog.open();
@@ -604,6 +605,7 @@ public class TabContent extends VerticalLayout implements Renderable {
     private CustomButton createReloadButton() {
 
 	CustomButton reloadButton = ComponentFactory.createReloadButton();
+	reloadButton.getStyle().set("margin-left", "15px");
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 

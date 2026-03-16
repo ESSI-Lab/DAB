@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting.group;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -41,24 +41,26 @@ public abstract class GroupComponentsHandler<T extends Component> {
     public enum GroupType {
 
 	/**
-	 * 
+	 *
 	 */
 	RADIO,
 	/**
-	 * 
+	 *
 	 */
 	CHECK
     }
 
     private final HashMap<String, ArrayList<Component>> itemToComponentsMap;
+    private Set<String> items;
     protected Setting groupSetting;
 
     /**
-     * 
+     *
      */
     public GroupComponentsHandler() {
 
 	itemToComponentsMap = new HashMap<>();
+	items = new LinkedHashSet<>();
     }
 
     /**
@@ -76,19 +78,23 @@ public abstract class GroupComponentsHandler<T extends Component> {
 
 		if (groupChild) {
 		    if (isGroupComponent(c)) {
-			c.setVisible(key.equals(value));
+
+			setVisible(c, key.equals(value));
+
 		    } else {
-			c.setVisible(false);
+
+			setVisible(c, false);
 		    }
 		} else {
-		    c.setVisible(key.equals(value));
+
+		    setVisible(c, key.equals(value));
 		}
 	    }
 	}
     }
 
     /**
-     * 
+     *
      */
     public abstract void applySelection();
 
@@ -116,7 +122,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
 
     /**
      * Set the {@link Setting} which groups all its children {@link Setting}, that is the root {@link Setting}
-     * 
+     *
      * @param groupSetting
      */
     public void setGroupSetting(Setting groupSetting) {
@@ -130,7 +136,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public void addComponents(String name, List<Component> list) {
 
-	list.forEach(c -> c.setVisible(false));
+	list.forEach(c -> setVisible(c, false));
 
 	ArrayList<Component> compList = getItemToComponentsMap().computeIfAbsent(name, k -> new ArrayList<>());
 
@@ -151,15 +157,15 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public void addItem(String name) {
 
-	AbstractListDataView<String> listDataView = getListDataView();
+	items.add(name);
+    }
 
-	List<String> list = listDataView.getItems().collect(Collectors.toList());
+    /**
+     *
+     */
+    public void setItems() {
 
-	if (!list.contains(name)) {
-	    list.add(name);
-	}
-
-	setItems(list);
+	setItems(new ArrayList<>(items));
     }
 
     /**
@@ -167,9 +173,7 @@ public abstract class GroupComponentsHandler<T extends Component> {
      */
     public List<String> getItems() {
 
-	AbstractListDataView<String> listDataView = getListDataView();
-
-	return listDataView.getItems().collect(Collectors.toList());
+	return new ArrayList<>(items);
     }
 
     /**
@@ -186,6 +190,23 @@ public abstract class GroupComponentsHandler<T extends Component> {
     public Setting getGroupSetting() {
 
 	return groupSetting;
+    }
+
+    /**
+     *
+     */
+    public void scrollInToView() {
+
+	Optional<Component> checked = getGroupComponent().//
+		getChildren().//
+		filter(c -> c.getElement().getProperty("checked", true)).//
+		findFirst();//
+
+	checked.ifPresent(component -> component.scrollIntoView(new ScrollOptions(//
+		ScrollOptions.Behavior.SMOOTH, //
+		ScrollOptions.Alignment.CENTER,//
+		ScrollOptions.Alignment.NEAREST//
+	)));
     }
 
     /**
@@ -206,6 +227,15 @@ public abstract class GroupComponentsHandler<T extends Component> {
     private AbstractListDataView<String> getListDataView() {
 
 	return (AbstractListDataView<String>) ((HasListDataView) getGroupComponent()).getListDataView();
+    }
+
+    /**
+     * @param component
+     * @param visible
+     */
+    private void setVisible(Component component, boolean visible) {
+
+	component.setVisible(visible);
     }
 
 }
