@@ -605,6 +605,7 @@ public class TabContent extends VerticalLayout implements Renderable {
     private CustomButton createReloadButton() {
 
 	CustomButton reloadButton = ComponentFactory.createReloadButton();
+	reloadButton.getStyle().set("margin-left", "15px");
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 

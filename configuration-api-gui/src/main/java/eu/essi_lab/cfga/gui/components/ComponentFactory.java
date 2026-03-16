@@ -277,13 +277,15 @@ public class ComponentFactory {
      */
     public static CustomButton createReloadButton() {
 
-	CustomButton reloadButton = new CustomButton("RELOAD", VaadinIcon.REFRESH.create());
+	CustomButton reloadButton = new CustomButton("RELOAD");
 	reloadButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	reloadButton.setId("reloadButton");
-	reloadButton.setWidth(150, Unit.PIXELS);
-	reloadButton.getStyle().set("margin-left", "15px");
-	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
-	reloadButton.getStyle().set("border-radius", "0px");
+	reloadButton.setWidth(110, Unit.PIXELS);
+	reloadButton.getStyle().set("color", "var(--_lumo-button-primary-background)");
+	reloadButton.getStyle().set("background-color", "hsl(214deg 2.39% 36.14% / 14%)");
+//	reloadButton.getStyle().set("margin-left", "15px");
+//	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
+//	reloadButton.getStyle().set("border-radius", "0px");
 
 	return reloadButton;
     }
