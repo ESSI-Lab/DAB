@@ -61,7 +61,7 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 	setCloseOnConfirm(false);
 
 	dialogHeight = 800;
-	dialogWidth = 800;
+	dialogWidth = 830;
 
 	setWidth(dialogWidth, Unit.PIXELS);
 	getHeaderLayout().getStyle().set("margin-bottom", "5px");
