@@ -162,6 +162,14 @@ public class GIResourceParser extends StAXDocumentParser {
 	return instrumentNames;
     }
 
+    public String getInstrumentName() {
+	return instrumentNames.isEmpty() ? "" : instrumentNames.get(0);
+    }
+
+    public String getUniqueInstrumentId() {
+	return uniqueInstrumentId;
+    }
+
     public List<String> getAttributeNames() {
 	return attributeNames;
     }
@@ -278,6 +286,7 @@ public class GIResourceParser extends StAXDocumentParser {
     public List<String> attributeNames = new ArrayList<String>();
     public List<String> attributeDescriptions = new ArrayList<String>();
     public List<String> instrumentNames = new ArrayList<String>();
+    public String uniqueInstrumentId = "";
     public String attributeCode = "";
     public List<String> observedPropertyURIs = new ArrayList<String>();
     public List<String> intrumentNames = new ArrayList<String>();
@@ -357,6 +366,8 @@ public class GIResourceParser extends StAXDocumentParser {
 	// INSTRUMENT
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.INSTRUMENT_TITLE_EL_NAME), v -> this.instrumentNames.add(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER_EL_NAME),
+		v -> this.uniqueInstrumentId = normalize(v));
 
 	// PLATFORM
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.PLATFORM_TITLE_EL_NAME), v -> this.platformNames.add(v));

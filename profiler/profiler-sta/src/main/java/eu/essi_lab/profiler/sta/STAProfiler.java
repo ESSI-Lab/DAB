@@ -39,6 +39,7 @@ import eu.essi_lab.profiler.sta.filter.DatastreamsObservationsFilter;
 import eu.essi_lab.profiler.sta.filter.FeaturesOfInterestFilter;
 import eu.essi_lab.profiler.sta.filter.ObservedPropertiesDatastreamsFilter;
 import eu.essi_lab.profiler.sta.filter.ObservedPropertiesFilter;
+import eu.essi_lab.profiler.sta.filter.SensorsFilter;
 import eu.essi_lab.profiler.sta.filter.LocationsFilter;
 import eu.essi_lab.profiler.sta.filter.LocationsThingsFilter;
 import eu.essi_lab.profiler.sta.filter.ObservationsFilter;
@@ -49,6 +50,7 @@ import eu.essi_lab.profiler.sta.handler.DatastreamsHandler;
 import eu.essi_lab.profiler.sta.handler.DatastreamsObservationsHandler;
 import eu.essi_lab.profiler.sta.handler.FeaturesOfInterestHandler;
 import eu.essi_lab.profiler.sta.handler.ObservedPropertiesHandler;
+import eu.essi_lab.profiler.sta.handler.SensorsHandler;
 import eu.essi_lab.profiler.sta.handler.LocationsHandler;
 import eu.essi_lab.profiler.sta.handler.ObservationsHandler;
 import eu.essi_lab.profiler.sta.handler.RootHandler;
@@ -76,6 +78,7 @@ public class STAProfiler extends Profiler<STAProfilerSetting> {
 	selector.register(new FeaturesOfInterestFilter(), new FeaturesOfInterestHandler());
 	selector.register(new ObservedPropertiesDatastreamsFilter(), new DatastreamsHandler());
 	selector.register(new ObservedPropertiesFilter(), new ObservedPropertiesHandler());
+	selector.register(new SensorsFilter(), new SensorsHandler());
 
 	return selector;
     }

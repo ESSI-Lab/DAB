@@ -177,6 +177,7 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 		    JSONObject ds = STAJsonWriter.datastream(id, name, description,
 			    "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
 			    unitName, unitSymbol, null, lon, lat, phenomenonTime, properties, platformId, baseUrl);
+		    addExpandedObservedProperty(ds, parser, baseUrl, staRequest);
 		    addExpandedObservations(ds, id, platformId, begin, end, endNow, webRequest, message, baseUrl, staRequest);
 		    datastreams.add(ds);
 		} catch (XMLStreamException | IOException e) {
@@ -280,6 +281,36 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	    h = 31 * h + c;
 	}
 	return Math.abs(h);
+    }
+
+    private void addExpandedObservedProperty(JSONObject datastream, GIResourceParser parser, String baseUrl,
+	    STARequest staRequest) {
+	boolean expandOp = staRequest.getExpandOptions().stream()
+		.anyMatch(o -> "ObservedProperty".equals(o.getProperty()));
+	if (!expandOp) {
+	    return;
+	}
+	String uniqueAttributeId = parser.getAttributeCode();
+	if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
+	    return;
+	}
+	long id = observedPropertyId(uniqueAttributeId);
+	String name = parser.getAttributeName();
+	if (name == null || name.isEmpty()) {
+	    name = uniqueAttributeId;
+	}
+	String description = parser.getAttributeDescription();
+	if (description == null) {
+	    description = "";
+	}
+	String definition = parser.getAttributeURI();
+	if (definition == null) {
+	    definition = "";
+	}
+	JSONObject props = new JSONObject();
+	props.put("variableCode", uniqueAttributeId);
+	JSONObject op = STAJsonWriter.observedProperty(id, name, description, definition, props, baseUrl);
+	datastream.put("ObservedProperty", op);
     }
 
     private void addExpandedObservations(JSONObject datastream, String datastreamId, String platformId,

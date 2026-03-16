@@ -198,6 +198,10 @@ public abstract class AbstractResourceMapper implements IResourceMapper {
 	    MIInstrument instrument = miInstruments.next();
 	    String code = instrument.getMDIdentifierCode();
 
+	    if (code==null || code.isEmpty()) {
+		code=instrument.getTitle();
+	    }
+
 	    if (code != null && !code.isEmpty()) {
 
 		code = generateCode(gsResource, code);

@@ -203,6 +203,22 @@ public final class STAJsonWriter {
     }
 
     /**
+     * Builds a STA Sensor entity.
+     */
+    public static JSONObject sensor(String id, String name, String description, JSONObject properties, String baseUrl) {
+	JSONObject o = new JSONObject();
+	if (baseUrl != null) {
+	    o.put("@iot.selfLink", baseUrl + "Sensors(" + id + ")");
+	    o.put("Datastreams@iot.navigationLink", baseUrl + "Sensors(" + id + ")/Datastreams");
+	}
+	o.put("@iot.id", id);
+	o.put("name", name != null ? name : id);
+	o.put("description", description != null ? description : "");
+	o.put("properties", properties != null ? properties : new JSONObject());
+	return o;
+    }
+
+    /**
      * Builds a STA ObservedProperty entity.
      */
     public static JSONObject observedProperty(long id, String name, String description, String definition,
@@ -245,6 +261,11 @@ public final class STAJsonWriter {
 			    idx = base.indexOf("/ObservedProperties");
 			    if (idx >= 0) {
 				base = base.substring(0, idx);
+			    } else {
+				idx = base.indexOf("/Sensors");
+				if (idx >= 0) {
+				    base = base.substring(0, idx);
+				}
 			    }
 			}
 		    }
