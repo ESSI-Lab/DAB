@@ -51,6 +51,7 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.ExpandSubRequest;
 import eu.essi_lab.profiler.sta.LocationsTransformer;
+import eu.essi_lab.profiler.sta.STAResourceMapper;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.profiler.sta.ThingsTransformer;
@@ -169,9 +170,13 @@ public class LocationsHandler extends StreamingRequestHandler {
 		    if (name == null) {
 			name = id;
 		    }
+		    String description = parser.getPlatformDescription();
+		    if (description == null) {
+			description = "";
+		    }
 		    String locKey = id + "|" + lon + "|" + lat + (altitude != null ? "|" + altitude : "");
 		    if (seenKeys.add(locKey)) {
-			JSONObject loc = STAJsonWriter.location(id, lon, lat, altitude, name, baseUrl);
+			JSONObject loc = STAJsonWriter.location(id, lon, lat, altitude, name,description, baseUrl);
 			addExpandedThings(loc, id, webRequest, baseUrl, staRequest);
 			locations.add(loc);
 		    }
@@ -247,13 +252,9 @@ public class LocationsHandler extends StreamingRequestHandler {
 		for (String result : thingsResult.getResultsList()) {
 		    try {
 			GIResourceParser parser = new GIResourceParser(result);
-			String id = parser.getUniquePlatformCode();
-			if (id != null) {
-			    String name = parser.getPlatformName();
-			    if (name == null) {
-				name = id;
-			    }
-			    things.put(STAJsonWriter.thing(id, name, "", baseUrl));
+			JSONObject thing = STAResourceMapper.thingFromParser(parser, baseUrl);
+			if (thing != null) {
+			    things.put(thing);
 			}
 		    } catch (Exception e) {
 			// skip malformed

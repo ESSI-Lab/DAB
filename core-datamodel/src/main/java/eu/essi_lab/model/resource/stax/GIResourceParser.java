@@ -142,6 +142,10 @@ public class GIResourceParser extends StAXDocumentParser {
 	return platformNames;
     }
 
+    public String getPlatformDescription() {
+	return platformDescription;
+    }
+
     public String getPlatformName() {
 	if (platformNames.isEmpty()) {
 	    return "";
@@ -282,6 +286,7 @@ public class GIResourceParser extends StAXDocumentParser {
     public List<String> platformNames = new ArrayList<String>();
     public List<String> platformURIs = new ArrayList<String>();
     public String originalPlatformCode = "";
+    public String platformDescription = "";
     public String uniquePlatformCode = "";
     public List<String> attributeNames = new ArrayList<String>();
     public List<String> attributeDescriptions = new ArrayList<String>();
@@ -372,6 +377,7 @@ public class GIResourceParser extends StAXDocumentParser {
 	// PLATFORM
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.PLATFORM_TITLE_EL_NAME), v -> this.platformNames.add(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.PLATFORM_IDENTIFIER_EL_NAME), v -> this.originalPlatformCode = v);
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.PLATFORM_DESCRIPTION.getName()), v -> this.platformDescription = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.UNIQUE_PLATFORM_IDENTIFIER_EL_NAME),
 		v -> this.uniquePlatformCode = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.PLATFORM_URI_EL_NAME), v -> this.platformURIs.add(v));

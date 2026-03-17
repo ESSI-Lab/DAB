@@ -77,18 +77,18 @@ public final class STAJsonWriter {
 	return o;
     }
 
-    public static JSONObject location(String id, BigDecimal lon, BigDecimal lat, String name, String baseUrl) {
-	return location(id,lon,lat,null,name,baseUrl);
+    public static JSONObject location(String id, BigDecimal lon, BigDecimal lat, String name,String description, String baseUrl) {
+	return location(id,lon,lat,null,name, description, baseUrl);
     }
 
     /**
      * Builds a STA Location entity (GeoJSON Point).
      */
-    public static JSONObject location(String id, BigDecimal lon, BigDecimal lat,BigDecimal altitude, String name, String baseUrl) {
+    public static JSONObject location(String id, BigDecimal lon, BigDecimal lat,BigDecimal altitude, String name, String description, String baseUrl) {
 	JSONObject o = new JSONObject();
 	o.put("@iot.id", id);
 	o.put("name", name != null ? name : id);
-	o.put("description", "");
+	o.put("description", description);
 	o.put("encodingType", "application/vnd.geo+json");
 	JSONObject loc = new JSONObject();
 	loc.put("type", "Point");

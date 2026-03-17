@@ -98,6 +98,7 @@ public class DatastreamsTransformer extends STATransformer {
 	selector.setIndexesPolicy(IndexesPolicy.ALL);
 	selector.addIndex(MetadataElement.ONLINE_ID);
 	selector.addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
+	selector.addIndex(MetadataElement.TITLE);
 	selector.addIndex(MetadataElement.PLATFORM_TITLE);
 	selector.addIndex(MetadataElement.ATTRIBUTE_TITLE);
 	selector.addIndex(MetadataElement.TEMP_EXTENT_BEGIN);

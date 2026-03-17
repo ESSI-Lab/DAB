@@ -23,14 +23,12 @@ package eu.essi_lab.profiler.sta.handler;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.stream.XMLStreamException;
 
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.resource.stax.GIResourceParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,6 +45,7 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.DatastreamsTransformer;
 import eu.essi_lab.profiler.sta.ExpandSubRequest;
+import eu.essi_lab.profiler.sta.STAResourceMapper;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.profiler.sta.ThingsTransformer;
@@ -118,15 +117,11 @@ public class ThingsHandler extends StreamingRequestHandler {
 	    for (String result : resultSet.getResultsList()) {
 		try {
 		    GIResourceParser parser = new GIResourceParser(result);
-		    String id = parser.getUniquePlatformCode();
-		    if (id == null) {
+		    JSONObject thing = STAResourceMapper.thingFromParser(parser, baseUrl);
+		    if (thing == null) {
 			continue;
 		    }
-		    String name = parser.getPlatformName();
-		    if (name == null) {
-			name = id;
-		    }
-		    JSONObject thing = STAJsonWriter.thing(id, name, "", baseUrl);
+		    String id = thing.getString("@iot.id");
 		    addExpandedDatastreams(thing, id, webRequest, baseUrl, staRequest);
 		    addExpandedMultiDatastreams(thing, staRequest);
 		    things.add(thing);
@@ -204,7 +199,8 @@ public class ThingsHandler extends StreamingRequestHandler {
 	    if (dsResult != null) {
 		for (String result : dsResult.getResultsList()) {
 		    try {
-			JSONObject ds = parseDatastreamFromResult(result, thingId, baseUrl);
+			GIResourceParser parser = new GIResourceParser(result);
+			JSONObject ds = STAResourceMapper.datastreamFromParser(parser, baseUrl, thingId);
 			if (ds != null) {
 			    datastreams.put(ds);
 			}
@@ -231,54 +227,4 @@ public class ThingsHandler extends StreamingRequestHandler {
 	}
     }
 
-    private static JSONObject parseDatastreamFromResult(String result, String platformId, String baseUrl)
-	    throws XMLStreamException, IOException {
-	GIResourceParser parser = new GIResourceParser(result);
-	String id = parser.getOnlineId();
-	if (id == null) {
-	    return null;
-	}
-	String platformName = parser.getPlatformName();
-	String attributeName = parser.getAttributeName();
-	String name = platformName != null && attributeName != null
-		? platformName + " - " + attributeName
-		: (attributeName != null ? attributeName : id);
-	String description = parser.getAttributeDescription();
-	if (description == null || description.isEmpty()) {
-	    description = attributeName != null ? attributeName : "";
-	}
-	String phenomenonTime = "";
-	String begin = parser.getTmpExtentBegin();
-	String end = parser.getTmpExtentEnd();
-	String endNow = parser.getTmpExtentEndNow();
-	if (endNow != null && endNow.equals("true")) {
-	    end = ISO8601DateTimeUtils.getISO8601DateTime();
-	}
-	if (begin != null && end != null) {
-	    phenomenonTime = begin + "/" + end;
-	} else if (begin != null) {
-	    phenomenonTime = begin;
-	} else if (end != null) {
-	    phenomenonTime = end;
-	}
-	BigDecimal lon = null;
-	BigDecimal lat = null;
-	if (parser.getBBOX() != null) {
-	    lon = parser.getBBOX().getBigDecimalWest();
-	    lat = parser.getBBOX().getBigDecimalNorth();
-	}
-	String unitName = parser.getUnits();
-	String unitSymbol = parser.getUnitsAbbreviation();
-	if (unitSymbol == null || unitSymbol.isEmpty()) {
-	    unitSymbol = unitName;
-	}
-	JSONObject properties = new JSONObject();
-	properties.put("resultType", "Timeseries");
-	if (platformId != null) {
-	    properties.put("platformId", platformId);
-	}
-	return STAJsonWriter.datastream(id, name, description,
-		"http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-		unitName, unitSymbol, null, lon, lat, phenomenonTime, properties, platformId, baseUrl);
-    }
 }

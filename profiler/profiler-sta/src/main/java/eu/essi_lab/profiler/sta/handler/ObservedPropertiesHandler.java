@@ -40,6 +40,7 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.ObservedPropertiesTransformer;
+import eu.essi_lab.profiler.sta.STAResourceMapper;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
@@ -92,17 +93,6 @@ public class ObservedPropertiesHandler extends StreamingRequestHandler {
 	return new ObservedPropertiesTransformer();
     }
 
-    private static long observedPropertyId(String uniqueAttributeId) {
-	if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
-	    return 0;
-	}
-	long h = 0;
-	for (char c : uniqueAttributeId.toCharArray()) {
-	    h = 31 * h + c;
-	}
-	return Math.abs(h);
-    }
-
     private void writeObservedPropertiesResponse(OutputStream output, WebRequest webRequest) throws Exception {
 	if (executor == null) {
 	    output.write("{\"value\":[]}".getBytes(StandardCharsets.UTF_8));
@@ -126,28 +116,16 @@ public class ObservedPropertiesHandler extends StreamingRequestHandler {
 		    if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
 			continue;
 		    }
-		    long id = observedPropertyId(uniqueAttributeId);
+		    long id = STAResourceMapper.observedPropertyId(uniqueAttributeId);
 		    if (requestedId != null && requestedId.matches("\\d+")) {
 			if (id != Long.parseLong(requestedId)) {
 			    continue;
 			}
 		    }
-		    String name = parser.getAttributeName();
-		    if (name == null || name.isEmpty()) {
-			name = uniqueAttributeId;
+		    JSONObject op = STAResourceMapper.observedPropertyFromParser(parser, baseUrl);
+		    if (op != null) {
+			observedProperties.add(op);
 		    }
-		    String description = parser.getAttributeDescription();
-		    if (description == null) {
-			description = "";
-		    }
-		    String definition = parser.getAttributeURI();
-		    if (definition == null) {
-			definition = "";
-		    }
-		    JSONObject props = new JSONObject();
-		    props.put("variableCode", uniqueAttributeId);
-		    JSONObject op = STAJsonWriter.observedProperty(id, name, description, definition, props, baseUrl);
-		    observedProperties.add(op);
 		} catch (Exception e) {
 		    e.printStackTrace();
 		}

@@ -51,6 +51,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.sta.DatastreamsTransformer;
 import eu.essi_lab.profiler.sta.ExpandSubRequest;
 import eu.essi_lab.profiler.sta.ObservedPropertiesTransformer;
+import eu.essi_lab.profiler.sta.STAResourceMapper;
 import eu.essi_lab.profiler.sta.STAJsonWriter;
 import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
@@ -130,53 +131,15 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	    for (String result : resultSet.getResultsList()) {
 		try {
 		    GIResourceParser parser = new GIResourceParser(result);
-		    String id = parser.getOnlineId();
-		    if (id == null) {
+		    JSONObject ds = STAResourceMapper.datastreamFromParser(parser, baseUrl);
+		    if (ds == null) {
 			continue;
 		    }
-		    String platformName = parser.getPlatformName();
-		    String attributeName = parser.getAttributeName();
-		    String name = platformName != null && attributeName != null
-			    ? platformName + " - " + attributeName
-			    : (attributeName != null ? attributeName : id);
-		    String description = parser.getAttributeDescription();
-		    if (description == null || description.isEmpty()) {
-			description = attributeName != null ? attributeName : "";
-		    }
-		    String phenomenonTime = "";
+		    String id = ds.getString("@iot.id");
+		    String platformId = ds.getJSONObject("properties").optString("platformId", null);
 		    String begin = parser.getTmpExtentBegin();
 		    String end = parser.getTmpExtentEnd();
 		    String endNow = parser.getTmpExtentEndNow();
-		    if (endNow!=null&&endNow.equals("true")){
-			end = ISO8601DateTimeUtils.getISO8601DateTime();
-		    }
-		    if (begin != null && end != null) {
-			phenomenonTime = begin + "/" + end;
-		    } else if (begin != null) {
-			phenomenonTime = begin;
-		    } else if (end != null) {
-			phenomenonTime = end;
-		    }
-		    BigDecimal lon = null;
-		    BigDecimal lat = null;
-		    if (parser.getBBOX() != null) {
-			lon = parser.getBBOX().getBigDecimalWest();
-			lat = parser.getBBOX().getBigDecimalNorth();
-		    }
-		    String unitName = parser.getUnits();
-		    String unitSymbol = parser.getUnitsAbbreviation();
-		    if (unitSymbol == null || unitSymbol.isEmpty()) {
-			unitSymbol = unitName;
-		    }
-		    JSONObject properties = new JSONObject();
-		    properties.put("resultType", "Timeseries");
-		    String platformId = parser.getUniquePlatformCode();
-		    if (platformId != null) {
-			properties.put("platformId", platformId);
-		    }
-		    JSONObject ds = STAJsonWriter.datastream(id, name, description,
-			    "http://www.opengis.net/def/observationType/OGC-OM/2.0/OM_Measurement",
-			    unitName, unitSymbol, null, lon, lat, phenomenonTime, properties, platformId, baseUrl);
 		    addExpandedObservedProperty(ds, parser, baseUrl, staRequest);
 		    addExpandedObservations(ds, id, platformId, begin, end, endNow, webRequest, message, baseUrl, staRequest);
 		    datastreams.add(ds);
@@ -257,7 +220,7 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 		    GIResourceParser parser = new GIResourceParser(result);
 		    String uniqueAttributeId = parser.getAttributeCode();
 		    if (uniqueAttributeId != null && !uniqueAttributeId.isEmpty()) {
-			long id = observedPropertyId(uniqueAttributeId);
+			long id = STAResourceMapper.observedPropertyId(uniqueAttributeId);
 			if (id == targetId) {
 			    return uniqueAttributeId;
 			}
@@ -272,17 +235,6 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	return null;
     }
 
-    private static long observedPropertyId(String uniqueAttributeId) {
-	if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
-	    return 0;
-	}
-	long h = 0;
-	for (char c : uniqueAttributeId.toCharArray()) {
-	    h = 31 * h + c;
-	}
-	return Math.abs(h);
-    }
-
     private void addExpandedObservedProperty(JSONObject datastream, GIResourceParser parser, String baseUrl,
 	    STARequest staRequest) {
 	boolean expandOp = staRequest.getExpandOptions().stream()
@@ -290,27 +242,10 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	if (!expandOp) {
 	    return;
 	}
-	String uniqueAttributeId = parser.getAttributeCode();
-	if (uniqueAttributeId == null || uniqueAttributeId.isEmpty()) {
-	    return;
+	JSONObject op = STAResourceMapper.observedPropertyFromParser(parser, baseUrl);
+	if (op != null) {
+	    datastream.put("ObservedProperty", op);
 	}
-	long id = observedPropertyId(uniqueAttributeId);
-	String name = parser.getAttributeName();
-	if (name == null || name.isEmpty()) {
-	    name = uniqueAttributeId;
-	}
-	String description = parser.getAttributeDescription();
-	if (description == null) {
-	    description = "";
-	}
-	String definition = parser.getAttributeURI();
-	if (definition == null) {
-	    definition = "";
-	}
-	JSONObject props = new JSONObject();
-	props.put("variableCode", uniqueAttributeId);
-	JSONObject op = STAJsonWriter.observedProperty(id, name, description, definition, props, baseUrl);
-	datastream.put("ObservedProperty", op);
     }
 
     private void addExpandedObservations(JSONObject datastream, String datastreamId, String platformId,
