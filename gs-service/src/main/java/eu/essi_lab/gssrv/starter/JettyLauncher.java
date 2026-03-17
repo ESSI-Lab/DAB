@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,9 +26,14 @@ import eu.essi_lab.messages.*;
 import org.eclipse.jetty.ee11.annotations.*;
 import org.eclipse.jetty.ee11.webapp.*;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.util.resource.*;
 
 import java.nio.file.*;
+import java.time.*;
+import java.time.temporal.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /***
  *
@@ -70,7 +75,16 @@ public class JettyLauncher {
 	webapp.setAttribute("org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern",
 		".*/spring-[^/]*\\.jar$|.*vaadin-[^/]*\\.jar$|.*flow-[^/]*\\.jar$");
 
-	server.setHandler(webapp);
+	CrossOriginHandler cors = new CrossOriginHandler();
+	cors.setAllowedMethods(Set.of("GET", "POST", "HEAD", "PUT", "DELETE", "OPTIONS"));
+	cors.setExposedHeaders(Set.of("Access-Control-Allow-Origin","Access-Control-Allow-Credentials", "Content-Type", "Authorization", "X-Requested-With"));
+	cors.setAllowedOriginPatterns(Set.of("*"));
+	cors.setAllowedHeaders(Set.of("*"));
+	cors.setAllowCredentials(true);
+	cors.setPreflightMaxAge(Duration.of(30, ChronoUnit.MINUTES));
+	cors.setHandler(webapp);
+
+	server.setHandler(cors);
 
 	server.start();
 	server.join();

@@ -7,11 +7,10 @@
 
 	<context-param>
 
-		<!-- See https://vaadin.com/docs/v14/guide/configuration for other properties -->
+		<!-- See https://vaadin.com/docs/latest/flow/configuration/properties for other properties -->
 
 		<!-- Set the Vaadin heartbeat interval to 30 seconds -->
-		<!-- Used by SingleTabManager to detect if the tab with the configuration 
-			view has been closed -->
+		<!-- Used by SingleTabManager to detect if the tab with the configuration view has been closed -->
 
 		<param-name>heartbeatInterval</param-name>
 		<param-value>30</param-value>
@@ -67,10 +66,7 @@
 		<servlet-name>dispatcher</servlet-name>
 		<servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-		<!-- remove comment to enable async support -->
-		<!-- <async-supported>true</async-supported> -->
 		<async-supported>true</async-supported>
-
 	</servlet>
 
 	<servlet-mapping>
@@ -101,12 +97,11 @@
 		<servlet-name>Vaadin</servlet-name>
 		<servlet-class>com.vaadin.flow.server.VaadinServlet</servlet-class>
 		<init-param>
-			<!-- See https://vaadin.com/docs/v23/configuration/properties for other 
+			<!-- See https://vaadin.com/docs/latest/flow/configuration/properties for other
 				properties -->
 
 			<!-- Set the Vaadin heartbeat interval to 30 seconds -->
-			<!-- Used by SingleTabManager to detect if the tab with the configuration 
-				view has been closed -->
+			<!-- Used by SingleTabManager to detect if the tab with the configuration view has been closed -->
 
 			<param-name>heartbeatInterval</param-name>
 			<param-value>30</param-value>
@@ -168,47 +163,6 @@
 	<filter-mapping>
 		<filter-name>user-finder-filter</filter-name>
 		<url-pattern>/services/*</url-pattern>
-	</filter-mapping>
-
-	<!-- ===================== -->
-	<!-- CorsFilter -->
-	<!-- ===================== -->
-
-	<filter>
-		<filter-name>CorsFilter</filter-name>
-		<filter-class>eu.essi_lab.gssrv.servlet.CORSDelegatorFilter</filter-class>
-		<async-supported>true</async-supported>
-		<init-param>
-			<param-name>cors.allowed.origins</param-name>
-			<param-value>*</param-value>
-		</init-param>
-		<init-param>
-			<param-name>cors.allowed.methods</param-name>
-			<param-value>GET,POST,HEAD,OPTIONS,PUT,DELETE</param-value>
-		</init-param>
-		<init-param>
-			<param-name>cors.allowed.headers</param-name>
-			<param-value>Content-Type,X-Requested-With,accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers,Sec-Fetch-Dest,Sec-Fetch-Mode,Sec-Fetch-Site,Mirrorsiteclient</param-value>
-		</init-param>
-		<init-param>
-			<param-name>cors.exposed.headers</param-name>
-			<param-value>Access-Control-Allow-Origin,Access-Control-Allow-Credentials</param-value>
-		</init-param>
-		<!-- commented, as raises an error on the new tomcat init-param> <param-name>cors.support.credentials</param-name> 
-			<param-value>true</param-value> </init-param -->
-		<init-param>
-			<param-name>cors.preflight.maxage</param-name>
-			<param-value>10</param-value>
-		</init-param>
-		<init-param>
-			<param-name>cors.request.decorate</param-name>
-			<param-value>true</param-value>
-		</init-param>
-	</filter>
-
-	<filter-mapping>
-		<filter-name>CorsFilter</filter-name>
-		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 	<!-- ======================== -->
