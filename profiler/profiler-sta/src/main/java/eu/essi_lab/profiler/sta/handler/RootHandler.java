@@ -48,7 +48,9 @@ public class RootHandler extends DefaultRequestHandler {
 	List<JSONObject> endpoints = new ArrayList<>();
 	endpoints.add(createEndpoint("Things", baseUrl + "Things"));
 	endpoints.add(createEndpoint("Locations", baseUrl + "Locations"));
+	endpoints.add(createEndpoint("HistoricalLocations", baseUrl + "HistoricalLocations"));
 	endpoints.add(createEndpoint("Datastreams", baseUrl + "Datastreams"));
+	endpoints.add(createEndpoint("MultiDatastreams", baseUrl + "MultiDatastreams"));
 	endpoints.add(createEndpoint("Sensors", baseUrl + "Sensors"));
 	endpoints.add(createEndpoint("Observations", baseUrl + "Observations"));
 	endpoints.add(createEndpoint("FeaturesOfInterest", baseUrl + "FeaturesOfInterest"));
@@ -64,8 +66,11 @@ public class RootHandler extends DefaultRequestHandler {
 
 	JSONObject serverSettings = new JSONObject();
 	JSONArray conformance = new JSONArray();
-	serverSettings.put("conformance",conformance);
-	root.put("serverSettings",serverSettings);
+	conformance.put("http://www.opengis.net/spec/iot_sensing/1.1/req/datamodel");
+	conformance.put("http://www.opengis.net/spec/iot_sensing/1.1/req/resource-path/resource-path-to-entities");
+	conformance.put("http://www.opengis.net/spec/iot_sensing/1.1/req/request-data");
+	serverSettings.put("conformance", conformance);
+	root.put("serverSettings", serverSettings);
 
 	return root.toString();
     }

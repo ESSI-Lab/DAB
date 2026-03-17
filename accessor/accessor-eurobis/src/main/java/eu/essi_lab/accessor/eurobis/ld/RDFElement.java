@@ -42,7 +42,7 @@ public enum RDFElement {
     BBOX(false, false, getSpatialQueryTemplate("dcat:bbox")), //
     THEMES(true, false, getMultipleQueryTemplate("dcat:theme")), //
     KEYWORDS(true, false, getMultipleLiteralQueryTemplate("schema:keywords")), //
-    KEYWORDLABELSANDURISANDTYPES(true, true, getKeywordsURIQuery()), //
+    KEYWORDLABELSANDURISANDTYPES(true, true, getKeywordsLabelURITypeQuery()), //
     PARAMETERS(true, false, getParametersQuery()), //
     PARAMETERLABELSANDURIS(true, true, getParametersURIQuery()), //
     INSTRUMENTS(true, false, getInstrumentsQuery()), //
@@ -171,7 +171,7 @@ public enum RDFElement {
 		"  }"; //
     }
 
-    private static String getKeywordsURIQuery() {
+    private static String getKeywordsLabelURITypeQuery() {
 	return getMultipleQueryHeader() + //
 
 		" WHERE { ?dataset a dcat:Dataset; \n" + //

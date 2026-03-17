@@ -107,6 +107,8 @@ public class DatastreamsTransformer extends STATransformer {
 	selector.addIndex(MetadataElement.BOUNDING_BOX);
 	selector.addIndex(MetadataElement.ATTRIBUTE_UNITS);
 	selector.addIndex(MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION);
+	selector.addIndex(MetadataElement.UNIQUE_INSTRUMENT_IDENTIFIER);
+	selector.addIndex(MetadataElement.INSTRUMENT_TITLE);
 	return selector;
     }
 }

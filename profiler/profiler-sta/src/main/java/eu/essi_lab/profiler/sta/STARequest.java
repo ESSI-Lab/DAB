@@ -21,6 +21,8 @@
 
 package eu.essi_lab.profiler.sta;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -283,12 +285,31 @@ public class STARequest {
 	return "true".equalsIgnoreCase(v);
     }
 
+    /**
+     * Extracts a top-level query parameter. Uses proper parsing (split by &) so that
+     * parameters whose values contain the same key (e.g. $expand=Observations($filter=...))
+     * do not incorrectly match.
+     */
     private String getQueryParam(String key) {
-	Optional<String> value = webRequest.extractQueryParameter(key);
-	if (value.isEmpty() && webRequest.getURLDecodedQueryString().isPresent()) {
-	    value = WebRequest.extractQueryParameter(webRequest.getURLDecodedQueryString().get(), key);
+	String queryString = webRequest.getQueryString();
+	if (queryString == null && webRequest.getURLDecodedQueryString().isPresent()) {
+	    queryString = webRequest.getURLDecodedQueryString().get();
 	}
-	return value.orElse(null);
+	if (queryString == null || queryString.isEmpty()) {
+	    return null;
+	}
+	String prefix = key + "=";
+	for (String param : queryString.split("&")) {
+	    if (param.startsWith(prefix)) {
+		String value = param.substring(prefix.length());
+		try {
+		    return URLDecoder.decode(value, StandardCharsets.UTF_8);
+		} catch (IllegalArgumentException e) {
+		    return value;
+		}
+	    }
+	}
+	return null;
     }
 
     private static Integer parseInt(String s) {
