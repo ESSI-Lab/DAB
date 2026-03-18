@@ -61,6 +61,6 @@ public abstract class Patch {
     /**
      * @return
      */
-    public abstract boolean doPatch() throws Exception;
+    protected abstract boolean doPatch() throws Exception;
 
 }

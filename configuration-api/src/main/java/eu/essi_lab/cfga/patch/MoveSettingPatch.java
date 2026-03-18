@@ -79,7 +79,7 @@ public class MoveSettingPatch extends Patch {
     }
 
     @Override
-    public boolean doPatch() throws Exception {
+    protected boolean doPatch() throws Exception {
 
 	List<Setting> targetSettings = parent. //
 		getSettings().//
