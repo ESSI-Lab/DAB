@@ -626,9 +626,12 @@ public class DABStarter implements ConfigurationChangeListener {
 	    //
 
 	    CustomPatch customPatch = CustomPatch.of(configuration, //
-		    (s) -> s.getSettingClass().equals(SessionCoordinatorSetting.class),//
+		    (s) -> s.getSettingClass().equals(SessionCoordinatorSetting.class) //
+			    && !s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel()),//
 		    (s) -> {
+		        SelectionUtils.deepClean(s);
 			s.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
+
 			return s;
 		    });
 
