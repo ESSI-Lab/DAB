@@ -10,84 +10,72 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.api.database.cfg.DatabaseSource;
-import eu.essi_lab.api.database.cfg.DatabaseSourceUrl;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.augmenter.worker.AugmentationReportsHandler;
-import eu.essi_lab.authorization.xacml.XACMLAuthorizer;
+import eu.essi_lab.api.database.cfg.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.augmenter.worker.*;
+import eu.essi_lab.authorization.xacml.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.*;
-import eu.essi_lab.cfga.check.CheckResponse.CheckResult;
-import eu.essi_lab.cfga.check.scheme.SchemeMethod;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.DefaultConfigurationScheme;
-import eu.essi_lab.cfga.gs.demo.DemoConfiguration;
-import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.cfga.check.CheckResponse.*;
+import eu.essi_lab.cfga.check.scheme.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.*;
+import eu.essi_lab.cfga.gs.demo.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
-import eu.essi_lab.cfga.source.FileSource;
-import eu.essi_lab.cfga.source.S3Source;
-import eu.essi_lab.configuration.ClusterType;
-import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask;
-import eu.essi_lab.gssrv.health.HealthCheck;
-import eu.essi_lab.gssrv.servlet.ServletListener;
-import eu.essi_lab.harvester.HarvestingReportsHandler;
-import eu.essi_lab.jaxb.common.CommonContext;
-import eu.essi_lab.jaxb.wms.extension.JAXBWMS;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.FileUtils;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.StreamUtils;
-import eu.essi_lab.messages.JVMOption;
-import eu.essi_lab.messages.bond.jaxb.ViewFactory;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.profiler.esri.feature.FeatureLayer1StationsArctic;
-import eu.essi_lab.profiler.esri.feature.query.CachedCollections;
-import eu.essi_lab.profiler.wms.extent.WMSLayer;
-import eu.essi_lab.profiler.wms.extent.map.WMSGetMapHandler;
-import eu.essi_lab.request.executor.schedule.DownloadReportsHandler;
-import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
-import jakarta.ws.rs.ext.RuntimeDelegate;
-import org.quartz.SchedulerException;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.*;
+import eu.essi_lab.cfga.source.*;
+import eu.essi_lab.configuration.*;
+import eu.essi_lab.gssrv.conf.task.*;
+import eu.essi_lab.gssrv.health.*;
+import eu.essi_lab.gssrv.servlet.*;
+import eu.essi_lab.harvester.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.jaxb.wms.extension.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.s3.*;
+import eu.essi_lab.lib.net.services.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.jaxb.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.profiler.esri.feature.*;
+import eu.essi_lab.profiler.esri.feature.query.*;
+import eu.essi_lab.profiler.wms.extent.*;
+import eu.essi_lab.profiler.wms.extent.map.*;
+import eu.essi_lab.request.executor.schedule.*;
+import eu.essi_lab.shared.driver.es.stats.*;
+import jakarta.ws.rs.ext.*;
+import org.quartz.*;
+import redis.clients.jedis.*;
 
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.cert.X509Certificate;
+import javax.net.ssl.*;
+import java.io.*;
+import java.security.*;
+import java.security.cert.*;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
-import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED;
+import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.*;
 
 /**
  * @author Fabrizio
@@ -113,6 +101,7 @@ public class DABStarter implements ConfigurationChangeListener {
      *
      */
     private SchedulerViewSetting schedulerSetting;
+    private MultiServiceManager manager;
 
     /**
      *
@@ -273,6 +262,8 @@ public class DABStarter implements ConfigurationChangeListener {
 	}
 
 	initDatabase();
+
+	initMultiServiceManager();
     }
 
     /**
@@ -285,6 +276,27 @@ public class DABStarter implements ConfigurationChangeListener {
 
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
+
+	if (manager != null && (event.getEventType() == CONFIGURATION_FLUSHED || event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
+
+	    switch (mode) {
+	    case MIXED, LOCAL_PRODUCTION, SERVICE -> {
+
+		List<ServiceDefinition> configDef = ConfigurationWrapper.getManagedServiceSettings().//
+			stream(). //
+			map(s -> ServiceDefinition.of(s.getServiceId(), s.getSelectedServiceImpl())).//
+			toList();
+
+		List<ServiceDefinition> definitions = manager.getDefinitions();
+
+		if (!configDef.equals(definitions)) {
+
+		    manager.setDefinitions(configDef);
+		}
+	    }
+	    }
+
+	}
 
 	if (event.getEventType() == CONFIGURATION_AUTO_RELOADED) {
 
@@ -872,7 +884,7 @@ public class DABStarter implements ConfigurationChangeListener {
 		    }
 
 		    X509Certificate[] defaultCerts = defaultTM.getAcceptedIssuers();
-		GSLoggerFactory.getLogger(getClass()).info("Certificates from default JVM trust store: {}", defaultCerts.length);
+		    GSLoggerFactory.getLogger(getClass()).info("Certificates from default JVM trust store: {}", defaultCerts.length);
 		    // --- 2. Load custom truststore ---
 		    KeyStore customKS = KeyStore.getInstance("JKS");
 		    try (InputStream is = new java.io.FileInputStream(customTrustStore)) {
@@ -880,7 +892,6 @@ public class DABStarter implements ConfigurationChangeListener {
 		    }
 		    List<String> customAliases = StreamUtils.iteratorToStream(customKS.aliases().asIterator()).toList();
 		    GSLoggerFactory.getLogger(getClass()).info("Certificates from custom trust store: {}", customAliases.size());
-
 
 		    // --- 3. Create merged KeyStore ---
 		    KeyStore mergedKS = KeyStore.getInstance("JKS");
@@ -917,14 +928,13 @@ public class DABStarter implements ConfigurationChangeListener {
 		    System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
 		    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
 
-
 		    GSLoggerFactory.getLogger(getClass()).info("Using merged trust store at {}", mergedTrustStore.getAbsolutePath());
 
 		    FileUtils.printTrustStoreCertificates(mergedTrustStore, trustStorePwd.get());
 
 		    GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
 		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).error("Error merging trust stores",e);
+		    GSLoggerFactory.getLogger(getClass()).error("Error merging trust stores", e);
 		}
 	    }
 
@@ -1148,9 +1158,44 @@ public class DABStarter implements ConfigurationChangeListener {
     /**
      *
      */
-    private void startSchedulerDelayed() {
+    private void initMultiServiceManager() {
 
-	Optional<Properties> keyValueOptions = ConfigurationWrapper.getSystemSettings().getKeyValueOptions();
+	switch (mode) {
+	case MIXED, LOCAL_PRODUCTION, SERVICE -> {
+
+	    if (ConfigurationWrapper.getSessionCoordinatorSetting().isEnabled()) {
+
+		String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint();
+
+		GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager STARTED");
+
+		JedisPool pool = new JedisPool(redisEndpoint, 6379);
+
+		String nodeId = HostNamePropertyUtils.getHostNameProperty();
+
+		manager = new MultiServiceManager( //
+			pool, //
+			nodeId, //
+			2);
+
+		manager.start();
+
+		Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
+
+		GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager ENDED");
+
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).info("Session coordinator setting disabled, unable to start multi service manager");
+	    }
+	}
+	}
+    }
+
+    /**
+     *
+     */
+    private void startSchedulerDelayed() {
 
 	int schedulerStartDelay = JVMOption.getIntValue(JVMOption.SCHEDULER_START_DELAY).get();
 
