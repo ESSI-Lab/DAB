@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -42,6 +42,8 @@ import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
+import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.Setting;
@@ -620,6 +622,19 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 
 	    //
+	    // this patch replaces the random id of the SessionCoordinatorSetting with the right one
+	    //
+
+	    CustomPatch customPatch = CustomPatch.of(configuration, //
+		    (s) -> s.getSettingClass().equals(SessionCoordinatorSetting.class),//
+		    (s) -> {
+			s.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
+			return s;
+		    });
+
+	    customPatch.patch();
+
+	    //
 	    //
 	    // ---------------------------------------------------------------
 
@@ -872,7 +887,7 @@ public class DABStarter implements ConfigurationChangeListener {
 		    }
 
 		    X509Certificate[] defaultCerts = defaultTM.getAcceptedIssuers();
-		GSLoggerFactory.getLogger(getClass()).info("Certificates from default JVM trust store: {}", defaultCerts.length);
+		    GSLoggerFactory.getLogger(getClass()).info("Certificates from default JVM trust store: {}", defaultCerts.length);
 		    // --- 2. Load custom truststore ---
 		    KeyStore customKS = KeyStore.getInstance("JKS");
 		    try (InputStream is = new java.io.FileInputStream(customTrustStore)) {
@@ -880,7 +895,6 @@ public class DABStarter implements ConfigurationChangeListener {
 		    }
 		    List<String> customAliases = StreamUtils.iteratorToStream(customKS.aliases().asIterator()).toList();
 		    GSLoggerFactory.getLogger(getClass()).info("Certificates from custom trust store: {}", customAliases.size());
-
 
 		    // --- 3. Create merged KeyStore ---
 		    KeyStore mergedKS = KeyStore.getInstance("JKS");
@@ -917,14 +931,13 @@ public class DABStarter implements ConfigurationChangeListener {
 		    System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
 		    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
 
-
 		    GSLoggerFactory.getLogger(getClass()).info("Using merged trust store at {}", mergedTrustStore.getAbsolutePath());
 
 		    FileUtils.printTrustStoreCertificates(mergedTrustStore, trustStorePwd.get());
 
 		    GSLoggerFactory.getLogger(getClass()).info("Trust store init ENDED");
 		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).error("Error merging trust stores",e);
+		    GSLoggerFactory.getLogger(getClass()).error("Error merging trust stores", e);
 		}
 	    }
 
