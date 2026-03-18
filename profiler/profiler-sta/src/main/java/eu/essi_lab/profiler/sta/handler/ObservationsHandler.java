@@ -129,7 +129,7 @@ public class ObservationsHandler extends StreamingRequestHandler {
 		    java.util.Date windowBeginDate = java.util.Date.from(windowBegin.toInstant());
 		    java.util.Date windowEndDate = java.util.Date.from(windowEnd.toInstant());
 
-		    DatastreamsObservationsHandler dsHandler = new DatastreamsObservationsHandler();
+		    DatastreamsHandler dsHandler = new DatastreamsHandler();
 		    List<JSONObject> obs = dsHandler.fetchObservationsForDatastream(
 			    webRequest, message, datastreamId, platformId, windowBeginDate, windowEndDate, baseUrl);
 		    observations.addAll(obs);

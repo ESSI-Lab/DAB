@@ -26,9 +26,9 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
 
 /**
- * Filter for OGC STA Datastreams entity set.
+ * Filter for OGC STA HistoricalLocations entity set and navigation (Things(id)/HistoricalLocations, Locations(id)/HistoricalLocations).
  */
-public class DatastreamsFilter implements WebRequestFilter {
+public class HistoricalLocationsFilter implements WebRequestFilter {
 
     @Override
     public boolean accept(WebRequest request) throws GSException {
@@ -36,9 +36,6 @@ public class DatastreamsFilter implements WebRequestFilter {
 	    return false;
 	}
 	String path = request.getRequestPath();
-	if (path == null || path.contains("MultiDatastreams")) {
-	    return false;
-	}
-	return path.contains("Datastreams") ;
+	return path != null && (path.contains("/HistoricalLocations") || path.endsWith("HistoricalLocations"));
     }
 }
