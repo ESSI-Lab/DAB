@@ -841,17 +841,10 @@ public class ConfigurationWrapper {
      * @return
      */
     public static SessionCoordinatorSetting getSessionCoordinatorSetting() {
-	Optional<SessionCoordinatorSetting> setting = configuration.get(//
-		SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel(), //
-		SessionCoordinatorSetting.class);
-	if (setting.isPresent()) {
-	    SessionCoordinatorSetting ret = setting.get();
-	    if (ret.isDistributedSessionCoordinator()){
 
-	    }
-	    return ret;
-	}
-	return new SessionCoordinatorSetting();
+	return configuration.get(//
+		SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel(), //
+		SessionCoordinatorSetting.class).get();
     }
 
     /**
