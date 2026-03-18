@@ -88,15 +88,20 @@ public enum GSTabIndex implements TabIndex {
      *
      */
     VIEWS(8),
-    /**
-     *
-     */
-    SEMANTICS(9, Descriptor.of(DefaultSemanticSearchSetting.class)), //
 
     /**
      *
      */
-    SYSTEM(10,//
+    SERVICES(9),
+    /**
+     *
+     */
+    SEMANTICS(10, Descriptor.of(DefaultSemanticSearchSetting.class)), //
+
+    /**
+     *
+     */
+    SYSTEM(11,//
 	    Descriptor.of(SystemSetting.class),//
 	    Descriptor.of(DatabaseSetting.class),//
 	    Descriptor.of(SchedulerViewSetting.class),//
@@ -110,7 +115,7 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    ABOUT(11);
+    ABOUT(12);
 
     private final int index;
     private final List<Descriptor> descriptors;
