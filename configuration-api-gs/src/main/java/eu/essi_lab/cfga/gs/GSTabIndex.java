@@ -28,12 +28,12 @@ import eu.essi_lab.cfga.gui.TabIndex;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -104,7 +104,12 @@ public enum GSTabIndex implements TabIndex {
 	    Descriptor.of(SharedPersistentDriverSetting.class),//
 	    Descriptor.of(DownloadSetting.class),//
 	    Descriptor.of(RateLimiterSetting.class), //
-	    Descriptor.of(SessionCoordinatorSetting.class) //
+	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel()),
+		    () -> {
+			SessionCoordinatorSetting setting = new SessionCoordinatorSetting();
+			setting.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
+			return setting;
+		    }) //
     ),
 
     /**
