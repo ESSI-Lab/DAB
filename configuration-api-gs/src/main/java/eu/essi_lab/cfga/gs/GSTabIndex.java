@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.check.scheme.SchemeItem;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.*;
@@ -17,6 +18,7 @@ import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gui.TabIndex;
+import eu.essi_lab.cfga.setting.*;
 
 /*-
  * #%L
@@ -108,6 +110,7 @@ public enum GSTabIndex implements TabIndex {
 		    () -> {
 			SessionCoordinatorSetting setting = new SessionCoordinatorSetting();
 			setting.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
+			SelectionUtils.deepClean(setting);
 			return setting;
 		    }) //
     ),
