@@ -136,8 +136,11 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.IDENTIFIER);
-	}
+	    if (value == null || value.isEmpty()) {
+		return Optional.empty();
+	    }
+
+	    return createEqualBond(value, MetadataElement.IDENTIFIER);	}
     };
 
     /**
