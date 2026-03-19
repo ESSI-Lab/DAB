@@ -127,7 +127,20 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
     }
 
     public String getRedisEndpoint() {
-	return getOption(REDIS_ENDPOINT_OPTION_KEY, String.class).get().getValue();
+
+	return getRedisEndpoint(true);
+    }
+
+    public String getRedisEndpoint(boolean includePort) {
+
+	String redisEndpoint = getOption(REDIS_ENDPOINT_OPTION_KEY, String.class).get().getValue();
+
+	if(!includePort) {
+
+	    redisEndpoint = redisEndpoint.substring(0, redisEndpoint.indexOf(':'));
+	}
+
+	return redisEndpoint;
     }
 
     public void setRedisEndpoint(String endpoint) {
