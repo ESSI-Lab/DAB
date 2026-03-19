@@ -284,6 +284,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		List<ServiceDefinition> configDef = ConfigurationWrapper.getManagedServiceSettings().//
 			stream(). //
+			filter(ConfigurationObject::isEnabled).//
 			map(s -> ServiceDefinition.of(s.getServiceId(), s.getSelectedServiceImpl())).//
 			toList();
 
@@ -1163,9 +1164,9 @@ public class DABStarter implements ConfigurationChangeListener {
 	switch (mode) {
 	case MIXED, LOCAL_PRODUCTION, SERVICE -> {
 
-	    if (ConfigurationWrapper.getSessionCoordinatorSetting().isEnabled()) {
+	    if (ConfigurationWrapper.getSessionCoordinatorSetting().isDistributedSessionCoordinator()) {
 
-		String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint();
+		String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint(false);
 
 		GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager STARTED");
 
