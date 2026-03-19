@@ -277,6 +277,21 @@ public class DABStarter implements ConfigurationChangeListener {
 	JVMOption.log();
     }
 
+    /**
+     *
+     */
+    private void updateServiceDefinitions() {
+
+	List<ServiceDefinition> configDef = ConfigurationWrapper.getServicesDefinition();
+
+	List<ServiceDefinition> definitions = manager.getDefinitions();
+
+	if (!configDef.equals(definitions)) {
+
+	    manager.setDefinitions(configDef);
+	}
+    }
+
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 
@@ -285,18 +300,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    switch (mode) {
 	    case MIXED, LOCAL_PRODUCTION, SERVICE -> {
 
-		List<ServiceDefinition> configDef = ConfigurationWrapper.getManagedServiceSettings().//
-			stream(). //
-			filter(ManagedServiceSetting::isEnabled).//
-			map(s -> ServiceDefinition.of(s.getServiceId(), s.getSelectedServiceImpl())).//
-			toList();
-
-		List<ServiceDefinition> definitions = manager.getDefinitions();
-
-		if (!configDef.equals(definitions)) {
-
-		    manager.setDefinitions(configDef);
-		}
+		updateServiceDefinitions();
 	    }
 	    }
 
@@ -643,7 +647,7 @@ public class DABStarter implements ConfigurationChangeListener {
 		    (s) -> s.getSettingClass().equals(SessionCoordinatorSetting.class) //
 			    && !s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel()),//
 		    (s) -> {
-		        SelectionUtils.deepClean(s);
+			SelectionUtils.deepClean(s);
 			s.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
 
 			return s;
@@ -1199,6 +1203,8 @@ public class DABStarter implements ConfigurationChangeListener {
 			2);
 
 		manager.start();
+
+		updateServiceDefinitions();
 
 		Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
 

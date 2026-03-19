@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.service.*;
+import eu.essi_lab.lib.net.services.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;
@@ -357,6 +358,19 @@ public class ConfigurationWrapper {
     public static List<ManagedServiceSetting> getManagedServiceSettings() {
 
 	return new ArrayList<>(configuration.list(ManagedServiceSetting.class, true));
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static List<ServiceDefinition> getServicesDefinition() {
+
+	return  getManagedServiceSettings().//
+		stream(). //
+		filter(ManagedServiceSetting::isEnabled).//
+		map(s -> ServiceDefinition.of(s.getServiceId(), s.getSelectedServiceImpl())).//
+		toList();
     }
 
     /**
