@@ -21,7 +21,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     private static final String SERVICE_NAME_OPTION_KEY = "serviceNameKey";
     private static final String SERVICE_DESCRIPTION_OPTION_KEY = "serviceDescKey";
     private static final String SERVICE_OPTIONS_OPTION_KEY = "serviceOptionsKey";
-    private static final String SERVICE_ID_OPTION_KEY = "serviceIdOptionKey";
+    static final String SERVICE_ID_OPTION_KEY = "serviceIdOptionKey";
 
     /**
      *
@@ -140,7 +140,14 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 
 		    ColumnDescriptor.create("Implementation", true, true, this::getImpl), //
 
-		    ColumnDescriptor.create("Description", true, true, this::getDesc))).//
+		    ColumnDescriptor.create("Description", true, true, this::getDesc),//
+
+		    ColumnDescriptor.create("Status", true, true, s -> ManagedServiceSupport.getInstance().getServiceStatus(s)),
+
+		    ColumnDescriptor.create("Host", true, true, s -> ManagedServiceSupport.getInstance().getServiceHost(s))
+
+	    )).//
+		    reloadable(() -> ManagedServiceSupport.getInstance().update()).//
 
 		    build();
 
