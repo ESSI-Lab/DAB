@@ -72,7 +72,9 @@ public final class STAJsonWriter {
 	if (baseUrl != null) {
 	    o.put("@iot.selfLink", baseUrl + "Things(" + id + ")");
 	    o.put("Locations@iot.navigationLink", baseUrl + "Things(" + id + ")/Locations");
+	    o.put("HistoricalLocations@iot.navigationLink", baseUrl + "Things(" + id + ")/HistoricalLocations");
 	    o.put("Datastreams@iot.navigationLink", baseUrl + "Things(" + id + ")/Datastreams");
+	    o.put("MultiDatastreams@iot.navigationLink", baseUrl + "Things(" + id + ")/MultiDatastreams");
 	}
 	return o;
     }
@@ -89,7 +91,7 @@ public final class STAJsonWriter {
 	o.put("@iot.id", id);
 	o.put("name", name != null ? name : id);
 	o.put("description", description);
-	o.put("encodingType", "application/vnd.geo+json");
+	o.put("encodingType", "application/geo+json");
 	JSONObject loc = new JSONObject();
 	loc.put("type", "Point");
 	JSONArray coords = new JSONArray().put(lon).put(lat);
@@ -101,6 +103,7 @@ public final class STAJsonWriter {
 	if (baseUrl != null) {
 	    o.put("@iot.selfLink", baseUrl + "Locations(" + id + ")");
 	    o.put("Things@iot.navigationLink", baseUrl + "Locations(" + id + ")/Things");
+	    o.put("HistoricalLocations@iot.navigationLink", baseUrl + "Locations(" + id + ")/HistoricalLocations");
 	}
 	return o;
     }
@@ -155,7 +158,7 @@ public final class STAJsonWriter {
 	o.put("phenomenonTime", phenomenonTime);
 	o.put("resultTime", resultTime);
 	if (baseUrl != null) {
-//	    o.put("@iot.selfLink", baseUrl + "Observations(" + id + ")");
+	    o.put("@iot.selfLink", baseUrl + "Observations(" + id + ")");
 	    if (datastreamId != null) {
 		o.put("Datastream@iot.navigationLink", baseUrl + "Datastreams(" + datastreamId + ")");
 	    }
@@ -210,6 +213,7 @@ public final class STAJsonWriter {
 	if (baseUrl != null) {
 	    o.put("@iot.selfLink", baseUrl + "Sensors(" + id + ")");
 	    o.put("Datastreams@iot.navigationLink", baseUrl + "Sensors(" + id + ")/Datastreams");
+	    o.put("MultiDatastreams@iot.navigationLink", baseUrl + "Sensors(" + id + ")/MultiDatastreams");
 	}
 	o.put("@iot.id", id);
 	o.put("name", name != null ? name : id);
@@ -232,6 +236,7 @@ public final class STAJsonWriter {
 	if (baseUrl != null) {
 	    o.put("@iot.selfLink", baseUrl + "ObservedProperties(" + id + ")");
 	    o.put("Datastreams@iot.navigationLink", baseUrl + "ObservedProperties(" + id + ")/Datastreams");
+	    o.put("MultiDatastreams@iot.navigationLink", baseUrl + "ObservedProperties(" + id + ")/MultiDatastreams");
 	}
 	return o;
     }

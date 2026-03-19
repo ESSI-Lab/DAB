@@ -73,7 +73,7 @@ public class RemovePropertyPatch extends Patch {
      * @return
      * @throws Exception
      */
-    public boolean doPatch() throws Exception {
+    protected boolean doPatch() throws Exception {
 
 	ArrayList<Setting> list = new ArrayList<>();
 

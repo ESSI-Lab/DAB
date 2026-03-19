@@ -1,5 +1,3 @@
-package eu.essi_lab.cfga.patch;
-
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
@@ -21,46 +19,23 @@ package eu.essi_lab.cfga.patch;
  * #L%
  */
 
-import eu.essi_lab.cfga.*;
+package eu.essi_lab.profiler.sta.filter;
+
+import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.pdk.handler.selector.WebRequestFilter;
 
 /**
- * @author Fabrizio
+ * Filter for OGC STA HistoricalLocations entity set and navigation (Things(id)/HistoricalLocations, Locations(id)/HistoricalLocations).
  */
-public abstract class Patch {
+public class HistoricalLocationsFilter implements WebRequestFilter {
 
-    private Configuration configuration;
-
-    /**
-     * @param configuration
-     */
-    public void setConfiguration(Configuration configuration) {
-
-	this.configuration = configuration;
-    }
-
-    /**
-     * @return
-     */
-    public Configuration getConfiguration() {
-
-	return configuration;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public void patch() throws Exception {
-
-	if (doPatch()) {
-
-	    ConfigurationUtils.backup(getConfiguration());
-	    ConfigurationUtils.flush(getConfiguration());
+    @Override
+    public boolean accept(WebRequest request) throws GSException {
+	if (!"GET".equalsIgnoreCase(request.getServletRequest().getMethod())) {
+	    return false;
 	}
+	String path = request.getRequestPath();
+	return path != null && (path.contains("/HistoricalLocations") || path.endsWith("HistoricalLocations"));
     }
-
-    /**
-     * @return
-     */
-    protected abstract boolean doPatch() throws Exception;
-
 }

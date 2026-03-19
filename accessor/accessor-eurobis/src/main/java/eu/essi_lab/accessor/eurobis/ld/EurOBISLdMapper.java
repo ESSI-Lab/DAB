@@ -122,7 +122,13 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    String license = turtle.getElement(RDFElement.LICENSE);
 	    List<String> citations = turtle.getElements(RDFElement.CITATIONS);
 	    String startDate = turtle.getElement(RDFElement.STARTDATE);
+	    if (startDate!=null){
+		startDate= startDate.replace("\"","");
+	    }
 	    String endDate = turtle.getElement(RDFElement.ENDDATE);
+	    if (endDate!=null){
+		endDate= endDate.replace("\"","");
+	    }
 	    String endDateInProgress = turtle.getElement(RDFElement.ENDDATEINPROGRESS);
 	    String bbox = turtle.getElement(RDFElement.BBOX);
 	    List<String> themes = turtle.getElements(RDFElement.THEMES);

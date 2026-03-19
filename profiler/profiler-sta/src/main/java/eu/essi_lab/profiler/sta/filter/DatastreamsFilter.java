@@ -36,6 +36,9 @@ public class DatastreamsFilter implements WebRequestFilter {
 	    return false;
 	}
 	String path = request.getRequestPath();
-	return path != null && (path.contains("/Datastreams") || path.endsWith("Datastreams"));
+	if (path == null || path.contains("MultiDatastreams")) {
+	    return false;
+	}
+	return path.contains("Datastreams") ;
     }
 }

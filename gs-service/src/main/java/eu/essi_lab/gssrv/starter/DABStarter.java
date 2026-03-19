@@ -38,6 +38,9 @@ import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
+import eu.essi_lab.cfga.gs.setting.service.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
+import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.*;
@@ -284,7 +287,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		List<ServiceDefinition> configDef = ConfigurationWrapper.getManagedServiceSettings().//
 			stream(). //
-			filter(ConfigurationObject::isEnabled).//
+			filter(ManagedServiceSetting::isEnabled).//
 			map(s -> ServiceDefinition.of(s.getServiceId(), s.getSelectedServiceImpl())).//
 			toList();
 
@@ -631,6 +634,22 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
+
+	    //
+	    // this patch replaces the random id of the SessionCoordinatorSetting with the right one
+	    //
+
+	    CustomPatch customPatch = CustomPatch.of(configuration, //
+		    (s) -> s.getSettingClass().equals(SessionCoordinatorSetting.class) //
+			    && !s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel()),//
+		    (s) -> {
+		        SelectionUtils.deepClean(s);
+			s.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
+
+			return s;
+		    });
+
+	    customPatch.patch();
 
 	    //
 	    //

@@ -150,6 +150,27 @@ public final class STAResourceMapper {
     }
 
     /**
+     * Maps a resource to a STA Sensor JSON object.
+     *
+     * @param parser  parsed harmonized metadata
+     * @param baseUrl base URL for links
+     * @return Sensor JSON, or null if id is missing
+     */
+    public static JSONObject sensorFromParser(GIResourceParser parser, String baseUrl) {
+	String id = parser.getUniqueInstrumentId();
+	if (id == null || id.isEmpty()) {
+	    return null;
+	}
+	String name = parser.getInstrumentName();
+	if (name == null || name.isEmpty()) {
+	    name = id;
+	}
+	String description = "";
+	JSONObject properties = new JSONObject();
+	return STAJsonWriter.sensor(id, name, description, properties, baseUrl);
+    }
+
+    /**
      * Computes a numeric id for an ObservedProperty from its unique attribute identifier.
      */
     public static long observedPropertyId(String uniqueAttributeId) {
