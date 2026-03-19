@@ -29,7 +29,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     public ManagedServiceSetting() {
 
 	setCanBeRemoved(true);
-	setCanBeDisabled(false);
+	setCanBeDisabled(true);
 	enableCompactMode(false);
 
 	setName("Managed service settings");
