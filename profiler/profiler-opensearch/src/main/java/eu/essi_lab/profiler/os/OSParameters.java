@@ -51,15 +51,15 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
 	    String[] split = value.split(",");
 	    if (split.length > 1) {
 		LogicalBond orBond = BondFactory.createOrBond();
-		for (int i = 0; i < split.length; i++) {
-		    orBond.getOperands().add(BondFactory.createSourceIdentifierBond(split[i]));
+		for (String s : split) {
+		    orBond.getOperands().add(BondFactory.createSourceIdentifierBond(s));
 		}
 		return Optional.of(orBond);
 	    }
@@ -136,8 +136,11 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.IDENTIFIER);
-	}
+	    if (value == null || value.isEmpty()) {
+		return Optional.empty();
+	    }
+
+	    return createEqualBond(value, MetadataElement.IDENTIFIER);	}
     };
 
     /**
@@ -152,7 +155,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -169,7 +172,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -271,7 +274,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -300,7 +303,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -316,7 +319,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -331,7 +334,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -346,7 +349,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -361,7 +364,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -374,7 +377,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -387,7 +390,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -399,7 +402,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -414,7 +417,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -430,7 +433,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -446,7 +449,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -461,7 +464,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -515,7 +518,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -530,7 +533,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -545,7 +548,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -561,7 +564,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -576,7 +579,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -588,16 +591,13 @@ public abstract class OSParameters {
 
 	    BondOperator operator = BondOperator.decode(timeRelation);
 
-	    switch (operator) {
-	    case INTERSECTS:
-		return Optional.of(
+	    return switch (operator) {
+		case INTERSECTS -> Optional.of(
 			BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.TEMP_EXTENT_END, value));
-	    case CONTAINS:
-		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER, MetadataElement.TEMP_EXTENT_BEGIN, value));
-	    case DISJOINT:
-	    default:
-		throw new IllegalArgumentException("Operator not yet implemented: " + operator);
-	    }
+		case CONTAINS ->
+			Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER, MetadataElement.TEMP_EXTENT_BEGIN, value));
+		default -> throw new IllegalArgumentException("Operator not yet implemented: " + operator);
+	    };
 
 	}
     };
@@ -609,7 +609,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -624,7 +624,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -639,7 +639,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -654,7 +654,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -669,7 +669,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -684,7 +684,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -699,7 +699,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -711,17 +711,12 @@ public abstract class OSParameters {
 
 	    BondOperator operator = BondOperator.decode(timeRelation);
 
-	    switch (operator) {
-	    case INTERSECTS:
-		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
-
-	    case CONTAINS:
-		return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS, MetadataElement.TEMP_EXTENT_END, value));
-
-	    case DISJOINT:
-	    default:
-		throw new IllegalArgumentException("Operator not yet implemented: " + operator);
-	    }
+	    return switch (operator) {
+		case INTERSECTS -> Optional.of(
+			BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.TEMP_EXTENT_BEGIN, value));
+		case CONTAINS -> Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS, MetadataElement.TEMP_EXTENT_END, value));
+		default -> throw new IllegalArgumentException("Operator not yet implemented: " + operator);
+	    };
 
 	}
     };
@@ -733,12 +728,12 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.QML_MAGNITUDE_VALUE,
-		    Double.valueOf(value)));
+		    Double.parseDouble(value)));
 	}
     };
 
@@ -749,12 +744,12 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.QML_MAGNITUDE_VALUE,
-		    Double.valueOf(value)));
+		    Double.parseDouble(value)));
 	}
     };
 
@@ -765,12 +760,12 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
 	    return Optional.of(
-		    BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE, Double.valueOf(value)));
+		    BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE, Double.parseDouble(value)));
 	}
     };
 
@@ -781,12 +776,12 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
 	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE,
-		    Double.valueOf(value)));
+		    Double.parseDouble(value)));
 	}
     };
 
@@ -797,7 +792,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -824,11 +819,11 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(BondFactory.createIsGEOSSDataCoreBond(Boolean.valueOf(value)));
+	    return Optional.of(BondFactory.createIsGEOSSDataCoreBond(Boolean.parseBoolean(value)));
 	}
     };
 
@@ -839,11 +834,11 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(BondFactory.createSimpleValueBond(MetadataElement.IN_SITU, Boolean.valueOf(value)));
+	    return Optional.of(BondFactory.createSimpleValueBond(MetadataElement.IN_SITU, Boolean.parseBoolean(value)));
 	}
     };
 
@@ -868,12 +863,12 @@ public abstract class OSParameters {
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
 	    // e.g: [0,20]
-	    if (!value.equals("")) {
+	    if (!value.isEmpty()) {
 
 		String[] range = value.replace("[", "").replace("]", "").split(",");
 		LogicalBond andBond = BondFactory.createAndBond();
-		ResourcePropertyBond min = BondFactory.createSSCScoreBond(BondOperator.GREATER_OR_EQUAL, Integer.valueOf(range[0]));
-		ResourcePropertyBond max = BondFactory.createSSCScoreBond(BondOperator.LESS_OR_EQUAL, Integer.valueOf(range[1]));
+		ResourcePropertyBond min = BondFactory.createSSCScoreBond(BondOperator.GREATER_OR_EQUAL, Integer.parseInt(range[0]));
+		ResourcePropertyBond max = BondFactory.createSSCScoreBond(BondOperator.LESS_OR_EQUAL, Integer.parseInt(range[1]));
 		andBond.getOperands().add(min);
 		andBond.getOperands().add(max);
 		return Optional.of(andBond);
@@ -892,12 +887,12 @@ public abstract class OSParameters {
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
 	    // e.g: [0,20]
-	    if (!value.equals("")) {
+	    if (!value.isEmpty()) {
 
 		String[] range = value.replace("[", "").replace("]", "").split(",");
 
 		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CLOUD_COVER_PERC,
-			Double.valueOf(range[0]));
+			Double.parseDouble(range[0]));
 
 		if (range.length == 1) {
 
@@ -907,7 +902,7 @@ public abstract class OSParameters {
 		LogicalBond andBond = BondFactory.createAndBond();
 
 		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CLOUD_COVER_PERC,
-			Double.valueOf(range[1]));
+			Double.parseDouble(range[1]));
 
 		andBond.getOperands().add(min);
 		andBond.getOperands().add(max);
@@ -926,7 +921,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -941,7 +936,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -956,7 +951,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -971,7 +966,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -986,7 +981,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1001,7 +996,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1016,7 +1011,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1031,7 +1026,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1046,7 +1041,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1061,7 +1056,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1076,11 +1071,11 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(BondFactory.createIsValidatedBond(Boolean.valueOf(value)));
+	    return Optional.of(BondFactory.createIsValidatedBond(Boolean.parseBoolean(value)));
 	}
     };
 
@@ -1091,13 +1086,13 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
 	    String[] split = value.split("_");
 
-	    ArrayList<Bond> bondList = new ArrayList<Bond>();
+	    ArrayList<Bond> bondList = new ArrayList<>();
 
 	    for (String bbox : split) {
 
@@ -1116,7 +1111,7 @@ public abstract class OSParameters {
 	    if (bondList.size() > 1) {
 		bond = BondFactory.createAndBond(bondList.toArray(new Bond[] {}));
 	    } else if (bondList.size() == 1) {
-		bond = bondList.get(0);
+		bond = bondList.getFirst();
 	    }
 
 	    return Optional.of(bond);
@@ -1131,7 +1126,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 
 		return Optional.empty();
 	    }
@@ -1149,7 +1144,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) throws Exception {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1170,7 +1165,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1191,7 +1186,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1212,7 +1207,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1234,7 +1229,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.equals("")) {
+	    if (value == null || value.isEmpty()) {
 		return Optional.empty();
 	    }
 
@@ -1261,14 +1256,14 @@ public abstract class OSParameters {
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
 	    // e.g: [0,20]
-	    if (!value.equals("")) {
+	    if (!value.isEmpty()) {
 
 		String[] range = value.replace("[", "").replace("]", "").split(",");
 		LogicalBond andBond = BondFactory.createAndBond();
 		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CONFIDENCE_CROP_TYPE,
-			Double.valueOf(range[0]));
+			Double.parseDouble(range[0]));
 		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CONFIDENCE_CROP_TYPE,
-			Double.valueOf(range[1]));
+			Double.parseDouble(range[1]));
 		andBond.getOperands().add(min);
 		andBond.getOperands().add(max);
 		return Optional.of(andBond);
@@ -1288,14 +1283,14 @@ public abstract class OSParameters {
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
 	    // e.g: [0,20]
-	    if (!value.equals("")) {
+	    if (!value.isEmpty()) {
 
 		String[] range = value.replace("[", "").replace("]", "").split(",");
 		LogicalBond andBond = BondFactory.createAndBond();
 		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CONFIDENCE_LC_TYPE,
-			Double.valueOf(range[0]));
+			Double.parseDouble(range[0]));
 		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CONFIDENCE_LC_TYPE,
-			Double.valueOf(range[1]));
+			Double.parseDouble(range[1]));
 		andBond.getOperands().add(min);
 		andBond.getOperands().add(max);
 		return Optional.of(andBond);
@@ -1315,14 +1310,14 @@ public abstract class OSParameters {
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
 	    // e.g: [0,20]
-	    if (!value.equals("")) {
+	    if (!value.isEmpty()) {
 
 		String[] range = value.replace("[", "").replace("]", "").split(",");
 		LogicalBond andBond = BondFactory.createAndBond();
 		SimpleValueBond min = BondFactory.createSimpleValueBond(BondOperator.GREATER_OR_EQUAL, MetadataElement.CONFIDENCE_IRR_TYPE,
-			Double.valueOf(range[0]));
+			Double.parseDouble(range[0]));
 		SimpleValueBond max = BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.CONFIDENCE_IRR_TYPE,
-			Double.valueOf(range[1]));
+			Double.parseDouble(range[1]));
 		andBond.getOperands().add(min);
 		andBond.getOperands().add(max);
 		return Optional.of(andBond);
@@ -1463,10 +1458,10 @@ public abstract class OSParameters {
 	String longitude = what3Words.getLongitude();
 
 	return create( //
-		Double.valueOf(latitude) - additionalDegrees, // south
-		Double.valueOf(longitude) + additionalDegrees, // west
-		Double.valueOf(latitude) - additionalDegrees, // north
-		Double.valueOf(longitude) + additionalDegrees, relatedValues); // east
+		Double.parseDouble(latitude) - additionalDegrees, // south
+		Double.parseDouble(longitude) + additionalDegrees, // west
+		Double.parseDouble(latitude) - additionalDegrees, // north
+		Double.parseDouble(longitude) + additionalDegrees, relatedValues); // east
     }
 
     /**
@@ -1484,17 +1479,17 @@ public abstract class OSParameters {
 	What3Words what3Words1 = new What3Words(split1[0], split1[1], split1[2]);
 	What3Words what3Words2 = new What3Words(split2[0], split2[1], split2[2]);
 
-	double lat1 = Double.valueOf(what3Words1.getLatitude());
-	double lon1 = Double.valueOf(what3Words1.getLongitude());
+	double lat1 = Double.parseDouble(what3Words1.getLatitude());
+	double lon1 = Double.parseDouble(what3Words1.getLongitude());
 
-	double lat2 = Double.valueOf(what3Words2.getLatitude());
-	double lon2 = Double.valueOf(what3Words2.getLongitude());
+	double lat2 = Double.parseDouble(what3Words2.getLatitude());
+	double lon2 = Double.parseDouble(what3Words2.getLongitude());
 
 	return create( //
-		lat1 <= lat2 ? lat1 : lat2, // south
-		lon1 <= lon2 ? lon1 : lon2, // west
-		lat1 >= lat2 ? lat1 : lat2, // north
-		lon1 >= lon2 ? lon1 : lon2, relatedValues); // east
+		Math.min(lat1, lat2), // south
+		Math.min(lon1, lon2), // west
+		Math.max(lat1, lat2), // north
+		Math.max(lon1, lon2), relatedValues); // east
     }
 
     /**
