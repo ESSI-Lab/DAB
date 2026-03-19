@@ -211,7 +211,7 @@ public class LocationsHandler extends StreamingRequestHandler {
 	String nextLink = null;
 	int pageSize = staRequest.getTop() != null ? staRequest.getTop() : 100;
 	boolean hasFullPage = locations.size() >= pageSize;
-	if (hasFullPage && resultSet != null && resultSet.getSearchAfter().isPresent()) {
+	if (resultSet != null && resultSet.getSearchAfter().isPresent()) {
 	    String token = resultSet.getSearchAfter().get().getValues()
 		    .map(v -> v.isEmpty() ? null : v.get(0).toString())
 		    .orElse(null);
