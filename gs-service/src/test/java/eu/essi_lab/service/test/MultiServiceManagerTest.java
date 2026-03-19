@@ -2,7 +2,6 @@ package eu.essi_lab.service.test;
 
 import eu.essi_lab.gssrv.services.*;
 import eu.essi_lab.lib.net.services.*;
-import eu.essi_lab.lib.utils.*;
 import redis.clients.jedis.*;
 
 import java.util.*;
@@ -21,7 +20,6 @@ public class MultiServiceManagerTest {
 	Jedis resource = pool.getResource();
 
 	String ping = resource.ping();
-
 
 	String nodeId = java.net.InetAddress.getLocalHost().getHostName();
 
@@ -56,7 +54,14 @@ public class MultiServiceManagerTest {
 	    @Override
 	    public void run() {
 
-		manager.getActiveServices().forEach(service -> GSLoggerFactory.getLogger(getClass()).info("Active: " + service.getId()));
+		List<Map.Entry<String, String>> activeServices = manager.getActiveServices();
+
+		activeServices.forEach(entry -> {
+
+		    System.out.println("Host: " + entry.getKey() + "\nService: " + entry.getValue());
+		});
+
+		//		manager.getActiveServices().forEach(service -> GSLoggerFactory.getLogger(getClass()).info("Active: " + service.getId()));
 	    }
 	};
 
@@ -80,21 +85,21 @@ public class MultiServiceManagerTest {
 	timer1.schedule(defTask, TimeUnit.SECONDS.toMillis(5));
 
 	//
- 	//
- 	//
+	//
+	//
 
-//	Timer timer2 = new Timer();
-//
-//	TimerTask defTask2 = new TimerTask() {
-//
-//	    @Override
-//	    public void run() {
-//
-//		manager.setDefinitions(List.of(def0));
-//	    }
-//	};
-//
-//	timer2.schedule(defTask2, TimeUnit.SECONDS.toMillis(45));
+	//	Timer timer2 = new Timer();
+	//
+	//	TimerTask defTask2 = new TimerTask() {
+	//
+	//	    @Override
+	//	    public void run() {
+	//
+	//		manager.setDefinitions(List.of(def0));
+	//	    }
+	//	};
+	//
+	//	timer2.schedule(defTask2, TimeUnit.SECONDS.toMillis(45));
 
 	//	Timer timer3 = new Timer();
 	//

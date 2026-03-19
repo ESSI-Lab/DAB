@@ -60,8 +60,6 @@ public class MultiServiceManager {
 	this.scheduler = Executors.newScheduledThreadPool(SCHEDULER_THREAD_POOL_SIZE);
     }
 
-
-
     /**
      * @param definitions
      */
@@ -87,7 +85,6 @@ public class MultiServiceManager {
     }
 
     /**
-     *
      * @return
      */
     public List<ServiceDefinition> getDefinitions() {
@@ -121,7 +118,7 @@ public class MultiServiceManager {
 
 	    if (active.containsKey(def.getId())) {
 
-		GSLoggerFactory.getLogger(getClass()).info("Service {} is already running", def.id);
+		GSLoggerFactory.getLogger(getClass()).info("Service {} is already active", def.id);
 
 		continue;
 	    }
@@ -176,16 +173,33 @@ public class MultiServiceManager {
     /**
      * @return
      */
-    public List<ManagedService> getActiveServices() {
+    public  List<Map.Entry<String, String>> getActiveServices() {
 
-	return active.values().stream().map(DistributedServiceRunner::getService).toList();
+	return getActiveServices(definitions, jedisPool);
     }
 
     /**
      * @return
      */
-    public List<DistributedServiceRunner> getActiveRunners() {
+    public static List<Map.Entry<String, String>> getActiveServices(List<ServiceDefinition> defs, JedisPool jedisPool) {
 
-	return active.values().stream().toList();
+	return defs.stream().map(def -> {
+
+	    try (Jedis jedis = jedisPool.getResource()) {
+
+		String value = jedis.get(RedisDistributedLock.getKey(def.getId()));
+
+		if (value != null && !value.equals("nil")) {
+
+		    String host = value.split(":")[0];
+		    String id = value.split(":")[1];
+
+		    return Map.entry(host, id);
+		}
+
+		return null;
+	    }
+
+	}).filter(Objects::nonNull).toList();//
     }
 }

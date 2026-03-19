@@ -6,9 +6,7 @@ import redis.clients.jedis.params.*;
 import java.util.*;
 
 /**
- *
  * @author Fabrizio
- *
  */
 public class RedisDistributedLock {
 
@@ -18,17 +16,12 @@ public class RedisDistributedLock {
     private final int ttlSeconds;
 
     private static final String RENEW_SCRIPT =
-	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " +
-		    "  return redis.call('EXPIRE', KEYS[1], ARGV[2]) " +
-		    "else return 0 end";
+	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " + "  return redis.call('EXPIRE', KEYS[1], ARGV[2]) " + "else return 0 end";
 
     private static final String RELEASE_SCRIPT =
-	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " +
-		    "  return redis.call('DEL', KEYS[1]) " +
-		    "else return 0 end";
+	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " + "  return redis.call('DEL', KEYS[1]) " + "else return 0 end";
 
     /**
-     *
      * @param jedisPool
      * @param serviceId
      * @param ttlSeconds
@@ -36,13 +29,30 @@ public class RedisDistributedLock {
      */
     public RedisDistributedLock(JedisPool jedisPool, String serviceId, int ttlSeconds, String nodeId) {
 	this.jedisPool = jedisPool;
-	this.key = "service:" + serviceId + ":lock";
-	this.value = nodeId + ":" + UUID.randomUUID();
+	this.key = getKey(serviceId);
+	this.value = nodeId + ":" + serviceId;
 	this.ttlSeconds = ttlSeconds;
     }
 
     /**
-     *
+     * @param serviceId
+     * @return
+     */
+    static String getKey(String serviceId) {
+
+	return "service:" + serviceId + ":lock";
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    static String getServiceId(String key) {
+
+	return key.replace("service:", "").replace(":lock", "");
+    }
+
+    /**
      * @return
      */
     public boolean tryAcquire() {
@@ -55,7 +65,6 @@ public class RedisDistributedLock {
     }
 
     /**
-     *
      * @return
      */
     public boolean renew() {
@@ -79,7 +88,6 @@ public class RedisDistributedLock {
     }
 
     /**
-     *
      * @return
      */
     public String getValue() {
