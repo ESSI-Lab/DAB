@@ -10,12 +10,12 @@ package eu.essi_lab.messages.web;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -33,15 +33,15 @@ import java.util.Set;
 import eu.essi_lab.lib.utils.StringUtils;
 
 /**
- * A parser which creates a key/value map from a query string or from an {@link InputStream}. In the latter case, the
- * stream content should be parsable to a key/value map
- * 
+ * A parser which creates a key/value map from a query string or from an {@link InputStream}. In the latter case, the stream content should
+ * be parsable to a key/value map
+ *
  * @author Fabrizio
  */
 public class KeyValueParser {
 
     /**
-     * 
+     *
      */
     public static final String UNDEFINED = "___undefined___";
     private Map<String, String> map;
@@ -64,7 +64,7 @@ public class KeyValueParser {
 
     /**
      * Creates a new parser from the given stream parser <code>streamParser</code> and <code>inputStream</code>
-     * 
+     *
      * @param streamParser
      * @param inputStream
      */
@@ -75,7 +75,7 @@ public class KeyValueParser {
 
     /**
      * Creates a new parser from the given stream parser <code>streamParser</code> and <code>inputStream</code>
-     * 
+     *
      * @param streamParser
      * @param inputStream
      */
@@ -87,7 +87,7 @@ public class KeyValueParser {
 
     /**
      * Creates a parser from the given <code>queryString</code>
-     * 
+     *
      * @param queryString
      */
     public KeyValueParser(String queryString) {
@@ -97,7 +97,7 @@ public class KeyValueParser {
 
     /**
      * Creates a parser from the given <code>queryString</code>
-     * 
+     *
      * @param queryString
      */
     public KeyValueParser(String queryString, boolean decodeValues) {
@@ -107,9 +107,9 @@ public class KeyValueParser {
     }
 
     /**
-     * Return the value of the given <code>key</code>, <code>null</code> if <code>key</code> does not exist,
-     * {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
-     * 
+     * Return the value of the given <code>key</code>, <code>null</code> if <code>key</code> does not exist, {@link #UNDEFINED} if the key
+     * exists but its value is the empty string (e.g.: 'key=')
+     *
      * @param key
      * @param ignoreCase
      * @param defaultValue
@@ -137,9 +137,9 @@ public class KeyValueParser {
     }
 
     /**
-     * Return the value of the given <code>key</code>, <code>null</code> if <code>key</code> does not exist,
-     * {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
-     * 
+     * Return the value of the given <code>key</code>, <code>null</code> if <code>key</code> does not exist, {@link #UNDEFINED} if the key
+     * exists but its value is the empty string (e.g.: 'key=')
+     *
      * @param key
      * @param ignoreCase
      * @return
@@ -170,9 +170,9 @@ public class KeyValueParser {
     }
 
     /**
-     * Return the value of the given <code>key</code> (case sensitive), <code>null</code> if <code>key</code> does not
-     * exist, {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
-     * 
+     * Return the value of the given <code>key</code> (case sensitive), <code>null</code> if <code>key</code> does not exist,
+     * {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
+     *
      * @param key
      * @return
      */
@@ -191,9 +191,9 @@ public class KeyValueParser {
     }
 
     /**
-     * Return the value of the given <code>key</code> (case sensitive), <code>null</code> if <code>key</code> does not
-     * exist, {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
-     * 
+     * Return the value of the given <code>key</code> (case sensitive), <code>null</code> if <code>key</code> does not exist,
+     * {@link #UNDEFINED} if the key exists but its value is the empty string (e.g.: 'key=')
+     *
      * @param key
      * @param defaultValue
      * @return
@@ -220,7 +220,7 @@ public class KeyValueParser {
 
     /**
      * Like {@link #getValue(String)} but UTF-8 decoded and with exact case match
-     * 
+     *
      * @param key
      * @return
      */
@@ -228,10 +228,10 @@ public class KeyValueParser {
 
 	return getDecodedValue(key, false);
     }
-    
+
     /**
      * Like {@link #getValue(String)} but UTF-8 decoded
-     * 
+     *
      * @param key
      * @param ignoreCase
      * @return
@@ -248,7 +248,7 @@ public class KeyValueParser {
 
     /**
      * Checks whether the value of the supplied <code>key</code> is non <code>null</code> and non {@link #UNDEFINED}
-     * 
+     *
      * @param key
      * @return
      */
@@ -259,7 +259,7 @@ public class KeyValueParser {
 
     /**
      * Checks whether the value of the supplied <code>key</code> is non <code>null</code> and non {@link #UNDEFINED}
-     * 
+     *
      * @param key
      * @param ignoreCase
      * @return
@@ -333,7 +333,13 @@ public class KeyValueParser {
 		    String value = keyValue[1];
 
 		    if (decodeValues) {
+
 			value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+		    }
+
+		    if (hashMap.containsKey(key)) {
+
+			value = hashMap.get(key) + "," + value;
 		    }
 
 		    hashMap.put(key, value);
@@ -353,7 +359,13 @@ public class KeyValueParser {
 		    }
 
 		    if (decodeValues) {
+
 			value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+		    }
+
+		    if (hashMap.containsKey(key)) {
+
+			value = hashMap.get(key) + "," + value;
 		    }
 
 		    hashMap.put(key, value);
