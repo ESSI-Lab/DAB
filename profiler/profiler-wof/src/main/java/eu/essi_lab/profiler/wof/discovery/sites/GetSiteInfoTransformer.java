@@ -152,7 +152,7 @@ public class GetSiteInfoTransformer extends DiscoveryRequestTransformer {
     @Override
     protected Page getPage(WebRequest webRequest) throws GSException {
 
-	return new Page(1, 1000000000);
+	return new Page(1, 1000);
     }
 
     @Override
