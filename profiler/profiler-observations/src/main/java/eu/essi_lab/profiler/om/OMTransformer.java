@@ -99,16 +99,6 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 	ResourceSelector selector = new ResourceSelector();
 	selector.setSubset(ResourceSubset.CORE_EXTENDED);
 	selector.setIndexesPolicy(IndexesPolicy.ALL);
-	// selector.addIndex(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER);
-	// selector.addIndex(MetadataElement.PLATFORM_TITLE);
-	// selector.addIndex(ResourceProperty.SOURCE_ID);
-	// selector.addIndex(MetadataElement.BOUNDING_BOX);
-	// selector.addIndex(MetadataElement.COUNTRY);
-	//
-	// selector.addIndex(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
-	// selector.addIndex(MetadataElement.ATTRIBUTE_TITLE);
-	//
-	// selector.addIndex(MetadataElement.in);
 
 	selector.setIncludeOriginal(false);
 	return selector;

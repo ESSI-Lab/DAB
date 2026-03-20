@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.eurobis.ld;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -42,7 +42,7 @@ public enum RDFElement {
     BBOX(false, false, getSpatialQueryTemplate("dcat:bbox")), //
     THEMES(true, false, getMultipleQueryTemplate("dcat:theme")), //
     KEYWORDS(true, false, getMultipleLiteralQueryTemplate("schema:keywords")), //
-    KEYWORDLABELSANDURISANDTYPES(true, true, getKeywordsLabelURITypeQuery()), //
+    KEYWORDLABELSANDURISANDTYPES(true, true, getKeywordsLabelURIThesaurusTypeQuery()), //
     PARAMETERS(true, false, getParametersQuery()), //
     PARAMETERLABELSANDURIS(true, true, getParametersURIQuery()), //
     INSTRUMENTS(true, false, getInstrumentsQuery()), //
@@ -98,8 +98,7 @@ public enum RDFElement {
     }
 
     private static String getMultipleQueryHeader() {
-	return PREFIXES + "SELECT (GROUP_CONCAT(DISTINCT ?" + VAR_PLACEHOLDER + "1; SEPARATOR='" + RDFResource.SEPARATOR1 + "') AS ?"
-		+ VAR_PLACEHOLDER + ")";
+	return PREFIXES + "SELECT (GROUP_CONCAT(DISTINCT ?" + VAR_PLACEHOLDER + "1; SEPARATOR='" + RDFResource.SEPARATOR1 + "') AS ?" + VAR_PLACEHOLDER + ")";
     }
 
     private static String getTelephoneTemplate(String elementName) {
@@ -171,7 +170,7 @@ public enum RDFElement {
 		"  }"; //
     }
 
-    private static String getKeywordsLabelURITypeQuery() {
+    private static String getKeywordsLabelURIThesaurusTypeQuery() {
 	return getMultipleQueryHeader() + //
 
 		" WHERE { ?dataset a dcat:Dataset; \n" + //
@@ -182,11 +181,18 @@ public enum RDFElement {
 		"                OPTIONAL{ ?definedTerm schema:name ?keywordlabel . " + //
 		" ?definedTerm schema:identifier ?keyworduri . " + //
 		"}\n" + //
+		"                OPTIONAL{ ?definedTerm schema:name ?keywordlabel . " + //
+		" ?definedTerm schema:identifier ?keyworduri . " + //
+		" ?definedTerm schema:additionalType ?keywordtype . " + //
+		"}\n" + //
 		"                OPTIONAL{ ?definedTerm schema:inDefinedTermSet ?schemak. " + //
-		" 					?schemak schema:name ?keywordtype" + //
+		" 					?schemak schema:name ?keywordthesaurus" + //
 		"		}\n" + //
-		"    BIND(CONCAT(COALESCE(str(?keywordlabel),''), '" + RDFResource.SEPARATOR2 + "', COALESCE(str(?keyworduri),''), '"
-		+ RDFResource.SEPARATOR2 + "', COALESCE(str(?keywordtype),'')) AS ?" + VAR_PLACEHOLDER + "1)" + //
+		"    BIND(CONCAT(" +//
+		"COALESCE(str(?keywordlabel),''), '" + RDFResource.SEPARATOR2 + "', " +//
+		"COALESCE(str(?keyworduri),''), '" + RDFResource.SEPARATOR2 + "', " +//
+		"COALESCE(str(?keywordthesaurus),''), '" + RDFResource.SEPARATOR2 + "', " +//
+		"COALESCE(str(?keywordtype),'')) AS ?" + VAR_PLACEHOLDER + "1)" + //
 		"  }}"; //
     }
 
@@ -199,21 +205,20 @@ public enum RDFElement {
 		"    ?definedVariable a schema:PropertyValue .\n" + //
 		"               ?definedVariable schema:name       ?parameterlabel .  \n" + //
 		"               ?definedVariable schema:identifier ?parameteruri . \n" + //
-		"    BIND(CONCAT(str(?parameterlabel), '" + RDFResource.SEPARATOR2 + "', str(?parameteruri)) AS ?" + VAR_PLACEHOLDER + "1)"
-		+ //
+		"    BIND(CONCAT(str(?parameterlabel), '" + RDFResource.SEPARATOR2 + "', str(?parameteruri)) AS ?" + VAR_PLACEHOLDER + "1)" + //
 		"  }}";
     }
-    
-    private static String getCreatorURIQuery() {
- 	return getMultipleQueryHeader() + //
 
- 		" WHERE { ?dataset a dcat:Dataset; \n" + //
- 		"  OPTIONAL {\n" + //
- 		"    ?dataset dct:creator ?creator.\n" + //
- 		"    ?creator a schema:Organization .\n" + //
+    private static String getCreatorURIQuery() {
+	return getMultipleQueryHeader() + //
+
+		" WHERE { ?dataset a dcat:Dataset; \n" + //
+		"  OPTIONAL {\n" + //
+		"    ?dataset dct:creator ?creator.\n" + //
+		"    ?creator a schema:Organization .\n" + //
 		"                OPTIONAL{?creator schema:identifier ?" + VAR_PLACEHOLDER + "1 }\n" + // 		
- 		"  }}";
-     }
+		"  }}";
+    }
 
     private static String getInstrumentsQuery() {
 	return getMultipleQueryHeader() + //
@@ -235,8 +240,7 @@ public enum RDFElement {
 		"    ?definedInstrument a schema:Thing .\n" + //
 		"                OPTIONAL{?definedInstrument schema:name       ?instrumentlabel . " + //
 		"                         ?definedInstrument schema:identifier ?instrumenturi ." + //
-		"    BIND(CONCAT(str(?instrumentlabel), '" + RDFResource.SEPARATOR2 + "', str(?instrumenturi)) AS ?" + VAR_PLACEHOLDER
-		+ "1)" + //
+		"    BIND(CONCAT(str(?instrumentlabel), '" + RDFResource.SEPARATOR2 + "', str(?instrumenturi)) AS ?" + VAR_PLACEHOLDER + "1)" + //
 		"}\n" + //
 		"  }}";
     }

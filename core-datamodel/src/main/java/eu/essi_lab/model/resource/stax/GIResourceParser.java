@@ -134,6 +134,10 @@ public class GIResourceParser extends StAXDocumentParser {
 	return south;
     }
 
+    public String getHydrometricZero() {
+	return hydrometricZero;
+    }
+
     public List<String> getPlatformURIs() {
 	return platformNames;
     }
@@ -324,6 +328,7 @@ public class GIResourceParser extends StAXDocumentParser {
     private String reportOnlineId = "";
 
     public String sourceId = "";
+    public String hydrometricZero= "";
     public List<String> points = new ArrayList<>();
     public List<String> keywords = new ArrayList<>();
 
@@ -357,6 +362,7 @@ public class GIResourceParser extends StAXDocumentParser {
 	super(result);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.IDENTIFIER.getName()), v -> fileIdentifier = normalize(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, ResourceProperty.SOURCE_ID_NAME), v -> sourceId = normalize(v));
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.HYDROMETRIC_ZERO.getName()), v -> hydrometricZero = normalize(v));
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Altitude"), v -> altitude = normalize(v));
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "west"), v -> west = normalize(v));

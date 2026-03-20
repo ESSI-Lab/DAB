@@ -68,6 +68,7 @@ public class JSONFeature {
 
     }
 
+
     public String getSampledFeatureTitle() {
 	if (platform.has("name")) {
 	    return platform.getString("name");
@@ -219,5 +220,6 @@ public class JSONFeature {
 	}
 	return ret;
     }
+
 
 }

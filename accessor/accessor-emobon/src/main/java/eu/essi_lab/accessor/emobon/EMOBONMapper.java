@@ -335,14 +335,15 @@ public class EMOBONMapper extends FileIdentifierMapper {
 
 	    // Add keywords from TTL if available
 	    if (turtle != null) {
-		List<List<String>> keywordsLabelsAndURIsAndTypes = turtle.getElementsList(RDFElement.KEYWORDLABELSANDURISANDTYPES);
-		for (List<String> k : keywordsLabelsAndURIsAndTypes) {
-		    if (k.size() < 3) {
+		List<List<String>> keywordsLabelsAndURIsAndThesarurusAndTypes = turtle.getElementsList(RDFElement.KEYWORDLABELSANDURISANDTYPES);
+		for (List<String> k : keywordsLabelsAndURIsAndThesarurusAndTypes) {
+		    if (k.size() < 4) {
 			continue;
 		    }
 		    String label = k.get(0);
 		    String uri = k.get(1);
-		    String type = k.get(2);
+		    String thesaurus = k.get(2);
+		    String type = k.get(3);
 		    if (type == null) {
 			type = "";
 		    }
@@ -350,6 +351,7 @@ public class EMOBONMapper extends FileIdentifierMapper {
 		    if (keywordsObj == null) {
 			keywordsObj = new Keywords();
 			keywordsObj.setTypeCode(type);
+			keywordsObj.setThesaurusNameCitationTitle(thesaurus);
 			keywordMap.put(type, keywordsObj);
 		    }
 		    if (uri != null && !uri.isEmpty()) {

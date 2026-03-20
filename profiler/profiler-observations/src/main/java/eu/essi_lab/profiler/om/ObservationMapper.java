@@ -226,6 +226,10 @@ public class ObservationMapper {
 	    observation = createObservation(view.get().getId(), ObservationType.TimeSeriesObservation);
 	}
 
+	if (parser.getHydrometricZero()!=null){
+	    platform.addParameter("hydrometricZero",parser.getHydrometricZero());
+	}
+
 	if (parser.getInstrumentNames() != null) {
 	    for (String instrument : parser.getInstrumentNames()) {
 		observation.addInstrument(instrument);
