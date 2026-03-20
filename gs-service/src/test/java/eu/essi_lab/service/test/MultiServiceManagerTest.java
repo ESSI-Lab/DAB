@@ -15,7 +15,7 @@ public class MultiServiceManagerTest {
      */
     public static void main(String[] args) throws Exception {
 
-	JedisPool pool = new JedisPool("dab.v4tdiw.clustercfg.use1.cache.amazonaws.com", 6379);
+	JedisPool pool = new JedisPool("localhost", 6379);
 
 	Jedis resource = pool.getResource();
 
