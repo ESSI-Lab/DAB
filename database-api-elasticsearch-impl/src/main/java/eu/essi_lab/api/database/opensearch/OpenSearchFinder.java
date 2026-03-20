@@ -13,12 +13,12 @@ package eu.essi_lab.api.database.opensearch;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -40,6 +40,7 @@ import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.request.executor.query.IQueryExecutor.*;
+import jakarta.xml.bind.*;
 import org.json.*;
 import org.opensearch.client.opensearch._types.*;
 import org.opensearch.client.opensearch._types.aggregations.*;
@@ -49,7 +50,6 @@ import org.opensearch.client.opensearch.core.search.*;
 import org.w3c.dom.Node;
 import org.xml.sax.*;
 
-import jakarta.xml.bind.*;
 import javax.xml.parsers.*;
 import java.io.*;
 import java.math.*;
@@ -214,8 +214,8 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	try {
 
-	    boolean useDistinctWithComposite = message.getDistinctValuesElement().isPresent()
-		    && message.getPage() != null && message.getPage().getSize() > 0;
+	    boolean useDistinctWithComposite =
+		    message.getDistinctValuesElement().isPresent() && message.getPage() != null && message.getPage().getSize() > 0;
 
 	    if (message.getDistinctValuesElement().isPresent() && !useDistinctWithComposite) {
 
@@ -559,12 +559,30 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    if (parser.isCanonicalQueryByIdentifiers()) {
 
+		OpenSearchQueryBuilder builder = new OpenSearchQueryBuilder(//
+			wrapper, //
+			message.getRankingStrategy(), //
+			Map.of(), //
+			false, //
+			false);
+
 		List<String> identifiers = parser.getIdentifiers();
 
-		return OpenSearchQueryBuilder.buildSearchQuery(//
-			database.getIdentifier(), //
-			MetadataElement.IDENTIFIER.getName(), //
-			identifiers.getFirst());//
+		List<Query> list = identifiers.stream().map(id ->
+
+			builder.buildMetadataElementQuery(//
+				MetadataElement.IDENTIFIER, //
+				BondOperator.EQUAL, //
+				id)
+
+		).toList();
+
+		if (list.size() == 1) {
+
+		    return list.getFirst();
+		}
+
+		return OpenSearchQueryBuilder.buildShouldQuery(list);
 	    }
 	}
 
