@@ -1,66 +1,22 @@
 package eu.essi_lab.profiler.csw.handler.discover;
 
-import java.util.AbstractMap.SimpleEntry;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.jaxb.csw._2_0_2.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.RequestMessage.*;
+import eu.essi_lab.messages.ResourceSelector.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.pdk.wrt.*;
+import eu.essi_lab.profiler.csw.*;
 
-/*-
- * #%L
- * Discovery and Access Broker (DAB)
- * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
- * %%
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- * #L%
- */
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import eu.essi_lab.jaxb.common.CommonContext;
-import eu.essi_lab.jaxb.csw._2_0_2.GetRecordById;
-import eu.essi_lab.jaxb.csw._2_0_2.GetRecords;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.RequestMessage.IterationMode;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
-import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
-import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.SortedFields;
-import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.web.KeyValueParser;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.SortOrder;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.ESSILabProvider;
-import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.profiler.csw.CSWGetRecordsParser;
-import eu.essi_lab.profiler.csw.CSWProfilerSetting;
-import eu.essi_lab.profiler.csw.CSWRequestConverter;
-import eu.essi_lab.profiler.csw.CSWRequestUtils;
-import eu.essi_lab.profiler.csw.CSWSearchAfterManager;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -167,7 +123,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 	    LogicalBond orBond = BondFactory.createOrBond();
 
 	    if (identifiers.size() == 1) {
-		return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, identifiers.get(0));
+		return BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, identifiers.getFirst());
 	    }
 
 	    for (String id : identifiers) {
@@ -245,7 +201,7 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	    List<String> identifiers = getIdentifiersFromGetRecordById(webRequest);
 
-	    return new Page(1, identifiers.size());
+	    return new Page(1, identifiers.size() + 1);
 
 	} catch (Exception e) {
 
@@ -280,9 +236,10 @@ public class CSWRequestTransformer extends DiscoveryRequestTransformer {
 
 	if (webRequest.isGetRequest()) {
 
-	    KeyValueParser parser = new KeyValueParser(webRequest.getURLDecodedQueryString().get());
+	    KeyValueParser parser = new KeyValueParser(webRequest.getOptionalQueryString().get());
 	    String ids = parser.getValue("id", true);
-	    return Arrays.asList(ids.split(","));
+
+	    return Stream.of(ids.split(",")).map(StringUtils::URLDecodeUTF8).toList();
 	}
 
 	GetRecordById getRecords = CommonContext.unmarshal(//
