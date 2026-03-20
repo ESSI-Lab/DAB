@@ -44,6 +44,12 @@ public class KeyValueParser {
      *
      */
     public static final String UNDEFINED = "___undefined___";
+
+    /**
+     *
+     */
+    public static final String MULTI_KEY_SEPARATOR = "_MKSEP_";
+
     private Map<String, String> map;
     private boolean decodeValues;
 
@@ -339,7 +345,7 @@ public class KeyValueParser {
 
 		    if (hashMap.containsKey(key)) {
 
-			value = hashMap.get(key) + "," + value;
+			value = hashMap.get(key) + MULTI_KEY_SEPARATOR + value;
 		    }
 
 		    hashMap.put(key, value);
@@ -365,7 +371,7 @@ public class KeyValueParser {
 
 		    if (hashMap.containsKey(key)) {
 
-			value = hashMap.get(key) + "," + value;
+			value = hashMap.get(key) + MULTI_KEY_SEPARATOR + value;
 		    }
 
 		    hashMap.put(key, value);
