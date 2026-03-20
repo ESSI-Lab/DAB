@@ -823,7 +823,7 @@ public class SettingComponent extends Div {
 
 		switch_.getStyle().set("margin-left", "5px");
 
-		if (forceHideHeader) {
+		if (forceHideHeader && parent == null) {
 
 		    headerLayout.removeAll();
 
