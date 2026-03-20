@@ -10,27 +10,29 @@ package eu.essi_lab.profiler.os;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.what3words.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.LogicalBond.*;
 import eu.essi_lab.messages.bond.spatial.*;
+import eu.essi_lab.messages.web.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.pdk.*;
 import eu.essi_lab.profiler.os.OSBox.*;
-import org.h2.util.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public abstract class OSParameters {
 
@@ -71,23 +73,23 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter HIERARCHY_LEVEL = new OSParameter("hLevel", "string", null, "{gs:hLevel}") {
+    public static final OSParameter HIERARCHY_LEVEL = new OSParameter("hLevel", "string", null, "{gs:hLevel}", false) {
 
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.HIERARCHY_LEVEL_CODE_LIST_VALUE);
+	    return readMultiValues(value, MetadataElement.HIERARCHY_LEVEL_CODE_LIST_VALUE, BondOperator.TEXT_SEARCH);
 	}
     };
 
     /**
      *
      */
-    public static final OSParameter SPATIAL_REPRESENTATION_TYPE = new OSParameter("spatialRepType", "string", null, "{gs:spatialRepType}") {
+    public static final OSParameter SPATIAL_REPRESENTATION_TYPE = new OSParameter("spatialRepType", "string", null, "{gs:spatialRepType}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.SPATIAL_REPRESENTATION_TYPE);
+	    return readMultiValues(value, MetadataElement.SPATIAL_REPRESENTATION_TYPE, BondOperator.TEXT_SEARCH);
 	}
     };
 
@@ -98,7 +100,7 @@ public abstract class OSParameters {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if(value == null || value.isEmpty()){
+	    if (value == null || value.isEmpty()) {
 
 		return Optional.empty();
 	    }
@@ -121,26 +123,23 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}") {
+    public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.PARENT_IDENTIFIER);
+	    return readMultiValues(value, MetadataElement.PARENT_IDENTIFIER, BondOperator.EQUAL);
 	}
     };
 
     /**
      *
      */
-    public static final OSParameter IDENTIFIER = new OSParameter("identifier", "string", null, "{gs:identifier}") {
+    public static final OSParameter IDENTIFIER = new OSParameter("identifier", "string", null, "{gs:identifier}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    if (value == null || value.isEmpty()) {
-		return Optional.empty();
-	    }
-
-	    return createEqualBond(value, MetadataElement.IDENTIFIER);	}
+	    return readMultiValues(value, MetadataElement.IDENTIFIER, BondOperator.EQUAL);
+	}
     };
 
     /**
@@ -475,34 +474,34 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter ORGANISATION_NAME = new OSParameter("organisationName", "string", null, "{gs:organisationName}") {
+    public static final OSParameter ORGANISATION_NAME = new OSParameter("organisationName", "string", null, "{gs:organisationName}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.ORGANISATION_NAME);
+	    return readMultiValues(value, MetadataElement.ORGANISATION_NAME, BondOperator.TEXT_SEARCH);
 	}
     };
 
     /**
      *
      */
-    public static final OSParameter OWNER_ORGANISATION_NAME = new OSParameter("ownerOrgName", "string", null, "{gs:ownerOrgName}") {
+    public static final OSParameter OWNER_ORGANISATION_NAME = new OSParameter("ownerOrgName", "string", null, "{gs:ownerOrgName}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.OWNER_ORGANISATION_NAME);
+	    return readMultiValues(value, MetadataElement.OWNER_ORGANISATION_NAME, BondOperator.TEXT_SEARCH);
 	}
     };
 
     /**
      *
      */
-    public static final OSParameter DIST_ORGANISATION_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}") {
+    public static final OSParameter DIST_ORGANISATION_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}", false) {
 
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiValues(value, MetadataElement.DISTRIBUTOR_ORGANISATION_NAME);
+	    return readMultiValues(value, MetadataElement.DISTRIBUTOR_ORGANISATION_NAME, BondOperator.TEXT_SEARCH);
 	}
     };
 
@@ -764,8 +763,8 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(
-		    BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE, Double.parseDouble(value)));
+	    return Optional.of(BondFactory.createSimpleValueBond(BondOperator.LESS_OR_EQUAL, MetadataElement.QML_DEPTH_VALUE,
+		    Double.parseDouble(value)));
 	}
     };
 
@@ -1131,7 +1130,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    SpatialBond spatialBond = fromWKT(StringUtils.urlDecode(value), relatedValues);
+	    SpatialBond spatialBond = fromWKT(StringUtils.URLDecodeUTF8(value), relatedValues);
 
 	    return Optional.of(spatialBond);
 	}
@@ -1497,26 +1496,48 @@ public abstract class OSParameters {
      * @param el
      * @return
      */
-    private static Optional<Bond> readMultiValues(String paramValue, MetadataElement el) {
+    private static Optional<Bond> readMultiKeys(String paramValue, MetadataElement el, BondOperator operator) {
+
+	return readMulti(paramValue, el, operator, KeyValueParser.MULTI_KEY_SEPARATOR);
+    }
+
+    /**
+     * @param paramValue
+     * @param el
+     * @return
+     */
+    private static Optional<Bond> readMultiValues(String paramValue, MetadataElement el, BondOperator operator) {
+
+	return readMulti(paramValue, el, operator, ",");
+    }
+
+    /**
+     * @param paramValue
+     * @param el
+     * @return
+     */
+    private static Optional<Bond> readMulti(String paramValue, MetadataElement el, BondOperator operator, String separator) {
 
 	if (paramValue == null || paramValue.isEmpty()) {
+
 	    return Optional.empty();
 	}
 
-	String[] split = paramValue.split(",");
+	List<String> list = Stream.of(paramValue.split(",")).map(StringUtils::URLDecodeUTF8).toList();
 
-	if (split.length > 1) {
+	if (list.size() > 1) {
+
 	    LogicalBond orBond = BondFactory.createOrBond();
 
-	    for (String s : split) {
+	    for (String s : list) {
 		orBond.getOperands().add(//
-			BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, s));
+			BondFactory.createSimpleValueBond(operator, el, s));
 	    }
 
 	    return Optional.of(orBond);
 	}
 
-	return Optional.of(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, paramValue));
+	return Optional.of(BondFactory.createSimpleValueBond(operator, el, list.getFirst()));
     }
 
     /**

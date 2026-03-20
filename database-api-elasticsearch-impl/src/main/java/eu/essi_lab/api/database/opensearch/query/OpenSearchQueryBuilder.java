@@ -97,7 +97,7 @@ import eu.essi_lab.model.resource.composed.ComposedElementItem;
  */
 public class OpenSearchQueryBuilder {
 
-    private final HashMap<String, String> dfMap;
+    private final Map<String, String> dfMap;
     private final StringBuilder builder;
     private final RankingStrategy ranking;
     private final boolean deletedIncluded;
@@ -111,7 +111,7 @@ public class OpenSearchQueryBuilder {
     public OpenSearchQueryBuilder(//
 	    OpenSearchWrapper wrapper, //
 	    RankingStrategy ranking, //
-	    HashMap<String, String> dataFolderMap, //
+	    Map<String, String> dataFolderMap, //
 	    boolean deletedIncluded, //
 	    boolean weightedQueriesInclued) {
 
