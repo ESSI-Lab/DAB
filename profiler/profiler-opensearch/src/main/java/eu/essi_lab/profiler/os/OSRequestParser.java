@@ -10,30 +10,25 @@ package eu.essi_lab.profiler.os;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import eu.essi_lab.messages.web.*;
+import org.joda.time.*;
+import org.joda.time.chrono.*;
+import org.joda.time.format.*;
+
+import java.net.*;
 import java.nio.charset.*;
-import java.util.Optional;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-
-import eu.essi_lab.messages.web.KeyValueParser;
-import eu.essi_lab.messages.web.WebRequest;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -90,7 +85,11 @@ public class OSRequestParser {
 	    return null;
 	}
 
-	value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+	if (parameter.decodeValue()) {
+
+	    value = URLDecoder.decode(value, StandardCharsets.UTF_8);
+	}
+
 	value = value.contains("&") ? value.replace("&", "&amp;") : value;
 
 	switch (parameter.getValueType()) {

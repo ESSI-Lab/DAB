@@ -417,7 +417,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    return null;
 	}
 
-	KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get(), true);
+	KeyValueParser keyValueParser = new KeyValueParser(request.getFormData().get());
 	OSRequestParser parser = new OSRequestParser(keyValueParser);
 
 	// creates the bond list

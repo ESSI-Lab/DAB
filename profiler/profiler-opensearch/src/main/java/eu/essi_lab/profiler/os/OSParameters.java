@@ -21,6 +21,7 @@ package eu.essi_lab.profiler.os;
  * #L%
  */
 
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.what3words.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.LogicalBond.*;
@@ -29,9 +30,9 @@ import eu.essi_lab.messages.web.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.pdk.*;
 import eu.essi_lab.profiler.os.OSBox.*;
-import org.h2.util.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 public abstract class OSParameters {
 
@@ -72,7 +73,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter HIERARCHY_LEVEL = new OSParameter("hLevel", "string", null, "{gs:hLevel}") {
+    public static final OSParameter HIERARCHY_LEVEL = new OSParameter("hLevel", "string", null, "{gs:hLevel}", false) {
 
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -84,7 +85,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter SPATIAL_REPRESENTATION_TYPE = new OSParameter("spatialRepType", "string", null, "{gs:spatialRepType}") {
+    public static final OSParameter SPATIAL_REPRESENTATION_TYPE = new OSParameter("spatialRepType", "string", null, "{gs:spatialRepType}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -122,7 +123,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}") {
+    public static final OSParameter PARENTS = new OSParameter("parents", "string", null, "{gs:parents}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -133,11 +134,11 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter IDENTIFIER = new OSParameter("identifier", "string", null, "{gs:identifier}") {
+    public static final OSParameter IDENTIFIER = new OSParameter("identifier", "string", null, "{gs:identifier}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
-	    return readMultiKeys(value, MetadataElement.IDENTIFIER, BondOperator.EQUAL);
+	    return readMultiValues(value, MetadataElement.IDENTIFIER, BondOperator.EQUAL);
 	}
     };
 
@@ -473,7 +474,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter ORGANISATION_NAME = new OSParameter("organisationName", "string", null, "{gs:organisationName}") {
+    public static final OSParameter ORGANISATION_NAME = new OSParameter("organisationName", "string", null, "{gs:organisationName}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -484,7 +485,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter OWNER_ORGANISATION_NAME = new OSParameter("ownerOrgName", "string", null, "{gs:ownerOrgName}") {
+    public static final OSParameter OWNER_ORGANISATION_NAME = new OSParameter("ownerOrgName", "string", null, "{gs:ownerOrgName}", false) {
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
 
@@ -495,7 +496,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter DIST_ORGANISATION_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}") {
+    public static final OSParameter DIST_ORGANISATION_NAME = new OSParameter("distOrgName", "string", null, "{gs:distOrgName}", false) {
 
 	@Override
 	public Optional<Bond> asBond(String value, String... relatedValues) {
@@ -1129,7 +1130,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    SpatialBond spatialBond = fromWKT(StringUtils.urlDecode(value), relatedValues);
+	    SpatialBond spatialBond = fromWKT(StringUtils.URLDecodeUTF8(value), relatedValues);
 
 	    return Optional.of(spatialBond);
 	}
@@ -1522,13 +1523,13 @@ public abstract class OSParameters {
 	    return Optional.empty();
 	}
 
-	String[] split = paramValue.split(separator);
+	List<String> list = Stream.of(paramValue.split(",")).map(StringUtils::URLDecodeUTF8).toList();
 
-	if (split.length > 1) {
+	if (list.size() > 1) {
 
 	    LogicalBond orBond = BondFactory.createOrBond();
 
-	    for (String s : split) {
+	    for (String s : list) {
 		orBond.getOperands().add(//
 			BondFactory.createSimpleValueBond(operator, el, s));
 	    }
@@ -1536,7 +1537,7 @@ public abstract class OSParameters {
 	    return Optional.of(orBond);
 	}
 
-	return Optional.of(BondFactory.createSimpleValueBond(operator, el, paramValue));
+	return Optional.of(BondFactory.createSimpleValueBond(operator, el, list.getFirst()));
     }
 
     /**
