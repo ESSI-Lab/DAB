@@ -63,6 +63,9 @@ public abstract class RDFResource {
 		r = r.substring(0, r.length() - 3);
 	    }
 	}
+	if (r!=null){
+	    r = r.replace("\"","").replace("\\n","");
+	}
 	return r;
     }
 
