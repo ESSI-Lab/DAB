@@ -9,10 +9,6 @@ import java.util.concurrent.*;
  */
 public class DistributedServiceRunner {
 
-    /**
-     *
-     */
-    private static final long RENEW_SECONDS = 10;
 
     /**
      *
@@ -21,6 +17,7 @@ public class DistributedServiceRunner {
 
     private final ManagedService service;
     private final RedisDistributedLock lock;
+    private final int renewSeconds;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private volatile boolean running = false;
@@ -29,10 +26,11 @@ public class DistributedServiceRunner {
      * @param service
      * @param lock
      */
-    public DistributedServiceRunner(ManagedService service, RedisDistributedLock lock) {
+    public DistributedServiceRunner(ManagedService service, RedisDistributedLock lock, int renewSeconds) {
 
 	this.service = service;
 	this.lock = lock;
+	this.renewSeconds = renewSeconds;
     }
 
     /**
@@ -69,7 +67,7 @@ public class DistributedServiceRunner {
 	    service.start();
 
 	    // starts heartbeat
-	    scheduler.scheduleWithFixedDelay(this::renewLock, RENEW_SECONDS, RENEW_SECONDS, TimeUnit.SECONDS);
+	    scheduler.scheduleWithFixedDelay(this::renewLock, renewSeconds, renewSeconds, TimeUnit.SECONDS);
 	}
     }
 

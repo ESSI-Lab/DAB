@@ -3,8 +3,6 @@ package eu.essi_lab.lib.net.services;
 import redis.clients.jedis.*;
 import redis.clients.jedis.params.*;
 
-import java.util.*;
-
 /**
  * @author Fabrizio
  */
@@ -15,11 +13,15 @@ public class RedisDistributedLock {
     private final String value;
     private final int ttlSeconds;
 
-    private static final String RENEW_SCRIPT =
-	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " + "  return redis.call('EXPIRE', KEYS[1], ARGV[2]) " + "else return 0 end";
+    private static final String RENEW_SCRIPT = //
+	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " + //
+		    "  return redis.call('EXPIRE', KEYS[1], ARGV[2]) " + //
+		    "else return 0 end";
 
-    private static final String RELEASE_SCRIPT =
-	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " + "  return redis.call('DEL', KEYS[1]) " + "else return 0 end";
+    private static final String RELEASE_SCRIPT = //
+	    "if redis.call('GET', KEYS[1]) == ARGV[1] then " + //
+		    "  return redis.call('DEL', KEYS[1]) " + //
+		    "else return 0 end";
 
     /**
      * @param jedisPool

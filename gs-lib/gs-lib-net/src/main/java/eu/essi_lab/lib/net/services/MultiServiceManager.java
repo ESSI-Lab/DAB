@@ -14,7 +14,12 @@ public class MultiServiceManager {
     /**
      *
      */
-    private static final int TTL_SECONDS = 30;
+    private static final int DEFAULT_TTL_SECONDS = 30;
+
+    /**
+     *
+     */
+    private static final int DEFAULT_RENEW_SECONDS = 10;
 
     /**
      *
@@ -30,6 +35,9 @@ public class MultiServiceManager {
     private final String nodeId;
     private final int maxServices;
     private final ScheduledExecutorService scheduler;
+
+    private int ttlSeconds = DEFAULT_TTL_SECONDS;
+    private int heartbeatSeconds = DEFAULT_RENEW_SECONDS;
 
     private volatile Map<String, DistributedServiceRunner> active;
     private volatile List<ServiceDefinition> definitions;
@@ -58,6 +66,24 @@ public class MultiServiceManager {
 	this.definitions = defs;
 	this.active = new ConcurrentHashMap<>();
 	this.scheduler = Executors.newScheduledThreadPool(SCHEDULER_THREAD_POOL_SIZE);
+    }
+
+    /**
+     *
+     * @param ttlSeconds
+     */
+    public void setTTSeconds(int ttlSeconds) {
+
+	this.ttlSeconds = ttlSeconds;
+    }
+
+    /**
+     *
+     * @param renewSeconds
+     */
+    public void setHeartbeatSeconds(int renewSeconds) {
+
+	this.heartbeatSeconds = renewSeconds;
     }
 
     /**
@@ -139,7 +165,7 @@ public class MultiServiceManager {
      */
     private void tryStartService(ServiceDefinition def) {
 
-	RedisDistributedLock lock = new RedisDistributedLock(jedisPool, def.id, TTL_SECONDS, nodeId);
+	RedisDistributedLock lock = new RedisDistributedLock(jedisPool, def.id, ttlSeconds, nodeId);
 
 	GSLoggerFactory.getLogger(getClass()).info("Trying to acquire lock for service {}", def.id);
 
@@ -154,7 +180,7 @@ public class MultiServiceManager {
 
 	ManagedService service = def.create();
 
-	DistributedServiceRunner runner = new DistributedServiceRunner(service, lock);
+	DistributedServiceRunner runner = new DistributedServiceRunner(service, lock, heartbeatSeconds);
 
 	active.put(def.id, runner);
 

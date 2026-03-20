@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -38,7 +38,6 @@ import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
-import eu.essi_lab.cfga.gs.setting.service.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
@@ -1187,20 +1186,27 @@ public class DABStarter implements ConfigurationChangeListener {
 	switch (mode) {
 	case MIXED, LOCAL_PRODUCTION, SERVICE -> {
 
-	    if (ConfigurationWrapper.getSessionCoordinatorSetting().isDistributedSessionCoordinator()) {
-
-		String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint(false);
+	    if (ConfigurationWrapper.getSessionCoordinatorSetting().isServicesCoordinatorEnabled()) {
 
 		GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager STARTED");
+
+		String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint(false);
 
 		JedisPool pool = new JedisPool(redisEndpoint, 6379);
 
 		String nodeId = HostNamePropertyUtils.getHostNameProperty();
 
+		int maxServices = ConfigurationWrapper.getSessionCoordinatorSetting().getMaxServices();
+		int heartbeat = ConfigurationWrapper.getSessionCoordinatorSetting().getHeartbeat();
+		int ttl = ConfigurationWrapper.getSessionCoordinatorSetting().getTTL();
+
 		manager = new MultiServiceManager( //
 			pool, //
 			nodeId, //
-			2);
+			maxServices);
+
+		manager.setHeartbeatSeconds(heartbeat);
+		manager.setTTSeconds(ttl);
 
 		manager.start();
 
