@@ -1955,14 +1955,9 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	public void defineValues(GSResource resource) {
 
 	    ExtensionHandler handler = resource.getExtensionHandler();
-	    handler.getHydrometricZero();
-	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
-	    VerticalExtent vertical = miMetadata.getDataIdentification().getVerticalExtent();
-	    if (vertical != null) {
-		Double minimum = vertical.getMinimumValue();
-		if (minimum != null) {
-		    addValue(minimum.toString());
-		}
+	    Optional<String> value = handler.getHydrometricZero();
+	    if (value.isPresent()){
+		addValue(value.get());
 	    }
 	}
     };
