@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf.import_export;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -35,7 +35,7 @@ import java.util.*;
 /**
  * @author Fabrizio
  */
-public class ConfigImportExportDescriptor extends TabContentDescriptor {
+public class ConfigToolsDescriptor extends TabContentDescriptor {
 
     /**
      *
@@ -45,7 +45,7 @@ public class ConfigImportExportDescriptor extends TabContentDescriptor {
     /**
      *
      */
-    public ConfigImportExportDescriptor() {
+    public ConfigToolsDescriptor() {
 
 	Div mainLayout = new Div();
 	mainLayout.getStyle().set("padding", "0px");
@@ -58,6 +58,8 @@ public class ConfigImportExportDescriptor extends TabContentDescriptor {
 	tabSheet.add("Import", new ConfigImporter());
 
 	tabSheet.add("Export", new ConfigExporter());
+
+	tabSheet.add("View", new ConfigViewer());
 
 	mainLayout.add(tabSheet);
 
