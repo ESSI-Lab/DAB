@@ -43,7 +43,24 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
     private static final String MAX_SERVICES_OPTION_KEY = "maxServices";
     private static final String TTL_OPTION_KEY = "ttl";
     private static final String HEARTBEAT_OPTION_KEY = "heartbeat";
-    private static final String SERVICES_SETTING_ID = "servicesSetting";
+    private static final String DIST_SERVICES_SETTING_ID = "distServicesSetting";
+    private static final String LOCAL_SERVICES_SETTING_ID = "localServicesSetting";
+
+    /**
+     * @author Fabrizio
+     */
+    public enum ServiceCoordinatorMode {
+
+	/**
+	 *
+	 */
+	LOCAL,
+
+	/**
+	 *
+	 */
+	DISTRIBUTED
+    }
 
     /**
      * @param object
@@ -71,6 +88,8 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 	setCanBeDisabled(false);
 	enableCompactMode(false);
 	setShowHeader(false);
+	setSelectionMode(SelectionMode.SINGLE);
+	setCanBeCleaned(false);
 
 	Option<BooleanChoice> distToken = BooleanChoiceOptionBuilder.get().//
 		withKey(USE_DIST_TOKEN_OPTION_KEY).//
@@ -112,13 +131,30 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 	//
 	//
 
-	Setting servicesSetting = new Setting();
-	servicesSetting.setIdentifier(SERVICES_SETTING_ID);
-	servicesSetting.setName("Settings for coordination of distributed services");
-	servicesSetting.setEditable(false);
-	servicesSetting.enableCompactMode(false);
-	servicesSetting.setEnabled(false);
-	servicesSetting.setShowHeader(true);
+	Setting localServiceSetting = new Setting();
+	localServiceSetting.setIdentifier(LOCAL_SERVICES_SETTING_ID);
+	localServiceSetting.setName("Local services coordination");
+
+	localServiceSetting.setDescription(
+		"Services coordination is limited to the local node, without limitation on the maximum number of runnable services");
+	localServiceSetting.setSelected(true);
+	localServiceSetting.setCanBeDisabled(false);
+	localServiceSetting.enableCompactMode(false);
+	localServiceSetting.setEditable(false);
+
+	addSetting(localServiceSetting);
+
+	//
+	//
+	//
+
+	Setting distServicesSetting = new Setting();
+	distServicesSetting.setIdentifier(DIST_SERVICES_SETTING_ID);
+	distServicesSetting.setName("Distributed services coordination");
+	distServicesSetting.setDescription("Services coordination is distributed on the cluster nodes with Redis");
+	distServicesSetting.setEditable(false);
+	distServicesSetting.enableCompactMode(false);
+	distServicesSetting.setCanBeDisabled(false);
 
 	Option<Integer> maxServicesOption = IntegerOptionBuilder.get(). //
 		withKey(MAX_SERVICES_OPTION_KEY).//
@@ -129,7 +165,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		withSelectedValue(3).//
 		build();
 
-	servicesSetting.addOption(maxServicesOption);
+	distServicesSetting.addOption(maxServicesOption);
 
 	Option<Integer> ttlOption = IntegerOptionBuilder.get(). //
 		withKey(TTL_OPTION_KEY).//
@@ -139,7 +175,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		withValue(30).//
 		build();
 
-	servicesSetting.addOption(ttlOption);
+	distServicesSetting.addOption(ttlOption);
 
 	Option<Integer> hearthbeatOption = IntegerOptionBuilder.get(). //
 		withKey(HEARTBEAT_OPTION_KEY).//
@@ -149,9 +185,9 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		withValue(10).//
 		build();
 
-	servicesSetting.addOption(hearthbeatOption);
+	distServicesSetting.addOption(hearthbeatOption);
 
-	addSetting(servicesSetting);
+	addSetting(distServicesSetting);
     }
 
     /**
@@ -167,8 +203,8 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 	public DescriptorProvider() {
 	    descriptor = TabContentDescriptorBuilder.get(SessionCoordinatorSetting.class).//
 		    withLabel("Session coordinator").//
-		    withShowDirective("Global setting for distributed session coordination (based on Redis) on a multi-node cluster."
-		    + " It can be used for distributed token acquisition (queue + heartbeat), or to coordinate distributed services")
+		    withShowDirective("Global setting for distributed session coordination with Redis on a multi-node cluster."
+		    + " Redis can be used for distributed token acquisition (queue + heartbeat), or for distributed services coordination")
 		    .build();
 	}
 
@@ -272,9 +308,11 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
     /**
      * @return
      */
-    public boolean isServicesCoordinatorEnabled() {
+    public ServiceCoordinatorMode getServiceCoordinatorMode() {
 
-	return getSetting(SERVICES_SETTING_ID).get().isEnabled();
+	return getSetting(DIST_SERVICES_SETTING_ID).//
+		isPresent() && getSetting(DIST_SERVICES_SETTING_ID).get().isSelected() ? //
+		ServiceCoordinatorMode.DISTRIBUTED : ServiceCoordinatorMode.LOCAL;
     }
 
     /**
@@ -282,7 +320,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
      */
     public int getMaxServices() {
 
-	return getSetting(SERVICES_SETTING_ID).//
+	return getSetting(DIST_SERVICES_SETTING_ID).//
 		get(). //
 		getOption(MAX_SERVICES_OPTION_KEY, Integer.class).get().//
 		getSelectedValue();
@@ -293,7 +331,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
      */
     public int getTTL() {
 
-	return getSetting(SERVICES_SETTING_ID).//
+	return getSetting(DIST_SERVICES_SETTING_ID).//
 		get(). //
 		getOption(TTL_OPTION_KEY, Integer.class).get().//
 		getValue();
@@ -304,7 +342,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
      */
     public int getHeartbeat() {
 
-	return getSetting(SERVICES_SETTING_ID).//
+	return getSetting(DIST_SERVICES_SETTING_ID).//
 		get(). //
 		getOption(HEARTBEAT_OPTION_KEY, Integer.class).get().//
 		getValue();

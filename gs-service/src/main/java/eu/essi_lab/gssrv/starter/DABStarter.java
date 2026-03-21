@@ -1186,15 +1186,21 @@ public class DABStarter implements ConfigurationChangeListener {
 	switch (mode) {
 	case MIXED, LOCAL_PRODUCTION, SERVICE -> {
 
-	    if (ConfigurationWrapper.getSessionCoordinatorSetting().isServicesCoordinatorEnabled()) {
+	    GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager STARTED");
 
-		GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager STARTED");
+	    SessionCoordinatorSetting.ServiceCoordinatorMode mode = ConfigurationWrapper.getSessionCoordinatorSetting()
+		    .getServiceCoordinatorMode();
+
+	    String hostName = HostNamePropertyUtils.getHostNameProperty();
+
+	    switch (mode) {
+	    case DISTRIBUTED -> {
+
+		GSLoggerFactory.getLogger(getClass()).info("Distributed coordination mode");
 
 		String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint(false);
 
 		JedisPool pool = new JedisPool(redisEndpoint, 6379);
-
-		String nodeId = HostNamePropertyUtils.getHostNameProperty();
 
 		int maxServices = ConfigurationWrapper.getSessionCoordinatorSetting().getMaxServices();
 		int heartbeat = ConfigurationWrapper.getSessionCoordinatorSetting().getHeartbeat();
@@ -1202,24 +1208,28 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		manager = new MultiServiceManager( //
 			pool, //
-			nodeId, //
+			hostName, //
 			maxServices);
 
 		manager.setHeartbeatSeconds(heartbeat);
 		manager.setTTSeconds(ttl);
-
-		manager.start();
-
-		updateServiceDefinitions();
-
-		Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
-
-		GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager ENDED");
-
-	    } else {
-
-		GSLoggerFactory.getLogger(getClass()).info("Session coordinator setting disabled, unable to start multi service manager");
 	    }
+	    case LOCAL -> {
+
+		GSLoggerFactory.getLogger(getClass()).info("Local coordination mode");
+
+		manager = new MultiServiceManager(hostName);
+	    }
+	    }
+
+	    manager.start();
+
+	    updateServiceDefinitions();
+
+	    Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
+
+	    GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager ENDED");
+
 	}
 	}
     }

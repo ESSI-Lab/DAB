@@ -369,7 +369,7 @@ public class ConfigurationWrapper {
 	return  getManagedServiceSettings().//
 		stream(). //
 		filter(ManagedServiceSetting::isEnabled).//
-		map(s -> ServiceDefinition.of(s.getServiceId(), s.getSelectedServiceImpl())).//
+		map(s -> ServiceDefinition.of(s.getServiceId(), s.getSelectedImplementationClass())).//
 		toList();
     }
 

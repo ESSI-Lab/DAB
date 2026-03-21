@@ -2,13 +2,13 @@ package eu.essi_lab.cfga.gs.setting.service;
 
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.lib.net.services.*;
 import eu.essi_lab.lib.utils.*;
 import redis.clients.jedis.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -45,15 +45,28 @@ public class ManagedServiceSupport {
 
 	GSLoggerFactory.getLogger(HarvestingSetting.class).debug("Updating managed service support STARTED");
 
-	String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint(false);
+	SessionCoordinatorSetting.ServiceCoordinatorMode mode = ConfigurationWrapper.getSessionCoordinatorSetting()
+		.getServiceCoordinatorMode();
 
-	JedisPool jedis = new JedisPool(redisEndpoint, 6379);
+	switch (mode) {
 
-	List<ServiceDefinition> defs = ConfigurationWrapper.getServicesDefinition();
+	case DISTRIBUTED -> {
 
-	activeServices = MultiServiceManager.getActiveServices(defs, jedis);
+	    String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint(false);
 
-	jedis.close();
+	    JedisPool jedis = new JedisPool(redisEndpoint, 6379);
+
+	    List<ServiceDefinition> defs = ConfigurationWrapper.getServicesDefinition();
+
+	    activeServices = MultiServiceManager.getDistributedActiveServices(defs, jedis);
+
+	    jedis.close();
+	}
+	case LOCAL -> {
+
+	    activeServices = MultiServiceManager.getLocalActiveServices();
+	}
+	}
 
 	GSLoggerFactory.getLogger(HarvestingSetting.class).debug("Updating managed service support ENDED");
     }

@@ -8,6 +8,7 @@ import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.option.*;
 import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
 import eu.essi_lab.lib.net.services.*;
 import eu.essi_lab.lib.utils.*;
 
@@ -18,10 +19,10 @@ import java.util.*;
  */
 public class ManagedServiceSetting extends Setting implements EditableSetting, KeyValueOptionDecorator {
 
-    private static final String SERVICE_NAME_OPTION_KEY = "serviceNameKey";
-    private static final String SERVICE_DESCRIPTION_OPTION_KEY = "serviceDescKey";
-    private static final String SERVICE_OPTIONS_OPTION_KEY = "serviceOptionsKey";
-    static final String SERVICE_ID_OPTION_KEY = "serviceIdOptionKey";
+    private static final String SERVICE_IMPL_OPTION_KEY = "serviceImpl";
+    private static final String SERVICE_DESCRIPTION_OPTION_KEY = "serviceDesc";
+    private static final String SERVICE_OPTIONS_OPTION_KEY = "service";
+    static final String SERVICE_ID_OPTION_KEY = "serviceId";
 
     /**
      *
@@ -34,15 +35,15 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 
 	setName("Managed service settings");
 
-	setDescription("A customizable service which executes the code provided by an implementation of the 'ManagedService' interface");
+	setDescription("A customizable service provided by an implementation of the 'ManagedService' interface");
 
 	//
 	// Options
 	//
 
-	Option<String> serviceNameOption = StringOptionBuilder.get().//
-		withKey(SERVICE_NAME_OPTION_KEY).//
-		withLabel("Service name").//
+	Option<String> serviceImplOption = StringOptionBuilder.get().//
+		withKey(SERVICE_IMPL_OPTION_KEY).//
+		withLabel("Service implementation").//
 		cannotBeDisabled().//
 		withSingleSelection().//
 		withValuesLoader(new ServiceValuesLoader()).//
@@ -50,7 +51,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		required().//
 		build();
 
-	addOption(serviceNameOption);
+	addOption(serviceImplOption);
 
 	Option<String> serviceIdOption = StringOptionBuilder.get().//
 		withKey(SERVICE_ID_OPTION_KEY).//
@@ -87,6 +88,48 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 	//
 
 	addKeyValueOption();
+
+	//
+	// set the validator
+	//
+	setValidator(new ManagedServiceValidator());
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class ManagedServiceValidator implements Validator {
+
+	@Override
+	public ValidationResponse validate(Configuration configuration, Setting setting, ValidationContext context) {
+
+	    ManagedServiceSetting manSetting = SettingUtils.downCast(setting, ManagedServiceSetting.class);
+
+	    List<Setting> list = new ArrayList<>();
+
+	    ConfigurationUtils.deepFind(configuration, s -> s.getSettingClass().equals(ManagedServiceSetting.class), list);
+
+	    List<String> ids = list.stream()
+		    .map(s -> s.getOption(ManagedServiceSetting.SERVICE_ID_OPTION_KEY, String.class).get().getValue()).toList();
+
+	    ValidationResponse response = new ValidationResponse();
+
+	    String impl = manSetting.getSelectedImplementation();
+
+	    if (impl == null) {
+
+		response.getErrors().add("Service implementation is required");
+		response.setResult(ValidationResponse.ValidationResult.VALIDATION_FAILED);
+	    }
+
+	    if (ids.contains(manSetting.getServiceId())) {
+
+		response.getErrors().add("Provided service id is already in use");
+		response.setResult(ValidationResponse.ValidationResult.VALIDATION_FAILED);
+	    }
+
+	    return response;
+	}
     }
 
     /**
@@ -125,7 +168,9 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 
 	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(ManagedServiceSetting.class).//
 
-		    withShowDirective("Managed services", SortDirection.ASCENDING).//
+		    withShowDirective("Customizable services provided by an implementation of the 'ManagedService' interface. "
+		    + "\n\nServices can run only on the local node, or they can be distributed on a multi-node cluster."
+		    + "according to the 'Session coordinator' setting in the 'System' tab", SortDirection.ASCENDING).//
 
 		    withAddDirective(//
 		    "ADD",//
@@ -170,7 +215,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 	 */
 	private String getImpl(Setting setting) {
 
-	    return setting.getObject().getJSONObject(SERVICE_NAME_OPTION_KEY).getJSONArray("values").getString(0);
+	    return setting.getObject().getJSONObject(SERVICE_IMPL_OPTION_KEY).getJSONArray("values").getString(0);
 	}
 
 	/**
@@ -234,28 +279,28 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     /**
      * @return
      */
-    public void selectServiceName(String name) {
+    public void selectImplementation(String impl) {
 
-	getOption(SERVICE_NAME_OPTION_KEY, String.class).get().select(n -> n.equals(name));
+	getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().select(n -> n.equals(impl));
     }
 
     /**
      * @return
      */
-    public String getSelectedServiceName() {
+    public String getSelectedImplementation() {
 
-	return getOption(SERVICE_NAME_OPTION_KEY, String.class).get().getSelectedValue();
+	return getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().getSelectedValue();
     }
 
     /**
      * @return
      */
-    public Class<? extends ManagedService> getSelectedServiceImpl() {
+    public Class<? extends ManagedService> getSelectedImplementationClass() {
 
 	ServiceLoader<ManagedService> loader = ServiceLoader.load(ManagedService.class);
 
 	return StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(service -> service.getName().equals(getSelectedServiceName())).//
+		filter(service -> service.getName().equals(getSelectedImplementation())).//
 		map(ManagedService::getClass). //
 		findFirst().//
 		get();//
