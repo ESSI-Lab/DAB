@@ -665,6 +665,7 @@ public enum MetadataElement implements Queryable {
     ALTITUDE(MetadataElement.ALTITUDE_EL_NAME), //
     ELEVATION_MIN(MetadataElement.ELEVATION_MIN_EL_NAME, ContentType.DOUBLE), //
     ELEVATION_MAX(MetadataElement.ELEVATION_MAX_EL_NAME, ContentType.DOUBLE), //
+    HYDROMETRIC_ZERO(MetadataElement.HYDROMETRIC_ZERO_EL_NAME, ContentType.DOUBLE), //
     FLOW_TO_OCEAN(MetadataElement.FLOW_TO_OCEAN_EL_NAME), //
     DOWNSTREAM_HYCOS_STATION(MetadataElement.DOWNSTREAM_HYCOS_STATION_EL_NAME), //
     REGULATION(MetadataElement.REGULATION_EL_NAME), //
@@ -786,6 +787,7 @@ public enum MetadataElement implements Queryable {
     public static final String ALTITUDE_EL_NAME = "Altitude";
     public static final String ELEVATION_MIN_EL_NAME = "ElevationMin";
     public static final String ELEVATION_MAX_EL_NAME = "ElevationMax";
+    public static final String HYDROMETRIC_ZERO_EL_NAME = "HydrometricZero";
     public static final String ALTITUDE_DATUM_EL_NAME = "AltitudeDatum";
     public static final String FLOW_TO_OCEAN_EL_NAME = "FlowtoOcean";
     public static final String DOWNSTREAM_HYCOS_STATION_EL_NAME = "DownstreamHYCOSstation";

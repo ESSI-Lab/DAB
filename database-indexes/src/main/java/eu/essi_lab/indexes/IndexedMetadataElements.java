@@ -1950,6 +1950,17 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	    defineBNHSProperty(BNHSProperty.DATUM_ALTITUDE, resource);
 	}
     };
+    public static final IndexedMetadataElement HYDROMETRIC_ZERO = new IndexedMetadataElement(MetadataElement.HYDROMETRIC_ZERO) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    ExtensionHandler handler = resource.getExtensionHandler();
+	    Optional<String> value = handler.getHydrometricZero();
+	    if (value.isPresent()){
+		addValue(value.get());
+	    }
+	}
+    };
     public static final IndexedMetadataElement ELEVATION_MIN = new IndexedMetadataElement(MetadataElement.ELEVATION_MIN) {
 	@Override
 	public void defineValues(GSResource resource) {

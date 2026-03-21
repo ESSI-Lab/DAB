@@ -307,6 +307,27 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
     }
 
+
+    public Optional<String> getHydrometricZero() {
+
+	try {
+	    return Optional.ofNullable(this.metadata.getTextContent(MetadataElement.HYDROMETRIC_ZERO.getName()));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    public void setHydrometricZero(String hydrometricZero) {
+	try {
+	    this.metadata.add(MetadataElement.HYDROMETRIC_ZERO.getName(), hydrometricZero);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
     /**
      * @return
      */
@@ -1572,5 +1593,6 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    this.getOriginatorOrganisationIdentifiers().forEach(d -> targetHandler.addOriginatorOrganisationIdentifier(d));
 	}
     }
+
 
 }
