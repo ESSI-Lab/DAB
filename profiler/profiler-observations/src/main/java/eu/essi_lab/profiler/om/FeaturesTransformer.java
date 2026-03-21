@@ -45,6 +45,8 @@ public class FeaturesTransformer extends OMTransformer {
 	selector.addIndex(ResourceProperty.SOURCE_ID);
 	selector.addIndex(MetadataElement.BOUNDING_BOX);
 	selector.addIndex(MetadataElement.COUNTRY);
+	selector.addIndex(MetadataElement.HYDROMETRIC_ZERO);
+	selector.addIndex(MetadataElement.ALTITUDE);
 	selector.setIncludeOriginal(false);
 	return selector;
     }

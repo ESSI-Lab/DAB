@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.om;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -33,6 +33,7 @@ import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -80,7 +81,7 @@ public class ObservationMapper {
     }
 
     /**
-     * 
+     *
      */
     public ObservationMapper() {
 
@@ -111,8 +112,9 @@ public class ObservationMapper {
 
 	    ResponsiblePartyParser innerParser = new ResponsiblePartyParser(party);
 
-	    relatedParties.add(JSONFeature.createRelatedParty(innerParser.getOrganisation(), innerParser.getIndividual(),
-		    innerParser.getEmail(), innerParser.getRole(), innerParser.getUrl()));
+	    relatedParties.add(
+		    JSONFeature.createRelatedParty(innerParser.getOrganisation(), innerParser.getIndividual(), innerParser.getEmail(),
+			    innerParser.getRole(), innerParser.getUrl()));
 	}
 
 	//
@@ -151,12 +153,12 @@ public class ObservationMapper {
 
 	} else if (
 
-	(parser.west != null && !parser.west.equals("") && //
-		parser.east != null && !parser.east.equals("") && //
-		parser.north != null && !parser.north.equals("") && //
-		parser.south != null && !parser.south.equals(""))//
+		(parser.west != null && !parser.west.equals("") && //
+			parser.east != null && !parser.east.equals("") && //
+			parser.north != null && !parser.north.equals("") && //
+			parser.south != null && !parser.south.equals(""))//
 
-		|| parser.geometry != null && !parser.geometry.isEmpty()) {
+			|| parser.geometry != null && !parser.geometry.isEmpty()) {
 
 	    String south = null;
 	    String west = null;
@@ -208,6 +210,16 @@ public class ObservationMapper {
 	    BigDecimal bign = new BigDecimal(north);
 	    BigDecimal bige = new BigDecimal(east);
 
+	    String altitudeString = parser.getAltitude();
+	    BigDecimal altitude = null;
+	    if (altitudeString != null && !altitudeString.isEmpty()) {
+		try {
+		    altitude = new BigDecimal(altitudeString);
+		} catch (Exception e) {
+
+		}
+	    }
+
 	    Double TOL = 0.000000001;
 	    if ((bign.doubleValue() - bigs.doubleValue() > TOL) && //
 		    (bige.doubleValue() - bigw.doubleValue() > TOL)) {
@@ -219,11 +231,25 @@ public class ObservationMapper {
 	    } else {
 		observation = createObservation(view.get().getId(), ObservationType.TimeSeriesObservation);
 
-		platform.setLatLon(bigs, bigw);
+		if (altitude != null ) {
+		    platform.setLatLonElevation(bigs, bigw, altitude);
+		} else {
+		    platform.setLatLon(bigs, bigw);
+		}
 	    }
 
 	} else {
 	    observation = createObservation(view.get().getId(), ObservationType.TimeSeriesObservation);
+	}
+
+	if (parser.getHydrometricZero() != null && !parser.getHydrometricZero().isEmpty()) {
+	    String hz = parser.getHydrometricZero();
+	    try {
+		BigDecimal bighz = new BigDecimal(hz);
+		platform.addParameter("hydrometricZero", bighz.toString());
+	    } catch (Exception e) {
+	    }
+
 	}
 
 	if (parser.getInstrumentNames() != null) {

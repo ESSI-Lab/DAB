@@ -247,7 +247,7 @@ public class ConfigImporter extends VerticalLayout {
 	wrapper.setSecretKey(info.getPassword());
 	wrapper.setEndpoint(info.getUri());
 
-	HeadObjectResponse objectMetadata = wrapper.getObjectMetadata(info.getName(), ConfigImportExportDescriptor.DEFAULT_CONFIG_NAME);
+	HeadObjectResponse objectMetadata = wrapper.getObjectMetadata(info.getName(), ConfigToolsDescriptor.DEFAULT_CONFIG_NAME);
 
 	if (objectMetadata != null) {
 
@@ -256,7 +256,7 @@ public class ConfigImporter extends VerticalLayout {
 
 		try {
 
-		    ConfigImportExportDescriptor.uploadS3Config(wrapper, info, configStream.clone());
+		    ConfigToolsDescriptor.uploadS3Config(wrapper, info, configStream.clone());
 
 		    NotificationDialog.getInfoDialog("Configuration correctly overwritten").open();
 
@@ -287,7 +287,7 @@ public class ConfigImporter extends VerticalLayout {
 
 	    try {
 
-		ConfigImportExportDescriptor.uploadS3Config(wrapper, setting.getSelectedStorageInfo().get(), configStream.clone());
+		ConfigToolsDescriptor.uploadS3Config(wrapper, setting.getSelectedStorageInfo().get(), configStream.clone());
 
 		NotificationDialog.getInfoDialog("Configuration correctly imported").open();
 
@@ -322,7 +322,7 @@ public class ConfigImporter extends VerticalLayout {
 		+ info.getPassword() + "@" //
 		+ info.getUri().replace("://", ":").replace("/", "") + "/" //
 		+ info.getName() + "/"//
-		+ ConfigImportExportDescriptor.DEFAULT_CONFIG_NAME;
+		+ ConfigToolsDescriptor.DEFAULT_CONFIG_NAME;
     }
 
     /**

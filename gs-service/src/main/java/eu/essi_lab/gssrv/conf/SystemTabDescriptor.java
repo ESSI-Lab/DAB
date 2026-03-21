@@ -54,7 +54,7 @@ public class SystemTabDescriptor extends TabDescriptor {
 		new DownloadSetting.DescriptorProvider().get(),//
 		new RateLimiterSetting.DescriptorProvider().get(),//
 		new SessionCoordinatorSetting.DescriptorProvider().get(),//
-		new ConfigImportExportDescriptor()
+		new ConfigToolsDescriptor()
 	);
     }
 }

@@ -132,7 +132,7 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    String endDateInProgress = turtle.getElement(RDFElement.ENDDATEINPROGRESS);
 	    String bbox = turtle.getElement(RDFElement.BBOX);
 	    List<String> themes = turtle.getElements(RDFElement.THEMES);
-	    List<List<String>> keywordsLabelsAndURIsAndTypes = turtle.getElementsList(RDFElement.KEYWORDLABELSANDURISANDTYPES);
+	    List<List<String>> keywordsLabelsAndURIsAndThesaurusAndTypes = turtle.getElementsList(RDFElement.KEYWORDLABELSANDURISANDTYPES);
 	    List<String> simpleKeywords = turtle.getElements(RDFElement.KEYWORDS);
 	    List<String> parameters = turtle.getElements(RDFElement.PARAMETERS);
 	    List<List<String>> parameterLabelsAndURIs = turtle.getElementsList(RDFElement.PARAMETERLABELSANDURIS);
@@ -285,20 +285,27 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 		kthemes.addKeyword(theme);
 	    }
 
-	    for (List<String> k : keywordsLabelsAndURIsAndTypes) {
-		if (k.size()<3) {
+	    for (List<String> k : keywordsLabelsAndURIsAndThesaurusAndTypes) {
+		if (k.size()<4) {
 		    continue;
 		}
 		String label = k.get(0);
 		String uri = k.get(1);
-		String type = k.get(2);
+		String thesaurus = k.get(2);
+		if (thesaurus == null) {
+		    thesaurus = "";
+		}
+		String type = k.get(3);
 		if (type == null) {
 		    type = "";
+		}else{
+		    type = type.replace("https://standards.iso.org/iso/19115/resources/Codelists/gml/MD_KeywordTypeCode.xml#","");
 		}
 		Keywords keywords = keywordMap.get(type);
 		if (keywords == null) {
 		    keywords = new Keywords();
 		    keywords.setTypeCode(type);
+		    keywords.setThesaurusNameCitationTitle(thesaurus);
 		    keywordMap.put(type, keywords);
 		}
 		if (uri != null) {

@@ -68,6 +68,7 @@ public class JSONFeature {
 
     }
 
+
     public String getSampledFeatureTitle() {
 	if (platform.has("name")) {
 	    return platform.getString("name");
@@ -173,6 +174,14 @@ public class JSONFeature {
 
     }
 
+    public void setLatLonElevation(BigDecimal lat, BigDecimal lon,BigDecimal elevation) {
+	JSONObject shape = new JSONObject();
+	shape.put("type", "Point");
+	shape.put("coordinates", getCoordinateArray(lon, lat, elevation));
+	platform.put(getGeometryName(), shape);
+
+    }
+
     public void setMultiPoints(List<List<BigDecimal>> points) {
 	JSONObject shape = new JSONObject();
 	shape.put("type", "MultiPoint");
@@ -219,5 +228,6 @@ public class JSONFeature {
 	}
 	return ret;
     }
+
 
 }
