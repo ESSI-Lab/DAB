@@ -32,7 +32,7 @@ public class MultiServiceManager {
     private static final int SCHEDULER_THREAD_POOL_SIZE = 1;
 
     private final JedisPool jedisPool;
-    private final String nodeId;
+    private final String hostName;
     private final int maxServices;
     private final ScheduledExecutorService scheduler;
 
@@ -43,25 +43,50 @@ public class MultiServiceManager {
     private volatile List<ServiceDefinition> definitions;
 
     /**
-     * @param pool
-     * @param nodeId
-     * @param maxServices
-     * @param defs
+     * Creates a new instance of {@link MultiServiceManager} with local services coordination
+     *
+     * @param hostName
      */
-    public MultiServiceManager(JedisPool pool, String nodeId, int maxServices) {
+    public MultiServiceManager(String hostName) {
 
-	this(pool, nodeId, maxServices, List.of());
+	this(null, hostName, Integer.MAX_VALUE, List.of());
     }
 
     /**
+     * Creates a new instance of {@link MultiServiceManager} with local services coordination
+     *
+     * @param hostName
+     * @param defs
+     */
+    public MultiServiceManager(String hostName, List<ServiceDefinition> defs) {
+
+	this(null, hostName, Integer.MAX_VALUE, defs);
+    }
+
+    /**
+     * Creates a new instance of {@link MultiServiceManager} with distributed services coordination
+     *
      * @param pool
-     * @param nodeId
+     * @param hostName
      * @param maxServices
      * @param defs
      */
-    public MultiServiceManager(JedisPool pool, String nodeId, int maxServices, List<ServiceDefinition> defs) {
+    public MultiServiceManager(JedisPool pool, String hostName, int maxServices) {
+
+	this(pool, hostName, maxServices, List.of());
+    }
+
+    /**
+     * Creates a new instance of {@link MultiServiceManager} with distributed services coordination
+     *
+     * @param pool
+     * @param hostName
+     * @param maxServices
+     * @param defs
+     */
+    public MultiServiceManager(JedisPool pool, String hostName, int maxServices, List<ServiceDefinition> defs) {
 	this.jedisPool = pool;
-	this.nodeId = nodeId;
+	this.hostName = hostName;
 	this.maxServices = maxServices;
 	this.definitions = defs;
 	this.active = new ConcurrentHashMap<>();
@@ -69,7 +94,6 @@ public class MultiServiceManager {
     }
 
     /**
-     *
      * @param ttlSeconds
      */
     public void setTTSeconds(int ttlSeconds) {
@@ -78,7 +102,6 @@ public class MultiServiceManager {
     }
 
     /**
-     *
      * @param renewSeconds
      */
     public void setHeartbeatSeconds(int renewSeconds) {
@@ -165,7 +188,7 @@ public class MultiServiceManager {
      */
     private void tryStartService(ServiceDefinition def) {
 
-	RedisDistributedLock lock = new RedisDistributedLock(jedisPool, def.id, ttlSeconds, nodeId);
+	ServiceLock lock = buildLock(def.id);
 
 	GSLoggerFactory.getLogger(getClass()).info("Trying to acquire lock for service {}", def.id);
 
@@ -199,21 +222,29 @@ public class MultiServiceManager {
     /**
      * @return
      */
-    public  List<Map.Entry<String, String>> getActiveServices() {
+    public List<Map.Entry<String, String>> getActiveServices() {
 
-	return getActiveServices(definitions, jedisPool);
+	return getDistributedActiveServices(definitions, jedisPool);
     }
 
     /**
      * @return
      */
-    public static List<Map.Entry<String, String>> getActiveServices(List<ServiceDefinition> defs, JedisPool jedisPool) {
+    public static List<Map.Entry<String, String>> getLocalActiveServices() {
+
+	return LocalServiceLock.ACTIVE_SERVICES.stream().toList();
+    }
+
+    /**
+     * @return
+     */
+    public static List<Map.Entry<String, String>> getDistributedActiveServices(List<ServiceDefinition> defs, JedisPool jedisPool) {
 
 	return defs.stream().map(def -> {
 
 	    try (Jedis jedis = jedisPool.getResource()) {
 
-		String value = jedis.get(RedisDistributedLock.getKey(def.getId()));
+		String value = jedis.get(ServiceLock.getKey(def.getId()));
 
 		if (value != null && !value.equals("nil")) {
 
@@ -228,4 +259,19 @@ public class MultiServiceManager {
 
 	}).filter(Objects::nonNull).toList();//
     }
+
+    /**
+     * @param serviceId
+     * @return
+     */
+    private ServiceLock buildLock(String serviceId) {
+
+	if (jedisPool == null) {
+
+	    return new LocalServiceLock(serviceId, hostName);
+	}
+
+	return new RedisLock(jedisPool, serviceId, ttlSeconds, hostName);
+    }
+
 }

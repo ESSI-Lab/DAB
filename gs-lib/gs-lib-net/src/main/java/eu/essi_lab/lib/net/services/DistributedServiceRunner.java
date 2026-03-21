@@ -16,7 +16,7 @@ public class DistributedServiceRunner {
     private static final long START_DELAY_SECONDS = 5;
 
     private final ManagedService service;
-    private final RedisDistributedLock lock;
+    private final ServiceLock lock;
     private final int renewSeconds;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
@@ -26,7 +26,7 @@ public class DistributedServiceRunner {
      * @param service
      * @param lock
      */
-    public DistributedServiceRunner(ManagedService service, RedisDistributedLock lock, int renewSeconds) {
+    public DistributedServiceRunner(ManagedService service, ServiceLock lock, int renewSeconds) {
 
 	this.service = service;
 	this.lock = lock;

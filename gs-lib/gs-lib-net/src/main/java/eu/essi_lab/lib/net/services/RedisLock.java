@@ -6,7 +6,7 @@ import redis.clients.jedis.params.*;
 /**
  * @author Fabrizio
  */
-public class RedisDistributedLock {
+public class RedisLock implements ServiceLock {
 
     private final JedisPool jedisPool;
     private final String key;
@@ -27,31 +27,13 @@ public class RedisDistributedLock {
      * @param jedisPool
      * @param serviceId
      * @param ttlSeconds
-     * @param nodeId
+     * @param hostName
      */
-    public RedisDistributedLock(JedisPool jedisPool, String serviceId, int ttlSeconds, String nodeId) {
+    public RedisLock(JedisPool jedisPool, String serviceId, int ttlSeconds, String hostName) {
 	this.jedisPool = jedisPool;
-	this.key = getKey(serviceId);
-	this.value = nodeId + ":" + serviceId;
+	this.key = ServiceLock.getKey(serviceId);
+	this.value = hostName + ":" + serviceId;
 	this.ttlSeconds = ttlSeconds;
-    }
-
-    /**
-     * @param serviceId
-     * @return
-     */
-    static String getKey(String serviceId) {
-
-	return "service:" + serviceId + ":lock";
-    }
-
-    /**
-     * @param key
-     * @return
-     */
-    static String getServiceId(String key) {
-
-	return key.replace("service:", "").replace(":lock", "");
     }
 
     /**
