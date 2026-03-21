@@ -48,6 +48,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		withSingleSelection().//
 		withValuesLoader(new ServiceValuesLoader()).//
 		withValues(ServiceValuesLoader.getValues()).//
+		withSelectedValue(ServiceValuesLoader.getValues().getFirst()).//
 		required().//
 		build();
 

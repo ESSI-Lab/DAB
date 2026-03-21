@@ -155,10 +155,15 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
 	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Loaded values: {}", values);
 
+	    if(values.isEmpty()) {
+
+		return;
+	    }
+
 	    //
 	    // set the values to the option
 	    //
-	    List<String> stringValues = values.stream().map(Object::toString).collect(Collectors.toList());
+	    List<String> stringValues = values.stream().map(Object::toString).toList();
 
 	    option.setObjectValues(stringValues);
 
@@ -171,6 +176,7 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
 		    singleSelect.setReadOnly(false);
 		    singleSelect.setItems(stringValues);
+		    singleSelect.setValue(stringValues.getFirst());
 		    singleSelect.setLabel("");
 		    singleSelect.setInvalid(false);
 
