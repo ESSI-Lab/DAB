@@ -4,7 +4,7 @@ import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.setting.*;
-import eu.essi_lab.lib.net.services.*;
+import eu.essi_lab.lib.net.service.*;
 import eu.essi_lab.lib.utils.*;
 import redis.clients.jedis.*;
 

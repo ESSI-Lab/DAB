@@ -1,5 +1,6 @@
-package eu.essi_lab.lib.net.services;
+package eu.essi_lab.lib.net.service;
 
+import eu.essi_lab.lib.net.service.lock.*;
 import eu.essi_lab.lib.utils.*;
 
 import java.util.concurrent.*;

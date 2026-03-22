@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.services;
+package eu.essi_lab.lib.net.service.lock;
 
 import redis.clients.jedis.*;
 import redis.clients.jedis.params.*;
@@ -6,7 +6,7 @@ import redis.clients.jedis.params.*;
 /**
  * @author Fabrizio
  */
-public class RedisLock implements ServiceLock {
+public class RedisServiceLock implements ServiceLock {
 
     private final JedisPool jedisPool;
     private final String key;
@@ -29,7 +29,7 @@ public class RedisLock implements ServiceLock {
      * @param ttlSeconds
      * @param hostName
      */
-    public RedisLock(JedisPool jedisPool, String serviceId, int ttlSeconds, String hostName) {
+    public RedisServiceLock(JedisPool jedisPool, String serviceId, int ttlSeconds, String hostName) {
 	this.jedisPool = jedisPool;
 	this.key = ServiceLock.getKey(serviceId);
 	this.value = hostName + ":" + serviceId;

@@ -1,5 +1,6 @@
-package eu.essi_lab.lib.net.services;
+package eu.essi_lab.lib.net.service;
 
+import eu.essi_lab.lib.net.service.lock.*;
 import eu.essi_lab.lib.utils.*;
 import redis.clients.jedis.*;
 
@@ -271,7 +272,7 @@ public class MultiServiceManager {
 	    return new LocalServiceLock(serviceId, hostName);
 	}
 
-	return new RedisLock(jedisPool, serviceId, ttlSeconds, hostName);
+	return new RedisServiceLock(jedisPool, serviceId, ttlSeconds, hostName);
     }
 
 }

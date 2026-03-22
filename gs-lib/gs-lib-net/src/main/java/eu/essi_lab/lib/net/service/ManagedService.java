@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.services;
+package eu.essi_lab.lib.net.service;
 
 /**
  * @author Fabrizio

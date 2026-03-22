@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.service.*;
-import eu.essi_lab.lib.net.services.*;
+import eu.essi_lab.lib.net.service.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;

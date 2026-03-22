@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.services;
+package eu.essi_lab.lib.net.service.lock;
 
 import java.util.*;
 
@@ -11,7 +11,7 @@ public class LocalServiceLock implements ServiceLock {
     private final String hostName;
     private final String serviceId;
 
-    static final Set<Map.Entry<String, String>> ACTIVE_SERVICES = new LinkedHashSet<>();
+    public static final Set<Map.Entry<String, String>> ACTIVE_SERVICES = new LinkedHashSet<>();
 
     /**
      *

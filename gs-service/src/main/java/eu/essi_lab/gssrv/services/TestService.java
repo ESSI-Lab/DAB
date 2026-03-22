@@ -1,6 +1,6 @@
 package eu.essi_lab.gssrv.services;
 
-import eu.essi_lab.lib.net.services.*;
+import eu.essi_lab.lib.net.service.*;
 import eu.essi_lab.lib.utils.*;
 
 import java.time.*;

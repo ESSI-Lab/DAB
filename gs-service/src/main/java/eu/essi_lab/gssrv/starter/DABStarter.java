@@ -54,7 +54,7 @@ import eu.essi_lab.jaxb.common.*;
 import eu.essi_lab.jaxb.wms.extension.*;
 import eu.essi_lab.lib.net.downloader.*;
 import eu.essi_lab.lib.net.s3.*;
-import eu.essi_lab.lib.net.services.*;
+import eu.essi_lab.lib.net.service.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.messages.bond.jaxb.*;
