@@ -6,7 +6,6 @@ import eu.essi_lab.lib.utils.*;
 
 import java.time.*;
 import java.time.temporal.*;
-import java.util.*;
 
 /**
  * @author Fabrizio
@@ -43,12 +42,15 @@ public class TestService implements ManagedService {
 
 	running = true;
 
+	publish(MessageChannel.MessageLevel.INFO, "Started service: " + getId());
+
 	new Thread(() -> {
+
 	    while (running) {
 
 		GSLoggerFactory.getLogger(getClass()).info("*** [ Running service: {} ] ***", getId());
 
-		publish(MessageChannel.MessageLevel.INFO, "[ Running service: " + getId() + " ]["+ UUID.randomUUID().toString() +"]");
+		publish(MessageChannel.MessageLevel.INFO, "Running service: " + getId());
 
 		try {
 		    Thread.sleep(Duration.of(5, ChronoUnit.SECONDS));
@@ -63,5 +65,8 @@ public class TestService implements ManagedService {
     public void stop() {
 
 	running = false;
+
+	publish(MessageChannel.MessageLevel.INFO, "Stopped service: " + getId());
+
     }
 }

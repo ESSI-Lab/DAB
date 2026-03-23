@@ -4,6 +4,7 @@ import com.vaadin.flow.data.provider.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gui.components.grid.*;
+import eu.essi_lab.cfga.gui.components.grid.renderer.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.option.*;
@@ -199,7 +200,8 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 
 		    ColumnDescriptor.create("Host", true, true, s -> ManagedServiceSupport.getInstance().getServiceHost(s)),
 
-		    ColumnDescriptor.create("Messages", true, true, s -> ManagedServiceSupport.getInstance().getServiceMessages(s))
+		    ColumnDescriptor.create("Messages", 70, s -> ManagedServiceSupport.getInstance().getServiceMessages(s), //
+			    ViewerColumnRenderer.create("Messages", "Messages","View service messages"))
 
 	    )).//
 		    reloadable(() -> ManagedServiceSupport.getInstance().update()).//

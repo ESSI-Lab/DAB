@@ -82,15 +82,8 @@ public class ManagedServiceSupport {
 	List<MessageChannel.Message> messages = MessageChannels.get().read(serviceId);
 
 	String joined = messages.stream().//
-		map(m -> "[" + m.getLevel() + ":" + m.getTimestamp() + ":" + m.getMessage() + "]").//
+		map(m -> m.getTimestamp()+", " + m.getLevel() + ": [ " + m.getMessage()+" ]").//
 		collect(Collectors.joining("\n"));
-
-	if (!joined.isEmpty()) {
-
-	    System.out.println("***");
-	    System.out.println(joined);
-	    System.out.println("***");
-	}
 
 	return joined;
     }

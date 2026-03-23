@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.grid;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -45,7 +45,7 @@ public class ColumnDescriptor {
     static final String POSITIONAL_COLUMN_NAME = "#";
 
     /**
-     * 
+     *
      */
     public ColumnDescriptor() {
     }
@@ -442,6 +442,30 @@ public class ColumnDescriptor {
 	descriptor.setSortable(sortable);
 	descriptor.setFiltered(filtered);
 	descriptor.setColumnVisible(visible);
+	descriptor.setRenderer(renderer);
+
+	return descriptor;
+    }
+
+    /**
+     * @param columnName
+     * @param valueProvider
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    int columnWidth,//
+	    ValueProvider<Setting, String> valueProvider,//
+	    ViewerColumnRenderer renderer) {
+
+	ColumnDescriptor descriptor = new ColumnDescriptor();
+	descriptor.setValueProvider(valueProvider);
+	descriptor.setColumnName(columnName);
+	descriptor.setColumnWidth(columnWidth);
+	descriptor.setSortable(false);
+	descriptor.setFiltered(false);
+	descriptor.setColumnVisible(true);
 	descriptor.setRenderer(renderer);
 
 	return descriptor;
