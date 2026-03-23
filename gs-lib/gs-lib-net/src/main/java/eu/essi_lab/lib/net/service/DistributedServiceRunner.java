@@ -121,6 +121,8 @@ public class DistributedServiceRunner {
 
 	stopService();
 
+	MessageChannels.getWritable().removeAll(service.getId());
+
 	lock.release();
 	scheduler.shutdownNow();
     }
