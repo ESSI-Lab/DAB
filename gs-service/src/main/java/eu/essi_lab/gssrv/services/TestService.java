@@ -1,10 +1,12 @@
 package eu.essi_lab.gssrv.services;
 
 import eu.essi_lab.lib.net.service.*;
+import eu.essi_lab.lib.net.service.message.*;
 import eu.essi_lab.lib.utils.*;
 
 import java.time.*;
 import java.time.temporal.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -45,6 +47,9 @@ public class TestService implements ManagedService {
 	    while (running) {
 
 		GSLoggerFactory.getLogger(getClass()).info("*** [ Running service: {} ] ***", getId());
+
+		publish(MessageChannel.MessageLevel.INFO, "[ Running service: " + getId() + " ]["+ UUID.randomUUID().toString() +"]");
+
 		try {
 		    Thread.sleep(Duration.of(5, ChronoUnit.SECONDS));
 		} catch (InterruptedException e) {

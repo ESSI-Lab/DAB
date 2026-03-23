@@ -43,25 +43,106 @@ public class MultiServiceManager {
     private volatile Map<String, DistributedServiceRunner> active;
     private volatile List<ServiceDefinition> definitions;
 
+    private static MultiServiceManager INSTANCE;
+
     /**
      * Creates a new instance of {@link MultiServiceManager} with local services coordination
      *
      * @param hostName
+     * @param channelSize
+     * @return
      */
-    public MultiServiceManager(String hostName) {
+    public static void initLocal(String hostName, int channelSize) {
 
-	this(null, hostName, Integer.MAX_VALUE, List.of());
+	INSTANCE = new MultiServiceManager(hostName, channelSize);
     }
 
     /**
      * Creates a new instance of {@link MultiServiceManager} with local services coordination
      *
      * @param hostName
+     * @param channelSize
+     * @param defs
+     * @return
+     */
+    public static void initLocal(String hostName, int channelSize, List<ServiceDefinition> defs) {
+
+	INSTANCE = new MultiServiceManager(hostName, channelSize, defs);
+    }
+
+    /**
+     * Creates a new instance of {@link MultiServiceManager} with distributed services coordination
+     *
+     * @param pool
+     * @param hostName
+     * @param channelSize
+     * @param maxServices
+     * @return
+     */
+    public static void initDistributed(JedisPool pool, String hostName, int maxServices, int channelSize) {
+
+	if (pool == null) {
+
+	    throw new IllegalArgumentException("JedisPool cannot be null");
+	}
+
+	INSTANCE = new MultiServiceManager(pool, hostName, maxServices, channelSize);
+    }
+
+    /**
+     * Creates a new instance of {@link MultiServiceManager} with distributed services coordination
+     *
+     * @param pool
+     * @param hostName
+     * @param channelSize
+     * @param maxServices
+     * @param defs
+     * @return
+     */
+    public static void initDistributed(JedisPool pool, String hostName, int maxServices, int channelSize, List<ServiceDefinition> defs) {
+
+	if (pool == null) {
+
+	    throw new IllegalArgumentException("JedisPool cannot be null");
+	}
+
+	INSTANCE = new MultiServiceManager(pool, hostName, maxServices, channelSize, defs);
+    }
+
+    /**
+     * @return
+     */
+    public static MultiServiceManager get() {
+
+	if (INSTANCE == null) {
+
+	    throw new IllegalStateException("MultiServiceManager has not been initialized");
+	}
+
+	return INSTANCE;
+    }
+
+    /**
+     * Creates a new instance of {@link MultiServiceManager} with local services coordination
+     *
+     * @param hostName
+     * @param channelSize
+     */
+    private MultiServiceManager(String hostName, int channelSize) {
+
+	this(null, hostName, Integer.MAX_VALUE, channelSize, List.of());
+    }
+
+    /**
+     * Creates a new instance of {@link MultiServiceManager} with local services coordination
+     *
+     * @param hostName
+     * @param channelSize
      * @param defs
      */
-    public MultiServiceManager(String hostName, List<ServiceDefinition> defs) {
+    private MultiServiceManager(String hostName, int channelSize, List<ServiceDefinition> defs) {
 
-	this(null, hostName, Integer.MAX_VALUE, defs);
+	this(null, hostName, Integer.MAX_VALUE, channelSize, defs);
     }
 
     /**
@@ -70,11 +151,12 @@ public class MultiServiceManager {
      * @param pool
      * @param hostName
      * @param maxServices
+     * @param channelSize
      * @param defs
      */
-    public MultiServiceManager(JedisPool pool, String hostName, int maxServices) {
+    private MultiServiceManager(JedisPool pool, String hostName, int maxServices, int channelSize) {
 
-	this(pool, hostName, maxServices, List.of());
+	this(pool, hostName, maxServices, channelSize, List.of());
     }
 
     /**
@@ -83,15 +165,25 @@ public class MultiServiceManager {
      * @param pool
      * @param hostName
      * @param maxServices
+     * @param channelSize
      * @param defs
      */
-    public MultiServiceManager(JedisPool pool, String hostName, int maxServices, List<ServiceDefinition> defs) {
+    private MultiServiceManager(JedisPool pool, String hostName, int maxServices, int channelSize, List<ServiceDefinition> defs) {
 	this.jedisPool = pool;
 	this.hostName = hostName;
 	this.maxServices = maxServices;
 	this.definitions = defs;
 	this.active = new ConcurrentHashMap<>();
 	this.scheduler = Executors.newScheduledThreadPool(SCHEDULER_THREAD_POOL_SIZE);
+
+	if (pool == null) {
+
+	    MessageChannels.init(channelSize);
+
+	} else {
+
+	    MessageChannels.init(pool, channelSize);
+	}
     }
 
     /**
@@ -225,13 +317,15 @@ public class MultiServiceManager {
      */
     public List<Map.Entry<String, String>> getActiveServices() {
 
-	return getDistributedActiveServices(definitions, jedisPool);
+	return jedisPool == null ? //
+		getLocalActiveServices() : //
+		getDistributedActiveServices(definitions, jedisPool);//
     }
 
     /**
      * @return
      */
-    public static List<Map.Entry<String, String>> getLocalActiveServices() {
+    private List<Map.Entry<String, String>> getLocalActiveServices() {
 
 	return LocalServiceLock.ACTIVE_SERVICES.stream().toList();
     }
@@ -239,7 +333,7 @@ public class MultiServiceManager {
     /**
      * @return
      */
-    public static List<Map.Entry<String, String>> getDistributedActiveServices(List<ServiceDefinition> defs, JedisPool jedisPool) {
+    private List<Map.Entry<String, String>> getDistributedActiveServices(List<ServiceDefinition> defs, JedisPool jedisPool) {
 
 	return defs.stream().map(def -> {
 

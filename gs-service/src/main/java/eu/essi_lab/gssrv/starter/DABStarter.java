@@ -103,7 +103,6 @@ public class DABStarter implements ConfigurationChangeListener {
      *
      */
     private SchedulerViewSetting schedulerSetting;
-    private MultiServiceManager manager;
 
     /**
      *
@@ -283,18 +282,18 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	List<ServiceDefinition> configDef = ConfigurationWrapper.getServicesDefinition();
 
-	List<ServiceDefinition> definitions = manager.getDefinitions();
+	List<ServiceDefinition> definitions = MultiServiceManager.get().getDefinitions();
 
 	if (!configDef.equals(definitions)) {
 
-	    manager.setDefinitions(configDef);
+	    MultiServiceManager.get().setDefinitions(configDef);
 	}
     }
 
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 
-	if (manager != null && (event.getEventType() == CONFIGURATION_FLUSHED || event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
+	if (MultiServiceManager.get() != null && (event.getEventType() == CONFIGURATION_FLUSHED || event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
 
 	    switch (mode) {
 	    case MIXED, LOCAL_PRODUCTION, SERVICE -> {
@@ -1193,43 +1192,47 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    String hostName = HostNamePropertyUtils.getHostNameProperty();
 
+	    SessionCoordinatorSetting setting = ConfigurationWrapper.getSessionCoordinatorSetting();
+
 	    switch (mode) {
 	    case DISTRIBUTED -> {
 
 		GSLoggerFactory.getLogger(getClass()).info("Distributed coordination mode");
 
-		String redisEndpoint = ConfigurationWrapper.getSessionCoordinatorSetting().getRedisEndpoint(false);
+		String redisEndpoint = setting.getRedisEndpoint(false);
 
 		JedisPool pool = new JedisPool(redisEndpoint, 6379);
 
-		int maxServices = ConfigurationWrapper.getSessionCoordinatorSetting().getMaxServices();
-		int heartbeat = ConfigurationWrapper.getSessionCoordinatorSetting().getHeartbeat();
-		int ttl = ConfigurationWrapper.getSessionCoordinatorSetting().getTTL();
+		int maxServices = setting.getMaxServices();
+		int heartbeat = setting.getHeartbeat();
+		int ttl = setting.getTTL();
+		int channelSize = setting.getDistributedMessageChannelSize();
 
-		manager = new MultiServiceManager( //
+		MultiServiceManager.initDistributed( //
 			pool, //
 			hostName, //
-			maxServices);
+			maxServices, channelSize);
 
-		manager.setHeartbeatSeconds(heartbeat);
-		manager.setTTSeconds(ttl);
+		MultiServiceManager.get().setHeartbeatSeconds(heartbeat);
+		MultiServiceManager.get().setTTSeconds(ttl);
 	    }
 	    case LOCAL -> {
 
 		GSLoggerFactory.getLogger(getClass()).info("Local coordination mode");
 
-		manager = new MultiServiceManager(hostName);
+		int channelSize = setting.getLocalMessageChannelSize();
+
+		MultiServiceManager.initLocal(hostName, channelSize);
 	    }
 	    }
 
-	    manager.start();
+	    MultiServiceManager.get().start();
 
 	    updateServiceDefinitions();
 
-	    Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
+	    Runtime.getRuntime().addShutdownHook(new Thread(MultiServiceManager.get()::shutdown));
 
 	    GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager ENDED");
-
 	}
 	}
     }

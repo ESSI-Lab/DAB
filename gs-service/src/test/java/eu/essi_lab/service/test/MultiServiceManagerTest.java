@@ -34,15 +34,16 @@ public class MultiServiceManagerTest {
 	ServiceDefinition def8 = ServiceDefinition.of("8", TestService.class);
 	ServiceDefinition def9 = ServiceDefinition.of("9", TestService.class);
 
-	MultiServiceManager manager = new MultiServiceManager( //
+	MultiServiceManager.initDistributed( //
 		pool, //
 		nodeId, //
 		5, //
+		100, //
 		List.of());//
 
-	manager.start();
+	MultiServiceManager.get().start();
 
-	Runtime.getRuntime().addShutdownHook(new Thread(manager::shutdown));
+	Runtime.getRuntime().addShutdownHook(new Thread(MultiServiceManager.get()::shutdown));
 
 	//
 	//
@@ -54,7 +55,7 @@ public class MultiServiceManagerTest {
 	    @Override
 	    public void run() {
 
-		List<Map.Entry<String, String>> activeServices = manager.getActiveServices();
+		List<Map.Entry<String, String>> activeServices = MultiServiceManager.get().getActiveServices();
 
 		activeServices.forEach(entry -> {
 
@@ -78,7 +79,7 @@ public class MultiServiceManagerTest {
 	    @Override
 	    public void run() {
 
-		manager.setDefinitions(List.of(def0, def1));
+		MultiServiceManager.get().setDefinitions(List.of(def0, def1));
 	    }
 	};
 

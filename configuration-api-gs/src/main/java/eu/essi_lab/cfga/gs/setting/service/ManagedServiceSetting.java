@@ -47,10 +47,10 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		cannotBeDisabled().//
 		withSingleSelection().//
 		withValuesLoader(new ServiceValuesLoader()).//
-		withValues(ServiceValuesLoader.getValues()).//
-		withSelectedValue(ServiceValuesLoader.getValues().getFirst()).//
-		required().//
-		build();
+		//		withValues(ServiceValuesLoader.getValues()).//
+		//		withSelectedValue(ServiceValuesLoader.getValues().getFirst()).//
+			required().//
+			build();
 
 	addOption(serviceImplOption);
 
@@ -123,7 +123,14 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		response.setResult(ValidationResponse.ValidationResult.VALIDATION_FAILED);
 	    }
 
-	    if (ids.contains(manSetting.getServiceId())) {
+	    String serviceId = manSetting.getServiceId();
+
+	    if (serviceId == null || serviceId.isEmpty()) {
+
+		response.getErrors().add("Service id is required");
+		response.setResult(ValidationResponse.ValidationResult.VALIDATION_FAILED);
+
+	    } else if (Objects.equals(context.getContext(), ValidationContext.PUT) && ids.contains(serviceId)) {
 
 		response.getErrors().add("Provided service id is already in use");
 		response.setResult(ValidationResponse.ValidationResult.VALIDATION_FAILED);
@@ -190,7 +197,9 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 
 		    ColumnDescriptor.create("Status", true, true, s -> ManagedServiceSupport.getInstance().getServiceStatus(s)),
 
-		    ColumnDescriptor.create("Host", true, true, s -> ManagedServiceSupport.getInstance().getServiceHost(s))
+		    ColumnDescriptor.create("Host", true, true, s -> ManagedServiceSupport.getInstance().getServiceHost(s)),
+
+		    ColumnDescriptor.create("Messages", true, true, s -> ManagedServiceSupport.getInstance().getServiceMessages(s))
 
 	    )).//
 		    reloadable(() -> ManagedServiceSupport.getInstance().update()).//
@@ -290,7 +299,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
      */
     public String getSelectedImplementation() {
 
-	return getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().getSelectedValue();
+	return getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().getValue();
     }
 
     /**

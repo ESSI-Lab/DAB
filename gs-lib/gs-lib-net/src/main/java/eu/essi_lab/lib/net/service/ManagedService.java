@@ -1,5 +1,7 @@
 package eu.essi_lab.lib.net.service;
 
+import eu.essi_lab.lib.net.service.message.*;
+
 /**
  * @author Fabrizio
  */
@@ -8,10 +10,9 @@ public interface ManagedService {
     /**
      * @param id
      */
-    public void setId(String id);
+    void setId(String id);
 
     /**
-     *
      * @return
      */
     String getId();
@@ -29,8 +30,26 @@ public interface ManagedService {
     /**
      *
      */
-    default String getName(){
+    default String getName() {
 
-        return getClass().getSimpleName();
+	return getClass().getSimpleName();
+    }
+
+    /**
+     * @param serviceId
+     * @param level
+     * @param message
+     */
+    default void publish(MessageChannel.MessageLevel level, String message) {
+
+        MessageChannels.get().publish(getId(), level, message);
+    }
+
+    /**
+     * @param serviceId
+     */
+    default void removeAll() {
+
+        MessageChannels.get().removeAll(getId());
     }
 }

@@ -44,7 +44,9 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
     private static final String TTL_OPTION_KEY = "ttl";
     private static final String HEARTBEAT_OPTION_KEY = "heartbeat";
     private static final String DIST_SERVICES_SETTING_ID = "distServicesSetting";
+    private static final String DIST_CHANNEL_SIZE_KEY = "distChannelSize";
     private static final String LOCAL_SERVICES_SETTING_ID = "localServicesSetting";
+    private static final String LOCAL_CHANNEL_SIZE_KEY = "localChannelSize";
 
     /**
      * @author Fabrizio
@@ -142,6 +144,18 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 	localServiceSetting.enableCompactMode(false);
 	localServiceSetting.setEditable(false);
 
+	Option<Integer> localChannelSize = IntegerOptionBuilder.get().//
+		withKey(LOCAL_CHANNEL_SIZE_KEY).//
+		withLabel("Message channel size").//
+		withDescription("Maximum number of allowed messages for each service (min. 10 / max. 500)").//
+		withMinValue(10).//
+		withMaxValue(500).//
+		withValue(100).//
+		cannotBeDisabled().//
+		build();
+
+	localServiceSetting.addOption(localChannelSize);
+
 	addSetting(localServiceSetting);
 
 	//
@@ -186,6 +200,18 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		build();
 
 	distServicesSetting.addOption(hearthbeatOption);
+
+	Option<Integer> distChannelSize = IntegerOptionBuilder.get().//
+		withKey(DIST_CHANNEL_SIZE_KEY).//
+		withLabel("Message channel size").//
+		withDescription("Maximum number of allowed messages for each service (min. 10 / max. 500)").//
+		withMinValue(10).//
+		withMaxValue(500).//
+		withValue(100).//
+		cannotBeDisabled().//
+		build();
+
+	distServicesSetting.addOption(distChannelSize);
 
 	addSetting(distServicesSetting);
     }
@@ -345,6 +371,28 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 	return getSetting(DIST_SERVICES_SETTING_ID).//
 		get(). //
 		getOption(HEARTBEAT_OPTION_KEY, Integer.class).get().//
+		getValue();
+    }
+
+    /**
+     * @return
+     */
+    public int getLocalMessageChannelSize() {
+
+	return getSetting(LOCAL_SERVICES_SETTING_ID).//
+		get(). //
+		getOption(LOCAL_CHANNEL_SIZE_KEY, Integer.class).get().//
+		getValue();
+    }
+
+    /**
+     * @return
+     */
+    public int getDistributedMessageChannelSize() {
+
+	return getSetting(DIST_SERVICES_SETTING_ID).//
+		get(). //
+		getOption(DIST_CHANNEL_SIZE_KEY, Integer.class).get().//
 		getValue();
     }
 }
