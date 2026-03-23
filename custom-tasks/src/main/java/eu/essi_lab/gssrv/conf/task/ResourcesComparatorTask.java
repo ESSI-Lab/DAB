@@ -13,58 +13,43 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.beust.jcommander.internal.Lists;
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.Database.IdentifierType;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.kafka.client.KafkaPublisher;
-import eu.essi_lab.lib.kafka.client.KafkaPublisher.SaslMechanism;
-import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
-import eu.essi_lab.lib.net.publisher.MessagePublisher;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.HarvestingStrategy;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.GSResourceComparator;
-import eu.essi_lab.model.resource.GSResourceComparator.ComparisonResponse;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.json.JSONObject;
-import org.quartz.JobExecutionContext;
+import com.beust.jcommander.internal.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.lib.kafka.client.*;
+import eu.essi_lab.lib.kafka.client.KafkaPublisher.*;
+import eu.essi_lab.lib.mqtt.hive.*;
+import eu.essi_lab.lib.net.publisher.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.GSResourceComparator.*;
+import org.apache.kafka.common.security.auth.*;
+import org.json.*;
+import org.quartz.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * This task must be embedded
@@ -139,16 +124,16 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	//
 	taskOptions.ifPresent(s -> //
 		comparisonProperties = Arrays.stream(s.trim().strip().split("\n")).//
-		map(v -> MetadataElement.optFromReadableName(v.trim().strip()).orElse(null)).//
-		filter(Objects::nonNull).//
-		collect(Collectors.toList()));
+			map(v -> MetadataElement.optFromName(v.trim().strip()).orElse(null)).//
+			filter(Objects::nonNull).//
+			collect(Collectors.toList()));
 
 	GSLoggerFactory.getLogger(getClass()).info("Selected comparison properties: {}", //
 		comparisonProperties.stream().//
 			map(p -> p.getReadableName().orElse(p.getName())).//
 			collect(Collectors.toList()));
 
-	HashMap<String, List<String>> modifiedRecords = new HashMap<>();
+	Map<String, List<String>> modifiedRecords = new ConcurrentHashMap();
 
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
@@ -226,11 +211,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			    filter(id -> !prevIds.contains(id)).//
 			    collect(Collectors.toList());
 
-		    List<String> commonIds = currIds.stream().//
+		    currIds.parallelStream().//
 			    filter(prevIds::contains).//
-			    toList();
-
-		    for (String id : commonIds) {
+			    forEach(id -> {
 
 			try {
 
@@ -262,9 +245,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			} catch (Exception ex) {
 
 			    GSLoggerFactory.getLogger(getClass()).error(ex);
-			    throw ex;
+			    //			    throw ex;
 			}
-		    }
+		    });
 		}
 
 		break;
