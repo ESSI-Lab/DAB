@@ -293,7 +293,7 @@ public class DABStarter implements ConfigurationChangeListener {
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 
-	if (MultiServiceManager.get() != null && (event.getEventType() == CONFIGURATION_FLUSHED || event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
+	if (MultiServiceManager.isInitialized() && (event.getEventType() == CONFIGURATION_FLUSHED || event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
 
 	    switch (mode) {
 	    case MIXED, LOCAL_PRODUCTION, SERVICE -> {
@@ -301,7 +301,6 @@ public class DABStarter implements ConfigurationChangeListener {
 		updateServiceDefinitions();
 	    }
 	    }
-
 	}
 
 	if (event.getEventType() == CONFIGURATION_AUTO_RELOADED) {

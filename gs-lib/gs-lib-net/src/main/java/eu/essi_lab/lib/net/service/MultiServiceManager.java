@@ -110,6 +110,15 @@ public class MultiServiceManager {
     }
 
     /**
+     *
+     * @return
+     */
+    public static boolean isInitialized(){
+
+	return INSTANCE != null;
+    }
+
+    /**
      * @return
      */
     public static MultiServiceManager get() {
