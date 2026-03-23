@@ -178,7 +178,7 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 		    singleSelect.setLabel("");
 		    singleSelect.setInvalid(false);
 
-		    if (!stringValues.isEmpty()){
+		    if (!stringValues.isEmpty() && option.isRequired()){
 
 			singleSelect.setValue(stringValues.getFirst());
 			option.select(v -> v.equals(stringValues.getFirst()));

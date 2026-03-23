@@ -48,10 +48,8 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		cannotBeDisabled().//
 		withSingleSelection().//
 		withValuesLoader(new ServiceValuesLoader()).//
-		//		withValues(ServiceValuesLoader.getValues()).//
-		//		withSelectedValue(ServiceValuesLoader.getValues().getFirst()).//
-			required().//
-			build();
+		required().//
+		build();
 
 	addOption(serviceImplOption);
 
@@ -201,7 +199,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		    ColumnDescriptor.create("Host", true, true, s -> ManagedServiceSupport.getInstance().getServiceHost(s)),
 
 		    ColumnDescriptor.create("Messages", 70, s -> ManagedServiceSupport.getInstance().getServiceMessages(s), //
-			    ViewerColumnRenderer.create("Messages", "Messages","View service messages"))
+			    ViewerColumnRenderer.create("Messages", "Messages", "View service messages"))
 
 	    )).//
 		    reloadable(() -> ManagedServiceSupport.getInstance().update()).//
