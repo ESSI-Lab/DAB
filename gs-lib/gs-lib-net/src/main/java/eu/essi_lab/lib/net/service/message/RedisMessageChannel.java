@@ -70,6 +70,7 @@ public class RedisMessageChannel implements MessageChannel {
 	    return jedis.lrange(key(serviceId), -max, -1). //
 		    stream().//
 		    map(Message::of).//
+		    sorted(Message.getComparator()).//
 		    toList();//
 	}
     }

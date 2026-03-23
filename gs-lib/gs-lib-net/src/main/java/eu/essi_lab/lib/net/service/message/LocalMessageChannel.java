@@ -107,7 +107,7 @@ public class LocalMessageChannel implements MessageChannel {
 
 	return messages == null ? new ArrayList<>() :
 		messages.stream(). //
-			sorted(Comparator.comparing(MessageChannel.Message::getTimestamp)).//
+			sorted(Message.getComparator()).//
 			toList();//
     }
 

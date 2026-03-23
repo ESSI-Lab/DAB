@@ -79,7 +79,7 @@ public class ManagedServiceSupport {
 
 	String serviceId = setting.getOption(ManagedServiceSetting.SERVICE_ID_OPTION_KEY, String.class).get().getValue();
 
-	List<MessageChannel.Message> messages = MessageChannels.readMessages(serviceId);
+	List<MessageChannel.Message> messages = MessageChannels.get().read(serviceId);
 
 	String joined = messages.stream().//
 		map(m -> "[" + m.getLevel() + ":" + m.getTimestamp() + ":" + m.getMessage() + "]").//

@@ -2,12 +2,13 @@ package eu.essi_lab.lib.net.service.message;
 
 import eu.essi_lab.lib.utils.*;
 
+import java.io.*;
 import java.util.*;
 
 /**
  * @author Fabrizio
  */
-public interface MessageChannel {
+public interface MessageChannel extends ReadableMessageChannel {
 
     /**
      * @author Fabrizio
@@ -66,6 +67,14 @@ public interface MessageChannel {
 	/**
 	 * @return
 	 */
+	static Comparator<Message> getComparator() {
+
+	    return (Comparator<Message> & Serializable) (m1, m2) -> m2.getTimestamp().compareTo(m1.getTimestamp());
+	}
+
+	/**
+	 * @return
+	 */
 	public String getTimestamp() {
 
 	    return timestamp;
@@ -111,42 +120,11 @@ public interface MessageChannel {
     }
 
     /**
-     *
      * @param serviceId
      * @param level
      * @param message
      */
     void publish(String serviceId, MessageLevel level, String message);
-
-    /**
-     * @param serviceId
-     * @return
-     */
-    List<Message> read(String serviceId);
-
-    /**
-     *
-     * @param serviceId
-     * @param minLevel
-     * @return
-     */
-    List<Message> read(String serviceId, MessageLevel minLevel);
-
-
-    /**
-     * @param serviceId
-     * @param max
-     * @return
-     */
-    List<Message> read(String serviceId, int max);
-
-    /**
-     * @param serviceId
-     * @param max
-     * @param minLevel
-     * @return
-     */
-    List<Message> read(String serviceId, int max, MessageLevel minLevel);
 
     /**
      * @param serviceId

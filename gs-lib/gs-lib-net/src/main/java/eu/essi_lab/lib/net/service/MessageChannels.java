@@ -13,6 +13,14 @@ public class MessageChannels {
     private static MessageChannel INSTANCE;
 
     /**
+     * @return
+     */
+    public static ReadableMessageChannel get() {
+
+	return INSTANCE;
+    }
+
+    /**
      *
      */
     static void init(int channelSize) {
@@ -29,33 +37,8 @@ public class MessageChannels {
 	INSTANCE = new RedisMessageChannel(pool, channelSize);
     }
 
-    /**
-     * @return
-     */
-    public static MessageChannel get() {
+    static MessageChannel getWritable() {
 
 	return INSTANCE;
-    }
-
-    /**
-     * @param serviceId
-     * @return
-     */
-    public static List<MessageChannel.Message> readMessages(String serviceId) {
-
-	return readMessages(serviceId, Integer.MAX_VALUE);
-    }
-
-    /**
-     * @param serviceId
-     * @param maxMessages
-     * @return
-     */
-    public static List<MessageChannel.Message> readMessages(String serviceId, int maxMessages) {
-
-	return INSTANCE.read(serviceId, maxMessages).//
-		stream(). //
-		sorted(Comparator.comparing(MessageChannel.Message::getTimestamp)).//
-		toList();
     }
 }

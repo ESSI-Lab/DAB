@@ -42,7 +42,7 @@ public interface ManagedService {
      */
     default void publish(MessageChannel.MessageLevel level, String message) {
 
-        MessageChannels.get().publish(getId(), level, message);
+        MessageChannels.getWritable().publish(getId(), level, message);
     }
 
     /**
@@ -50,6 +50,6 @@ public interface ManagedService {
      */
     default void removeAll() {
 
-        MessageChannels.get().removeAll(getId());
+        MessageChannels.getWritable().removeAll(getId());
     }
 }
