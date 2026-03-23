@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os.handler.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -43,11 +43,11 @@ import eu.essi_lab.pdk.wrt.*;
 import eu.essi_lab.profiler.os.*;
 import eu.essi_lab.profiler.os.OSProfilerSetting.*;
 import eu.essi_lab.profiler.os.handler.discover.covering.*;
+import eu.essi_lab.profiler.os.handler.discover.datahub.*;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.*;
-import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonMapper;
 import eu.essi_lab.profiler.os.handler.srvinfo.*;
-
 import jakarta.ws.rs.core.*;
+
 import java.util.*;
 import java.util.stream.*;
 
@@ -315,31 +315,36 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		}
 	    }
 
+	    //
+ 	    // supported parameters check
+ 	    //
+
 	    List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
 
-	    // it can throw an IllegalArgumentException
-	    boolean paramFound = false;
+	    List<String> unsupportedParams = keyValueParser.getParametersMap().keySet().//
+		    stream().//
+		    filter(key -> !parameters.stream().//
+		    map(OSParameter::getName).toList().contains(key)).//
+		    toList();
 
-	    for (OSParameter osParameter : parameters) {
-
-		String parse = parser.parse(osParameter);
-		paramFound |= parse != null && !parse.equals("");
-	    }
-
-	    if (!paramFound) {
+	    if (!unsupportedParams.isEmpty()) {
 
 		GSLoggerFactory.getLogger(getClass())
-			.error("Validation failed, invalid OpenSearch request: none of the supported search parameters is set");
+			.error("Validation failed: found one or more unsupported parameters: " + unsupportedParams);
 
 		message.setResult(ValidationResult.VALIDATION_FAILED);
-		message.setError("Invalid OpenSearch request: none of the supported search parameters is set");
+		message.setError("Found one or more unsupported parameters: " + unsupportedParams);
 
 		return message;
 	    }
 
+	    //
+ 	    // output format check
+ 	    //
+
 	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);
 
-	    if (outputFormat != null && !outputFormat.equals("")) {
+	    if (outputFormat != null && !outputFormat.isEmpty()) {
 
 		if (outputFormat.equals("application/atom xml")) {
 		    outputFormat = MediaType.APPLICATION_ATOM_XML;
@@ -634,8 +639,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * Unless explicitly set in the profiler setting with {@link KeyValueOptionKeys#MAX_RESULT_WINDOW_SIZE}
-     * key value option, the max window size is unlimited
+     * Unless explicitly set in the profiler setting with {@link KeyValueOptionKeys#MAX_RESULT_WINDOW_SIZE} key value option, the max window
+     * size is unlimited
      *
      * @return
      */
