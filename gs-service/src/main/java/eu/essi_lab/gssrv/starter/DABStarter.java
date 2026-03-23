@@ -1210,7 +1210,8 @@ public class DABStarter implements ConfigurationChangeListener {
 		MultiServiceManager.initDistributed( //
 			pool, //
 			hostName, //
-			maxServices, channelSize);
+			maxServices,//
+			channelSize);
 
 		MultiServiceManager.get().setHeartbeatSeconds(heartbeat);
 		MultiServiceManager.get().setTTSeconds(ttl);
