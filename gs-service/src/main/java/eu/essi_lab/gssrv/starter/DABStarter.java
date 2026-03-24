@@ -298,7 +298,7 @@ public class DABStarter implements ConfigurationChangeListener {
 		|| event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
 
 	    switch (mode) {
-	    case MIXED, LOCAL_PRODUCTION, SERVICE -> {
+	    case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH -> {
 
 		updateServiceDefinitions();
 	    }
