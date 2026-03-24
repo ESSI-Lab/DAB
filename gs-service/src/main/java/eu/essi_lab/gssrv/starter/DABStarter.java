@@ -1196,7 +1196,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    switch (mode) {
 	    case DISTRIBUTED -> {
 
-		GSLoggerFactory.getLogger(getClass()).info("Distributed coordination mode");
+		GSLoggerFactory.getLogger(getClass()).info("Coordination mode: distributed");
 
 		String redisEndpoint = setting.getRedisEndpoint(false);
 
@@ -1218,7 +1218,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 	    case LOCAL -> {
 
-		GSLoggerFactory.getLogger(getClass()).info("Local coordination mode");
+		GSLoggerFactory.getLogger(getClass()).info("Coordination mode: local");
 
 		int channelSize = setting.getLocalMessageChannelSize();
 
