@@ -1182,7 +1182,7 @@ public class DABStarter implements ConfigurationChangeListener {
     private void initMultiServiceManager() {
 
 	switch (mode) {
-	case MIXED, LOCAL_PRODUCTION, SERVICE -> {
+	case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH -> {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager STARTED");
 
