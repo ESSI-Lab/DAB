@@ -50,7 +50,7 @@ public final class LombardiaClients {
      */
     public static HISCentralLombardiaClient createFromConfiguration(URL endpoint) throws Exception {
 	var setting = ConfigurationWrapper.getSessionCoordinatorSetting();
-	if (!setting.isDistributedSessionCoordinator()) {
+	if (!setting.isEnabled() || !setting.isDistributedTokenUsed()) {
 	    return new HISCentralLombardiaClient(endpoint);
 	}
 	String redisEndpoint = setting.getRedisEndpoint();

@@ -225,7 +225,8 @@ public class SettingComponentFactory {
 		forceReadonly,//
 		forceHideHeader, //
 		null,// comparator
-		tabContent, tabView);
+		tabContent, //
+		tabView);
     }
 
     /**

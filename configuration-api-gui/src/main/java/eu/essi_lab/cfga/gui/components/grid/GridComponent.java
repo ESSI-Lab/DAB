@@ -264,7 +264,8 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		column.setFlexGrow(1);
 	    }
 
-	    if (descriptor.isFiltered() || descriptor.getRenderer().isPresent()) {
+	    if (descriptor.isFiltered() || (descriptor.getRenderer().isPresent() && //
+		    !(descriptor.getRenderer().get() instanceof ViewerColumnRenderer))) {
 
 		addFilter(descriptor, column);
 	    }

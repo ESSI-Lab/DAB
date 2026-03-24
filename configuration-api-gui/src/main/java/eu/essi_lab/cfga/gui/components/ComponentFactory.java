@@ -390,7 +390,10 @@ public class ComponentFactory {
      */
     public static Div createDiv() {
 
-	return new Div();
+	Div div = new Div();
+	div.setWidthFull();
+
+	return div;
     }
 
     /**

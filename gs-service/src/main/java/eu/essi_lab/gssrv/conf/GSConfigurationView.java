@@ -36,6 +36,7 @@ import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.oauth.*;
+import eu.essi_lab.cfga.gs.setting.service.*;
 import eu.essi_lab.cfga.gs.task.*;
 import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
@@ -497,6 +498,7 @@ public class GSConfigurationView extends ConfigurationView {
 	return Arrays.asList(//
 		new AsynchDownloadDescriptor(),//
 		new ViewsDescriptor(),//
+		new ManagedServiceSetting.TabDescriptorProvider(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//
