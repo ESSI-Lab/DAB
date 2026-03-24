@@ -78,6 +78,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.*;
+import static eu.essi_lab.configuration.ExecutionMode.CONFIGURATION;
 
 /**
  * @author Fabrizio
@@ -293,7 +294,8 @@ public class DABStarter implements ConfigurationChangeListener {
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 
-	if (MultiServiceManager.isInitialized() && (event.getEventType() == CONFIGURATION_FLUSHED || event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
+	if (MultiServiceManager.isInitialized() && (event.getEventType() == CONFIGURATION_FLUSHED
+		|| event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
 
 	    switch (mode) {
 	    case MIXED, LOCAL_PRODUCTION, SERVICE -> {
@@ -492,7 +494,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    // LOCAL_PRODUCTION mode
 	    // but this is done in the next rows...)
 	    //
-	    if (mode == ExecutionMode.CONFIGURATION || mode == ExecutionMode.MIXED) {
+	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED) {
 
 		configuration.pauseAutoreload();
 	    }
@@ -1182,18 +1184,18 @@ public class DABStarter implements ConfigurationChangeListener {
     private void initMultiServiceManager() {
 
 	switch (mode) {
-	case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH -> {
+	case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH, CONFIGURATION -> {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager STARTED");
+	    GSLoggerFactory.getLogger(getClass()).info("Init multi service manager STARTED");
 
-	    SessionCoordinatorSetting.ServiceCoordinatorMode mode = ConfigurationWrapper.getSessionCoordinatorSetting()
+	    SessionCoordinatorSetting.ServiceCoordinatorMode serviceMode = ConfigurationWrapper.getSessionCoordinatorSetting()
 		    .getServiceCoordinatorMode();
 
 	    String hostName = HostNamePropertyUtils.getHostNameProperty();
 
 	    SessionCoordinatorSetting setting = ConfigurationWrapper.getSessionCoordinatorSetting();
 
-	    switch (mode) {
+	    switch (serviceMode) {
 	    case DISTRIBUTED -> {
 
 		GSLoggerFactory.getLogger(getClass()).info("Coordination mode: distributed");
@@ -1226,13 +1228,22 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 	    }
 
-	    MultiServiceManager.get().start();
+	    if (mode != CONFIGURATION) {
+
+		GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager");
+
+		MultiServiceManager.get().start();
+
+	    } else {
+
+		GSLoggerFactory.getLogger(getClass()).info("Multi service manager start is disabled in CONFIGURATION exec. mode");
+	    }
 
 	    updateServiceDefinitions();
 
 	    Runtime.getRuntime().addShutdownHook(new Thread(MultiServiceManager.get()::shutdown));
 
-	    GSLoggerFactory.getLogger(getClass()).info("Starting multi service manager ENDED");
+	    GSLoggerFactory.getLogger(getClass()).info("Init multi service manager ENDED");
 	}
 	}
     }
@@ -1292,7 +1303,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    //
 	    // for these exec modes also starts the SchedulerSupport
 	    //
-	    if (mode == ExecutionMode.CONFIGURATION || mode == ExecutionMode.MIXED || mode == ExecutionMode.LOCAL_PRODUCTION) {
+	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED || mode == ExecutionMode.LOCAL_PRODUCTION) {
 
 		SchedulerSupport.getInstance().updateDelayed();
 	    }
