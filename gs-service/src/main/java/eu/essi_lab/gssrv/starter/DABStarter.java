@@ -54,7 +54,6 @@ import eu.essi_lab.jaxb.common.*;
 import eu.essi_lab.jaxb.wms.extension.*;
 import eu.essi_lab.lib.net.downloader.*;
 import eu.essi_lab.lib.net.s3.*;
-import eu.essi_lab.lib.net.service.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.messages.bond.jaxb.*;
@@ -65,6 +64,7 @@ import eu.essi_lab.profiler.esri.feature.query.*;
 import eu.essi_lab.profiler.wms.extent.*;
 import eu.essi_lab.profiler.wms.extent.map.*;
 import eu.essi_lab.request.executor.schedule.*;
+import eu.essi_lab.services.*;
 import eu.essi_lab.shared.driver.es.stats.*;
 import jakarta.ws.rs.ext.*;
 import org.quartz.*;
@@ -78,7 +78,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.*;
-import static eu.essi_lab.configuration.ExecutionMode.CONFIGURATION;
+import static eu.essi_lab.configuration.ExecutionMode.*;
 
 /**
  * @author Fabrizio
@@ -298,7 +298,7 @@ public class DABStarter implements ConfigurationChangeListener {
 		|| event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
 
 	    switch (mode) {
-	    case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH -> {
+	    case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH, CONFIGURATION -> {
 
 		updateServiceDefinitions();
 	    }
