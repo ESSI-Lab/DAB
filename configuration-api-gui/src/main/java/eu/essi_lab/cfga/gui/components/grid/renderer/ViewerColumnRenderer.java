@@ -82,6 +82,8 @@ public class ViewerColumnRenderer extends GridColumnRenderer<Button> {
 	textArea.setHeight("600px");
 	textArea.setReadOnly(true);
 	textArea.setValue(text);
+	textArea.addClassName("no-wrap");
+	textArea.addClassName("text-area-readonly");
 
 	NotificationDialog dialog = NotificationDialog.getNotificationDialog(windowTitle, "");
 	dialog.setWidth(areaWidth + 30 + "px");
