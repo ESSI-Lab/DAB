@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.service.message;
+package eu.essi_lab.services.message;
 
 import eu.essi_lab.lib.utils.*;
 import redis.clients.jedis.*;

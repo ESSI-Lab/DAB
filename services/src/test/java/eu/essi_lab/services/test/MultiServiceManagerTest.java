@@ -1,7 +1,7 @@
-package eu.essi_lab.service.test;
+package eu.essi_lab.services.test;
 
-import eu.essi_lab.gssrv.services.*;
-import eu.essi_lab.lib.net.service.*;
+import eu.essi_lab.services.*;
+import eu.essi_lab.services.impl.*;
 import redis.clients.jedis.*;
 
 import java.util.*;

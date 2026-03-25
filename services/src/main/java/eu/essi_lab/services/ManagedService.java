@@ -1,6 +1,6 @@
-package eu.essi_lab.lib.net.service;
+package eu.essi_lab.services;
 
-import eu.essi_lab.lib.net.service.message.*;
+import eu.essi_lab.services.message.*;
 
 /**
  * @author Fabrizio
@@ -42,7 +42,7 @@ public interface ManagedService {
      */
     default void publish(MessageChannel.MessageLevel level, String message) {
 
-        MessageChannels.getWritable().publish(getId(), level, message);
+       MessageChannels.getWritable().publish(getId(), level, message);
     }
 
     /**

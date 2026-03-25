@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.service;
+package eu.essi_lab.services;
 
 import java.util.*;
 

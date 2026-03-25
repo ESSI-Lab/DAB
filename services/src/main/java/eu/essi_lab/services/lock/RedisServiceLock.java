@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.service.lock;
+package eu.essi_lab.services.lock;
 
 import redis.clients.jedis.*;
 import redis.clients.jedis.params.*;

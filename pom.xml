@@ -2354,6 +2354,7 @@
         <module>configuration-api-rest</module>
 
         <module>custom-tasks</module>
+        <module>services</module>
 
     </modules>
 

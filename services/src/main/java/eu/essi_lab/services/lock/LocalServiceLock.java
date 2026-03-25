@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.service.lock;
+package eu.essi_lab.services.lock;
 
 import java.util.*;
 

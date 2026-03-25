@@ -1,9 +1,7 @@
-package eu.essi_lab.lib.net.service;
+package eu.essi_lab.services;
 
-import eu.essi_lab.lib.net.service.message.*;
+import eu.essi_lab.services.message.*;
 import redis.clients.jedis.*;
-
-import java.util.*;
 
 /**
  * @author Fabrizio

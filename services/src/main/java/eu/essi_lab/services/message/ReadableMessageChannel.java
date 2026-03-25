@@ -1,4 +1,4 @@
-package eu.essi_lab.lib.net.service.message;
+package eu.essi_lab.services.message;
 
 import java.util.*;
 

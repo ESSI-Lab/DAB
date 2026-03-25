@@ -1,7 +1,7 @@
-package eu.essi_lab.lib.net.service;
+package eu.essi_lab.services;
 
-import eu.essi_lab.lib.net.service.lock.*;
 import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.services.lock.*;
 import redis.clients.jedis.*;
 
 import java.util.*;

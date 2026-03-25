@@ -10,8 +10,8 @@ import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.option.*;
 import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.validation.*;
-import eu.essi_lab.lib.net.service.*;
 import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.services.*;
 
 import java.util.*;
 
