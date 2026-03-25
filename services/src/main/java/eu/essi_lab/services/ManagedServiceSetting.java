@@ -287,8 +287,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     public boolean equals(Object o) {
 
 	return o instanceof ManagedServiceSetting other && //
-		Objects.equals(getServiceId(), other.getServiceId()) && Objects.equals(getSelectedImplClass(),
-		other.getSelectedImplClass());
+		Objects.equals(toString(), other.toString());
     }
 
 }

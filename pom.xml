@@ -219,6 +219,9 @@
         <org.apache.jena.version>5.6.0</org.apache.jena.version>
         <org.apache.jena.tbd.version>4.10.0</org.apache.jena.tbd.version>
 
+        <!-- Apache Avro -->
+        <org.apache.avro.version>1.11.3</org.apache.avro.version>
+
         <!-- Saxon - XSLT and XQuery Processor -->
         <saxon-he.version>10.6</saxon-he.version>
 
@@ -468,6 +471,12 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.apache.avro</groupId>
+                <artifactId>avro</artifactId>
+                <version>${org.apache.avro.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>

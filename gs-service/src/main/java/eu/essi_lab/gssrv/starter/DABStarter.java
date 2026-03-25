@@ -283,12 +283,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	List<ManagedServiceSetting> configSettings = ConfigurationWrapper.getManagedServiceSettings();
 
-	List<ManagedServiceSetting> currentSettings = MultiServiceManager.get().getSettings();
-
-	if (!configSettings.equals(currentSettings)) {
-
-	    MultiServiceManager.get().setSettings(configSettings);
-	}
+	MultiServiceManager.get().setSettings(configSettings);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package eu.essi_lab.services.impl;
 
 import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.services.*;
 import eu.essi_lab.services.message.*;
 
 import java.time.*;
@@ -10,32 +9,14 @@ import java.time.temporal.*;
 /**
  * @author Fabrizio
  */
-public class TestService implements ManagedService {
+public class TestService extends AbstractManagedService {
 
-    private volatile boolean running = false;
-    private String id;
-    private boolean enabled;
-    private ManagedServiceSetting setting;
+    private boolean running;
 
     /**
      *
      */
     public TestService() {
-    }
-
-    /**
-     * @param id
-     */
-    @Override
-    public void setId(String id) {
-
-	this.id = id;
-    }
-
-    @Override
-    public String getId() {
-
-	return id;
     }
 
     @Override
@@ -51,8 +32,8 @@ public class TestService implements ManagedService {
 
 		GSLoggerFactory.getLogger(getClass()).info("*** [ Running service: {} ] ***", getId());
 
-		setting.getServiceOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Options: {}", o));
-		setting.getKeyValueOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Key-value options: {}", o));
+		getSetting().getServiceOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Options: {}", o));
+		getSetting().getKeyValueOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Key-value options: {}", o));
 
 		publish(MessageChannel.MessageLevel.INFO, "Running service: " + getId());
 
@@ -71,19 +52,6 @@ public class TestService implements ManagedService {
 	running = false;
 
 	publish(MessageChannel.MessageLevel.INFO, "Stopped service: " + getId());
-
-    }
-
-    @Override
-    public void configure(ManagedServiceSetting setting) {
-
-	this.setting = setting;
-    }
-
-    @Override
-    public ManagedServiceSetting getSetting() {
-
-	return setting;
     }
 
 }

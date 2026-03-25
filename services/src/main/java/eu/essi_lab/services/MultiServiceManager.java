@@ -218,11 +218,15 @@ public class MultiServiceManager {
 
 	GSLoggerFactory.getLogger(getClass()).info("Set definitions");
 
-	this.settings = settings;
+	this.settings = settings.stream().filter(ManagedServiceSetting::isEnabled).toList();
 
+	//
 	// shutdown and removes from the active map the service runner
-	// that  are no longer in definitions list
-	List<String> list = settings.stream().map(ManagedServiceSetting::getServiceId).toList();
+	// that  are no longer in definitions list or that are disabled
+	//
+	List<String> list = this.settings.stream().
+		map(ManagedServiceSetting::getServiceId).
+		toList();
 
 	active.keySet().stream().//
 		filter(serviceId -> !list.contains(serviceId)).//
@@ -238,7 +242,7 @@ public class MultiServiceManager {
     /**
      * @return
      */
-    public List<ManagedServiceSetting> getSettings() {
+    public synchronized List<ManagedServiceSetting> getSettings() {
 
 	return settings;
     }

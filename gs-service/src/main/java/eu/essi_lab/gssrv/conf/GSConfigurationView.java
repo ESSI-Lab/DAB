@@ -78,7 +78,7 @@ import java.util.*;
 @CssImport(value = "./styles/vaadin-text-field-no-border.css", themeFor = "vaadin-text-field")
 @CssImport(value = "./styles/vaadin-text-area-readonly.css", themeFor = "vaadin-text-area")
 @CssImport(value = "./styles/vaadin-text-area-default.css", themeFor = "vaadin-text-area")
-
+@CssImport(value = "./styles/vaadin-text-area-no-wrap.css", themeFor = "vaadin-text-area")
 public class GSConfigurationView extends ConfigurationView {
 
     static SettingLinkedList<SchedulerWorkerSetting> newWorkerSettingList;
