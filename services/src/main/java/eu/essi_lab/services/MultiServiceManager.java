@@ -41,7 +41,7 @@ public class MultiServiceManager {
     private int heartbeatSeconds = DEFAULT_RENEW_SECONDS;
 
     private volatile Map<String, DistributedServiceRunner> active;
-    private volatile List<ServiceDefinition> definitions;
+    private volatile List<ManagedServiceSetting> settings;
 
     private static MultiServiceManager INSTANCE;
 
@@ -62,12 +62,12 @@ public class MultiServiceManager {
      *
      * @param hostName
      * @param channelSize
-     * @param defs
+     * @param settings
      * @return
      */
-    public static void initLocal(String hostName, int channelSize, List<ServiceDefinition> defs) {
+    public static void initLocal(String hostName, int channelSize, List<ManagedServiceSetting> settings) {
 
-	INSTANCE = new MultiServiceManager(hostName, channelSize, defs);
+	INSTANCE = new MultiServiceManager(hostName, channelSize, settings);
     }
 
     /**
@@ -96,24 +96,24 @@ public class MultiServiceManager {
      * @param hostName
      * @param channelSize
      * @param maxServices
-     * @param defs
+     * @param settings
      * @return
      */
-    public static void initDistributed(JedisPool pool, String hostName, int maxServices, int channelSize, List<ServiceDefinition> defs) {
+    public static void initDistributed(JedisPool pool, String hostName, int maxServices, int channelSize,
+	    List<ManagedServiceSetting> settings) {
 
 	if (pool == null) {
 
 	    throw new IllegalArgumentException("JedisPool cannot be null");
 	}
 
-	INSTANCE = new MultiServiceManager(pool, hostName, maxServices, channelSize, defs);
+	INSTANCE = new MultiServiceManager(pool, hostName, maxServices, channelSize, settings);
     }
 
     /**
-     *
      * @return
      */
-    public static boolean isInitialized(){
+    public static boolean isInitialized() {
 
 	return INSTANCE != null;
     }
@@ -149,7 +149,7 @@ public class MultiServiceManager {
      * @param channelSize
      * @param defs
      */
-    private MultiServiceManager(String hostName, int channelSize, List<ServiceDefinition> defs) {
+    private MultiServiceManager(String hostName, int channelSize, List<ManagedServiceSetting> defs) {
 
 	this(null, hostName, Integer.MAX_VALUE, channelSize, defs);
     }
@@ -177,11 +177,11 @@ public class MultiServiceManager {
      * @param channelSize
      * @param defs
      */
-    private MultiServiceManager(JedisPool pool, String hostName, int maxServices, int channelSize, List<ServiceDefinition> defs) {
+    private MultiServiceManager(JedisPool pool, String hostName, int maxServices, int channelSize, List<ManagedServiceSetting> defs) {
 	this.jedisPool = pool;
 	this.hostName = hostName;
 	this.maxServices = maxServices;
-	this.definitions = defs;
+	this.settings = defs;
 	this.active = new ConcurrentHashMap<>();
 	this.scheduler = Executors.newScheduledThreadPool(SCHEDULER_THREAD_POOL_SIZE);
 
@@ -212,17 +212,17 @@ public class MultiServiceManager {
     }
 
     /**
-     * @param definitions
+     * @param settings
      */
-    public synchronized void setDefinitions(List<ServiceDefinition> definitions) {
+    public synchronized void setSettings(List<ManagedServiceSetting> settings) {
 
 	GSLoggerFactory.getLogger(getClass()).info("Set definitions");
 
-	this.definitions = definitions;
+	this.settings = settings;
 
 	// shutdown and removes from the active map the service runner
 	// that  are no longer in definitions list
-	List<String> list = definitions.stream().map(ServiceDefinition::getId).toList();
+	List<String> list = settings.stream().map(ManagedServiceSetting::getServiceId).toList();
 
 	active.keySet().stream().//
 		filter(serviceId -> !list.contains(serviceId)).//
@@ -238,9 +238,9 @@ public class MultiServiceManager {
     /**
      * @return
      */
-    public List<ServiceDefinition> getDefinitions() {
+    public List<ManagedServiceSetting> getSettings() {
 
-	return definitions;
+	return settings;
     }
 
     /**
@@ -265,11 +265,11 @@ public class MultiServiceManager {
 	    return;
 	}
 
-	for (ServiceDefinition def : definitions) {
+	for (ManagedServiceSetting set : settings) {
 
-	    if (active.containsKey(def.getId())) {
+	    if (active.containsKey(set.getServiceId())) {
 
-		GSLoggerFactory.getLogger(getClass()).info("Service {} is already active", def.id);
+		GSLoggerFactory.getLogger(getClass()).info("Service {} is already active", set.getServiceId());
 
 		continue;
 	    }
@@ -281,33 +281,33 @@ public class MultiServiceManager {
 		break;
 	    }
 
-	    tryStartService(def);
+	    tryStartService(set);
 	}
     }
 
     /**
-     * @param def
+     * @param setting
      */
-    private void tryStartService(ServiceDefinition def) {
+    private void tryStartService(ManagedServiceSetting setting) {
 
-	ServiceLock lock = buildLock(def.id);
+	ServiceLock lock = buildLock(setting.getServiceId());
 
-	GSLoggerFactory.getLogger(getClass()).info("Trying to acquire lock for service {}", def.id);
+	GSLoggerFactory.getLogger(getClass()).info("Trying to acquire lock for service {}", setting.getServiceId());
 
 	if (!lock.tryAcquire()) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Lock for service {} already acquired", def.id);
+	    GSLoggerFactory.getLogger(getClass()).info("Lock for service {} already acquired", setting.getServiceId());
 
 	    return;
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Lock for service {} acquired", def.id);
+	GSLoggerFactory.getLogger(getClass()).info("Lock for service {} acquired", setting.getServiceId());
 
-	ManagedService service = def.create();
+	ManagedService service = setting.createService();
 
 	DistributedServiceRunner runner = new DistributedServiceRunner(service, lock, heartbeatSeconds);
 
-	active.put(def.id, runner);
+	active.put(setting.getServiceId(), runner);
 
 	runner.start();
     }
@@ -328,7 +328,7 @@ public class MultiServiceManager {
 
 	return jedisPool == null ? //
 		getLocalActiveServices() : //
-		getDistributedActiveServices(definitions, jedisPool);//
+		getDistributedActiveServices(settings, jedisPool);//
     }
 
     /**
@@ -342,13 +342,13 @@ public class MultiServiceManager {
     /**
      * @return
      */
-    private List<Map.Entry<String, String>> getDistributedActiveServices(List<ServiceDefinition> defs, JedisPool jedisPool) {
+    private List<Map.Entry<String, String>> getDistributedActiveServices(List<ManagedServiceSetting> settings, JedisPool jedisPool) {
 
-	return defs.stream().map(def -> {
+	return settings.stream().map(def -> {
 
 	    try (Jedis jedis = jedisPool.getResource()) {
 
-		String value = jedis.get(ServiceLock.getKey(def.getId()));
+		String value = jedis.get(ServiceLock.getKey(def.getServiceId()));
 
 		if (value != null && !value.equals("nil")) {
 

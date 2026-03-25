@@ -1,11 +1,12 @@
 package eu.essi_lab.services;
 
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.services.message.*;
 
 /**
  * @author Fabrizio
  */
-public interface ManagedService {
+public interface ManagedService extends Configurable<ManagedServiceSetting> {
 
     /**
      * @param id
@@ -27,12 +28,10 @@ public interface ManagedService {
      */
     void stop();
 
-    /**
-     *
-     */
-    default String getName() {
+    @Override
+    default String getType() {
 
-	return getClass().getSimpleName();
+	return getClass().getName();
     }
 
     /**
@@ -42,7 +41,7 @@ public interface ManagedService {
      */
     default void publish(MessageChannel.MessageLevel level, String message) {
 
-       MessageChannels.getWritable().publish(getId(), level, message);
+	MessageChannels.getWritable().publish(getId(), level, message);
     }
 
     /**
@@ -50,6 +49,6 @@ public interface ManagedService {
      */
     default void removeAll() {
 
-        MessageChannels.getWritable().removeAll(getId());
+	MessageChannels.getWritable().removeAll(getId());
     }
 }

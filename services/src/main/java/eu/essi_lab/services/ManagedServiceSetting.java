@@ -1,17 +1,10 @@
-package eu.essi_lab.cfga.gs.setting.service;
+package eu.essi_lab.services;
 
-import com.vaadin.flow.data.provider.*;
 import eu.essi_lab.cfga.*;
-import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.cfga.gui.components.grid.*;
-import eu.essi_lab.cfga.gui.components.grid.renderer.*;
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.option.*;
 import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.validation.*;
 import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.services.*;
 
 import java.util.*;
 
@@ -20,10 +13,11 @@ import java.util.*;
  */
 public class ManagedServiceSetting extends Setting implements EditableSetting, KeyValueOptionDecorator {
 
-    private static final String SERVICE_IMPL_OPTION_KEY = "serviceImpl";
-    private static final String SERVICE_DESCRIPTION_OPTION_KEY = "serviceDesc";
-    private static final String SERVICE_OPTIONS_OPTION_KEY = "service";
-    static final String SERVICE_ID_OPTION_KEY = "serviceId";
+    public static final String SERVICE_IMPL_OPTION_KEY = "serviceImpl";
+    public static final String SERVICE_DESCRIPTION_OPTION_KEY = "serviceDesc";
+    public static final String SERVICE_ID_OPTION_KEY = "serviceId";
+
+    private static final String SERVICE_OPTIONS_OPTION_KEY = "serviceOpt";
 
     /**
      *
@@ -96,6 +90,36 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     }
 
     /**
+     *
+     */
+    public void loadServiceImpl() {
+
+	ServiceValuesLoader loader = new ServiceValuesLoader();
+	List<String> values = loader.loadValues(Optional.empty());
+
+	getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().setValues(values);
+    }
+
+    /**
+     * @param id
+     * @param clazz
+     * @return
+     */
+    public static ManagedServiceSetting of(String id, Class<? extends ManagedService> clazz) {
+
+	ManagedServiceSetting setting = new ManagedServiceSetting();
+
+	setting.loadServiceImpl();
+
+	setting.setServiceId(id);
+	setting.selectImpl(clazz.getName());
+
+	SelectionUtils.deepClean(setting);
+
+	return setting;
+    }
+
+    /**
      * @author Fabrizio
      */
     public static class ManagedServiceValidator implements Validator {
@@ -114,7 +138,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 
 	    ValidationResponse response = new ValidationResponse();
 
-	    String impl = manSetting.getSelectedImplementation();
+	    String impl = manSetting.getSelectedImpl();
 
 	    if (impl == null) {
 
@@ -140,6 +164,26 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     }
 
     /**
+     * @return
+     */
+    public ManagedService createService() {
+
+	try {
+
+	    ManagedService service = getSelectedImplClass().getDeclaredConstructor().newInstance();
+	    service.setId(getServiceId());
+
+	    service.configure(this);
+
+	    return service;
+
+	} catch (Exception e) {
+
+	    throw new RuntimeException(e);
+	}
+    }
+
+    /**
      * @author Fabrizio
      */
     public static class ServiceValuesLoader extends ValuesLoader<String> {
@@ -149,7 +193,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 	    ServiceLoader<ManagedService> loader = ServiceLoader.load(ManagedService.class);
 
 	    return StreamUtils.iteratorToStream(loader.iterator()).//
-		    map(ManagedService::getName).//
+		    map(ManagedService::getType).//
 		    sorted().//
 		    toList();
 	}
@@ -158,83 +202,6 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 	protected List<String> loadValues(Optional<String> input) {
 
 	    return getValues();
-	}
-    }
-
-    /**
-     * @author Fabrizio
-     */
-    public static class TabDescriptorProvider extends TabDescriptor {
-
-	/**
-	 *
-	 */
-	public TabDescriptorProvider() {
-
-	    setLabel("Services");
-
-	    TabContentDescriptor descriptor = TabContentDescriptorBuilder.get(ManagedServiceSetting.class).//
-
-		    withShowDirective("Customizable services provided by an implementation of the 'ManagedService' interface. "
-		    + "\n\nServices can run only on the local node, or they can be distributed on a multi-node cluster."
-		    + "according to the 'Session coordinator' setting in the 'System' tab", SortDirection.ASCENDING).//
-
-		    withAddDirective(//
-		    "ADD",//
-		    "Add managed service", //
-		    ManagedServiceSetting.class.getCanonicalName()).//
-		    withRemoveDirective("REMOVE", "Remove managed service", true, ManagedServiceSetting.class.getCanonicalName()).//
-		    withEditDirective("EDIT", "Edit managed service", Directive.ConfirmationPolicy.ON_WARNINGS).//
-
-		    withGridInfo(Arrays.asList(//
-
-		    ColumnDescriptor.create("Id", true, true, this::getId), //
-
-		    ColumnDescriptor.create("Implementation", true, true, this::getImpl), //
-
-		    ColumnDescriptor.create("Description", true, true, this::getDesc),//
-
-		    ColumnDescriptor.create("Status", true, true, s -> ManagedServiceSupport.getInstance().getServiceStatus(s)),
-
-		    ColumnDescriptor.create("Host", true, true, s -> ManagedServiceSupport.getInstance().getServiceHost(s)),
-
-		    ColumnDescriptor.create("Messages", 70, s -> ManagedServiceSupport.getInstance().getServiceMessages(s), //
-			    ViewerColumnRenderer.create("Messages", "Messages", "View service messages"))
-
-	    )).//
-		    reloadable(() -> ManagedServiceSupport.getInstance().update()).//
-
-		    build();
-
-	    setIndex(GSTabIndex.SERVICES.getIndex());
-	    addContentDescriptor(descriptor);
-	}
-
-	/**
-	 * @param setting
-	 * @return
-	 */
-	private String getDesc(Setting setting) {
-
-	    return setting.getObject().getJSONObject(SERVICE_DESCRIPTION_OPTION_KEY).getJSONArray("values").getString(0);
-	}
-
-	/**
-	 * @param setting
-	 * @return
-	 */
-	private String getImpl(Setting setting) {
-
-	    return setting.getObject().getJSONObject(SERVICE_IMPL_OPTION_KEY).getJSONArray("values").getString(0);
-	}
-
-	/**
-	 * @param setting
-	 * @return
-	 */
-	private String getId(Setting setting) {
-
-	    return setting.getObject().getJSONObject(SERVICE_ID_OPTION_KEY).getJSONArray("values").getString(0);
 	}
     }
 
@@ -289,7 +256,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     /**
      * @return
      */
-    public void selectImplementation(String impl) {
+    public void selectImpl(String impl) {
 
 	getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().select(n -> n.equals(impl));
     }
@@ -297,7 +264,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     /**
      * @return
      */
-    public String getSelectedImplementation() {
+    public String getSelectedImpl() {
 
 	return getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().getValue();
     }
@@ -305,15 +272,23 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     /**
      * @return
      */
-    public Class<? extends ManagedService> getSelectedImplementationClass() {
+    public Class<? extends ManagedService> getSelectedImplClass() {
 
 	ServiceLoader<ManagedService> loader = ServiceLoader.load(ManagedService.class);
 
 	return StreamUtils.iteratorToStream(loader.iterator()).//
-		filter(service -> service.getName().equals(getSelectedImplementation())).//
+		filter(service -> service.getType().equals(getSelectedImpl())).//
 		map(ManagedService::getClass). //
 		findFirst().//
 		get();//
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+	return o instanceof ManagedServiceSetting other && //
+		Objects.equals(getServiceId(), other.getServiceId()) && Objects.equals(getSelectedImplClass(),
+		other.getSelectedImplClass());
     }
 
 }

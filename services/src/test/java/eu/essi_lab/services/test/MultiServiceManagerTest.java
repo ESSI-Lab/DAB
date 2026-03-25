@@ -16,23 +16,25 @@ public class MultiServiceManagerTest {
     public static void main(String[] args) throws Exception {
 
 	JedisPool pool = new JedisPool("localhost", 6379);
-
+//
 	Jedis resource = pool.getResource();
-
+//
 	String ping = resource.ping();
 
 	String nodeId = java.net.InetAddress.getLocalHost().getHostName();
 
-	ServiceDefinition def0 = ServiceDefinition.of("0", TestService.class);
-	ServiceDefinition def1 = ServiceDefinition.of("1", TestService.class);
-	ServiceDefinition def2 = ServiceDefinition.of("2", TestService.class);
-	ServiceDefinition def3 = ServiceDefinition.of("3", TestService.class);
-	ServiceDefinition def4 = ServiceDefinition.of("4", TestService.class);
-	ServiceDefinition def5 = ServiceDefinition.of("5", TestService.class);
-	ServiceDefinition def6 = ServiceDefinition.of("6", TestService.class);
-	ServiceDefinition def7 = ServiceDefinition.of("7", TestService.class);
-	ServiceDefinition def8 = ServiceDefinition.of("8", TestService.class);
-	ServiceDefinition def9 = ServiceDefinition.of("9", TestService.class);
+	ManagedServiceSetting set0 = ManagedServiceSetting.of("0", TestService.class);
+	ManagedServiceSetting set1 = ManagedServiceSetting.of("1", TestService.class);
+	ManagedServiceSetting set2 = ManagedServiceSetting.of("2", TestService.class);
+	ManagedServiceSetting set3 = ManagedServiceSetting.of("3", TestService.class);
+	ManagedServiceSetting set4 = ManagedServiceSetting.of("4", TestService.class);
+	ManagedServiceSetting set5 = ManagedServiceSetting.of("5", TestService.class);
+	ManagedServiceSetting set6 = ManagedServiceSetting.of("6", TestService.class);
+	ManagedServiceSetting set7 = ManagedServiceSetting.of("7", TestService.class);
+	ManagedServiceSetting set8 = ManagedServiceSetting.of("8", TestService.class);
+	ManagedServiceSetting set9 = ManagedServiceSetting.of("9", TestService.class);
+
+	ManagedService service = set0.createService();
 
 	MultiServiceManager.initDistributed( //
 		pool, //
@@ -74,16 +76,16 @@ public class MultiServiceManagerTest {
 
 	Timer timer1 = new Timer();
 
-	TimerTask defTask = new TimerTask() {
+	TimerTask setTask = new TimerTask() {
 
 	    @Override
 	    public void run() {
 
-		MultiServiceManager.get().setDefinitions(List.of(def0, def1));
+		MultiServiceManager.get().setSettings(List.of(set0, set1));
 	    }
 	};
 
-	timer1.schedule(defTask, TimeUnit.SECONDS.toMillis(5));
+	timer1.schedule(setTask, TimeUnit.SECONDS.toMillis(5));
 
 	//
 	//
@@ -91,29 +93,29 @@ public class MultiServiceManagerTest {
 
 	//	Timer timer2 = new Timer();
 	//
-	//	TimerTask defTask2 = new TimerTask() {
+	//	TimerTask setTask2 = new TimerTask() {
 	//
 	//	    @Override
 	//	    public void run() {
 	//
-	//		manager.setDefinitions(List.of(def0));
+	//		manager.setDefinitions(List.of(set0));
 	//	    }
 	//	};
 	//
-	//	timer2.schedule(defTask2, TimeUnit.SECONDS.toMillis(45));
+	//	timer2.schedule(setTask2, TimeUnit.SECONDS.toMillis(45));
 
 	//	Timer timer3 = new Timer();
 	//
-	//	TimerTask defTask3 = new TimerTask() {
+	//	TimerTask setTask3 = new TimerTask() {
 	//
 	//	    @Override
 	//	    public void run() {
 	//
-	//		manager.setDefinitions(List.of(def0, def1, def2, def3, def4, def5, def6, def7, def8, def9));
+	//		manager.setDefinitions(List.of(set0, set1, set2, set3, set4, set5, set6, set7, set8, set9));
 	//	    }
 	//	};
 	//
-	//	timer3.schedule(defTask3, TimeUnit.SECONDS.toMillis(55));
+	//	timer3.schedule(setTask3, TimeUnit.SECONDS.toMillis(55));
 
 	//	Timer timer2 = new Timer();
 	//

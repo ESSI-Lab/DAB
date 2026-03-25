@@ -498,7 +498,7 @@ public class GSConfigurationView extends ConfigurationView {
 	return Arrays.asList(//
 		new AsynchDownloadDescriptor(),//
 		new ViewsDescriptor(),//
-		new ManagedServiceSetting.TabDescriptorProvider(),//
+		new ManagedServiceSettingTabDescriptorProvider(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//
