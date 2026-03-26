@@ -1,4 +1,11 @@
-package eu.essi_lab.services.impl;
+package eu.essi_lab.services.data_hub;
+
+import com.fasterxml.jackson.databind.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.services.impl.*;
 
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
@@ -17,6 +24,7 @@ import java.net.http.*;
 import java.nio.*;
 import java.time.*;
 import java.util.*;
+import java.util.function.*;
 
 /**
  * @author Fabrizio
@@ -236,6 +244,24 @@ public class DataHUBService extends AbstractManagedService {
 
 	consumer = new KafkaConsumer<>(props);
 
+	Database database = null;
+	SourceStorageWorker worker = null;
+
+	try {
+
+	    database  = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
+
+	    worker = database.getWorker(sourceId);
+
+	} catch (GSException e) {
+
+	    publish(MessageChannel.MessageLevel.ERROR, "Unable to get database instance: " + e.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    running = false;
+	    return;
+	}
+
 	while (running) {
 
 	    List<PartitionInfo> partitions = partitions(topic.get());
@@ -257,7 +283,7 @@ public class DataHUBService extends AbstractManagedService {
 		    continue;
 		}
 
-		List<Map<String, Object>> decodedMessages = new ArrayList<>();
+		List<Map<String, Object>> rawMessages = new ArrayList<>();
 
 		for (ConsumerRecord<byte[], byte[]> msg : records) {
 
@@ -275,16 +301,55 @@ public class DataHUBService extends AbstractManagedService {
 			continue;
 		    }
 
-		    decodedMessages.addAll(decode(msg, raw, schemaRegistryURL.get(), token));
+		    rawMessages.addAll(decode(msg, raw, schemaRegistryURL.get(), token));
 		}
 
-		decodedMessages.sort((a, b) -> Long.compare((Long) b.get("timestamp"), (Long) a.get("timestamp")));
+		rawMessages.sort((a, b) -> Long.compare((Long) b.get("timestamp"), (Long) a.get("timestamp")));
 
-		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + decodedMessages.size());
+		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + rawMessages.size());
 
-		decodedMessages.forEach(this::handle);
+		rawMessages.stream(). //
+			map(msg -> DecodedMessage.of(this, mapper, msg)).//
+			filter(Objects::nonNull).//
+			filter(messageFilter()).//
+			forEach(this::handle);//
 	    }
 	}
+    }
+
+    /**
+     * TO BE IMPLEMENTED: filter in only messages related to the DataHUB
+     *
+     * @return
+     */
+    private Predicate<DecodedMessage> messageFilter() {
+
+	return (msg) -> true;
+    }
+
+    /**
+     * TO BE IMPLEMENTED
+     *
+     * @param decodedMessage
+     */
+    private void handle(DecodedMessage decodedMessage) {
+
+	String timeStamp = decodedMessage.timeStamp();
+	String entityURN = decodedMessage.entityURN();
+	ChangeType changeType = decodedMessage.type();
+
+	switch (changeType) {
+	case UPSERT -> {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Upsert message");
+	}
+	case DELETE -> {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Delete message");
+	}
+	}
+
+	publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
     }
 
     /**
@@ -334,29 +399,55 @@ public class DataHUBService extends AbstractManagedService {
     }
 
     /**
-     * @param decodedMessage
+     * @author Fabrizio
      */
-    private void handle(Map<String, Object> decodedMessage) {
+    private enum ChangeType {
 
-	try {
+	UPSERT, DELETE;
+    }
 
-	    Object data = decodedMessage.get("data");
+    /**
+     * @param timeStamp
+     * @param entityURN
+     * @author Fabrizio
+     */
+    private record DecodedMessage(//
+	    String timeStamp,//
+	    String entityURN, //
+	    ChangeType type) {
 
-	    String json = mapper.writeValueAsString(data);
+	/**
+	 * @param service
+	 * @param mapper
+	 * @param decodedMessage
+	 * @return
+	 */
+	static DecodedMessage of(DataHUBService service, ObjectMapper mapper, Map<String, Object> decodedMessage) {
 
-	    JSONObject jsonObject = new JSONObject(json);
+	    try {
 
-	    String timeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
-	    String entityURN = jsonObject.optString("entityUrn", "missing entityURN");
-	    String changeType = jsonObject.optString("changeType", "missing changeType");
+		Object data = decodedMessage.get("data");
 
-	    publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
+		String json = mapper.writeValueAsString(data);
 
-	} catch (JsonProcessingException e) {
+		JSONObject jsonObject = new JSONObject(json);
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Error serializing data: " + e.getMessage());
+		String timeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
+		String entityURN = jsonObject.optString("entityUrn", "missing entityURN");
+		String changeType = jsonObject.optString("changeType", "missing changeType");
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+		service.publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
+
+		return new DecodedMessage(timeStamp, entityURN, ChangeType.valueOf(changeType));
+
+	    } catch (JsonProcessingException e) {
+
+		service.publish(MessageChannel.MessageLevel.ERROR, "Error serializing data: " + e.getMessage());
+
+		GSLoggerFactory.getLogger(DataHUBService.class).error(e);
+	    }
+
+	    return null;
 	}
     }
 
