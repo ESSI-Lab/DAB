@@ -1,7 +1,6 @@
 package eu.essi_lab.cfga.gs.setting.service;
 
 import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.services.*;
@@ -43,11 +42,11 @@ public class ManagedServiceSupport {
      */
     public synchronized void update() {
 
-	GSLoggerFactory.getLogger(HarvestingSetting.class).debug("Updating managed service support STARTED");
+	GSLoggerFactory.getLogger(ManagedServiceSupport.class).debug("Updating managed service support STARTED");
 
 	activeServices = MultiServiceManager.get().getActiveServices();
 
-	GSLoggerFactory.getLogger(HarvestingSetting.class).debug("Updating managed service support ENDED");
+	GSLoggerFactory.getLogger(ManagedServiceSupport.class).debug("Updating managed service support ENDED");
     }
 
     /**
@@ -82,7 +81,7 @@ public class ManagedServiceSupport {
 	List<MessageChannel.Message> messages = MessageChannels.get().read(serviceId);
 
 	String joined = messages.stream().//
-		map(m -> m.getTimestamp()+", " + m.getLevel() + ": [ " + m.getMessage()+" ]").//
+		map(m -> m.getTimestamp() + ", " + m.getLevel() + ": [ " + m.getMessage() + " ]").//
 		collect(Collectors.joining("\n"));
 
 	return joined;
