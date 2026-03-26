@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.services.message.*;
-import netscape.javascript.*;
 import org.apache.avro.*;
 import org.apache.avro.generic.*;
 import org.apache.avro.io.*;
@@ -43,11 +42,20 @@ public class DataHUBService extends AbstractManagedService {
 
     private static final String MAX_MESSAGES_KEY = "maxMessages";
     private static final String TEXT_FILTER_KEY = "textFilter";
+    private static final String ENABLE_TEXT_FILTER_KEY = "enableTextFilter";
+
+    private static final String SOURCE_ID_KEY = "dataHubSourceId";
+
+    private static final List<String> TEST_IDS_ = List.of(
+	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_gct,DEV)",//
+	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_pzz,DEV)",//
+	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_srg,DEV)");//
 
     /**
      *
      */
     private KafkaConsumer<byte[], byte[]> consumer;
+    private String sourceId;
 
     /**
      *
@@ -164,6 +172,21 @@ public class DataHUBService extends AbstractManagedService {
 	    running = false;
 	}
 
+	Optional<String> optSourceId = getSetting().readKeyValue(SOURCE_ID_KEY);
+
+	if (!(check(optSourceId))) {
+
+	    publish(MessageChannel.MessageLevel.ERROR, "Missing source identifier");
+
+	    running = false;
+
+	} else {
+
+	    sourceId = optSourceId.get();
+	}
+
+	boolean enableTextFilter = getSetting().readKeyValue(ENABLE_TEXT_FILTER_KEY).map(Boolean::parseBoolean).orElse(true);
+
 	if (!running) {
 
 	    return;
@@ -215,29 +238,15 @@ public class DataHUBService extends AbstractManagedService {
 
 	while (running) {
 
-	    List<PartitionInfo> partitions = consumer.partitionsFor(topic.get());
+	    List<PartitionInfo> partitions = partitions(topic.get());
 
 	    for (PartitionInfo partition : partitions) {
 
-		TopicPartition tp = new TopicPartition(topic.get(), partition.partition());
-
-		consumer.assign(List.of(tp));
-
-		consumer.seekToEnd(List.of(tp));
-
-		long high = consumer.position(tp);
-
-		long start = Math.max(0, high - Integer.parseInt(maxMessages.get()));
-
-		consumer.seek(tp, start);
-
-		//
-		// poll messages
-		//
+		preparePoll(topic.get(), partition, Integer.parseInt(maxMessages.get()));
 
 		GSLoggerFactory.getLogger(getClass()).debug("Polling STARTED");
 
-		ConsumerRecords<byte[], byte[]> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+		ConsumerRecords<byte[], byte[]> records = poll();
 
 		GSLoggerFactory.getLogger(getClass()).debug("Polling ENDED");
 
@@ -261,9 +270,9 @@ public class DataHUBService extends AbstractManagedService {
 
 		    String text = new String(raw);
 
-		    if (!text.contains(textFilter.get())) {
+		    if (enableTextFilter && !text.contains(textFilter.get())) {
 
-			//			continue;
+			continue;
 		    }
 
 		    decodedMessages.addAll(decode(msg, raw, schemaRegistryURL.get(), token));
@@ -273,40 +282,82 @@ public class DataHUBService extends AbstractManagedService {
 
 		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + decodedMessages.size());
 
-		for (int i = 0; i < decodedMessages.size(); i++) {
-
-		    Object data = decodedMessages.get(i).get("data");
-
-		    try {
-
-			String json = mapper.writeValueAsString(data);
-
-			JSONObject jsonObject = new JSONObject(json);
-
-			String timeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
-			String entityURN = jsonObject.optString("entityUrn", "missing entityURN");
-			String changeType = jsonObject.optString("changeType", "missing changeType");
-
-			publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
-
-		    } catch (JsonProcessingException e) {
-
-			publish(MessageChannel.MessageLevel.ERROR, "Error serializing data: " + e.getMessage());
-
-			GSLoggerFactory.getLogger(getClass()).error(e);
-		    }
-		}
+		decodedMessages.forEach(this::handle);
 	    }
 	}
     }
 
     /**
-     * @param optional
+     * @param topic
      * @return
      */
-    private boolean check(Optional<String> optional) {
+    private List<PartitionInfo> partitions(String topic) {
 
-	return optional.isPresent() && !optional.get().isEmpty();
+	synchronized (consumer) {
+
+	    return consumer.partitionsFor(topic);
+	}
+    }
+
+    /**
+     * @param topic
+     * @param partition
+     * @param maxMessages
+     */
+    private void preparePoll(String topic, PartitionInfo partition, int maxMessages) {
+
+	synchronized (consumer) {
+
+	    TopicPartition tp = new TopicPartition(topic, partition.partition());
+
+	    consumer.assign(List.of(tp));
+
+	    consumer.seekToEnd(List.of(tp));
+
+	    long high = consumer.position(tp);
+
+	    long start = Math.max(0, high - maxMessages);
+
+	    consumer.seek(tp, start);
+	}
+    }
+
+    /**
+     * @return
+     */
+    private ConsumerRecords<byte[], byte[]> poll() {
+
+	synchronized (consumer) {
+
+	    return consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+	}
+    }
+
+    /**
+     * @param decodedMessage
+     */
+    private void handle(Map<String, Object> decodedMessage) {
+
+	try {
+
+	    Object data = decodedMessage.get("data");
+
+	    String json = mapper.writeValueAsString(data);
+
+	    JSONObject jsonObject = new JSONObject(json);
+
+	    String timeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
+	    String entityURN = jsonObject.optString("entityUrn", "missing entityURN");
+	    String changeType = jsonObject.optString("changeType", "missing changeType");
+
+	    publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
+
+	} catch (JsonProcessingException e) {
+
+	    publish(MessageChannel.MessageLevel.ERROR, "Error serializing data: " + e.getMessage());
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
     }
 
     /**
@@ -385,7 +436,10 @@ public class DataHUBService extends AbstractManagedService {
 
 	if (consumer != null) {
 
-	    consumer.close();
+	    synchronized (consumer) {
+
+		consumer.close();
+	    }
 	}
 
 	running = false;
@@ -480,4 +534,12 @@ public class DataHUBService extends AbstractManagedService {
 	return reader.read(null, decoder);
     }
 
+    /**
+     * @param optional
+     * @return
+     */
+    private boolean check(Optional<String> optional) {
+
+	return optional.isPresent() && !optional.get().isEmpty();
+    }
 }
