@@ -2363,7 +2363,7 @@
         <module>configuration-api-rest</module>
 
         <module>custom-tasks</module>
-        <module>services</module>
+        <module>service-dev-kit</module>
         <module>service-data-hub</module>
 
     </modules>
