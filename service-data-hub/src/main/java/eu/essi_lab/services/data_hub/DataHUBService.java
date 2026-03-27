@@ -7,10 +7,8 @@ import eu.essi_lab.accessor.datahub.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.identifierdecorator.*;
 import eu.essi_lab.indexes.*;
 import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.messages.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
@@ -30,6 +28,7 @@ import java.net.http.*;
 import java.nio.*;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.*;
 
 /**
@@ -61,6 +60,8 @@ public class DataHUBService extends AbstractManagedService {
     private static final String DATA_HUB_SOURCE_LABEL_KEY = "dataHub.sourceLabel";
     private static final String DATA_HUB_RECORDS_FILTER_KEY = "dataHub.recordsFilter";
 
+    private static final String THREAD_POOL_SIZE_KEY = "threadPoolSize";
+
     private static final List<String> TEST_IDS_ = List.of(
 	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_gct,DEV)",//
 	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_pzz,DEV)",//
@@ -75,6 +76,12 @@ public class DataHUBService extends AbstractManagedService {
     private String serviceUrl;
     private String token;
     private String sourceLabel;
+
+    /**
+     *
+     */
+    private static final int DEFAULT_THREAD_POOL_SIZE = 10;
+    private ExecutorService executor;
 
     /**
      *
@@ -209,6 +216,17 @@ public class DataHUBService extends AbstractManagedService {
 	    sourceLabel = optSourceLabel.get();
 	}
 
+	int threadPoolSize = getSetting(). //
+		readKeyValue(THREAD_POOL_SIZE_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_THREAD_POOL_SIZE);//
+
+	ThreadFactory factory = Thread.ofPlatform().//
+		name(getClass().getSimpleName()).//
+		factory();
+
+	executor = Executors.newFixedThreadPool(threadPoolSize, factory);
+
 	if (!running) {
 
 	    return;
@@ -285,7 +303,7 @@ public class DataHUBService extends AbstractManagedService {
 	props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
 
 	consumer = new KafkaConsumer<>(props);
-
+	
 	while (running) {
 
 	    List<PartitionInfo> partitions = partitions(topic.get());
@@ -307,7 +325,7 @@ public class DataHUBService extends AbstractManagedService {
 		    continue;
 		}
 
-		List<Map<String, Object>> decodedMessages = new ArrayList<>();
+		List<Map<String, Object>> rawDecodedMessages = new ArrayList<>();
 
 		for (ConsumerRecord<byte[], byte[]> msg : records) {
 
@@ -325,20 +343,51 @@ public class DataHUBService extends AbstractManagedService {
 			continue;
 		    }
 
-		    decodedMessages.addAll(decode(msg, schemaRegistryURL.get(), token));
+		    rawDecodedMessages.addAll(decode(msg, schemaRegistryURL.get(), token));
 		}
 
-		decodedMessages.sort((a, b) -> Long.compare((Long) b.get("timestamp"), (Long) a.get("timestamp")));
+		rawDecodedMessages.sort((a, b) -> Long.compare((Long) b.get("timestamp"), (Long) a.get("timestamp")));
 
-		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + decodedMessages.size());
+		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + rawDecodedMessages.size());
 
-		decodedMessages.stream(). //
-			map(msg -> DecodedMessage.of(this, mapper, msg)).//
-			filter(Objects::nonNull).//
-			filter(isDataHUBMessage(recordsFilter.get())).//
-			forEach(this::handle);//
+		if (rawDecodedMessages.isEmpty()) {
+
+		    commit();
+
+		} else {
+
+		    List<DecodedMessage> list = rawDecodedMessages.stream(). //
+
+			    map(msg -> DecodedMessage.of(this, mapper, msg)).//
+			    filter(Objects::nonNull).//
+			    filter(isDataHUBMessage(recordsFilter.get())). //
+			    toList();
+
+		    StreamUtils.asynchConsume(list, this::process, executor);//
+
+		    commit();
+		}
 	    }
 	}
+    }
+
+    @Override
+    public void stop() {
+
+	if (consumer != null) {
+
+	    synchronized (consumer) {
+
+		consumer.close();
+	    }
+	}
+
+	if (executor != null) {
+
+	    executor.close();
+	}
+
+	running = false;
     }
 
     /**
@@ -369,11 +418,9 @@ public class DataHUBService extends AbstractManagedService {
     }
 
     /**
-     * TO BE IMPLEMENTED
-     *
      * @param decodedMessage
      */
-    private void handle(DecodedMessage decodedMessage) {
+    private void process(DecodedMessage decodedMessage) {
 
 	String timeStamp = decodedMessage.timeStamp();
 	String entityURN = decodedMessage.entityURN();
@@ -383,6 +430,8 @@ public class DataHUBService extends AbstractManagedService {
 
 	    switch (changeType) {
 	    case UPSERT -> {
+
+		GSLoggerFactory.getLogger(getClass()).info("Handling UPSERT record: {}", entityURN);
 
 		DatahubConnector connector = new DatahubConnector();
 
@@ -426,15 +475,18 @@ public class DataHUBService extends AbstractManagedService {
 
 		    GSLoggerFactory.getLogger(getClass()).debug("New record: " + entityURN);
 		}
+
 	    }
 	    case DELETE -> {
 
-		GSLoggerFactory.getLogger(getClass()).debug("Deleted record: " + entityURN);
+		GSLoggerFactory.getLogger(getClass()).info("Handling DELETE record: {}", entityURN);
 
 		targetFolder.remove(entityURN);
 
 	    }
 	    }
+
+	    commit();
 
 	} catch (Exception e) {
 
@@ -485,6 +537,24 @@ public class DataHUBService extends AbstractManagedService {
 	synchronized (consumer) {
 
 	    return consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+	}
+    }
+
+    /**
+     *
+     */
+    private void commit() {
+
+	synchronized (consumer) {
+
+	    try {
+
+		consumer.commitSync();
+
+	    } catch (Exception e) {
+
+		error("Unable to commit: " + e.getMessage(), e);
+	    }
 	}
     }
 
@@ -626,20 +696,6 @@ public class DataHUBService extends AbstractManagedService {
 	}
 
 	return decodedMessages;
-    }
-
-    @Override
-    public void stop() {
-
-	if (consumer != null) {
-
-	    synchronized (consumer) {
-
-		consumer.close();
-	    }
-	}
-
-	running = false;
     }
 
     /**
