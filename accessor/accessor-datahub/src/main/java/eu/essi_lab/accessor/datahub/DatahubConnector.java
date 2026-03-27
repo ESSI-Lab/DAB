@@ -10,56 +10,42 @@ package eu.essi_lab.accessor.datahub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import eu.essi_lab.cdk.harvest.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.json.*;
+import org.slf4j.*;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
-import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.OriginalMetadata;
+import java.io.*;
+import java.net.http.*;
+import java.nio.file.*;
+import java.util.*;
 
 /**
  * Connector for retrieving metadata from DataHub
- * 
+ *
  * @author Generated
  */
-public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSetting> {
+public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSetting> {
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "DatahubConnector";
 
@@ -196,9 +182,9 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 
 		for (String identifier : batch) {
 		    try {
-			identifier = identifier.replace("\",","");
-			identifier = identifier.replace("\"","");
-			String metadata = fetchMetadataForIdentifier(endpoint, accessToken, identifier);
+			identifier = identifier.replace("\",", "");
+			identifier = identifier.replace("\"", "");
+			String metadata = fetch(endpoint, accessToken, identifier);
 			if (metadata != null && !metadata.trim().isEmpty()) {
 			    ret.add(metadata);
 			    logger.debug("Successfully fetched metadata for identifier: {}", identifier);
@@ -255,9 +241,8 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 
     /**
      * Authenticates with the DataHub API and returns an access token
-     * 
-     * @param endpoint
-     *            the base endpoint URL
+     *
+     * @param endpoint the base endpoint URL
      * @return the access token
      * @throws GSException
      */
@@ -344,10 +329,9 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
     }
 
     /**
-     * Reads identifiers from a URL (http://) or local file (file://)
-     * Supports both plain text (one identifier per line) and JSON format
+     * Reads identifiers from a URL (http://) or local file (file://) Supports both plain text (one identifier per line) and JSON format
      * with a "datahub_urns" array
-     * 
+     *
      * @return list of identifiers
      * @throws GSException
      */
@@ -453,11 +437,9 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 
     /**
      * Parses identifiers from plain text content (one per line)
-     * 
-     * @param content
-     *            the content to parse
-     * @param identifiers
-     *            the list to add identifiers to
+     *
+     * @param content the content to parse
+     * @param identifiers the list to add identifiers to
      */
     private void parseIdentifiersLineByLine(String content, List<String> identifiers) {
 	String[] lines = content.split("\\r?\\n");
@@ -471,18 +453,14 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 
     /**
      * Fetches metadata for a single identifier
-     * 
-     * @param endpoint
-     *            the base endpoint URL
-     * @param accessToken
-     *            the access token
-     * @param identifier
-     *            the dataset identifier
+     *
+     * @param endpoint the base endpoint URL
+     * @param accessToken the access token
+     * @param identifier the dataset identifier
      * @return the metadata JSON string
      * @throws GSException
      */
-    private String fetchMetadataForIdentifier(String endpoint, String accessToken, String identifier)
-	    throws GSException {
+    public String fetch(String endpoint, String accessToken, String identifier) throws GSException {
 	try {
 	    String apiUrl = endpoint + "/datahub-rndt/get-unflatten-properties";
 	    logger.debug("Fetching metadata for identifier: {} from: {}", identifier, apiUrl);
@@ -504,20 +482,20 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 	    int statusCode = 0;
 	    int maxRetries = 3;
 	    int retryDelaySeconds = 5;
-	    
+
 	    for (int attempt = 1; attempt <= maxRetries; attempt++) {
 		try {
 		    response = downloader.downloadResponse(request);
 		    statusCode = response.statusCode();
-		    
+
 		    // If status is 500 and not the last attempt, retry
 		    if (statusCode == 500 && attempt < maxRetries) {
-			logger.warn("Received status 500 for identifier {} (attempt {}/{}), retrying in {} seconds...", 
-				identifier, attempt, maxRetries, retryDelaySeconds);
+			logger.warn("Received status 500 for identifier {} (attempt {}/{}), retrying in {} seconds...", identifier, attempt,
+				maxRetries, retryDelaySeconds);
 			Thread.sleep(retryDelaySeconds * 1000);
 			continue;
 		    }
-		    
+
 		    // Break the loop if successful or non-500 error
 		    break;
 		} catch (InterruptedException e) {
@@ -527,8 +505,8 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 		} catch (Exception e) {
 		    // For other exceptions, retry if not the last attempt
 		    if (attempt < maxRetries) {
-			logger.warn("Exception during request for identifier {} (attempt {}/{}), retrying in {} seconds...", 
-				identifier, attempt, maxRetries, retryDelaySeconds, e);
+			logger.warn("Exception during request for identifier {} (attempt {}/{}), retrying in {} seconds...", identifier,
+				attempt, maxRetries, retryDelaySeconds, e);
 			try {
 			    Thread.sleep(retryDelaySeconds * 1000);
 			} catch (InterruptedException ie) {
@@ -546,11 +524,11 @@ public class   DatahubConnector extends HarvestedQueryConnector<DatahubConnector
 
 	    if (response == null || statusCode >= 400) {
 		if (response == null) {
-		    logger.warn("Failed to fetch metadata for identifier {} - no response received (after {} attempts)", 
-			identifier, maxRetries);
+		    logger.warn("Failed to fetch metadata for identifier {} - no response received (after {} attempts)", identifier,
+			    maxRetries);
 		} else {
-		    logger.warn("Failed to fetch metadata for identifier {} with status code: {} (after {} attempts)", 
-			identifier, statusCode, maxRetries);
+		    logger.warn("Failed to fetch metadata for identifier {} with status code: {} (after {} attempts)", identifier,
+			    statusCode, maxRetries);
 		}
 		return null;
 	    }
