@@ -1,15 +1,20 @@
 package eu.essi_lab.services.data_hub;
 
+import com.fasterxml.jackson.core.*;
+import com.fasterxml.jackson.core.type.*;
 import com.fasterxml.jackson.databind.*;
+import eu.essi_lab.accessor.datahub.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.model.exceptions.*;
-import eu.essi_lab.services.impl.*;
-
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.databind.*;
+import eu.essi_lab.identifierdecorator.*;
+import eu.essi_lab.indexes.*;
 import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.services.impl.*;
 import eu.essi_lab.services.message.*;
 import org.apache.avro.*;
 import org.apache.avro.generic.*;
@@ -17,6 +22,7 @@ import org.apache.avro.io.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
 import org.json.*;
+import org.w3c.dom.*;
 
 import java.io.*;
 import java.net.*;
@@ -31,28 +37,29 @@ import java.util.function.*;
  */
 public class DataHUBService extends AbstractManagedService {
 
-    private Map<Integer, Schema> schemaCache;
-    private ObjectMapper mapper;
+    private final Map<Integer, Schema> schemaCache;
+    private final ObjectMapper mapper;
     private boolean running;
 
-    private static final String TOKEN_URL_KEY = "token.url";
+    private static final String SCHEMA_REGISTRY_URL_KEY = "shemaRegistryURL";
+    private static final String SERVICE_URL_KEY = "serviceURL";
+
     private static final String TOKEN_USER_KEY = "token.user";
     private static final String TOKEN_PWD_KEY = "token.pwd";
 
-    private static final String SCHEMA_REGISTRY_URL_KEY = "shemaRegistryURL";
-
-    private static final String BOOTSTRAP_SERVERS_KEY = "bootstrapServers";
-    private static final String TOPIC_KEY = "topic";
-    private static final String GROUP_ID_KEY = "groupId";
-
+    private static final String KAFKA_BOOTSTRAP_SERVERS_KEY = "kafka.bootstrapServers";
+    private static final String KAFKA_TOPIC_KEY = "kafka.topic";
+    private static final String KAFKA_GROUP_ID_KEY = "kafka.groupId";
     private static final String KAFKA_USERNAME_KEY = "kafka.username";
     private static final String KAFKA_PASSWORD_KEY = "kafka.password";
+    private static final String KAFKA_MAX_MESSAGES_KEY = "kafka.maxMessages";
 
-    private static final String MAX_MESSAGES_KEY = "maxMessages";
-    private static final String TEXT_FILTER_KEY = "textFilter";
-    private static final String ENABLE_TEXT_FILTER_KEY = "enableTextFilter";
+    private static final String TEST_FILTER_KEY = "test.filter";
+    private static final String TEST_FILTER_ENABLED_KEY = "test.filter.enabled";
 
-    private static final String SOURCE_ID_KEY = "dataHubSourceId";
+    private static final String DATA_HUB_SOURCE_ID_KEY = "dataHub.sourceId";
+    private static final String DATA_HUB_SOURCE_LABEL_KEY = "dataHub.sourceLabel";
+    private static final String DATA_HUB_RECORDS_FILTER_KEY = "dataHub.recordsFilter";
 
     private static final List<String> TEST_IDS_ = List.of(
 	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_gct,DEV)",//
@@ -64,6 +71,10 @@ public class DataHUBService extends AbstractManagedService {
      */
     private KafkaConsumer<byte[], byte[]> consumer;
     private String sourceId;
+    private DatabaseFolder targetFolder;
+    private String serviceUrl;
+    private String token;
+    private String sourceLabel;
 
     /**
      *
@@ -83,117 +94,120 @@ public class DataHUBService extends AbstractManagedService {
 	// read key-values
 	//
 
-	Optional<String> bootstrapServers = getSetting().readKeyValue(BOOTSTRAP_SERVERS_KEY);
+	Optional<String> bootstrapServers = getSetting().readKeyValue(KAFKA_BOOTSTRAP_SERVERS_KEY);
 
 	if (bootstrapServers.isEmpty()) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing bootstrap server configuration");
-
-	    running = false;
+	    error("Missing bootstrap server configuration");
 	}
 
-	Optional<String> groupId = getSetting().readKeyValue(GROUP_ID_KEY);
+	Optional<String> groupId = getSetting().readKeyValue(KAFKA_GROUP_ID_KEY);
 
 	if (!(check(groupId))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing group id");
-
-	    running = false;
+	    error("Missing group id");
 	}
 
 	Optional<String> user = getSetting().readKeyValue(KAFKA_USERNAME_KEY);
 
 	if (!(check(user))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing user name");
-
-	    running = false;
+	    error("Missing user name");
 	}
 
 	Optional<String> pwd = getSetting().readKeyValue(KAFKA_PASSWORD_KEY);
 
 	if (!(check(pwd))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing password");
-
-	    running = false;
+	    error("Missing password");
 	}
 
-	Optional<String> tokenUrl = getSetting().readKeyValue(TOKEN_URL_KEY);
+	Optional<String> optServiceUrl = getSetting().readKeyValue(SERVICE_URL_KEY);
 
-	if (!(check(tokenUrl))) {
+	if (!(check(optServiceUrl))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing token url");
+	    error("Missing token url");
 
-	    running = false;
+	} else {
+
+	    serviceUrl = optServiceUrl.get();
 	}
 
 	Optional<String> tokenUser = getSetting().readKeyValue(TOKEN_USER_KEY);
 
 	if (!(check(tokenUser))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing token user name");
-
-	    running = false;
+	    error("Missing token user name");
 	}
 
 	Optional<String> tokenPwd = getSetting().readKeyValue(TOKEN_PWD_KEY);
 
 	if (!(check(tokenPwd))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing token password");
-
-	    running = false;
+	    error("Missing token password");
 	}
 
 	Optional<String> schemaRegistryURL = getSetting().readKeyValue(SCHEMA_REGISTRY_URL_KEY);
 
 	if (!(check(schemaRegistryURL))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing schema registry url");
-
-	    running = false;
+	    error("Missing schema registry url");
 	}
 
-	Optional<String> topic = getSetting().readKeyValue(TOPIC_KEY);
+	Optional<String> topic = getSetting().readKeyValue(KAFKA_TOPIC_KEY);
 
 	if (!(check(topic))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing topic name");
-	    running = false;
+	    error("Missing topic name");
 	}
 
-	Optional<String> maxMessages = getSetting().readKeyValue(MAX_MESSAGES_KEY);
+	Optional<String> maxMessages = getSetting().readKeyValue(KAFKA_MAX_MESSAGES_KEY);
 
 	if (!(check(maxMessages))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing max messages");
-	    running = false;
+	    error("Missing max messages");
 	}
 
-	Optional<String> textFilter = getSetting().readKeyValue(TEXT_FILTER_KEY);
+	boolean useTestFilter = getSetting(). //
+		readKeyValue(TEST_FILTER_ENABLED_KEY).//
+		map(Boolean::parseBoolean).//
+		orElse(true);//
 
-	if (!(check(textFilter))) {
+	Optional<String> testFilter = getSetting().readKeyValue(TEST_FILTER_KEY);
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing text filter");
+	if (useTestFilter && !(check(testFilter))) {
 
-	    running = false;
+	    error("Missing required test filter");
 	}
 
-	Optional<String> optSourceId = getSetting().readKeyValue(SOURCE_ID_KEY);
+	Optional<String> recordsFilter = getSetting().readKeyValue(DATA_HUB_RECORDS_FILTER_KEY);
+
+	if (!(check(recordsFilter))) {
+
+	    error("Missing records filter");
+	}
+
+	Optional<String> optSourceId = getSetting().readKeyValue(DATA_HUB_SOURCE_ID_KEY);
 
 	if (!(check(optSourceId))) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Missing source identifier");
-
-	    running = false;
+	    error("Missing source identifier");
 
 	} else {
 
 	    sourceId = optSourceId.get();
 	}
 
-	boolean enableTextFilter = getSetting().readKeyValue(ENABLE_TEXT_FILTER_KEY).map(Boolean::parseBoolean).orElse(true);
+	Optional<String> optSourceLabel = getSetting().readKeyValue(DATA_HUB_SOURCE_LABEL_KEY);
+
+	if (!(check(optSourceLabel))) {
+
+	    error("Missing source label");
+
+	} else {
+
+	    sourceLabel = optSourceLabel.get();
+	}
 
 	if (!running) {
 
@@ -201,22 +215,50 @@ public class DataHUBService extends AbstractManagedService {
 	}
 
 	//
-	// get token
+	// get target folder
 	//
-
-	String token = null;
 
 	try {
 
-	    token = String.valueOf(getAccessToken(tokenUrl.get(), tokenUser.get(), tokenPwd.get()));
+	    Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
+
+	    SourceStorageWorker worker = database.getWorker(sourceId);
+
+	    boolean data1Folder = worker.existsData1Folder();
+	    boolean data2Folder = worker.existsData2Folder();
+
+	    if (data1Folder && data2Folder) {
+
+		error("Both data1 and data2 folders exist");
+		return;
+	    }
+
+	    if (!data1Folder && !data2Folder) {
+
+		error("Both data1 and data2 folders missing");
+		return;
+	    }
+
+	    targetFolder = data1Folder ? worker.getData1Folder() : worker.getData2Folder();
+
+	} catch (GSException e) {
+
+	    error("Unable to get database instance: " + e.getMessage(), e);
+	    return;
+	}
+
+	//
+	// get token
+	//
+
+	try {
+
+	    token = String.valueOf(getAccessToken(serviceUrl, tokenUser.get(), tokenPwd.get()));
 
 	} catch (Exception e) {
 
-	    publish(MessageChannel.MessageLevel.ERROR, "Unable to get access token: " + e.getMessage());
+	    error("Unable to get access token: " + e.getMessage(), e);
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-
-	    running = false;
 	    return;
 	}
 
@@ -244,24 +286,6 @@ public class DataHUBService extends AbstractManagedService {
 
 	consumer = new KafkaConsumer<>(props);
 
-	Database database = null;
-	SourceStorageWorker worker = null;
-
-	try {
-
-	    database  = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
-
-	    worker = database.getWorker(sourceId);
-
-	} catch (GSException e) {
-
-	    publish(MessageChannel.MessageLevel.ERROR, "Unable to get database instance: " + e.getMessage());
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-
-	    running = false;
-	    return;
-	}
-
 	while (running) {
 
 	    List<PartitionInfo> partitions = partitions(topic.get());
@@ -283,7 +307,7 @@ public class DataHUBService extends AbstractManagedService {
 		    continue;
 		}
 
-		List<Map<String, Object>> rawMessages = new ArrayList<>();
+		List<Map<String, Object>> decodedMessages = new ArrayList<>();
 
 		for (ConsumerRecord<byte[], byte[]> msg : records) {
 
@@ -296,35 +320,52 @@ public class DataHUBService extends AbstractManagedService {
 
 		    String text = new String(raw);
 
-		    if (enableTextFilter && !text.contains(textFilter.get())) {
+		    if (useTestFilter && !text.contains(testFilter.get())) {
 
 			continue;
 		    }
 
-		    rawMessages.addAll(decode(msg, raw, schemaRegistryURL.get(), token));
+		    decodedMessages.addAll(decode(msg, schemaRegistryURL.get(), token));
 		}
 
-		rawMessages.sort((a, b) -> Long.compare((Long) b.get("timestamp"), (Long) a.get("timestamp")));
+		decodedMessages.sort((a, b) -> Long.compare((Long) b.get("timestamp"), (Long) a.get("timestamp")));
 
-		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + rawMessages.size());
+		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + decodedMessages.size());
 
-		rawMessages.stream(). //
+		decodedMessages.stream(). //
 			map(msg -> DecodedMessage.of(this, mapper, msg)).//
 			filter(Objects::nonNull).//
-			filter(messageFilter()).//
+			filter(isDataHUBMessage(recordsFilter.get())).//
 			forEach(this::handle);//
 	    }
 	}
     }
 
     /**
-     * TO BE IMPLEMENTED: filter in only messages related to the DataHUB
+     * Filters in only messages related to the DataHUB
      *
      * @return
      */
-    private Predicate<DecodedMessage> messageFilter() {
+    private Predicate<DecodedMessage> isDataHUBMessage(String recordsFilter) {
 
-	return (msg) -> true;
+	return (msg) -> {
+
+	    Optional<JSONObject> optValue = msg.optAspectValue();
+
+	    if (optValue.isPresent()) {
+
+		JSONObject aspectValue = optValue.get();
+
+		JSONObject customProperties = aspectValue.optJSONObject("customProperties");
+
+		if (customProperties != null) {
+
+		    return customProperties.has(recordsFilter);
+		}
+	    }
+
+	    return false;
+	};
     }
 
     /**
@@ -338,18 +379,67 @@ public class DataHUBService extends AbstractManagedService {
 	String entityURN = decodedMessage.entityURN();
 	ChangeType changeType = decodedMessage.type();
 
-	switch (changeType) {
-	case UPSERT -> {
+	try {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Upsert message");
-	}
-	case DELETE -> {
+	    switch (changeType) {
+	    case UPSERT -> {
 
-	    GSLoggerFactory.getLogger(getClass()).debug("Delete message");
-	}
-	}
+		DatahubConnector connector = new DatahubConnector();
 
-	publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
+		String jsonEntity = connector.fetch(serviceUrl, token, entityURN);
+
+		OriginalMetadata original = new OriginalMetadata();
+		original.setMetadata(jsonEntity);
+
+		DatahubMapper mapper = new DatahubMapper();
+
+		GSSource source = new GSSource();
+		source.setEndpoint(serviceUrl);
+		source.setUniqueIdentifier(sourceId);
+		source.setLabel(sourceLabel);
+
+		GSResource resource = mapper.map(original, source);
+
+		resource.setPrivateId(StringUtils.URLEncodeUTF8(resource.getOriginalId().get()));
+
+		IndexedElementsWriter.write(resource);
+
+		Document doc = resource.asDocument(true);
+
+		boolean stored = targetFolder.store(entityURN, DatabaseFolder.FolderEntry.of(doc), DatabaseFolder.EntryType.GS_RESOURCE);
+
+		if (!stored) {
+
+		    boolean replaced = targetFolder.replace(entityURN, DatabaseFolder.FolderEntry.of(doc),
+			    DatabaseFolder.EntryType.GS_RESOURCE);
+
+		    if (replaced) {
+
+			GSLoggerFactory.getLogger(getClass()).debug("Modified record: " + entityURN);
+
+		    } else {
+
+			error("Unable to add/replace record: " + entityURN);
+		    }
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("New record: " + entityURN);
+		}
+	    }
+	    case DELETE -> {
+
+		GSLoggerFactory.getLogger(getClass()).debug("Deleted record: " + entityURN);
+
+		targetFolder.remove(entityURN);
+
+	    }
+	    }
+
+	} catch (Exception e) {
+
+	    error("Unable to handle record: " + e.getMessage(), e);
+	}
     }
 
     /**
@@ -414,7 +504,16 @@ public class DataHUBService extends AbstractManagedService {
     private record DecodedMessage(//
 	    String timeStamp,//
 	    String entityURN, //
+	    JSONObject aspect,//
 	    ChangeType type) {
+
+	/**
+	 * @return
+	 */
+	public Optional<JSONObject> optAspectValue() {
+
+	    return Optional.ofNullable(aspect);
+	}
 
 	/**
 	 * @param service
@@ -432,13 +531,22 @@ public class DataHUBService extends AbstractManagedService {
 
 		JSONObject jsonObject = new JSONObject(json);
 
+		JSONObject aspect = jsonObject.optJSONObject("aspect");
+
+		JSONObject aspectValue = null;
+
+		if (aspect != null) {
+
+		    aspectValue = aspect.optJSONObject("value");
+		}
+
 		String timeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
 		String entityURN = jsonObject.optString("entityUrn", "missing entityURN");
 		String changeType = jsonObject.optString("changeType", "missing changeType");
 
 		service.publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
 
-		return new DecodedMessage(timeStamp, entityURN, ChangeType.valueOf(changeType));
+		return new DecodedMessage(timeStamp, entityURN, aspectValue, ChangeType.valueOf(changeType));
 
 	    } catch (JsonProcessingException e) {
 
@@ -458,16 +566,16 @@ public class DataHUBService extends AbstractManagedService {
      * @param token
      * @return
      */
-    private List<Map<String, Object>> decode(ConsumerRecord<byte[], byte[]> msg, byte[] raw, String schemaRegistryURL, String token) {
+    private List<Map<String, Object>> decode(ConsumerRecord<byte[], byte[]> msg, String schemaRegistryURL, String token) {
 
 	List<Map<String, Object>> decodedMessages = new ArrayList<>();
 
 	try {
 
-	    GenericRecord record = deserialize(raw, schemaRegistryURL, token);
+	    GenericRecord record = deserialize(msg.value(), schemaRegistryURL, token);
 
 	    String json = record.toString();
-	    Map<String, Object> map = mapper.readValue(json, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {
+	    Map<String, Object> map = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
 	    });
 
 	    if (map.containsKey("aspect")) {
@@ -514,9 +622,7 @@ public class DataHUBService extends AbstractManagedService {
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-
-	    publish(MessageChannel.MessageLevel.ERROR, "Error decoding message:" + e.getMessage());
+	    error("Error decoding message:" + e.getMessage(), e);
 	}
 
 	return decodedMessages;
@@ -556,6 +662,8 @@ public class DataHUBService extends AbstractManagedService {
 	    payload.put("app_to_use", "TUTTE");
 
 	    String body = mapper.writeValueAsString(payload);
+
+	    tokenUrl += "/ext-login";
 
 	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(tokenUrl)).header("Content-Type", "application/json")
 		    .POST(HttpRequest.BodyPublishers.ofString(body)).build();
@@ -632,5 +740,30 @@ public class DataHUBService extends AbstractManagedService {
     private boolean check(Optional<String> optional) {
 
 	return optional.isPresent() && !optional.get().isEmpty();
+    }
+
+    /**
+     * @param message
+     * @param ex
+     */
+    private void error(String message) {
+
+	error(message, null);
+    }
+
+    /**
+     * @param message
+     * @param ex
+     */
+    private void error(String message, Exception ex) {
+
+	publish(MessageChannel.MessageLevel.ERROR, message);
+
+	if (ex != null) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+	}
+
+	running = false;
     }
 }

@@ -2364,7 +2364,7 @@
 
         <module>custom-tasks</module>
         <module>services</module>
-        <module>data-hub-service</module>
+        <module>service-data-hub</module>
 
     </modules>
 
