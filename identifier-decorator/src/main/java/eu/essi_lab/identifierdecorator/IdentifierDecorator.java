@@ -91,7 +91,6 @@ public class IdentifierDecorator {
     public void decorateHarvestedIdentifier(//
 	    GSResource incomingResource, //
 	    HarvestingProperties harvestingProperties, //
-	    SourceStorage storage, //
 	    boolean isFirstHarvesting, //
 	    boolean isRecovery, //
 	    boolean isIncremental) throws DuplicatedResourceException, ConflictingResourceException, GSException {
