@@ -933,6 +933,21 @@ public class OpenSearchWrapper {
      * @throws OpenSearchException
      * @throws IOException
      */
+    public Result upsertWithOpenSearchClient(IndexData indexData) throws OpenSearchException, IOException {
+
+	IndexRequest<Map<String, Object>> indexRequest = indexData.getIndexRequest();
+
+	IndexResponse indexResponse = client.index(indexRequest);
+
+	return indexResponse.result();
+    }
+
+    /**
+     * @param indexData
+     * @return
+     * @throws OpenSearchException
+     * @throws IOException
+     */
     public boolean storeWithOpenSearchClient(IndexData indexData) throws OpenSearchException, IOException {
 
 	IndexRequest<Map<String, Object>> indexRequest = indexData.getIndexRequest();

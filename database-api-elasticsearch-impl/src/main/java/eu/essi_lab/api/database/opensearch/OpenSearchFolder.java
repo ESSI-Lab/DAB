@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONObject;
+import org.opensearch.client.opensearch._types.*;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.DeleteByQueryRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -88,6 +89,34 @@ public class OpenSearchFolder implements DatabaseFolder {
     public String getName() {
 
 	return name;
+    }
+
+    @Override
+    public UpsertResult upsert(String key, FolderEntry entry, EntryType type) throws Exception {
+
+	Result result = null;
+
+	if (type == EntryType.SHAPE_FILE) {
+
+	    List<IndexData> list = IndexData.ofShapeFile(this, key, entry);
+
+	    for (IndexData indexData : list) {
+
+		result = wrapper.upsertWithOpenSearchClient(indexData);
+
+		wrapper.synch();
+	    }
+
+	} else {
+
+	    IndexData indexData = IndexData.of(this, key, entry, type);
+
+	    result = wrapper.upsertWithOpenSearchClient(indexData);
+
+	    wrapper.synch();
+	}
+
+	return result == Result.Created ? UpsertResult.INSERTED :  UpsertResult.UPDATED;
     }
 
     @Override
