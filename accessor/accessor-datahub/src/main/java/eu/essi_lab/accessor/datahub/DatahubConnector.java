@@ -74,6 +74,12 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+
+	if(getSetting().readKeyValue("instantExit").orElse("false").equals("true")){
+
+	    return ret;
+	}
+
 	if (originalMetadata.isEmpty()) {
 	    originalMetadata = getOriginalMetadata();
 	}
