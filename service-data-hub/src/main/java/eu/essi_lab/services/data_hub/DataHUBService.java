@@ -1,7 +1,5 @@
 package eu.essi_lab.services.data_hub;
 
-import com.fasterxml.jackson.core.*;
-import com.fasterxml.jackson.core.type.*;
 import com.fasterxml.jackson.databind.*;
 import eu.essi_lab.accessor.datahub.*;
 import eu.essi_lab.api.database.*;
@@ -14,9 +12,6 @@ import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.services.impl.*;
 import eu.essi_lab.services.message.*;
-import org.apache.avro.*;
-import org.apache.avro.generic.*;
-import org.apache.avro.io.*;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.*;
 import org.json.*;
@@ -25,7 +20,6 @@ import org.w3c.dom.*;
 import java.io.*;
 import java.net.*;
 import java.net.http.*;
-import java.nio.*;
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -36,37 +30,48 @@ import java.util.function.*;
  */
 public class DataHUBService extends AbstractManagedService {
 
-    private final Map<Integer, Schema> schemaCache;
-    private final ObjectMapper mapper;
-    private boolean running;
-
     private static final String SCHEMA_REGISTRY_URL_KEY = "shemaRegistryURL";
     private static final String SERVICE_URL_KEY = "serviceURL";
-
     private static final String TOKEN_USER_KEY = "token.user";
     private static final String TOKEN_PWD_KEY = "token.pwd";
-
     private static final String KAFKA_BOOTSTRAP_SERVERS_KEY = "kafka.bootstrapServers";
     private static final String KAFKA_TOPIC_KEY = "kafka.topic";
     private static final String KAFKA_GROUP_ID_KEY = "kafka.groupId";
     private static final String KAFKA_USERNAME_KEY = "kafka.username";
     private static final String KAFKA_PASSWORD_KEY = "kafka.password";
-    private static final String KAFKA_MAX_MESSAGES_KEY = "kafka.maxMessages";
+    private static final String KAFKA_MAX_POLL_RECORDS_KEY = "kafka.maxPollRecords";
+
+    private static final String KAFKA_MAX_PENDING_PROCESSES_KEY = "kafka.maxPendingProcesses";
+    private static final String KAFKA_MAX_CONCURRENT_PROCESSES_KEY = "kafka.maxConcurrentProcesses";
 
     private static final String TEST_FILTER_KEY = "test.filter";
     private static final String TEST_FILTER_ENABLED_KEY = "test.filter.enabled";
-
     private static final String DATA_HUB_SOURCE_ID_KEY = "dataHub.sourceId";
     private static final String DATA_HUB_SOURCE_LABEL_KEY = "dataHub.sourceLabel";
     private static final String DATA_HUB_RECORDS_FILTER_KEY = "dataHub.recordsFilter";
 
-    private static final String THREAD_POOL_SIZE_KEY = "threadPoolSize";
+    /**
+     * Concurrency control
+     */
+    private static final int DEFAULT_MAX_CONCURRENT_PROCESSES = 10;
 
-    private static final List<String> TEST_IDS_ = List.of(
-	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_gct,DEV)",//
-	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_pzz,DEV)",//
-	    "urn:li:dataset:(urn:li:dataPlatform:metadata,abdam_pai_rischio_frana_uom_dx_sele_glt_srg,DEV)");//
+    /**
+     * Backpressure control
+     */
+    private static final int DEFAULT_MAX_PENDING_PROCESSES = 50;
 
+    /**
+     * Overrides default 500
+     */
+    private static final int DEFAULT_MAX_POLL_RECORDS = 100;
+
+    /**
+     *
+     */
+    private static final int MAX_STOP_WAIT_SECONDS = 30;
+
+
+    private boolean running;
     /**
      *
      */
@@ -76,20 +81,15 @@ public class DataHUBService extends AbstractManagedService {
     private String serviceUrl;
     private String token;
     private String sourceLabel;
-
-    /**
-     *
-     */
-    private static final int DEFAULT_THREAD_POOL_SIZE = 10;
     private ExecutorService executor;
+    private OffsetTracker tracker;
+    private Decoder decoder;
 
     /**
      *
      */
     public DataHUBService() {
 
-	schemaCache = new HashMap<>();
-	mapper = new ObjectMapper();
     }
 
     @Override
@@ -168,13 +168,6 @@ public class DataHUBService extends AbstractManagedService {
 	    error("Missing topic name");
 	}
 
-	Optional<String> maxMessages = getSetting().readKeyValue(KAFKA_MAX_MESSAGES_KEY);
-
-	if (!(check(maxMessages))) {
-
-	    error("Missing max messages");
-	}
-
 	boolean useTestFilter = getSetting(). //
 		readKeyValue(TEST_FILTER_ENABLED_KEY).//
 		map(Boolean::parseBoolean).//
@@ -216,16 +209,53 @@ public class DataHUBService extends AbstractManagedService {
 	    sourceLabel = optSourceLabel.get();
 	}
 
-	int threadPoolSize = getSetting(). //
-		readKeyValue(THREAD_POOL_SIZE_KEY).//
+	//
+	// these properties control the
+	//
+
+	int maxPollRecords = getSetting(). //
+		readKeyValue(KAFKA_MAX_POLL_RECORDS_KEY).//
 		map(Integer::parseInt).//
-		orElse(DEFAULT_THREAD_POOL_SIZE);//
+		orElse(DEFAULT_MAX_POLL_RECORDS);//
+
+	int maxConcurrentProcesses = getSetting(). //
+		readKeyValue(KAFKA_MAX_CONCURRENT_PROCESSES_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_MAX_CONCURRENT_PROCESSES);//
+
+	int maxPendingProcesses = getSetting(). //
+		readKeyValue(KAFKA_MAX_PENDING_PROCESSES_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_MAX_PENDING_PROCESSES);//
+
+	//
+	// init executor
+	//
 
 	ThreadFactory factory = Thread.ofPlatform().//
 		name(getClass().getSimpleName()).//
 		factory();
 
-	executor = Executors.newFixedThreadPool(threadPoolSize, factory);
+	executor = Executors.newFixedThreadPool(maxConcurrentProcesses, factory);
+
+	//
+	// get target folder
+	//
+
+	getTargetFolder().ifPresent(f -> targetFolder = f);
+
+	//
+	// get token
+	//
+
+	try {
+
+	    token = String.valueOf(getAccessToken(serviceUrl, tokenUser.get(), tokenPwd.get()));
+
+	} catch (Exception e) {
+
+	    error("Unable to get access token: " + e.getMessage(), e);
+	}
 
 	if (!running) {
 
@@ -233,8 +263,159 @@ public class DataHUBService extends AbstractManagedService {
 	}
 
 	//
-	// get target folder
+	// init consumer
 	//
+
+	Properties props = new Properties();
+
+	props.put("bootstrap.servers", bootstrapServers.get());
+	props.put("group.id", groupId.get());
+	props.put("max.poll.records", String.valueOf(maxPollRecords));
+
+	props.put("enable.auto.commit", "false");
+	props.put("auto.offset.reset", "latest");
+	props.put("security.protocol", "SASL_SSL");
+	props.put("sasl.mechanism", "SCRAM-SHA-512");
+
+	props.put("sasl.jaas.config",
+		"org.apache.kafka.common.security.scram.ScramLoginModule required " + "username=\"" + user.get() + "\" " + "password=\""
+			+ pwd.get() + "\";");
+
+	props.put("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+
+	props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+
+	decoder = new Decoder(this);
+
+	consumer = new KafkaConsumer<>(props);
+
+	tracker = new OffsetTracker();
+
+	consumer.subscribe(List.of(topic.get()), new ConsumerRebalanceListener() {
+
+	    @Override
+	    public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+
+		tracker.onPartitionAssigned(partitions);
+	    }
+
+	    @Override
+	    public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+
+		commitSync();
+	    }
+
+	    @Override
+	    public void onPartitionsLost(Collection<TopicPartition> partitions) {
+	    }
+	});
+
+	Semaphore inFlight = new Semaphore(maxPendingProcesses); // backpressure
+
+	while (running) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Polling STARTED");
+
+	    ConsumerRecords<byte[], byte[]> records = poll();
+
+	    GSLoggerFactory.getLogger(getClass()).info("Polling ENDED");
+
+	    GSLoggerFactory.getLogger(getClass()).info("Records found: {}", records.count());
+
+	    for (ConsumerRecord<byte[], byte[]> record : records) {
+
+		try {
+
+		    inFlight.acquire();
+
+		} catch (InterruptedException e) {
+		    Thread.currentThread().interrupt();
+		    return;
+		}
+
+		executor.submit(() -> {
+
+		    try {
+
+			byte[] raw = record.value();
+
+			Optional<DecodedRecord> optRecord;
+
+			if (raw != null) {
+
+			    //			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
+			    //				    map(rec -> DecodedRecord.of(this, decoder.getMapper(), rec)).//
+			    //				    filter(test(recordsFilter.get()));
+
+			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
+
+				    map(rec -> DecodedRecord.of(DataHUBService.this, decoder.getMapper(), rec));
+
+			} else {
+
+			    optRecord = Optional.empty();
+			}
+
+			optRecord.ifPresent(this::fakeProcess);
+
+		    } finally {
+
+			tracker.markProcessed(record);
+
+			inFlight.release();
+		    }
+		});
+	    }
+	}
+
+	commitAsync();
+    }
+
+    @Override
+    public void stop() {
+
+	if (executor != null) {
+
+	    executor.shutdown();
+
+	    try {
+
+		if (!executor.awaitTermination(MAX_STOP_WAIT_SECONDS, TimeUnit.SECONDS)) {
+
+		    executor.shutdownNow();
+		}
+	    } catch (Exception e) {
+
+		error("Unable to await executor termination: " + e.getMessage(), e);
+	    }
+	}
+
+	if (consumer != null) {
+
+	    synchronized (consumer) {
+
+		try {
+
+		    commitSync();
+
+		} catch (Exception e) {
+
+		    error("Unable to commit synch: " + e.getMessage(), e);
+
+		} finally {
+
+		    consumer.close();
+		}
+	    }
+	}
+
+	running = false;
+    }
+
+    /**
+     * @return
+     */
+    private Optional<DatabaseFolder> getTargetFolder() {
 
 	try {
 
@@ -248,146 +429,22 @@ public class DataHUBService extends AbstractManagedService {
 	    if (data1Folder && data2Folder) {
 
 		error("Both data1 and data2 folders exist");
-		return;
+		return Optional.empty();
 	    }
 
 	    if (!data1Folder && !data2Folder) {
 
 		error("Both data1 and data2 folders missing");
-		return;
+		return Optional.empty();
 	    }
 
-	    targetFolder = data1Folder ? worker.getData1Folder() : worker.getData2Folder();
+	    return Optional.of(data1Folder ? worker.getData1Folder() : worker.getData2Folder());
 
 	} catch (GSException e) {
 
 	    error("Unable to get database instance: " + e.getMessage(), e);
-	    return;
+	    return Optional.empty();
 	}
-
-	//
-	// get token
-	//
-
-	try {
-
-	    token = String.valueOf(getAccessToken(serviceUrl, tokenUser.get(), tokenPwd.get()));
-
-	} catch (Exception e) {
-
-	    error("Unable to get access token: " + e.getMessage(), e);
-
-	    return;
-	}
-
-	//
-	// init consumer
-	//
-
-	Properties props = new Properties();
-
-	props.put("bootstrap.servers", bootstrapServers.get());
-	props.put("group.id", groupId.get());
-	props.put("enable.auto.commit", "false");
-	props.put("auto.offset.reset", "latest");
-
-	props.put("security.protocol", "SASL_SSL");
-	props.put("sasl.mechanism", "SCRAM-SHA-512");
-
-	props.put("sasl.jaas.config",
-		"org.apache.kafka.common.security.scram.ScramLoginModule required " + "username=\"" + user.get() + "\" " + "password=\""
-			+ pwd.get() + "\";");
-
-	props.put("key.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
-
-	props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
-
-	consumer = new KafkaConsumer<>(props);
-	
-	while (running) {
-
-	    List<PartitionInfo> partitions = partitions(topic.get());
-
-	    for (PartitionInfo partition : partitions) {
-
-		preparePoll(topic.get(), partition, Integer.parseInt(maxMessages.get()));
-
-		GSLoggerFactory.getLogger(getClass()).debug("Polling STARTED");
-
-		ConsumerRecords<byte[], byte[]> records = poll();
-
-		GSLoggerFactory.getLogger(getClass()).debug("Polling ENDED");
-
-		if (records.isEmpty()) {
-
-		    GSLoggerFactory.getLogger(getClass()).trace("No records found");
-
-		    continue;
-		}
-
-		List<Map<String, Object>> rawDecodedMessages = new ArrayList<>();
-
-		for (ConsumerRecord<byte[], byte[]> msg : records) {
-
-		    byte[] raw = msg.value();
-
-		    if (raw == null) {
-
-			continue;
-		    }
-
-		    String text = new String(raw);
-
-		    if (useTestFilter && !text.contains(testFilter.get())) {
-
-			continue;
-		    }
-
-		    rawDecodedMessages.addAll(decode(msg, schemaRegistryURL.get(), token));
-		}
-
-		rawDecodedMessages.sort((a, b) -> Long.compare((Long) b.get("timestamp"), (Long) a.get("timestamp")));
-
-		publish(MessageChannel.MessageLevel.INFO, "Total matching messages: " + rawDecodedMessages.size());
-
-		if (rawDecodedMessages.isEmpty()) {
-
-		    commit();
-
-		} else {
-
-		    List<DecodedMessage> list = rawDecodedMessages.stream(). //
-
-			    map(msg -> DecodedMessage.of(this, mapper, msg)).//
-			    filter(Objects::nonNull).//
-			    filter(isDataHUBMessage(recordsFilter.get())). //
-			    toList();
-
-		    StreamUtils.asynchConsume(list, this::process, executor);//
-
-		    commit();
-		}
-	    }
-	}
-    }
-
-    @Override
-    public void stop() {
-
-	if (consumer != null) {
-
-	    synchronized (consumer) {
-
-		consumer.close();
-	    }
-	}
-
-	if (executor != null) {
-
-	    executor.close();
-	}
-
-	running = false;
     }
 
     /**
@@ -395,7 +452,7 @@ public class DataHUBService extends AbstractManagedService {
      *
      * @return
      */
-    private Predicate<DecodedMessage> isDataHUBMessage(String recordsFilter) {
+    private Predicate<DecodedRecord> test(String recordsFilter) {
 
 	return (msg) -> {
 
@@ -418,13 +475,34 @@ public class DataHUBService extends AbstractManagedService {
     }
 
     /**
-     * @param decodedMessage
+     * @param decodedRecord
      */
-    private void process(DecodedMessage decodedMessage) {
+    private void fakeProcess(DecodedRecord decodedRecord) {
 
-	String timeStamp = decodedMessage.timeStamp();
-	String entityURN = decodedMessage.entityURN();
-	ChangeType changeType = decodedMessage.type();
+	String timeStamp = decodedRecord.timeStamp();
+	String entityURN = decodedRecord.entityURN();
+	ChangeType changeType = decodedRecord.type();
+
+	try {
+
+	    publish(MessageChannel.MessageLevel.INFO, timeStamp + "/" + entityURN + "/" + changeType);
+
+	    GSLoggerFactory.getLogger(getClass()).info(timeStamp + "/" + entityURN + "/" + changeType);
+
+	} catch (Exception e) {
+
+	    error("Unable to process record: " + e.getMessage(), e, true);
+	}
+    }
+
+    /**
+     * @param decodedRecord
+     */
+    private void process(DecodedRecord decodedRecord) {
+
+	String timeStamp = decodedRecord.timeStamp();
+	String entityURN = decodedRecord.entityURN();
+	ChangeType changeType = decodedRecord.type();
 
 	try {
 
@@ -482,50 +560,12 @@ public class DataHUBService extends AbstractManagedService {
 		GSLoggerFactory.getLogger(getClass()).info("Handling DELETE record: {}", entityURN);
 
 		targetFolder.remove(entityURN);
-
 	    }
 	    }
-
-	    commit();
 
 	} catch (Exception e) {
 
-	    error("Unable to handle record: " + e.getMessage(), e);
-	}
-    }
-
-    /**
-     * @param topic
-     * @return
-     */
-    private List<PartitionInfo> partitions(String topic) {
-
-	synchronized (consumer) {
-
-	    return consumer.partitionsFor(topic);
-	}
-    }
-
-    /**
-     * @param topic
-     * @param partition
-     * @param maxMessages
-     */
-    private void preparePoll(String topic, PartitionInfo partition, int maxMessages) {
-
-	synchronized (consumer) {
-
-	    TopicPartition tp = new TopicPartition(topic, partition.partition());
-
-	    consumer.assign(List.of(tp));
-
-	    consumer.seekToEnd(List.of(tp));
-
-	    long high = consumer.position(tp);
-
-	    long start = Math.max(0, high - maxMessages);
-
-	    consumer.seek(tp, start);
+	    error("Unable to process record: " + e.getMessage(), e, true);
 	}
     }
 
@@ -536,166 +576,8 @@ public class DataHUBService extends AbstractManagedService {
 
 	synchronized (consumer) {
 
-	    return consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+	    return consumer.poll(Duration.ofMillis(TimeUnit.SECONDS.toMillis(1)));
 	}
-    }
-
-    /**
-     *
-     */
-    private void commit() {
-
-	synchronized (consumer) {
-
-	    try {
-
-		consumer.commitSync();
-
-	    } catch (Exception e) {
-
-		error("Unable to commit: " + e.getMessage(), e);
-	    }
-	}
-    }
-
-    /**
-     * @author Fabrizio
-     */
-    private enum ChangeType {
-
-	UPSERT, DELETE;
-    }
-
-    /**
-     * @param timeStamp
-     * @param entityURN
-     * @author Fabrizio
-     */
-    private record DecodedMessage(//
-	    String timeStamp,//
-	    String entityURN, //
-	    JSONObject aspect,//
-	    ChangeType type) {
-
-	/**
-	 * @return
-	 */
-	public Optional<JSONObject> optAspectValue() {
-
-	    return Optional.ofNullable(aspect);
-	}
-
-	/**
-	 * @param service
-	 * @param mapper
-	 * @param decodedMessage
-	 * @return
-	 */
-	static DecodedMessage of(DataHUBService service, ObjectMapper mapper, Map<String, Object> decodedMessage) {
-
-	    try {
-
-		Object data = decodedMessage.get("data");
-
-		String json = mapper.writeValueAsString(data);
-
-		JSONObject jsonObject = new JSONObject(json);
-
-		JSONObject aspect = jsonObject.optJSONObject("aspect");
-
-		JSONObject aspectValue = null;
-
-		if (aspect != null) {
-
-		    aspectValue = aspect.optJSONObject("value");
-		}
-
-		String timeStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
-		String entityURN = jsonObject.optString("entityUrn", "missing entityURN");
-		String changeType = jsonObject.optString("changeType", "missing changeType");
-
-		service.publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
-
-		return new DecodedMessage(timeStamp, entityURN, aspectValue, ChangeType.valueOf(changeType));
-
-	    } catch (JsonProcessingException e) {
-
-		service.publish(MessageChannel.MessageLevel.ERROR, "Error serializing data: " + e.getMessage());
-
-		GSLoggerFactory.getLogger(DataHUBService.class).error(e);
-	    }
-
-	    return null;
-	}
-    }
-
-    /**
-     * @param msg
-     * @param raw
-     * @param schemaRegistryURL
-     * @param token
-     * @return
-     */
-    private List<Map<String, Object>> decode(ConsumerRecord<byte[], byte[]> msg, String schemaRegistryURL, String token) {
-
-	List<Map<String, Object>> decodedMessages = new ArrayList<>();
-
-	try {
-
-	    GenericRecord record = deserialize(msg.value(), schemaRegistryURL, token);
-
-	    String json = record.toString();
-	    Map<String, Object> map = mapper.readValue(json, new TypeReference<Map<String, Object>>() {
-	    });
-
-	    if (map.containsKey("aspect")) {
-
-		Object aspectObj = map.get("aspect");
-
-		if (aspectObj instanceof Map) {
-
-		    @SuppressWarnings("unchecked")
-		    Map<String, Object> aspect = (Map<String, Object>) aspectObj;
-
-		    Object value = aspect.get("value");
-
-		    if (value instanceof byte[] bytes) {
-
-			String str = new String(bytes);
-
-			try {
-
-			    aspect.put("value", mapper.readValue(str, Object.class));
-
-			} catch (Exception e) {
-
-			    aspect.put("value", str);
-			}
-		    }
-
-		    if (value instanceof String str) {
-
-			try {
-			    aspect.put("value", mapper.readValue(str, Object.class));
-			} catch (Exception ignored) {
-			}
-		    }
-		}
-	    }
-
-	    Map<String, Object> output = new HashMap<>();
-
-	    output.put("timestamp", msg.timestamp());
-	    output.put("data", map);
-
-	    decodedMessages.add(output);
-
-	} catch (Exception e) {
-
-	    error("Error decoding message:" + e.getMessage(), e);
-	}
-
-	return decodedMessages;
     }
 
     /**
@@ -709,6 +591,7 @@ public class DataHUBService extends AbstractManagedService {
     private String getAccessToken(String tokenUrl, String tokenUser, String tokenPwd) throws IOException, InterruptedException {
 
 	HttpResponse<String> response;
+	ObjectMapper mapper = new ObjectMapper();
 
 	try (HttpClient client = HttpClient.newHttpClient()) {
 
@@ -730,63 +613,51 @@ public class DataHUBService extends AbstractManagedService {
 	JsonNode json = mapper.readTree(response.body());
 
 	return json.get("access_token").asText();
-
     }
 
     /**
-     * @param schemaRegistryUrl
-     * @param schemaId
-     * @param token
-     * @return
-     * @throws Exception
+     *
      */
-    private Schema getSchema(String schemaRegistryUrl, int schemaId, String token) throws Exception {
+    private void commitAsync() {
 
-	if (!schemaCache.containsKey(schemaId)) {
+	Map<TopicPartition, OffsetAndMetadata> offsets = tracker.buildOffsets();
 
-	    HttpClient client = HttpClient.newHttpClient();
+	if (!offsets.isEmpty()) {
 
-	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(schemaRegistryUrl + "/schemas/ids/" + schemaId))
-		    .header("Authorization", "Bearer " + token).GET().build();
+	    synchronized (consumer) {
 
-	    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+		consumer.commitAsync(offsets, (offsets1, exception) -> {
 
-	    JsonNode json = mapper.readTree(response.body());
+		    if (exception != null) {
 
-	    String schemaStr = json.get("schema").asText();
-
-	    Schema schema = new Schema.Parser().parse(schemaStr);
-
-	    schemaCache.put(schemaId, schema);
+			error(exception.getMessage(), exception);
+		    }
+		});
+	    }
 	}
-
-	return schemaCache.get(schemaId);
     }
 
     /**
-     * @param raw
-     * @param schemaRegistryUrl
-     * @param token
-     * @return
-     * @throws Exception
+     *
      */
-    private GenericRecord deserialize(byte[] raw, String schemaRegistryUrl, String token) throws Exception {
+    private void commitSync() {
 
-	ByteBuffer buffer = ByteBuffer.wrap(raw);
+	Map<TopicPartition, OffsetAndMetadata> offsets = tracker.buildOffsets();
 
-	buffer.get(); // magic byte
-	int schemaId = buffer.getInt();
+	if (!offsets.isEmpty()) {
 
-	Schema schema = getSchema(schemaRegistryUrl, schemaId, token);
+	    synchronized (consumer) {
 
-	byte[] avroBytes = new byte[buffer.remaining()];
-	buffer.get(avroBytes);
+		try {
 
-	BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(avroBytes, null);
+		    consumer.commitSync(offsets);
 
-	GenericDatumReader<GenericRecord> reader = new GenericDatumReader<>(schema);
+		} catch (Exception e) {
 
-	return reader.read(null, decoder);
+		    error(e.getMessage(), e);
+		}
+	    }
+	}
     }
 
     /**
@@ -801,17 +672,9 @@ public class DataHUBService extends AbstractManagedService {
     /**
      * @param message
      * @param ex
+     * @param running
      */
-    private void error(String message) {
-
-	error(message, null);
-    }
-
-    /**
-     * @param message
-     * @param ex
-     */
-    private void error(String message, Exception ex) {
+    void error(String message, Exception ex, boolean running) {
 
 	publish(MessageChannel.MessageLevel.ERROR, message);
 
@@ -820,6 +683,33 @@ public class DataHUBService extends AbstractManagedService {
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
 	}
 
-	running = false;
+	this.running = running;
+    }
+
+    /**
+     * @param message
+     * @param running
+     */
+    private void error(String message, boolean running) {
+
+	error(message, null);
+    }
+
+    /**
+     * @param message
+     * @param ex
+     */
+    void error(String message, Exception ex) {
+
+	error(message, ex, false);
+    }
+
+    /**
+     * @param message
+     * @param ex
+     */
+    private void error(String message) {
+
+	error(message, null, true);
     }
 }

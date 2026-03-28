@@ -40,11 +40,14 @@ public class LocalMessageChannel implements MessageChannel {
     @Override
     public void publish(String serviceId, MessageLevel level, String message) {
 
-	List<Message> messages = MESSAGE_MAP.computeIfAbsent(serviceId, k -> new ArrayList<>());
+	synchronized (MESSAGE_MAP) {
 
-	messages.add(Message.of(serviceId, level, message));
+	    List<Message> messages = MESSAGE_MAP.computeIfAbsent(serviceId, k -> new ArrayList<>());
 
-	MESSAGE_MAP.put(serviceId, ListUtils.lastN(messages, channelSize));
+	    messages.add(Message.of(serviceId, level, message));
+
+	    MESSAGE_MAP.put(serviceId, ListUtils.lastN(messages, channelSize));
+	}
     }
 
     /**
@@ -105,10 +108,10 @@ public class LocalMessageChannel implements MessageChannel {
 
 	List<Message> messages = MESSAGE_MAP.get(serviceId);
 
-	return messages == null ? new ArrayList<>() :
-		messages.stream(). //
-			sorted(Message.getComparator()).//
-			toList();//
+	return messages == null ? new ArrayList<>() : messages.stream(). //
+		sorted(Message.getComparator()).//
+		toList();//
+
     }
 
     /**

@@ -264,7 +264,7 @@ public class MultiServiceManager {
 
 	if (active.size() >= maxServices) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Max services reached");
+	    GSLoggerFactory.getLogger(getClass()).warn("Max services reached");
 
 	    return;
 	}
@@ -273,14 +273,12 @@ public class MultiServiceManager {
 
 	    if (active.containsKey(set.getServiceId())) {
 
-		GSLoggerFactory.getLogger(getClass()).info("Service {} is already active", set.getServiceId());
-
 		continue;
 	    }
 
 	    if (active.size() >= maxServices) {
 
-		GSLoggerFactory.getLogger(getClass()).info("Max services reached");
+		GSLoggerFactory.getLogger(getClass()).warn("Max services reached");
 
 		break;
 	    }
@@ -300,12 +298,8 @@ public class MultiServiceManager {
 
 	if (!lock.tryAcquire()) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Lock for service {} already acquired", setting.getServiceId());
-
 	    return;
 	}
-
-	GSLoggerFactory.getLogger(getClass()).info("Lock for service {} acquired", setting.getServiceId());
 
 	ManagedService service = setting.createService();
 
@@ -381,5 +375,4 @@ public class MultiServiceManager {
 
 	return new RedisServiceLock(jedisPool, serviceId, ttlSeconds, hostName);
     }
-
 }
