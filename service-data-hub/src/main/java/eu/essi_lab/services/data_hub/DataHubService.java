@@ -28,7 +28,7 @@ import java.util.function.*;
 /**
  * @author Fabrizio
  */
-public class DataHUBService extends AbstractManagedService {
+public class DataHubService extends AbstractManagedService {
 
     private static final String SCHEMA_REGISTRY_URL_KEY = "shemaRegistryURL";
     private static final String SERVICE_URL_KEY = "serviceURL";
@@ -70,7 +70,6 @@ public class DataHUBService extends AbstractManagedService {
      */
     private static final int MAX_STOP_WAIT_SECONDS = 30;
 
-
     private boolean running;
     /**
      *
@@ -88,7 +87,7 @@ public class DataHUBService extends AbstractManagedService {
     /**
      *
      */
-    public DataHUBService() {
+    public DataHubService() {
 
     }
 
@@ -314,13 +313,7 @@ public class DataHUBService extends AbstractManagedService {
 
 	while (running) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Polling STARTED");
-
 	    ConsumerRecords<byte[], byte[]> records = poll();
-
-	    GSLoggerFactory.getLogger(getClass()).info("Polling ENDED");
-
-	    GSLoggerFactory.getLogger(getClass()).info("Records found: {}", records.count());
 
 	    for (ConsumerRecord<byte[], byte[]> record : records) {
 
@@ -330,6 +323,8 @@ public class DataHUBService extends AbstractManagedService {
 
 		} catch (InterruptedException e) {
 		    Thread.currentThread().interrupt();
+		    error("Loop thread interrupted: " + e.getMessage(), e);
+
 		    return;
 		}
 
@@ -343,20 +338,20 @@ public class DataHUBService extends AbstractManagedService {
 
 			if (raw != null) {
 
-			    //			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
-			    //				    map(rec -> DecodedRecord.of(this, decoder.getMapper(), rec)).//
-			    //				    filter(test(recordsFilter.get()));
-
 			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
+				    map(rec -> DecodedRecord.of(this, decoder.getMapper(), rec)).//
+				    filter(test(recordsFilter.get()));
 
-				    map(rec -> DecodedRecord.of(DataHUBService.this, decoder.getMapper(), rec));
+			    //			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
+			    //
+			    //				    map(rec -> DecodedRecord.of(DataHUBService.this, decoder.getMapper(), rec));
 
 			} else {
 
 			    optRecord = Optional.empty();
 			}
 
-			optRecord.ifPresent(this::fakeProcess);
+			optRecord.ifPresent(this::process);
 
 		    } finally {
 
@@ -454,9 +449,14 @@ public class DataHUBService extends AbstractManagedService {
      */
     private Predicate<DecodedRecord> test(String recordsFilter) {
 
-	return (msg) -> {
+	return (record) -> {
 
-	    Optional<JSONObject> optValue = msg.optAspectValue();
+	    if (record.type() == ChangeType.DELETE) {
+
+		return true;
+	    }
+
+	    Optional<JSONObject> optValue = record.optAspectValue();
 
 	    if (optValue.isPresent()) {
 
@@ -466,7 +466,7 @@ public class DataHUBService extends AbstractManagedService {
 
 		if (customProperties != null) {
 
-		    return customProperties.has(recordsFilter);
+		    return customProperties.toString().contains(recordsFilter);
 		}
 	    }
 
@@ -509,7 +509,7 @@ public class DataHUBService extends AbstractManagedService {
 	    switch (changeType) {
 	    case UPSERT -> {
 
-		GSLoggerFactory.getLogger(getClass()).info("Handling UPSERT record: {}", entityURN);
+		GSLoggerFactory.getLogger(getClass()).info("Processing UPSERT record STARTED: {}", entityURN);
 
 		DatahubConnector connector = new DatahubConnector();
 
@@ -533,33 +533,33 @@ public class DataHUBService extends AbstractManagedService {
 
 		Document doc = resource.asDocument(true);
 
-		boolean stored = targetFolder.store(entityURN, DatabaseFolder.FolderEntry.of(doc), DatabaseFolder.EntryType.GS_RESOURCE);
+		DatabaseFolder.UpsertResult upsertResult = targetFolder.upsert( //
+			entityURN,  //
+			DatabaseFolder.FolderEntry.of(doc),   //
+			DatabaseFolder.EntryType.GS_RESOURCE);//
 
-		if (!stored) {
+		publish(MessageChannel.MessageLevel.INFO, "Record: " + timeStamp + "/" + entityURN + "/" + upsertResult);
 
-		    boolean replaced = targetFolder.replace(entityURN, DatabaseFolder.FolderEntry.of(doc),
-			    DatabaseFolder.EntryType.GS_RESOURCE);
-
-		    if (replaced) {
-
-			GSLoggerFactory.getLogger(getClass()).debug("Modified record: " + entityURN);
-
-		    } else {
-
-			error("Unable to add/replace record: " + entityURN);
-		    }
-
-		} else {
-
-		    GSLoggerFactory.getLogger(getClass()).debug("New record: " + entityURN);
-		}
-
+		GSLoggerFactory.getLogger(getClass()).info("Processing UPSERT record ENDED: {}/{}", entityURN, upsertResult);
 	    }
 	    case DELETE -> {
 
-		GSLoggerFactory.getLogger(getClass()).info("Handling DELETE record: {}", entityURN);
+		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record STARTED: {}", entityURN);
 
-		targetFolder.remove(entityURN);
+		String decodedURN = StringUtils.URLEncodeUTF8(entityURN);
+
+		boolean removed = targetFolder.remove(decodedURN);
+
+		if (removed) {
+
+		    publish(MessageChannel.MessageLevel.INFO, "Record: " + timeStamp + "/" + entityURN + "/REMOVED");
+
+		} else {
+
+		    publish(MessageChannel.MessageLevel.ERROR, "Unable to remove record: " + entityURN);
+		}
+
+		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record ENDED: {}", entityURN);
 	    }
 	    }
 

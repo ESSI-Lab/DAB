@@ -39,7 +39,7 @@ public class DistributedServiceRunner {
      */
     public void start() {
 
-	GSLoggerFactory.getLogger(getClass()).info("Starting for service {}", service.getId());
+	GSLoggerFactory.getLogger(getClass()).info("Starting service {}", service.getId());
 
 	scheduler.scheduleWithFixedDelay(this::attemptStart, 0, START_DELAY_SECONDS, TimeUnit.SECONDS);
     }
@@ -51,7 +51,7 @@ public class DistributedServiceRunner {
 
 	if (running) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("Service {} running", service.getId());
+//	    GSLoggerFactory.getLogger(getClass()).info("Service {} running", service.getId());
 
 	    return;
 	}
@@ -65,7 +65,8 @@ public class DistributedServiceRunner {
 	    GSLoggerFactory.getLogger(getClass()).info("Lock acquired for service {}", service.getId());
 
 	    running = true;
-	    service.start();
+
+	    new Thread(service::start).start();
 
 	    // starts heartbeat
 	    scheduler.scheduleWithFixedDelay(this::renewLock, renewSeconds, renewSeconds, TimeUnit.SECONDS);
@@ -85,8 +86,6 @@ public class DistributedServiceRunner {
 	}
 
 	boolean ok = lock.renew();
-
-	GSLoggerFactory.getLogger(getClass()).info("Lock renewed for service {}: {}", service.getId(), ok);
 
 	if (!ok) {
 

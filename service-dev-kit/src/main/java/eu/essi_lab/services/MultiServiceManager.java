@@ -216,8 +216,6 @@ public class MultiServiceManager {
      */
     public synchronized void setSettings(List<ManagedServiceSetting> settings) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Set definitions");
-
 	this.settings = settings.stream().filter(ManagedServiceSetting::isEnabled).toList();
 
 	//
@@ -235,8 +233,6 @@ public class MultiServiceManager {
 	    active.get(serviceId).shutdown();
 	    active.remove(serviceId);
 	});//
-
-	GSLoggerFactory.getLogger(getClass()).info("Active map: {}", active);
     }
 
     /**

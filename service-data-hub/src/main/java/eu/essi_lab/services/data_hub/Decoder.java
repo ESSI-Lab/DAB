@@ -22,12 +22,12 @@ class Decoder {
      */
     private final ObjectMapper mapper;
     private final Map<Integer, Schema> schemaCache;
-    private final DataHUBService service;
+    private final DataHubService service;
 
     /**
      * @param service
      */
-    Decoder(DataHUBService service) {
+    Decoder(DataHubService service) {
 
 	this.service = service;
 	this.mapper = new ObjectMapper();

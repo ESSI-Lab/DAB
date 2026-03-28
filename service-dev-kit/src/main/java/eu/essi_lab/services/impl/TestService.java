@@ -26,24 +26,21 @@ public class TestService extends AbstractManagedService {
 
 	publish(MessageChannel.MessageLevel.INFO, "Started service: " + getId());
 
-	new Thread(() -> {
+	while (running) {
 
-	    while (running) {
+	    GSLoggerFactory.getLogger(getClass()).info("*** [ Running service: {} ] ***", getId());
 
-		GSLoggerFactory.getLogger(getClass()).info("*** [ Running service: {} ] ***", getId());
+	    getSetting().getServiceOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Options: {}", o));
+	    getSetting().getKeyValueOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Key-value options: {}", o));
 
-		getSetting().getServiceOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Options: {}", o));
-		getSetting().getKeyValueOptions().ifPresent(o -> GSLoggerFactory.getLogger(getClass()).info("Key-value options: {}", o));
+	    publish(MessageChannel.MessageLevel.INFO, "Running service: " + getId());
 
-		publish(MessageChannel.MessageLevel.INFO, "Running service: " + getId());
-
-		try {
-		    Thread.sleep(Duration.of(5, ChronoUnit.SECONDS));
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
-		}
+	    try {
+		Thread.sleep(Duration.of(5, ChronoUnit.SECONDS));
+	    } catch (InterruptedException e) {
+		e.printStackTrace();
 	    }
-	}).start();
+	}
     }
 
     @Override

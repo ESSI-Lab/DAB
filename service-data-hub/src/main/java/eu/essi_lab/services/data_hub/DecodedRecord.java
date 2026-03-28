@@ -38,7 +38,7 @@ record DecodedRecord(//
      * @param rawRecord
      * @return
      */
-    static DecodedRecord of(DataHUBService service, ObjectMapper mapper, Map<String, Object> rawRecord) {
+    static DecodedRecord of(DataHubService service, ObjectMapper mapper, Map<String, Object> rawRecord) {
 
 	try {
 
@@ -61,19 +61,18 @@ record DecodedRecord(//
 	    String entityURN = jsonObject.optString("entityUrn", "missing entityURN");
 	    String changeType = jsonObject.optString("changeType", "missing changeType");
 
-	    service.publish(MessageChannel.MessageLevel.INFO, "Message: " + timeStamp + "/" + entityURN + "/" + changeType);
-
+	    //noinspection unchecked
 	    return new DecodedRecord(timeStamp, //
 		    entityURN, //
 		    aspectValue, //
-		    ((ConsumerRecord<byte[], byte[]>) rawRecord.get("record")), //
+		    (ConsumerRecord<byte[], byte[]>) rawRecord.get("record"), //
 		    ChangeType.valueOf(changeType));
 
 	} catch (JsonProcessingException e) {
 
 	    service.publish(MessageChannel.MessageLevel.ERROR, "Error serializing data: " + e.getMessage());
 
-	    GSLoggerFactory.getLogger(DataHUBService.class).error(e);
+	    GSLoggerFactory.getLogger(DataHubService.class).error(e);
 	}
 
 	return null;
