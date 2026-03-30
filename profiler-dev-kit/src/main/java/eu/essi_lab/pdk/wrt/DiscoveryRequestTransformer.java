@@ -10,53 +10,33 @@ package eu.essi_lab.pdk.wrt;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.ServiceLoader;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.bond.LogicalBond.*;
+import eu.essi_lab.messages.bond.parser.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.pdk.*;
+import eu.essi_lab.pdk.handler.*;
 
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.SortedFields;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
-import eu.essi_lab.messages.bond.QueryableBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.RuntimeInfoElementBond;
-import eu.essi_lab.messages.bond.SimpleValueBond;
-import eu.essi_lab.messages.bond.SpatialBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.ViewBond;
-import eu.essi_lab.messages.bond.parser.DiscoveryBondHandler;
-import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.Pluggable;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.handler.DiscoveryHandler;
+import java.util.*;
 
 /**
  * Validates and transforms a "discovery query" in the correspondent {@link DiscoveryMessage}. The discovery query is represented by a
@@ -151,11 +131,11 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	getSetting().flatMap(ProfilerSetting::getResultSetMapperThreadsCount).ifPresent(message::setResultSetMapperThreadsCount);
 
 	//
- 	// optionally set the data proxy server endpoint
- 	//
+	// optionally set the data proxy server endpoint
+	//
 
-	ConfigurationWrapper.getSystemSettings().readKeyValue(SystemSetting.KeyValueOptionKeys.DATA_PROXY_SERVER.getLabel()).
-		ifPresent(message::setDataProxyServer);
+	ConfigurationWrapper.getSystemSettings().readKeyValue(SystemSetting.KeyValueOptionKeys.DATA_PROXY_SERVER.getLabel())
+		.ifPresent(message::setDataProxyServer);
 
 	//
 	//
@@ -166,23 +146,29 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	message.setUserBond(getUserBond(message.getWebRequest()));
 
 	Optional<Queryable> distinctElement = getDistinctElement(message.getWebRequest());
-	if (distinctElement.isPresent()) {
-	    message.setDistinctValuesElement(distinctElement.get());
-	}
+	distinctElement.ifPresent(message::setDistinctValuesElement);
 
 	Optional<SortedFields> sortedFields = getSortedFields();
-	if (sortedFields.isPresent()) {
-	    message.setSortedFields(sortedFields.get());
-	}
+	sortedFields.ifPresent(message::setSortedFields);
 
 	Optional<View> optionalView = message.getView();
+
 	Bond finalBond = message.getUserBond().orElse(null);
+
 	if (optionalView.isPresent()) {
+
+	    privateViewCheck(optionalView.get(), message.getWebRequest());
+
 	    Optional<View> view = WebRequestTransformer.findView(message.getDataBaseURI(), optionalView.get().getId());
+
 	    if (view.isPresent()) {
+
 		if (finalBond == null) {
+
 		    finalBond = view.get().getBond();
+
 		} else {
+
 		    finalBond = BondFactory.createAndBond(finalBond, view.get().getBond());
 		}
 	    }
@@ -195,6 +181,57 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	message.setResourceSelector(selector);
 
 	return message;
+    }
+
+    /**
+     * @param requestView
+     * @param webRequest
+     * @throws GSException
+     */
+    private void privateViewCheck(View requestView, WebRequest webRequest) throws GSException {
+
+	boolean privateViewCheck = Boolean.parseBoolean(ConfigurationWrapper. //
+		getSystemSettings().//
+		readKeyValue(SystemSetting.KeyValueOptionKeys.PRIVATE_VIEW_CHECK.getLabel()).//
+		orElse("false"));//
+
+	if (privateViewCheck && requestView.getVisibility() == View.ViewVisibility.PRIVATE) {
+
+	    String token = ConfigurationWrapper. //
+		    getSystemSettings().//
+		    readKeyValue(SystemSetting.KeyValueOptionKeys.CONFIG_SERVICE_AUTHTOKEN.getLabel()).//
+		    orElse(null);//
+
+	    if (token == null) {
+
+		throw GSException.createException(getClass(),//
+			"Authorization token of configuration service is required to authorize the private view " + requestView.getId(), //
+			ErrorInfo.ERRORTYPE_CLIENT,//
+			ErrorInfo.SEVERITY_ERROR, //
+			"MissingConfigServiceAuthTokenForPrivateView");
+	    }
+
+	    Optional<String> optReqToken = webRequest.extractTokenId();
+
+	    if (optReqToken.isEmpty()) {
+
+		throw GSException.createException(getClass(),//
+			"Request token is required to authorize the private view " + requestView.getId(), //
+			ErrorInfo.ERRORTYPE_CLIENT,//
+			ErrorInfo.SEVERITY_ERROR, //
+			"MissingRequestTokenForPrivateView");
+	    }
+
+	    if (!token.equals(optReqToken.get())) {
+
+		throw GSException.createException(getClass(),//
+			"Provided request token is not authorized for the private view " + requestView.getId(), //
+			ErrorInfo.ERRORTYPE_CLIENT,//
+			ErrorInfo.SEVERITY_ERROR, //
+			"RequestTokenNotAuthorizedForPrivateView");
+	    }
+	}
+
     }
 
     /**

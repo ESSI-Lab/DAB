@@ -124,7 +124,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 *
 	 */
-	VIEWS_CACHE("viewsCache");
+	VIEWS_CACHE("viewsCache"),
+
+	/**
+	 *
+	 */
+	PRIVATE_VIEW_CHECK("privateViewCheck");
 
 	/**
 	 * MirrorSiteTokenGeneratorHandler option prefix
