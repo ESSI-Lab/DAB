@@ -128,11 +128,11 @@ public class VolatileFolder implements DatabaseFolder {
      * @throws Exception
      */
     @Override
-    public UpsertResult upsert(String key, FolderEntry entry, EntryType type) throws Exception {
+    public UpsertType upsert(String key, FolderEntry entry, EntryType type) throws Exception {
 
 	store(key, entry, type);
 
-	return UpsertResult.INSERTED;
+	return UpsertType.INSERTED;
     }
 
     @Override
