@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.*;
 
+import static eu.essi_lab.accessor.datahub.DatahubMapper.*;
+
 /**
  * @author Fabrizio
  */
@@ -40,15 +42,16 @@ public class DataHubService extends AbstractManagedService {
     private static final String KAFKA_USERNAME_KEY = "kafka.username";
     private static final String KAFKA_PASSWORD_KEY = "kafka.password";
     private static final String KAFKA_MAX_POLL_RECORDS_KEY = "kafka.maxPollRecords";
+    private static final String KAFKA_POLL_TIMEOUT_SECONDS_KEY = "kafka.pollTimeoutSeconds";
 
     private static final String KAFKA_MAX_PENDING_PROCESSES_KEY = "kafka.maxPendingProcesses";
     private static final String KAFKA_MAX_CONCURRENT_PROCESSES_KEY = "kafka.maxConcurrentProcesses";
 
-    private static final String TEST_FILTER_KEY = "test.filter";
-    private static final String TEST_FILTER_ENABLED_KEY = "test.filter.enabled";
     private static final String DATA_HUB_SOURCE_ID_KEY = "dataHub.sourceId";
     private static final String DATA_HUB_SOURCE_LABEL_KEY = "dataHub.sourceLabel";
     private static final String DATA_HUB_RECORDS_FILTER_KEY = "dataHub.recordsFilter";
+
+    private static final String MAX_STOP_WAIT_SECONDS_KEY = "maxStopWaitSeconds";
 
     /**
      * Concurrency control
@@ -68,7 +71,12 @@ public class DataHubService extends AbstractManagedService {
     /**
      *
      */
-    private static final int MAX_STOP_WAIT_SECONDS = 30;
+    private static final int DEFAULT_MAX_STOP_WAIT_SECONDS = 30;
+
+    /**
+     *
+     */
+    private static final int DEFAULT_POLL_TIMEOUT_SECONDS = 1;
 
     private boolean running;
     /**
@@ -83,6 +91,7 @@ public class DataHubService extends AbstractManagedService {
     private ExecutorService executor;
     private OffsetTracker tracker;
     private Decoder decoder;
+    private int maxStopWaitSeconds;
 
     /**
      *
@@ -167,18 +176,6 @@ public class DataHubService extends AbstractManagedService {
 	    error("Missing topic name");
 	}
 
-	boolean useTestFilter = getSetting(). //
-		readKeyValue(TEST_FILTER_ENABLED_KEY).//
-		map(Boolean::parseBoolean).//
-		orElse(true);//
-
-	Optional<String> testFilter = getSetting().readKeyValue(TEST_FILTER_KEY);
-
-	if (useTestFilter && !(check(testFilter))) {
-
-	    error("Missing required test filter");
-	}
-
 	Optional<String> recordsFilter = getSetting().readKeyValue(DATA_HUB_RECORDS_FILTER_KEY);
 
 	if (!(check(recordsFilter))) {
@@ -209,7 +206,7 @@ public class DataHubService extends AbstractManagedService {
 	}
 
 	//
-	// these properties control the
+	//
 	//
 
 	int maxPollRecords = getSetting(). //
@@ -226,6 +223,16 @@ public class DataHubService extends AbstractManagedService {
 		readKeyValue(KAFKA_MAX_PENDING_PROCESSES_KEY).//
 		map(Integer::parseInt).//
 		orElse(DEFAULT_MAX_PENDING_PROCESSES);//
+
+	int pollTimeoutSeconds = getSetting(). //
+		readKeyValue(KAFKA_POLL_TIMEOUT_SECONDS_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_POLL_TIMEOUT_SECONDS);//
+
+	maxStopWaitSeconds = getSetting(). //
+		readKeyValue(MAX_STOP_WAIT_SECONDS_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_MAX_STOP_WAIT_SECONDS);
 
 	//
 	// init executor
@@ -313,7 +320,7 @@ public class DataHubService extends AbstractManagedService {
 
 	while (running) {
 
-	    ConsumerRecords<byte[], byte[]> records = poll();
+	    ConsumerRecords<byte[], byte[]> records = poll(pollTimeoutSeconds);
 
 	    for (ConsumerRecord<byte[], byte[]> record : records) {
 
@@ -340,11 +347,7 @@ public class DataHubService extends AbstractManagedService {
 
 			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
 				    map(rec -> DecodedRecord.of(this, decoder.getMapper(), rec)).//
-				    filter(test(recordsFilter.get()));
-
-			    //			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
-			    //
-			    //				    map(rec -> DecodedRecord.of(DataHUBService.this, decoder.getMapper(), rec));
+				    filter(checkRecord(recordsFilter.get()));
 
 			} else {
 
@@ -375,7 +378,7 @@ public class DataHubService extends AbstractManagedService {
 
 	    try {
 
-		if (!executor.awaitTermination(MAX_STOP_WAIT_SECONDS, TimeUnit.SECONDS)) {
+		if (!executor.awaitTermination(maxStopWaitSeconds, TimeUnit.SECONDS)) {
 
 		    executor.shutdownNow();
 		}
@@ -447,13 +450,13 @@ public class DataHubService extends AbstractManagedService {
      *
      * @return
      */
-    private Predicate<DecodedRecord> test(String recordsFilter) {
+    private Predicate<DecodedRecord> checkRecord(String recordsFilter) {
 
 	return (record) -> {
 
 	    if (record.type() == ChangeType.DELETE) {
 
-		return true;
+		return record.entityURN().contains("DEV");
 	    }
 
 	    Optional<JSONObject> optValue = record.optAspectValue();
@@ -517,6 +520,7 @@ public class DataHubService extends AbstractManagedService {
 
 		OriginalMetadata original = new OriginalMetadata();
 		original.setMetadata(jsonEntity);
+		original.setSchemeURI(DATAHUB_NS_URI);
 
 		DatahubMapper mapper = new DatahubMapper();
 
@@ -533,7 +537,7 @@ public class DataHubService extends AbstractManagedService {
 
 		Document doc = resource.asDocument(true);
 
-		DatabaseFolder.UpsertResult upsertResult = targetFolder.upsert( //
+		DatabaseFolder.UpsertType upsertResult = targetFolder.upsert( //
 			entityURN,  //
 			DatabaseFolder.FolderEntry.of(doc),   //
 			DatabaseFolder.EntryType.GS_RESOURCE);//
@@ -572,11 +576,11 @@ public class DataHubService extends AbstractManagedService {
     /**
      * @return
      */
-    private ConsumerRecords<byte[], byte[]> poll() {
+    private ConsumerRecords<byte[], byte[]> poll(int timeout) {
 
 	synchronized (consumer) {
 
-	    return consumer.poll(Duration.ofMillis(TimeUnit.SECONDS.toMillis(1)));
+	    return consumer.poll(Duration.ofMillis(TimeUnit.SECONDS.toMillis(timeout)));
 	}
     }
 
