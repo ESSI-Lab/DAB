@@ -60,7 +60,6 @@ public class IdentifierDecoratorComponent extends HarvestingComponent {
 	    this.identifierDecorator.decorateHarvestedIdentifier(//
 		    resource, //
 		    getHarvestingProperties(), //
-		    getSourceStorage(), //
 		    isFirstHarvesting(), //
 		    isRecovering(), //
 		    isIncrementalHarvesting());

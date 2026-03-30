@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -178,7 +178,8 @@ public class SettingComponent extends Div {
 	    boolean forceReadonly, //
 	    boolean forceHideHeader, //
 	    Comparator<Setting> comparator, //
-	    TabContent tabContent, boolean tabView) {
+	    TabContent tabContent, //
+	    boolean tabView) {
 
 	this.configuration = configuration;
 	this.setting = setting;
@@ -459,7 +460,7 @@ public class SettingComponent extends Div {
 			((VerticalLayout) tabSheet.getComponent(tabSheet.getTabAt(i))).add(mainLayout);
 		    }
 		}
-	    } else if(!setting.getOptions().isEmpty()){
+	    } else if (!setting.getOptions().isEmpty()) {
 
 		tabSheet.add("Options", mainLayout);
 	    }
@@ -470,6 +471,7 @@ public class SettingComponent extends Div {
 	}
 
 	HorizontalLayout headerLayout = SettingComponentFactory.createSettingHeaderLayout(setting);
+	headerLayout.setId("header-layout_" + setting.getName());
 
 	//
 	// forced to hide the whole header by the put/edit dialogs
@@ -477,7 +479,6 @@ public class SettingComponent extends Div {
 	//
 	if (forceHideHeader && parent == null) {
 
-	    headerLayout.setId("header-layout_" + setting.getName());
 	    headerLayout.getStyle().set("display", "none");
 	}
 
@@ -487,7 +488,6 @@ public class SettingComponent extends Div {
 	if (!setting.isShowHeaderSet()) {
 
 	    Div div = ComponentFactory.createDiv();
-	    div.setWidthFull();
 
 	    headerLayout.add(div);
 	}
@@ -537,7 +537,6 @@ public class SettingComponent extends Div {
 		if (setting.canBeDisabled() || setting.canBeRemoved() || setting.isEditable()) {
 
 		    Div div = ComponentFactory.createDiv();
-		    div.setWidthFull();
 
 		    headerLayout.add(div);
 
@@ -802,32 +801,42 @@ public class SettingComponent extends Div {
 
 	    boolean enabled = !forceReadonly;
 
-	    Switch toggle = SettingComponentFactory.createSettingSwitch(this, setting.isEnabled(), enabled);
+	    Switch switch_ = SettingComponentFactory.createSettingSwitch(this, setting.isEnabled(), enabled);
 
 	    //
 	    //
 	    // set as attribute the setting identifier. the listener for the button state changes is added
-	    // to the SettingComponent, which will have several listeners attached, one for each toggle
+	    // to the SettingComponent, which will have several listeners attached, one for each switch_
 	    // button of the children settings. When the button state changes, it is possible to retrieve the
-	    // setting id property from the toggle button which is the source of the event, and searching for
+	    // setting id property from the switch_ button which is the source of the event, and searching for
 	    // the child setting having that id in order to update the setting state according to the button value
 	    //
 	    //
-	    toggle.getElement().setAttribute("settingid", setting.getIdentifier());
+	    switch_.getElement().setAttribute("settingid", setting.getIdentifier());
 
-	    updateSettingToComponentsMap(setting, toggle);
+	    updateSettingToComponentsMap(setting, switch_);
 
-	    boolean radioUpdated = !isScheduling(setting) && updateRadioGroup(parent, setting, toggle, multiSelectionMode);
-	    boolean checkUpdated = !isScheduling(setting) && updateCheckGroup(parent, setting, toggle, multiSelectionMode);
+	    boolean radioUpdated = !isScheduling(setting) && updateRadioGroup(parent, setting, switch_, multiSelectionMode);
+	    boolean checkUpdated = !isScheduling(setting) && updateCheckGroup(parent, setting, switch_, multiSelectionMode);
 
 	    if (!radioUpdated && !checkUpdated) {
 
-		toggle.getStyle().set("margin-left", "5px");
+		switch_.getStyle().set("margin-left", "5px");
 
-		headerLayout.add(toggle);
+		if (forceHideHeader && parent == null) {
+
+		    headerLayout.removeAll();
+
+		    Div div = ComponentFactory.createDiv();
+
+		    headerLayout.add(div);
+		    headerLayout.getStyle().set("display", "");
+		}
+
+		headerLayout.add(switch_);
 	    }
 
-	    return Optional.of(toggle);
+	    return Optional.of(switch_);
 	}
 
 	return Optional.empty();

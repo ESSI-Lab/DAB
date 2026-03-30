@@ -70,6 +70,11 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     /**
      *
      */
+    private static final int THREAD_POOL_SIZE = 10;
+
+    /**
+     *
+     */
     private static final List<Queryable> DEFAULT_COMPARISON_PROPERTIES = Lists.newArrayList();
 
     static {
@@ -133,7 +138,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			map(p -> p.getReadableName().orElse(p.getName())).//
 			collect(Collectors.toList()));
 
-	Map<String, List<String>> modifiedRecords = new ConcurrentHashMap();
+	Map<String, List<String>> modifiedRecords = new ConcurrentHashMap<>();
 
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
@@ -203,17 +208,20 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    }
 
 		    deletedRecords = prevIds.//
-			    stream().//
+			    parallelStream().//
 			    filter(id -> !currIds.contains(id)).//
 			    collect(Collectors.toList());
 
-		    newRecords = currIds.stream().//
+		    newRecords = currIds.//
+			    parallelStream().//
 			    filter(id -> !prevIds.contains(id)).//
 			    collect(Collectors.toList());
 
-		    currIds.parallelStream().//
-			    filter(prevIds::contains).//
-			    forEach(id -> {
+		    ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, Thread.ofVirtual().factory());
+
+		    List<String> source = currIds.parallelStream().filter(prevIds::contains).toList();
+
+		    StreamUtils.asynchConsume(source, (id) -> {
 
 			try {
 
@@ -222,12 +230,14 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			    if (opt1.isEmpty()) {
 
-				throw new Exception("Resource " + id + " not found in data-1 folder");
+				GSLoggerFactory.getLogger(getClass()).error("Resource {} not found in data-1 folder", id);
+				return;
 			    }
 
 			    if (opt2.isEmpty()) {
 
-				throw new Exception("Resource " + id + " not found in data-2 folder");
+				GSLoggerFactory.getLogger(getClass()).error("Resource {} not found in data-2 folder", id);
+				return;
 			    }
 
 			    ComparisonResponse response = GSResourceComparator.compare(comparisonProperties, opt1.get(), opt2.get());
@@ -245,9 +255,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			} catch (Exception ex) {
 
 			    GSLoggerFactory.getLogger(getClass()).error(ex);
-			    //			    throw ex;
+
 			}
-		    });
+		    }, executor);//
 		}
 
 		break;

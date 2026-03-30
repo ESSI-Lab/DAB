@@ -36,6 +36,7 @@ import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.oauth.*;
+import eu.essi_lab.cfga.gs.setting.service.*;
 import eu.essi_lab.cfga.gs.task.*;
 import eu.essi_lab.cfga.gui.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
@@ -77,7 +78,7 @@ import java.util.*;
 @CssImport(value = "./styles/vaadin-text-field-no-border.css", themeFor = "vaadin-text-field")
 @CssImport(value = "./styles/vaadin-text-area-readonly.css", themeFor = "vaadin-text-area")
 @CssImport(value = "./styles/vaadin-text-area-default.css", themeFor = "vaadin-text-area")
-
+@CssImport(value = "./styles/vaadin-text-area-no-wrap.css", themeFor = "vaadin-text-area")
 public class GSConfigurationView extends ConfigurationView {
 
     static SettingLinkedList<SchedulerWorkerSetting> newWorkerSettingList;
@@ -497,6 +498,7 @@ public class GSConfigurationView extends ConfigurationView {
 	return Arrays.asList(//
 		new AsynchDownloadDescriptor(),//
 		new ViewsDescriptor(),//
+		new ManagedServiceSettingTabDescriptorProvider(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//

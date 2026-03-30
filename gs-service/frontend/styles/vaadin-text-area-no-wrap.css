@@ -1,0 +1,5 @@
+:host(.no-wrap) [part='input-field']::slotted(textarea) {
+    white-space: pre;
+    overflow-x: auto;
+    overflow-y: auto;
+}

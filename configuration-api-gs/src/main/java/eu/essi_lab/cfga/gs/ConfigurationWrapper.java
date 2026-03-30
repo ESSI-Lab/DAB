@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.services.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;
@@ -348,6 +349,14 @@ public class ConfigurationWrapper {
 	return new ArrayList<>(configuration.list(//
 		AugmenterWorkerSetting.class, //
 		false));
+    }
+
+    /**
+     * @return
+     */
+    public static List<ManagedServiceSetting> getManagedServiceSettings() {
+
+	return new ArrayList<>(configuration.list(ManagedServiceSetting.class, true));
     }
 
     /**

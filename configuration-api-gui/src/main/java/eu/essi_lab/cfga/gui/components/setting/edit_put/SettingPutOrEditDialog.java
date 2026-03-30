@@ -170,8 +170,8 @@ public abstract class SettingPutOrEditDialog extends ConfirmationDialog {
 		setting,//
 		false, //  forceReadonly
 		true,// forceHideHeader
-		null,
-		tabView); // tabContent
+		null,// comparator
+		tabView); // tabView
 
 	((HasSize) component).setWidthFull();
 	((HasSize) component).setHeight(componentHeight, Unit.PIXELS);

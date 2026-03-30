@@ -33,6 +33,17 @@ import java.util.List;
 public class ListUtils {
 
     /**
+     * @param list
+     * @param max
+     * @return
+     */
+    public static <T> List<T> lastN(List<T> list, int max) {
+	int size = list.size();
+	int from = Math.max(0, size - max);
+	return list.subList(from, size);
+    }
+
+    /**
      * @param <T>
      * @param list
      * @return

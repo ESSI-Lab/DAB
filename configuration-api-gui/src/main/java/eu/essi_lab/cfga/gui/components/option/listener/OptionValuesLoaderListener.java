@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.option.listener;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -36,7 +36,6 @@ import eu.essi_lab.cfga.option.*;
 import eu.essi_lab.lib.utils.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -155,10 +154,15 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
 	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Loaded values: {}", values);
 
+	    if (values.isEmpty()) {
+
+		return;
+	    }
+
 	    //
 	    // set the values to the option
 	    //
-	    List<String> stringValues = values.stream().map(Object::toString).collect(Collectors.toList());
+	    List<String> stringValues = values.stream().map(Object::toString).toList();
 
 	    option.setObjectValues(stringValues);
 
@@ -173,6 +177,12 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 		    singleSelect.setItems(stringValues);
 		    singleSelect.setLabel("");
 		    singleSelect.setInvalid(false);
+
+		    if (!stringValues.isEmpty() && option.isRequired()){
+
+			singleSelect.setValue(stringValues.getFirst());
+			option.select(v -> v.equals(stringValues.getFirst()));
+		    }
 
 		} else {
 
@@ -207,7 +217,7 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
 	    VerticalLayout layout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
 	    layout.getStyle().set("padding", "0px");
-	    layout.getStyle().set("padding-top","20px");
+	    layout.getStyle().set("padding-top", "20px");
 	    layout.getStyle().set("padding-right", "20px");
 
 	    setContent(layout);

@@ -10,25 +10,20 @@ package eu.essi_lab.request.executor.access;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import java.io.File;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ServiceLoader;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.access.DataDownloaderFactory;
@@ -162,7 +157,16 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    ACCESS_EXECUTOR_TOO_MANY_RESOURCES);
 	}
 
-	Optional<ElasticsearchInfoPublisher> publisher = ElasticsearchInfoPublisher.create(accessMessage.getWebRequest());
+	Optional<ElasticsearchInfoPublisher> publisher = Optional.empty();
+
+	if (accessMessage.getWebRequest() != null) {
+
+	    publisher = ElasticsearchInfoPublisher.create(accessMessage.getWebRequest());
+
+	} else {
+
+	    publisher = ElasticsearchInfoPublisher.create(UUID.randomUUID().toString(), "AccessExecutor");
+	}
 
 	if (publisher.isPresent()) {
 
@@ -200,7 +204,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		    continue;
 		}
 		DataDescriptor fdd = tmpReport.getFullDataDescriptor();
-		if (targetDescriptor!=null && fdd.getDataFormat().equals(targetDescriptor.getDataFormat())) {
+		if (targetDescriptor != null && fdd.getDataFormat().equals(targetDescriptor.getDataFormat())) {
 		    report = tmpReport;
 		    break;
 		}
@@ -278,10 +282,9 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
     }
 
     /**
-     * Retrieves (if possible) a data object from a downloader, according to a given
-     * reportDescriptor (a previously tested working descriptor) and a
-     * targetDescriptor (as requested by the user)
-     * 
+     * Retrieves (if possible) a data object from a downloader, according to a given reportDescriptor (a previously tested working
+     * descriptor) and a targetDescriptor (as requested by the user)
+     *
      * @param downloader
      * @param reportDescriptor
      * @param targetDescriptor
@@ -395,10 +398,9 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	    if (targetDescriptor.getDataFormat().equals(DataFormat.WKT())) {
 		// TODO WKT validator
-	    } else if (targetDescriptor.getDataType().equals(DataType.RATING_CURVE)){
+	    } else if (targetDescriptor.getDataType().equals(DataType.RATING_CURVE)) {
 		// TODO R_C validator
-	    }
-	    else {
+	    } else {
 
 		String msg = "The downloaded file is not in expected format. Remote service error?";
 		GSLoggerFactory.getLogger(getClass()).error(msg);
@@ -494,12 +496,10 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
     }
 
     /**
-     * Choose from the just obtained remote descriptor one that is similar in terms
-     * of format, crs and type to the descriptor tested successfully during access
-     * test. This method is useful, because in the meantime (after the access test
-     * has been done, it can be that dimensions have been increased due to new data
-     * has become available (e.g. in case of real time data)
-     * 
+     * Choose from the just obtained remote descriptor one that is similar in terms of format, crs and type to the descriptor tested
+     * successfully during access test. This method is useful, because in the meantime (after the access test has been done, it can be that
+     * dimensions have been increased due to new data has become available (e.g. in case of real time data)
+     *
      * @param remoteDescriptors
      * @param fullDataDescriptor
      * @return
@@ -531,13 +531,10 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
     }
 
     /**
-     * The full descriptor gets optimized according to the target descriptor,
-     * depending on the downloader capabilities. In particular Subset/resolution
-     * will be possibly modified. TODO: the downloader.canSubset invocation should
-     * be replaced in the future with a read on the access report access report
-     * should be modified to report downloader subset capabilities (i.e. the
-     * subsettable dimensions)
-     * 
+     * The full descriptor gets optimized according to the target descriptor, depending on the downloader capabilities. In particular
+     * Subset/resolution will be possibly modified. TODO: the downloader.canSubset invocation should be replaced in the future with a read
+     * on the access report access report should be modified to report downloader subset capabilities (i.e. the subsettable dimensions)
+     *
      * @param downloader
      * @param fullDescriptor
      * @param targetDescriptor
@@ -562,7 +559,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 	    targetCRS = sourceCRS;
 	}
 
-	if (sourceCRS!=null && !sourceCRS.equals(targetCRS)) {
+	if (sourceCRS != null && !sourceCRS.equals(targetCRS)) {
 	    DataDimension spatial1 = targetDescriptor.getFirstSpatialDimension();
 	    DataDimension spatial2 = targetDescriptor.getSecondSpatialDimension();
 	    if (spatial1 != null && spatial2 != null) {
@@ -573,8 +570,8 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 		SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> sourceCorners = new SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>>(
 			lower, upper);
 		try {
-		    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> targetCorners = CRSUtils
-			    .translateBBOX(sourceCorners, targetCRS, sourceCRS);
+		    SimpleEntry<SimpleEntry<Double, Double>, SimpleEntry<Double, Double>> targetCorners = CRSUtils.translateBBOX(
+			    sourceCorners, targetCRS, sourceCRS);
 		    SimpleEntry<Double, Double> lowerTarget = targetCorners.getKey();
 		    SimpleEntry<Double, Double> upperTarget = targetCorners.getValue();
 		    lowerTarget1 = lowerTarget.getKey();
@@ -660,7 +657,7 @@ public class AccessExecutor extends AbstractAuthorizedExecutor implements IAcces
 
 	    }
 	}
-	if (sourceCRS!=null && sourceCRS.equals(targetCRS)) {
+	if (sourceCRS != null && sourceCRS.equals(targetCRS)) {
 	    for (int i = 0; i < fullDescriptor.getSpatialDimensions().size(); i++) {
 		DataDimension dataDimension = fullDescriptor.getSpatialDimensions().get(i);
 		if (downloader.canSubset(dataDimension.getName())) { //

@@ -1,0 +1,330 @@
+
+Total matching messages: 6
+
+
+----- Message 1 -----
+{
+  "auditHeader": null,
+  "entityType": "dataset",
+  "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+  "entityKeyAspect": null,
+  "changeType": "DELETE",
+  "aspectName": "datasetKey",
+  "aspect": null,
+  "systemMetadata": null,
+  "previousAspectValue": {
+    "value": "{\"name\":\"test_sync_datahub2dab\",\"platform\":\"urn:li:dataPlatform:metadata\",\"origin\":\"DEV\"}",
+    "contentType": "application/json"
+  },
+  "previousSystemMetadata": {
+    "lastObserved": 1773135573185,
+    "runId": "no-run-id-provided",
+    "lastRunId": "no-run-id-provided",
+    "pipelineName": null,
+    "registryName": null,
+    "registryVersion": null,
+    "properties": null
+  },
+  "created": {
+    "time": 1773135603036,
+    "actor": "urn:li:corpuser:__datahub_system",
+    "impersonator": null,
+    "message": null
+  }
+}
+
+----- Message 2 -----
+{
+  "auditHeader": null,
+  "entityType": "dataset",
+  "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+  "entityKeyAspect": null,
+  "changeType": "UPSERT",
+  "aspectName": "datasetProperties",
+  "aspect": {
+    "value": {
+      "name": "Report 2022 sul consumo di suolo nel territorio italiano - Versione 2.1",
+      "description": "Il presente documento fornisce un'analisi dettagliata del consumo di suolo in Italia per l'anno 2022, evidenziando le aree maggiormente interessate da fenomeni di urbanizzazione e trasformazione del territorio. Vengono presentati dati statistici, mappe tematiche e tendenze osservate, con l'obiettivo di supportare le politiche di pianificazione territoriale e gestione sostenibile delle risorse naturali.",
+      "customProperties": {
+        "resource_constraints:::access_constraints:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+        "date_of_next_update": "None",
+        "online_resources:::0:::protocol:::uri": "http://www.w3.org/TR/xlink/",
+        "bbox_4326:::east_bound_longitude": "15.892",
+        "data_location": "S3;output-data;SIM/cu_v1_6/ispra_2022_report_consumo_suolo_2025.pdf",
+        "online_resources:::0:::description:::label": "accessPoint",
+        "formats:::0:::name:::label": "PDF",
+        "online_resources:::0:::source_auth_type": "NO_AUTH",
+        "descriptive_keywords:::0:::thesaurus:::name": "GEMET - INSPIRE themes, version 1.0",
+        "identifier": "urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+        "lineage_source:::0:::description": "La procedura utilizzata in questo paper è stata adottata per la produzione di questo dataset.",
+        "resource_author_id": "0a4af5a1-9ddd-485d-8bf4-b384b223510b",
+        "resource_owner:::address:::email": "ispra@ispra.it",
+        "descriptive_keywords:::0:::keywords:::2:::uri": "https://www.eionet.europa.eu/gemet/en/concept/8240",
+        "descriptive_keywords:::1:::keywords:::2:::label": "open data",
+        "metadata_profile:::name": "Linee guida RNDT",
+        "update_frequency:::value": "notPlanned",
+        "metadata_owner:::link": "https://sim.mase.gov.it",
+        "lineage_statement": "Il documento è stato prodotto utilizzando dati satellitari Sentinel-2 preprocessati e classificati tramite algoritmi di machine learning per identificare le aree di consumo di suolo. Le procedure adottate sono descritte in dettaglio nelle sezioni successive.",
+        "online_resources:::0:::description:::uri": "http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint",
+        "point_of_contact:::role": "pointOfContact",
+        "spatial_scope:::keywords:::label": "National",
+        "resource_revision_date": "2025-10-11T12:00:00Z",
+        "descriptive_keywords:::0:::keywords:::0:::label": "environmental change",
+        "online_resources:::0:::function:::value": "download",
+        "quality_scope:::scope_code:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+        "graphic_overview:::url": "https://sim.gov.mase.it/path/to/metadata/preview.png",
+        "metadata_owner:::address:::email": "sim@mase.gov.it",
+        "metadata_updated_at": "2025-10-11T12:00:00Z",
+        "online_resources:::0:::name": "ispra_2022_report_consumo_suolo_2025.pdf",
+        "resource_constraints:::security_note": "None",
+        "status:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode",
+        "resource_constraints:::use_constraints:::value": "otherRestrictions",
+        "descriptive_keywords:::0:::keywords:::2:::label": "survey",
+        "descriptive_keywords:::0:::keywords:::1:::uri": "https://www.eionet.europa.eu/gemet/en/concept/2882",
+        "graphic_overview:::description": "Anteprima del dataset",
+        "edition_date": "2025-10-11T12:00:00Z",
+        "conformity:::0:::specification_publication_date": "2004-12-01",
+        "descriptive_keywords:::1:::keywords:::0:::label": "change detection",
+        "spatial_scope:::thesaurus:::name": "Spatial scope",
+        "descriptive_keywords:::0:::thesaurus:::url": "https://www.eionet.europa.eu/gemet/it/inspire-themes",
+        "metadata_version": "2.1",
+        "presentation_form:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode",
+        "conformity:::2:::explanation": "Anche se questo servizio non è conforme agli standard OGC o INSPIRE, è conforme alla ISO 19115:2003, che fornisce metadati standardizzati per i dataset geospaziali e archivistici.",
+        "resource_publication_date": "2025-10-11T12:00:00Z",
+        "temporal_extent:::start_date": "2021-10-10",
+        "resource_constraints:::security_classification:::value": "unclassified",
+        "character_set:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode",
+        "resource_constraints:::other_constraints": "http://publications.europa.eu/resource/authority/licence/IODL_2_0",
+        "spatial_scope:::thesaurus:::publication_date": "2019-05-22",
+        "data_language": "it",
+        "update_frequency:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode",
+        "descriptive_keywords:::1:::keywords:::3:::label": "SIM internal resource",
+        "spatial_scope:::thesaurus:::url": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope",
+        "metadata_owner:::organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "abstract": "Il presente documento fornisce un'analisi dettagliata del consumo di suolo in Italia per l'anno 2022, evidenziando le aree maggiormente interessate da fenomeni di urbanizzazione e trasformazione del territorio. Vengono presentati dati statistici, mappe tematiche e tendenze osservate, con l'obiettivo di supportare le politiche di pianificazione territoriale e gestione sostenibile delle risorse naturali.",
+        "bbox_native_epsg_gml_polygon": "1093222.384452345315367 4233539.465107622556388 1104998.453366933856159 4234408.290833427571 1104069.77282649744302 4246856.559968182817 1092311.991264782846 4245986.91919365339 1093222.384452345315 4233539.465107622556",
+        "resource_provider:::organization_name": "CU.V1.06 - Analisi ed estrazione dati della rete osservativa in situ e mobile",
+        "resource_owner:::link": "https://www.ispra.it",
+        "bbox_4326:::west_bound_longitude": "15.758",
+        "descriptive_keywords:::0:::keywords:::0:::uri": "https://www.eionet.europa.eu/gemet/en/concept/2782",
+        "temporal_extent:::end_date": "2022-10-11",
+        "conformity:::1:::explanation": "Il servizio non è conforme agli standard INSPIRE per l'infrastruttura dei dati spaziali, in quanto manca della metadati e dei servizi dati necessari per soddisfare i criteri di interoperabilità dell'INSPIRE.",
+        "resource_provider:::link": "https://sim.mase.gov.it/cu_v4_7",
+        "resource_provider:::address:::email": "sim@mase.gov.it",
+        "formats:::0:::name:::uri": "https://www.iana.org/assignments/media-types/application/pdf",
+        "conformity:::0:::explanation": "Questo servizio non è conforme agli standard OGC per i dati geospaziali a causa di limitazioni nei formati di dati spaziali e del fatto che i servizi non sono allineati con i protocolli richiesti dall'OGC.",
+        "conformity:::0:::pass": "False",
+        "conformity:::1:::pass": "False",
+        "metadata_original_version": "ispra_2022_report_consumo_suolo_2025-10-11_v1",
+        "conformity:::2:::pass": "True",
+        "conformity:::2:::specification_title": "ISO 19115:2003 - Geographic Information - Metadata",
+        "parent_identifier": "v4_7_changedetection_series",
+        "quality_scope:::scope_details": "Entire document",
+        "resource_owner:::organization_name": "Istituto Superiore per la Protezione e la Ricerca Ambientale (ISPRA)",
+        "resource_creation_date": "2025-10-11T12:00:00Z",
+        "bbox_4326:::north_bound_latitude": "38.167",
+        "point_of_contact:::link": "https://www.ispra.it",
+        "resource_constraints:::access_constraints:::value": "otherRestrictions",
+        "conformity:::1:::specification_title": "Direttiva INSPIRE 2007/2/EC",
+        "metadata_owner:::role": "pointOfContact",
+        "online_resources:::0:::application_profile:::label": "download",
+        "online_resources:::0:::protocol:::label": "WWW:LINK-1.0-http--link",
+        "status:::value": "completed",
+        "conformity:::0:::specification_title": "OGC Standards for Geographic Information",
+        "hierarchy_level:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+        "graphic_overview:::file_type": "PNG",
+        "formats:::0:::version": "inapplicable",
+        "topic_categories:::1": "location",
+        "topic_categories:::0": "environment",
+        "bbox_4326:::south_bound_latitude": "38.055",
+        "quality_scope:::scope_code:::value": "document",
+        "lineage_source:::0:::source_citation:::online_resource:::0:::url": "https://doi.org/10.1007/s12145-019-00380-5",
+        "edition": "Version 2.1",
+        "spatial_scope:::keywords:::uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national",
+        "title": "Report 2022 sul consumo di suolo nel territorio italiano - Versione 2.1",
+        "resource_expiration_date": "2026-12-11T12:00:00Z",
+        "presentation_form:::value": "documentDigital",
+        "resource_constraints:::use_constraints:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+        "conformity:::1:::specification_publication_date": "2007-05-15",
+        "public": "True",
+        "lineage_source:::0:::source_citation:::title": "Land Use and Land Cover Change Detection Using Remote Sensing Data: A Review",
+        "conformity:::2:::specification_publication_date": "2003-12-01",
+        "online_resources:::0:::url": "https://sim-dev.mase.gov.it/core/api/mastercatalog-cart-downloader/bucket/urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+        "descriptive_keywords:::1:::keywords:::1:::label": "CU.V1.06",
+        "resource_constraints:::security_classification:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode",
+        "point_of_contact:::address:::email": "ispra@ispra.it",
+        "resource_constraints:::use_limitation": "IODL 2.0",
+        "metadata_language": "it",
+        "resource_owner:::role": "owner",
+        "point_of_contact:::organization_name": "Istituto Superiore per la Protezione e la Ricerca Ambientale (ISPRA)",
+        "online_resources:::0:::application_profile:::uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download",
+        "hierarchy_level:::value": "document",
+        "metadata_profile:::version": "2.0",
+        "character_set:::value": "utf8",
+        "descriptive_keywords:::0:::thesaurus:::publication_date": "2008-06-01",
+        "descriptive_keywords:::0:::keywords:::1:::label": "environmental monitoring",
+        "resource_provider:::role": "resourceProvider",
+        "online_resources:::0:::function:::uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode"
+      },
+      "tags": []
+    },
+    "contentType": "application/json"
+  },
+  "systemMetadata": {
+    "lastObserved": 1773135573180,
+    "runId": "no-run-id-provided",
+    "lastRunId": "no-run-id-provided",
+    "pipelineName": null,
+    "registryName": null,
+    "registryVersion": null,
+    "properties": null
+  },
+  "previousAspectValue": null,
+  "previousSystemMetadata": null,
+  "created": {
+    "time": 1773135573173,
+    "actor": "urn:li:corpuser:x2030admin@mase.it",
+    "impersonator": null,
+    "message": null
+  }
+}
+
+----- Message 3 -----
+{
+  "auditHeader": null,
+  "entityType": "dataset",
+  "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+  "entityKeyAspect": null,
+  "changeType": "UPSERT",
+  "aspectName": "browsePaths",
+  "aspect": {
+    "value": {
+      "paths": [
+        "/dev/metadata"
+      ]
+    },
+    "contentType": "application/json"
+  },
+  "systemMetadata": {
+    "lastObserved": 1773135573182,
+    "runId": "no-run-id-provided",
+    "lastRunId": "no-run-id-provided",
+    "pipelineName": null,
+    "registryName": null,
+    "registryVersion": null,
+    "properties": null
+  },
+  "previousAspectValue": null,
+  "previousSystemMetadata": null,
+  "created": {
+    "time": 1773135573173,
+    "actor": "urn:li:corpuser:x2030admin@mase.it",
+    "impersonator": null,
+    "message": null
+  }
+}
+
+----- Message 4 -----
+{
+  "auditHeader": null,
+  "entityType": "dataset",
+  "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+  "entityKeyAspect": null,
+  "changeType": "UPSERT",
+  "aspectName": "browsePathsV2",
+  "aspect": {
+    "value": {
+      "path": [
+        {
+          "id": "Default"
+        }
+      ]
+    },
+    "contentType": "application/json"
+  },
+  "systemMetadata": {
+    "lastObserved": 1773135573183,
+    "runId": "no-run-id-provided",
+    "lastRunId": "no-run-id-provided",
+    "pipelineName": null,
+    "registryName": null,
+    "registryVersion": null,
+    "properties": null
+  },
+  "previousAspectValue": null,
+  "previousSystemMetadata": null,
+  "created": {
+    "time": 1773135573173,
+    "actor": "urn:li:corpuser:x2030admin@mase.it",
+    "impersonator": null,
+    "message": null
+  }
+}
+
+----- Message 5 -----
+{
+  "auditHeader": null,
+  "entityType": "dataset",
+  "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+  "entityKeyAspect": null,
+  "changeType": "UPSERT",
+  "aspectName": "dataPlatformInstance",
+  "aspect": {
+    "value": {
+      "platform": "urn:li:dataPlatform:metadata"
+    },
+    "contentType": "application/json"
+  },
+  "systemMetadata": {
+    "lastObserved": 1773135573184,
+    "runId": "no-run-id-provided",
+    "lastRunId": "no-run-id-provided",
+    "pipelineName": null,
+    "registryName": null,
+    "registryVersion": null,
+    "properties": null
+  },
+  "previousAspectValue": null,
+  "previousSystemMetadata": null,
+  "created": {
+    "time": 1773135573173,
+    "actor": "urn:li:corpuser:x2030admin@mase.it",
+    "impersonator": null,
+    "message": null
+  }
+}
+
+----- Message 6 -----
+{
+  "auditHeader": null,
+  "entityType": "dataset",
+  "entityUrn": "urn:li:dataset:(urn:li:dataPlatform:metadata,test_sync_datahub2dab,DEV)",
+  "entityKeyAspect": null,
+  "changeType": "UPSERT",
+  "aspectName": "datasetKey",
+  "aspect": {
+    "value": {
+      "name": "test_sync_datahub2dab",
+      "platform": "urn:li:dataPlatform:metadata",
+      "origin": "DEV"
+    },
+    "contentType": "application/json"
+  },
+  "systemMetadata": {
+    "lastObserved": 1773135573185,
+    "runId": "no-run-id-provided",
+    "lastRunId": "no-run-id-provided",
+    "pipelineName": null,
+    "registryName": null,
+    "registryVersion": null,
+    "properties": null
+  },
+  "previousAspectValue": null,
+  "previousSystemMetadata": null,
+  "created": {
+    "time": 1773135573173,
+    "actor": "urn:li:corpuser:x2030admin@mase.it",
+    "impersonator": null,
+    "message": null
+  }
+}

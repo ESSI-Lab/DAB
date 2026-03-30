@@ -121,6 +121,20 @@ public class VolatileFolder implements DatabaseFolder {
 	return this.folderName;
     }
 
+    /**
+     * @param key
+     * @param entry
+     * @param type
+     * @throws Exception
+     */
+    @Override
+    public UpsertResult upsert(String key, FolderEntry entry, EntryType type) throws Exception {
+
+	store(key, entry, type);
+
+	return UpsertResult.INSERTED;
+    }
+
     @Override
     public boolean store(String key, FolderEntry entry, EntryType type) throws Exception {
 

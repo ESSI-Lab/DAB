@@ -1249,6 +1249,20 @@
             <version>${project.parent.version}</version>
         </dependency>
 
+        <!-- Services -->
+
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>service-dev-kit</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>service-data-hub</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
         <!-- Custom tasks -->
 
         <dependency>
