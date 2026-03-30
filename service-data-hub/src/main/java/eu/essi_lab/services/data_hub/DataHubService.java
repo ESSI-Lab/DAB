@@ -456,7 +456,7 @@ public class DataHubService extends AbstractManagedService {
 
 	    if (record.type() == ChangeType.DELETE) {
 
-		return record.entityURN().contains("DEV");
+		return true;
 	    }
 
 	    Optional<JSONObject> optValue = record.optAspectValue();
