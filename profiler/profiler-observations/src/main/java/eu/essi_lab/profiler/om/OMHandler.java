@@ -107,8 +107,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 	    message.setResult(ValidationResult.VALIDATION_FAILED);
 	    message.setError(
-		    "Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE
-			    + " but was " + (limit + offset));
+		    "Result window is too large, offset + limit must be less than or equal to: " + OpenSearchDatabase.MAX_RESULT_WINDOW_SIZE + " but was " + (limit + offset));
 	    message.setErrorCode("400");
 	}
 
@@ -352,8 +351,8 @@ public class OMHandler extends StreamingRequestHandler {
 
 		String includeValues = request.getParameterValue(APIParameters.INCLUDE_VALUES);
 
-		if (asynchDownloadRequest || (includeValues != null && (includeValues.toLowerCase().equals("yes")
-			|| includeValues.toLowerCase().equals("true")))) {
+		if (asynchDownloadRequest || (includeValues != null && (includeValues.toLowerCase()
+			.equals("yes") || includeValues.toLowerCase().equals("true")))) {
 
 		    if (asynchDownloadRequest) {
 
@@ -491,7 +490,6 @@ public class OMHandler extends StreamingRequestHandler {
 
 			if (useCache && identifier != null) {
 
-
 			    GSLoggerFactory.getLogger(getClass()).info("Getting data from cache");
 			    ResultWriter finalWriter = resultWriter;
 			    ResponseListener<DataRecord> listener = new ResponseListener<DataRecord>() {
@@ -519,7 +517,9 @@ public class OMHandler extends StreamingRequestHandler {
 			    }
 
 			} else {
-			    GSLoggerFactory.getLogger(getClass()).info("Getting data from remote service. Online: {}, Begin: {}, End {} ",observation.getId(),begin,end);
+			    GSLoggerFactory.getLogger(getClass())
+				    .info("Getting data from remote service. Online: {}, Begin: {}, End {} ", observation.getId(), begin,
+					    end);
 			    // real time access request
 
 			    AccessMessage accessMessage = new AccessMessage();
@@ -577,38 +577,43 @@ public class OMHandler extends StreamingRequestHandler {
 
 			    accessMessage.setTargetDataDescriptor(descriptor);
 
-			    ResultSet<DataObject> accessResult = exec(accessMessage);
+			    try {
+				ResultSet<DataObject> accessResult = exec(accessMessage);
 
-			    DataObject dataObject = accessResult.getResultsList().get(0);
+				DataObject dataObject = accessResult.getResultsList().get(0);
 
-			    switch (type) {
-			    case TimeSeriesObservation:
-				switch (userOutputFormat) {
-				case JSON:
-				    addPointsFromWML(dataObject.getFile(), resultWriter, observation, userOutputFormat, coord);
+				switch (type) {
+				case TimeSeriesObservation:
+				    switch (userOutputFormat) {
+				    case JSON:
+					addPointsFromWML(dataObject.getFile(), resultWriter, observation, userOutputFormat, coord);
+					break;
+				    case WATERML_1:
+				    case WATERML_2:
+				    case NETCDF:
+				    case CSV:
+
+					FileInputStream stream = new FileInputStream(dataObject.getFile());
+					IOUtils.copy(stream, output);
+					stream.close();
+					output.close();
+					return;
+				    default:
+					throw new IllegalArgumentException("Unexpected value: " + userOutputFormat);
+				    }
 				    break;
-				case WATERML_1:
-				case WATERML_2:
-				case NETCDF:
-				case CSV:
-
-				    FileInputStream stream = new FileInputStream(dataObject.getFile());
-				    IOUtils.copy(stream, output);
-				    stream.close();
-				    output.close();
-				    return;
+				case TrajectoryObservation:
+				    addPointsFromTrajectoryNetCDF(dataObject.getFile(), observation, viewId, writer);
+				    break;
+				case SamplingSurfaceObservation:
+				    addPointsFromGridNetCDF(dataObject.getFile(), observation, descriptor, writer);
+				    break;
 				default:
-				    throw new IllegalArgumentException("Unexpected value: " + userOutputFormat);
+				    break;
 				}
-				break;
-			    case TrajectoryObservation:
-				addPointsFromTrajectoryNetCDF(dataObject.getFile(), observation, viewId, writer);
-				break;
-			    case SamplingSurfaceObservation:
-				addPointsFromGridNetCDF(dataObject.getFile(), observation, descriptor, writer);
-				break;
-			    default:
-				break;
+
+			    } catch (Exception ee) {
+				GSLoggerFactory.getLogger(getClass()).error("Exception while executing request", ee);
 			    }
 
 			}

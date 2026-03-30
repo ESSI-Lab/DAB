@@ -30,7 +30,11 @@ public class OpenMetricsFilter implements WebRequestFilter {
     @Override
     public boolean accept(WebRequest request) throws GSException {
 	String path = request.getRequestPath();
-	return path.endsWith("metrics");
+	boolean ret = false;
+	if (path.endsWith("metrics")) {
+	    ret = true;
+	}
+	return ret;
     }
 
 }
