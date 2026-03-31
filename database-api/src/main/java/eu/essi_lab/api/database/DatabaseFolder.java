@@ -41,7 +41,7 @@ public interface DatabaseFolder {
      * @author Fabrizio
      *
      */
-    enum UpsertResult {
+    enum UpsertType {
 	/**
 	 *
 	 */
@@ -220,7 +220,7 @@ public interface DatabaseFolder {
      * @param type
      * @throws Exception
      */
-    UpsertResult upsert(String key, FolderEntry entry, EntryType type) throws Exception;
+    UpsertType upsert(String key, FolderEntry entry, EntryType type) throws Exception;
 
     /**
      * Stores a DOM resource with the specified <code>key</code> in this folder.<br>

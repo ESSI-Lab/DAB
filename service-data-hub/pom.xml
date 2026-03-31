@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>service-data-hub</artifactId>
-    <name>ESSI-Lab DataHUB Service</name>
+    <name>ESSI-Lab Service DataHub</name>
 
     <dependencies>
 

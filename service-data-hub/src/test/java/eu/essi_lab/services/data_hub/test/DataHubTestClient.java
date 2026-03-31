@@ -2,12 +2,15 @@ package eu.essi_lab.services.data_hub.test;
 
 import com.fasterxml.jackson.core.type.*;
 import com.fasterxml.jackson.databind.*;
+import eu.essi_lab.lib.utils.*;
 
 import java.io.*;
 import java.net.*;
 import java.net.http.*;
+import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -71,8 +74,8 @@ public class DataHubTestClient {
      * @return
      * @throws IOException
      */
-    private static Map<String, Object> flattenJsonFromFile(Path file, String sep) throws IOException {
-	Map<String, Object> json = MAPPER.readValue(file.toFile(), new TypeReference<>() {
+    private static Map<String, Object> flattenJsonFromFile(String file, String sep) throws IOException {
+	Map<String, Object> json = MAPPER.readValue(file.getBytes(StandardCharsets.UTF_8), new TypeReference<>() {
 	});
 	return flattenJson(json, sep);
     }
@@ -116,19 +119,31 @@ public class DataHubTestClient {
     }
 
     /**
+     * @param count
+     * @param waitSeconds
+     * @param recordPrefix
      * @throws Exception
      */
-    private static void upsert() throws Exception {
+    private static void insert(int count, int waitSeconds, String recordPrefix) throws Exception {
 
 	int success = 0;
 	List<String> failed = new ArrayList<>();
 
 	try (var files = Files.list(Paths.get(JSON_INPUT_FOLDER_PATH))) {
 
-	    for (Path file : files.filter(f -> f.toString().endsWith(".json")).toList()) {
+	    Path path = files.filter(f -> f.toString().endsWith(".json")).toList().getFirst();
+
+	    String file = IOStreamUtils.asUTF8String(new FileInputStream(path.toFile()));
+
+	    for (int i = 0; i < count; i++) {
+
+		String modFile = new String(file).replace("_IDENTIFIER_", "ID_" + recordPrefix + "_" + i);
+		modFile = modFile.replace("_TITLE_", "TITLE_" + recordPrefix + "_" + i);
+		modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + recordPrefix + "_" + i);
 
 		try {
-		    Map<String, Object> flat = flattenJsonFromFile(file, ":::");
+
+		    Map<String, Object> flat = flattenJsonFromFile(modFile, ":::");
 		    Map<String, Object> prepared = preparePayload(flat);
 
 		    boolean ok = post(CREATE_ENDPOINT_BASE, TOKEN, prepared.get("payload"));
@@ -139,14 +154,65 @@ public class DataHubTestClient {
 			success++;
 			System.out.println("Published entity: " + urn);
 		    } else {
-			failed.add(file.getFileName().toString());
+			failed.add(path.getFileName().toString());
 			System.out.println("Failed: " + file);
 		    }
 
+		    Thread.sleep(TimeUnit.SECONDS.toMillis(waitSeconds));
+
 		} catch (Exception e) {
-		    failed.add(file.getFileName().toString());
+		    failed.add(path.getFileName().toString());
 		    System.out.println("Exception: " + file + " -> " + e.getMessage());
 		}
+	    }
+	}
+
+	System.out.println("\n====================");
+	System.out.println("Success: " + success);
+	System.out.println("Failed: " + failed.size());
+    }
+
+    /**
+     * @param recordId
+     * @param mod
+     * @throws Exception
+     */
+    private static void update(String recordId, String mod) throws Exception {
+
+	int success = 0;
+	List<String> failed = new ArrayList<>();
+
+	try (var files = Files.list(Paths.get(JSON_INPUT_FOLDER_PATH))) {
+
+	    Path path = files.filter(f -> f.toString().endsWith(".json")).toList().getFirst();
+
+	    String file = IOStreamUtils.asUTF8String(new FileInputStream(path.toFile()));
+
+	    String modFile = new String(file).replace("_IDENTIFIER_", recordId);
+
+	    modFile = modFile.replace("_TITLE_", "TITLE_" + mod);
+	    modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + mod);
+
+	    try {
+
+		Map<String, Object> flat = flattenJsonFromFile(modFile, ":::");
+		Map<String, Object> prepared = preparePayload(flat);
+
+		boolean ok = post(CREATE_ENDPOINT_BASE, TOKEN, prepared.get("payload"));
+
+		String urn = (String) prepared.get("urn");
+
+		if (ok) {
+		    success++;
+		    System.out.println("Published entity: " + urn);
+		} else {
+		    failed.add(path.getFileName().toString());
+		    System.out.println("Failed: " + file);
+		}
+
+	    } catch (Exception e) {
+		failed.add(path.getFileName().toString());
+		System.out.println("Exception: " + file + " -> " + e.getMessage());
 	    }
 	}
 
@@ -193,12 +259,18 @@ public class DataHubTestClient {
      */
     public static void main(String[] args) throws Exception {
 
-	// UPSERT
-	upsert();
+	String idPrefix = "test_3";
 
- 	List<String> urns = List.of(
-		"urn:li:dataset:(urn:li:dataPlatform:metadata,test_id_4,DEV)");
+	insert(10, 1, idPrefix);
 
-//	delete(urns);
+//	update("ID_test_3_1", ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
+
+//	for (int i = 0; i < 9; i++) {
+//
+//	    List<String> urns = List.of("urn:li:dataset:(urn:li:dataPlatform:metadata,ID_test_3_" + i + ",DEV)");
+//
+//	    delete(urns);
+//	}
+
     }
 }

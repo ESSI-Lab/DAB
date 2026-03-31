@@ -92,7 +92,7 @@ public class OpenSearchFolder implements DatabaseFolder {
     }
 
     @Override
-    public UpsertResult upsert(String key, FolderEntry entry, EntryType type) throws Exception {
+    public UpsertType upsert(String key, FolderEntry entry, EntryType type) throws Exception {
 
 	Result result = null;
 
@@ -116,7 +116,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    wrapper.synch();
 	}
 
-	return result == Result.Created ? UpsertResult.INSERTED :  UpsertResult.UPDATED;
+	return result == Result.Created ? UpsertType.INSERTED :  UpsertType.UPDATED;
     }
 
     @Override

@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>service-dev-kit</artifactId>
-    <name>ESSI-Lab Services</name>
+    <name>ESSI-Lab Service Development KIT</name>
 
     <dependencies>
 
