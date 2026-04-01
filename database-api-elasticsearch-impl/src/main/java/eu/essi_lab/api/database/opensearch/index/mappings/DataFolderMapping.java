@@ -82,6 +82,7 @@ public class DataFolderMapping extends IndexMapping {
 	addProperty(WRITING_FOLDER_TAG, FieldType.Binary.jsonValue());
 
 	addProperty(MetaFolderMapping.DATA_FOLDER, FieldType.Text.jsonValue());
+	addProperty(toKeywordField(MetaFolderMapping.DATA_FOLDER), FieldType.Keyword.jsonValue());
 
 	// centroid
 	addProperty(CENTROID, FieldType.GeoPoint.jsonValue());
@@ -229,6 +230,11 @@ public class DataFolderMapping extends IndexMapping {
 	Set<String> properties = record.mappings().properties().keySet();
 
 	HashMap<String, Property> missingFieldsMap = new HashMap<>();
+
+	if(!properties.contains(toKeywordField(MetaFolderMapping.DATA_FOLDER))){
+
+	    missingFieldsMap.put(toKeywordField(MetaFolderMapping.DATA_FOLDER), createProperty(FieldType.Keyword.jsonValue()));
+	}
 
 	// using listQueryables instead of listValues because of OpenSearchDataFolderIndexUpdateTest
 	MetadataElement.listQueryables().forEach(el -> {

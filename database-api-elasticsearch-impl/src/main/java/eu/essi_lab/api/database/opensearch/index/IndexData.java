@@ -225,6 +225,7 @@ public class IndexData {
 		: SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
 
 	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
+	indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.DATA_FOLDER), dataFolder);
 
 	handleResource(indexData, handler);
 
