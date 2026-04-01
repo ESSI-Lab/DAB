@@ -624,12 +624,12 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		subAggs.put(field, //
 			Aggregation.of(a -> a //
 				.terms(t -> t.field(IndexMapping.toKeywordField("dataFolder")).size(2)) //
-				.aggregations("values", // maximum n values for property
+				.aggregations("values",
 					v -> v.terms(tt -> tt //
 						.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()))
 							? field
 							: IndexMapping.toKeywordField(field)) //
-						.size(maxValuesPerField))))); //
+						.size(maxValuesPerField)))));
 	    }
 
 	    SearchRequest.Builder builder = new SearchRequest.Builder();
@@ -665,7 +665,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    SearchResponse<Void> response = client.search(request, Void.class);
 
-	    if (OpenSearchDatabase.debugQueries()) {
+	    if (!OpenSearchDatabase.debugQueries()) {
 
 		JSONObject reqObject = OpenSearchUtils.toJSONObject(request);
 		GSLoggerFactory.getLogger(getClass()).debug(reqObject.toString(3));
@@ -717,7 +717,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		}
 	    }
 
-	    if (composite.buckets().array().size() < DEFAULT_DISCOVERY_PAGE_SIZE) {
+	    if (composite.buckets().array().size() < aggregationPageSize) {
 
 		break;
 	    }
@@ -728,10 +728,10 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		afterKey = new HashMap<>();
 
-		for (Map.Entry<String, JsonData> e : rawAfterKey.entrySet()) {
+		String key = rawAfterKey.keySet().iterator().next();
+		String value =  rawAfterKey.get(key).to(String.class);
 
-		    afterKey.put(e.getKey(), e.getValue().toString());
-		}
+		afterKey.put(key, value);
 
 	    } else {
 
