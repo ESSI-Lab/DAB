@@ -3,30 +3,23 @@
  */
 package eu.essi_lab.api.database.opensearch.index.mappings;
 
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
-import eu.essi_lab.indexes.IndexedElements;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.JSONUtils;
-import eu.essi_lab.model.index.jaxb.BoundingBox;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.model.resource.composed.ComposedElementItem;
-import org.json.JSONObject;
-import org.opensearch.client.opensearch.OpenSearchClient;
-import org.opensearch.client.opensearch._types.mapping.FieldType;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.opensearch.*;
+import eu.essi_lab.indexes.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.index.jaxb.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.composed.*;
+import org.json.*;
+import org.opensearch.client.opensearch.*;
+import org.opensearch.client.opensearch._types.mapping.*;
 import org.opensearch.client.opensearch._types.mapping.Property;
-import org.opensearch.client.opensearch.indices.GetMappingRequest;
-import org.opensearch.client.opensearch.indices.GetMappingResponse;
-import org.opensearch.client.opensearch.indices.PutMappingRequest;
-import org.opensearch.client.opensearch.indices.PutMappingResponse;
-import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
+import org.opensearch.client.opensearch.indices.*;
+import org.opensearch.client.opensearch.indices.get_mapping.*;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
 /*-
  * #%L
@@ -38,12 +31,12 @@ import java.util.stream.Collectors;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -82,6 +75,7 @@ public class DataFolderMapping extends IndexMapping {
 	addProperty(WRITING_FOLDER_TAG, FieldType.Binary.jsonValue());
 
 	addProperty(MetaFolderMapping.DATA_FOLDER, FieldType.Text.jsonValue());
+	addProperty(toKeywordField(MetaFolderMapping.DATA_FOLDER), FieldType.Keyword.jsonValue());
 
 	// centroid
 	addProperty(CENTROID, FieldType.GeoPoint.jsonValue());
@@ -109,7 +103,10 @@ public class DataFolderMapping extends IndexMapping {
 		addProperty(toDateField(el.getName()), FieldType.Date.jsonValue(), true);
 	    }
 
-	    case SPATIAL -> addProperty(el.getName(), FieldType.GeoShape.jsonValue(), true); // ignoring malformed
+	    case SPATIAL -> {
+		addProperty(el.getName(), FieldType.GeoShape.jsonValue(), true); // ignoring malformed
+		addProperty(toHashField(el.getName()), FieldType.GeoShape.jsonValue(), true); // bbox hash
+	    }
 	    // shapes
 	    case TEXTUAL -> {
 		addProperty(el.getName(), FieldType.Text.jsonValue());
@@ -230,6 +227,16 @@ public class DataFolderMapping extends IndexMapping {
 
 	HashMap<String, Property> missingFieldsMap = new HashMap<>();
 
+	if (!properties.contains(toKeywordField(MetaFolderMapping.DATA_FOLDER))) {
+
+	    missingFieldsMap.put(toKeywordField(MetaFolderMapping.DATA_FOLDER), createProperty(FieldType.Keyword.jsonValue()));
+	}
+
+	if (!properties.contains(toHashField(MetadataElement.BOUNDING_BOX.getName()))) {
+
+	    missingFieldsMap.put(toHashField(MetadataElement.BOUNDING_BOX.getName()), createProperty(FieldType.Keyword.jsonValue()));
+	}
+
 	// using listQueryables instead of listValues because of OpenSearchDataFolderIndexUpdateTest
 	MetadataElement.listQueryables().forEach(el -> {
 
@@ -250,7 +257,10 @@ public class DataFolderMapping extends IndexMapping {
 		    missingFieldsMap.put(toDateField(el.getName()), createProperty(FieldType.Date.jsonValue(), true));
 		}
 
-		case SPATIAL -> missingFieldsMap.put(el.getName(), createProperty(FieldType.GeoShape.jsonValue(), true));
+		case SPATIAL -> {
+		    missingFieldsMap.put(el.getName(), createProperty(FieldType.GeoShape.jsonValue(), true));
+		    missingFieldsMap.put(toHashField(el.getName()), createProperty(FieldType.GeoShape.jsonValue(), true));
+		}
 
 		case TEXTUAL -> {
 
