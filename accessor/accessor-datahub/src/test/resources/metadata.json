@@ -1,0 +1,541 @@
+{
+    "identifier": "urn:li:dataset:(urn:li:dataPlatform:metadata,_IDENTIFIER_,DEV)",
+    "public": true,
+    "character_set": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode",
+        "value": "utf8"
+    },
+    "hierarchy_level": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+        "value": "dataset"
+    },
+    "parent_identifier": "ecmwf_weather_forecast",
+    "metadata_profile": {
+        "name": "ISO 19115-2 Geographic information — Metadata — Part 2: Extensions for imagery and gridded data",
+        "version": "ISO 19115-2:2019"
+    },
+    "metadata_language": "it",
+    "metadata_updated_at": "2026-02-27T12:00:00Z",
+    "metadata_owner": {
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "address": {
+            "email": "test@test.gov.it"
+        },
+        "link": "https://test.test.gov.it",
+        "role": "pointOfContact"
+    },
+    "metadata_version": "2.1",
+    "metadata_original_version": "urn:li:dataset:(urn:li:dataPlatform:metadata,ecmwf_weather_forecast_2m_temperature_202602271200_windy,DEV)_v1",
+    "title": "_TITLE_",
+    "abstract": "_ABSTRACT_",
+    "edition": "Version 2.1",
+    "edition_date": "2026-02-27T12:00:00Z",
+    "resource_creation_date": "2026-02-27T12:00:00Z",
+    "resource_publication_date": "2026-02-27T12:00:00Z",
+    "resource_revision_date": "2026-02-27T12:00:00Z",
+    "resource_expiration_date": "2025-12-11T12:00:00Z",
+    "resource_owner": {
+        "organization_name": "Test organization",
+        "address": {
+            "email": "test@mail.it"
+        },
+        "link": "https://test.it",
+        "role": "owner"
+    },
+    "other_roles": [
+        {
+            "organization_name": "Test organization",
+            "address": {
+                "email": "test@mail.it"
+            },
+            "link": "https://test.it",
+            "role": "author"
+        }
+    ],
+    "presentation_form": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode",
+        "value": "mapDigital"
+    },
+    "point_of_contact": {
+        "organization_name": "Test organization 2",
+        "address": {
+            "email": "test@test.gov.it"
+        },
+        "link": "https://test.test.gov.it",
+        "role": "pointOfContact"
+    },
+    "graphic_overview": {
+        "url": "https://test.gov.test.it/path/to/metadata/preview.png",
+        "description": "Anteprima del dataset",
+        "file_type": "PNG"
+    },
+    "descriptive_keywords": [
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/7102"
+                },
+                {
+                    "label": "environmental change",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2782"
+                },
+                {
+                    "label": "environmental monitoring",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2882"
+                },
+                {
+                    "label": "survey",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/8240"
+                }
+            ],
+            "thesaurus": {
+                "name": "GEMET - INSPIRE themes, version 1.0",
+                "url": "https://www.eionet.europa.eu/gemet/it/inspire-themes",
+                "publication_date": "2008-06-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "ecmwf"
+                },
+                {
+                    "label": "weather forecast"
+                },
+                {
+                    "label": "EU"
+                },
+                {
+                    "label": "open data"
+                },
+                {
+                    "label": "Test"
+                }
+            ]
+        }
+    ],
+    "spatial_scope": {
+        "keywords": {
+            "label": "National",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/national"
+        },
+        "thesaurus": {
+            "name": "Spatial scope",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope",
+            "publication_date": "2019-05-22"
+        }
+    },
+    "status": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode",
+        "value": "completed"
+    },
+    "update_frequency": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode",
+        "value": "daily"
+    },
+    "date_of_next_update": "2026-02-28T00:00Z",
+    "temporal_extent": {
+        "start_date": "2026-02-27T12:00Z",
+        "end_date": "2026-02-30T12:00Z"
+    },
+    "bbox_4326": {
+        "west_bound_longitude": 5.188434,
+        "east_bound_longitude": 19.428116,
+        "south_bound_latitude": 35.924645,
+        "north_bound_latitude": 47.368594
+    },
+    "native_epsg": {
+        "url": "http://www.opengis.net/def/crs/EPSG/0/4326",
+        "label": "WGS 84"
+    },
+    "bbox_native_epsg_gml_polygon": "POLYGON ((5.188434 35.924645, 19.428116 35.924645, 19.428116 47.368594, 5.188434 47.368594, 5.188434 35.924645))",
+    "vertical_extent": {
+        "minimum_value": 2,
+        "maximum_value": 2,
+        "crs": "http://www.opengis.net/def/crs/EPSG/0/5773"
+    },
+    "resource_constraints": {
+        "use_limitation": "IODL 2.0",
+        "access_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "use_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "other_constraints": "http://publications.europa.eu/resource/authority/licence/IODL_2_0",
+        "security_classification": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode",
+            "value": "unclassified"
+        },
+        "security_note": null
+    },
+    "data_language": "en",
+    "dataset_type": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode",
+        "value": "grid"
+    },
+    "spatial_resolution": {
+        "value": 100,
+        "uom": "http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m"
+    },
+    "spatial_representation_info": {
+        "grid_spatial_representation": {
+            "number_of_dimensions": 3,
+            "axis_dimension_properties": [
+                {
+                    "dimension_name": {
+                        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode",
+                        "value": "time"
+                    },
+                    "dimension_size": 72,
+                    "resolution": {
+                        "value": 1,
+                        "uom": "hours"
+                    },
+                    "dimension_title": "Temporal resolution",
+                    "dimension_description": "Weather forecast is provided hourly up to 3 days (72 hours)."
+                },
+                {
+                    "dimension_name": {
+                        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode",
+                        "value": "row"
+                    },
+                    "dimension_size": 3245,
+                    "resolution": {
+                        "value": 100,
+                        "uom": "http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m"
+                    },
+                    "dimension_title": "Number of rows",
+                    "dimension_description": "Number of rows"
+                },
+                {
+                    "dimension_name": {
+                        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode",
+                        "value": "column"
+                    },
+                    "dimension_size": 1573,
+                    "resolution": {
+                        "value": 100,
+                        "uom": "http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m"
+                    },
+                    "dimension_title": "Number of columns",
+                    "dimension_description": "Number of columns"
+                },
+                {
+                    "dimension_name": {
+                        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode",
+                        "value": "vertical"
+                    },
+                    "dimension_size": "unknown",
+                    "resolution": {
+                        "value": 2,
+                        "uom": "http://standards.iso.org/iso/19139/resources/uom/ML_gmxUom.xml#m"
+                    },
+                    "dimension_title": "Variabile 'unknown' di test",
+                    "dimension_description": "Variabile 'unknown' di test"
+                }
+            ],
+            "cell_geometry": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode",
+                "value": "area"
+            },
+            "transformation_parameter_availability": true
+        }
+    },
+    "raster_nodata_value": -9999,
+    "topic_categories": [
+        "environment",
+        "location",
+        "imageryBaseMapsEarthCover"
+    ],
+    "resource_provider": {
+        "organization_name": "CU.V4.07 - Gestione illecita dei rifiuti",
+        "address": {
+            "email": "test@test.gov.it"
+        },
+        "link": "https://test.test.gov.it/cu_v4_7",
+        "role": "resourceProvider"
+    },
+    "formats": [
+        {
+            "name": {
+                "uri": "http://inspire.ec.europa.eu/media-types/image/tiff",
+                "label": "GeoTIFF"
+            },
+            "version": "inapplicable"
+        }
+    ],
+    "data_location": "S3;output-data;test/v4_7/v4_7_changedetection_comunereggiocalabria_asbestos_20251011.tiff",
+    "raster_mosaic": true,
+    "online_resources": [
+        {
+            "protocol": {
+                "uri": "http://www.opengis.net/def/serviceType/ogc/wms",
+                "label": "OGC:WMS"
+            },
+            "application_profile": {
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/view",
+                "label": "view"
+            },
+            "description": {
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint",
+                "label": "accessPoint"
+            },
+            "url": "https://ext-gis-services.platform.test-dev.test.gov.it/ecmwf/ows",
+            "name": "ecmwf:urn:li:dataset:(urn:li:dataPlatform:metadata,ecmwf_weather_forecast_2m_temperature_202602271200_windy,DEV)",
+            "function": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode",
+                "value": "view"
+            },
+            "layer_style": {
+                "name": "ecmwf",
+                "workspace": "v4_7"
+            },
+            "temporal_wms": false,
+            "source_auth_type": "INTERNAL_GEOSERVER"
+        },
+        {
+            "protocol": {
+                "uri": "http://www.w3.org/TR/xlink/",
+                "label": "WWW:LINK-1.0-http--link"
+            },
+            "application_profile": {
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download",
+                "label": "download"
+            },
+            "description": {
+                "label": "Windy-style configuration JSON"
+            },
+            "url": "https://test-dev.test.gov.it/core/api/mastercatalog-cart-downloader/bucket/urn:li:dataset:(urn:li:dataPlatform:metadata,ecmwf_weather_forecast_2m_temperature_202602271200_windy,DEV)",
+            "name": "urn:li:dataset:(urn:li:dataPlatform:metadata,ecmwf_weather_forecast_2m_temperature_202602271200_windy,DEV).json",
+            "function": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode",
+                "value": "download"
+            },
+            "source_auth_type": "NO_AUTH"
+        }
+    ],
+    "conformity": [
+        {
+            "specification_title": "REGOLAMENTO (UE) N. 1089/2010 DELLA COMMISSIONE del 23 novembre 2010 recante attuazione della direttiva 2007/2/CE del Parlamento europeo e del Consiglio per quanto riguarda l'interoperabilità dei set di dati territoriali e dei servizi di dati territoriali",
+            "specification_publication_date": "2010-12-08",
+            "explanation": "Vedi specifiche",
+            "pass": true
+        }
+    ],
+    "positional_accuracy": {
+        "unit": "m",
+        "unit_system": "http://www.bipm.org/en/si",
+        "value": 5
+    },
+    "quality_scope": {
+        "scope_code": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+            "value": "dataset"
+        },
+        "scope_details": "Entire dataset"
+    },
+    "lineage_statement": "L’elaborazione si basa sul confronto di dati multispettrali/iper-spettrali acquisiti in date diverse e sull’applicazione di metodologie di telerilevamento e classificazione tematica. Il prodotto finale fornisce una mappa classificata che evidenzia le zone soggette a variazioni significative correlate a fenomeni di contaminazione o alterazione del suolo, supportando attività di monitoraggio ambientale, valutazioni di rischio e pianificazione degli interventi.",
+    "lineage_source": [
+        {
+            "description": "La procedura utilizzata in questo paper è stata adottata per la produzione di questo dataset.",
+            "source_citation": {
+                "title": "Change detection techniques for remote sensing applications: a survey",
+                "online_resource": [
+                    {
+                        "url": "https://doi.org/10.1007/s12145-019-00380-5"
+                    }
+                ]
+            }
+        }
+    ],
+    "lineage_process_step": [
+        {
+            "description": "Pre-processing delle immagini multispettrali per correzione radiometrica e atmosferica.",
+            "rationale": "Garantire la comparabilità temporale delle immagini acquisite in date diverse.",
+            "date": "2025-10-10T10:30:00Z",
+            "processor": {
+                "individual_name": "Mario Rossi",
+                "organisation_name": "Agenzia Regionale per la Protezione Ambientale",
+                "role": "processor"
+            },
+            "source": {
+                "description": "Scene multispettrali Sentinel-2 preprocessate",
+                "source_citation": {
+                    "title": "Sentinel-2 User Guide",
+                    "online_resource": [
+                        {
+                            "url": "https://sentinel.esa.int/web/sentinel/user-guides/sentinel-2-msi"
+                        }
+                    ]
+                }
+            },
+            "processing_information": {
+                "id": "PROC_STEP_001",
+                "software_reference": {
+                    "title": "ESA SNAP Toolbox 9.0",
+                    "online_resource": [
+                        {
+                            "url": "https://step.esa.int/main/download/snap-download/"
+                        }
+                    ]
+                },
+                "procedure_description": "Applicazione dei moduli Sen2Cor per la correzione atmosferica e normalizzazione radiometrica.",
+                "documentation": [
+                    {
+                        "title": "Sen2Cor Configuration and User Guide",
+                        "online_resource": [
+                            {
+                                "url": "https://step.esa.int/main/snap-supported-plugins/sen2cor/"
+                            }
+                        ]
+                    }
+                ],
+                "parameter": [
+                    {
+                        "name": "Atmospheric Correction Level",
+                        "direction": "in",
+                        "description": "Livello di correzione applicato alle bande multispettrali.",
+                        "optionality": false,
+                        "repeatability": false,
+                        "value_type": {
+                            "url": "http://www.w3.org/2001/XMLSchema#string",
+                            "label": "xsd:string"
+                        },
+                        "value": "L2A",
+                        "source": {
+                            "description": "Specifiche del processore Sen2Cor",
+                            "source_citation": {
+                                "title": "Sen2Cor Algorithm Theoretical Basis",
+                                "online_resource": [
+                                    {
+                                        "url": "https://step.esa.int"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "name": "Target Resolution",
+                        "direction": "in",
+                        "description": "Risoluzione spaziale impostata per l'elaborazione.",
+                        "optionality": false,
+                        "repeatability": false,
+                        "value_type": {
+                            "url": "http://www.w3.org/2001/XMLSchema#integer",
+                            "label": "xsd:integer"
+                        },
+                        "value": "10",
+                        "source": {
+                            "description": "Parametri di configurazione SNAP",
+                            "source_citation": {
+                                "title": "SNAP Processing Parameters",
+                                "online_resource": [
+                                    {
+                                        "url": "https://step.esa.int"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "algorithm": {
+                    "citation": {
+                        "title": "Sen2Cor Atmospheric Correction Algorithm",
+                        "online_resource": [
+                            {
+                                "url": "https://sentinel.esa.int"
+                            }
+                        ]
+                    },
+                    "description": "Algoritmo di correzione atmosferica basato su modelli radiativi ESA Sen2Cor."
+                }
+            },
+            "output": {
+                "description": "Immagini multispettrali correttamente calibrate per analisi successive.",
+                "source_citation": {
+                    "title": "Dataset pre-processato",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/preprocessed-data"
+                        }
+                    ]
+                }
+            },
+            "report": {
+                "name": "Rapporto di pre-processing",
+                "description": "Report generato automaticamente contenente log e parametri.",
+                "file_type": "PDF"
+            }
+        },
+        {
+            "description": "Classificazione tematica tramite analisi multitemporale.",
+            "rationale": "Identificare variazioni significative correlate a fenomeni di alterazione del suolo.",
+            "date": "2025-10-10T15:00:00Z",
+            "processor": {
+                "organisation_name": "Dipartimento di Scienze della Terra",
+                "role": "processor"
+            },
+            "source": {
+                "description": "Dataset multispettrale pre-processato",
+                "source_citation": {
+                    "title": "Dataset pre-processato",
+                    "online_resource": [
+                        {
+                            "url": "https://example.org/preprocessed-data"
+                        }
+                    ]
+                }
+            },
+            "processing_information": {
+                "id": "PROC_STEP_002",
+                "software_reference": {
+                    "title": "QGIS Semi-Automatic Classification Plugin",
+                    "online_resource": [
+                        {
+                            "url": "https://semiautomaticclassificationmanual-v7.readthedocs.io/"
+                        }
+                    ]
+                },
+                "procedure_description": "Classificazione supervisionata tramite Random Forest.",
+                "documentation": [
+                    {
+                        "title": "Random Forest Algorithm Overview",
+                        "online_resource": [
+                            {
+                                "url": "https://scikit-learn.org/stable/modules/ensemble.html#forest"
+                            }
+                        ],
+                        "graphic_overview": []
+                    }
+                ],
+                "run_time_parameters": "classifier=random_forest;n_estimators=200",
+                "algorithm": {
+                    "citation": {
+                        "title": "Breiman's Random Forests",
+                        "online_resource": [
+                            {
+                                "url": "https://doi.org/10.1023/A:1010933404324"
+                            }
+                        ]
+                    },
+                    "description": "Classificatore basato su insiemi di alberi decisionali."
+                }
+            },
+            "output": {
+                "description": "Mappa delle variazioni tematiche.",
+                "source_citation": {
+                    "title": "Classified dataset"
+                }
+            },
+            "report": {
+                "name": "Rapporto di classificazione",
+                "description": "Descrizione delle classi ottenute e delle metriche di accuratezza.",
+                "file_type": "PDF"
+            }
+        }
+    ]
+}

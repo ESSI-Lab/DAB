@@ -92,7 +92,7 @@ public class OpenSearchDatabase extends Database {
     /**
      * @return
      */
-    static boolean debugQueries() {
+    public static boolean debugQueries() {
 
 	return ConfigurationWrapper.getSystemSettings(). //
 		readKeyValue(SystemSetting.KeyValueOptionKeys.DEBUG_OPENSEARCH_QUERIES.getLabel()). //
