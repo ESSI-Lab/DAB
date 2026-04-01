@@ -129,7 +129,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 *
 	 */
-	PRIVATE_VIEW_CHECK("privateViewCheck");
+	PRIVATE_VIEW_CHECK("privateViewCheck"),
+
+	/**
+	 *
+	 */
+	REST_API_PROTOCOL("restApiProtocol");
 
 	/**
 	 * MirrorSiteTokenGeneratorHandler option prefix

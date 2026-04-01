@@ -21,6 +21,8 @@ package eu.essi_lab.pdk;
  * #L%
  */
 
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.*;
@@ -28,10 +30,17 @@ import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResourceConsumer;
 import eu.essi_lab.model.resource.GSResource;
 
+import java.util.*;
+
 /**
  * @author Fabrizio
  */
 public class OnlineResourceConsumer implements ResourceConsumer {
+
+    /**
+     *
+     */
+    private static final String DEFAULT_REST_API_PROTOCOL = "REST API";
 
     @Override
     public void consume(GSResource gsResource, DiscoveryMessage message) {
@@ -132,6 +141,14 @@ public class OnlineResourceConsumer implements ResourceConsumer {
      * @return
      */
     private String fromProtocol(DiscoveryMessage message, String publicId, String protocol) {
+
+	String restApiProtocol = ConfigurationWrapper.getSystemSettings().readKeyValue(SystemSetting.KeyValueOptionKeys.REST_API_PROTOCOL.getLabel())
+	        .orElse(DEFAULT_REST_API_PROTOCOL);
+
+	if(restApiProtocol.equals(protocol)) {
+
+	    return fromProtocol(message.getDataProxyServer().get(), publicId, "/rest");
+	}
 
 	NetProtocolWrapper wrapper = NetProtocolWrapper.of(protocol).orElse(null);
 
