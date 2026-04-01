@@ -13,12 +13,12 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,6 +28,8 @@ import com.beust.jcommander.internal.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.Database.*;
 import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.api.database.opensearch.*;
+import eu.essi_lab.api.database.opensearch.index.mappings.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
@@ -45,11 +47,21 @@ import eu.essi_lab.model.resource.*;
 import eu.essi_lab.model.resource.GSResourceComparator.*;
 import org.apache.kafka.common.security.auth.*;
 import org.json.*;
+import org.opensearch.client.json.*;
+import org.opensearch.client.opensearch._types.*;
+import org.opensearch.client.util.*;
+import org.opensearch.search.aggregations.bucket.terms.*;
 import org.quartz.*;
 
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.*;
+
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.opensearch._types.aggregations.*;
+
+import java.util.*;
 
 /**
  * This task must be embedded
@@ -207,57 +219,82 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
 		    }
 
+		    //
+		    // deleted
+		    //
+
 		    deletedRecords = prevIds.//
 			    parallelStream().//
 			    filter(id -> !currIds.contains(id)).//
 			    collect(Collectors.toList());
+		    //
+		    // new
+		    //
 
 		    newRecords = currIds.//
 			    parallelStream().//
 			    filter(id -> !prevIds.contains(id)).//
 			    collect(Collectors.toList());
 
-		    ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, Thread.ofVirtual().factory());
+		    //
+		    // common
+		    //
 
-		    List<String> source = currIds.parallelStream().filter(prevIds::contains).toList();
+		    List<String> names = comparisonProperties. //
+			    stream().//
+			    filter(q -> !q.getName().equals(MetadataElement.BOUNDING_BOX.getName())).//
+			    map(Queryable::getName).//
+			    toList();
 
-		    StreamUtils.asynchConsume(source, (id) -> {
+		    modifiedRecords = compare(//
+			    ((OpenSearchDatabase) finder.getDatabase()).getClient(), //
+			    DataFolderMapping.get().getIndex(), //
+			    names, //
+			    gsSource.getUniqueIdentifier()); //
 
-			try {
-
-			    Optional<GSResource> opt1 = data1Folder.get(IdentifierType.PUBLIC, id);
-			    Optional<GSResource> opt2 = data2Folder.get(IdentifierType.PUBLIC, id);
-
-			    if (opt1.isEmpty()) {
-
-				GSLoggerFactory.getLogger(getClass()).error("Resource {} not found in data-1 folder", id);
-				return;
-			    }
-
-			    if (opt2.isEmpty()) {
-
-				GSLoggerFactory.getLogger(getClass()).error("Resource {} not found in data-2 folder", id);
-				return;
-			    }
-
-			    ComparisonResponse response = GSResourceComparator.compare(comparisonProperties, opt1.get(), opt2.get());
-
-			    if (!response.getProperties().isEmpty()) {
-
-				response.getProperties().forEach(prop -> {
-
-				    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
-
-				    list.add(id);
-				});
-			    }
-
-			} catch (Exception ex) {
-
-			    GSLoggerFactory.getLogger(getClass()).error(ex);
-
-			}
-		    }, executor);//
+		    //		    Set<String> commonIds = currIds.stream().filter(prevIds::contains).collect(Collectors.toSet());
+		    //
+		    //		    ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE, Thread.ofVirtual().factory());
+		    //
+		    //		    List<String> source = currIds.parallelStream().filter(prevIds::contains).toList();
+		    //
+		    //		    StreamUtils.asynchConsume(source, (id) -> {
+		    //
+		    //			try {
+		    //
+		    //			    Optional<GSResource> opt1 = data1Folder.get(IdentifierType.PUBLIC, id);
+		    //			    Optional<GSResource> opt2 = data2Folder.get(IdentifierType.PUBLIC, id);
+		    //
+		    //			    if (opt1.isEmpty()) {
+		    //
+		    //				GSLoggerFactory.getLogger(getClass()).error("Resource {} not found in data-1 folder", id);
+		    //				return;
+		    //			    }
+		    //
+		    //			    if (opt2.isEmpty()) {
+		    //
+		    //				GSLoggerFactory.getLogger(getClass()).error("Resource {} not found in data-2 folder", id);
+		    //				return;
+		    //			    }
+		    //
+		    //			    ComparisonResponse response = GSResourceComparator.compare(comparisonProperties, opt1.get(), opt2.get());
+		    //
+		    //			    if (!response.getProperties().isEmpty()) {
+		    //
+		    //				response.getProperties().forEach(prop -> {
+		    //
+		    //				    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
+		    //
+		    //				    list.add(id);
+		    //				});
+		    //			    }
+		    //
+		    //			} catch (Exception ex) {
+		    //
+		    //			    GSLoggerFactory.getLogger(getClass()).error(ex);
+		    //
+		    //			}
+		    //		    }, executor);//
 		}
 
 		break;
@@ -344,12 +381,12 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // at least one change is expected!
 		    if (!response.getProperties().isEmpty()) {
 
-			response.getProperties().forEach(prop -> {
+			for (Queryable prop : response.getProperties()) {
 
 			    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
 
 			    list.add(modified.getPublicId());
-			});
+			}
 		    }
 		}
 	    }
@@ -562,6 +599,148 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     public ExecutionStage getExecutionStage() {
 
 	return ExecutionStage.BEFORE_HARVESTING_END;
+    }
+
+    /**
+     * @param client
+     * @param index
+     * @param targetField
+     * @param sourceId
+     * @return
+     * @throws Exception
+     */
+    public Map<String, List<String>> compare(OpenSearchClient client, String index, List<String> targetFields, String sourceId)
+	    throws Exception {
+
+	Map<String, String> afterKey = null;
+
+	Map<String, List<String>> out = new HashMap<>();
+
+	targetFields.forEach(field -> out.put(field, new ArrayList<>()));
+
+	while (true) {
+
+	    Map<String, String> finalAfterKey = afterKey;
+
+	    Map<String, Aggregation> subAggs = new HashMap<>();
+
+	    for (String field : targetFields) {
+
+		subAggs.put(field,
+			Aggregation.of(
+				a -> a.terms(t ->
+						t.field(IndexMapping.toKeywordField("dataFolder")).size(2))
+						.aggregations("values",
+							v -> v.terms(tt -> tt.field(IndexMapping.toKeywordField(field)).size(100) // tuning
+			))));
+	    }
+
+	    SearchResponse<Void> response = client.search(s -> s.index(index).size(0)
+
+		    .query(q -> q.term(t -> t.field(IndexMapping.toKeywordField("sourceId")).value(FieldValue.of(sourceId))))
+
+		    .aggregations("by_fileId", a ->
+
+			    a.composite(c -> {
+
+					c.size(PAGE_SIZE);
+
+					CompositeAggregationSource fileIdSource = new CompositeAggregationSource.Builder()
+
+						.terms(t -> t.field(IndexMapping.toKeywordField("fileId"))).build();
+
+					c.sources(Map.of("fileId", fileIdSource));
+
+					if (finalAfterKey != null) {
+
+					    c.after(finalAfterKey);
+					}
+
+					return c;
+				    })
+
+				    .aggregations(subAggs)
+
+		    ), Void.class);
+
+	    JSONObject object = OpenSearchUtils.toJSONObject(response);
+	    GSLoggerFactory.getLogger(getClass()).debug(object.toString(3));
+
+	    //
+	    //
+	    //
+
+	    CompositeAggregate composite = response.aggregations().get("by_fileId").composite();
+
+	    for (CompositeBucket bucket : composite.buckets().array()) {
+
+		String fileId = bucket.key().get("fileId").toString();
+
+		Map<String, Aggregate> aggs = bucket.aggregations();
+
+		for (String field : targetFields) {
+
+		    Aggregate agg = aggs.get(field);
+
+		    if (agg == null || !agg.isSterms()) {
+
+			continue;
+		    }
+
+		    StringTermsAggregate byFolder = agg.sterms();
+
+		    Set<String> values1 = new HashSet<>();
+		    Set<String> values2 = new HashSet<>();
+
+		    for (StringTermsBucket folderBucket : byFolder.buckets().array()) {
+
+			String folder = folderBucket.key();
+
+			StringTermsAggregate values = folderBucket.aggregations().get("values").sterms();
+
+			Set<String> targetSet = "data-1".equals(folder) ? values1 : values2;
+
+			for (StringTermsBucket v : values.buckets().array()) {
+
+			    targetSet.add(v.key());
+			}
+		    }
+
+		    if (!values1.equals(values2)) {
+
+			out.get(field).add(fileId);
+		    }
+		}
+	    }
+
+	    if (composite.buckets().array().size() < PAGE_SIZE) {
+
+		break;
+	    }
+
+	    Map<String, JsonData> rawAfterKey = composite.afterKey();
+
+	    if (rawAfterKey != null) {
+
+		afterKey = new HashMap<>();
+
+		for (Map.Entry<String, JsonData> e : rawAfterKey.entrySet()) {
+
+		    afterKey.put(e.getKey(), e.getValue().toString());
+		}
+
+	    } else {
+
+		afterKey = null;
+	    }
+
+	    if (afterKey == null) {
+
+		break;
+	    }
+	}
+
+	return out;
     }
 
 }
