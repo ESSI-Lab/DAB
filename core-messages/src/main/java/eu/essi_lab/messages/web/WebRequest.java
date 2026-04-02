@@ -1051,7 +1051,6 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     *
      * @param fullRequest
      * @return
      */
@@ -1061,7 +1060,6 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
     }
 
     /**
-     *
      * @param requestPath
      * @param query
      * @return
@@ -1099,13 +1097,21 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    }
 
 	    //
-	    // we try in the query string
+	    // query string
 	    //
 
 	    Optional<String> viewQueryParameter = extractQueryParameter(query, "view");
+
 	    if (viewQueryParameter.isPresent()) {
 
 		return viewQueryParameter;
+	    }
+
+	    Optional<String> viewIdQueryParameter = extractQueryParameter(query, "viewId");
+
+	    if (viewIdQueryParameter.isPresent()) {
+
+		return viewIdQueryParameter;
 	    }
 
 	} catch (Exception ex) {
