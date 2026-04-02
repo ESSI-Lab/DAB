@@ -140,7 +140,24 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 	case 3:
 	    sensorType = "10001";
 	    break;
-
+	case 4:
+	    sensorType = "19";
+	    break;
+	case 5:
+	    sensorType = "20036";
+	    break;
+	case 6:
+	    sensorType = "20026";
+	    break;
+	case 7:
+	    sensorType = "20027";
+	    break;
+	case 8:
+	    sensorType = "22";
+	    break;
+	case 9:
+	    sensorType = "20";
+	    break;
 	default:
 	    break;
 	}
@@ -238,7 +255,7 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 	Optional<Integer> mr = getSetting().getMaxRecords();
 	// metadataTemplate = null;
 	page = page + 1;
-	if (page > 3) {
+	if (page > 9) {
 	    ret.setResumptionToken(null);
 	    // GSLoggerFactory.getLogger(getClass()).info("Dataset with time interval: {}", countTimeDataset);
 	    logger.info("Total number of dataset: {}", countDataset);

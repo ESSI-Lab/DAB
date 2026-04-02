@@ -67,6 +67,7 @@ public class DownloadTestTask extends AbstractCustomTask {
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
 	log(status, "Data download test task STARTED");
+	GSLoggerFactory.getLogger(getClass()).info("Data download test task STARTED");
 
 	Optional<String> taskOptions = readTaskOptions(context);
 
@@ -120,8 +121,6 @@ public class DownloadTestTask extends AbstractCustomTask {
 	DatabaseWriter writer = DatabaseProviderFactory.getWriter(ConfigurationWrapper.getStorageInfo());
 
 	GSLoggerFactory.getLogger(getClass()).info("Found {} sources", resources.size());
-
-	Optional<S3TransferWrapper> optS3TransferManager = getS3TransferManager();
 
 	for (int i = 0; i < resources.size(); i++) {
 

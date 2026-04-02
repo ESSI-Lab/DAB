@@ -411,6 +411,17 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	if (measureName.startsWith("Livello idrometrico ")) {
 	    measureName = "Livello idrometrico";
 	}
+	if (measureName.startsWith("Pressione")) {
+	    measureName = "Pressione";
+	}
+	if (measureName.startsWith("Velocità")) {
+	    measureName = "Velocità vento";
+	}
+	if (measureName.startsWith("Direzione")) {
+	    measureName = "Direzione vento";
+	}
+
+
 
 	coverageDescription.setAttributeTitle(measureName);
 
