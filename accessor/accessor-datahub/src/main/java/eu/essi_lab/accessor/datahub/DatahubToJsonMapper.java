@@ -397,7 +397,7 @@ public final class DatahubToJsonMapper {
     private static JSONObject responsiblePartyToJson(ResponsibleParty party) {
         if (party == null) return null;
         JSONObject o = new JSONObject();
-        putOpt(o, "organization_name", party.getOrganisationName());
+        putOpt(o, "organisation_name", party.getOrganisationName());
         putOpt(o, "individual_name", party.getIndividualName());
         putOpt(o, "role", party.getRoleCode());
         Contact contact = party.getContact();
@@ -626,7 +626,7 @@ public final class DatahubToJsonMapper {
                         if (!points.get(0).equals(points.get(points.size() - 1))) {
                             points.add(points.get(0));
                         }
-                        putOpt(out, "bbox_native_epsg_gml_polygon", "POLYGON ((" + String.join(", ", points) + "))");
+                        putOpt(out, "bbox_native_epsg_gml_polygon", String.join(" ", points));
                     }
                 }
             }
