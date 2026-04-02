@@ -29,6 +29,7 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResourceConsumer;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 
 import java.util.*;
 
@@ -64,6 +65,7 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 
 		//
 		// first try: guessing from protocol encoded by us from WCS, WMS, WFS, WMTS mappers
+		// or from REST API protocol
 		//
 
 		String linkage = fromProtocol(message, publicId, protocol);
@@ -142,7 +144,12 @@ public class OnlineResourceConsumer implements ResourceConsumer {
      */
     private String fromProtocol(DiscoveryMessage message, String publicId, String protocol) {
 
-	String restApiProtocol = ConfigurationWrapper.getSystemSettings().readKeyValue(SystemSetting.KeyValueOptionKeys.REST_API_PROTOCOL.getLabel())
+	if (protocol == null) {
+
+	    return null;
+	}
+
+	String restApiProtocol = ConfigurationWrapper.getSystemSettings().readKeyValue(KeyValueOptionKeys.REST_API_PROTOCOL.getLabel())
 	        .orElse(DEFAULT_REST_API_PROTOCOL);
 
 	if(restApiProtocol.equals(protocol)) {
