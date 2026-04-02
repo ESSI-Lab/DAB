@@ -28,6 +28,7 @@ import com.vaadin.flow.component.textfield.*;
 import eu.essi_lab.cfga.gui.dialog.*;
 
 import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -95,19 +96,26 @@ public class ViewerColumnRenderer extends GridColumnRenderer<Button> {
     protected Dialog createDialog(String windowTitle, String text) {
 
 	int areaWidth = 700;
-
+	int areaHeight = 600;
+	
 	TextArea textArea = new TextArea();
 	textArea.getStyle().set("font-size", "14px");
 	textArea.getStyle().set("padding", "0px");
-	textArea.setWidth(areaWidth + "px");
-	textArea.setHeight("600px");
+	textArea.setWidthFull();
+	textArea.setHeight(areaHeight+"px");
 	textArea.setReadOnly(true);
 	textArea.setValue(text);
 	textArea.addClassName("no-wrap");
 	textArea.addClassName("text-area-readonly");
 
 	NotificationDialog dialog = NotificationDialog.getNotificationDialog(windowTitle, "");
+	dialog.setResizable(true);
 	dialog.setWidth(areaWidth + 30 + "px");
+	dialog.setMinWidth(areaWidth + 30 + "px");
+
+	dialog.setMinHeight(areaHeight + 160 + "px");
+	dialog.setMaxHeight(areaHeight + 160 + "px");
+
 	dialog.getContentLayout().getStyle().set("padding-left", "12px");
 	dialog.setContent(textArea);
 
