@@ -62,7 +62,7 @@ public class GetSitesTransformer extends DiscoveryRequestTransformer {
     /**
      * 
      */
-    private static final int DEFAULT_PAGE_SIZE = 1000000;
+    private static final int DEFAULT_PAGE_SIZE = 1000;
 
     public GetSitesTransformer() {
 	// empty constructor for service loader
