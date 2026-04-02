@@ -94,7 +94,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	message = super.refineMessage(message);
 
-	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
+	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
 
 	// including weighted queries to improve ranking
 	message.setIncludeWeightedQueries(true);
@@ -108,7 +108,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    message.setResultsPriority(ResultsPriority.DATASET);
 
-	    setView(CoveringModeDiscoveryHandler.COVERING_MODE_VIEW_ID, databaseURI, message);
+	    setView(CoveringModeDiscoveryHandler.COVERING_MODE_VIEW_ID, storageInfo, message);
 
 	    RankingStrategy strategy = new RankingStrategy();
 	    strategy.setAbstractWeight("0");
@@ -194,20 +194,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    message.setIncludeBboxUnion(bboxUnion != null && bboxUnion.equals("true"));
 
 	    //
-	    // set the view from the param if present
-	    //
-
-	    Optional<OSParameter> viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
-
-	    String viewIdValue = viewIdParam.map(parser::parse).orElse(null);
-
-	    if (viewIdValue != null && !viewIdValue.isEmpty()) {
-
-		setView(viewIdValue, databaseURI, message);
-	    }
-
-	    //
-	    // Term frequency
+	    // term frequency
 	    //
 
 	    handleTermFrequency(parser, message);
