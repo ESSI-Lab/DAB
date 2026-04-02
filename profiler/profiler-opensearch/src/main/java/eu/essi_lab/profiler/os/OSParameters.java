@@ -49,6 +49,11 @@ public abstract class OSParameters {
     /**
      *
      */
+    public static final OSParameter TOKEN = new OSParameter("token", "string", null, null);
+
+    /**
+     *
+     */
     public static final OSParameter START_INDEX = new OSParameter("si", "int", "1", "{startIndex}");
 
     /**
