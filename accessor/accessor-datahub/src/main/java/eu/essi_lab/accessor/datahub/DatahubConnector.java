@@ -115,6 +115,7 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
 		if (om != null && !om.isEmpty()) {
 		    OriginalMetadata metadata = new OriginalMetadata();
 		    metadata.setSchemeURI(DatahubMapper.DATAHUB_NS_URI);
+
 		    metadata.setMetadata(om);
 		    ret.addRecord(metadata);
 		    partialNumbers++;
@@ -192,6 +193,9 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
 			identifier = identifier.replace("\"", "");
 			String metadata = fetch(endpoint, accessToken, identifier);
 			if (metadata != null && !metadata.trim().isEmpty()) {
+				if (metadata.contains("vector_spatial")){
+					System.out.println(metadata);
+				}
 			    ret.add(metadata);
 			    logger.debug("Successfully fetched metadata for identifier: {}", identifier);
 			} else {

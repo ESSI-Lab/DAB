@@ -43,6 +43,9 @@ public class EXT_CIOnlineResourceType extends CIOnlineResourceType {
     @XmlTransient
     private String layerStyleWorkspace;
 
+    @XmlTransient
+    private String sourceAuthType;
+
     /**
      *
      */
@@ -126,5 +129,16 @@ public class EXT_CIOnlineResourceType extends CIOnlineResourceType {
     public void setLayerStyleWorkspace(String layerStyleWorkspace) {
 
 	this.layerStyleWorkspace = layerStyleWorkspace;
+    }
+
+    @XmlElement
+    public String getSourceAuthType() {
+
+	return sourceAuthType;
+    }
+
+    public void setSourceAuthType(String sourceAuthType) {
+
+	this.sourceAuthType = sourceAuthType;
     }
 }

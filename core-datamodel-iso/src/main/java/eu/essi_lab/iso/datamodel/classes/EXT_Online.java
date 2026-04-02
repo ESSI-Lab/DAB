@@ -69,6 +69,11 @@ public class EXT_Online extends Online {
 	    setDescription(online.getDescription());
 	}
 
+	if (online.getElementType().getDescription() != null) {
+
+	    getElementType().setDescription(online.getElementType().getDescription());
+	}
+
 	if (online.getIdentifier() != null) {
 
 	    setIdentifier(online.getIdentifier());
@@ -79,14 +84,29 @@ public class EXT_Online extends Online {
 	    setProtocol(online.getProtocol());
 	}
 
+	if (online.getElementType().getProtocol() != null) {
+
+	    getElementType().setProtocol(online.getElementType().getProtocol());
+	}
+
 	if (online.getFunctionCode() != null) {
 
 	    setFunctionCode(online.getFunctionCode());
 	}
 
+	if (online.getElementType().getFunction() != null) {
+
+	    getElementType().setFunction(online.getElementType().getFunction());
+	}
+
 	if (online.getApplicationProfile() != null) {
 
 	    setApplicationProfile(online.getApplicationProfile());
+	}
+
+	if (online.getElementType().getApplicationProfile() != null) {
+
+	    getElementType().setApplicationProfile(online.getElementType().getApplicationProfile());
 	}
 
 	if (online.getDescriptionGmxAnchor() != null) {
@@ -97,6 +117,17 @@ public class EXT_Online extends Online {
 	if (online.getProtocolGmxAnchorHref() != null) {
 
 	    setProtocolAnchor(online.getProtocolGmxAnchorHref(), online.getProtocolGmxAnchorTitle());
+	}
+
+	if (online instanceof EXT_Online) {
+
+	    EXT_CIOnlineResourceType onlineType = ((EXT_Online) online).getElementType();
+	    getElementType().setQueryStringFragment(onlineType.getQueryStringFragment());
+	    getElementType().setLayerPk(onlineType.getLayerPk());
+	    getElementType().setTemporal(onlineType.isTemporal());
+	    getElementType().setLayerStyleName(onlineType.getLayerStyleName());
+	    getElementType().setLayerStyleWorkspace(onlineType.getLayerStyleWorkspace());
+	    getElementType().setSourceAuthType(onlineType.getSourceAuthType());
 	}
     }
 

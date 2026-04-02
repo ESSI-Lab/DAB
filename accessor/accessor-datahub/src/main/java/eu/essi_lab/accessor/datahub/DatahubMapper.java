@@ -34,14 +34,13 @@ import net.opengis.gml.v_3_2_0.CodeType;
 import net.opengis.iso19139.gco.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.srv.v_20060504.*;
-import org.apache.cxf.common.jaxb.JAXBUtils;
 import org.json.*;
 import org.slf4j.*;
 
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import javax.xml.datatype.*;
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.*;
 import java.util.*;
 import java.util.Date;
@@ -729,6 +728,10 @@ public class DatahubMapper extends FileIdentifierMapper {
         String bboxNativeEpsgGmlPolygon = json.optString("bbox_native_epsg_gml_polygon", null);
         if (bboxNativeEpsgGmlPolygon != null && !bboxNativeEpsgGmlPolygon.isEmpty()) {
             try {
+                bboxNativeEpsgGmlPolygon = bboxNativeEpsgGmlPolygon.replace("POLYGON","");
+                bboxNativeEpsgGmlPolygon = bboxNativeEpsgGmlPolygon.replace("(","");
+                bboxNativeEpsgGmlPolygon = bboxNativeEpsgGmlPolygon.replace(")","");
+                bboxNativeEpsgGmlPolygon = bboxNativeEpsgGmlPolygon.replace(",","");
                 // Parse space-separated coordinates string (format: x1 y1 x2 y2 x3 y3 ...)
                 String[] coordStrings = bboxNativeEpsgGmlPolygon.trim().split("\\s+");
                 List<Double> coordinates = new ArrayList<>();
@@ -762,10 +765,18 @@ public class DatahubMapper extends FileIdentifierMapper {
             String crs = verticalExtent.optString("crs", null);
 
             if (!minValue.isNaN() && !maxValue.isNaN()) {
+                VerticalExtent isoVerticalExtent = new VerticalExtent();
+                isoVerticalExtent.setMinimumValue(minValue);
+                isoVerticalExtent.setMaximumValue(maxValue);
+                if (crs != null && !crs.isEmpty()) {
+                    VerticalCRS verticalCRS = new VerticalCRS();
+                    verticalCRS.setId(crs);
+                    isoVerticalExtent.setVerticalCRS(verticalCRS);
+                }
                 if (identification instanceof DataIdentification) {
-                    ((DataIdentification) identification).addVerticalExtent(minValue, maxValue, crs);
+                    ((DataIdentification) identification).addVerticalExtent(isoVerticalExtent);
                 } else if (identification instanceof ServiceIdentification) {
-                    ((ServiceIdentification) identification).addVerticalExtent(minValue, maxValue);
+                    ((ServiceIdentification) identification).addVerticalExtent(isoVerticalExtent);
                 }
             }
         }
@@ -1079,11 +1090,13 @@ public class DatahubMapper extends FileIdentifierMapper {
 
                     String layerPk = onlineResourceObj.optString("layer_pk", null);
 
+                    String sourceAuthType = onlineResourceObj.optString("source_auth_type", null);
+
                     boolean temporalWms = onlineResourceObj.optBoolean("temporal_wms", false);
 
                     JSONObject layerStyle = onlineResourceObj.optJSONObject("layer_style");
 
-                    if (queryStringFragment != null || layerPk != null || temporalWms || layerStyle != null) {
+                    if (queryStringFragment != null || layerPk != null || sourceAuthType != null || temporalWms || layerStyle != null) {
 
                         EXT_Online extOnline = new EXT_Online(online);
 
@@ -1095,6 +1108,11 @@ public class DatahubMapper extends FileIdentifierMapper {
                         if (layerPk != null) {
 
                             extOnline.getElementType().setLayerPk(layerPk);
+                        }
+
+                        if (sourceAuthType != null) {
+
+                            extOnline.getElementType().setSourceAuthType(sourceAuthType);
                         }
 
                         if (layerStyle != null) {
@@ -1996,7 +2014,7 @@ public class DatahubMapper extends FileIdentifierMapper {
             coreMetadata.getMIMetadata().getDataIdentification().setEquivalentScale(equivalentScale.intValue());
         }
 
-        // Spatial representation info (grid)
+        // Spatial representation info
         JSONObject spatialRepInfo = json.optJSONObject("spatial_representation_info");
         if (spatialRepInfo != null) {
             JSONObject gridRep = spatialRepInfo.optJSONObject("grid_spatial_representation");
@@ -2063,6 +2081,75 @@ public class DatahubMapper extends FileIdentifierMapper {
                 }
                 coreMetadata.getMIMetadata().addGridSpatialRepresentation(grid);
             }
+
+            JSONObject vectorRep = spatialRepInfo.optJSONObject("vector_spatial_representation");
+            if (vectorRep != null) {
+                MDVectorSpatialRepresentationType vector = new MDVectorSpatialRepresentationType();
+
+                JSONObject topologyLevelObj = vectorRep.optJSONObject("topology_level");
+                if (topologyLevelObj != null) {
+                    String topologyValue = topologyLevelObj.optString("value", null);
+                    String topologyUri = topologyLevelObj.optString("uri", null);
+                    if (topologyValue != null) {
+                        MDTopologyLevelCodePropertyType topology = new MDTopologyLevelCodePropertyType();
+                        topology.setMDTopologyLevelCode(ISOMetadata.createCodeListValueType(
+                                topologyUri != null && !topologyUri.isEmpty() ? topologyUri : "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_TopologyLevelCode",
+                                topologyValue,
+                                ISOMetadata.ISO_19115_CODESPACE,
+                                topologyValue));
+                        vector.setTopologyLevel(topology);
+                    }
+                }
+
+                JSONArray geometricObjects = vectorRep.optJSONArray("geometric_objects");
+                if (geometricObjects != null) {
+                    for (int i = 0; i < geometricObjects.length(); i++) {
+                        JSONObject geometricObject = geometricObjects.optJSONObject(i);
+                        if (geometricObject == null) continue;
+
+                        MDGeometricObjectsType geometricType = new MDGeometricObjectsType();
+                        JSONObject geometricObjectTypeObj = geometricObject.optJSONObject("geometric_object_type");
+                        if (geometricObjectTypeObj != null) {
+                            String geometricValue = geometricObjectTypeObj.optString("value", null);
+                            String geometricUri = geometricObjectTypeObj.optString("uri", null);
+                            if (geometricValue != null) {
+                                MDGeometricObjectTypeCodePropertyType geometricCode = new MDGeometricObjectTypeCodePropertyType();
+                                geometricCode.setMDGeometricObjectTypeCode(ISOMetadata.createCodeListValueType(
+                                        geometricUri != null && !geometricUri.isEmpty() ? geometricUri : "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode",
+                                        geometricValue,
+                                        ISOMetadata.ISO_19115_CODESPACE,
+                                        geometricValue));
+                                geometricType.setGeometricObjectType(geometricCode);
+                            }
+                        }
+
+                        Object countObj = geometricObject.opt("geometric_object_count");
+                        Integer count = null;
+                        if (countObj instanceof Number) {
+                            count = ((Number) countObj).intValue();
+                        } else if (countObj instanceof String) {
+                            try {
+                                count = Integer.parseInt((String) countObj);
+                            } catch (NumberFormatException e) {
+                                // ignore
+                            }
+                        }
+                        if (count != null) {
+                            IntegerPropertyType countProperty = new IntegerPropertyType();
+                            countProperty.setInteger(BigInteger.valueOf(count));
+                            geometricType.setGeometricObjectCount(countProperty);
+                        }
+
+                        MDGeometricObjectsPropertyType geometricProperty = new MDGeometricObjectsPropertyType();
+                        geometricProperty.setMDGeometricObjects(geometricType);
+                        vector.getGeometricObjects().add(geometricProperty);
+                    }
+                }
+
+                MDSpatialRepresentationPropertyType property = new MDSpatialRepresentationPropertyType();
+                property.setAbstractMDSpatialRepresentation(ObjectFactories.GMD().createAbstractMDSpatialRepresentation(vector));
+                coreMetadata.getMIMetadata().getElementType().getSpatialRepresentationInfo().add(property);
+            }
         }
 
         // Raster nodata value
@@ -2088,6 +2175,7 @@ public class DatahubMapper extends FileIdentifierMapper {
         // Use the id field from the original metadata as the original identifier
         return resource.getPublicId();
     }
+
 
 
 }

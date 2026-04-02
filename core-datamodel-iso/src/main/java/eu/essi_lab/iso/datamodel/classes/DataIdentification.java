@@ -522,7 +522,7 @@ public class DataIdentification extends Identification {
 	extent.setMaximumValue(max);
 	if (crs != null && !crs.isEmpty()) {
 	    VerticalCRS verticalCRS = new VerticalCRS();
-	    // Set CRS identifier if needed
+	    verticalCRS.setId(crs);
 	    extent.setVerticalCRS(verticalCRS);
 	}
 	addVerticalExtent(extent);
