@@ -192,8 +192,6 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 	try {
 
 	    ManagedService service = getSelectedImplClass().getDeclaredConstructor().newInstance();
-	    service.setId(getServiceId());
-
 	    service.configure(this);
 
 	    return service;

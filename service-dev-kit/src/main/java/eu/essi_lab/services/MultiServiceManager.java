@@ -241,7 +241,7 @@ public class MultiServiceManager {
 
 	//
 	// shutdown and removes from the active map the service runner
-	// that  are no longer in definitions list or that are disabled
+	// that are no longer in settings list or that are disabled
 	//
 	List<String> list = this.settings.stream().
 		map(ManagedServiceSetting::getServiceId).
