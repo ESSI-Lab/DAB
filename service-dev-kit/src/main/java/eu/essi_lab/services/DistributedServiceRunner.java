@@ -72,8 +72,6 @@ public class DistributedServiceRunner {
 
 	if (running) {
 
-//	    GSLoggerFactory.getLogger(getClass()).info("Service {} running", service.getId());
-
 	    return;
 	}
 
@@ -86,6 +84,8 @@ public class DistributedServiceRunner {
 	    GSLoggerFactory.getLogger(getClass()).info("Lock acquired for service {}", service.getId());
 
 	    running = true;
+
+	    MessageChannels.getWritable().removeAll(service.getId());
 
 	    new Thread(service::start).start();
 
@@ -106,11 +106,9 @@ public class DistributedServiceRunner {
 	    return;
 	}
 
-	boolean ok = lock.renew();
+	if (!lock.renew()) {
 
-	if (!ok) {
-
-	    GSLoggerFactory.getLogger(getClass()).info("Lock lost for service {}", service.getId());
+	    GSLoggerFactory.getLogger(getClass()).info("Lock lost of service {}", service.getId());
 
 	    // lock lost → stop immediately
 	    stopService();
@@ -120,7 +118,7 @@ public class DistributedServiceRunner {
     /**
      *
      */
-    public void stopService() {
+    private void stopService() {
 
 	try {
 
@@ -137,11 +135,9 @@ public class DistributedServiceRunner {
     /**
      *
      */
-    public void shutdown() {
+    void shutdown() {
 
 	stopService();
-
-	MessageChannels.getWritable().removeAll(service.getId());
 
 	lock.release();
 	scheduler.shutdownNow();
