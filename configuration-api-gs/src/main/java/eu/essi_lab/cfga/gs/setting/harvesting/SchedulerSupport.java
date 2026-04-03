@@ -116,7 +116,7 @@ public class SchedulerSupport {
 
 	synchronized (SchedulerSupport.this) {
 
-	    GSLoggerFactory.getLogger(HarvestingSetting.class).debug("Updating scheduler support STARTED");
+	    GSLoggerFactory.getLogger(SchedulerSupport.class).debug("Updating scheduler support STARTED");
 
 	    userDateTimeZone = ConfigurationWrapper.getSchedulerSetting().getUserDateTimeZone();
 
@@ -142,7 +142,7 @@ public class SchedulerSupport {
 
 		executingSettings = new ArrayList<>();
 
-		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List executing settings failed: {}", e.getMessage(), e);
+		GSLoggerFactory.getLogger(SchedulerSupport.class).error("List executing settings failed: {}", e.getMessage(), e);
 	    }
 
 	    try {
@@ -172,7 +172,7 @@ public class SchedulerSupport {
 
 		nextFireTimeMap = new HashMap<>();
 
-		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List scheduled settings failed: {}", e.getMessage(), e);
+		GSLoggerFactory.getLogger(SchedulerSupport.class).error("List scheduled settings failed: {}", e.getMessage(), e);
 	    }
 
 	    //
@@ -184,14 +184,14 @@ public class SchedulerSupport {
 
 	    } catch (SQLException e) {
 
-		GSLoggerFactory.getLogger(HarvestingSetting.class).error("List job status failed: {}", e.getMessage(), e);
+		GSLoggerFactory.getLogger(SchedulerSupport.class).error("List job status failed: {}", e.getMessage(), e);
 	    }
 
 	    //
 	    //
 	    //
 
-	    GSLoggerFactory.getLogger(HarvestingSetting.class).debug("Updating scheduler support ENDED");
+	    GSLoggerFactory.getLogger(SchedulerSupport.class).debug("Updating scheduler support ENDED");
 	}
     }
 

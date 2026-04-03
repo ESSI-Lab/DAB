@@ -60,6 +60,12 @@ public enum ExecutionMode implements LabeledEnum {
      * Reserved for very intensive requests usage
      */
     INTENSIVE("Intensive"),
+
+    /**
+     *
+     */
+    SERVICE("Service"),
+
     /**
      *
      */

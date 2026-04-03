@@ -152,6 +152,15 @@ public abstract class IndexMapping {
      * @param field
      * @return
      */
+    public static String toHashField(String field) {
+
+	return field + "_hash";
+    }
+
+    /**
+     * @param field
+     * @return
+     */
     public static String toTextField(String field) {
 
 	return field.replace("_keyword", "");

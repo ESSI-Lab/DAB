@@ -186,7 +186,7 @@ public abstract class AbstractSetting extends ConfigurationObject {
     }
 
     /**
-     * Default: true - This property tells the client to compact all the options inside a component such as an accordion or a details pane
+     * Default: false - This property tells the client to compact all the options inside a component such as an accordion or a details pane
      */
     public void enableCompactMode(boolean set) {
 

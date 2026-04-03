@@ -80,6 +80,7 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
     @Override
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
 
+
 	Optional<String> optionalView = webRequest.extractViewId();
 	String viewId = optionalView.isPresent() ? optionalView.get() : null;
 

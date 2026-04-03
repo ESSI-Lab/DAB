@@ -10,28 +10,34 @@ package eu.essi_lab.pdk;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.iso.datamodel.classes.Distribution;
-import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.net.protocols.*;
 import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.ResourceConsumer;
-import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.resource.*;
 
 /**
  * @author Fabrizio
  */
 public class OnlineResourceConsumer implements ResourceConsumer {
+
+    /**
+     *
+     */
+    private static final String DEFAULT_REST_API_PROTOCOL = "REST API";
 
     @Override
     public void consume(GSResource gsResource, DiscoveryMessage message) {
@@ -55,6 +61,7 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 
 		//
 		// first try: guessing from protocol encoded by us from WCS, WMS, WFS, WMTS mappers
+		// or from REST API protocol
 		//
 
 		String linkage = fromProtocol(message, publicId, protocol);
@@ -133,6 +140,19 @@ public class OnlineResourceConsumer implements ResourceConsumer {
      */
     private String fromProtocol(DiscoveryMessage message, String publicId, String protocol) {
 
+	if (protocol == null) {
+
+	    return null;
+	}
+
+	String restApiProtocol = ConfigurationWrapper.getSystemSettings().readKeyValue(KeyValueOptionKeys.REST_API_PROTOCOL.getLabel())
+		.orElse(DEFAULT_REST_API_PROTOCOL);
+
+	if (restApiProtocol.equals(protocol)) {
+
+	    return fromProtocol(message.getDataProxyServer().get(), "service", publicId, "/rest");
+	}
+
 	NetProtocolWrapper wrapper = NetProtocolWrapper.of(protocol).orElse(null);
 
 	return switch (wrapper) {
@@ -142,7 +162,7 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 	    //
 
 	    case ESRIMapServer_10_0_0, //
-		 ESRIMapServer -> //
+	         ESRIMapServer -> //
 		    fromProtocol(message.getDataProxyServer().get(), publicId, "/esri/MapServer/");
 
 	    //
@@ -150,42 +170,54 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 	    //
 
 	    case WCS,//
-		 WCS_1_0, //
-		 WCS_EDO, //
-		 WCS_1_0_0, //
-		 WCS_1_0_0_TDS,//
-		 WCS_1_1, WCS_1_1_1,//
-		 WCS_1_1_2,//
-		 WCS_2_0,//
-		 WCS_2_0_1,//
+	         WCS_1_0, //
+	         WCS_EDO, //
+	         WCS_1_0_0, //
+	         WCS_1_0_0_TDS,//
+	         WCS_1_1, WCS_1_1_1,//
+	         WCS_1_1_2,//
+	         WCS_2_0,//
+	         WCS_2_0_1,//
 
-		 //
-		 // WFS
-		 //
+	         //
+	         // WFS
+	         //
 
-		 WFS,//
-		 WFS_1_0_0,//
-		 WFS_1_1_0,//
-		 WFS_2_0_0,//
+	         WFS,//
+	         WFS_1_0_0,//
+	         WFS_1_1_0,//
+	         WFS_2_0_0,//
 
-		 //
-		 // WMS
-		 //
+	         //
+	         // WMS
+	         //
 
-		 WMS,//
-		 WMS_1_1_1,//
-		 WMS_1_3_0, //
-		 WMS_Q_1_3_0,//
+	         WMS,//
+	         WMS_1_1_1,//
+	         WMS_1_3_0, //
+	         WMS_Q_1_3_0,//
 
-		 //
-		 // WMTS
-		 //
+	         //
+	         // WMTS
+	         //
 
-		 WMTS,//
-		 WMTS_1_0_0 -> fromProtocol(message.getDataProxyServer().get(), publicId, "/ogc");
+	         WMTS,//
+	         WMTS_1_0_0 -> fromProtocol(message.getDataProxyServer().get(), publicId, "/ogc");
 
 	    case null, default -> null;
 	};
+    }
+
+    /**
+     * @param proxyEndpoint
+     * @param afterRequest
+     * @param datasetId
+     * @param lastPath
+     * @return
+     */
+    private String fromProtocol(String proxyEndpoint, String afterRequest, String datasetId, String lastPath) {
+
+	return proxyEndpoint + "gil/request/" + afterRequest + "/" + datasetId + lastPath;
     }
 
     /**
@@ -196,6 +228,6 @@ public class OnlineResourceConsumer implements ResourceConsumer {
      */
     private String fromProtocol(String proxyEndpoint, String datasetId, String lastPath) {
 
-	return proxyEndpoint + "gil/request/dataset/" + datasetId + lastPath;
+	return fromProtocol(proxyEndpoint, "dataset", datasetId, lastPath);
     }
 }

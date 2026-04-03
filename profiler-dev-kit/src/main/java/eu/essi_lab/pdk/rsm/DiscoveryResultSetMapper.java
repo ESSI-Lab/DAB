@@ -22,7 +22,7 @@ package eu.essi_lab.pdk.rsm;
  */
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
@@ -32,11 +32,9 @@ import eu.essi_lab.model.resource.GSResource;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.stream.Collectors;
 
 /**
  * Implementation specific to map a <code>ResultSet&ltGSResource&gt</code> in to a <code>ResultSet&ltT&gt</code>
@@ -131,14 +129,14 @@ public abstract class DiscoveryResultSetMapper<T>
 	List<String> ids = ConfigurationWrapper.getGDCSourceSetting().getSelectedSourcesIds();
 
 	// ---
- 	//
+	//
 	// if getResultSetMapperThreadsCount() is present, then a fixed thread pool
 	// of platform threads is used
 	//
 	// if getResultSetMapperThreadsCount() is empty, then a thread per task executor
 	// of virtual threads is used
 	//
- 	// ---
+	// ---
 
 	ThreadFactory virtualFactory = Thread.ofVirtual().//
 		name(getClass().getSimpleName() + "@" + message.getRequestId(true)).//
@@ -152,23 +150,9 @@ public abstract class DiscoveryResultSetMapper<T>
 		.map(count -> Executors.newFixedThreadPool(count, platformFactory))
 		.orElse(Executors.newThreadPerTaskExecutor(virtualFactory));
 
-	try {
-	    List<CompletableFuture<T>> futures = resultSet.getResultsList().//
-		stream().//
-		map(res -> CompletableFuture.supplyAsync(() -> map(message, res, ids), executor)).//
-		toList();
+	List<T> out = StreamUtils.asynchMap(resultSet.getResultsList(), (res) -> map(message, res, ids), executor);//
 
-	    List<T> out = futures.//
-		stream().//
-		map(CompletableFuture::join).//
-		collect(Collectors.toList());//
-
-	    mappedResSet.setResultsList(out);
-
-	} finally {
-
-	    executor.shutdown();
-	}
+	mappedResSet.setResultsList(out);
 
 	//
 	//

@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,7 +26,6 @@ import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.details.*;
 import com.vaadin.flow.component.details.Details.*;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import com.vaadin.flow.component.textfield.*;
@@ -225,7 +224,8 @@ public class SettingComponentFactory {
 		forceReadonly,//
 		forceHideHeader, //
 		null,// comparator
-		tabContent, tabView);
+		tabContent, //
+		tabView);
     }
 
     /**
@@ -381,16 +381,9 @@ public class SettingComponentFactory {
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.getStyle().set("margin-left", "3px");
 
-	//
-	//
-	//
 	button.addEnabledStyle("color", "white");
 	button.addEnabledStyle("background-color", "var(--_lumo-button-primary-background)");
 	button.addEnabledStyle("border", "none");
-
-	//
-	//
-	//
 
 	button.addClickListener(e -> new SettingPutDialog(configuration, tabContent, addDirective).open());
 

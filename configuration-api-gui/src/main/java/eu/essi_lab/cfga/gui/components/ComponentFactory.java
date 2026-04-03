@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -27,7 +27,6 @@ import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.details.*;
 import com.vaadin.flow.component.details.Details.*;
 import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.component.orderedlayout.*;
 import eu.essi_lab.cfga.gui.components.listener.*;
 import eu.essi_lab.cfga.gui.components.tabs.*;
@@ -236,7 +235,6 @@ public class ComponentFactory {
     }
 
     /**
-     *
      * @param value
      * @param enabled
      * @param listener
@@ -248,7 +246,6 @@ public class ComponentFactory {
     }
 
     /**
-     *
      * @param size
      * @param value
      * @param enabled
@@ -259,7 +256,7 @@ public class ComponentFactory {
 
 	Switch switch_ = new Switch(size);
 
-	if(listener != null) {
+	if (listener != null) {
 	    switch_.addValueChangeListener(listener);
 	}
 
@@ -283,9 +280,9 @@ public class ComponentFactory {
 	reloadButton.setWidth(110, Unit.PIXELS);
 	reloadButton.getStyle().set("color", "var(--_lumo-button-primary-background)");
 	reloadButton.getStyle().set("background-color", "hsl(214deg 2.39% 36.14% / 14%)");
-//	reloadButton.getStyle().set("margin-left", "15px");
-//	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
-//	reloadButton.getStyle().set("border-radius", "0px");
+	//	reloadButton.getStyle().set("margin-left", "15px");
+	//	reloadButton.getStyle().set("border", "1px solid hsl(0deg 0% 81%)");
+	//	reloadButton.getStyle().set("border-radius", "0px");
 
 	return reloadButton;
     }
@@ -297,21 +294,15 @@ public class ComponentFactory {
      */
     public static Button createCustomAddDirectiveButton(CustomAddDirective addDirective) {
 
-	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName(), VaadinIcon.PLUS_SQUARE_O.create());
-	button.setWidth(100, Unit.PIXELS);
+	ConfigurationViewButton button = new ConfigurationViewButton(addDirective.getName());
+	button.setTooltip(addDirective.getDescription().orElse("Add setting"));
+	button.setWidth(110, Unit.PIXELS);
 	button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 	button.getStyle().set("margin-left", "3px");
 
-	//
-	//
-	//
 	button.addEnabledStyle("color", "white");
-	button.addEnabledStyle("background-color", "#008ab7");
+	button.addEnabledStyle("background-color", "var(--_lumo-button-primary-background)");
 	button.addEnabledStyle("border", "none");
-
-	//
-	//
-	//
 
 	button.addClickListener(addDirective.getListener());
 
@@ -390,7 +381,10 @@ public class ComponentFactory {
      */
     public static Div createDiv() {
 
-	return new Div();
+	Div div = new Div();
+	div.setWidthFull();
+
+	return div;
     }
 
     /**

@@ -45,7 +45,7 @@ public class ColumnDescriptor {
     static final String POSITIONAL_COLUMN_NAME = "#";
 
     /**
-     * 
+     *
      */
     public ColumnDescriptor() {
     }
@@ -442,6 +442,30 @@ public class ColumnDescriptor {
 	descriptor.setSortable(sortable);
 	descriptor.setFiltered(filtered);
 	descriptor.setColumnVisible(visible);
+	descriptor.setRenderer(renderer);
+
+	return descriptor;
+    }
+
+    /**
+     * @param columnName
+     * @param valueProvider
+     * @param renderer
+     * @return
+     */
+    public static ColumnDescriptor create(//
+	    String columnName, //
+	    int columnWidth,//
+	    ValueProvider<Setting, String> valueProvider,//
+	    ViewerColumnRenderer renderer) {
+
+	ColumnDescriptor descriptor = new ColumnDescriptor();
+	descriptor.setValueProvider(valueProvider);
+	descriptor.setColumnName(columnName);
+	descriptor.setColumnWidth(columnWidth);
+	descriptor.setSortable(false);
+	descriptor.setFiltered(false);
+	descriptor.setColumnVisible(true);
 	descriptor.setRenderer(renderer);
 
 	return descriptor;

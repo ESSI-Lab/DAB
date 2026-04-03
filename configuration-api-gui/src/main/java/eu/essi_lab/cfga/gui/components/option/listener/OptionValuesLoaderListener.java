@@ -36,7 +36,6 @@ import eu.essi_lab.cfga.option.*;
 import eu.essi_lab.lib.utils.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -155,10 +154,15 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
 	    GSLoggerFactory.getLogger(ComponentFactory.class).debug("Loaded values: {}", values);
 
+	    if (values.isEmpty()) {
+
+		return;
+	    }
+
 	    //
 	    // set the values to the option
 	    //
-	    List<String> stringValues = values.stream().map(Object::toString).collect(Collectors.toList());
+	    List<String> stringValues = values.stream().map(Object::toString).toList();
 
 	    option.setObjectValues(stringValues);
 
@@ -173,6 +177,12 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 		    singleSelect.setItems(stringValues);
 		    singleSelect.setLabel("");
 		    singleSelect.setInvalid(false);
+
+		    if (!stringValues.isEmpty() && option.isRequired()){
+
+			singleSelect.setValue(stringValues.getFirst());
+			option.select(v -> v.equals(stringValues.getFirst()));
+		    }
 
 		} else {
 
@@ -207,7 +217,7 @@ public class OptionValuesLoaderListener implements ButtonChangeListener {
 
 	    VerticalLayout layout = ComponentFactory.createNoSpacingNoMarginVerticalLayout();
 	    layout.getStyle().set("padding", "0px");
-	    layout.getStyle().set("padding-top","20px");
+	    layout.getStyle().set("padding-top", "20px");
 	    layout.getStyle().set("padding-right", "20px");
 
 	    setContent(layout);

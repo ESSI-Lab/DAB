@@ -136,7 +136,7 @@ public class GetVariablesTransformer extends DiscoveryRequestTransformer {
 
 	WOFRequest request = getWOFRequest(webRequest);
 	int start = 1;
-	int count = 1000000000;
+	int count = 1000;
 	String startValue = request.getParameterValue(Parameter.START);
 	if (startValue != null && !startValue.equals("")) {
 	    start = Integer.parseInt(startValue);

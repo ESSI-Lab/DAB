@@ -1,0 +1,370 @@
+{
+    "identifier": "v4_7_changedetection_comunereggiocalabria_asbestos_20251011_shape",
+    "resource_author_id": "0a4af5a1-9ddd-485d-8bf4-b384b223510b",
+    "public": true,
+    "character_set": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode",
+        "value": "utf8"
+    },
+    "hierarchy_level": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+        "value": "dataset"
+    },
+    "parent_identifier": "v4_7_changedetection_series",
+    "metadata_profile": {
+        "name": "Linee guida RNDT",
+        "version": "2.0"
+    },
+    "metadata_language": "it",
+    "metadata_updated_at": "2025-10-11",
+    "metadata_owner": {
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "address": {
+            "email": "sim@mase.gov.it"
+        },
+        "link": "https://sim.mase.gov.it",
+        "role": "pointOfContact"
+    },
+    "metadata_version": "1.0",
+    "title": "Change Detection - Classificazione Amianto - comune di Reggio Calabria (2025-10-11) - Vettoriale",
+    "abstract": "Il dataset contiene i risultati dell’analisi di change detection finalizzata all’individuazione e classificazione delle aree potenzialmente interessate da presenza di amianto nel territorio comunale di Reggio Calabria. L'analisi comprende due immagini satellitari Sentinel-2 in data 2024-10-10 e 2025-10-05, mentre l'elaborazione è stata effettuata in data 2025-10-11.",
+    "resource_creation_date": "2025-10-11T12:00:00Z",
+    "resource_publication_date": "2025-10-11T12:00:00Z",
+    "resource_revision_date": "2025-10-11T12:00:00Z",
+    "resource_expiration_date": "2025-12-11T12:00:00Z",
+    "resource_owner": {
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "address": {
+            "email": "sim@mase.gov.it"
+        },
+        "link": "https://sim.mase.gov.it",
+        "role": "owner"
+    },
+    "other_roles": [
+        {
+            "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+            "address": {
+                "email": "sim@mase.gov.it"
+            },
+            "link": "https://sim.mase.gov.it",
+            "role": "author"
+        },
+        {
+            "organization_name": "Istituto Superiore per la Protezione e la Ricerca Ambientale",
+            "address": {
+                "email": "protocollo.ispra@ispra.legalmail.it"
+            },
+            "link": "https://www.isprambiente.gov.it",
+            "role": "contributor"
+        }
+    ],
+    "presentation_form": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode",
+        "value": "mapDigital"
+    },
+    "point_of_contact": {
+        "organization_name": "Ministero dell'Ambiente e della Sicurezza Energetica",
+        "address": {
+            "email": "sim@mase.gov.it"
+        },
+        "link": "https://sim.mase.gov.it",
+        "role": "pointOfContact"
+    },
+    "graphic_overview": {
+        "url": "https://sim.gov.mase.it/path/to/metadata/preview.png",
+        "description": "Anteprima del dataset",
+        "file_type": "PNG"
+    },
+    "descriptive_keywords": [
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/7102"
+                },
+                {
+                    "label": "environmental change",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2782"
+                },
+                {
+                    "label": "environmental monitoring",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/2882"
+                },
+                {
+                    "label": "survey",
+                    "uri": "https://www.eionet.europa.eu/gemet/en/concept/8240"
+                }
+            ],
+            "thesaurus": {
+                "name": "GEMET - INSPIRE themes, version 1.0",
+                "url": "https://www.eionet.europa.eu/gemet/it/inspire-themes",
+                "publication_date": "2008-06-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "remote sensing",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_6498"
+                },
+                {
+                    "label": "satellite observation",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_9000182"
+                },
+                {
+                    "label": "earth observation satellites",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_9000039"
+                },
+                {
+                    "label": "temporal variations",
+                    "uri": "http://aims.fao.org/aos/agrovoc/c_8fc366d4"
+                }
+            ],
+            "thesaurus": {
+                "name": "AGROVOC Multilingual Thesaurus",
+                "url": "http://aims.fao.org/aos/agrovoc",
+                "revision_date": "2024-01-01"
+            }
+        },
+        {
+            "keywords": [
+                {
+                    "label": "change detection"
+                },
+                {
+                    "label": "CU.V4.07"
+                },
+                {
+                    "label": "open data"
+                },
+                {
+                    "label": "Sistema di Monitoraggio Integrato (SIM)"
+                }
+            ]
+        }
+    ],
+    "spatial_scope": {
+        "keywords": {
+            "label": "Local",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope/local"
+        },
+        "thesaurus": {
+            "name": "Spatial scope",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/SpatialScope",
+            "publication_date": "2019-05-22"
+        }
+    },
+    "inspire_priority_dataset": {
+        "keywords": {
+            "label": "Establishments involving dangerous substances (SEVESO III Directive)",
+            "uri": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset/EstablishmentsInvolvingDangerousSubstances-dir-2012-18"
+        },
+        "thesaurus": {
+            "name": "INSPIRE priority data set",
+            "url": "http://inspire.ec.europa.eu/metadata-codelist/PriorityDataset",
+            "publication_date": "2018-04-04"
+        }
+    },
+    "status": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode",
+        "value": "completed"
+    },
+    "update_frequency": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode",
+        "value": "notPlanned"
+    },
+    "date_of_next_update": null,
+    "temporal_extent": {
+        "start_date": "2024-10-10",
+        "end_date": "2025-10-11"
+    },
+    "bbox_4326": {
+        "west_bound_longitude": 15.758,
+        "east_bound_longitude": 15.892,
+        "south_bound_latitude": 38.055,
+        "north_bound_latitude": 38.167
+    },
+    "native_epsg": {
+        "url": "http://www.opengis.net/def/crs/EPSG/0/32632",
+        "label": "WGS 84 / UTM zone 32N"
+    },
+    "bbox_native_epsg_gml_polygon": "1093222.384452345315367 4233539.465107622556388 1104998.453366933856159 4234408.290833427571 1104069.77282649744302 4246856.559968182817 1092311.991264782846 4245986.91919365339 1093222.384452345315 4233539.465107622556",
+    "vertical_extent": {
+        "minimum_value": 0,
+        "maximum_value": 100,
+        "crs": "http://www.opengis.net/def/crs/EPSG/0/5773"
+    },
+    "resource_constraints": {
+        "use_limitation": "IODL 2.0",
+        "access_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "use_constraints": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode",
+            "value": "otherRestrictions"
+        },
+        "other_constraints": "http://publications.europa.eu/resource/authority/licence/IODL_2_0",
+        "security_classification": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ClassificationCode",
+            "value": "unclassified"
+        },
+        "security_note": null
+    },
+    "data_language": "en",
+    "dataset_type": {
+        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode",
+        "value": "vector"
+    },
+    "spatial_representation_info": {
+        "vector_spatial_representation": {
+            "topology_level": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_TopologyLevelCode",
+                "value": "geometryOnly"
+            },
+            "geometric_objects": [
+                {
+                    "geometric_object_type": {
+                        "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode",
+                        "value": "surface"
+                    },
+                    "geometric_object_count": 2654
+                }
+            ]
+        }
+    },
+    "equivalent_scale": 20000,
+    "topic_categories": [
+        "environment",
+        "location",
+        "imageryBaseMapsEarthCover"
+    ],
+    "resource_provider": {
+        "organization_name": "CU.V4.07 - Gestione illecita dei rifiuti",
+        "address": {
+            "email": "sim@mase.gov.it"
+        },
+        "link": "https://sim.mase.gov.it/cu_v4_7",
+        "role": "resourceProvider"
+    },
+    "formats": [
+        {
+            "name": {
+                "uri": "http://inspire.ec.europa.eu/media-types/application/x-shapefile",
+                "label": "ESRI Shapefile"
+            },
+            "version": "inapplicable"
+        },
+        {
+            "name": {
+                "uri": "http://inspire.ec.europa.eu/media-types/application/gml+xml",
+                "label": "GML"
+            },
+            "version": "3.2"
+        },
+        {
+            "name": {
+                "uri": "http://inspire.ec.europa.eu/media-types/application/geo+json",
+                "label": "GeoJSON"
+            },
+            "version": "unknown"
+        },
+        {
+            "name": {
+                "uri": "http://inspire.ec.europa.eu/media-types/application/geopackage+sqlite3",
+                "label": "GeoPackage"
+            },
+            "version": "unknown"
+        },
+        {
+            "name": {
+                "uri": "http://inspire.ec.europa.eu/media-types/application/vnd.google-earth.kml+xml",
+                "label": "KML"
+            },
+            "version": "unknown"
+        }
+    ],
+    "online_resources": [
+        {
+            "protocol": {
+                "uri": "http://www.opengis.net/def/serviceType/ogc/wms",
+                "label": "OGC:WFS"
+            },
+            "application_profile": {
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/download",
+                "label": "download"
+            },
+            "description": {
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint",
+                "label": "accessPoint"
+            },
+            "url": "https://ext-gis-services.platform.sim-dev.mase.gov.it/v4_7/ows",
+            "name": "v4_7:changedetection_comunereggiocalabria_asbestos_20251011_shape",
+            "function": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode",
+                "value": "download"
+            },
+            "layer_pk": "fid",
+            "source_auth_type": "INTERNAL_GEOSERVER"
+        },
+        {
+            "protocol": {
+                "uri": "http://www.opengis.net/def/serviceType/ogc/wms",
+                "label": "OGC:WMS"
+            },
+            "application_profile": {
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/SpatialDataServiceType/view",
+                "label": "view"
+            },
+            "description": {
+                "uri": "http://inspire.ec.europa.eu/metadata-codelist/OnLineDescriptionCode/accessPoint",
+                "label": "accessPoint"
+            },
+            "url": "https://ext-gis-services.platform.sim-dev.mase.gov.it/v4_7/ows",
+            "name": "v4_7:changedetection_comunereggiocalabria_asbestos_20251011_shape",
+            "function": {
+                "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_OnlineFunctionCode",
+                "value": "view"
+            },
+            "layer_style": {
+                "name": "changedetection_asbestos",
+                "workspace": "v4_7"
+            },
+            "source_auth_type": "INTERNAL_GEOSERVER"
+        }
+    ],
+    "conformity": [
+        {
+            "specification_title": "REGOLAMENTO (UE) N. 1089/2010 DELLA COMMISSIONE del 23 novembre 2010 recante attuazione della direttiva 2007/2/CE del Parlamento europeo e del Consiglio per quanto riguarda l'interoperabilità dei set di dati territoriali e dei servizi di dati territoriali",
+            "specification_publication_date": "2010-12-08",
+            "explanation": "Vedi specifiche",
+            "pass": true
+        }
+    ],
+    "positional_accuracy": {
+        "unit": "m",
+        "unit_system": "http://www.bipm.org/en/si",
+        "value": 5
+    },
+    "quality_scope": {
+        "scope_code": {
+            "uri": "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode",
+            "value": "dataset"
+        },
+        "scope_details": "Entire dataset"
+    },
+    "lineage_statement": "L’elaborazione si basa sul confronto di dati multispettrali/iper-spettrali acquisiti in date diverse e sull’applicazione di metodologie di telerilevamento e classificazione tematica. Il prodotto finale fornisce una mappa classificata che evidenzia le zone soggette a variazioni significative correlate a fenomeni di contaminazione o alterazione del suolo, supportando attività di monitoraggio ambientale, valutazioni di rischio e pianificazione degli interventi.",
+    "lineage_source": [
+        {
+            "description": "La procedura utilizzata in questo paper è stata adottata per la produzione di questo dataset.",
+            "source_citation": {
+                "title": "Change detection techniques for remote sensing applications: a survey",
+                "online_resource": [
+                    {
+                        "url": "https://doi.org/10.1007/s12145-019-00380-5"
+                    }
+                ]
+            }
+        }
+    ]
+}

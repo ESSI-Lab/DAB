@@ -21,18 +21,84 @@ package eu.essi_lab.lib.utils;
  * #L%
  */
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
  */
 public class StreamUtils {
+
+    /**
+     * Blocking method that asynchronously executes the mapping of the list <code>source</code> of type <code>I</code> and returns the
+     * resulting list of type <code>O</code>. The given <code>executor</code> is shutdown before exit
+     *
+     * @param source the source list of type <code>I</code>
+     * @param asynchMapper a function that asynchronously maps type <code>I</code> items from <code>source</code> to type
+     * <code>O</code> items
+     * @param executor executes asynchronously <code>asynchFunction</code> on each item of the list <code>source</code>
+     * @param <I> the input type
+     * @param <O> the output type
+     * @return
+     */
+    public static <I, O> List<O> asynchMap(List<I> source, Function<I, O> asynchMapper, ExecutorService executor) {
+
+	try {
+
+	    List<CompletableFuture<O>> futures = source.//
+		    stream().//
+		    map(res -> CompletableFuture.supplyAsync(() -> asynchMapper.apply(res), executor)).//
+		    toList();
+
+	    return futures.//
+		    stream().//
+		    map(CompletableFuture::join).//
+		    collect(Collectors.toList()); //
+
+	} finally {
+
+	    executor.shutdown();
+	}
+    }
+
+    /**
+     * Blocking method that asynchronously consumes with <code>asynchConsumer</code> the given
+     * list <code>source</code> of type <code>I</code>. The given <code>executor</code> is shutdown before exit
+     *
+     * @param source the source list of type <code>I</code>
+     * @param asynchConsumer a consumer that asynchronously consume the items of the list <code>source</code>
+     * @param executor executes asynchronously <code>asynchConsumer</code> on each item of the list <code>source</code>
+     * @param <I> the input type
+     * @return
+     */
+    public static <I> void asynchConsume(List<I> source, Consumer<I> asynchConsumer, ExecutorService executor) {
+
+	try {
+
+	    List<CompletableFuture<Object>> futures = source.//
+		    stream().//
+
+		    map(res -> CompletableFuture.supplyAsync(() -> {
+
+		asynchConsumer.accept(res);
+
+		return null;
+
+	    }, executor)).//
+		    toList();
+
+	    futures.//
+		    stream().//
+		    map(CompletableFuture::join).//
+		    toList();
+
+	} finally {
+
+	    executor.shutdown();
+	}
+    }
 
     /**
      * @param iterator
@@ -55,10 +121,9 @@ public class StreamUtils {
     }
 
     /**
-     * E.g.: given a stream of Person:<br><br>
-     * persons.stream().filter(distinctByKey(Person::getName)) <br>
+     * E.g.: given a stream of Person:<br><br> persons.stream().filter(distinctByKey(Person::getName)) <br>
      * persons.stream().filter(distinctByKey(p -> p.getName()))
-     * 
+     *
      * @param keyExtractor
      * @return
      */

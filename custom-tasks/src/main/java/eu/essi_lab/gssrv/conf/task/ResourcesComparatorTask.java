@@ -24,47 +24,38 @@ package eu.essi_lab.gssrv.conf.task;
  * #L%
  */
 
-import com.beust.jcommander.internal.Lists;
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.Database.IdentifierType;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.kafka.client.KafkaPublisher;
-import eu.essi_lab.lib.kafka.client.KafkaPublisher.SaslMechanism;
-import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
-import eu.essi_lab.lib.net.publisher.MessagePublisher;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.Page;
-import eu.essi_lab.messages.ResourceSelector;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.HarvestingStrategy;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.GSResourceComparator;
-import eu.essi_lab.model.resource.GSResourceComparator.ComparisonResponse;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.json.JSONObject;
-import org.quartz.JobExecutionContext;
+import com.google.common.collect.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.api.database.opensearch.*;
+import eu.essi_lab.api.database.opensearch.index.mappings.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.lib.kafka.client.*;
+import eu.essi_lab.lib.kafka.client.KafkaPublisher.*;
+import eu.essi_lab.lib.mqtt.hive.*;
+import eu.essi_lab.lib.net.publisher.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.GSResourceComparator.*;
+import org.apache.kafka.common.security.auth.*;
+import org.json.*;
+import org.opensearch.client.json.*;
+import org.opensearch.client.opensearch.*;
+import org.opensearch.client.opensearch._types.*;
+import org.opensearch.client.opensearch._types.aggregations.*;
+import org.opensearch.client.opensearch.core.*;
+import org.quartz.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.stream.*;
 
 /**
  * This task must be embedded
@@ -74,9 +65,25 @@ import java.util.stream.Collectors;
 public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
     /**
-     *
+     * default page size of the discovery requests to get new records after selective harvesting
      */
-    private static final int PAGE_SIZE = 1000;
+    private static final int DEFAULT_DISCOVERY_PAGE_SIZE = 1000;
+
+    /**
+     * default maximum number of fields to aggregate in the comparison aggregation method
+     */
+    private static final int DEFAULT_MAX_AGGREGATION_FIELDS = 3;
+
+    /**
+     * default page size of aggregation requests in the comparison aggregation method
+     */
+    private static final int DEFAULT_AGGREGATION_PAGE_SIZE = 1000;
+
+    /**
+     * default max. number of values for each multi-value field that are included in the comparison aggregation method
+     */
+    private static final int DEFAULT_MAX_VALUES_PER_FIELD = 10;
+
     private List<String> newRecords;
     private List<String> deletedRecords;
     private DatabaseFolder data1Folder;
@@ -85,31 +92,25 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     /**
      *
      */
-    private static final List<Queryable> DEFAULT_COMPARISON_PROPERTIES = Lists.newArrayList();
+    private static final List<String> DEFAULT_COMPARISON_PROPERTIES = new ArrayList<>();
 
     static {
-	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TITLE);
-	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ABSTRACT);
-	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_BEGIN);
-	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_END);
-	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.BOUNDING_BOX);
-	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.KEYWORD);
-	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ONLINE_LINKAGE);
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TITLE.getName());
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ABSTRACT.getName());
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_BEGIN.getName());
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.TEMP_EXTENT_END.getName());
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.BOUNDING_BOX.getName());
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.KEYWORD.getName());
+	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ONLINE_LINKAGE.getName());
     }
-
-    /**
-     *
-     */
-    private List<Queryable> comparisonProperties = DEFAULT_COMPARISON_PROPERTIES;
-    private Exception e;
 
     /**
      *
      */
     public ResourcesComparatorTask() {
 
-	newRecords = Lists.newArrayList();
-	deletedRecords = Lists.newArrayList();
+	newRecords = new ArrayList<>();
+	deletedRecords = new ArrayList<>();
     }
 
     @Override
@@ -117,38 +118,49 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	log(status, "Resources comparator task STARTED");
 
+	int discoveryPageSize = DEFAULT_DISCOVERY_PAGE_SIZE;
+
+	List<String> comparisonFields = DEFAULT_COMPARISON_PROPERTIES;
+
+	int maxAggFields = DEFAULT_MAX_AGGREGATION_FIELDS;
+
+	int aggregationPageSize = DEFAULT_AGGREGATION_PAGE_SIZE;
+
+	int maxValuesPerField = DEFAULT_MAX_VALUES_PER_FIELD;
+
 	Optional<String> taskOptions = readTaskOptions(context);
 
-	//
-	// reading target comparison properties to override default ones
-	//
+	if (taskOptions.isPresent()) {
 
-	//
-	// Supported values:
-	//
-	// Keyword
-	// Topic category
-	// Online link
-	// Spatial extent
-	// Title
-	// Abstract
-	// Distribution format
-	// Temporal extent begin
-	// Temporal extent end
-	// Online protocol
-	//
-	taskOptions.ifPresent(s -> //
-		comparisonProperties = Arrays.stream(s.trim().strip().split("\n")).//
-		map(v -> MetadataElement.optFromReadableName(v.trim().strip()).orElse(null)).//
+	    Properties properties = new Properties();
+	    properties.load(IOStreamUtils.asStream(taskOptions.get()));
+
+	    String comparisonProp = properties.getProperty("comparisonProp", null);
+
+	    if (comparisonProp != null) {
+
+		comparisonFields = Arrays.asList(comparisonProp.split(","));
+	    }
+
+	    discoveryPageSize = Integer.parseInt(properties.getProperty("discoveryPageSize", String.valueOf(DEFAULT_DISCOVERY_PAGE_SIZE)));
+
+	    maxAggFields = Integer.parseInt(properties.getProperty("maxAggFields", String.valueOf(DEFAULT_MAX_AGGREGATION_FIELDS)));
+
+	    aggregationPageSize = Integer.parseInt(
+		    properties.getProperty("aggregationPageSize", String.valueOf(DEFAULT_AGGREGATION_PAGE_SIZE)));
+
+	    maxValuesPerField = Integer.parseInt(properties.getProperty("maxValuesPerField", String.valueOf(DEFAULT_MAX_VALUES_PER_FIELD)));
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Selected comparison fields: {}", //
+		comparisonFields);
+
+	List<Queryable> queryables = comparisonFields.stream().//
+		map(v -> (Queryable) MetadataElement.optFromName(v.trim().strip()).orElse(null)).//
 		filter(Objects::nonNull).//
-		collect(Collectors.toList()));
+		toList();
 
-	GSLoggerFactory.getLogger(getClass()).info("Selected comparison properties: {}", //
-		comparisonProperties.stream().//
-			map(p -> p.getReadableName().orElse(p.getName())).//
-			collect(Collectors.toList()));
-
-	HashMap<String, List<String>> modifiedRecords = new HashMap<>();
+	Map<String, List<String>> modifiedRecords = new HashMap<>();
 
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
@@ -203,8 +215,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // successive harvesting, comparing data-1 and data-2 folders
 		    //
 
-		    List<String> currIds = Lists.newArrayList();
-		    List<String> prevIds = Lists.newArrayList();
+		    List<String> currIds = new ArrayList<>();
+		    List<String> prevIds = new ArrayList<>();
 
 		    if (worker.isData1WritingFolder()) {
 
@@ -217,53 +229,50 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
 		    }
 
+		    //
+		    // deleted
+		    //
+
 		    deletedRecords = prevIds.//
-			    stream().//
+			    parallelStream().//
 			    filter(id -> !currIds.contains(id)).//
 			    collect(Collectors.toList());
+		    //
+		    // new
+		    //
 
-		    newRecords = currIds.stream().//
+		    newRecords = currIds.//
+			    parallelStream().//
 			    filter(id -> !prevIds.contains(id)).//
 			    collect(Collectors.toList());
 
-		    List<String> commonIds = currIds.stream().//
-			    filter(prevIds::contains).//
-			    toList();
+		    //
+		    // common
+		    //
 
-		    for (String id : commonIds) {
+		    comparisonFields = comparisonFields.stream().map(f -> {
 
-			try {
+			if (f.equals(MetadataElement.BOUNDING_BOX.getName())) {
 
-			    Optional<GSResource> opt1 = data1Folder.get(IdentifierType.PUBLIC, id);
-			    Optional<GSResource> opt2 = data2Folder.get(IdentifierType.PUBLIC, id);
-
-			    if (opt1.isEmpty()) {
-
-				throw new Exception("Resource " + id + " not found in data-1 folder");
-			    }
-
-			    if (opt2.isEmpty()) {
-
-				throw new Exception("Resource " + id + " not found in data-2 folder");
-			    }
-
-			    ComparisonResponse response = GSResourceComparator.compare(comparisonProperties, opt1.get(), opt2.get());
-
-			    if (!response.getProperties().isEmpty()) {
-
-				response.getProperties().forEach(prop -> {
-
-				    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
-
-				    list.add(id);
-				});
-			    }
-
-			} catch (Exception ex) {
-
-			    GSLoggerFactory.getLogger(getClass()).error(ex);
-			    throw ex;
+			    return DataFolderMapping.toHashField(MetadataElement.BOUNDING_BOX.getName());
 			}
+
+			return f;
+
+		    }).toList();
+
+		    List<List<String>> partition = Lists.partition(comparisonFields, maxAggFields);
+
+		    for (List<String> fields : partition) {
+
+			Map<String, List<String>> result = compare(//
+				((OpenSearchDatabase) finder.getDatabase()).getClient(), //
+				fields, //
+				gsSource.getUniqueIdentifier(),//
+				aggregationPageSize, //
+				maxValuesPerField);//
+
+			result.keySet().forEach(key -> modifiedRecords.put(key, result.get(key)));
 		    }
 		}
 
@@ -277,42 +286,53 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		//
 		// 1) searching for new records. if the returned records are in the ListRecordsRequest modified list,
-		// they will be removed
-		// from the new records list
+		// they will be removed from the new records list
 		//
 
-		String startTimeStamp = worker.getStartTimeStamp();
-		String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
+		Optional<SearchAfter> searchAfter = Optional.empty();
 
-		ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
-			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
+		do {
 
-		ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.LESS,
-			ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(untilDateStamp));
+		    String startTimeStamp = worker.getStartTimeStamp();
+		    String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
 
-		ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
+		    ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
+			    ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
 
-		LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
+		    ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.LESS,
+			    ResourceProperty.RESOURCE_TIME_STAMP, untilDateStamp);
 
-		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-		discoveryMessage.setExcludeResourceBinary(true);
-		discoveryMessage.setUseCachedSourcesDataFolderMap(false);
+		    ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
 
-		ResourceSelector resourceSelector = new ResourceSelector();
-		resourceSelector.addIndex(MetadataElement.IDENTIFIER);
+		    LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
 
-		discoveryMessage.setResourceSelector(resourceSelector);
-		discoveryMessage.setSources(List.of(gsSource));
-		discoveryMessage.setUserBond(andBond);
-		discoveryMessage.setNormalizedBond(andBond);
-		discoveryMessage.setPermittedBond(andBond);
-		discoveryMessage.setIncludeDeleted(false);
-		discoveryMessage.setPage(new Page(1, PAGE_SIZE));
+		    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 
-		ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
-		resultSet.//
-			getResultsList().//
-			forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER.getName()).get(0)));
+		    discoveryMessage.setExcludeResourceBinary(true);
+		    discoveryMessage.setUseCachedSourcesDataFolderMap(false);
+
+		    ResourceSelector resourceSelector = new ResourceSelector();
+		    resourceSelector.addIndex(MetadataElement.IDENTIFIER);
+
+		    discoveryMessage.setResourceSelector(resourceSelector);
+		    discoveryMessage.setSources(List.of(gsSource));
+		    discoveryMessage.setUserBond(andBond);
+		    discoveryMessage.setNormalizedBond(andBond);
+		    discoveryMessage.setPermittedBond(andBond);
+		    discoveryMessage.setIncludeDeleted(false);
+		    discoveryMessage.setPage(new Page(1, discoveryPageSize));
+
+		    searchAfter.ifPresent(discoveryMessage::setSearchAfter);
+
+		    ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
+
+		    resultSet.//
+			    getResultsList().//
+			    forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER.getName()).getFirst()));
+
+		    searchAfter = resultSet.getSearchAfter();
+
+		} while (searchAfter.isPresent());
 
 		//
 		// 2) deleted records
@@ -346,17 +366,17 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    GSResource incoming = writingFolder.get(IdentifierType.PUBLIC, modified.getPublicId()).get();
 
-		    ComparisonResponse response = GSResourceComparator.compare(comparisonProperties, incoming, modified);
+		    ComparisonResponse response = GSResourceComparator.compare(queryables, incoming, modified);
 
 		    // at least one change is expected!
 		    if (!response.getProperties().isEmpty()) {
 
-			response.getProperties().forEach(prop -> {
+			for (Queryable prop : response.getProperties()) {
 
 			    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
 
 			    list.add(modified.getPublicId());
-			});
+			}
 		    }
 		}
 	    }
@@ -557,7 +577,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(ResourcesComparatorTask.class).error(e);
+	    GSLoggerFactory.getLogger(ResourcesComparatorTask.class).error(ex);
 
 	    throw ex;
 	}
@@ -569,6 +589,162 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     public ExecutionStage getExecutionStage() {
 
 	return ExecutionStage.BEFORE_HARVESTING_END;
+    }
+
+    /**
+     * @param client
+     * @param targetFields
+     * @param sourceId
+     * @param aggregationPageSize
+     * @return
+     * @throws Exception
+     */
+    private Map<String, List<String>> compare( //
+	    OpenSearchClient client, //
+	    List<String> targetFields, //
+	    String sourceId, //
+	    int aggregationPageSize, //
+	    int maxValuesPerField)//
+	    throws Exception {
+
+	Map<String, String> afterKey = null;
+
+	Map<String, List<String>> out = new HashMap<>();
+
+	targetFields.forEach(field -> out.put(field, new ArrayList<>()));
+
+	while (true) {
+
+	    Map<String, String> finalAfterKey = afterKey;
+
+	    Map<String, Aggregation> subAggs = new HashMap<>();
+
+	    for (String field : targetFields) {
+
+		subAggs.put(field, //
+			Aggregation.of(a -> a //
+				.terms(t -> t.field(IndexMapping.toKeywordField("dataFolder")).size(2)) //
+				.aggregations("values",
+					v -> v.terms(tt -> tt //
+						.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()))
+							? field
+							: IndexMapping.toKeywordField(field)) //
+						.size(maxValuesPerField)))));
+	    }
+
+	    SearchRequest.Builder builder = new SearchRequest.Builder();
+
+	    SearchRequest request = builder.index(DataFolderMapping.get().getIndex()).size(0) //
+
+		    .query(q -> q.term(t -> t.field(IndexMapping.toKeywordField("sourceId")).value(FieldValue.of(sourceId)))) //
+
+		    .aggregations("by_fileId", a -> //
+
+			    a.composite(c -> {
+
+					c.size(aggregationPageSize);//
+
+					CompositeAggregationSource fileIdSource = new CompositeAggregationSource.Builder()//
+
+						.terms(t -> t.field(IndexMapping.toKeywordField("fileId"))).build();//
+
+					//noinspection unchecked
+					c.sources(Map.of("fileId", fileIdSource));//
+
+					if (finalAfterKey != null) {
+
+					    c.after(finalAfterKey);
+					}
+
+					return c;
+				    })
+
+				    .aggregations(subAggs)
+
+		    ).build();
+
+	    SearchResponse<Void> response = client.search(request, Void.class);
+
+	    if (!OpenSearchDatabase.debugQueries()) {
+
+		JSONObject reqObject = OpenSearchUtils.toJSONObject(request);
+		GSLoggerFactory.getLogger(getClass()).debug(reqObject.toString(3));
+
+		JSONObject resObject = OpenSearchUtils.toJSONObject(response);
+		GSLoggerFactory.getLogger(getClass()).debug(resObject.toString(3));
+	    }
+
+	    CompositeAggregate composite = response.aggregations().get("by_fileId").composite();
+
+	    for (CompositeBucket bucket : composite.buckets().array()) {
+
+		String fileId = bucket.key().get("fileId").toString();
+
+		Map<String, Aggregate> aggs = bucket.aggregations();
+
+		for (String field : targetFields) {
+
+		    Aggregate agg = aggs.get(field);
+
+		    if (agg == null || !agg.isSterms()) {
+
+			continue;
+		    }
+
+		    StringTermsAggregate byFolder = agg.sterms();
+
+		    Set<String> values1 = new HashSet<>();
+		    Set<String> values2 = new HashSet<>();
+
+		    for (StringTermsBucket folderBucket : byFolder.buckets().array()) {
+
+			String folder = folderBucket.key();
+
+			StringTermsAggregate values = folderBucket.aggregations().get("values").sterms();
+
+			Set<String> targetSet = "data-1".equals(folder) ? values1 : values2;
+
+			for (StringTermsBucket v : values.buckets().array()) {
+
+			    targetSet.add(v.key());
+			}
+		    }
+
+		    if (!values1.equals(values2)) {
+
+			out.get(field).add(fileId);
+		    }
+		}
+	    }
+
+	    if (composite.buckets().array().size() < aggregationPageSize) {
+
+		break;
+	    }
+
+	    Map<String, JsonData> rawAfterKey = composite.afterKey();
+
+	    if (rawAfterKey != null) {
+
+		afterKey = new HashMap<>();
+
+		String key = rawAfterKey.keySet().iterator().next();
+		String value =  rawAfterKey.get(key).to(String.class);
+
+		afterKey.put(key, value);
+
+	    } else {
+
+		afterKey = null;
+	    }
+
+	    if (afterKey == null) {
+
+		break;
+	    }
+	}
+
+	return out;
     }
 
 }

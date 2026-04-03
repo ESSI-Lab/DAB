@@ -37,9 +37,25 @@ import eu.essi_lab.model.resource.GSResource;
 public interface DatabaseFolder {
 
     /**
+     *
+     * @author Fabrizio
+     *
+     */
+    enum UpsertType {
+	/**
+	 *
+	 */
+	UPDATED,
+	/**
+	 *
+	 */
+	INSERTED
+    }
+
+    /**
      * @author Fabrizio
      */
-    public static class FolderEntry {
+    class FolderEntry {
 
 	private Document document;
 	private InputStream stream;
@@ -196,6 +212,15 @@ public interface DatabaseFolder {
      * Returns the name of this folder
      */
     String getName();
+
+    /**
+     *
+     * @param key
+     * @param entry
+     * @param type
+     * @throws Exception
+     */
+    UpsertType upsert(String key, FolderEntry entry, EntryType type) throws Exception;
 
     /**
      * Stores a DOM resource with the specified <code>key</code> in this folder.<br>

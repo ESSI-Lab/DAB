@@ -1,10 +1,38 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.api.database.opensearch.index;
 
-import java.io.File;
-import java.io.FileInputStream;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.DatabaseFolder.*;
+import eu.essi_lab.api.database.SourceStorageWorker.*;
+import eu.essi_lab.api.database.opensearch.*;
+import eu.essi_lab.api.database.opensearch.index.mappings.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.utils.zip.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.Queryable.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.index.jaxb.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.model.resource.composed.*;
+import jakarta.xml.bind.*;
+import org.joda.time.*;
+import org.json.*;
+import org.opensearch.client.opensearch._types.mapping.*;
+import org.opensearch.client.opensearch.core.*;
+import org.w3c.dom.*;
+import org.w3c.dom.Node;
+
+import javax.xml.transform.*;
+import javax.xml.xpath.*;
+import java.io.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.Date;
+import java.util.stream.*;
 
 /*-
  * #%L
@@ -27,65 +55,6 @@ import java.io.FileInputStream;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import jakarta.xml.bind.JAXBException;
-import javax.xml.transform.TransformerException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
-import org.opensearch.client.opensearch.core.IndexRequest;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.DatabaseFolder.EntryType;
-import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
-import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
-import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
-import eu.essi_lab.api.database.opensearch.index.mappings.AugmentersMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.CacheMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.ConfigurationMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.DataFolderMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.FolderRegistryMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.IndexMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.MetaFolderMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.UsersMapping;
-import eu.essi_lab.api.database.opensearch.index.mappings.ViewsMapping;
-import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
-import eu.essi_lab.lib.utils.ClonableInputStream;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.zip.Unzipper;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.model.Queryable;
-import eu.essi_lab.model.Queryable.ContentType;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.index.jaxb.BoundingBox;
-import eu.essi_lab.model.index.jaxb.IndexesMetadata;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.model.resource.composed.ComposedElement;
-
 /**
  * @author Fabrizio
  */
@@ -97,12 +66,12 @@ public class IndexData {
     public enum DataType {
 
 	/**
-	 * 
+	 *
 	 */
 	BINARY("binary"),
 
 	/**
-	 * 
+	 *
 	 */
 	DOC("doc");
 
@@ -225,6 +194,7 @@ public class IndexData {
 		: SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
 
 	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
+	indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.DATA_FOLDER), dataFolder);
 
 	handleResource(indexData, handler);
 
@@ -570,7 +540,8 @@ public class IndexData {
 	    //
 
 	    indexData.put(BINARY_PROPERTY, ShapeFileMapping.SHAPE_FILE);
-	    indexData.put(ShapeFileMapping.SHAPE_FILE, Base64.getEncoder().encodeToString(object.toString().getBytes(StandardCharsets.UTF_8)));
+	    indexData.put(ShapeFileMapping.SHAPE_FILE,
+		    Base64.getEncoder().encodeToString(object.toString().getBytes(StandardCharsets.UTF_8)));
 
 	    indexData.put(ShapeFileMapping.SHAPE, shape);
 
@@ -598,29 +569,19 @@ public class IndexData {
 	if (name.contains(SourceStorageWorker.META_POSTFIX)) {
 
 	    return MetaFolderMapping.get().getIndex();
-	}
-
-	else if (name.contains(SourceStorageWorker.DATA_1_POSTFIX) || name.contains(SourceStorageWorker.DATA_2_POSTFIX)) {
+	} else if (name.contains(SourceStorageWorker.DATA_1_POSTFIX) || name.contains(SourceStorageWorker.DATA_2_POSTFIX)) {
 
 	    return DataFolderMapping.get().getIndex();
-	}
-
-	else if (name.contains(Database.USERS_FOLDER)) {
+	} else if (name.contains(Database.USERS_FOLDER)) {
 
 	    return UsersMapping.get().getIndex();
-	}
-
-	else if (name.contains(Database.VIEWS_FOLDER)) {
+	} else if (name.contains(Database.VIEWS_FOLDER)) {
 
 	    return ViewsMapping.get().getIndex();
-	}
-
-	else if (name.contains(Database.AUGMENTERS_FOLDER)) {
+	} else if (name.contains(Database.AUGMENTERS_FOLDER)) {
 
 	    return AugmentersMapping.get().getIndex();
-	}
-
-	else if (name.contains(Database.CACHE_FOLDER)) {
+	} else if (name.contains(Database.CACHE_FOLDER)) {
 
 	    return CacheMapping.get().getIndex();
 
@@ -635,7 +596,7 @@ public class IndexData {
     }
 
     /**
-     * 
+     *
      */
     private IndexData() {
 
@@ -763,6 +724,15 @@ public class IndexData {
 	if (shape.isPresent()) {
 
 	    indexData.put(MetadataElement.BOUNDING_BOX.getName(), shape.get().getShape());
+
+	    try {
+		String shapeHash = StringUtils.hashSHA256messageDigest(shape.get().getShape());
+		indexData.put(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()), shapeHash);
+
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(IndexData.class).error(e);
+	    }
+
 	    indexData.put(BoundingBox.AREA_ELEMENT_NAME, shape.get().getArea());
 	    indexData.put(DataFolderMapping.CENTROID, shape.get().getCentroid());
 	}
@@ -791,20 +761,20 @@ public class IndexData {
 			filter(el -> el.getName().equals(elName)).//
 			forEach(composed -> {
 
-			    JSONObject item = new JSONObject();
-			    nested.put(item);
+		    JSONObject item = new JSONObject();
+		    nested.put(item);
 
-			    composed.getProperties().//
-				    forEach(prop -> {
+		    composed.getProperties().//
+			    forEach(prop -> {
 
-					item.put(prop.getName(), prop.getValue());
+			item.put(prop.getName(), prop.getValue());
 
-					if (prop.getType() == ContentType.TEXTUAL) {
+			if (prop.getType() == ContentType.TEXTUAL) {
 
-					    item.put(IndexMapping.toKeywordField(prop.getName()), prop.getValue());
-					}
-				    });
-			});
+			    item.put(IndexMapping.toKeywordField(prop.getName()), prop.getValue());
+			}
+		    });
+		});
 
 		indexData.put(elName, nested);
 	    });
@@ -1144,7 +1114,7 @@ public class IndexData {
 			stream().//
 
 			// mapping to ISO-8601 string
-			map(v -> ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.parseLong(v.toString())))).
+				map(v -> ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds(new Date(Long.parseLong(v.toString())))).
 
 			forEach(dateTimeStringArray::put);
 

@@ -148,19 +148,21 @@ public class DataQualityInfo {
 	DQQuantitativeResultType quantitativeResult = new DQQuantitativeResultType();
 	
 	// Set value unit (required)
-	// Note: UnitOfMeasureType structure is complex - this is a minimal implementation
-	// The unit and unitSystem parameters are stored but may need refinement for full ISO 19115 compliance
 	UnitOfMeasurePropertyType unitProperty = new UnitOfMeasurePropertyType();
-	// Create UnitOfMeasureType - simplified implementation
-	// Full implementation would require setting proper UnitOfMeasureType fields
+	if (unitSystem != null && !unitSystem.isEmpty()) {
+	    unitProperty.setHref(unitSystem);
+	}
+	if (unit != null && !unit.isEmpty()) {
+	    unitProperty.setTitle(unit);
+	}
 	quantitativeResult.setValueUnit(unitProperty);
 	
-	// Set value (required) - create a RecordPropertyType with the value
-	// Note: RecordType structure is complex - this is a minimal implementation
+	// Set value (required) - store as RecordTypeType simple value for round-trip
 	List<RecordPropertyType> values = new ArrayList<>();
 	RecordPropertyType valueProperty = new RecordPropertyType();
-	// Create RecordType - simplified implementation
-	// Full implementation would require creating a proper RecordType with fields containing the value
+	RecordTypeType recordType = new RecordTypeType();
+	recordType.setValue(String.valueOf(value));
+	valueProperty.setRecord(recordType);
 	values.add(valueProperty);
 	quantitativeResult.setValue(values);
 	

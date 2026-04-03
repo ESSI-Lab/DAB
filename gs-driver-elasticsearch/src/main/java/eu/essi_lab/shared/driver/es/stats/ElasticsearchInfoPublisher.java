@@ -69,6 +69,7 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	cache = new ExpiringCache<TreeMap<String, List<Object>>>();
 	cache.setDuration(6000000);
     }
+
     private static final ExecutorService THREAD_POOL = Executors.newCachedThreadPool(new ThreadFactory() {
 
 	@Override
@@ -95,6 +96,27 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 	    return Optional.of(new ElasticsearchInfoPublisher(//
 		    request.getRequestId(), //
 		    request.getRequestContext()));
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(ElasticsearchInfoPublisher.class).error(e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param runtimeId
+     * @param context
+     * @return
+     */
+    public static Optional<ElasticsearchInfoPublisher> create(String runtimeId, String context) {
+
+	try {
+
+	    return Optional.of(new ElasticsearchInfoPublisher(//
+		    runtimeId, //
+		    context));
 
 	} catch (Exception e) {
 
@@ -462,8 +484,8 @@ public class ElasticsearchInfoPublisher extends RuntimeInfoPublisher {
 		    continue;
 		}
 		Object refined = null;
-		if (values.size() == 1 && !stringValue.isEmpty()
-			&& org.apache.commons.lang3.StringUtils.isNumeric("" + stringValue.charAt(0))) {
+		if (values.size() == 1 && !stringValue.isEmpty() && org.apache.commons.lang3.StringUtils.isNumeric(
+			"" + stringValue.charAt(0))) {
 		    try {
 			refined = Double.parseDouble(stringValue);
 			if (!Double.isFinite((double) refined)) {

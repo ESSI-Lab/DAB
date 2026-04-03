@@ -1,19 +1,21 @@
 package eu.essi_lab.identifierdecorator;
 
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.api.database.*;
 import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.junit.*;
+import org.junit.rules.*;
+import org.mockito.*;
+import org.mockito.invocation.*;
+import org.mockito.stubbing.*;
 
-import java.util.Arrays;
-import java.util.UUID;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import java.util.*;
 
 /*-
  * #%L
@@ -35,17 +37,6 @@ import org.mockito.stubbing.Answer;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import eu.essi_lab.api.database.Database.IdentifierType;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
-import eu.essi_lab.messages.HarvestingProperties;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.ResultsPriority;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.GSResource;
 
 public class IdentifierDecoratorTest {
 
@@ -82,7 +73,7 @@ public class IdentifierDecoratorTest {
 	GSResource resource = new Dataset();
 	resource.setSource(source);
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
     }
 
@@ -102,7 +93,7 @@ public class IdentifierDecoratorTest {
 	resource.setSource(source);
 	Assert.assertNull(resource.getPublicId());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertNotNull(resource.getPublicId());
     }
@@ -144,7 +135,7 @@ public class IdentifierDecoratorTest {
 	String originalId = UUID.randomUUID().toString();
 	resource.setOriginalId(originalId);
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
     }
@@ -189,7 +180,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
     }
@@ -240,7 +231,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
     }
 
@@ -290,7 +281,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, true, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, true, false);
 
     }
 
@@ -340,7 +331,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, true);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, true);
 
     }
 
@@ -390,7 +381,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, true, true);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, true, true);
 
     }
 
@@ -437,7 +428,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, null, false, false, false);
+	decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, false, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", incomingResource.getPublicId());
 
@@ -498,7 +489,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, null, false, false, false);
+	decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, false, false, false);
 
     }
 
@@ -557,7 +548,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, null, false, true, false);
+	decorator.decorateHarvestedIdentifier(incomingResource, harvestingProperties, false, true, false);
 
 	Assert.assertEquals(originalId + "@identifier", incomingResource.getPublicId());
 
@@ -627,7 +618,7 @@ public class IdentifierDecoratorTest {
 	}).when(dbReader).getResource(Mockito.any(), Mockito.any());
 
 	Assert.assertNotEquals(existingDABId, resource.getPublicId());
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), false, false, false);
 
 	Assert.assertEquals(existingDABId, resource.getPublicId());
     }
@@ -696,7 +687,7 @@ public class IdentifierDecoratorTest {
 	}).when(dbReader).getResource(Mockito.any(), Mockito.any());
 
 	Assert.assertNotEquals(existingDABId, resource.getPublicId());
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, true, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), false, true, false);
 
 	Assert.assertEquals(existingDABId, resource.getPublicId());
     }
@@ -770,7 +761,7 @@ public class IdentifierDecoratorTest {
 	}).when(dbReader).getResource(Mockito.any(), Mockito.any());
 
 	Assert.assertNotEquals(existingDABId, resource.getPublicId());
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, false, true);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), false, false, true);
 	Mockito.verify(listRecordsRequest, Mockito.times(1)).addIncrementalModifiedResource(Mockito.any());
     }
 
@@ -840,7 +831,7 @@ public class IdentifierDecoratorTest {
 	}).when(dbReader).getResource(Mockito.any(), Mockito.any());
 
 	Assert.assertNotEquals(existingDABId, resource.getPublicId());
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, false, true, true);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), false, true, true);
 
     }
 
@@ -897,7 +888,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId, resource.getPublicId());
 
@@ -958,7 +949,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
     }
 
@@ -1119,7 +1110,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
 	Assert.assertEquals(parentid + "@identifier",
@@ -1182,7 +1173,7 @@ public class IdentifierDecoratorTest {
 	    }
 	}).when(dbReader).getResources(Mockito.any(), Mockito.any());
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId, resource.getPublicId());
 	Assert.assertEquals(parentid, resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
@@ -1214,7 +1205,7 @@ public class IdentifierDecoratorTest {
 
 	Assert.assertFalse(decorator.useOriginalId(resource, originalId));
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
 	Assert.assertEquals(parentid, resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
@@ -1246,7 +1237,7 @@ public class IdentifierDecoratorTest {
 
 	Assert.assertFalse(decorator.useOriginalId(resource, originalId));
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
 	Assert.assertEquals(parentid + "@identifier",
@@ -1279,7 +1270,7 @@ public class IdentifierDecoratorTest {
 
 	Assert.assertFalse(decorator.useOriginalId(resource, originalId));
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
 	Assert.assertEquals(parentid, resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
@@ -1311,7 +1302,7 @@ public class IdentifierDecoratorTest {
 
 	Assert.assertFalse(decorator.useOriginalId(resource, originalId));
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
 	Assert.assertEquals(parentid, resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
@@ -1343,7 +1334,7 @@ public class IdentifierDecoratorTest {
 
 	Assert.assertFalse(decorator.useOriginalId(resource, originalId));
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId + "@identifier", resource.getPublicId());
 	Assert.assertEquals(parentid + "@identifier",
@@ -1376,7 +1367,7 @@ public class IdentifierDecoratorTest {
 
 	Assert.assertTrue(decorator.useOriginalId(resource, originalId));
 
-	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), null, true, false, false);
+	decorator.decorateHarvestedIdentifier(resource, new HarvestingProperties(), true, false, false);
 
 	Assert.assertEquals(originalId, resource.getPublicId());
 	Assert.assertEquals(parentid, resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());

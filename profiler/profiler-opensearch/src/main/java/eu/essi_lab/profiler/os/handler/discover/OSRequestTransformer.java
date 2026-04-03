@@ -43,11 +43,11 @@ import eu.essi_lab.pdk.wrt.*;
 import eu.essi_lab.profiler.os.*;
 import eu.essi_lab.profiler.os.OSProfilerSetting.*;
 import eu.essi_lab.profiler.os.handler.discover.covering.*;
+import eu.essi_lab.profiler.os.handler.discover.datahub.*;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.*;
-import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonMapper;
 import eu.essi_lab.profiler.os.handler.srvinfo.*;
-
 import jakarta.ws.rs.core.*;
+
 import java.util.*;
 import java.util.stream.*;
 
@@ -94,7 +94,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	message = super.refineMessage(message);
 
-	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
+	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
 
 	// including weighted queries to improve ranking
 	message.setIncludeWeightedQueries(true);
@@ -108,7 +108,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	    message.setResultsPriority(ResultsPriority.DATASET);
 
-	    setView(CoveringModeDiscoveryHandler.COVERING_MODE_VIEW_ID, databaseURI, message);
+	    setView(CoveringModeDiscoveryHandler.COVERING_MODE_VIEW_ID, storageInfo, message);
 
 	    RankingStrategy strategy = new RankingStrategy();
 	    strategy.setAbstractWeight("0");
@@ -194,20 +194,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    message.setIncludeBboxUnion(bboxUnion != null && bboxUnion.equals("true"));
 
 	    //
-	    // set the view from the param if present
-	    //
-
-	    Optional<OSParameter> viewIdParam = WebRequestParameter.findParameter(OSParameters.VIEW_ID.getName(), OSParameters.class);
-
-	    String viewIdValue = viewIdParam.map(parser::parse).orElse(null);
-
-	    if (viewIdValue != null && !viewIdValue.isEmpty()) {
-
-		setView(viewIdValue, databaseURI, message);
-	    }
-
-	    //
-	    // Term frequency
+	    // term frequency
 	    //
 
 	    handleTermFrequency(parser, message);
@@ -315,31 +302,36 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 		}
 	    }
 
+	    //
+ 	    // supported parameters check
+ 	    //
+
 	    List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
 
-	    // it can throw an IllegalArgumentException
-	    boolean paramFound = false;
+	    List<String> unsupportedParams = keyValueParser.getParametersMap().keySet().//
+		    stream().//
+		    filter(key -> !parameters.stream().//
+		    map(OSParameter::getName).toList().contains(key)).//
+		    toList();
 
-	    for (OSParameter osParameter : parameters) {
-
-		String parse = parser.parse(osParameter);
-		paramFound |= parse != null && !parse.equals("");
-	    }
-
-	    if (!paramFound) {
+	    if (!unsupportedParams.isEmpty()) {
 
 		GSLoggerFactory.getLogger(getClass())
-			.error("Validation failed, invalid OpenSearch request: none of the supported search parameters is set");
+			.error("Validation failed: found one or more unsupported parameters: " + unsupportedParams);
 
 		message.setResult(ValidationResult.VALIDATION_FAILED);
-		message.setError("Invalid OpenSearch request: none of the supported search parameters is set");
+		message.setError("Found one or more unsupported parameters: " + unsupportedParams);
 
 		return message;
 	    }
 
+	    //
+ 	    // output format check
+ 	    //
+
 	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);
 
-	    if (outputFormat != null && !outputFormat.equals("")) {
+	    if (outputFormat != null && !outputFormat.isEmpty()) {
 
 		if (outputFormat.equals("application/atom xml")) {
 		    outputFormat = MediaType.APPLICATION_ATOM_XML;
@@ -634,8 +626,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * Unless explicitly set in the profiler setting with {@link KeyValueOptionKeys#MAX_RESULT_WINDOW_SIZE}
-     * key value option, the max window size is unlimited
+     * Unless explicitly set in the profiler setting with {@link KeyValueOptionKeys#MAX_RESULT_WINDOW_SIZE} key value option, the max window
+     * size is unlimited
      *
      * @return
      */

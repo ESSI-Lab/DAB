@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.services.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.Configuration;
@@ -348,6 +349,14 @@ public class ConfigurationWrapper {
 	return new ArrayList<>(configuration.list(//
 		AugmenterWorkerSetting.class, //
 		false));
+    }
+
+    /**
+     * @return
+     */
+    public static List<ManagedServiceSetting> getManagedServiceSettings() {
+
+	return new ArrayList<>(configuration.list(ManagedServiceSetting.class, true));
     }
 
     /**

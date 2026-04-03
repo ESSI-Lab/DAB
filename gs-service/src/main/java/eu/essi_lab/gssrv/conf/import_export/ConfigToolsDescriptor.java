@@ -35,7 +35,7 @@ import java.util.*;
 /**
  * @author Fabrizio
  */
-public class ConfigImportExportDescriptor extends TabContentDescriptor {
+public class ConfigToolsDescriptor extends TabContentDescriptor {
 
     /**
      *
@@ -45,7 +45,7 @@ public class ConfigImportExportDescriptor extends TabContentDescriptor {
     /**
      *
      */
-    public ConfigImportExportDescriptor() {
+    public ConfigToolsDescriptor() {
 
 	Div mainLayout = new Div();
 	mainLayout.getStyle().set("padding", "0px");
@@ -58,6 +58,8 @@ public class ConfigImportExportDescriptor extends TabContentDescriptor {
 	tabSheet.add("Import", new ConfigImporter());
 
 	tabSheet.add("Export", new ConfigExporter());
+
+	tabSheet.add("View", new ConfigViewer());
 
 	mainLayout.add(tabSheet);
 

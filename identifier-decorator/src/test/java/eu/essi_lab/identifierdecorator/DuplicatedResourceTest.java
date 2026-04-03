@@ -85,7 +85,6 @@ public class DuplicatedResourceTest {
 	    decorator.decorateHarvestedIdentifier(//
 		    incomingResource, //
 		    harvestingProperties, //
-		    null, //
 		    true, // first harvesting
 		    false, // is recovery
 		    false); // is incremental
@@ -115,8 +114,6 @@ public class DuplicatedResourceTest {
 	    decorator.decorateHarvestedIdentifier(//
 		    incomingResource, //
 		    harvestingProperties, //
-		    null, //
-
 		    true, // first harvesting
 		    true, // is recovery
 		    false); // is incremental
@@ -146,8 +143,6 @@ public class DuplicatedResourceTest {
 	    decorator.decorateHarvestedIdentifier(//
 		    incomingResource, //
 		    harvestingProperties, //
-		    null, //
-
 		    true, // first harvesting
 		    false, // is recovery
 		    true); // is incremental
@@ -179,8 +174,6 @@ public class DuplicatedResourceTest {
 	    decorator.decorateHarvestedIdentifier(//
 		    incomingResource, //
 		    harvestingProperties, //
-		    null, //
-
 		    false, // first harvesting
 		    false, // is recovery
 		    true); // is incremental
@@ -215,8 +208,6 @@ public class DuplicatedResourceTest {
 	    decorator.decorateHarvestedIdentifier(//
 		    incomingResource, //
 		    harvestingProperties, //
-		    null, //
-
 		    false, // first harvesting
 		    false, // is recovery
 		    false); // is incremental
@@ -267,8 +258,6 @@ public class DuplicatedResourceTest {
 	    decorator.decorateHarvestedIdentifier(//
 		    incomingResource, //
 		    harvestingProperties, //
-		    null, //
-
 		    false, // first harvesting
 		    false, // is recovery
 		    false); // is incremental
@@ -319,8 +308,6 @@ public class DuplicatedResourceTest {
 	    decorator.decorateHarvestedIdentifier(//
 		    incomingResource, //
 		    harvestingProperties, //
-		    null, //
-
 		    false, // first harvesting
 		    true, // is recovery
 		    false); // is incremental

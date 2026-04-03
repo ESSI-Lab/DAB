@@ -87,6 +87,18 @@ public class MarkLogicFolder implements DatabaseFolder {
 	return name;
     }
 
+    /**
+     * @param key
+     * @param entry
+     * @param type
+     * @throws Exception
+     */
+    @Override
+    public UpsertType upsert(String key, FolderEntry entry, EntryType type) throws Exception {
+
+	return UpsertType.INSERTED;
+    }
+
     @Override
     public boolean store(String key, FolderEntry entry, EntryType type) throws Exception {
 

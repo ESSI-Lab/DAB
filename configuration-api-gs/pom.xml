@@ -36,6 +36,12 @@
 			<artifactId>gs-lib-skos</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>service-dev-kit</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		
 		<dependency>
 			<groupId>jakarta.servlet</groupId>

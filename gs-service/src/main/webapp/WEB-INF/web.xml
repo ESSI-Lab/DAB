@@ -105,9 +105,10 @@
 
 			<param-name>heartbeatInterval</param-name>
 			<param-value>30</param-value>
-		</init-param>
 
+		</init-param>
 		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
 	</servlet>
 
 	<servlet-mapping>

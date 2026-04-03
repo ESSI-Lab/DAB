@@ -71,8 +71,13 @@ public class DatahubConnectorSetting extends HarvestedConnectorSetting {
 		build();
 	addOption(identifiersUrlOption);
     }
-    
-    /**
+
+	public void setUsername(String username) {
+
+		getOption(USERNAME_OPTION_KEY, String.class).get().setValue(username);
+
+	}
+     /**
      * @return
      */
     public Optional<String> getUsername() { 
@@ -93,7 +98,16 @@ public class DatahubConnectorSetting extends HarvestedConnectorSetting {
 	}
 	return Optional.empty();
     }
-    
+
+	
+    public void setPassword(String password) {
+		getOption(PASSWORD_OPTION_KEY, String.class).get().setValue(password);
+	}
+
+	public void setIdentifiersUrl(String identifiersUrl) {
+		getOption(IDENTIFIERS_URL_OPTION_KEY, String.class).get().setValue(identifiersUrl);
+	}
+
     /**
      * @return
      */

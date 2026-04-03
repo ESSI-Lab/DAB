@@ -29,10 +29,7 @@ import java.util.Optional;
 
 import jakarta.xml.bind.JAXBElement;
 
-import net.opengis.iso19139.gco.v_20060504.BooleanPropertyType;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
-import net.opengis.iso19139.gco.v_20060504.DatePropertyType;
+import net.opengis.iso19139.gco.v_20060504.*;
 import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.srv.v_20060504.SVOperationMetadataPropertyType;
 import net.opengis.iso19139.srv.v_20060504.SVOperationMetadataType;
@@ -120,6 +117,7 @@ public final class DatahubToJsonMapper {
         mapConstraints(out, identification);
         mapDistribution(out, core);
         mapQualityInformation(out, mi, resource);
+        mapExtensionFields(out, resource);
 
         if ("dataset".equalsIgnoreCase(hierarchyLevel) || "document".equalsIgnoreCase(hierarchyLevel) || "series".equalsIgnoreCase(hierarchyLevel)) {
             mapDatasetSpecific(out, core, identification);
@@ -253,7 +251,6 @@ public final class DatahubToJsonMapper {
     }
 
     private static JSONObject presentationFormObj(Identification id) {
-        String defaultUri = "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#CI_PresentationFormCode";
         try {
             JSONObject ret = new JSONObject();
             List<CIPresentationFormCodePropertyType> pf = id.getFirstCitation().getPresentationForm();
@@ -400,7 +397,7 @@ public final class DatahubToJsonMapper {
     private static JSONObject responsiblePartyToJson(ResponsibleParty party) {
         if (party == null) return null;
         JSONObject o = new JSONObject();
-        putOpt(o, "organization_name", party.getOrganisationName());
+        putOpt(o, "organisation_name", party.getOrganisationName());
         putOpt(o, "individual_name", party.getIndividualName());
         putOpt(o, "role", party.getRoleCode());
         Contact contact = party.getContact();
@@ -618,17 +615,25 @@ public final class DatahubToJsonMapper {
             if (polyIt != null && polyIt.hasNext()) {
                 Iterator<Double> coords = polyIt.next().getCoordinates();
                 if (coords != null) {
-                    StringBuilder sb = new StringBuilder();
+                    List<String> points = new ArrayList<>();
                     while (coords.hasNext()) {
-                        if (sb.length() > 0) sb.append(' ');
-                        sb.append(coords.next());
+                        Double x = coords.next();
+                        if (!coords.hasNext()) break;
+                        Double y = coords.next();
+                        points.add(x + " " + y);
                     }
-                    if (sb.length() > 0) putOpt(out, "bbox_native_epsg_gml_polygon", sb.toString());
+                    if (points.size() >= 3) {
+                        if (!points.get(0).equals(points.get(points.size() - 1))) {
+                            points.add(points.get(0));
+                        }
+                        putOpt(out, "bbox_native_epsg_gml_polygon", String.join(" ", points));
+                    }
                 }
             }
         } catch (Exception e) {
             // ignore
         }
+        mapVerticalExtent(out, identification);
         if (core == null) return;
         try {
             Iterator<eu.essi_lab.iso.datamodel.classes.ReferenceSystem> it = core.getMIMetadata().getReferenceSystemInfos();
@@ -651,6 +656,34 @@ public final class DatahubToJsonMapper {
                     putOpt(nativeEpsg, "label", label);
                     out.put("native_epsg", nativeEpsg);
                 }
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    private static void mapVerticalExtent(JSONObject out, Identification identification) {
+        try {
+            VerticalExtent verticalExtent = identification instanceof DataIdentification
+                ? ((DataIdentification) identification).getVerticalExtent()
+                : (identification instanceof ServiceIdentification ? ((ServiceIdentification) identification).getVerticalExtent() : null);
+            if (verticalExtent == null) return;
+
+            JSONObject vertical = new JSONObject();
+            putOpt(vertical, "minimum_value", verticalExtent.getMinimumValue());
+            putOpt(vertical, "maximum_value", verticalExtent.getMaximumValue());
+
+            try {
+                VerticalCRS verticalCRS = verticalExtent.getVerticalCRS();
+                if (verticalCRS != null) {
+                    putOpt(vertical, "crs", verticalCRS.getId());
+                }
+            } catch (Exception e) {
+                // ignore missing or malformed vertical CRS
+            }
+
+            if (vertical.length() > 0) {
+                out.put("vertical_extent", vertical);
             }
         } catch (Exception e) {
             // ignore
@@ -742,6 +775,17 @@ public final class DatahubToJsonMapper {
         return ISOMetadata.getHREFStringFromCharacterString(nameProp);
     }
 
+    private static final String MD_SPATIAL_REPRESENTATION_TYPE_CODE_URI =
+        "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode";
+    private static final String MD_CELL_GEOMETRY_CODE_URI =
+        "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode";
+    private static final String MD_DIMENSION_NAME_TYPE_CODE_URI =
+        "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode";
+    private static final String MD_TOPOLOGY_LEVEL_CODE_URI =
+        "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_TopologyLevelCode";
+    private static final String MD_GEOMETRIC_OBJECT_TYPE_CODE_URI =
+        "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode";
+
     private static void mapDistribution(JSONObject out, CoreMetadata core) {
         try {
             eu.essi_lab.iso.datamodel.classes.Distribution dist = core.getMIMetadata().getDistribution();
@@ -769,7 +813,10 @@ public final class DatahubToJsonMapper {
             } catch (Exception e) {
                 // ignore
             }
-            if (!onlines.isEmpty()) out.put("online_resources", new JSONArray(onlines));
+            if (!onlines.isEmpty()) {
+                onlines.sort((left, right) -> Integer.compare(onlineSortRank(left), onlineSortRank(right)));
+                out.put("online_resources", new JSONArray(onlines));
+            }
         } catch (Exception e) {
             // ignore
         }
@@ -780,11 +827,55 @@ public final class DatahubToJsonMapper {
         JSONObject o = new JSONObject();
         putOpt(o, "url", online.getLinkage());
         putOpt(o, "name", online.getName());
-        putOpt(o, "description", descriptionObj(online.getDescription(), online.getDescriptionGmxAnchor()));
+        putOpt(o, "description", descriptionObj(descriptionLabel(online), online.getDescriptionGmxAnchor()));
         putOpt(o, "protocol", protocolObj(online));
         putOpt(o, "function", functionObj(online));
         putOpt(o, "application_profile", applicationProfileObj(online));
+        if (online instanceof EXT_Online) {
+            EXT_CIOnlineResourceType extType = ((EXT_Online) online).getElementType();
+            putOpt(o, "layer_pk", extType.getLayerPk());
+            putOpt(o, "source_auth_type", extType.getSourceAuthType());
+            if (extType.isTemporal()) {
+                o.put("temporal_wms", true);
+            }
+            if (extType.getLayerStyleName() != null || extType.getLayerStyleWorkspace() != null) {
+                JSONObject layerStyle = new JSONObject();
+                putOpt(layerStyle, "name", extType.getLayerStyleName());
+                putOpt(layerStyle, "workspace", extType.getLayerStyleWorkspace());
+                if (layerStyle.length() > 0) o.put("layer_style", layerStyle);
+            }
+        }
         return o;
+    }
+
+    private static int onlineSortRank(JSONObject online) {
+        String functionValue = null;
+        JSONObject function = online.optJSONObject("function");
+        if (function != null) functionValue = function.optString("value", null);
+        // Keep ordering stable/deterministic for DataHub JSON:
+        // expected sequence is `download` first, then `view`.
+        if ("download".equalsIgnoreCase(functionValue)) return 0;
+        if ("view".equalsIgnoreCase(functionValue)) return 1;
+        return 2;
+    }
+
+    private static String descriptionLabel(Online online) {
+        try {
+            CharacterStringPropertyType description = online.getElementType().getDescription();
+            if (description == null) return online.getDescription();
+            JAXBElement<?> jaxbElement = description.getCharacterString();
+            if (jaxbElement != null && jaxbElement.getValue() instanceof net.opengis.iso19139.gmx.v_20060504.AnchorType) {
+                net.opengis.iso19139.gmx.v_20060504.AnchorType anchor =
+                    (net.opengis.iso19139.gmx.v_20060504.AnchorType) jaxbElement.getValue();
+                // In ISO19139 `gmx:Anchor`, the human-readable label is usually in `xlink:title`
+                // while `value` can be empty. We prefer the value when present, otherwise fallback to title.
+                if (anchor.getValue() != null && !anchor.getValue().isEmpty()) return anchor.getValue();
+                if (anchor.getTitle() != null && !anchor.getTitle().isEmpty()) return anchor.getTitle();
+            }
+            return stringFromCharProp(description);
+        } catch (Exception e) {
+            return online.getDescription();
+        }
     }
 
     private static JSONObject descriptionObj(String label, String uri) {
@@ -798,7 +889,8 @@ public final class DatahubToJsonMapper {
     private static JSONObject protocolObj(Online online) {
         try {
             String uri = online.getProtocolGmxAnchorHref();
-            String label = online.getProtocol();
+            String label = online.getProtocolGmxAnchorTitle();
+            if (label == null) label = online.getProtocol();
             if (uri == null && label == null) return null;
             JSONObject o = new JSONObject();
             if (uri != null) o.put("uri", uri);
@@ -874,7 +966,25 @@ public final class DatahubToJsonMapper {
             }
             List<JSONObject> conformity = conformanceResultsFromDataQuality(dq);
             if (conformity != null && !conformity.isEmpty()) out.put("conformity", new JSONArray(conformity));
+            JSONObject positionalAccuracy = positionalAccuracyFromDataQuality(dq);
+            if (positionalAccuracy != null) out.put("positional_accuracy", positionalAccuracy);
             putOpt(out, "quality_scope", qualityScopeObj(dq));
+        } catch (Exception e) {
+            // ignore
+        }
+    }
+
+    private static void mapExtensionFields(JSONObject out, GSResource resource) {
+        try {
+            if (resource == null || resource.getExtensionHandler() == null) return;
+            resource.getExtensionHandler().getRasterMosaic().ifPresent(value -> out.put("raster_mosaic", value));
+            resource.getExtensionHandler().getAttributeMissingValue().ifPresent(value -> {
+                try {
+                    out.put("raster_nodata_value", Double.valueOf(value));
+                } catch (NumberFormatException e) {
+                    out.put("raster_nodata_value", value);
+                }
+            });
         } catch (Exception e) {
             // ignore
         }
@@ -930,7 +1040,7 @@ public final class DatahubToJsonMapper {
         putOpt(o, "rationale", stringFromCharProp(step.getRationale()));
         if (step.isSetDateTime() && step.getDateTime() != null && step.getDateTime().getDateTime() != null) {
             try {
-                o.put("date", step.getDateTime().getDateTime().toXMLFormat());
+                o.put("date", normalizeDateTime(step.getDateTime().getDateTime().toXMLFormat()));
             } catch (Exception e) {
                 // ignore
             }
@@ -1007,6 +1117,12 @@ public final class DatahubToJsonMapper {
             }
         }
         return o.length() > 0 ? o : null;
+    }
+
+    private static String normalizeDateTime(String value) {
+        if (value == null) return null;
+        if (value.endsWith(".000Z")) return value.replace(".000Z", "Z");
+        return value;
     }
 
     private static JSONObject algorithmToJson(LEAlgorithmType alg) {
@@ -1198,6 +1314,70 @@ public final class DatahubToJsonMapper {
         }
     }
 
+    private static JSONObject positionalAccuracyFromDataQuality(eu.essi_lab.iso.datamodel.classes.DataQuality dq) {
+        try {
+            List<?> reports = dq.getReports();
+            if (reports == null) return null;
+            for (Object reportElement : reports) {
+                if (!(reportElement instanceof DQElementPropertyType)) continue;
+                JAXBElement<? extends AbstractDQElementType> element = ((DQElementPropertyType) reportElement).getAbstractDQElement();
+                if (element == null) continue;
+                AbstractDQElementType value = element.getValue();
+                if (!(value instanceof DQAbsoluteExternalPositionalAccuracyType dqAccuracy)) continue;
+                List<DQResultPropertyType> results = dqAccuracy.getResult();
+                if (results == null || results.isEmpty()) continue;
+                for (DQResultPropertyType resultProperty : results) {
+                    if (resultProperty == null) continue;
+                    JAXBElement<? extends AbstractDQResultType> resultElement = resultProperty.getAbstractDQResult();
+                    if (resultElement == null) continue;
+                    AbstractDQResultType resultValue = resultElement.getValue();
+                    if (!(resultValue instanceof DQQuantitativeResultType quantitative)) continue;
+
+                    JSONObject out = new JSONObject();
+
+                    UnitOfMeasurePropertyType valueUnit = quantitative.getValueUnit();
+                    if (valueUnit != null) {
+                        putOpt(out, "unit_system", valueUnit.getHref());
+                        putOpt(out, "unit", valueUnit.getTitle());
+                    }
+
+                    if (quantitative.isSetValue() && quantitative.getValue() != null && !quantitative.getValue().isEmpty()) {
+                        RecordPropertyType recordProperty = quantitative.getValue().get(0);
+                        if (recordProperty != null && recordProperty.isSetRecord()) {
+                            Object record = recordProperty.getRecord();
+                            String rawValue = null;
+                            if (record instanceof net.opengis.iso19139.gco.v_20060504.RecordTypeType) {
+                                rawValue = ((net.opengis.iso19139.gco.v_20060504.RecordTypeType) record).getValue();
+                            } else if (record != null) {
+                                rawValue = record.toString();
+                            }
+                            Double numericValue = parseDouble(rawValue);
+                            if (numericValue != null) {
+                                out.put("value", numericValue == Math.floor(numericValue) ? numericValue.intValue() : numericValue);
+                            } else {
+                                putOpt(out, "value", rawValue);
+                            }
+                        }
+                    }
+
+                    return out.length() > 0 ? out : null;
+                }
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        return null;
+    }
+
+    private static Double parseDouble(String rawValue) {
+        if (rawValue == null || rawValue.isEmpty()) return null;
+        try {
+            return Double.parseDouble(rawValue);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private static void mapDatasetSpecific(JSONObject out, CoreMetadata core, Identification identification) {
         if (!(identification instanceof DataIdentification)) return;
         DataIdentification di = (DataIdentification) identification;
@@ -1205,7 +1385,8 @@ public final class DatahubToJsonMapper {
             Iterator<String> langIt = di.getLanguages();
             if (langIt != null && langIt.hasNext()) putOpt(out, "data_language", langIt.next());
             putOpt(out, "parent_identifier", core.getMIMetadata().getParentIdentifier());
-            putOpt(out, "dataset_type", codeObj(di.getSpatialRepresentationTypeCodeListValue()));
+            String datasetType = di.getSpatialRepresentationTypeCodeListValue();
+            if (datasetType != null) putOpt(out, "dataset_type", codeObj(datasetType, MD_SPATIAL_REPRESENTATION_TYPE_CODE_URI));
             Integer equivScale = null;
             Iterator<Integer> denIt = di.getDenominators();
             if (denIt != null && denIt.hasNext()) equivScale = denIt.next();
@@ -1218,7 +1399,7 @@ public final class DatahubToJsonMapper {
             if (res != null && res.getDistanceValue() != null) {
                 JSONObject sr = new JSONObject();
                 sr.put("value", res.getDistanceValue());
-                sr.put("uom", "m");
+                sr.put("uom", res.getDistanceUOM() != null ? res.getDistanceUOM() : "m");
                 out.put("spatial_resolution", sr);
             }
             JSONObject spatialRepInfo = spatialRepresentationInfoToJson(core.getMIMetadata());
@@ -1230,11 +1411,18 @@ public final class DatahubToJsonMapper {
 
     private static JSONObject spatialRepresentationInfoToJson(eu.essi_lab.iso.datamodel.classes.MDMetadata mi) {
         try {
+            JSONObject vectorSpatialRepresentation = vectorSpatialRepresentationInfoToJson(mi);
+            if (vectorSpatialRepresentation != null) {
+                JSONObject spatialRepInfo = new JSONObject();
+                spatialRepInfo.put("vector_spatial_representation", vectorSpatialRepresentation);
+                return spatialRepInfo;
+            }
+
             eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation grid = mi.getGridSpatialRepresentation();
             if (grid == null) return null;
             JSONObject gridRep = new JSONObject();
             Integer numDim = grid.getNumberOfDimensions();
-            if (numDim != null) gridRep.put("number_of_dimensions", String.valueOf(numDim));
+            if (numDim != null) gridRep.put("number_of_dimensions", numDim);
             String cellGeometry = grid.getCellGeometryCode();
             if (cellGeometry != null) {
                 String cellUri = gridCellGeometryUri(grid);
@@ -1259,15 +1447,69 @@ public final class DatahubToJsonMapper {
         }
     }
 
+    private static JSONObject vectorSpatialRepresentationInfoToJson(eu.essi_lab.iso.datamodel.classes.MDMetadata mi) {
+        try {
+            List<MDSpatialRepresentationPropertyType> spatialReps = mi.getElementType().getSpatialRepresentationInfo();
+            if (spatialReps == null) return null;
+            for (MDSpatialRepresentationPropertyType spatialRep : spatialReps) {
+                if (spatialRep == null || spatialRep.getAbstractMDSpatialRepresentation() == null) continue;
+                AbstractMDSpatialRepresentationType value = spatialRep.getAbstractMDSpatialRepresentation().getValue();
+                if (!(value instanceof MDVectorSpatialRepresentationType)) continue;
+
+                MDVectorSpatialRepresentationType vector = (MDVectorSpatialRepresentationType) value;
+                JSONObject out = new JSONObject();
+
+                MDTopologyLevelCodePropertyType topologyLevel = vector.getTopologyLevel();
+                if (topologyLevel != null && topologyLevel.getMDTopologyLevelCode() != null) {
+                    CodeListValueType topologyCode = topologyLevel.getMDTopologyLevelCode();
+                    out.put("topology_level", codeObj(
+                        topologyCode.getCodeListValue(),
+                        normalizeCodelistUri(topologyCode.getCodeList(), MD_TOPOLOGY_LEVEL_CODE_URI)));
+                }
+
+                if (vector.getGeometricObjects() != null && !vector.getGeometricObjects().isEmpty()) {
+                    JSONArray geometricObjects = new JSONArray();
+                    for (MDGeometricObjectsPropertyType geometricProperty : vector.getGeometricObjects()) {
+                        if (geometricProperty == null) continue;
+                        MDGeometricObjectsType geometric = geometricProperty.getMDGeometricObjects();
+                        if (geometric == null) continue;
+                        JSONObject geometricJson = new JSONObject();
+                        if (geometric.getGeometricObjectType() != null &&
+                                geometric.getGeometricObjectType().getMDGeometricObjectTypeCode() != null) {
+                            CodeListValueType geometricCode = geometric.getGeometricObjectType().getMDGeometricObjectTypeCode();
+                            geometricJson.put("geometric_object_type", codeObj(
+                                geometricCode.getCodeListValue(),
+                                normalizeCodelistUri(geometricCode.getCodeList(), MD_GEOMETRIC_OBJECT_TYPE_CODE_URI)));
+                        }
+                        if (geometric.getGeometricObjectCount() != null &&
+                                geometric.getGeometricObjectCount().getInteger() != null) {
+                            geometricJson.put("geometric_object_count", geometric.getGeometricObjectCount().getInteger().intValue());
+                        }
+                        if (geometricJson.length() > 0) geometricObjects.put(geometricJson);
+                    }
+                    if (geometricObjects.length() > 0) out.put("geometric_objects", geometricObjects);
+                }
+
+                return out.length() > 0 ? out : null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
+    }
+
     private static String gridCellGeometryUri(eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation grid) {
         try {
             net.opengis.iso19139.gmd.v_20060504.MDCellGeometryCodePropertyType prop = grid.getElementType().getCellGeometry();
             if (prop == null) return null;
             Object code = prop.getMDCellGeometryCode();
-            if (code instanceof CodeListValueType) return ((CodeListValueType) code).getCodeList();
+            if (code instanceof CodeListValueType) {
+                String uri = ((CodeListValueType) code).getCodeList();
+                return normalizeCodelistUri(uri, MD_CELL_GEOMETRY_CODE_URI);
+            }
             return null;
         } catch (Exception e) {
-            return null;
+            return MD_CELL_GEOMETRY_CODE_URI;
         }
     }
 
@@ -1278,13 +1520,13 @@ public final class DatahubToJsonMapper {
             String dimNameUri = dimensionNameTypeCodeUri(dim);
             if (dimNameVal != null) o.put("dimension_name", codeObj(dimNameVal, dimNameUri));
             BigInteger size = dim.getDimensionSize();
-            if (size != null) o.put("dimension_size", size.intValue() == 0 ? "unknown" : size.toString());
+            if (size != null) o.put("dimension_size", size.intValue() == 0 ? "unknown" : size.intValue());
             Double resVal = dim.getResolutionValue();
             String resUom = dim.getResolutionUOM();
             if (resVal != null || resUom != null) {
                 JSONObject res = new JSONObject();
                 if (resUom != null) res.put("uom", resUom);
-                if (resVal != null) res.put("value", resVal == Math.floor(resVal) ? String.valueOf(resVal.intValue()) : String.valueOf(resVal));
+                if (resVal != null) res.put("value", resVal == Math.floor(resVal) ? resVal.intValue() : resVal);
                 o.put("resolution", res);
             }
             return o.length() > 0 ? o : null;
@@ -1299,11 +1541,22 @@ public final class DatahubToJsonMapper {
             if (prop == null) return null;
             Object code = prop.getMDDimensionNameTypeCode();
             if (code instanceof JAXBElement) code = ((JAXBElement<?>) code).getValue();
-            if (code instanceof CodeListValueType) return ((CodeListValueType) code).getCodeList();
+            if (code instanceof CodeListValueType) {
+                String uri = ((CodeListValueType) code).getCodeList();
+                return normalizeCodelistUri(uri, MD_DIMENSION_NAME_TYPE_CODE_URI);
+            }
             return null;
         } catch (Exception e) {
-            return null;
+            return MD_DIMENSION_NAME_TYPE_CODE_URI;
         }
+    }
+
+    private static String normalizeCodelistUri(String uri, String fallback) {
+        if (uri == null || uri.isEmpty()) return fallback;
+        if (uri.startsWith("http://www.isotc211.org/2005/resources/codeList.xml#")) {
+            return uri.replace("http://www.isotc211.org/2005/resources/codeList.xml#", "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#");
+        }
+        return uri;
     }
 
     private static void mapServiceSpecific(JSONObject out, eu.essi_lab.iso.datamodel.classes.MDMetadata mi) {

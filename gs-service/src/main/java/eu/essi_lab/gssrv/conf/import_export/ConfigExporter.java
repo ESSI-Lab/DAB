@@ -122,7 +122,7 @@ public class ConfigExporter extends VerticalLayout {
 
 		    ClonableInputStream configStream = new ClonableInputStream(stream);
 
-		    File out = new File(localExportField.getValue(), ConfigImportExportDescriptor.DEFAULT_CONFIG_NAME);
+		    File out = new File(localExportField.getValue(), ConfigToolsDescriptor.DEFAULT_CONFIG_NAME);
 
 		    FileUtils.copyInputStreamToFile(configStream.clone(), out);
 
@@ -183,7 +183,7 @@ public class ConfigExporter extends VerticalLayout {
 		    wrapper.setSecretKey(info.getPassword());
 		    wrapper.setEndpoint(info.getUri());
 
-		    ConfigImportExportDescriptor.uploadS3Config(wrapper, info, stream);
+		    ConfigToolsDescriptor.uploadS3Config(wrapper, info, stream);
 
 		    setMessage(msgDiv, "Configuration correctly exported", "green");
 
