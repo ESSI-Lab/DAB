@@ -10,12 +10,12 @@ package eu.essi_lab.services;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -237,23 +237,42 @@ public class MultiServiceManager {
      */
     public synchronized void setSettings(List<ManagedServiceSetting> settings) {
 
+	//
+	// clears message channel only of the removed services
+	// preserving the message channels of the disabled ones
+	//
+	active.keySet().stream().//
+
+		filter(serviceId -> !ids(settings).contains(serviceId)).//
+		forEach(serviceId -> {
+
+	    MessageChannels.getWritable().removeAll(serviceId);
+	});//
+
+	// retains only enabled services
 	this.settings = settings.stream().filter(ManagedServiceSetting::isEnabled).toList();
 
 	//
-	// shutdown and removes from the active map the service runner
-	// that are no longer in settings list or that are disabled
+	// shutdown and removes from the active map the services runner
+	// with enabled services that have been removed
 	//
-	List<String> list = this.settings.stream().
-		map(ManagedServiceSetting::getServiceId).
-		toList();
-
 	active.keySet().stream().//
-		filter(serviceId -> !list.contains(serviceId)).//
+
+		filter(serviceId -> !ids(this.settings).contains(serviceId)).//
 		forEach(serviceId -> {
 
 	    active.get(serviceId).shutdown();
 	    active.remove(serviceId);
 	});//
+    }
+
+    /**
+     * @param settings
+     * @return
+     */
+    private List<String> ids(List<ManagedServiceSetting> settings) {
+
+	return settings.stream().map(ManagedServiceSetting::getServiceId).toList();
     }
 
     /**

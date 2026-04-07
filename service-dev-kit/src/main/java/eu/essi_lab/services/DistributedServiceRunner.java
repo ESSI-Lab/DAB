@@ -85,8 +85,6 @@ public class DistributedServiceRunner {
 
 	    running = true;
 
-	    MessageChannels.getWritable().removeAll(service.getId());
-
 	    new Thread(service::start).start();
 
 	    // starts heartbeat
