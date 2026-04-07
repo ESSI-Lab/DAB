@@ -50,6 +50,7 @@ public class HarvestingProperties extends Properties {
     private static final String START_TIME_STAMP_KEY = "startTimeStamp";
     private static final String RECOVERY_RESUMPTION_TOKEN_KEY = "recoveryResumptionToken";
     private static final String COMPLETED_KEY = "completed";
+    private static final String SOURCE_UP_KEY = "sourceUp";
 
     /**
      * 
@@ -228,6 +229,31 @@ public class HarvestingProperties extends Properties {
     public Optional<Boolean> isCompleted() {
 
 	String property = getProperty(COMPLETED_KEY);
+	if (property == null) {
+	    return Optional.empty();
+	}
+
+	return Optional.of(Boolean.valueOf(property));
+    }
+
+    /**
+     * Stores whether the source is currently reachable and returns records.
+     *
+     * @param sourceUp
+     */
+    public void setSourceUp(boolean sourceUp) {
+
+	setProperty(SOURCE_UP_KEY, String.valueOf(sourceUp));
+    }
+
+    /**
+     * Returns whether the source is currently reachable and returns records.
+     *
+     * @return empty if never tested
+     */
+    public Optional<Boolean> isSourceUp() {
+
+	String property = getProperty(SOURCE_UP_KEY);
 	if (property == null) {
 	    return Optional.empty();
 	}

@@ -117,7 +117,9 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 		remoteWriteUrl, awsRegion);
 	Files.writeString(configFile.toPath(), yaml, StandardCharsets.UTF_8);
 
-	log(status, "Launching Prometheus agent at port " + listenPort, false);
+
+
+		GSLoggerFactory.getLogger(getClass()).info( "Launching Prometheus agent at port {}",  listenPort);
 
 	// 3) start the external prometheus process
 	ProcessBuilder pb = new ProcessBuilder(//
@@ -143,7 +145,7 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	    throw new IOException("Prometheus agent exited with code " + exitCode);
 	}
 
-	log(status, "Prometheus agent task ENDED");
+		GSLoggerFactory.getLogger(getClass()).info("Prometheus agent task ENDED");
     }
 
     private static String requireOption(EnumMap<PrometheusAgentTaskOptions, String> options,
@@ -187,7 +189,9 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	    String downloadUrl, File prometheusCacheDir) throws Exception {
 
 	File prometheusBinary = findPrometheusBinary(prometheusCacheDir);
+
 	if (prometheusBinary != null && prometheusBinary.canExecute()) {
+
 	    return prometheusBinary;
 	}
 
@@ -212,7 +216,10 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	    String tarFileName = toLastPathSegment(downloadUrl);
 	    File tarFile = new File(prometheusCacheDir, tarFileName);
 
-	    downloadTarIfNeeded(downloadUrl, tarFile);
+		GSLoggerFactory.getLogger(getClass()).info("Downloading Prometheus binary");
+
+
+		downloadTarIfNeeded(downloadUrl, tarFile);
 
 	    // Extract into a dedicated directory inside the cache dir.
 	    File extractDir = new File(prometheusCacheDir, "extract");
@@ -260,22 +267,32 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	    Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
 	    Files.move(tmp, tarFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	}
-    }
+		GSLoggerFactory.getLogger(PrometheusAgentTask.class).info("Downloaded Prometheus");
+
+	}
 
     private File findPrometheusBinary(File rootDir) throws IOException {
+		GSLoggerFactory.getLogger(getClass()).info("Finding Prometheus binary");
 	if (rootDir == null || !rootDir.exists()) {
+		GSLoggerFactory.getLogger(getClass()).info("Prometheus binary not found");
 	    return null;
 	}
 
 	// Search for an executable named "prometheus".
 	Path root = rootDir.toPath();
 	try (var stream = Files.walk(root)) {
-	    return stream//
-		    .filter(p -> Files.isRegularFile(p))//
-		    .filter(p -> p.getFileName().toString().equals("prometheus"))//
-		    .map(Path::toFile)//
-		    .findFirst()//
-		    .orElse(null);
+		File ret = stream//
+				.filter(p -> Files.isRegularFile(p))//
+				.filter(p -> p.getFileName().toString().equals("prometheus"))//
+				.map(Path::toFile)//
+				.findFirst()//
+				.orElse(null);
+		if (ret==null){
+			GSLoggerFactory.getLogger(getClass()).info("Prometheus binary not found");
+		}else{
+			GSLoggerFactory.getLogger(getClass()).info("Prometheus binary found");
+		}
+		return ret;
 	}
     }
 

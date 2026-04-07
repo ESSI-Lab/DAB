@@ -32,12 +32,17 @@ import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.access.availability.DownloadInformation;
+import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
+import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.ResourceProperty;
@@ -91,6 +96,8 @@ public class StatisticsTask extends AbstractCustomTask {
 	HashMap<String, Integer> datasets = new HashMap<String, Integer>();
 	HashMap<String, Integer> platforms = new HashMap<String, Integer>();
 	HashMap<String, Integer> variables = new HashMap<String, Integer>();
+	HashMap<String, Integer> sourceUp = new HashMap<String, Integer>();
+	HashMap<String, Double> lastHarvestingTime = new HashMap<String, Double>();
 
 	HashMap<String, Double> coreMetadataCompleteness = new HashMap<String, Double>();
 	HashMap<String, Double> fullMetadataCompleteness = new HashMap<String, Double>();
@@ -98,6 +105,7 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	PrometheusConfig config = PrometheusConfig.DEFAULT;
 	PrometheusMeterRegistry registry = new PrometheusMeterRegistry(config);
+	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 	for (String source : overallStats.keySet()) {
 
 	    GSSource s = ConfigurationWrapper.getSource(source);
@@ -126,8 +134,28 @@ public class StatisticsTask extends AbstractCustomTask {
 			register(registry);
 
 		datasets.put(source, Integer.parseInt(stats.getTimeSeriesCount()));
-		io.micrometer.core.instrument.Gauge.builder("timeseries_total", datasets, g -> g.get(source))//
-			.description("Total number of timeseries ")//
+		io.micrometer.core.instrument.Gauge.builder("harvested_records", datasets, g -> g.get(source))//
+			.description("Total number of harvested records ")//
+			.tag("source_id", source).//
+			register(registry);
+
+		SourceStorageWorker worker = database.getWorker(source);
+		HarvestingProperties harvestingProperties = worker.getHarvestingProperties();
+		String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
+		double endHarvestingEpochSeconds = Optional.ofNullable(endHarvestingTimestamp)
+			.flatMap(ISO8601DateTimeUtils::parseISO8601ToDate)
+			.map(date -> (double) (date.getTime() / 1000L))
+			.orElse(0d);
+		lastHarvestingTime.put(source, endHarvestingEpochSeconds);
+		io.micrometer.core.instrument.Gauge.builder("last_harvesting_time", lastHarvestingTime, g -> g.get(source))//
+			.description("Last harvesting end timestamp in epoch seconds")//
+			.tag("source_id", source).//
+			register(registry);
+
+		int up = harvestingProperties.isSourceUp().orElse(false) ? 1 : 0;
+		sourceUp.put(source, up);
+		io.micrometer.core.instrument.Gauge.builder("source_up", sourceUp, g -> g.get(source))//
+			.description("Source connectivity status (1=up, 0=down)")//
 			.tag("source_id", source).//
 			register(registry);
 
