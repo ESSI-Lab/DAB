@@ -24,6 +24,8 @@ package eu.essi_lab.services;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.services.message.*;
 
+import java.util.*;
+
 /**
  * @author Fabrizio
  */
@@ -54,16 +56,52 @@ public interface ManagedService extends Configurable<ManagedServiceSetting> {
      * @param level
      * @param message
      */
+    default void publish(String key, String value) {
+
+	KeyValueStoreProvider.getWritable().upsert(getId(), key, value);
+    }
+
+    /**
+     * @param level
+     * @param message
+     */
     default void publish(MessageChannel.MessageLevel level, String message) {
 
 	MessageChannels.getWritable().publish(getId(), level, message);
     }
 
     /**
+     * @param serviceId
+     * @return
+     */
+    default List<Map.Entry<String, String>> read(){
+
+        return KeyValueStoreProvider.get().get(getId());
+    }
+
+    /**
+     * @param serviceId
+     * @param key
+     * @return
+     */
+    default Optional<Map.Entry<String, String>> read(String key){
+
+        return KeyValueStoreProvider.get().get(getId(), key);
+    }
+
+    /**
      *
      */
-    default void removeAll() {
+    default void clearKeyValueStore() {
 
-	MessageChannels.getWritable().removeAll(getId());
+	KeyValueStoreProvider.getWritable().clear(getId());
+    }
+
+    /**
+     *
+     */
+    default void clearMessages() {
+
+	MessageChannels.getWritable().clear(getId());
     }
 }

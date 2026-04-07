@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.setting.service;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -105,7 +105,10 @@ public class ManagedServiceSupport {
 		map(m -> m.getTimestamp() + ", " + m.getLevel() + ": [ " + m.getMessage() + " ]").//
 		collect(Collectors.joining("\n"));
 
-	return joined;
+	String collect = KeyValueStoreProvider.get().get(serviceId).stream().map(e -> "Key: " + e.getKey() + " - Value: " + e.getValue())
+		.collect(Collectors.joining("\n"));
+
+	return joined + "\n" + collect;
     }
 
     /**

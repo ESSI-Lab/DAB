@@ -209,10 +209,12 @@ public class MultiServiceManager {
 	if (pool == null) {
 
 	    MessageChannels.init(channelSize);
+	    KeyValueStoreProvider.init();
 
 	} else {
 
 	    MessageChannels.init(pool, channelSize);
+	    KeyValueStoreProvider.init(pool);
 	}
     }
 
@@ -237,20 +239,12 @@ public class MultiServiceManager {
      */
     public synchronized void setSettings(List<ManagedServiceSetting> settings) {
 
-	//
-	// clears message channel only of the removed services
-	// preserving the message channels of the disabled ones
-	//
-	active.keySet().stream().//
-
-		filter(serviceId -> !ids(settings).contains(serviceId)).//
-		forEach(serviceId -> {
-
-	    MessageChannels.getWritable().removeAll(serviceId);
-	});//
 
 	// retains only enabled services
 	this.settings = settings.stream().filter(ManagedServiceSetting::isEnabled).toList();
+
+	// save the keys before remove some
+	List<String> keys = active.keySet().stream().toList();
 
 	//
 	// shutdown and removes from the active map the services runner
@@ -264,6 +258,21 @@ public class MultiServiceManager {
 	    active.get(serviceId).shutdown();
 	    active.remove(serviceId);
 	});//
+
+	//
+	// clears message channel and key-value store only of the removed services
+	// preserving the message channels and key-value store of the disabled ones
+	//
+	keys.stream().//
+
+		filter(serviceId -> !ids(settings).contains(serviceId)).//
+		forEach(serviceId -> {
+
+	    MessageChannels.getWritable().clear(serviceId);
+	    KeyValueStoreProvider.getWritable().clear(serviceId);
+
+	});//
+
     }
 
     /**

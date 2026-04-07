@@ -139,7 +139,7 @@ public class LocalMessageChannel implements MessageChannel {
      * @param serviceId
      */
     @Override
-    public void removeAll(String serviceId) {
+    public void clear(String serviceId) {
 
 	MESSAGE_MAP.remove(serviceId);
     }

@@ -65,7 +65,7 @@ public class RedisMessageChannel implements MessageChannel {
 
 	    jedis.rpush(key(serviceId), msg);
 
-	    jedis.sadd("services:messages:index", serviceId);
+	    jedis.sadd(memberKey(), serviceId);
 
 	    jedis.ltrim(key(serviceId), -channelSize, -1);
 	}
@@ -106,12 +106,12 @@ public class RedisMessageChannel implements MessageChannel {
     }
 
     @Override
-    public void removeAll(String serviceId) {
+    public void clear(String serviceId) {
 
 	try (Jedis jedis = pool.getResource()) {
 
 	    jedis.del(key(serviceId));
-	    jedis.srem("services:messages:index", serviceId);
+	    jedis.srem(memberKey(), serviceId);
 	}
     }
 
@@ -131,5 +131,14 @@ public class RedisMessageChannel implements MessageChannel {
     private String key(String serviceId) {
 
 	return "service:" + serviceId + ":messages";
+    }
+
+    /**
+     *
+     * @return
+     */
+    private String memberKey(){
+
+	return "services:messages:index";
     }
 }

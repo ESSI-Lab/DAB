@@ -150,7 +150,7 @@ public interface MessageChannel extends ReadableMessageChannel {
     /**
      * @param serviceId
      */
-    void removeAll(String serviceId);
+    void clear(String serviceId);
 
     /**
      * @param serviceId
