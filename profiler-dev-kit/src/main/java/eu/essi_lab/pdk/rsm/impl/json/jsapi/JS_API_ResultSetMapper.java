@@ -1076,7 +1076,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	String description = on.getDescription();
 	String protocol = on.getProtocol();
 	String function = on.getFunctionCode();
-	String anchor = on.getDescriptionGmxAnchor();
+	String anchor = on.getDescriptionGmxAnchorHref();
 
 	JSONObject online = new JSONObject();
 	boolean addOnline = false;

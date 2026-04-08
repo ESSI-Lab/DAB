@@ -827,7 +827,7 @@ public final class DatahubToJsonMapper {
         JSONObject o = new JSONObject();
         putOpt(o, "url", online.getLinkage());
         putOpt(o, "name", online.getName());
-        putOpt(o, "description", descriptionObj(descriptionLabel(online), online.getDescriptionGmxAnchor()));
+        putOpt(o, "description", descriptionObj(descriptionLabel(online), online.getDescriptionGmxAnchorHref()));
         putOpt(o, "protocol", protocolObj(online));
         putOpt(o, "function", functionObj(online));
         putOpt(o, "application_profile", applicationProfileObj(online));

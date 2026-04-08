@@ -20,7 +20,7 @@ public class OnlineTest extends MetadataTest<Online, CIOnlineResourceType> {
 
 	online.setProtocolAnchor("protocolHrefGmxAnchor", "protocolValueGmxAnchor");
 
-	Assert.assertEquals("descriptionGmxAnchor", online.getDescriptionGmxAnchor());
+	Assert.assertEquals("descriptionGmxAnchor", online.getDescriptionGmxAnchorHref());
 
 	Assert.assertEquals("protocolHrefGmxAnchor", online.getProtocolGmxAnchorHref());
 
@@ -66,7 +66,7 @@ public class OnlineTest extends MetadataTest<Online, CIOnlineResourceType> {
 	Assert.assertNull(online.getProtocol());
 	Assert.assertNull(online.getDescription());
 	Assert.assertNull(online.getLinkage());
-	Assert.assertNull(online.getDescriptionGmxAnchor());
+	Assert.assertNull(online.getDescriptionGmxAnchorHref());
 	Assert.assertNull(online.getFunctionCode());
 	Assert.assertNull(online.getIdentifier());
 
