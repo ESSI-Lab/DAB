@@ -1,11 +1,11 @@
 package eu.essi_lab.iso.datamodel.test;
 
 import eu.essi_lab.iso.datamodel.classes.*;
+import jakarta.xml.bind.*;
 import org.junit.*;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
-import jakarta.xml.bind.*;
 import javax.xml.parsers.*;
 import java.io.*;
 
@@ -15,7 +15,7 @@ import java.io.*;
 public class EXT_OnlineTest {
 
     @Test
-    public void wrapperTest1(){
+    public void wrapperTest1() {
 
 	Online online = new Online();
 
@@ -37,7 +37,7 @@ public class EXT_OnlineTest {
     }
 
     @Test
-    public void wrapperWithAnchorTest(){
+    public void wrapperWithAnchorTest() {
 
 	Online online = new Online();
 
@@ -51,7 +51,7 @@ public class EXT_OnlineTest {
 
 	EXT_Online extOnline = new EXT_Online(online);
 
-	Assert.assertEquals("descriptionGmxAnchor", extOnline.getDescriptionGmxAnchor());
+	Assert.assertEquals("descriptionGmxAnchor", extOnline.getDescriptionGmxAnchorHref());
 	Assert.assertEquals("protocolHrefGmxAnchor", extOnline.getProtocolGmxAnchorHref());
 	Assert.assertEquals("protocolValueGmxAnchor", extOnline.getProtocolGmxAnchorTitle());
 
@@ -61,6 +61,32 @@ public class EXT_OnlineTest {
 	Assert.assertEquals("id", extOnline.getIdentifier());
     }
 
+    @Test
+    public void wrapperWithAnchorTest2() {
+
+	Online online = new Online();
+
+	online.setDescriptionGmxAnchor("descriptionGmxAnchor", "descriptionGmxAnchorTitle");
+	online.setProtocolAnchor("protocolHrefGmxAnchor", "protocolValueGmxAnchor");
+
+	online.setName("name");
+	online.setLinkage("link");
+	online.setFunctionCode("download");
+	online.setIdentifier("id");
+
+	EXT_Online extOnline = new EXT_Online(online);
+
+	Assert.assertEquals("descriptionGmxAnchor", extOnline.getDescriptionGmxAnchorHref());
+	Assert.assertEquals("descriptionGmxAnchorTitle", extOnline.getDescriptionGmxAnchorTitle());
+
+	Assert.assertEquals("protocolHrefGmxAnchor", extOnline.getProtocolGmxAnchorHref());
+	Assert.assertEquals("protocolValueGmxAnchor", extOnline.getProtocolGmxAnchorTitle());
+
+	Assert.assertEquals("name", extOnline.getName());
+	Assert.assertEquals("link", extOnline.getLinkage());
+	Assert.assertEquals("download", extOnline.getFunctionCode());
+	Assert.assertEquals("id", extOnline.getIdentifier());
+    }
 
     @Test
     public void initTest() {

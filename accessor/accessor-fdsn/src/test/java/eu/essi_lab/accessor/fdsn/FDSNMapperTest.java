@@ -124,7 +124,7 @@ public class FDSNMapperTest {
 
 	TestCase.assertEquals("http://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us20008se3&format=quakeml", online.getLinkage());
 	TestCase.assertEquals("HTTP-GET", online.getProtocol());
-	TestCase.assertEquals("http://www.essi-lab.eu/broker/accesstypes/direct", online.getDescriptionGmxAnchor());
+	TestCase.assertEquals("http://www.essi-lab.eu/broker/accesstypes/direct", online.getDescriptionGmxAnchorHref());
 	TestCase.assertEquals("information", online.getFunctionCode());
 
 	ArrayList<Format> formats = Lists.newArrayList(distributionInformation.getFormats());

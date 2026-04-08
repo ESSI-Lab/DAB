@@ -109,9 +109,9 @@ public class EXT_Online extends Online {
 	    getElementType().setApplicationProfile(online.getElementType().getApplicationProfile());
 	}
 
-	if (online.getDescriptionGmxAnchor() != null) {
+	if (online.getDescriptionGmxAnchorHref() != null) {
 
-	    setDescriptionGmxAnchor(online.getDescriptionGmxAnchor());
+	    setDescriptionGmxAnchor(online.getDescriptionGmxAnchorHref(), online.getDescriptionGmxAnchorTitle());
 	}
 
 	if (online.getProtocolGmxAnchorHref() != null) {

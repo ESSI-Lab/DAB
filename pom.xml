@@ -440,6 +440,8 @@
         <!--VULN-UPDATE 2025-->
         <sun.mail.version>1.6.2</sun.mail.version>
 
+        <milton.version>4.1.1.2676</milton.version>
+
         <!-- Surefire args -->
         <surefire.arglineopen>
             --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
@@ -471,6 +473,12 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>io.milton</groupId>
+                <artifactId>milton-server-ce</artifactId>
+                <version>${milton.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.avro</groupId>
@@ -2365,6 +2373,7 @@
         <module>custom-tasks</module>
         <module>service-dev-kit</module>
         <module>service-data-hub</module>
+        <module>service-webdav</module>
 
     </modules>
 
