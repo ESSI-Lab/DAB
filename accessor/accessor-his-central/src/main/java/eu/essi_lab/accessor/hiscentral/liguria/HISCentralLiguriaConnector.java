@@ -143,11 +143,9 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 	}
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
-	boolean maxNumberReached = false;
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && start > mr.get() - 1) {
-	    // max record set
-	    maxNumberReached = true;
-	}
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	// maxRecords limits harvested metadata records (partialNumbers), not station index
+	boolean maxNumberReached = !unlimited && mr.isPresent() && partialNumbers >= mr.get();
 
 	if (BEARER_TOKEN == null) {
 	    BEARER_TOKEN = getBearerToken();
@@ -173,9 +171,9 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 	    int end = start + STEP;
 	    if (end > response.length()) {
 		end = response.length();
-	    } else {
-		ret.setResumptionToken(String.valueOf(end));
 	    }
+
+	    boolean stoppedByMax = false;
 
 	    // JSONArray description_Response = getOriginalMetadata(descriptionVariableURL);//
 	    // downloader.downloadOptionalString(descriptionVariableURL);
@@ -183,6 +181,11 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 	    // JSONObject datasetMetadata = object.getJSONObject("dataset-metadata");
 
 	    for (int j = start; j < end; j++) {
+
+		if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		    stoppedByMax = true;
+		    break;
+		}
 
 		JSONObject sensorInfo = response.getJSONObject(j);
 
@@ -273,17 +276,25 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 			});
 
 			Set<String> toAdd = map.get(code);
-			for (String s : toAdd) {
-			    partialNumbers++;
-			    ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo, stationsParameter));
+			if (toAdd != null) {
+			    for (String s : toAdd) {
+				if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+				    stoppedByMax = true;
+				    break;
+				}
+				partialNumbers++;
+				ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo, stationsParameter));
+			    }
 			}
-			
 			// Now it is safe to delete the file
 			if (tempFile != null && tempFile.exists()) {
 			    boolean deleted = tempFile.delete();
 			    if (!deleted) {
 			        logger.debug("Could not delete temp file: " + tempFile.getAbsolutePath());
 			    }
+			}
+			if (stoppedByMax) {
+			    break;
 			}
 			// while (iterator.hasNext()) {
 			// String s = iterator.next();
@@ -305,6 +316,12 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 		    }
 		}
 
+	    }
+
+	    if (stoppedByMax) {
+		ret.setResumptionToken(null);
+	    } else if (end < response.length()) {
+		ret.setResumptionToken(String.valueOf(end));
 	    }
 
 	    logger.debug("ADDED {} records for ARPAL Liguria {}", partialNumbers);

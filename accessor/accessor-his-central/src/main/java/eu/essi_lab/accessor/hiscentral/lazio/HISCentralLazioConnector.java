@@ -302,8 +302,8 @@ public class HISCentralLazioConnector extends HarvestedQueryConnector<HISCentral
 
 	    Downloader downloader = new Downloader();
 
-	    downloader.setConnectionTimeout(TimeUnit.SECONDS, 10);
-
+	    downloader.setConnectionTimeout(TimeUnit.SECONDS, 5);
+	    downloader.setResponseTimeout(TimeUnit.SECONDS, 5);
 	    HttpResponse<InputStream> response = downloader.downloadResponse(request);
 
 	    JSONObject result = new JSONObject(IOStreamUtils.asUTF8String(response.body()));

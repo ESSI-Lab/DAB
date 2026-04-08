@@ -217,19 +217,24 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 	}
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
-	boolean maxNumberReached = false;
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && start > mr.get() - 1) {
-	    // max record set
-	    maxNumberReached = true;
-	}
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	// maxRecords limits harvested metadata records (partialNumbers), not API offset (start)
+	boolean maxNumberReached = !unlimited && mr.isPresent() && partialNumbers >= mr.get();
 
 	List<JSONObject> sensorList = getSensorList(start, pageSize);
 
 	if (sensorList.size() > 0 && !maxNumberReached) {
 
 	    int count = 0;
+	    boolean stoppedByMax = false;
 
 	    for (int i = 0; i < sensorList.size(); i++) {
+
+		if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		    stoppedByMax = true;
+		    break;
+		}
+
 		JSONObject sensorObj = sensorList.get(i);
 
 		if (sensorObj != null) {
@@ -243,6 +248,11 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 
 			    for (Map.Entry<UMBRIA_Variable, List<String>> entry : resMap.entrySet()) {
 
+				if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+				    stoppedByMax = true;
+				    break;
+				}
+
 				String variableName = entry.getKey().name();
 				String startDate = entry.getValue().get(1);
 				String time = entry.getValue().get(0);
@@ -252,13 +262,27 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 				partialNumbers++;
 				count++;
 			    }
+			    if (stoppedByMax) {
+				break;
+			    }
 			}
 		    }
 
 		}
 	    }
-	    ret.setResumptionToken(String.valueOf(start + pageSize));
-	    logger.debug("ADDED {} records. Number of analyzed floats: {}", partialNumbers, String.valueOf(start + pageSize));
+	    if (stoppedByMax) {
+		ret.setResumptionToken(null);
+		logger.debug("ADDED {} records (max reached). TOTAL STATION SIZE: {}", partialNumbers, stationsMap.size());
+		partialNumbers = 0;
+	    } else if (sensorList.size() < pageSize) {
+		// last page of sensors: no further offset to request
+		ret.setResumptionToken(null);
+		logger.debug("ADDED {} records. Last sensor page; TOTAL STATION SIZE: {}", partialNumbers, stationsMap.size());
+		partialNumbers = 0;
+	    } else {
+		ret.setResumptionToken(String.valueOf(start + pageSize));
+		logger.debug("ADDED {} records. Number of analyzed floats: {}", partialNumbers, String.valueOf(start + pageSize));
+	    }
 
 	} else {
 	    ret.setResumptionToken(null);

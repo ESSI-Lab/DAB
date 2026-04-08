@@ -101,8 +101,6 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
      */
     private Logger logger = GSLoggerFactory.getLogger(this.getClass());
 
-    private int maxRecords;
-
     private Downloader downloader;
 
     private int currentYear;
@@ -122,6 +120,11 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 
 	    page = Integer.valueOf(rt);
 	}
+
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	// maxRecords limits harvested metadata records (countDataset), not resumption page index
+	boolean maxNumberReached = !unlimited && mr.isPresent() && countDataset >= mr.get();
 
 	String sensorType = "";
 
@@ -164,11 +167,19 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 
 	Map<String, VenetoStation> map = new HashMap<String, VenetoStation>();
 
-	if (!sensorType.isEmpty()) {
+	boolean stoppedByMax = false;
+
+	if (!sensorType.isEmpty() && !maxNumberReached) {
 
 	    map = createStationMap(sensorType);
 
-	    for (Map.Entry<String, VenetoStation> entry : map.entrySet()) {
+	    outer: for (Map.Entry<String, VenetoStation> entry : map.entrySet()) {
+
+		if (!unlimited && mr.isPresent() && countDataset >= mr.get()) {
+		    stoppedByMax = true;
+		    break outer;
+		}
+
 		VenetoStation station = entry.getValue();
 		String codSeq = entry.getKey();
 		JSONObject datasetMetadata = station.getMetadataStation();
@@ -183,6 +194,10 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 			    JSONObject jsonValues = new JSONObject(value);
 			    Iterator<String> keys = jsonValues.keys();
 			    while (keys.hasNext()) {
+				if (!unlimited && mr.isPresent() && countDataset >= mr.get()) {
+				    stoppedByMax = true;
+				    break outer;
+				}
 				String key = (String) keys.next();
 				ret.addRecord(HISCentralVenetoMapper.create(datasetMetadata, sensorInfo, key, station.getStartDate(),
 					station.getEndDate()));
@@ -190,6 +205,10 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 			    }
 
 			} else {
+			    if (!unlimited && mr.isPresent() && countDataset >= mr.get()) {
+				stoppedByMax = true;
+				break outer;
+			    }
 			    ret.addRecord(HISCentralVenetoMapper.create(datasetMetadata, sensorInfo, "Cumulata giornaliera",
 				    station.getStartDate(), station.getEndDate()));
 			    countDataset++;
@@ -252,15 +271,22 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 	// }
 	// }
 
-	Optional<Integer> mr = getSetting().getMaxRecords();
-	// metadataTemplate = null;
-	page = page + 1;
-	if (page > 9) {
+	if (stoppedByMax) {
 	    ret.setResumptionToken(null);
-	    // GSLoggerFactory.getLogger(getClass()).info("Dataset with time interval: {}", countTimeDataset);
-	    logger.info("Total number of dataset: {}", countDataset);
+	    logger.info("Max records reached; dataset count: {}", countDataset);
+	    countDataset = 0;
+	} else if (maxNumberReached) {
+	    ret.setResumptionToken(null);
+	    countDataset = 0;
 	} else {
-	    ret.setResumptionToken(String.valueOf(page));
+	    page = page + 1;
+	    if (page > 9) {
+		ret.setResumptionToken(null);
+		logger.info("Total number of dataset: {}", countDataset);
+		countDataset = 0;
+	    } else {
+		ret.setResumptionToken(String.valueOf(page));
+	    }
 	}
 
 	return ret;

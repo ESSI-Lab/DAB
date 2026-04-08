@@ -51,6 +51,8 @@ public class HarvestingProperties extends Properties {
     private static final String RECOVERY_RESUMPTION_TOKEN_KEY = "recoveryResumptionToken";
     private static final String COMPLETED_KEY = "completed";
     private static final String SOURCE_UP_KEY = "sourceUp";
+    private static final String CONNECTIVITY_TEST_DURATION_MS_KEY = "connectivityTestDurationMs";
+    private static final String LAST_SOURCE_UP_UNIX_MS_KEY = "lastSourceUpUnixTimestampMs";
 
     /**
      * 
@@ -259,6 +261,47 @@ public class HarvestingProperties extends Properties {
 	}
 
 	return Optional.of(Boolean.valueOf(property));
+    }
+
+    /**
+     * Duration of the last source connectivity test, in milliseconds.
+     */
+    public void setConnectivityTestDurationMs(long durationMs) {
+
+	setProperty(CONNECTIVITY_TEST_DURATION_MS_KEY, String.valueOf(durationMs));
+    }
+
+    /**
+     * @return duration of the last connectivity test in milliseconds, if recorded
+     */
+    public Optional<Long> getConnectivityTestDurationMs() {
+
+	String property = getProperty(CONNECTIVITY_TEST_DURATION_MS_KEY);
+	if (property == null) {
+	    return Optional.empty();
+	}
+	return Optional.of(Long.parseLong(property));
+    }
+
+    /**
+     * Wall-clock time (milliseconds since Unix epoch) when the source was last observed as up
+     * during a connectivity test.
+     */
+    public void setLastSourceUpUnixTimestampMs(long unixTimestampMs) {
+
+	setProperty(LAST_SOURCE_UP_UNIX_MS_KEY, String.valueOf(unixTimestampMs));
+    }
+
+    /**
+     * @return last time the source was seen up (Unix epoch ms), if ever recorded
+     */
+    public Optional<Long> getLastSourceUpUnixTimestampMs() {
+
+	String property = getProperty(LAST_SOURCE_UP_UNIX_MS_KEY);
+	if (property == null) {
+	    return Optional.empty();
+	}
+	return Optional.of(Long.parseLong(property));
     }
 
 }

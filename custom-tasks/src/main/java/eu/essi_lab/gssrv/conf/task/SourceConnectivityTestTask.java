@@ -31,8 +31,11 @@ import eu.essi_lab.adk.harvest.IHarvestedAccessor;
 import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
+import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
+import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.HarvestingProperties;
@@ -81,22 +84,37 @@ public class SourceConnectivityTestTask extends AbstractCustomTask {
 
 	GSLoggerFactory.getLogger(getClass()).info("Testing connectivity of {} sources for view {}", viewSources.size(), viewId);
 
+
+
+	int s = 0;
+
 	for (GSSource source : viewSources) {
-		GSLoggerFactory.getLogger(getClass()).info("Testing connectivity for source '{}'", source.getLabel());
+		GSLoggerFactory.getLogger(getClass()).info("Testing connectivity for source '{}', {}", source.getLabel(),++s+"/"+viewSources.size());
 
 	    boolean sourceUp = false;
+	    long testStartMs = System.currentTimeMillis();
 
 	    try {
 		Optional<HarvestingSetting> optHarvestingSetting = ConfigurationWrapper.getHarvestingSettings(source.getUniqueIdentifier());
 		if (optHarvestingSetting.isPresent()) {
+		    AccessorSetting accessorSetting = optHarvestingSetting.get().getSelectedAccessorSetting();
+		    AccessorSetting clonedSetting = SettingUtils.downCast(accessorSetting, AccessorSetting.class, true);
+		    if (clonedSetting != null) {
+			HarvestedConnectorSetting connectorSetting = clonedSetting.getHarvestedConnectorSetting();
+			if (connectorSetting != null) {
+			    connectorSetting.setMaxRecords(1);
+			    connectorSetting.setPageSize(1);
+			    accessorSetting = clonedSetting;
+			}
+		    }
 		    @SuppressWarnings("rawtypes")
-		    IHarvestedAccessor accessor = AccessorFactory
-			    .getConfiguredHarvestedAccessor(optHarvestingSetting.get().getSelectedAccessorSetting());
+		    IHarvestedAccessor accessor = AccessorFactory.getConfiguredHarvestedAccessor(accessorSetting);
 
 		    ListRecordsRequest request = new ListRecordsRequest();
 		    request.setHarvestingProperties(sourceStorage.retrieveHarvestingProperties(source));
 
-		    ListRecordsResponse<?> response = accessor.listRecords(request);
+
+		    ListRecordsResponse<?> response = accessor.getConnector().listRecords(request);
 		    sourceUp = response != null && !response.getRecordsAsList().isEmpty();
 		} else {
 		    GSLoggerFactory.getLogger(getClass()).warn(
@@ -112,8 +130,14 @@ public class SourceConnectivityTestTask extends AbstractCustomTask {
 			e);
 	    }
 
+	    long connectivityTestDurationMs = System.currentTimeMillis() - testStartMs;
+
 	    HarvestingProperties properties = sourceStorage.retrieveHarvestingProperties(source);
 	    properties.setSourceUp(sourceUp);
+	    properties.setConnectivityTestDurationMs(connectivityTestDurationMs);
+	    if (sourceUp) {
+		properties.setLastSourceUpUnixTimestampMs(System.currentTimeMillis());
+	    }
 	    sourceStorage.storeHarvestingProperties(source, properties);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Source '{}' ({}) connectivity status: {}",
