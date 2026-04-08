@@ -21,6 +21,7 @@ package eu.essi_lab.pdk;
  * #L%
  */
 
+import com.google.api.client.util.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.iso.datamodel.classes.*;
@@ -28,6 +29,8 @@ import eu.essi_lab.lib.net.protocols.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.resource.*;
+
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -54,7 +57,9 @@ public class OnlineResourceConsumer implements ResourceConsumer {
 
 	    String publicId = gsResource.getPublicId();
 
-	    dist.getDistributionOnlines().forEachRemaining(online -> {
+	    List<Online> onlines = dist.getAllDistributionOnlines();
+
+	    onlines.forEach(online -> {
 
 		String name = online.getName();
 		String protocol = online.getProtocol();
