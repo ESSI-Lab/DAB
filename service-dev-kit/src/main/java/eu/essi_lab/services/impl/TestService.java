@@ -57,9 +57,9 @@ public class TestService extends AbstractManagedService {
 
 	    publish(MessageChannel.MessageLevel.INFO, "Running service: " + getId());
 
-	    publish(getId(), ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
+	    upsert(getId(), ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
 
-	    List<Map.Entry<String, String>> store = read();
+	    List<Map.Entry<String, String>> store = get();
 
 	    for (Map.Entry<String, String> stringStringEntry : store) {
 

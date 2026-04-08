@@ -53,12 +53,20 @@ public interface ManagedService extends Configurable<ManagedServiceSetting> {
     }
 
     /**
-     * @param level
-     * @param message
+     * @param key
+     * @param value
      */
-    default void publish(String key, String value) {
+    default void upsert(String key, String value) {
 
 	KeyValueStoreProvider.getWritable().upsert(getId(), key, value);
+    }
+
+    /**
+     * @param key
+     */
+    default void remove(String key) {
+
+	KeyValueStoreProvider.getWritable().remove(getId(), key);
     }
 
     /**
@@ -74,9 +82,9 @@ public interface ManagedService extends Configurable<ManagedServiceSetting> {
      * @param serviceId
      * @return
      */
-    default List<Map.Entry<String, String>> read(){
+    default List<Map.Entry<String, String>> get() {
 
-        return KeyValueStoreProvider.get().get(getId());
+	return KeyValueStoreProvider.get().get(getId());
     }
 
     /**
@@ -84,9 +92,9 @@ public interface ManagedService extends Configurable<ManagedServiceSetting> {
      * @param key
      * @return
      */
-    default Optional<Map.Entry<String, String>> read(String key){
+    default Optional<Map.Entry<String, String>> read(String key) {
 
-        return KeyValueStoreProvider.get().get(getId(), key);
+	return KeyValueStoreProvider.get().get(getId(), key);
     }
 
     /**
@@ -100,7 +108,7 @@ public interface ManagedService extends Configurable<ManagedServiceSetting> {
     /**
      *
      */
-    default void clearMessages() {
+    default void clearMessageChannel() {
 
 	MessageChannels.getWritable().clear(getId());
     }
