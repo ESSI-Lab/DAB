@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -473,16 +473,15 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
-     * This method is called every time the client window is loaded.<br> Returns a clone with disabled autoreload of the
+     * This method is called when the client window is loaded.<br> Returns a clone with disabled autoreload of the
      * {@link DABStarter#configuration}. Changes applied to this configuration instance are not applied to the source configuration until
-     * this configuration is flushed and the source configuration performs the autoreload.<br> This avoid to apply intermediate
-     * configuration changes to the source configuration which is the core of the {@link ConfigurationWrapper}.<br> When this cloned
-     * configuration is flushed, the source configuration and all the other instances of the other suite nodes will apply the changes in
-     * maximum <i>autoreload-time</i>, that is currently set in 30 seconds.<br>
+     * this configuration is <i>flushed</i> and the source configuration performs the autoreload.<br> This avoids to apply intermediate
+     * configuration changes to the source configuration which is the core of the {@link ConfigurationWrapper}. It also allows
+     * to compare the two configurations to enable/disable the save button.<br> When this cloned
+     * configuration is flushed, the source configuration of this node is suddenly updated (see {@link SaveConfirmationDialog#onConfigurationFlushConfirmed()}).<br>
+     * The other cluster nodes, having only a single read-only copy of the source configuration,
+     * will apply the changes in maximum <i>autoreload-time</i>, that is currently set in 5 minutes.<br>
      * <br>
-     * The source event is read-only and has the autoreload enabled, so this is the only event that the configuration can dispatch. Because
-     * of this, in order to receive these events, this view should register itself as listener also to the source configuration (the
-     * registration to the this returned instance is done by the superclass). At the moment this is not done since not strictly required
      */
     @Override
     protected Configuration initConfiguration() {
@@ -498,7 +497,7 @@ public class GSConfigurationView extends ConfigurationView {
 	return Arrays.asList(//
 		new AsynchDownloadDescriptor(),//
 		new ViewsDescriptor(),//
-		new ManagedServiceSettingTabDescriptorProvider(),//
+		new ServicesTabDescriptor(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//

@@ -37,12 +37,12 @@ import java.util.*;
  * @author Fabrizio
  *
  */
-public class ManagedServiceSettingTabDescriptorProvider extends TabDescriptor {
+public class ServicesTabDescriptor extends TabDescriptor {
 
     /**
      *
      */
-    public ManagedServiceSettingTabDescriptorProvider() {
+    public ServicesTabDescriptor() {
 
 	setLabel("Services");
 
@@ -63,9 +63,9 @@ public class ManagedServiceSettingTabDescriptorProvider extends TabDescriptor {
 
 		ColumnDescriptor.create("Id", true, true, this::getId), //
 
-		ColumnDescriptor.create("Implementation", true, true, this::getImpl), //
+		ColumnDescriptor.create("Implementation", 400, true, true, this::getImpl), //
 
-		ColumnDescriptor.create("Description", true, true, this::getDesc),//
+		ColumnDescriptor.create("Description", 400, true, true, this::getDesc),//
 
 		ColumnDescriptor.create("Status", true, true, s -> ManagedServiceSupport.getInstance().getServiceStatus(s)),
 
