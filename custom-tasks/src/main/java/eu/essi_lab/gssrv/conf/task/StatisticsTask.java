@@ -77,7 +77,8 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * 
  * Task options (line-based {@code KEY=value}):
  * <ul>
- * <li>{@code VIEW_ID} — required view identifier</li>
+ * <li>{@code VIEW_ID} — optional view identifier; when omitted, aggregate statistics use all sources (no view bond);
+ * metadata completeness metrics still require a view and are skipped if {@code VIEW_ID} is not set</li>
  * <li>{@code METRICS} — optional comma-separated list of {@link StatisticsMetric} names; when omitted, all metrics are
  * computed</li>
  * <li>{@code METADATA_COMPLETENESS_ELEMENTS} — optional comma-separated {@link MetadataElement} identifiers for
@@ -208,35 +209,21 @@ public class StatisticsTask extends AbstractCustomTask {
 	    }
 	}
 
-	if (viewId == null) {
-	    Optional<String> raw = rawTaskOptions;
-	    if (raw.isPresent()) {
-		String r = raw.get().trim();
-		if (!r.contains("=")) {
-		    viewId = r.split("\\R", 2)[0].trim();
-		}
-	    }
-	}
-
 	if (viewId == null || viewId.isEmpty()) {
-
-	    GSLoggerFactory.getLogger(getClass()).info("No view specified by statistics task");
-
-	    status.setPhase(JobPhase.CANCELED);
-	    return;
-	}
-
-	if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS) && metadataCompletenessElements.isEmpty()) {
-	    metadataCompletenessElements = new ArrayList<>(List.of(MetadataElement.IDENTIFIER, MetadataElement.TITLE));
+	    GSLoggerFactory.getLogger(getClass()).info(
+		    "No view specified (VIEW_ID empty); statistics are computed for all sources (no view filter).");
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info(
-		"Updating metrics for view {} (metrics: {}, metadata completeness elements: {}, metadata set completeness: {})",
-		viewId, metrics, metadataCompletenessElements, metadataCompletenessSets);
+		"Updating metrics for {} (metrics: {}, metadata completeness elements: {}, metadata set completeness: {})",
+		(viewId != null && !viewId.isEmpty()) ? ("view " + viewId) : "all sources (no view)",
+		metrics, metadataCompletenessElements, metadataCompletenessSets);
 
+	Optional<String> viewIdForStats = (viewId != null && !viewId.isEmpty()) ? Optional.of(viewId) : Optional.empty();
+	String statsArtifactKey = (viewId != null && !viewId.isEmpty()) ? viewId : "all-sources";
 	SourceStatistics sourceStats = null;
 	try {
-	    sourceStats = new SourceStatistics(null, Optional.of(viewId), ResourceProperty.SOURCE_ID);
+	    sourceStats = new SourceStatistics(null, viewIdForStats, ResourceProperty.SOURCE_ID);
 	} catch (Exception e1) {
 	    e1.printStackTrace();
 	}
@@ -259,12 +246,14 @@ public class StatisticsTask extends AbstractCustomTask {
 	if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS)
 		|| metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)) {
 	    try {
-		reportView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
-		if (reportView.isEmpty()) {
-		    GSLoggerFactory.getLogger(getClass()).warn("View {} not found; metadata completeness metrics will be skipped",
-			    viewId);
-		} else {
-		    discoveryFinder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
+		if (viewId != null && !viewId.isEmpty()) {
+		    reportView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+		    if (reportView.isEmpty()) {
+			GSLoggerFactory.getLogger(getClass()).warn(
+				"View {} not found; metadata completeness metrics will be skipped", viewId);
+		    } else {
+			discoveryFinder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
+		    }
 		}
 	    } catch (GSException e) {
 		GSLoggerFactory.getLogger(getClass()).warn("Cannot resolve view or finder for metadata completeness metrics: {}",
@@ -463,7 +452,7 @@ public class StatisticsTask extends AbstractCustomTask {
 		    && (lastCancelCheckMs == 0 || now - lastCancelCheckMs >= CANCEL_CHECK_INTERVAL_MS)) {
 		lastCancelCheckMs = now;
 		if (ConfigurationWrapper.isJobCanceled(context)) {
-		    GSLoggerFactory.getLogger(getClass()).info("Statistics task CANCELED view id {} ", viewId);
+		    GSLoggerFactory.getLogger(getClass()).info("Statistics task CANCELED (view / artifact key: {})", statsArtifactKey);
 
 		    status.setPhase(JobPhase.CANCELED);
 		    return;
@@ -472,7 +461,8 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Updated metrics for view {}", viewId);
+	GSLoggerFactory.getLogger(getClass()).info("Updated metrics for {}",
+		(viewId != null && !viewId.isEmpty()) ? ("view " + viewId) : "all sources (no view)");
 
 	Optional<S3TransferWrapper> optS3TransferManager = getS3TransferManager();
 
@@ -483,7 +473,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	    S3TransferWrapper manager = optS3TransferManager.get();
 	    manager.setACLPublicRead(true);
 
-	    File tempFile = File.createTempFile(getClass().getSimpleName() + viewId, ".txt");
+	    File tempFile = File.createTempFile(getClass().getSimpleName() + statsArtifactKey, ".txt");
 
 	    String text = registry.scrape();
 
@@ -492,7 +482,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	    manager.uploadFile(
 		    tempFile.getAbsolutePath(), 
 		    "dabreporting", 
-		    "monitoring/" + viewId + ".txt");
+		    "monitoring/" + statsArtifactKey + ".txt");
 
 	    tempFile.delete();
 
@@ -616,6 +606,9 @@ public class StatisticsTask extends AbstractCustomTask {
     private static DiscoveryMessage newDiscoveryMessageForSource(View view, String sourceId) {
 
 	DiscoveryMessage message = new DiscoveryMessage();
+	List<GSSource> sources = new ArrayList<>();
+	sources.add(ConfigurationWrapper.getSource(sourceId));
+	message.setSources(sources);
 	message.setView(view);
 	Bond base = BondFactory.createAndBond(view.getBond(), BondFactory.createSourceIdentifierBond(sourceId));
 	message.setUserBond(base);
@@ -635,8 +628,10 @@ public class StatisticsTask extends AbstractCustomTask {
 	    return 0.0;
 	}
 	Bond baseClone = baseMessage.getUserBond().get().clone();
-	SimpleValueBond exists = BondFactory.createExistsSimpleValueBond(element);
-	Bond withElement = BondFactory.createAndBond(exists, baseClone);
+	Bond target = getBond(element);
+
+	Bond withElement = BondFactory.createAndBond(target, baseClone);
+
 	baseMessage.setUserBond(withElement);
 	baseMessage.setPermittedBond(withElement);
 	int withCount = finder.count(baseMessage).getCount();
@@ -655,12 +650,25 @@ public class StatisticsTask extends AbstractCustomTask {
 	}
 	Bond combined = baseMessage.getUserBond().get().clone();
 	for (MetadataElement el : elements) {
-	    combined = BondFactory.createAndBond(BondFactory.createExistsSimpleValueBond(el), combined);
+	    combined = BondFactory.createAndBond(getBond(el), combined);
 	}
 	baseMessage.setUserBond(combined);
 	baseMessage.setPermittedBond(combined);
 	int withCount = finder.count(baseMessage).getCount();
 	return 100.0 * withCount / totalRecords;
+    }
+
+    private static Bond getBond(MetadataElement element) {
+	Bond target = null;
+	switch (element){
+	case TEMP_EXTENT:
+	    target = BondFactory.createOrBond(BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_BEGIN),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_END),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_BEGIN_NOW),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_END_NOW),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW));
+	    break;
+	default:
+	    target = BondFactory.createExistsSimpleValueBond(element);
+	    break;
+	}
+	return target;
     }
 
     /**
