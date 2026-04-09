@@ -10,12 +10,12 @@ package eu.essi_lab.services.data_hub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -29,7 +29,6 @@ import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.indexes.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.*;
-import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.services.impl.*;
 import eu.essi_lab.services.message.*;
@@ -440,6 +439,11 @@ public class DataHubService extends AbstractManagedService {
 
 	    Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
+	    SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
+
+	    sourceStorage.harvestingStarted(getSource(), HarvestingStrategy.SELECTIVE, false, false);
+	    sourceStorage.harvestingEnded(getSource(), HarvestingStrategy.SELECTIVE);
+
 	    SourceStorageWorker worker = database.getWorker(sourceId);
 
 	    boolean data1Folder = worker.existsData1Folder();
@@ -447,21 +451,22 @@ public class DataHubService extends AbstractManagedService {
 
 	    if (data1Folder && data2Folder) {
 
-		error("Both data1 and data2 folders exist");
+		error("Both data-1 and data-2 folders exist");
 		return Optional.empty();
 	    }
 
-	    if (!data1Folder && !data2Folder) {
+	    if (!data1Folder) {
 
-		error("Both data1 and data2 folders missing");
+		error("data-1 folder missing");
 		return Optional.empty();
 	    }
 
-	    return Optional.of(data1Folder ? worker.getData1Folder() : worker.getData2Folder());
+	    return Optional.of(worker.getData1Folder());
 
-	} catch (GSException e) {
+	} catch (Exception e) {
 
-	    error("Unable to get database instance: " + e.getMessage(), e);
+	    error("Unable to retrieve target folder: " + e.getMessage(), e);
+
 	    return Optional.empty();
 	}
     }
@@ -545,12 +550,7 @@ public class DataHubService extends AbstractManagedService {
 
 		DatahubMapper mapper = new DatahubMapper();
 
-		GSSource source = new GSSource();
-		source.setEndpoint(serviceUrl);
-		source.setUniqueIdentifier(sourceId);
-		source.setLabel(sourceLabel);
-
-		GSResource resource = mapper.map(original, source);
+		GSResource resource = mapper.map(original, getSource());
 
 		resource.setPrivateId(StringUtils.URLEncodeUTF8(resource.getOriginalId().get()));
 
@@ -592,6 +592,19 @@ public class DataHubService extends AbstractManagedService {
 
 	    error("Unable to process record: " + e.getMessage(), e, true);
 	}
+    }
+
+    /**
+     * @return
+     */
+    private GSSource getSource() {
+
+	GSSource source = new GSSource();
+	source.setEndpoint(serviceUrl);
+	source.setUniqueIdentifier(sourceId);
+	source.setLabel(sourceLabel);
+
+	return source;
     }
 
     /**
@@ -706,6 +719,10 @@ public class DataHubService extends AbstractManagedService {
 	if (ex != null) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).error(message);
 	}
 
 	this.running = running;
