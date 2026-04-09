@@ -514,6 +514,10 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	    // distribution info, download
 	    //
 
+	    String resourceIdentifier = generateCode(dataset, stationCode + "-" + paramCode);
+	    coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
+	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
+
 	    if (puntoMisuraUrl != null && !puntoMisuraUrl.isEmpty()) {
 
 		if (puntoMisuraUrl.endsWith("?format=json")) {
@@ -541,14 +545,26 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		if (m != null && m.equals(PIEMONTE_Variable.SCALADEFLUSSO)) {
 		    puntoMisuraUrl = puntoMisuraUrl.replace("punti_misura_idro", getDataParam);
 		    puntoMisuraUrl = puntoMisuraUrl + "?" + varType + "=" + lastPath;
-		    coreMetadata.addDistributionOnlineResource(identifier, puntoMisuraUrl,
-			    CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI, "download");
+
+		    Online o = new Online();
+		    o.setLinkage(puntoMisuraUrl);
+		    o.setFunctionCode("download");
+		    o.setName(identifier);
+		    o.setIdentifier(resourceIdentifier);
+		    o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI);
+		    distribution.addDistributionOnline(o);
 		    dataset.getPropertyHandler().setIsRatingCurve(true);
 
 		} else if (realTimeData) {
 		    puntoMisuraUrl = HISCentralPiemonteConnector.REAL_TIME_URL + HISCentralPiemonteConnector.DATA_URL + "?station_code=" + stationCode + "&page=1&page_size=10000";
-		    coreMetadata.addDistributionOnlineResource(identifier, puntoMisuraUrl,
-			    CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI, "download");
+
+		    Online o = new Online();
+		    o.setLinkage(puntoMisuraUrl);
+		    o.setFunctionCode("download");
+		    o.setName(identifier);
+		    o.setIdentifier(resourceIdentifier);
+		    o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI);
+		    distribution.addDistributionOnline(o);
 		    dataset.getPropertyHandler().setIsTimeseries(true);
 		} else {
 		    dataset.getPropertyHandler().setIsTimeseries(true);
@@ -571,15 +587,13 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 
 			onlineData = onlineData.contains("?format=json") ? onlineData.replace("?format=json", "") : onlineData;
 
-			coreMetadata.addDistributionOnlineResource(identifier, onlineData,
-				CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI, "download");
-
-			// Online o = new Online();
-			// o.setLinkage(onlineData);
-			// o.setFunctionCode("download");
-			// o.setName(stationName + "_" + paramCode);
-			// o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI);
-			// distribution.addDistributionOnline(o);
+			Online o = new Online();
+			o.setLinkage(onlineData);
+			o.setFunctionCode("download");
+			o.setName(identifier);
+			o.setIdentifier(resourceIdentifier);
+			o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI);
+			distribution.addDistributionOnline(o);
 
 		    } else {
 			GSLoggerFactory.getLogger(this.getClass()).warn("Last path url {}: ", lastPath);
