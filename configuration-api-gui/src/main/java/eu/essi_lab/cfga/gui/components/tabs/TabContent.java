@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.tabs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -43,7 +43,7 @@ import java.util.stream.*;
 /**
  * @author Fabrizio
  */
-public class TabContent extends VerticalLayout implements Renderable {
+public class TabContent extends VerticalLayout implements Renderable, ConfigurationChangeListener {
 
     /**
      *
@@ -163,8 +163,8 @@ public class TabContent extends VerticalLayout implements Renderable {
 	    headerLayout.add(descLayout);
 
 	    //
- 	    // max description length is limited
- 	    //
+	    // max description length is limited
+	    //
 
 	    Optional<AddDirective> addDirective = directiveHolder.get(AddDirective.class);
 
@@ -255,6 +255,24 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 		headerLayout.add(reloadButton);
 	    }
+
+	    if (tabContentDesc.isReloadableOnFlush()) {
+
+		configuration.addChangeEventListener(this);
+	    }
+	}
+    }
+
+    @Override
+    public void configurationChanged(ConfigurationChangeEvent event) {
+
+	if (event.getEventType() == EventType.CONFIGURATION_FLUSHED) {
+
+	    tabContentDesc.getTabReloader().ifPresent(reloader -> tabContentDesc.getTabReloader().get().run());
+
+	    removeAllButHeader();
+
+	    render(true);
 	}
     }
 
@@ -365,7 +383,6 @@ public class TabContent extends VerticalLayout implements Renderable {
 			false,// forceHideHeader
 			this); //
 
-
 		if (component.getDetails().isPresent()) {
 
 		    Details details = component.getDetails().get();
@@ -375,7 +392,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 			details.getStyle().set("margin-top", "15px");
 		    }
 
-		   add(details);
+		    add(details);
 
 		} else {
 
@@ -383,7 +400,7 @@ public class TabContent extends VerticalLayout implements Renderable {
 		    Div div = ComponentFactory.createDiv();
 		    div.setHeightFull();
 		    div.setWidthFull();
-		    div.getStyle().set("overflow","auto");
+		    div.getStyle().set("overflow", "auto");
 
 		    // this is required to allow the replacing of the modified setting component
 		    // see #replaceSettingComponent
@@ -499,11 +516,10 @@ public class TabContent extends VerticalLayout implements Renderable {
     }
 
     /**
-     *
      * @param componentId
      * @return
      */
-    private int indexOf(String componentId){
+    private int indexOf(String componentId) {
 
 	Iterator<Component> it = getChildren().sequential().iterator();
 	int index = 0;
@@ -519,11 +535,10 @@ public class TabContent extends VerticalLayout implements Renderable {
     }
 
     /**
-     *
      * @param componentId
      * @return
      */
-    private Component find(String componentId){
+    private Component find(String componentId) {
 
 	Iterator<Component> it = getChildren().sequential().iterator();
 	while (it.hasNext()) {
@@ -609,20 +624,12 @@ public class TabContent extends VerticalLayout implements Renderable {
 
 	reloadButton.addClickListener((ComponentEventListener<ClickEvent<Button>>) event -> {
 
-	    if (tabContentDesc.getTabReloader().isPresent()) {
+	    tabContentDesc.getTabReloader().ifPresent(reloader -> tabContentDesc.getTabReloader().get().run());
 
-		tabContentDesc.getTabReloader().get().run();
+	    removeAllButHeader();
 
-		removeAllButHeader();
+	    render(true);
 
-		render(true);
-
-	    } else {
-
-		removeAllButHeader();
-
-		render(true);
-	    }
 	});
 
 	return reloadButton;
@@ -666,7 +673,6 @@ public class TabContent extends VerticalLayout implements Renderable {
     }
 
     /**
-     *
      * @return
      */
     public TabDescriptor getTabDesc() {
@@ -675,7 +681,6 @@ public class TabContent extends VerticalLayout implements Renderable {
     }
 
     /**
-     *
      * @return
      */
     public TabContentDescriptor getTabContentDesc() {
