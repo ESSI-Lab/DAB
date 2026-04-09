@@ -106,12 +106,13 @@ public class DataHubService extends AbstractManagedService {
     private String sourceId;
     private DatabaseFolder targetFolder;
     private String serviceUrl;
-    private String token;
     private String sourceLabel;
     private ExecutorService executor;
     private OffsetTracker tracker;
     private Decoder decoder;
     private int maxStopWaitSeconds;
+    private String tokenUser;
+    private String tokenPwd;
 
     /**
      *
@@ -168,18 +169,26 @@ public class DataHubService extends AbstractManagedService {
 	    serviceUrl = optServiceUrl.get();
 	}
 
-	Optional<String> tokenUser = getSetting().readKeyValue(TOKEN_USER_KEY);
+	Optional<String> optTokenUser = getSetting().readKeyValue(TOKEN_USER_KEY);
 
-	if (!(check(tokenUser))) {
+	if (!(check(optTokenUser))) {
 
 	    error("Missing token user name");
+
+	} else {
+
+	    tokenUser = optTokenUser.get();
 	}
 
-	Optional<String> tokenPwd = getSetting().readKeyValue(TOKEN_PWD_KEY);
+	Optional<String> optTokenPwd = getSetting().readKeyValue(TOKEN_PWD_KEY);
 
-	if (!(check(tokenPwd))) {
+	if (!(check(optTokenPwd))) {
 
 	    error("Missing token password");
+
+	} else {
+
+	    tokenPwd = optTokenPwd.get();
 	}
 
 	Optional<String> schemaRegistryURL = getSetting().readKeyValue(SCHEMA_REGISTRY_URL_KEY);
@@ -270,19 +279,6 @@ public class DataHubService extends AbstractManagedService {
 
 	getTargetFolder().ifPresent(f -> targetFolder = f);
 
-	//
-	// get token
-	//
-
-	try {
-
-	    token = String.valueOf(getAccessToken(serviceUrl, tokenUser.get(), tokenPwd.get()));
-
-	} catch (Exception e) {
-
-	    error("Unable to get access token: " + e.getMessage(), e);
-	}
-
 	if (!running) {
 
 	    return;
@@ -365,7 +361,7 @@ public class DataHubService extends AbstractManagedService {
 
 			if (raw != null) {
 
-			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
+			    optRecord = decoder.decode(record, schemaRegistryURL.get()). //
 				    map(rec -> DecodedRecord.of(this, decoder.getMapper(), rec)).//
 				    filter(checkRecord(recordsFilter.get()));
 
@@ -542,6 +538,8 @@ public class DataHubService extends AbstractManagedService {
 
 		DatahubConnector connector = new DatahubConnector();
 
+		String token = getAccessToken();
+
 		String jsonEntity = connector.fetch(serviceUrl, token, entityURN);
 
 		OriginalMetadata original = new OriginalMetadata();
@@ -619,14 +617,11 @@ public class DataHubService extends AbstractManagedService {
     }
 
     /**
-     * @param tokenUrl
-     * @param tokenUser
-     * @param tokenPwd
      * @return
      * @throws IOException
      * @throws InterruptedException
      */
-    private String getAccessToken(String tokenUrl, String tokenUser, String tokenPwd) throws IOException, InterruptedException {
+    String getAccessToken() throws IOException, InterruptedException {
 
 	HttpResponse<String> response;
 	ObjectMapper mapper = new ObjectMapper();
@@ -640,7 +635,7 @@ public class DataHubService extends AbstractManagedService {
 
 	    String body = mapper.writeValueAsString(payload);
 
-	    tokenUrl += "/ext-login";
+	    String tokenUrl = serviceUrl + "/ext-login";
 
 	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(tokenUrl)).header("Content-Type", "application/json")
 		    .POST(HttpRequest.BodyPublishers.ofString(body)).build();

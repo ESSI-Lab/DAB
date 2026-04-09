@@ -259,11 +259,11 @@ public class DataHubTestClient {
      */
     public static void main(String[] args) throws Exception {
 
-	String idPrefix = "test_3";
+	String idPrefix = "test_9";
 
-	insert(10, 1, idPrefix);
+	insert(3, 1, idPrefix);
 
-//	update("ID_test_3_1", ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
+//	update("ID_test_8_0", ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
 
 //	for (int i = 0; i < 9; i++) {
 //

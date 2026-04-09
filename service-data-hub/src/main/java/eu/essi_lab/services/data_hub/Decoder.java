@@ -10,12 +10,12 @@ package eu.essi_lab.services.data_hub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -32,6 +32,7 @@ import java.net.*;
 import java.net.http.*;
 import java.nio.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -42,8 +43,12 @@ class Decoder {
      *
      */
     private final ObjectMapper mapper;
-    private final Map<Integer, Schema> schemaCache;
     private final DataHubService service;
+
+    /**
+     *
+     */
+    private static final Map<Integer, Schema> SCHEMA_CACHE = new ConcurrentHashMap<>();
 
     /**
      * @param service
@@ -52,7 +57,6 @@ class Decoder {
 
 	this.service = service;
 	this.mapper = new ObjectMapper();
-	this.schemaCache = new HashMap<>();
     }
 
     /**
@@ -65,12 +69,12 @@ class Decoder {
     Optional<Map<String, Object>> decode( //
 
 	    ConsumerRecord<byte[], byte[]> consumerRecord,  //
-	    String schemaRegistryURL, //
-	    String token) {
+	    String schemaRegistryURL //
+    ) {
 
 	try {
 
-	    GenericRecord record = deserialize(consumerRecord.value(), schemaRegistryURL, token);
+	    GenericRecord record = deserialize(consumerRecord.value(), schemaRegistryURL);
 
 	    String json = record.toString();
 	    Map<String, Object> map = mapper.readValue(json, new TypeReference<>() {
@@ -134,14 +138,14 @@ class Decoder {
      * @return
      * @throws Exception
      */
-    private GenericRecord deserialize(byte[] raw, String schemaRegistryUrl, String token) throws Exception {
+    private GenericRecord deserialize(byte[] raw, String schemaRegistryUrl) throws Exception {
 
 	ByteBuffer buffer = ByteBuffer.wrap(raw);
 
 	buffer.get(); // magic byte
 	int schemaId = buffer.getInt();
 
-	Schema schema = getSchema(schemaRegistryUrl, schemaId, token);
+	Schema schema = getSchema(schemaRegistryUrl, schemaId);
 
 	byte[] avroBytes = new byte[buffer.remaining()];
 	buffer.get(avroBytes);
@@ -160,13 +164,15 @@ class Decoder {
      * @return
      * @throws Exception
      */
-    private Schema getSchema(String schemaRegistryUrl, int schemaId, String token) throws Exception {
+    private Schema getSchema(String schemaRegistryUrl, int schemaId) throws Exception {
 
-	if (!schemaCache.containsKey(schemaId)) {
+	if (!SCHEMA_CACHE.containsKey(schemaId)) {
 
 	    HttpResponse<String> response;
 
 	    try (HttpClient client = HttpClient.newHttpClient()) {
+
+		String token = service.getAccessToken();
 
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(schemaRegistryUrl + "/schemas/ids/" + schemaId))
 			.header("Authorization", "Bearer " + token).GET().build();
@@ -180,10 +186,10 @@ class Decoder {
 
 	    Schema schema = new Schema.Parser().parse(schemaStr);
 
-	    schemaCache.put(schemaId, schema);
+	    SCHEMA_CACHE.put(schemaId, schema);
 	}
 
-	return schemaCache.get(schemaId);
+	return SCHEMA_CACHE.get(schemaId);
     }
 
     /**
