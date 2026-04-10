@@ -289,9 +289,10 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * The source configuration is read-only, it can dispatch only {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED}
+     * The source configuration is read-only,
+     * it can dispatch only {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED}
      * events after the flush of the cloned configuration
-     * @see SaveConfirmationDialog#onConfigurationFlushConfirmed()
+     * @see GSConfigurationView#onConfigurationFlushed()
      * @param event
      */
     @Override

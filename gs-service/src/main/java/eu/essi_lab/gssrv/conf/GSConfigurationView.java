@@ -265,6 +265,26 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
+     * Forces the reload of the source configuration so in this node, the changes are already available without waiting for the
+     * autoreload.<br> The source configuration, provided by {@link ConfigurationWrapper},
+     * is read-only and it can dispatch only
+     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED}
+     * events after the flush of the cloned configuration
+     */
+    @Override
+    protected void onConfigurationFlushed() {
+
+	try {
+
+	    DABStarter.configuration.reload();
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+    }
+
+    /**
      * @param event
      */
     @Override
@@ -476,11 +496,11 @@ public class GSConfigurationView extends ConfigurationView {
      * This method is called when the client window is loaded.<br> Returns a clone with disabled autoreload of the
      * {@link DABStarter#configuration}. Changes applied to this configuration instance are not applied to the source configuration until
      * this configuration is <i>flushed</i> and the source configuration performs the autoreload.<br> This avoids to apply intermediate
-     * configuration changes to the source configuration which is the core of the {@link ConfigurationWrapper}. It also allows
-     * to compare the two configurations to enable/disable the save button.<br> When this cloned
-     * configuration is flushed, the source configuration of this node is suddenly updated (see {@link SaveConfirmationDialog#onConfigurationFlushConfirmed()}).<br>
-     * The other cluster nodes, having only a single read-only copy of the source configuration,
-     * will apply the changes in maximum <i>autoreload-time</i>, that is currently set in 5 minutes.<br>
+     * configuration changes to the source configuration which is the core of the {@link ConfigurationWrapper}. It also allows to compare
+     * the two configurations to enable/disable the save button.<br> When this cloned configuration is flushed, the source configuration of
+     * this node is suddenly updated (see {@link SaveConfirmationDialog#onConfigurationFlushConfirmed()}).<br> The other cluster nodes,
+     * having only a single read-only copy of the source configuration, will apply the changes in maximum <i>autoreload-time</i>, that is
+     * currently set in 5 minutes.<br>
      * <br>
      */
     @Override
