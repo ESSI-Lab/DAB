@@ -176,14 +176,8 @@ class SaveConfirmationDialog extends ConfirmationDialog {
 
 	try {
 
+	    // flushes the cloned configuration
 	    view.getConfiguration().flush();
-
-	    //
-	    // forces the reload to the wrapper configuration so in
-	    // this node, the changes are already available without waiting for the autoreload
-	    // useful for testing purpose
-	    //
-	    DABStarter.configuration.reload();
 
 	    view.updateScheduler();
 

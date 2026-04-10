@@ -92,7 +92,7 @@ public interface ManagedService extends Configurable<ManagedServiceSetting> {
      * @param key
      * @return
      */
-    default Optional<Map.Entry<String, String>> read(String key) {
+    default Optional<Map.Entry<String, String>> get(String key) {
 
 	return KeyValueStoreProvider.get().get(getId(), key);
     }

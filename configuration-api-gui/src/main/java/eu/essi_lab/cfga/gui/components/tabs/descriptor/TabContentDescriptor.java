@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.tabs.descriptor;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -29,9 +29,7 @@ import eu.essi_lab.cfga.setting.*;
 import java.util.*;
 
 /**
- *
  * @author Fabrizio
- *
  */
 public class TabContentDescriptor {
 
@@ -42,6 +40,7 @@ public class TabContentDescriptor {
     private Runnable tabReloadHandler;
     private Component content;
     private Class<? extends Setting> settingClass;
+    private boolean reloadOnFlush;
 
     /**
      *
@@ -66,7 +65,6 @@ public class TabContentDescriptor {
 
 	this.label = label;
     }
-
 
     /**
      * @return the
@@ -101,21 +99,48 @@ public class TabContentDescriptor {
     }
 
     /**
+     * @return
+     */
+    public boolean isReloadableOnFlush() {
+
+	return reloadOnFlush;
+    }
+
+    /**
      * @param reloadable
      */
     public void setReloadable(boolean reloadable) {
 
+	setReloadable(reloadable, false);
+    }
+
+    /**
+     * @param reloadable
+     * @param reloadOnFlush
+     */
+    public void setReloadable(boolean reloadable, boolean reloadOnFlush) {
+
 	this.reloadable = reloadable;
+	this.reloadOnFlush = reloadOnFlush;
+    }
+
+    /**
+     * @param reloadable
+     */
+    public void setReloadable(Runnable reloader) {
+
+	setReloadable(reloader, false);
     }
 
     /**
      * @param reloadable
      * @param reloader
      */
-    public void setReloadable(boolean reloadable, Runnable reloader) {
+    public void setReloadable(Runnable reloader, boolean reloadOnFlush) {
 
-	this.reloadable = reloadable;
+	this.reloadable = true;
 	this.tabReloadHandler = reloader;
+	this.reloadOnFlush = reloadOnFlush;
     }
 
     /**
@@ -127,7 +152,6 @@ public class TabContentDescriptor {
     }
 
     /**
-     *
      * @return
      */
     public Optional<Class<? extends Setting>> getSettingClass() {
@@ -136,7 +160,6 @@ public class TabContentDescriptor {
     }
 
     /**
-     *
      * @param settingClass
      */
     public void setSettingClass(Class<? extends Setting> settingClass) {

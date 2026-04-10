@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -38,6 +38,7 @@ import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
+import eu.essi_lab.cfga.gs.setting.service.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
@@ -46,6 +47,7 @@ import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.*;
 import eu.essi_lab.cfga.source.*;
 import eu.essi_lab.configuration.*;
+import eu.essi_lab.gssrv.conf.*;
 import eu.essi_lab.gssrv.conf.task.*;
 import eu.essi_lab.gssrv.health.*;
 import eu.essi_lab.gssrv.servlet.*;
@@ -286,11 +288,17 @@ public class DABStarter implements ConfigurationChangeListener {
 	MultiServiceManager.get().setSettings(configSettings);
     }
 
+    /**
+     * The source configuration is read-only,
+     * it can dispatch only {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED}
+     * events after the flush of the cloned configuration
+     * @see GSConfigurationView#onConfigurationFlushed()
+     * @param event
+     */
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 
-	if (MultiServiceManager.isInitialized() && (event.getEventType() == CONFIGURATION_FLUSHED
-		|| event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
+	if (MultiServiceManager.isInitialized()) {
 
 	    switch (mode) {
 	    case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH, CONFIGURATION -> {
@@ -300,25 +308,23 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 	}
 
-	if (event.getEventType() == CONFIGURATION_AUTO_RELOADED) {
+	switch (mode) {
+	case BATCH, AUGMENTER, BULK -> {
 
-	    switch (mode) {
-	    case BATCH, AUGMENTER, BULK -> {
+	    if (!schedulerSetting.equals(ConfigurationWrapper.getSchedulerSetting())) {
 
-		if (!schedulerSetting.equals(ConfigurationWrapper.getSchedulerSetting())) {
+		GSLoggerFactory.getLogger(DABStarter.class).info("Detected scheduler setting changes");
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler STARTED");
 
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Detected scheduler setting changes");
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler STARTED");
+		schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
-		    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+		SchedulerFactory.getScheduler(schedulerSetting, true);
 
-		    SchedulerFactory.getScheduler(schedulerSetting, true);
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler ENDED");
-		}
-	    }
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler ENDED");
 	    }
 	}
+	}
+
     }
 
     /**

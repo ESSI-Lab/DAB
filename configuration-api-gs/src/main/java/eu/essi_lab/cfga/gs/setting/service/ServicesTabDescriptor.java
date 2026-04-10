@@ -10,18 +10,20 @@ package eu.essi_lab.cfga.gs.setting.service;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
+import com.vaadin.flow.component.*;
 import com.vaadin.flow.data.provider.*;
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gui.components.grid.*;
 import eu.essi_lab.cfga.gui.components.grid.renderer.*;
@@ -33,16 +35,14 @@ import eu.essi_lab.services.*;
 import java.util.*;
 
 /**
- *
  * @author Fabrizio
- *
  */
-public class ManagedServiceSettingTabDescriptorProvider extends TabDescriptor {
+public class ServicesTabDescriptor extends TabDescriptor {
 
     /**
      *
      */
-    public ManagedServiceSettingTabDescriptorProvider() {
+    public ServicesTabDescriptor() {
 
 	setLabel("Services");
 
@@ -63,9 +63,9 @@ public class ManagedServiceSettingTabDescriptorProvider extends TabDescriptor {
 
 		ColumnDescriptor.create("Id", true, true, this::getId), //
 
-		ColumnDescriptor.create("Implementation", true, true, this::getImpl), //
+		ColumnDescriptor.create("Implementation", 400, true, true, this::getImpl), //
 
-		ColumnDescriptor.create("Description", true, true, this::getDesc),//
+		ColumnDescriptor.create("Description", 400, true, true, this::getDesc),//
 
 		ColumnDescriptor.create("Status", true, true, s -> ManagedServiceSupport.getInstance().getServiceStatus(s)),
 
@@ -75,12 +75,14 @@ public class ManagedServiceSettingTabDescriptorProvider extends TabDescriptor {
 			ViewerColumnRenderer.create("Messages", "Messages", "View service messages"))
 
 	)).//
-		reloadable(() -> ManagedServiceSupport.getInstance().update()).//
+		reloadable(() -> ManagedServiceSupport.getInstance().update(), true).//
 
 		build();
 
 	setIndex(GSTabIndex.SERVICES.getIndex());
 	addContentDescriptor(descriptor);
+
+	ManagedServiceSupport.getInstance().update();
     }
 
     /**
