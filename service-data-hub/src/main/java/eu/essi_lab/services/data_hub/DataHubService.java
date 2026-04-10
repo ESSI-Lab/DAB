@@ -10,12 +10,12 @@ package eu.essi_lab.services.data_hub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -29,7 +29,6 @@ import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.indexes.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.*;
-import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.services.impl.*;
 import eu.essi_lab.services.message.*;
@@ -107,12 +106,13 @@ public class DataHubService extends AbstractManagedService {
     private String sourceId;
     private DatabaseFolder targetFolder;
     private String serviceUrl;
-    private String token;
     private String sourceLabel;
     private ExecutorService executor;
     private OffsetTracker tracker;
     private Decoder decoder;
     private int maxStopWaitSeconds;
+    private String tokenUser;
+    private String tokenPwd;
 
     /**
      *
@@ -169,18 +169,26 @@ public class DataHubService extends AbstractManagedService {
 	    serviceUrl = optServiceUrl.get();
 	}
 
-	Optional<String> tokenUser = getSetting().readKeyValue(TOKEN_USER_KEY);
+	Optional<String> optTokenUser = getSetting().readKeyValue(TOKEN_USER_KEY);
 
-	if (!(check(tokenUser))) {
+	if (!(check(optTokenUser))) {
 
 	    error("Missing token user name");
+
+	} else {
+
+	    tokenUser = optTokenUser.get();
 	}
 
-	Optional<String> tokenPwd = getSetting().readKeyValue(TOKEN_PWD_KEY);
+	Optional<String> optTokenPwd = getSetting().readKeyValue(TOKEN_PWD_KEY);
 
-	if (!(check(tokenPwd))) {
+	if (!(check(optTokenPwd))) {
 
 	    error("Missing token password");
+
+	} else {
+
+	    tokenPwd = optTokenPwd.get();
 	}
 
 	Optional<String> schemaRegistryURL = getSetting().readKeyValue(SCHEMA_REGISTRY_URL_KEY);
@@ -271,19 +279,6 @@ public class DataHubService extends AbstractManagedService {
 
 	getTargetFolder().ifPresent(f -> targetFolder = f);
 
-	//
-	// get token
-	//
-
-	try {
-
-	    token = String.valueOf(getAccessToken(serviceUrl, tokenUser.get(), tokenPwd.get()));
-
-	} catch (Exception e) {
-
-	    error("Unable to get access token: " + e.getMessage(), e);
-	}
-
 	if (!running) {
 
 	    return;
@@ -366,7 +361,7 @@ public class DataHubService extends AbstractManagedService {
 
 			if (raw != null) {
 
-			    optRecord = decoder.decode(record, schemaRegistryURL.get(), token). //
+			    optRecord = decoder.decode(record, schemaRegistryURL.get()). //
 				    map(rec -> DecodedRecord.of(this, decoder.getMapper(), rec)).//
 				    filter(checkRecord(recordsFilter.get()));
 
@@ -440,6 +435,11 @@ public class DataHubService extends AbstractManagedService {
 
 	    Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
+	    SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
+
+	    sourceStorage.harvestingStarted(getSource(), HarvestingStrategy.SELECTIVE, false, false);
+	    sourceStorage.harvestingEnded(getSource(), HarvestingStrategy.SELECTIVE);
+
 	    SourceStorageWorker worker = database.getWorker(sourceId);
 
 	    boolean data1Folder = worker.existsData1Folder();
@@ -447,21 +447,22 @@ public class DataHubService extends AbstractManagedService {
 
 	    if (data1Folder && data2Folder) {
 
-		error("Both data1 and data2 folders exist");
+		error("Both data-1 and data-2 folders exist");
 		return Optional.empty();
 	    }
 
-	    if (!data1Folder && !data2Folder) {
+	    if (!data1Folder) {
 
-		error("Both data1 and data2 folders missing");
+		error("data-1 folder missing");
 		return Optional.empty();
 	    }
 
-	    return Optional.of(data1Folder ? worker.getData1Folder() : worker.getData2Folder());
+	    return Optional.of(worker.getData1Folder());
 
-	} catch (GSException e) {
+	} catch (Exception e) {
 
-	    error("Unable to get database instance: " + e.getMessage(), e);
+	    error("Unable to retrieve target folder: " + e.getMessage(), e);
+
 	    return Optional.empty();
 	}
     }
@@ -537,6 +538,8 @@ public class DataHubService extends AbstractManagedService {
 
 		DatahubConnector connector = new DatahubConnector();
 
+		String token = getAccessToken();
+
 		String jsonEntity = connector.fetch(serviceUrl, token, entityURN);
 
 		OriginalMetadata original = new OriginalMetadata();
@@ -545,12 +548,7 @@ public class DataHubService extends AbstractManagedService {
 
 		DatahubMapper mapper = new DatahubMapper();
 
-		GSSource source = new GSSource();
-		source.setEndpoint(serviceUrl);
-		source.setUniqueIdentifier(sourceId);
-		source.setLabel(sourceLabel);
-
-		GSResource resource = mapper.map(original, source);
+		GSResource resource = mapper.map(original, getSource());
 
 		resource.setPrivateId(StringUtils.URLEncodeUTF8(resource.getOriginalId().get()));
 
@@ -597,6 +595,19 @@ public class DataHubService extends AbstractManagedService {
     /**
      * @return
      */
+    private GSSource getSource() {
+
+	GSSource source = new GSSource();
+	source.setEndpoint(serviceUrl);
+	source.setUniqueIdentifier(sourceId);
+	source.setLabel(sourceLabel);
+
+	return source;
+    }
+
+    /**
+     * @return
+     */
     private ConsumerRecords<byte[], byte[]> poll(int timeout) {
 
 	synchronized (consumer) {
@@ -606,14 +617,11 @@ public class DataHubService extends AbstractManagedService {
     }
 
     /**
-     * @param tokenUrl
-     * @param tokenUser
-     * @param tokenPwd
      * @return
      * @throws IOException
      * @throws InterruptedException
      */
-    private String getAccessToken(String tokenUrl, String tokenUser, String tokenPwd) throws IOException, InterruptedException {
+    String getAccessToken() throws IOException, InterruptedException {
 
 	HttpResponse<String> response;
 	ObjectMapper mapper = new ObjectMapper();
@@ -627,7 +635,7 @@ public class DataHubService extends AbstractManagedService {
 
 	    String body = mapper.writeValueAsString(payload);
 
-	    tokenUrl += "/ext-login";
+	    String tokenUrl = serviceUrl + "/ext-login";
 
 	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(tokenUrl)).header("Content-Type", "application/json")
 		    .POST(HttpRequest.BodyPublishers.ofString(body)).build();
@@ -706,6 +714,10 @@ public class DataHubService extends AbstractManagedService {
 	if (ex != null) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).error(message);
 	}
 
 	this.running = running;

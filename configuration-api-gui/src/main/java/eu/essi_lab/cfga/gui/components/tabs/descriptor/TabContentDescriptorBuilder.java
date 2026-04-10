@@ -677,12 +677,37 @@ public class TabContentDescriptorBuilder {
     }
 
     /**
+     *
+     * @param reloadOnFlush
+     * @return
+     */
+    public TabContentDescriptorBuilder reloadable(boolean reloadOnFlush) {
+
+	descriptor.setReloadable(true, reloadOnFlush);
+
+	return this;
+    }
+
+    /**
      * @param reloader
      * @return
      */
     public TabContentDescriptorBuilder reloadable(Runnable reloader) {
 
-	descriptor.setReloadable(true, reloader);
+	descriptor.setReloadable(reloader);
+
+	return this;
+    }
+
+    /**
+     *
+     * @param reloader
+     * @param reloadOnFlush
+     * @return
+     */
+    public TabContentDescriptorBuilder reloadable(Runnable reloader, boolean reloadOnFlush) {
+
+	descriptor.setReloadable(reloader, reloadOnFlush);
 
 	return this;
     }
