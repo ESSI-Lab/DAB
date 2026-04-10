@@ -26,9 +26,11 @@ import eu.essi_lab.accessor.datahub.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.identifierdecorator.*;
 import eu.essi_lab.indexes.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.services.impl.*;
 import eu.essi_lab.services.message.*;
@@ -550,7 +552,13 @@ public class DataHubService extends AbstractManagedService {
 
 		GSResource resource = mapper.map(original, getSource());
 
-		resource.setPrivateId(StringUtils.URLEncodeUTF8(resource.getOriginalId().get()));
+		String originalId = IdentifierDecorator.generatePersistentIdentifier( //
+			resource.getOriginalId().get(), //
+			getSource().getUniqueIdentifier());//
+
+		resource.setPrivateId(StringUtils.URLEncodeUTF8(originalId));
+		resource.setOriginalId(originalId);
+		resource.setPublicId(originalId);
 
 		IndexedElementsWriter.write(resource);
 
@@ -636,6 +644,42 @@ public class DataHubService extends AbstractManagedService {
 	    String body = mapper.writeValueAsString(payload);
 
 	    String tokenUrl = serviceUrl + "/ext-login";
+
+	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(tokenUrl)).header("Content-Type", "application/json")
+		    .POST(HttpRequest.BodyPublishers.ofString(body)).build();
+
+	    response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	}
+
+	JsonNode json = mapper.readTree(response.body());
+
+	return json.get("access_token").asText();
+    }
+
+    /**
+     *
+     * @param user
+     * @param pwd
+     * @param url
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    static String getAccessToken(String user, String pwd, String url) throws IOException, InterruptedException {
+
+	HttpResponse<String> response;
+	ObjectMapper mapper = new ObjectMapper();
+
+	try (HttpClient client = HttpClient.newHttpClient()) {
+
+	    Map<String, Object> payload = new HashMap<>();
+	    payload.put("user", user);
+	    payload.put("psw", pwd);
+	    payload.put("app_to_use", "TUTTE");
+
+	    String body = mapper.writeValueAsString(payload);
+
+	    String tokenUrl = url + "/ext-login";
 
 	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(tokenUrl)).header("Content-Type", "application/json")
 		    .POST(HttpRequest.BodyPublishers.ofString(body)).build();
