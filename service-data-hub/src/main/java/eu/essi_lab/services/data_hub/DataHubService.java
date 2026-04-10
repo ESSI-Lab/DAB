@@ -665,7 +665,7 @@ public class DataHubService extends AbstractManagedService {
      * @throws IOException
      * @throws InterruptedException
      */
-    static String getAccessToken(String user, String pwd, String url) throws IOException, InterruptedException {
+    public static String getAccessToken(String user, String pwd, String url) throws IOException, InterruptedException {
 
 	HttpResponse<String> response;
 	ObjectMapper mapper = new ObjectMapper();
