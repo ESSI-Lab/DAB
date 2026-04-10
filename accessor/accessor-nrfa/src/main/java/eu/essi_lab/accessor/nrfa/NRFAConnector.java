@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.nrfa;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.json.JSONObject;
 
@@ -61,6 +62,9 @@ public class NRFAConnector extends HarvestedQueryConnector<NRFAConnectorSetting>
 
     List<String> stations = null;
 
+    /** Total metadata records emitted in the current harvest (across listRecords calls until completion or max). */
+    private int partialNumbers;
+
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 
@@ -72,41 +76,69 @@ public class NRFAConnector extends HarvestedQueryConnector<NRFAConnectorSetting>
 	    stations = client.getStationIdentifiers();
 	}
 
-	String token = request.getResumptionToken();
-
-	if (token == null) {
-	    token = stations.get(0);
+	if (stations.isEmpty()) {
+	    return ret;
 	}
+
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+
+	String incoming = request.getResumptionToken();
+	if (incoming == null) {
+	    incoming = stations.get(0);
+	}
+
+	boolean matched = false;
+	boolean stoppedByMax = false;
 
 	for (int i = 0; i < stations.size(); i++) {
 	    String station = stations.get(i);
-	    if (station.equals(token)) {
-		if (i == stations.size() - 1) {
-		    token = null;
-		} else {
-		    token = stations.get(i + 1);
-		}
-		ret.setResumptionToken(token);
+	    if (!station.equals(incoming)) {
+		continue;
+	    }
+	    matched = true;
 
-		StationInfo info = client.getStationInfo(station);
+	    StationInfo info = client.getStationInfo(station);
 
-		String jsonString = info.getJSON().toString();
+	    String jsonString = info.getJSON().toString();
 
-		List<ParameterInfo> parameters = info.getParameterInfos();
-		for (ParameterInfo parameter : parameters) {
-		    JSONObject json = new JSONObject(jsonString);
-		    JSONObject summary = json.getJSONObject("data-summary");
-		    List<JSONObject> list = new ArrayList<>();
-		    list.add(parameter.getJSON());
-		    summary.put("data-types", list);
-		    OriginalMetadata metadataRecord = new OriginalMetadata();
-		    metadataRecord.setSchemeURI(CommonNameSpaceContext.NRFA_URI);
-		    metadataRecord.setMetadata(json.toString());
-		    ret.addRecord(metadataRecord);
+	    List<ParameterInfo> parameters = info.getParameterInfos();
+	    for (ParameterInfo parameter : parameters) {
+		if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		    stoppedByMax = true;
+		    break;
 		}
 
+		JSONObject json = new JSONObject(jsonString);
+		JSONObject summary = json.getJSONObject("data-summary");
+		List<JSONObject> list = new ArrayList<>();
+		list.add(parameter.getJSON());
+		summary.put("data-types", list);
+		OriginalMetadata metadataRecord = new OriginalMetadata();
+		metadataRecord.setSchemeURI(CommonNameSpaceContext.NRFA_URI);
+		metadataRecord.setMetadata(json.toString());
+		ret.addRecord(metadataRecord);
+		partialNumbers++;
 	    }
 
+	    if (stoppedByMax) {
+		ret.setResumptionToken(null);
+		partialNumbers = 0;
+		return ret;
+	    }
+
+	    if (i == stations.size() - 1) {
+		ret.setResumptionToken(null);
+		partialNumbers = 0;
+	    } else {
+		ret.setResumptionToken(stations.get(i + 1));
+	    }
+	    break;
+	}
+
+	if (!matched) {
+	    ret.setResumptionToken(null);
+	    partialNumbers = 0;
 	}
 
 	return ret;

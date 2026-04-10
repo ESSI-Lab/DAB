@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.json.JSONObject;
 
@@ -127,7 +128,15 @@ public class EiffelS3Connector extends HarvestedQueryConnector<EiffelS3Connector
 
 	GSLoggerFactory.getLogger(getClass()).debug("Starting from index: {}", index);
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+
 	for (int i = index; i <= end; i++) {
+
+	    if (!unlimited && mr.isPresent() && recordsCount >= mr.get()) {
+		response.setResumptionToken(null);
+		return response;
+	    }
 
 	    try {
 

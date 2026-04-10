@@ -270,6 +270,10 @@ public class StatisticsTask extends AbstractCustomTask {
 	    GSLoggerFactory.getLogger(getClass()).info("Processing source "+source+" "+ ++si+"/"+overallStats.size());
 
 	    GSSource s = ConfigurationWrapper.getSource(source);
+	    if (s==null){
+		GSLoggerFactory.getLogger(getClass()).error("Source "+source+" not found,skipping");
+		continue;
+	    }
 	    if (metrics.contains(StatisticsMetric.SOURCE_INFO)) {
 		Gauge.builder(StatisticsMetric.SOURCE_INFO.prometheusName(), () -> 1)//
 			.description(StatisticsMetric.SOURCE_INFO.description())//
@@ -332,6 +336,7 @@ public class StatisticsTask extends AbstractCustomTask {
 		}
 
 		if (metrics.contains(StatisticsMetric.SOURCE_UP)) {
+		    
 		    int up = harvestingProperties.isSourceUp().orElse(false) ? 1 : 0;
 		    sourceUp.put(source, up);
 		    io.micrometer.core.instrument.Gauge.builder(StatisticsMetric.SOURCE_UP.prometheusName(), sourceUp, g -> g.get(source))//

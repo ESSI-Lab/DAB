@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
@@ -59,19 +60,18 @@ public class NasaGSFCConnector extends HarvestedQueryConnector<NasaGSFCConnector
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
 
 	try {
-	    OriginalMetadata massdeficit = createMetadata("massdeficit.xml");
-	    OriginalMetadata ozminn = createMetadata("ozminn.xml");
-	    OriginalMetadata ozoneholearea = createMetadata("ozoneholearea.xml");
-	    OriginalMetadata ozonemaxn = createMetadata("ozonemaxn.xml");
-	    OriginalMetadata ozoneminimum = createMetadata("ozoneminimum.xml");
-	    OriginalMetadata polarcap = createMetadata("polarcap.xml");
-
-	    response.addRecord(massdeficit);
-	    response.addRecord(ozminn);
-	    response.addRecord(ozoneholearea);
-	    response.addRecord(ozonemaxn);
-	    response.addRecord(ozoneminimum);
-	    response.addRecord(polarcap);
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
+	    String[] files = { "massdeficit.xml", "ozminn.xml", "ozoneholearea.xml", "ozonemaxn.xml", "ozoneminimum.xml",
+		    "polarcap.xml" };
+	    for (String fileName : files) {
+		if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		    break;
+		}
+		response.addRecord(createMetadata(fileName));
+		added++;
+	    }
 
 	} catch (Exception ex) {
 

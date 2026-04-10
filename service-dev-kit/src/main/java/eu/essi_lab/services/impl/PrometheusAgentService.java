@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf.task;
+package eu.essi_lab.services.impl;
 
 /*-
  * #%L
@@ -33,95 +33,124 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.EnumMap;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
-import org.quartz.JobExecutionContext;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.OptionsKey;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.FileUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.utils.zip.TarExtractor;
+import eu.essi_lab.services.message.MessageChannel;
 
 /**
  * Downloads and runs Prometheus in "agent" mode, generating a tailored configuration file.
+ * <p>
+ * Configure via {@link eu.essi_lab.services.ManagedServiceSetting} key-value options (Java
+ * {@link Properties}); see {@link OptionKeys} for required property names.
  */
-public class PrometheusAgentTask extends AbstractCustomTask {
+public class PrometheusAgentService extends AbstractManagedService {
+
+    /**
+     * Property keys for {@link eu.essi_lab.services.ManagedServiceSetting} key-value options.
+     */
+    public static final class OptionKeys {
+
+	public static final String DOWNLOAD_URL = "DOWNLOAD_URL";
+	public static final String SCRAPE_INTERVAL = "SCRAPE_INTERVAL";
+	public static final String JOB_NAME = "JOB_NAME";
+	public static final String SCHEME = "SCHEME";
+	public static final String METRICS_PATH = "METRICS_PATH";
+	public static final String TARGET = "TARGET";
+	public static final String REMOTE_WRITE_URL = "REMOTE_WRITE_URL";
+	public static final String AWS_REGION = "AWS_REGION";
+	public static final String LISTEN_PORT = "LISTEN_PORT";
+
+	private OptionKeys() {
+	}
+    }
 
     private static final String AGENT_ROOT_DIR_NAME = "prometheus-agent";
 
-    public enum PrometheusAgentTaskOptions implements OptionsKey {
-	DOWNLOAD_URL,
-	SCRAPE_INTERVAL,
-	JOB_NAME,
-	SCHEME,
-	METRICS_PATH,
-	TARGET,
-	REMOTE_WRITE_URL,
-	AWS_REGION,
-	LISTEN_PORT;
-    }
+    private volatile boolean running;
+    private final AtomicReference<Process> processRef = new AtomicReference<>();
 
     @Override
-    public String getName() {
-	return "Prometheus agent task";
-    }
+    public void start() {
 
-    @Override
-    public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
-	log(status, "Prometheus agent task STARTED");
+	running = true;
 
-	Optional<EnumMap<PrometheusAgentTaskOptions, String>> taskOptions = readTaskOptions(context,
-		PrometheusAgentTaskOptions.class);
+	publish(MessageChannel.MessageLevel.INFO, "Prometheus agent service STARTED: " + getId());
+
+	Optional<Properties> taskOptions = getSetting().getKeyValueOptions();
 	if (taskOptions.isEmpty() || taskOptions.get().isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("No options specified for Prometheus agent task");
-	    status.setPhase(JobPhase.CANCELED);
+	    GSLoggerFactory.getLogger(getClass()).error("No key-value options specified for Prometheus agent service");
+	    publish(MessageChannel.MessageLevel.ERROR, "No options specified for Prometheus agent service");
 	    return;
 	}
 
-	EnumMap<PrometheusAgentTaskOptions, String> options = taskOptions.get();
-	String downloadUrl = requireOption(options, PrometheusAgentTaskOptions.DOWNLOAD_URL);
-	String scrapeInterval = requireOption(options, PrometheusAgentTaskOptions.SCRAPE_INTERVAL);
-	String jobName = requireOption(options, PrometheusAgentTaskOptions.JOB_NAME);
-	String scheme = requireOption(options, PrometheusAgentTaskOptions.SCHEME);
-	String metricsPath = requireOption(options, PrometheusAgentTaskOptions.METRICS_PATH);
-	String target = requireOption(options, PrometheusAgentTaskOptions.TARGET);
-	String remoteWriteUrl = requireOption(options, PrometheusAgentTaskOptions.REMOTE_WRITE_URL);
-	String awsRegion = requireOption(options, PrometheusAgentTaskOptions.AWS_REGION);
-	int listenPort = Integer.parseInt(requireOption(options, PrometheusAgentTaskOptions.LISTEN_PORT));
+	Properties options = taskOptions.get();
+	String downloadUrl;
+	String scrapeInterval;
+	String jobName;
+	String scheme;
+	String metricsPath;
+	String target;
+	String remoteWriteUrl;
+	String awsRegion;
+	int listenPort;
+	try {
+	    downloadUrl = requireProp(options, OptionKeys.DOWNLOAD_URL);
+	    scrapeInterval = requireProp(options, OptionKeys.SCRAPE_INTERVAL);
+	    jobName = requireProp(options, OptionKeys.JOB_NAME);
+	    scheme = requireProp(options, OptionKeys.SCHEME);
+	    metricsPath = requireProp(options, OptionKeys.METRICS_PATH);
+	    target = requireProp(options, OptionKeys.TARGET);
+	    remoteWriteUrl = requireProp(options, OptionKeys.REMOTE_WRITE_URL);
+	    awsRegion = requireProp(options, OptionKeys.AWS_REGION);
+	    listenPort = Integer.parseInt(requireProp(options, OptionKeys.LISTEN_PORT));
+	} catch (NumberFormatException e) {
+	    publish(MessageChannel.MessageLevel.ERROR,
+		    "Invalid " + OptionKeys.LISTEN_PORT + ": " + e.getMessage());
+	    return;
+	} catch (IllegalArgumentException e) {
+	    publish(MessageChannel.MessageLevel.ERROR, e.getMessage());
+	    return;
+	}
 
 	String safeJobName = FileUtils.sanitizeForNtfs(jobName);
 
 	Path javaTmpDir = IOStreamUtils.getUserTempDirectory().toPath();
 	File agentRootDir = javaTmpDir.resolve(AGENT_ROOT_DIR_NAME).toFile();
 
-	// 1) cache download/extraction (shared across jobs, as long as URL is the same)
 	File prometheusCacheDir = getCacheDir(agentRootDir, downloadUrl);
-	File prometheusBinary = getOrDownloadAndExtractPrometheus(status, context, downloadUrl, prometheusCacheDir);
+	File prometheusBinary;
+	try {
+	    prometheusBinary = getOrDownloadAndExtractPrometheus(downloadUrl, prometheusCacheDir);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Prometheus agent setup failed", e);
+	    publish(MessageChannel.MessageLevel.ERROR, "Prometheus agent setup failed: " + e.getMessage());
+	    return;
+	}
 	if (prometheusBinary == null) {
-	    // canceled before we could start the agent
 	    return;
 	}
 
-	// 2) generate agent config for this specific job
 	File prometheusBinaryDir = prometheusBinary.getParentFile();
 	File configFile = new File(prometheusBinaryDir, "prometheus-" + safeJobName + ".yml");
-	String yaml = buildPrometheusAgentConfigYaml(scrapeInterval, jobName, scheme, metricsPath, target,
-		remoteWriteUrl, awsRegion);
-	Files.writeString(configFile.toPath(), yaml, StandardCharsets.UTF_8);
+	String yaml = buildPrometheusAgentConfigYaml(scrapeInterval, jobName, scheme, metricsPath, target, remoteWriteUrl,
+		awsRegion);
+	try {
+	    Files.writeString(configFile.toPath(), yaml, StandardCharsets.UTF_8);
+	} catch (IOException e) {
+	    publish(MessageChannel.MessageLevel.ERROR, "Unable to write config: " + e.getMessage());
+	    return;
+	}
 
+	GSLoggerFactory.getLogger(getClass()).info("Launching Prometheus agent at port {}", listenPort);
 
-
-		GSLoggerFactory.getLogger(getClass()).info( "Launching Prometheus agent at port {}",  listenPort);
-
-	// 3) start the external prometheus process
 	ProcessBuilder pb = new ProcessBuilder(//
 		"./prometheus", //
 		"--config.file=" + configFile.getName(), //
@@ -130,37 +159,66 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	pb.directory(prometheusBinaryDir);
 	pb.redirectErrorStream(true);
 
-	// Start a process output logger so the child won't block due to full buffers.
-	Process process = pb.start();
-	startOutputLogger(process.getInputStream(), context);
+	Process process;
+	try {
+	    process = pb.start();
+	} catch (IOException e) {
+	    publish(MessageChannel.MessageLevel.ERROR, "Unable to start Prometheus: " + e.getMessage());
+	    return;
+	}
 
-	// Cancellation watcher: if the job is disabled/removed, stop the agent.
-	startCancellationWatcher(process, status, context);
+	processRef.set(process);
+	startOutputLogger(process.getInputStream());
+	startCancellationWatcher(process);
 
-	int exitCode = waitForProcessToEnd(process, status, context);
-	if (status.getPhase() == JobPhase.CANCELED || ConfigurationWrapper.isJobCanceled(context)) {
+	int exitCode;
+	try {
+	    exitCode = waitForProcessToEnd(process);
+	} catch (InterruptedException e) {
+	    Thread.currentThread().interrupt();
+	    publish(MessageChannel.MessageLevel.INFO, "Prometheus agent interrupted");
+	    return;
+	} finally {
+	    processRef.compareAndSet(process, null);
+	}
+
+	if (!running) {
 	    return;
 	}
 	if (exitCode != 0) {
-	    throw new IOException("Prometheus agent exited with code " + exitCode);
+	    publish(MessageChannel.MessageLevel.ERROR, "Prometheus agent exited with code " + exitCode);
+	    return;
 	}
 
-		GSLoggerFactory.getLogger(getClass()).info("Prometheus agent task ENDED");
+	publish(MessageChannel.MessageLevel.INFO, "Prometheus agent service ENDED: " + getId());
     }
 
-    private static String requireOption(EnumMap<PrometheusAgentTaskOptions, String> options,
-	    PrometheusAgentTaskOptions key) {
-	String value = options.get(key);
+    @Override
+    public void stop() {
+
+	running = false;
+
+	Process p = processRef.getAndSet(null);
+	if (p != null) {
+	    p.destroy();
+	}
+
+	publish(MessageChannel.MessageLevel.INFO, "Stopped Prometheus agent service: " + getId());
+    }
+
+    private static String requireProp(Properties options, String key) {
+
+	String value = options.getProperty(key);
 	if (value == null || value.trim().isEmpty()) {
-	    throw new IllegalArgumentException("Missing required option: " + key.name());
+	    throw new IllegalArgumentException("Missing required option: " + key);
 	}
 	return value.trim();
     }
 
     private static File getCacheDir(File agentRootDir, String downloadUrl) {
+
 	String fileName = toLastPathSegment(downloadUrl);
 	String baseName = fileName;
-	// remove common archive suffixes
 	if (baseName.endsWith(".tar.gz")) {
 	    baseName = baseName.substring(0, baseName.length() - ".tar.gz".length());
 	} else if (baseName.endsWith(".tgz")) {
@@ -175,18 +233,17 @@ public class PrometheusAgentTask extends AbstractCustomTask {
     }
 
     private static String toLastPathSegment(String url) {
+
 	try {
 	    String path = new java.net.URI(url).getPath();
 	    int idx = path.lastIndexOf('/');
 	    return idx >= 0 ? path.substring(idx + 1) : path;
 	} catch (Exception e) {
-	    // fallback: no path parsing, but keep it stable
 	    return url.replaceAll("[^a-zA-Z0-9._-]", "_");
 	}
     }
 
-    private File getOrDownloadAndExtractPrometheus(SchedulerJobStatus status, JobExecutionContext context,
-	    String downloadUrl, File prometheusCacheDir) throws Exception {
+    private File getOrDownloadAndExtractPrometheus(String downloadUrl, File prometheusCacheDir) throws Exception {
 
 	File prometheusBinary = findPrometheusBinary(prometheusCacheDir);
 
@@ -195,37 +252,30 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	    return prometheusBinary;
 	}
 
-	// Serialize downloads/extraction for the same cache directory.
 	File lockFile = new File(prometheusCacheDir, ".download.lock");
 	lockFile.getParentFile().mkdirs();
 
 	try (RandomAccessFile raf = new RandomAccessFile(lockFile, "rw");
 		FileChannel channel = raf.getChannel(); FileLock lock = channel.lock()) {
 
-	    // Double-check after acquiring lock.
 	    prometheusBinary = findPrometheusBinary(prometheusCacheDir);
 	    if (prometheusBinary != null && prometheusBinary.canExecute()) {
 		return prometheusBinary;
 	    }
 
-	    if (ConfigurationWrapper.isJobCanceled(context)) {
-		status.setPhase(JobPhase.CANCELED);
+	    if (!running) {
 		return null;
 	    }
 
 	    String tarFileName = toLastPathSegment(downloadUrl);
 	    File tarFile = new File(prometheusCacheDir, tarFileName);
 
-		GSLoggerFactory.getLogger(getClass()).info("Downloading Prometheus binary");
+	    GSLoggerFactory.getLogger(getClass()).info("Downloading Prometheus binary");
 
+	    downloadTarIfNeeded(downloadUrl, tarFile);
 
-		downloadTarIfNeeded(downloadUrl, tarFile);
-
-	    // Extract into a dedicated directory inside the cache dir.
 	    File extractDir = new File(prometheusCacheDir, "extract");
 	    if (extractDir.exists()) {
-		// Keep it simple: ensure an old partial extraction doesn't break us.
-		// (We don't delete aggressively if it's already usable.)
 		if (findPrometheusBinary(extractDir) == null) {
 		    IOStreamUtils.deleteDirectory(extractDir.toPath().toFile());
 		}
@@ -247,19 +297,18 @@ public class PrometheusAgentTask extends AbstractCustomTask {
     }
 
     private static void downloadTarIfNeeded(String downloadUrl, File tarFile) throws Exception {
+
 	if (tarFile.exists() && tarFile.length() > 0) {
 	    return;
 	}
 
 	Downloader downloader = new Downloader();
-	// downloader already retries on non-200 responses if configured by caller; we keep it simple.
-	// We download the response body into the target file.
 	File parent = tarFile.getParentFile();
 	if (!parent.exists() && !parent.mkdirs()) {
 	    throw new IOException("Unable to create directory: " + parent.getAbsolutePath());
 	}
 
-	GSLoggerFactory.getLogger(PrometheusAgentTask.class).info("Downloading Prometheus from {}", downloadUrl);
+	GSLoggerFactory.getLogger(PrometheusAgentService.class).info("Downloading Prometheus from {}", downloadUrl);
 
 	try (InputStream in = downloader.downloadOptionalStream(downloadUrl).orElseThrow(
 		() -> new IOException("Unable to download Prometheus archive: " + downloadUrl))) {
@@ -267,38 +316,37 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	    Files.copy(in, tmp, StandardCopyOption.REPLACE_EXISTING);
 	    Files.move(tmp, tarFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	}
-		GSLoggerFactory.getLogger(PrometheusAgentTask.class).info("Downloaded Prometheus");
-
-	}
+	GSLoggerFactory.getLogger(PrometheusAgentService.class).info("Downloaded Prometheus");
+    }
 
     private File findPrometheusBinary(File rootDir) throws IOException {
-		GSLoggerFactory.getLogger(getClass()).info("Finding Prometheus binary");
+
+	GSLoggerFactory.getLogger(getClass()).info("Finding Prometheus binary");
 	if (rootDir == null || !rootDir.exists()) {
-		GSLoggerFactory.getLogger(getClass()).info("Prometheus binary not found");
+	    GSLoggerFactory.getLogger(getClass()).info("Prometheus binary not found");
 	    return null;
 	}
 
-	// Search for an executable named "prometheus".
 	Path root = rootDir.toPath();
 	try (var stream = Files.walk(root)) {
-		File ret = stream//
-				.filter(p -> Files.isRegularFile(p))//
-				.filter(p -> p.getFileName().toString().equals("prometheus"))//
-				.map(Path::toFile)//
-				.findFirst()//
-				.orElse(null);
-		if (ret==null){
-			GSLoggerFactory.getLogger(getClass()).info("Prometheus binary not found");
-		}else{
-			GSLoggerFactory.getLogger(getClass()).info("Prometheus binary found");
-		}
-		return ret;
+	    File ret = stream//
+		    .filter(p -> Files.isRegularFile(p))//
+		    .filter(p -> p.getFileName().toString().equals("prometheus"))//
+		    .map(Path::toFile)//
+		    .findFirst()//
+		    .orElse(null);
+	    if (ret == null) {
+		GSLoggerFactory.getLogger(getClass()).info("Prometheus binary not found");
+	    } else {
+		GSLoggerFactory.getLogger(getClass()).info("Prometheus binary found");
+	    }
+	    return ret;
 	}
     }
 
     private static String buildPrometheusAgentConfigYaml(String scrapeInterval, String jobName, String scheme,
 	    String metricsPath, String target, String remoteWriteUrl, String awsRegion) {
-	// YAML generation intentionally matches the example provided by the user.
+
 	return "global:\n" //
 		+ "  scrape_interval: " + scrapeInterval + "\n" //
 		+ "# Define the scrape configurations\n" //
@@ -315,18 +363,18 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 		+ "      region: \"" + awsRegion + "\"\n";
     }
 
-    private void startOutputLogger(InputStream inputStream, JobExecutionContext context) {
+    private void startOutputLogger(InputStream inputStream) {
+
 	Thread t = new Thread(() -> {
 	    try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 		String line;
 		while ((line = br.readLine()) != null) {
-		    if (ConfigurationWrapper.isJobCanceled(context)) {
+		    if (!running) {
 			break;
 		    }
 		    GSLoggerFactory.getLogger(getClass()).debug("[prometheus] {}", line);
 		}
 	    } catch (IOException e) {
-		// Process is being stopped or stream interrupted; we just log and exit the logger thread.
 		GSLoggerFactory.getLogger(getClass()).debug("Prometheus output logger stopped: {}", e.getMessage());
 	    }
 	});
@@ -334,12 +382,12 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	t.start();
     }
 
-    private void startCancellationWatcher(Process process, SchedulerJobStatus status, JobExecutionContext context) {
+    private void startCancellationWatcher(Process process) {
+
 	Thread t = new Thread(() -> {
 	    try {
 		while (process.isAlive()) {
-		    if (ConfigurationWrapper.isJobCanceled(context)) {
-			status.setPhase(JobPhase.CANCELED);
+		    if (!running) {
 			process.destroy();
 			break;
 		    }
@@ -353,11 +401,10 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	t.start();
     }
 
-    private int waitForProcessToEnd(Process process, SchedulerJobStatus status, JobExecutionContext context)
-	    throws InterruptedException {
+    private int waitForProcessToEnd(Process process) throws InterruptedException {
+
 	while (process.isAlive()) {
-	    if (ConfigurationWrapper.isJobCanceled(context)) {
-		status.setPhase(JobPhase.CANCELED);
+	    if (!running) {
 		process.destroy();
 		break;
 	    }
@@ -366,4 +413,3 @@ public class PrometheusAgentTask extends AbstractCustomTask {
 	return process.waitFor();
     }
 }
-

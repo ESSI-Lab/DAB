@@ -108,6 +108,9 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 
     private LinkedHashSet<String> studyArray = null;
 
+    /** Total metadata records emitted in the current harvesting run (listRecords / getGranules). */
+    private int harvestRecordCount;
+
     /**
      * 
      */
@@ -260,6 +263,15 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 	    } finally {
 		file.delete();
 	    }
+	}
+
+	Optional<Integer> mrOpt = getSetting().getMaxRecords();
+	boolean unlimitedHarvest = getSetting().isMaxRecordsUnlimited();
+	if (!unlimitedHarvest && mrOpt.isPresent() && harvestRecordCount >= mrOpt.get()) {
+	    ListRecordsResponse<OriginalMetadata> done = new ListRecordsResponse<>();
+	    done.setResumptionToken(null);
+	    harvestRecordCount = 0;
+	    return done;
 	}
 
 	String resumptionToken = request.getResumptionToken();
@@ -636,12 +648,16 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 		record.setMetadata(str);
 		record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 		ret.addRecord(record);
+		harvestRecordCount++;
 	    } catch (Exception ee) {
 		ee.printStackTrace();
 	    }
 
 	}
 	ret.setResumptionToken(resumptionToken);
+	if (resumptionToken == null) {
+	    harvestRecordCount = 0;
+	}
 	return ret;
 
     }
@@ -722,6 +738,14 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 	    GSLoggerFactory.getLogger(getClass()).info("Process STARTED");
 	}
 
+	Optional<Integer> mrEntry = getSetting().getMaxRecords();
+	boolean unlimitedEntry = getSetting().isMaxRecordsUnlimited();
+	if (!unlimitedEntry && mrEntry.isPresent() && harvestRecordCount >= mrEntry.get()) {
+	    listRecordsResponse.setResumptionToken(null);
+	    harvestRecordCount = 0;
+	    return listRecordsResponse;
+	}
+
 	String studyName = studyArray.toArray(new String[] {})[studyIndex];
 
 	GSLoggerFactory.getLogger(getClass()).info("Current study [" + studyIndex + "/" + (studyArray.size() - 1) + "] STARTED");
@@ -730,7 +754,16 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 
 	GSLoggerFactory.getLogger(getClass()).info("Retrieved [" + jsonArray.length() + "] records");
 
+	Optional<Integer> mrG = getSetting().getMaxRecords();
+	boolean unlimitedG = getSetting().isMaxRecordsUnlimited();
+	boolean stoppedByCap = false;
+
 	for (int j = 0; j < jsonArray.length(); j++) {
+
+	    if (!unlimitedG && mrG.isPresent() && harvestRecordCount >= mrG.get()) {
+		stoppedByCap = true;
+		break;
+	    }
 
 	    JSONObject jsonObject = jsonArray.getJSONObject(j);
 
@@ -739,6 +772,13 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 	    metadata.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 
 	    listRecordsResponse.addRecord(metadata);
+	    harvestRecordCount++;
+	}
+
+	if (stoppedByCap) {
+	    listRecordsResponse.setResumptionToken(null);
+	    harvestRecordCount = 0;
+	    return listRecordsResponse;
 	}
 
 	int nextOffset = 0;
@@ -767,6 +807,7 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 	if (studyIndex == studyArray.size()) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Process ENDED");
+	    harvestRecordCount = 0;
 	} else {
 
 	    resumptionToken = studyIndex + "SEP" + nextOffset;

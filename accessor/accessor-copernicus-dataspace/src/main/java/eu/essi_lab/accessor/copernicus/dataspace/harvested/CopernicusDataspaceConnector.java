@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -126,8 +127,15 @@ public class CopernicusDataspaceConnector extends HarvestedQueryConnector<Copern
 	try {
 
 	    List<GSResource> collections = getCollections();
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
 
 	    for (GSResource collection : collections) {
+
+		if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		    break;
+		}
 
 		OriginalMetadata metadata = new OriginalMetadata();
 		metadata.setSchemeURI(SatelliteCollectionMapper.SATELLITE_COLLECTION_SCHEME_URI);
@@ -140,6 +148,7 @@ public class CopernicusDataspaceConnector extends HarvestedQueryConnector<Copern
 		metadata.setMetadata(collection.asString(true));
 
 		response.addRecord(metadata);
+		added++;
 	    }
 
 	} catch (Exception e) {

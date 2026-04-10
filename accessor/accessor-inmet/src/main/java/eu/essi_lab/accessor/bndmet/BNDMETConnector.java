@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.bndmet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.accessor.bndmet.model.BNDMETParameter;
 import eu.essi_lab.accessor.bndmet.model.BNDMETStation;
@@ -41,6 +42,8 @@ public class BNDMETConnector extends HarvestedQueryConnector<BNDMETConnectorSett
      * 
      */
     public static final String TYPE = "BNDMETConnector";
+
+    private int partialNumbers;
 
     @Override
     public boolean supports(GSSource source) {
@@ -61,17 +64,38 @@ public class BNDMETConnector extends HarvestedQueryConnector<BNDMETConnectorSett
 	}
 	BNDMETClient client = new BNDMETClient(getSourceURL());
 	List<BNDMETStation> stations = client.getStations();
-	int i = Integer.parseInt(token);
-	BNDMETStation station = stations.get(i);
-	if (i == stations.size() - 1) {
-	    token = null;
-	} else {
-	    token = "" + (i + 1);
-	}
-	List<BNDMETParameter> parameters = client.getStationParameters(station.getValue(BNDMET_Station_Code.CD_ESTACAO));
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
-	response.setResumptionToken(token);
+
+	if (stations.isEmpty()) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
+
+	int i = Integer.parseInt(token);
+	if (i < 0 || i >= stations.size()) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
+
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
+
+	BNDMETStation station = stations.get(i);
+	List<BNDMETParameter> parameters = client.getStationParameters(station.getValue(BNDMET_Station_Code.CD_ESTACAO));
+
+	boolean stoppedByMax = false;
 	for (BNDMETParameter parameter : parameters) {
+	    if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		stoppedByMax = true;
+		break;
+	    }
 	    BNDMETStation cloneStation = station.clone();
 	    List<BNDMETParameter> reducedList = new ArrayList<>();
 	    reducedList.add(parameter);
@@ -81,7 +105,22 @@ public class BNDMETConnector extends HarvestedQueryConnector<BNDMETConnectorSett
 	    metadataRecord.setMetadata(metadata);
 	    metadataRecord.setSchemeURI(CommonNameSpaceContext.BNDMET_URI);
 	    response.addRecord(metadataRecord);
+	    partialNumbers++;
 	}
+
+	if (stoppedByMax) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
+
+	if (i == stations.size() - 1) {
+	    token = null;
+	    partialNumbers = 0;
+	} else {
+	    token = "" + (i + 1);
+	}
+	response.setResumptionToken(token);
 	return response;
 
     }

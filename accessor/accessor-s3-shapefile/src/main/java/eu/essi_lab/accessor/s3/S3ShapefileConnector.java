@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -70,6 +71,9 @@ public class S3ShapefileConnector extends HarvestedQueryConnector<S3ShapefileCon
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
 
 	String sourceUrl = getSourceURL();
 
@@ -109,11 +113,16 @@ public class S3ShapefileConnector extends HarvestedQueryConnector<S3ShapefileCon
 		ShapeFileMetadata metadata = new ShapeFileMetadata(featureSource);
 		List<FeatureMetadata> features = metadata.getFeatures();
 		for (FeatureMetadata feature : features) {
+		    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+			ret.setResumptionToken(null);
+			return ret;
+		    }
 		    feature.setUrl(url);
 		    OriginalMetadata metadataRecord = new OriginalMetadata();
 		    metadataRecord.setSchemeURI(CommonNameSpaceContext.HIS_CENTRAL_SHAPEFILE);
 		    metadataRecord.setMetadata(feature.marshal());
 		    ret.addRecord(metadataRecord);
+		    added++;
 		}
 
 		String[] unzippedFiles = s3unzippedDir.list();

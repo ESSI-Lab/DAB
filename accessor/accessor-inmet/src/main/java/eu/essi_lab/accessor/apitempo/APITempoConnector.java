@@ -46,6 +46,9 @@ public class APITempoConnector extends HarvestedQueryConnector<APITempoConnector
      */
     public static final String TYPE = "APITempoConnector";
 
+    /** Metadata records emitted in the current harvest (across listRecords calls). */
+    private int partialNumbers;
+
     @Override
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
@@ -66,25 +69,43 @@ public class APITempoConnector extends HarvestedQueryConnector<APITempoConnector
 	APITempoClient client = new APITempoClient(getSourceURL());
 	List<APITempoStation> stations = client.getStations();
 	int i = Integer.parseInt(token);
-	APITempoStation station = stations.get(i);
+
+	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
+
+	if (stations.isEmpty()) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
+
+	if (i < 0 || i >= stations.size()) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
-	boolean maxNumberReached = false;
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && i > mr.get() - 1) {
-	    // // max record set
-	    maxNumberReached = true;
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	// maxRecords limits metadata records (partialNumbers), not station index
+	boolean maxNumberReached = !unlimited && mr.isPresent() && partialNumbers >= mr.get();
+
+	if (maxNumberReached) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
 	}
 
-	if (i == stations.size() - 1 || maxNumberReached) {
-	    token = null;
-	} else {
-	    token = "" + (i + 1);
-	}
+	APITempoStation station = stations.get(i);
 	String stationCode = station.getValue(APITempoStationCode.ID);
 	List<APITempoParameter> parameters = client.getStationParameters(stationCode);
-	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
-	response.setResumptionToken(token);
+
+	boolean stoppedByMax = false;
 	for (APITempoParameter parameter : parameters) {
+	    if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		stoppedByMax = true;
+		break;
+	    }
+
 	    APITempoStation cloneStation = station.clone();
 	    List<APITempoParameter> reducedList = new ArrayList<>();
 	    String parameterCode = parameter.getValue(APITempoParameterCode.ID);
@@ -111,6 +132,20 @@ public class APITempoConnector extends HarvestedQueryConnector<APITempoConnector
 	    metadataRecord.setMetadata(metadata);
 	    metadataRecord.setSchemeURI(CommonNameSpaceContext.APITEMPO_URI);
 	    response.addRecord(metadataRecord);
+	    partialNumbers++;
+	}
+
+	if (stoppedByMax) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
+
+	if (i == stations.size() - 1) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	} else {
+	    response.setResumptionToken(String.valueOf(i + 1));
 	}
 	return response;
 

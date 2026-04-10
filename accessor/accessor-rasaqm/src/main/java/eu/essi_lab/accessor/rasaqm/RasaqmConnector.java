@@ -27,6 +27,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
@@ -62,10 +63,13 @@ public class RasaqmConnector extends HarvestedQueryConnector<RasaqmConnectorSett
 	try {
 	    ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
 	    List<SimpleEntry<String, String>> parameters = client.getParameters();
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
 	    // SimpleEntry<String, String> p = parameters.get(0);
 	    // parameters.clear();
 	    // parameters.add(p);
-	    for (SimpleEntry<String, String> parameter : parameters) {
+	    outer: for (SimpleEntry<String, String> parameter : parameters) {
 		String parameterId = parameter.getKey();
 		Date now = new Date();
 		Date yesterday = new Date(now.getTime() - 1000 * 60 * 60 * 24l);
@@ -74,6 +78,9 @@ public class RasaqmConnector extends HarvestedQueryConnector<RasaqmConnectorSett
 		// active yesterday
 		Set<String> stationNames = dataset.getStationNames();
 		for (String stationName : stationNames) {
+		    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+			break outer;
+		    }
 		    RasaqmSeries serie = dataset.getSeries(stationName);
 		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		    serie.marshal(baos);
@@ -82,6 +89,7 @@ public class RasaqmConnector extends HarvestedQueryConnector<RasaqmConnectorSett
 		    metadataRecord.setMetadata(metadata);
 		    metadataRecord.setSchemeURI(CommonNameSpaceContext.RASAQM_URI);
 		    ret.addRecord(metadataRecord);
+		    added++;
 		}
 	    }
 	    return ret;

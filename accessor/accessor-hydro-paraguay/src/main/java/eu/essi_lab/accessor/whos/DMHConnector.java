@@ -72,6 +72,8 @@ public class DMHConnector extends HarvestedQueryConnector<DMHConnectorSetting> {
      */
     private static final String DMH_CONNECTOR_SOURCE_NOT_FOUND_ERROR = "DMH_CONNECTOR_SOURCE_NOT_FOUND_ERROR";
 
+    private int partialNumbers;
+
     @Override
     public boolean supports(GSSource source) {
 	String url = source.getEndpoint();
@@ -102,10 +104,21 @@ public class DMHConnector extends HarvestedQueryConnector<DMHConnectorSetting> {
 
 	try {
 	    List<DMHStation> stations = client.getStations();
-	    for (DMHStation station : stations) {
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		ret.setResumptionToken(null);
+		partialNumbers = 0;
+		return ret;
+	    }
+	    stations: for (DMHStation station : stations) {
 		GSLoggerFactory.getLogger(getClass()).info("Adding station "+station.getName());
 		List<DMHVariable> variables = station.getVariables();
 		for (DMHVariable variable : variables) {
+
+		    if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+			break stations;
+		    }
 
 		    Dataset dataset = new Dataset();
 		    dataset.setSource(source.get());
@@ -270,9 +283,11 @@ public class DMHConnector extends HarvestedQueryConnector<DMHConnectorSetting> {
 		    record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 		    record.setMetadata(dataset.asString(true));
 		    ret.addRecord(record);
+		    partialNumbers++;
 		}
 	    }
 	    GSLoggerFactory.getLogger(getClass()).info("Stations added");
+	    partialNumbers = 0;
 
 	} catch (Exception e) {
 	    e.printStackTrace();

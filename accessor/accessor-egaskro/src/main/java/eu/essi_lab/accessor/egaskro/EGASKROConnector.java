@@ -62,16 +62,29 @@ public class EGASKROConnector extends HarvestedQueryConnector<EGASKROConnectorSe
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
+
 	OriginalMetadata collection1 = createCollectionMetadata("Departmental/Roshydromet/Exposure dose", "egaskro-1");
 	response.addRecord(collection1);
+	added++;
 
+	if (!unlimited && mr.isPresent() && added >= mr.get()) {
+	    return response;
+	}
 	OriginalMetadata collection2 = createCollectionMetadata("Departmental/Roshydromet/Average daily activity of radionuclides",
 		"egaskro-2");
 	response.addRecord(collection2);
+	added++;
 
+	if (!unlimited && mr.isPresent() && added >= mr.get()) {
+	    return response;
+	}
 	OriginalMetadata collection3 = createCollectionMetadata("Departmental/Roshydromet/Volumetric activity of radionuclides",
 		"egaskro-3");
 	response.addRecord(collection3);
+	added++;
 
 	GSLoggerFactory.getLogger(getClass()).debug("Retrieving exposure dose data STARTED");
 
@@ -83,7 +96,11 @@ public class EGASKROConnector extends HarvestedQueryConnector<EGASKROConnectorSe
 	}
 	
 	for (String[] line : exposureDose) {
+	    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		return response;
+	    }
 	    response.addRecord(createDatasetMetadata(line, "egaskro-1", "Exposure dose"));
+	    added++;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Retrieving exposure dose data ENDED");
@@ -97,7 +114,11 @@ public class EGASKROConnector extends HarvestedQueryConnector<EGASKROConnectorSe
 	}
 	
 	for (String[] line : radioNuclidesAverage) {
+	    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		return response;
+	    }
 	    response.addRecord(createDatasetMetadata(line, "egaskro-2", "Average daily activity of radionuclides"));
+	    added++;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Retrieving radionuclides average data ENDED");
@@ -111,7 +132,11 @@ public class EGASKROConnector extends HarvestedQueryConnector<EGASKROConnectorSe
 	}
 	
 	for (String[] line : radioNuclidesVolumetric) {
+	    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		return response;
+	    }
 	    response.addRecord(createDatasetMetadata(line, "egaskro-3", "Volumetric activity of radionuclides"));
+	    added++;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Retrieving radionuclides volumetric data ENDED");
