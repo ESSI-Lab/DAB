@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.services.webdav;
 
@@ -13,47 +13,31 @@ package eu.essi_lab.services.webdav;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Date;
-import java.util.Map;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.DatabaseFolder.*;
+import eu.essi_lab.api.database.SourceStorageWorker.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.resource.*;
+import io.milton.http.*;
+import io.milton.http.Request.*;
+import io.milton.http.exceptions.*;
+import io.milton.resource.*;
+import org.apache.commons.io.*;
 
-import org.apache.commons.io.IOUtils;
-
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.DatabaseFolder.EntryType;
-import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.messages.HarvestingProperties;
-import eu.essi_lab.model.resource.GSResource;
-import io.milton.http.Auth;
-import io.milton.http.Range;
-import io.milton.http.Request;
-import io.milton.http.Request.Method;
-import io.milton.http.exceptions.BadRequestException;
-import io.milton.http.exceptions.ConflictException;
-import io.milton.http.exceptions.NotAuthorizedException;
-import io.milton.http.exceptions.NotFoundException;
-import io.milton.resource.DeletableResource;
-import io.milton.resource.GetableResource;
-import io.milton.resource.PropFindableResource;
-import io.milton.resource.ReplaceableResource;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -75,7 +59,7 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
 	this.file = file;
 	this.database = database;
 
-	GSLoggerFactory.getLogger(getClass()).info("File resource [{}] created", this);
+	GSLoggerFactory.getLogger(getClass()).debug("File resource [{}] created", this);
     }
 
     @Override
@@ -92,6 +76,7 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
 	try {
 
 	    DatabaseFolder folder = database.getFolder(dir);
+
 	    if (folder != null) {
 
 		return folder.exists(file);
@@ -105,10 +90,9 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
     }
 
     @Override
-    public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType)
-	    throws IOException, NotAuthorizedException, BadRequestException, NotFoundException {
+    public void sendContent(OutputStream out, Range range, Map<String, String> params, String contentType) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Seding content of [{}] STARTED", this);
+	GSLoggerFactory.getLogger(getClass()).debug("Sending content of [{}] STARTED", this);
 
 	try {
 
@@ -121,13 +105,13 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Seding content of [{}] ENDED", this);
+	GSLoggerFactory.getLogger(getClass()).debug("Sending content of [{}] ENDED", this);
     }
 
     @Override
-    public void replaceContent(InputStream inputStream, Long length) throws BadRequestException, ConflictException, NotAuthorizedException {
+    public void replaceContent(InputStream inputStream, Long length) {
 
-	GSLoggerFactory.getLogger(getClass()).info("Replacing content of [{}] STARTED", this);
+	GSLoggerFactory.getLogger(getClass()).debug("Replacing content of [{}] STARTED", this);
 
 	try {
 
@@ -138,15 +122,11 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
 
 		entry = FolderEntry.of(inputStream);
 		type = EntryType.HARVESTING_PROPERTIES;
-	    }
-
-	    else if (file.equals(SourceStorageWorker.ERRORS_REPORT_FILE_NAME)) {
+	    } else if (file.equals(SourceStorageWorker.ERRORS_REPORT_FILE_NAME)) {
 
 		entry = FolderEntry.of(inputStream);
 		type = EntryType.HARVESTING_ERROR_REPORT;
-	    }
-
-	    else if (file.equals(SourceStorageWorker.WARN_REPORT_FILE_NAME)) {
+	    } else if (file.equals(SourceStorageWorker.WARN_REPORT_FILE_NAME)) {
 
 		entry = FolderEntry.of(inputStream);
 		type = EntryType.HARVESTING_WARN_REPORT;
@@ -171,13 +151,13 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Replacing content of [{}] ENDED", this);
+	GSLoggerFactory.getLogger(getClass()).debug("Replacing content of [{}] ENDED", this);
     }
 
     @Override
     public void delete() throws NotAuthorizedException, ConflictException, BadRequestException {
 
-	GSLoggerFactory.getLogger(getClass()).info("Deleting file [{}] STARTED", this);
+	GSLoggerFactory.getLogger(getClass()).debug("Deleting file [{}] STARTED", this);
 
 	try {
 	    database.getFolder(dir).remove(StringUtils.URLDecodeUTF8(file));
@@ -187,19 +167,13 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Deleting ended [{}] STARTED", this);
+	GSLoggerFactory.getLogger(getClass()).debug("Deleting ended [{}] STARTED", this);
     }
 
     @Override
     public String getContentType(String accepts) {
 
 	return "application/octet-stream";
-    }
-
-    @Override
-    public Long getContentLength() {
-
-	return null;
     }
 
     @Override
@@ -215,21 +189,27 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
     }
 
     @Override
-    public Date getCreateDate() {
-
-	return new Date();
-    }
-
-    @Override
     public Object authenticate(String user, String password) {
 
-	return null;
+	return "ok";
     }
 
     @Override
     public boolean authorise(Request request, Method method, Auth auth) {
 
 	return true;
+    }
+
+    @Override
+    public Date getCreateDate() {
+
+	return null;
+    }
+
+    @Override
+    public Long getContentLength() {
+
+	return null;
     }
 
     @Override
@@ -245,7 +225,7 @@ public class DatabaseFileResource implements GetableResource, PropFindableResour
     }
 
     @Override
-    public String checkRedirect(Request request) throws NotAuthorizedException, BadRequestException {
+    public String checkRedirect(Request request) {
 
 	return null;
     }

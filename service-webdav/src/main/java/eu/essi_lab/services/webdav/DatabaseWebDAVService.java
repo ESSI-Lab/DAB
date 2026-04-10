@@ -44,10 +44,17 @@ public class DatabaseWebDAVService extends AbstractManagedService {
      */
     private static final int DEFAULT_PORT = 8083;
 
+
     /**
      *
      */
-    private static final String PORT_KEY = "";
+    private static final int DEFAULT_MAX_FILES = 1000;
+
+    /**
+     *
+     */
+    private static final String PORT_KEY = "port";
+    private static final String MAX_FILES_KEY = "maxFiles";
 
     /**
      *
@@ -65,6 +72,11 @@ public class DatabaseWebDAVService extends AbstractManagedService {
 		map(Integer::parseInt).//
 		orElse(DEFAULT_PORT);//
 
+	int maxFiles = getSetting(). //
+		readKeyValue(MAX_FILES_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_MAX_FILES);//
+
 	StorageInfo osStorageInfo = ConfigurationWrapper.getStorageInfo();
 
 	OpenSearchDatabase database = new OpenSearchDatabase();
@@ -75,7 +87,7 @@ public class DatabaseWebDAVService extends AbstractManagedService {
 	    throw new RuntimeException(e);
 	}
 
-	DatabaseResourceFactory factory = new DatabaseResourceFactory(database);
+	DatabaseResourceFactory factory = new DatabaseResourceFactory(database, maxFiles);
 
 	HttpManagerBuilder builder = new HttpManagerBuilder();
 
