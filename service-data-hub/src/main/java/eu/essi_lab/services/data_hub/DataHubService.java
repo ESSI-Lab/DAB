@@ -99,7 +99,7 @@ public class DataHubService extends AbstractManagedService {
      */
     private static final int DEFAULT_POLL_TIMEOUT_SECONDS = 1;
 
-    private boolean running;
+    private volatile boolean running;
     /**
      *
      */
@@ -389,6 +389,8 @@ public class DataHubService extends AbstractManagedService {
     @Override
     public void stop() {
 
+	running = false;
+
 	if (executor != null) {
 
 	    executor.shutdown();
@@ -423,8 +425,6 @@ public class DataHubService extends AbstractManagedService {
 		}
 	    }
 	}
-
-	running = false;
     }
 
     /**
