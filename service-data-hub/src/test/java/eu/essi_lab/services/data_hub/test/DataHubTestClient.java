@@ -121,10 +121,11 @@ public class DataHubTestClient {
     /**
      * @param count
      * @param waitSeconds
+     * @param modfier
      * @param recordPrefix
      * @throws Exception
      */
-    private static void insert(int count, int waitSeconds, String recordPrefix) throws Exception {
+    private static void insert(int count, int waitSeconds, String modifier, String baseId) throws Exception {
 
 	int success = 0;
 	List<String> failed = new ArrayList<>();
@@ -137,9 +138,12 @@ public class DataHubTestClient {
 
 	    for (int i = 0; i < count; i++) {
 
-		String modFile = new String(file).replace("_IDENTIFIER_", "ID_" + recordPrefix + "_" + i);
-		modFile = modFile.replace("_TITLE_", "TITLE_" + recordPrefix + "_" + i);
-		modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + recordPrefix + "_" + i);
+		String recordId = baseId.replace("MODIFIER", modifier + "_" + i);
+
+		String modFile = new String(file).replace("_IDENTIFIER_", recordId);
+
+		modFile = modFile.replace("_TITLE_", "TITLE_" + modifier + "_" + i);
+		modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + modifier + "_" + i);
 
 		try {
 
@@ -173,11 +177,13 @@ public class DataHubTestClient {
     }
 
     /**
-     * @param recordId
-     * @param mod
+     * @param modifier
+     * @param baseId
+     * @param counter
+     * @param sourceId
      * @throws Exception
      */
-    private static void update(String recordId, String mod) throws Exception {
+    private static void update(String modifier, String baseId, String counter, String sourceId) throws Exception {
 
 	int success = 0;
 	List<String> failed = new ArrayList<>();
@@ -188,10 +194,12 @@ public class DataHubTestClient {
 
 	    String file = IOStreamUtils.asUTF8String(new FileInputStream(path.toFile()));
 
+	    String recordId = baseId.replace("MODIFIER", modifier + "_" + counter) + "@" + sourceId;
+
 	    String modFile = new String(file).replace("_IDENTIFIER_", recordId);
 
-	    modFile = modFile.replace("_TITLE_", "TITLE_" + mod);
-	    modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + mod);
+	    modFile = modFile.replace("_TITLE_", "TITLE_" + ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
+	    modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
 
 	    try {
 
@@ -259,18 +267,30 @@ public class DataHubTestClient {
      */
     public static void main(String[] args) throws Exception {
 
-	String idPrefix = "test_9";
+	String sourceId = "datahub";
 
-	insert(3, 1, idPrefix);
+	///
 
-//	update("ID_test_8_0", ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
+	String modifier = "test_15";
 
-//	for (int i = 0; i < 9; i++) {
-//
-//	    List<String> urns = List.of("urn:li:dataset:(urn:li:dataPlatform:metadata,ID_test_3_" + i + ",DEV)");
-//
-//	    delete(urns);
-//	}
+	///
+
+	String baseId = "urn:li:dataset:(urn:li:dataPlatform:metadata,_MODIFIER_,DEV)";
+
+	///
+
+//	insert(1, 1, modifier, baseId);
+
+//	update(modifier, baseId, "0", sourceId);
+
+	for (int i = 0; i < 1; i++) {
+
+	    String id = baseId.replace("MODIFIER", modifier+ "_" + i)+"@" + sourceId;
+
+	    List<String> urns = List.of(id);
+
+	    delete(urns);
+	}
 
     }
 }

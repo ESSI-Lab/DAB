@@ -30,7 +30,6 @@ import eu.essi_lab.identifierdecorator.*;
 import eu.essi_lab.indexes.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.*;
-import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.services.impl.*;
 import eu.essi_lab.services.message.*;
@@ -449,13 +448,13 @@ public class DataHubService extends AbstractManagedService {
 
 	    if (data1Folder && data2Folder) {
 
-		error("Both data-1 and data-2 folders exist");
+		error("Both data-1 and data-2 folders exist", false);
 		return Optional.empty();
 	    }
 
 	    if (!data1Folder) {
 
-		error("data-1 folder missing");
+		error("data-1 folder missing", false);
 		return Optional.empty();
 	    }
 
@@ -657,7 +656,6 @@ public class DataHubService extends AbstractManagedService {
     }
 
     /**
-     *
      * @param user
      * @param pwd
      * @param url
@@ -773,7 +771,7 @@ public class DataHubService extends AbstractManagedService {
      */
     private void error(String message, boolean running) {
 
-	error(message, null);
+	error(message, null, running);
     }
 
     /**
