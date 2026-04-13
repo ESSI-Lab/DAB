@@ -77,8 +77,10 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * 
  * Task options (line-based {@code KEY=value}):
  * <ul>
- * <li>{@code VIEW_ID} — optional view identifier; when omitted, aggregate statistics use all sources (no view bond);
- * metadata completeness metrics still require a view and are skipped if {@code VIEW_ID} is not set</li>
+ * <li>{@code VIEW_ID} — optional view identifier; when omitted, aggregate statistics and metadata completeness use all
+ * sources with no view bond (per-source counts include every record for that source). When set, the view’s bond
+ * restricts which records completeness percentages apply to; if the view id is invalid, metadata completeness metrics
+ * are skipped</li>
  * <li>{@code METRICS} — optional comma-separated list of {@link StatisticsMetric} names; when omitted, all metrics are
  * computed</li>
  * <li>{@code METADATA_COMPLETENESS_ELEMENTS} — optional comma-separated {@link MetadataElement} identifiers for
@@ -91,6 +93,60 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * {@code METADATA_SET_COMPLETENESS_core=IDENTIFIER} and
  * {@code METADATA_SET_COMPLETENESS_optional=IDENTIFIER,TITLE,BOUNDING_BOX}</li>
  * </ul>
+ *
+ * <h3>Available Prometheus metrics ({@link StatisticsMetric})</h3>
+ * <p>
+ * Each metric is registered as a Micrometer/Prometheus gauge. Most are per {@code source_id}; metadata completeness
+ * metrics use {@code VIEW_ID} when set to filter records, or all records per source when it is omitted. Subset via
+ * {@code METRICS}.
+ * </p>
+ * <dl>
+ * <dt>{@link StatisticsMetric#SOURCE_INFO SOURCE_INFO} ({@code source_info})</dt>
+ * <dd>Constant {@code 1} used as a carrier for labels {@code source_id} and {@code source_label} (human-readable name),
+ * so monitoring systems can resolve source identity alongside other series.</dd>
+ *
+ * <dt>{@link StatisticsMetric#DOWNLOAD_AVAILABILITY DOWNLOAD_AVAILABILITY} ({@code download_availability})</dt>
+ * <dd>{@code 1} if the last successful download is newer than the last failed download (or there is no failed download),
+ * {@code 0} otherwise. Reflects whether downloads from the source are currently considered available.</dd>
+ *
+ * <dt>{@link StatisticsMetric#HARVESTED_RECORDS HARVESTED_RECORDS} ({@code harvested_records})</dt>
+ * <dd>Number of harvested time series for the source (from semantic statistics: time series count).</dd>
+ *
+ * <dt>{@link StatisticsMetric#LAST_HARVESTING_UNIX_TIMESTAMP_MS LAST_HARVESTING_UNIX_TIMESTAMP_MS}
+ * ({@code last_harvesting_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch <b>milliseconds</b> of the last harvesting run end time, from harvesting properties. Omitted if no end
+ * timestamp is stored.</dd>
+ *
+ * <dt>{@link StatisticsMetric#SOURCE_UP SOURCE_UP} ({@code source_up})</dt>
+ * <dd>{@code 1} if the source is marked up in harvesting properties, {@code 0} if down or unknown.</dd>
+ *
+ * <dt>{@link StatisticsMetric#CONNECTIVITY_TEST_DURATION_MS CONNECTIVITY_TEST_DURATION_MS}
+ * ({@code connectivity_test_duration_ms})</dt>
+ * <dd>Duration in milliseconds of the last connectivity test toward the source. Omitted if not recorded.</dd>
+ *
+ * <dt>{@link StatisticsMetric#LAST_SOURCE_UP_UNIX_TIMESTAMP_MS LAST_SOURCE_UP_UNIX_TIMESTAMP_MS}
+ * ({@code last_source_up_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch milliseconds when the source was last observed as up during a connectivity test. Omitted if not
+ * recorded.</dd>
+ *
+ * <dt>{@link StatisticsMetric#PLATFORMS_TOTAL PLATFORMS_TOTAL} ({@code platforms_total})</dt>
+ * <dd>Total number of platforms (sites) for the source in semantic statistics.</dd>
+ *
+ * <dt>{@link StatisticsMetric#VARIABLES_TOTAL VARIABLES_TOTAL} ({@code variables_total})</dt>
+ * <dd>Total number of variables (attributes) for the source in semantic statistics.</dd>
+ *
+ * <dt>{@link StatisticsMetric#METADATA_COMPLETENESS METADATA_COMPLETENESS} ({@code metadata_completeness})</dt>
+ * <dd>Per metadata element, the fraction of records (for that source) where the element is present, within the
+ * {@code VIEW_ID} filter if set, otherwise among all records of the source. Expressed as a percentage {@code 0–100}.
+ * Series are distinguished by label {@code element} (see {@code METADATA_COMPLETENESS_ELEMENTS}).</dd>
+ *
+ * <dt>{@link StatisticsMetric#METADATA_SET_COMPLETENESS METADATA_SET_COMPLETENESS} ({@code metadata_set_completeness})</dt>
+ * <dd>Per named set, the fraction of records (for that source) where <b>all</b> elements in that set are present
+ * (logical AND), within the {@code VIEW_ID} filter if set, otherwise among all records of the source. Percentage
+ * {@code 0–100}. Series use label {@code element_set} (see {@code METADATA_SET_COMPLETENESS} and
+ * {@code METADATA_SET_COMPLETENESS_&lt;name&gt;}).</dd>
+ * </dl>
+ *
  * Legacy: a single line without {@code =} is treated as the view id (same as only {@code VIEW_ID} before).
  * 
  * @author boldrini
@@ -114,7 +170,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	DOWNLOAD_AVAILABILITY("download_availability", "Download availability "),
 	HARVESTED_RECORDS("harvested_records", "Total number of harvested records "),
 	LAST_HARVESTING_UNIX_TIMESTAMP_MS("last_harvesting_unix_timestamp_ms",
-		"Last harvesting end timestamp in epoch seconds"),
+		"Last harvesting end timestamp in Unix epoch milliseconds"),
 	SOURCE_UP("source_up", "Source connectivity status (1=up, 0=down)"),
 	CONNECTIVITY_TEST_DURATION_MS("connectivity_test_duration_ms",
 		"Duration of the last source connectivity test in milliseconds"),
@@ -246,14 +302,20 @@ public class StatisticsTask extends AbstractCustomTask {
 	if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS)
 		|| metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)) {
 	    try {
+		boolean completenessAllowed = false;
 		if (viewId != null && !viewId.isEmpty()) {
 		    reportView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
 		    if (reportView.isEmpty()) {
 			GSLoggerFactory.getLogger(getClass()).warn(
 				"View {} not found; metadata completeness metrics will be skipped", viewId);
 		    } else {
-			discoveryFinder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
+			completenessAllowed = true;
 		    }
+		} else {
+		    completenessAllowed = true;
+		}
+		if (completenessAllowed) {
+		    discoveryFinder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
 		}
 	    } catch (GSException e) {
 		GSLoggerFactory.getLogger(getClass()).warn("Cannot resolve view or finder for metadata completeness metrics: {}",
@@ -389,12 +451,11 @@ public class StatisticsTask extends AbstractCustomTask {
 			    register(registry);
 		}
 
-		if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS) && discoveryFinder != null && reportView.isPresent()) {
+		if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS) && discoveryFinder != null) {
 		    try {
-			View v = reportView.get();
-			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(v, source)).getCount();
+			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(reportView, source)).getCount();
 			for (MetadataElement completenessElement : metadataCompletenessElements) {
-			    double pct = occurrencePercentGivenTotal(discoveryFinder, newDiscoveryMessageForSource(v, source),
+			    double pct = occurrencePercentGivenTotal(discoveryFinder, newDiscoveryMessageForSource(reportView, source),
 				    totalRecords, completenessElement);
 			    final String elementTag = prometheusElementTag(completenessElement);
 			    final String completenessKey = metadataCompletenessKey(source, elementTag);
@@ -411,12 +472,11 @@ public class StatisticsTask extends AbstractCustomTask {
 		    }
 		}
 
-		if (metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS) && discoveryFinder != null && reportView.isPresent()) {
+		if (metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS) && discoveryFinder != null) {
 		    try {
-			View v = reportView.get();
-			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(v, source)).getCount();
+			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(reportView, source)).getCount();
 			for (MetadataCompletenessSet mcs : metadataCompletenessSets) {
-			    double pct = occurrencePercentAllElements(discoveryFinder, newDiscoveryMessageForSource(v, source),
+			    double pct = occurrencePercentAllElements(discoveryFinder, newDiscoveryMessageForSource(reportView, source),
 				    totalRecords, mcs.elements);
 			    final String setKey = metadataCompletenessSetKey(source, mcs.setNameTag);
 			    metadataCompletenessBySet.put(setKey, pct);
@@ -608,14 +668,19 @@ public class StatisticsTask extends AbstractCustomTask {
 	return out;
     }
 
-    private static DiscoveryMessage newDiscoveryMessageForSource(View view, String sourceId) {
+    /**
+     * Discovery query for one source. When {@code view} is empty, the view bond is {@link BondFactory#getTrueBond()}
+     * (same as an unconstrained view), so counts include all records for that source.
+     */
+    private static DiscoveryMessage newDiscoveryMessageForSource(Optional<View> view, String sourceId) {
 
+	Bond viewBond = view.map(View::getBond).orElse(BondFactory.getTrueBond());
+	Bond base = BondFactory.createAndBond(viewBond, BondFactory.createSourceIdentifierBond(sourceId));
 	DiscoveryMessage message = new DiscoveryMessage();
 	List<GSSource> sources = new ArrayList<>();
 	sources.add(ConfigurationWrapper.getSource(sourceId));
 	message.setSources(sources);
-	message.setView(view);
-	Bond base = BondFactory.createAndBond(view.getBond(), BondFactory.createSourceIdentifierBond(sourceId));
+	view.ifPresent(message::setView);
 	message.setUserBond(base);
 	message.setPermittedBond(base);
 	return message;

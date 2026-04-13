@@ -82,7 +82,7 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 
 
 	Optional<String> optionalView = webRequest.extractViewId();
-	String viewId = optionalView.isPresent() ? optionalView.get() : null;
+	String viewId = optionalView.isPresent() ? optionalView.get() : "all-sources";
 
 	return new StreamingOutput() {
 

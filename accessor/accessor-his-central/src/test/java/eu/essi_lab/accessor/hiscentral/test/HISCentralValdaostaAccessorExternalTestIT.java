@@ -163,6 +163,9 @@ public class HISCentralValdaostaAccessorExternalTestIT {
 
 	List<GSResource> recordsAsList = listRecordsResponse.getRecordsAsList();
 
+	for(GSResource record : recordsAsList) {
+	    System.out.println(record.getOriginalMetadata().getMetadata());
+	}
 	Assert.assertEquals(64, recordsAsList.size());
 
 	GSResource gsResource = recordsAsList.get(0);
