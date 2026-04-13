@@ -54,6 +54,9 @@ public class ANASARConnector extends HarvestedQueryConnector<ANASARConnectorSett
 
     private static final int PAGE_SIZE = 10;
 
+    /** Metadata records emitted in the current harvesting run (aligned with {@link eu.essi_lab.accessor.ana.ANAConnector}). */
+    private int partialNumbers;
+
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	ANASARClient client = new ANASARClient();
@@ -62,20 +65,24 @@ public class ANASARConnector extends HarvestedQueryConnector<ANASARConnectorSett
 	    token = "0";
 	}
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
-	int from = Integer.parseInt(token);
-	int to = Math.min(client.getStations().size(), from + PAGE_SIZE);
-	if (to != client.getStations().size()) {
-	    ret.setResumptionToken("" + to);
-	}
-	List<JSONObject> page = client.getStations().subList(from, to);
+
 	Optional<Integer> mr = getSetting().getMaxRecords();
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && to > mr.get()) {
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	if (!unlimited && mr.isPresent() && partialNumbers > mr.get() - 1) {
 	    ret.setResumptionToken(null);
-	    if (page.size() > mr.get()) {
-		page = page.subList(0, mr.get());
-	    }
+	    partialNumbers = 0;
+	    return ret;
 	}
-	for (JSONObject item : page) {
+
+	int from = Integer.parseInt(token);
+	List<JSONObject> stations = client.getStations();
+	int stationCount = stations.size();
+	int to = Math.min(stationCount, from + PAGE_SIZE);
+	List<JSONObject> page = stations.subList(from, to);
+
+	boolean stoppedByMax = false;
+
+	stationsLoop: for (JSONObject item : page) {
 	    if (item.has("res_id") && item.has("tsi_id")) {
 		String resId = "unknown";
 		try {
@@ -83,18 +90,36 @@ public class ANASARConnector extends HarvestedQueryConnector<ANASARConnectorSett
 
 		    List<JSONObject> series = client.getSeriesInformation(resId);
 		    for (JSONObject serie : series) {
+			if (!unlimited && mr.isPresent() && partialNumbers > mr.get() - 1) {
+			    stoppedByMax = true;
+			    break stationsLoop;
+			}
 			OriginalMetadata record = new OriginalMetadata();
 			record.setMetadata(serie.toString());
 			record.setSchemeURI(CommonNameSpaceContext.ANA_SAR_URI);
 			ret.addRecord(record);
+			partialNumbers++;
 		    }
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error("Error for reservoir: " + resId + " (skipping)");
 		}
 
-	    }else {
-		GSLoggerFactory.getLogger(getClass()).error("Missing res id or tsi id " );
+	    } else {
+		GSLoggerFactory.getLogger(getClass()).error("Missing res id or tsi id ");
 	    }
+	}
+
+	if (stoppedByMax) {
+	    ret.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return ret;
+	}
+
+	if (to != stationCount) {
+	    ret.setResumptionToken("" + to);
+	} else {
+	    ret.setResumptionToken(null);
+	    partialNumbers = 0;
 	}
 	return ret;
     }

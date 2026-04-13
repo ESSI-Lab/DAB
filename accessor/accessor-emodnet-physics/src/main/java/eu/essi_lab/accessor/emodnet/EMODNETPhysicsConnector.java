@@ -26,6 +26,7 @@ import java.util.List;
 import java.net.URISyntaxException;
 import java.net.http.HttpTimeoutException;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONObject;
@@ -88,8 +89,16 @@ public class EMODNETPhysicsConnector extends HarvestedQueryConnector<EMODNETPhys
 	}
 	List<String> identifiers = datasetIdentifiers.getKey();
 	List<String> metadataIdentifiers = datasetIdentifiers.getValue();
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
 
 	for (String identifier : identifiers) {
+
+	    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		break;
+	    }
+
 	    JSONObject metadata = null;
 	    JSONObject additionalMetadata = null;
 	    try {
@@ -124,6 +133,7 @@ public class EMODNETPhysicsConnector extends HarvestedQueryConnector<EMODNETPhys
 	    }
 	    metadataRecord.setAdditionalInfo(handler);
 	    ret.addRecord(metadataRecord);
+	    added++;
 	}
 	return ret;
 

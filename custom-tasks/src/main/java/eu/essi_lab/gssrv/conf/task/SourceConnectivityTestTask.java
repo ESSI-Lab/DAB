@@ -21,6 +21,7 @@ package eu.essi_lab.gssrv.conf.task;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,20 +67,23 @@ public class SourceConnectivityTestTask extends AbstractCustomTask {
 	    }
 	}
 
+	List<GSSource> viewSources = new ArrayList<>();
+
 	if (viewId == null) {
-	    GSLoggerFactory.getLogger(getClass()).info("No view specified by source connectivity test task");
-	    status.setPhase(JobPhase.CANCELED);
-	    return;
+	    GSLoggerFactory.getLogger(getClass()).info("View '{}' not set, checking all sources", viewId);
+	    viewSources = ConfigurationWrapper.getAllSources();
+	}else{
+	    Optional<View> optView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+	    if (optView.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).info("View '{}' not found, exiting", viewId);
+		status.setPhase(JobPhase.CANCELED);
+		return;
+	    }  else{
+		viewSources = ConfigurationWrapper.getViewSources(optView.get());
+	    }
 	}
 
-	Optional<View> optView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
-	if (optView.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).info("View '{}' not found for source connectivity test task", viewId);
-	    status.setPhase(JobPhase.CANCELED);
-	    return;
-	}
 
-	List<GSSource> viewSources = ConfigurationWrapper.getViewSources(optView.get());
 	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 
 	GSLoggerFactory.getLogger(getClass()).info("Testing connectivity of {} sources for view {}", viewSources.size(), viewId);

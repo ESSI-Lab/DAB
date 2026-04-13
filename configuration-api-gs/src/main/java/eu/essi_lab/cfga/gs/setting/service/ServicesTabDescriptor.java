@@ -75,7 +75,7 @@ public class ServicesTabDescriptor extends TabDescriptor {
 			ViewerColumnRenderer.create("Messages", "Messages", "View service messages"))
 
 	)).//
-		reloadable(() -> ManagedServiceSupport.getInstance().update()).//
+		reloadable(() -> ManagedServiceSupport.getInstance().update(), true).//
 
 		build();
 

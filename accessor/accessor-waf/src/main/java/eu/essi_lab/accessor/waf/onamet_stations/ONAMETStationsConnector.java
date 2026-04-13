@@ -87,7 +87,11 @@ public class ONAMETStationsConnector extends HarvestedQueryConnector<ONAMETStati
 
 	GSLoggerFactory.getLogger(getClass()).debug("Creating original metadata STARTED");
 
-	for (String[] stationArray : stations) {
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
+
+	stations: for (String[] stationArray : stations) {
 
 	    ONAMETStation station = new ONAMETStation(stationArray);
 
@@ -96,8 +100,13 @@ public class ONAMETStationsConnector extends HarvestedQueryConnector<ONAMETStati
 		ONAMETParameter parameter = ONAMETParameter.find(parameters, parameterId);
 
 		if (ONAMETParameterId.valueOf(parameterId) != ONAMETParameterId.RS) {
-		    
+
+		    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+			break stations;
+		    }
+
 		    response.addRecord(ONAMETStationsMapper.create(station, parameter));
+		    added++;
 		}
 	    }
 	}

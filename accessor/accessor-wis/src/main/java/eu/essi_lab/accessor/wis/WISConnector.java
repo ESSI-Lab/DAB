@@ -80,6 +80,8 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
      */
     private static final String WIS_CONNECTOR_SOURCE_NOT_FOUND_ERROR = "WIS_CONNECTOR_SOURCE_NOT_FOUND_ERROR";
 
+    private int partialNumbers;
+
     @Override
     public boolean supports(GSSource source) {
 	String url = source.getEndpoint();
@@ -140,9 +142,17 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 
 	int getVarAttempts = 0;
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+	    ret.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return ret;
+	}
+
 	GSLoggerFactory.getLogger(getClass()).info("Adding station STARTED");
 
-	for (Station station : stations) {
+	stations: for (Station station : stations) {
 
 	    getVarAttempts = 0;
 
@@ -175,6 +185,10 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 	    }
 
 	    for (ObservedProperty observedProperty : observedProperties) {
+
+		if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		    break stations;
+		}
 
 		Dataset dataset = new Dataset();
 		dataset.setSource(source.get());
@@ -492,6 +506,7 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 		    record.setMetadata(dataset.asString(true));
 
 		    ret.addRecord(record);
+		    partialNumbers++;
 
 		} catch (Exception e) {
 
@@ -504,6 +519,7 @@ public class WISConnector extends HarvestedQueryConnector<WISConnectorSetting> {
 	GSLoggerFactory.getLogger(getClass()).info("Adding station ENDED");
 
 	ret.setResumptionToken(null);
+	partialNumbers = 0;
 	return ret;
     }
 

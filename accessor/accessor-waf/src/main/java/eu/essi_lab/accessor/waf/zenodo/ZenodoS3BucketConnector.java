@@ -60,6 +60,10 @@ public class ZenodoS3BucketConnector extends HarvestedQueryConnector<ZenodoS3Buc
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<OriginalMetadata>();
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
+
 	Downloader downloader = new Downloader();
 	Optional<InputStream> stream = downloader.downloadOptionalStream(getSourceURL());
 
@@ -98,6 +102,7 @@ public class ZenodoS3BucketConnector extends HarvestedQueryConnector<ZenodoS3Buc
 			    originalMetadata.setMetadata(om);
 			    originalMetadata.setSchemeURI(CommonNameSpaceContext.OAI_DATACITE_NS_URI);
 			    response.addRecord(originalMetadata);
+			    added++;
 
 			}
 		    }

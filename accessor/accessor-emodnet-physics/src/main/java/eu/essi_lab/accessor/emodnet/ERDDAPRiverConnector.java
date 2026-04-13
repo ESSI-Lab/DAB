@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.emodnet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 
@@ -66,8 +67,15 @@ public class ERDDAPRiverConnector extends HarvestedQueryConnector<ERDDAPRiverCon
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
 	List<ERDDAPRow> metadatas = client.getMetaData();
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
 
 	for (ERDDAPRow metadata : metadatas) {
+
+	    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		break;
+	    }
 
 	    OriginalMetadata metadataRecord = new OriginalMetadata();
 	    try {
@@ -77,6 +85,7 @@ public class ERDDAPRiverConnector extends HarvestedQueryConnector<ERDDAPRiverCon
 		info.add(new GSProperty<String>("url", client.getBaseURL()));
 		metadataRecord.setAdditionalInfo(info);
 		ret.addRecord(metadataRecord);
+		added++;
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error(e);
 		e.printStackTrace();

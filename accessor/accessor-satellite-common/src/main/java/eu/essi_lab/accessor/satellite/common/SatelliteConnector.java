@@ -23,6 +23,7 @@ package eu.essi_lab.accessor.satellite.common;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
@@ -49,8 +50,15 @@ public abstract class SatelliteConnector<S extends HarvestedConnectorSetting> ex
 	try {
 
 	    List<GSResource> collections = getCollections();
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
 
 	    for (GSResource collection : collections) {
+
+		if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		    break;
+		}
 
 		OriginalMetadata metadata = new OriginalMetadata();
 		metadata.setSchemeURI(SatelliteCollectionMapper.SATELLITE_COLLECTION_SCHEME_URI);
@@ -63,6 +71,7 @@ public abstract class SatelliteConnector<S extends HarvestedConnectorSetting> ex
 		metadata.setMetadata(collection.asString(true));
 
 		response.addRecord(metadata);
+		added++;
 	    }
 
 	} catch (Exception e) {

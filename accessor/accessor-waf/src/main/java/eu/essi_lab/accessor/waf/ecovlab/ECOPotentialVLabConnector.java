@@ -27,6 +27,7 @@ package eu.essi_lab.accessor.waf.ecovlab;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,6 +63,10 @@ public class ECOPotentialVLabConnector extends HarvestedQueryConnector<ECOPotent
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<OriginalMetadata>();
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
+
 	Downloader downloader = new Downloader();
 	Optional<InputStream> stream = downloader.downloadOptionalStream(getSourceURL());
 
@@ -73,7 +78,7 @@ public class ECOPotentialVLabConnector extends HarvestedQueryConnector<ECOPotent
 	    try {
 		XMLDocumentReader reader = new XMLDocumentReader(inputStream);
 
-		Arrays.asList(reader.evaluateNodes("//*:Key/text()")).//
+		Iterator<OriginalMetadata> it = Arrays.asList(reader.evaluateNodes("//*:Key/text()")).//
 			stream().//
 
 			map(n -> {
@@ -101,8 +106,14 @@ public class ECOPotentialVLabConnector extends HarvestedQueryConnector<ECOPotent
 
 			    return originalMetadata;
 			}).//
-			filter(Objects::nonNull).//
-			forEach(o -> response.addRecord(o));
+			filter(Objects::nonNull).iterator();
+		while (it.hasNext()) {
+		    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+			break;
+		    }
+		    response.addRecord(it.next());
+		    added++;
+		}
 
 	    } catch (SAXException | IOException | XPathExpressionException e) {
 

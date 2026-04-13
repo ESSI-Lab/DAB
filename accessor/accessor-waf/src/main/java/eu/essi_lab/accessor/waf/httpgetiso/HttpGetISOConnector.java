@@ -48,6 +48,8 @@ public class HttpGetISOConnector extends HarvestedQueryConnector<HttpGetISOConne
 
     public static final String TYPE = "HttpGetISOConnector";
 
+    private int harvestRecordCount;
+
     @Override
     
     public boolean supports(GSSource source) {
@@ -75,6 +77,12 @@ public class HttpGetISOConnector extends HarvestedQueryConnector<HttpGetISOConne
     
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	if (!unlimited && mr.isPresent() && harvestRecordCount >= mr.get()) {
+	    harvestRecordCount = 0;
+	    return ret;
+	}
 	try {
 	    String endpoint = getSourceURL();
 	    Downloader d = new Downloader();
@@ -87,14 +95,22 @@ public class HttpGetISOConnector extends HarvestedQueryConnector<HttpGetISOConne
 		    OriginalMetadata metadataRecord = new OriginalMetadata();
 		    metadataRecord.setMetadata(nodeReader.asString());
 		    metadataRecord.setSchemeURI(CommonNameSpaceContext.GMD_NS_URI);
+		    if (!unlimited && mr.isPresent() && harvestRecordCount >= mr.get()) {
+			return ret;
+		    }
 		    ret.addRecord(metadataRecord);
+		    harvestRecordCount++;
 		} else {
 		    node = reader.evaluateNode("//*:MI_Metadata[1]");
 		    XMLNodeReader nodeReader = new XMLNodeReader(node);
 		    OriginalMetadata metadataRecord = new OriginalMetadata();
 		    metadataRecord.setMetadata(nodeReader.asString());
 		    metadataRecord.setSchemeURI(CommonNameSpaceContext.GMI_NS_URI);
+		    if (!unlimited && mr.isPresent() && harvestRecordCount >= mr.get()) {
+			return ret;
+		    }
 		    ret.addRecord(metadataRecord);
+		    harvestRecordCount++;
 		}
 
 	    }
