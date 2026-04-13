@@ -155,7 +155,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 
 		    HashMap<String, Boolean> map = createSelectionMap();
 
-		    // the setting is not found in case of non contextual menu items
+		    // the setting is not found in case of non-contextual menu items
 		    // since they are enabled also if no context is selected
 		    Optional<Setting> setting = findEventSetting(configuration, eventItem);
 
