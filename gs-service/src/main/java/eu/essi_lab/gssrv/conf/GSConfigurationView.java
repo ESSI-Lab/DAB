@@ -266,13 +266,22 @@ public class GSConfigurationView extends ConfigurationView {
 
     /**
      * Forces the reload of the source configuration so in this node, the changes are already available without waiting for the
-     * autoreload.<br> The source configuration, provided by {@link ConfigurationWrapper},
-     * is read-only and it can dispatch only
-     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED}
-     * events after the flush of the cloned configuration
+     * autoreload.<br> The source configuration, provided by {@link ConfigurationWrapper}, is read-only and it can dispatch only
+     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED} events after the flush of the cloned
+     * configuration
      */
     @Override
     protected void onConfigurationFlushed() {
+
+	//
+	// in very particular cases, the configuration can be flushed also without
+	// pressing the save button,
+	// for example in case of ServicesTabDescriptor where a menu handler
+	// can start/stop a service. in that case, the service setting is replaced with an
+	// enabled/disabled setting, and the config is flushed. this changes also enable
+	// the save button in #configurationChanged and here, it is disabled again
+	//
+	getSaveButton().setEnabled(false);
 
 	try {
 
