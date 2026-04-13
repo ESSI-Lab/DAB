@@ -10,7 +10,6 @@ import java.net.http.*;
 import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
-import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -28,7 +27,6 @@ public class DataHubTestClient {
 	CREATE_ENDPOINT_BASE = System.getenv("createEndpoint");
 	DELETE_ENDPOINT_BASE = System.getenv("deleteEndpoint");
 	TOKEN = System.getenv("token");
-
     }
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -109,11 +107,20 @@ public class DataHubTestClient {
 
 	String body = MAPPER.writeValueAsString(payload);
 
-	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("accept", "application/json")
-		.header("Content-Type", "application/json").header("Authorization", "Bearer " + token)
-		.POST(HttpRequest.BodyPublishers.ofString(body)).build();
+	HttpRequest request = HttpRequest.newBuilder(). //
+		uri(URI.create(url)).//
+		header("accept", "application/json").//
+		header("Content-Type", "application/json").//
+		header("Authorization", "Bearer " + token).//
+		POST(HttpRequest.BodyPublishers.ofString(body)).//
+		build();//
 
 	HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
+
+	if (response.statusCode() != 200) {
+
+	    GSLoggerFactory.getLogger(DataHubTestClient.class).error(response.body());
+	}
 
 	return response.statusCode() == 200 || response.statusCode() == 201;
     }
@@ -121,10 +128,11 @@ public class DataHubTestClient {
     /**
      * @param count
      * @param waitSeconds
+     * @param modfier
      * @param recordPrefix
      * @throws Exception
      */
-    private static void insert(int count, int waitSeconds, String recordPrefix) throws Exception {
+    private static void insert(String modifier, String baseId) throws Exception {
 
 	int success = 0;
 	List<String> failed = new ArrayList<>();
@@ -135,63 +143,68 @@ public class DataHubTestClient {
 
 	    String file = IOStreamUtils.asUTF8String(new FileInputStream(path.toFile()));
 
-	    for (int i = 0; i < count; i++) {
-
-		String modFile = new String(file).replace("_IDENTIFIER_", "ID_" + recordPrefix + "_" + i);
-		modFile = modFile.replace("_TITLE_", "TITLE_" + recordPrefix + "_" + i);
-		modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + recordPrefix + "_" + i);
-
-		try {
-
-		    Map<String, Object> flat = flattenJsonFromFile(modFile, ":::");
-		    Map<String, Object> prepared = preparePayload(flat);
-
-		    boolean ok = post(CREATE_ENDPOINT_BASE, TOKEN, prepared.get("payload"));
-
-		    String urn = (String) prepared.get("urn");
-
-		    if (ok) {
-			success++;
-			System.out.println("Published entity: " + urn);
-		    } else {
-			failed.add(path.getFileName().toString());
-			System.out.println("Failed: " + file);
-		    }
-
-		    Thread.sleep(TimeUnit.SECONDS.toMillis(waitSeconds));
-
-		} catch (Exception e) {
-		    failed.add(path.getFileName().toString());
-		    System.out.println("Exception: " + file + " -> " + e.getMessage());
-		}
-	    }
-	}
-
-	System.out.println("\n====================");
-	System.out.println("Success: " + success);
-	System.out.println("Failed: " + failed.size());
-    }
-
-    /**
-     * @param recordId
-     * @param mod
-     * @throws Exception
-     */
-    private static void update(String recordId, String mod) throws Exception {
-
-	int success = 0;
-	List<String> failed = new ArrayList<>();
-
-	try (var files = Files.list(Paths.get(JSON_INPUT_FOLDER_PATH))) {
-
-	    Path path = files.filter(f -> f.toString().endsWith(".json")).toList().getFirst();
-
-	    String file = IOStreamUtils.asUTF8String(new FileInputStream(path.toFile()));
+	    String recordId = baseId.replace("MODIFIER", modifier);
 
 	    String modFile = new String(file).replace("_IDENTIFIER_", recordId);
 
-	    modFile = modFile.replace("_TITLE_", "TITLE_" + mod);
-	    modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + mod);
+	    modFile = modFile.replace("_TITLE_", "TITLE_" + modifier);
+	    modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + modifier);
+
+	    try {
+
+		Map<String, Object> flat = flattenJsonFromFile(modFile, ":::");
+		Map<String, Object> prepared = preparePayload(flat);
+
+		boolean ok = post(CREATE_ENDPOINT_BASE, TOKEN, prepared.get("payload"));
+
+		String urn = (String) prepared.get("urn");
+
+		if (ok) {
+		    success++;
+		    System.out.println("Published entity: " + urn);
+		} else {
+		    failed.add(path.getFileName().toString());
+		    System.out.println("Failed: " + file);
+		}
+
+	    } catch (Exception e) {
+
+		failed.add(path.getFileName().toString());
+		GSLoggerFactory.getLogger(DataHubTestClient.class).error(e);
+	    }
+
+	}
+
+	System.out.println("\n====================");
+	System.out.println("Insert success: " + success);
+	System.out.println("Insert failed: " + failed.size());
+	System.out.println("====================");
+    }
+
+    /**
+     * @param modifier
+     * @param baseId
+     * @param counter
+     * @param sourceIdPostfix
+     * @throws Exception
+     */
+    private static void update(String modifier, String baseId, String sourceIdPostfix) throws Exception {
+
+	int success = 0;
+	List<String> failed = new ArrayList<>();
+
+	try (var files = Files.list(Paths.get(JSON_INPUT_FOLDER_PATH))) {
+
+	    Path path = files.filter(f -> f.toString().endsWith(".json")).toList().getFirst();
+
+	    String file = IOStreamUtils.asUTF8String(new FileInputStream(path.toFile()));
+
+	    String recordId = baseId.replace("MODIFIER", modifier) + sourceIdPostfix;
+
+	    String modFile = new String(file).replace("_IDENTIFIER_", recordId);
+
+	    modFile = modFile.replace("_TITLE_", "TITLE_" + ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
+	    modFile = modFile.replace("_ABSTRACT_", "ABSTRACT_" + ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
 
 	    try {
 
@@ -212,31 +225,33 @@ public class DataHubTestClient {
 
 	    } catch (Exception e) {
 		failed.add(path.getFileName().toString());
-		System.out.println("Exception: " + file + " -> " + e.getMessage());
+		GSLoggerFactory.getLogger(DataHubTestClient.class).error(e);
 	    }
 	}
 
 	System.out.println("\n====================");
-	System.out.println("Success: " + success);
-	System.out.println("Failed: " + failed.size());
+	System.out.println("Update success: " + success);
+	System.out.println("Update failed: " + failed.size());
+	System.out.println("====================");
     }
 
     /**
      * @param urns
      * @throws Exception
      */
-    private static void delete(List<String> urns) throws Exception {
+    private static void delete(String modifier, String baseId, String sourceIdPostfix) throws Exception {
 
 	int success = 0;
 	List<String> failed = new ArrayList<>();
 
-	for (String urn : urns) {
+	String urn = baseId.replace("MODIFIER", modifier) + sourceIdPostfix;
 
-	    String url = DELETE_ENDPOINT_BASE + urn;
+	String url = DELETE_ENDPOINT_BASE + urn;
 
-	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("accept", "*/*")
-		    .header("Authorization", "Bearer " + TOKEN).DELETE().build();
+	HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).header("accept", "*/*")
+		.header("Authorization", "Bearer " + TOKEN).DELETE().build();
 
+	try {
 	    HttpResponse<String> response = HTTP.send(request, HttpResponse.BodyHandlers.ofString());
 
 	    if (response.statusCode() == 200 || response.statusCode() == 204) {
@@ -246,11 +261,17 @@ public class DataHubTestClient {
 		failed.add(urn);
 		System.out.println("Failed: " + urn);
 	    }
+
+	} catch (Exception e) {
+
+	    failed.add(urn);
+	    GSLoggerFactory.getLogger(DataHubTestClient.class).error(e);
 	}
 
 	System.out.println("\n====================");
-	System.out.println("Deleted: " + success);
-	System.out.println("Failed: " + failed.size());
+	System.out.println("Delete success: " + success);
+	System.out.println("Delete failed: " + failed.size());
+	System.out.println("\n====================");
     }
 
     /**
@@ -259,18 +280,26 @@ public class DataHubTestClient {
      */
     public static void main(String[] args) throws Exception {
 
-	String idPrefix = "test_9";
+	String sourceIdPostfix = "@datahub";
 
-	insert(3, 1, idPrefix);
+	///
 
-//	update("ID_test_8_0", ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds());
+	String modifier = "test_15_0";
 
-//	for (int i = 0; i < 9; i++) {
-//
-//	    List<String> urns = List.of("urn:li:dataset:(urn:li:dataPlatform:metadata,ID_test_3_" + i + ",DEV)");
-//
-//	    delete(urns);
-//	}
+	///
 
+	String baseId = "urn:li:dataset:(urn:li:dataPlatform:metadata,_MODIFIER_,DEV)";
+
+	///
+
+	insert(modifier, baseId);
+
+	///
+
+	update(modifier, baseId, sourceIdPostfix);
+
+	///
+
+	delete(modifier, baseId, sourceIdPostfix);
     }
 }
