@@ -125,9 +125,10 @@ public class PrometheusAgentService extends AbstractManagedService {
 	}
 
 	String safeJobName = FileUtils.sanitizeForNtfs(jobName);
+	String safeServiceId = FileUtils.sanitizeForNtfs(getId());
 
 	Path javaTmpDir = IOStreamUtils.getUserTempDirectory().toPath();
-	File agentRootDir = javaTmpDir.resolve(AGENT_ROOT_DIR_NAME).toFile();
+	File agentRootDir = javaTmpDir.resolve(AGENT_ROOT_DIR_NAME + "-" + safeServiceId).toFile();
 
 	File prometheusCacheDir = getCacheDir(agentRootDir, downloadUrl);
 	File prometheusBinary;
