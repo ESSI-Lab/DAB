@@ -27,6 +27,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -347,6 +348,9 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 	return null;
     }
 
+    public static String email = null;
+    public static String password = null;
+
     public static String getBearerToken(String baseUrl) {
 
 	GSLoggerFactory.getLogger(HISCentralValdaostaConnector.class).info("Getting BEARER TOKEN from Valle d'Aosta CFVDA service");
@@ -357,8 +361,21 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
 	try {
    	    
 	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put("email", ConfigurationWrapper.getCredentialsSetting().getAostaClientId().orElse(null));
-	    params.put("password", ConfigurationWrapper.getCredentialsSetting().getAostaClientPassword().orElse(null));
+
+	    if (ConfigurationWrapper.getConfiguration().isPresent()) {
+		Optional<String> emailSettings = ConfigurationWrapper.getCredentialsSetting().getAostaClientId();
+		if (emailSettings.isPresent()&&emailSettings.get()!=null) {
+		    email = emailSettings.get();
+		}
+		Optional<String> passwordSettings = ConfigurationWrapper.getCredentialsSetting().getAostaClientPassword();
+		if (passwordSettings.isPresent()&&passwordSettings.get()!=null) {
+		    password = passwordSettings.get();
+		}
+	    }
+
+
+	    params.put("email",email );
+	    params.put("password", password);
 
 	    Downloader downloader = new Downloader();
 	    

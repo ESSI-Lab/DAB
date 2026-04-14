@@ -177,4 +177,12 @@ public class HISCentralValdaostaAccessorExternalTestIT {
 	Assert.assertTrue(object.has("dataset-info"));
 	Assert.assertTrue(object.has("sensor-info"));
     }
+
+    public static void main(String[] args) throws Exception {
+	HISCentralValdaostaConnector.email = System.getProperty("aosta.user");
+	HISCentralValdaostaConnector.password = System.getProperty("aosta.password");
+	HISCentralValdaostaAccessorExternalTestIT it = new HISCentralValdaostaAccessorExternalTestIT();
+	it.listRecordsTest();
+    }
+
 }
