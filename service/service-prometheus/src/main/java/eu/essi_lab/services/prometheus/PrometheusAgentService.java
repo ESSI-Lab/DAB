@@ -139,6 +139,8 @@ public class PrometheusAgentService extends AbstractManagedService {
 	    return;
 	}
 	if (prometheusBinary == null) {
+	    publish(MessageChannel.MessageLevel.INFO,
+		    "Prometheus agent start aborted: service stopped before binary was ready");
 	    return;
 	}
 
@@ -148,12 +150,14 @@ public class PrometheusAgentService extends AbstractManagedService {
 		awsRegion);
 	try {
 	    Files.writeString(configFile.toPath(), yaml, StandardCharsets.UTF_8);
+	    publish(MessageChannel.MessageLevel.INFO, "Wrote Prometheus agent config: " + configFile.getName());
 	} catch (IOException e) {
 	    publish(MessageChannel.MessageLevel.ERROR, "Unable to write config: " + e.getMessage());
 	    return;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Launching Prometheus agent at port {}", listenPort);
+	publish(MessageChannel.MessageLevel.INFO, "Launching Prometheus agent on port " + listenPort);
 
 	ProcessBuilder pb = new ProcessBuilder(//
 		"./prometheus", //
@@ -268,6 +272,7 @@ public class PrometheusAgentService extends AbstractManagedService {
 
 	if (prometheusBinary != null && prometheusBinary.canExecute()) {
 
+	    publish(MessageChannel.MessageLevel.INFO, "Using cached Prometheus binary under " + prometheusCacheDir.getPath());
 	    return prometheusBinary;
 	}
 
@@ -279,10 +284,13 @@ public class PrometheusAgentService extends AbstractManagedService {
 
 	    prometheusBinary = findPrometheusBinary(prometheusCacheDir);
 	    if (prometheusBinary != null && prometheusBinary.canExecute()) {
+		publish(MessageChannel.MessageLevel.INFO,
+			"Using cached Prometheus binary under " + prometheusCacheDir.getPath());
 		return prometheusBinary;
 	    }
 
 	    if (!running) {
+		publish(MessageChannel.MessageLevel.INFO, "Prometheus agent start cancelled before download");
 		return null;
 	    }
 
@@ -290,6 +298,7 @@ public class PrometheusAgentService extends AbstractManagedService {
 	    File tarFile = new File(prometheusCacheDir, tarFileName);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Downloading Prometheus binary");
+	    publish(MessageChannel.MessageLevel.INFO, "Downloading Prometheus from " + downloadUrl);
 
 	    downloadTarIfNeeded(downloadUrl, tarFile);
 
@@ -302,6 +311,7 @@ public class PrometheusAgentService extends AbstractManagedService {
 	    extractDir.mkdirs();
 
 	    GSLoggerFactory.getLogger(getClass()).info("Extracting Prometheus from {}", tarFile.getAbsolutePath());
+	    publish(MessageChannel.MessageLevel.INFO, "Extracting Prometheus archive");
 	    TarExtractor extractor = new TarExtractor();
 	    extractor.extract(tarFile, extractDir, true);
 
