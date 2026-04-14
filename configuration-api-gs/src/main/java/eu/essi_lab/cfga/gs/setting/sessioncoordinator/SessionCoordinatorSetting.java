@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.setting.sessioncoordinator;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -47,6 +47,15 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
     private static final String DIST_CHANNEL_SIZE_KEY = "distChannelSize";
     private static final String LOCAL_SERVICES_SETTING_ID = "localServicesSetting";
     private static final String LOCAL_CHANNEL_SIZE_KEY = "localChannelSize";
+
+    /**
+     *
+     */
+    public static final int DEFAULT_REDIS_PORT = 6379;
+    public static final int DEFAULT_CHANNEL_SIZE = 100;
+    public static final int DEFAULT_MAX_SERVICES = 3;
+    public static final int DEFAULT_TTL_SECONDS = 30;
+    public static final int DEFAULT_HEARTBEAT_SECONDS = 10;
 
     /**
      * @author Fabrizio
@@ -107,7 +116,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 	Option<String> endpointOption = StringOptionBuilder.get().//
 		withKey(REDIS_ENDPOINT_OPTION_KEY).//
 		withLabel("Redis endpoint (host:port)").//
-		withValue("localhost:6379").//
+		withValue("localhost:" + DEFAULT_REDIS_PORT).//
 		cannotBeDisabled().//
 		build();
 
@@ -150,7 +159,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		withDescription("Maximum number of allowed messages for each service (min. 10 / max. 500)").//
 		withMinValue(10).//
 		withMaxValue(500).//
-		withValue(100).//
+		withValue(DEFAULT_CHANNEL_SIZE).//
 		cannotBeDisabled().//
 		build();
 
@@ -176,7 +185,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		cannotBeDisabled().//
 		withSingleSelection().//
 		withValues(List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)).//
-		withSelectedValue(3).//
+		withSelectedValue(DEFAULT_MAX_SERVICES).//
 		build();
 
 	distServicesSetting.addOption(maxServicesOption);
@@ -186,7 +195,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		withLabel("Lock duration (TTL) in seconds. Minimum value is 30 seconds").//
 		cannotBeDisabled().//
 		withMinValue(30).//
-		withValue(30).//
+		withValue(DEFAULT_TTL_SECONDS).//
 		build();
 
 	distServicesSetting.addOption(ttlOption);
@@ -196,7 +205,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		withLabel("Heartbeat frequency in seconds (recommended 1/3 of TTL). Minimum value is 10 seconds").//
 		cannotBeDisabled().//
 		withMinValue(10).//
-		withValue(10).//
+		withValue(DEFAULT_HEARTBEAT_SECONDS).//
 		build();
 
 	distServicesSetting.addOption(hearthbeatOption);
@@ -207,7 +216,7 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
 		withDescription("Maximum number of allowed messages for each service (min. 10 / max. 500)").//
 		withMinValue(10).//
 		withMaxValue(500).//
-		withValue(100).//
+		withValue(DEFAULT_CHANNEL_SIZE).//
 		cannotBeDisabled().//
 		build();
 
@@ -288,9 +297,9 @@ public class SessionCoordinatorSetting extends Setting implements EditableSettin
     /**
      * @param endpoint
      */
-    public void setRedisEndpoint(String endpoint) {
+    public void setRedisEndpoint(String endpoint, String port) {
 
-	getOption(REDIS_ENDPOINT_OPTION_KEY, String.class).get().setValue(endpoint != null ? endpoint : "");
+	getOption(REDIS_ENDPOINT_OPTION_KEY, String.class).get().setValue(endpoint + ":" + port);
     }
 
     /**
