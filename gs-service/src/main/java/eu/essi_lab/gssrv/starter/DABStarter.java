@@ -501,16 +501,6 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 
 	    //
-	    // in execution mode CONFIGURATION and MIXED there is no need to autoreload
-	    // since there is only one node, no shared configuration (also in
-	    // LOCAL_PRODUCTION mode but this is done in the next rows...)
-	    //
-	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED) {
-
-		configuration.pauseAutoreload();
-	    }
-
-	    //
 	    // set volatile DB according to the java option
 	    //
 	    if (JVMOption.isEnabled(JVMOption.FORCE_VOLATILE_DB)) {
@@ -643,8 +633,6 @@ public class DABStarter implements ConfigurationChangeListener {
 			FileSource.switchSource(configuration, path.get()) : //
 			FileSource.switchSource(configuration);
 
-		configuration.pauseAutoreload();
-
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
 
@@ -665,6 +653,15 @@ public class DABStarter implements ConfigurationChangeListener {
 	    customPatch.patch();
 
 	    //
+	    // in these mode there is no need to autoreload
+	    // since there is only one node, no shared configuration
+	    //
+	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED || mode == LOCAL_PRODUCTION) {
+
+		configuration.pauseAutoreload();
+	    }
+
+	    //
 	    //
 	    // ---------------------------------------------------------------
 
@@ -677,8 +674,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	    if (!configuration.isAutoreloadPaused()) {
 
 		GSLoggerFactory.getLogger(DABStarter.class)
-			.info("Configuration auto-reload time: {}{}",
-				configuration.getAutoreloadInterval().orElse(-1),
+			.info("Configuration auto-reload time: {} {}", configuration.getAutoreloadInterval().orElse(-1),
 				configuration.getAutoreloadTimeUnit().orElse(null));
 
 	    } else {
