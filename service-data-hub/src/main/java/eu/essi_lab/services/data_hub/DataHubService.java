@@ -586,7 +586,7 @@ public class DataHubService extends AbstractManagedService {
 
 		} else {
 
-		    publish(MessageChannel.MessageLevel.ERROR, "Unable to remove record: " + entityURN);
+		    publish(MessageChannel.MessageLevel.WARN, "Unable to remove record: " + entityURN);
 		}
 
 		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record ENDED: {}", entityURN);

@@ -96,7 +96,7 @@ public class MarkLogicFolder implements DatabaseFolder {
     @Override
     public UpsertType upsert(String key, FolderEntry entry, EntryType type) throws Exception {
 
-	return UpsertType.INSERTED;
+	return UpsertType.INSERTION;
     }
 
     @Override

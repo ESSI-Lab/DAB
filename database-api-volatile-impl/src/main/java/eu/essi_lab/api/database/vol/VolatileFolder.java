@@ -132,7 +132,7 @@ public class VolatileFolder implements DatabaseFolder {
 
 	store(key, entry, type);
 
-	return UpsertType.INSERTED;
+	return UpsertType.INSERTION;
     }
 
     @Override
