@@ -2371,9 +2371,9 @@
         <module>configuration-api-rest</module>
 
         <module>custom-tasks</module>
+
         <module>service-dev-kit</module>
-        <module>service-data-hub</module>
-        <module>service-webdav</module>
+        <module>service</module>
 
     </modules>
 

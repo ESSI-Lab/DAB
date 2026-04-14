@@ -9,7 +9,7 @@
 
 	<artifactId>gs-lib</artifactId>
 	<packaging>pom</packaging>
-	<name>ESSI-Lab DAB Library</name>
+	<name>ESSI-Lab DAB Library multi-module</name>
 	<description>DAB Common Library</description>
 
 	<modules>

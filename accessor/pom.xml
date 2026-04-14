@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>accessor</artifactId>
-	<name>ESSI-Lab Accessors</name>
+	<name>ESSI-Lab Accessor multi-module</name>
 	<description>ESSI-Lab Accessor</description>
 	<packaging>pom</packaging>
 

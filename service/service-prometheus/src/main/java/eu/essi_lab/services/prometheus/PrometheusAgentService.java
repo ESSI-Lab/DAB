@@ -1,4 +1,4 @@
-package eu.essi_lab.services.impl;
+package eu.essi_lab.services.prometheus;
 
 /*-
  * #%L
@@ -21,29 +21,19 @@ package eu.essi_lab.services.impl;
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.utils.zip.*;
+import eu.essi_lab.services.impl.*;
+import eu.essi_lab.services.message.*;
 
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.FileUtils;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.utils.zip.TarExtractor;
-import eu.essi_lab.services.message.MessageChannel;
+import java.io.*;
+import java.nio.channels.*;
+import java.nio.charset.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
 
 /**
  * Downloads and runs Prometheus in "agent" mode, generating a tailored configuration file.
