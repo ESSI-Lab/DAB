@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -30,9 +30,11 @@ import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.TaskStarter;
 import eu.essi_lab.cfga.gui.components.tabs.TabContent;
+import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
+import eu.essi_lab.lib.utils.*;
 
 /**
  * @author Fabrizio
@@ -41,12 +43,12 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 public class HarvestingStarter extends TaskStarter {
 
     /**
-     * 
+     *
      */
     private HarvestingSetting harvSetting;
 
     /**
-     * 
+     *
      */
     public HarvestingStarter() {
 
@@ -70,6 +72,24 @@ public class HarvestingStarter extends TaskStarter {
 	    HashMap<String, Boolean> selection) {
 
 	harvSetting = SettingUtils.downCast(setting.get(), HarvestingSettingLoader.load().getClass());
+
+	if (!harvSetting.getScheduling().isEnabled()) {
+
+	    harvSetting.getScheduling().setEnabled(true);
+	    configuration.replace(harvSetting);
+
+	    try {
+
+		configuration.flush();
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e);
+
+		NotificationDialog.getErrorDialog("Unable to flush configuration after enabling scheduling: " + e.getMessage()).open();
+		return;
+	    }
+	}
 
 	super.onClick(event, tabContent, configuration, setting, selection);
     }

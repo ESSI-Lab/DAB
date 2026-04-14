@@ -101,7 +101,7 @@ public class HarvestingInfoItemHandler extends GridMenuItemHandler {
     @Override
     public String getItemText() {
 
-	return "Harvesting info";
+	return "Last harvesting info";
     }
 
     /**
