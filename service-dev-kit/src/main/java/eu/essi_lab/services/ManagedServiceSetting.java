@@ -10,12 +10,12 @@ package eu.essi_lab.services;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -119,25 +119,6 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 	List<String> values = loader.loadValues(Optional.empty());
 
 	getOption(SERVICE_IMPL_OPTION_KEY, String.class).get().setValues(values);
-    }
-
-    /**
-     * @param id
-     * @param clazz
-     * @return
-     */
-    public static ManagedServiceSetting of(String id, Class<? extends ManagedService> clazz) {
-
-	ManagedServiceSetting setting = new ManagedServiceSetting();
-
-	setting.loadServiceImpl();
-
-	setting.setServiceId(id);
-	setting.selectImpl(clazz.getName());
-
-	SelectionUtils.deepClean(setting);
-
-	return setting;
     }
 
     /**
@@ -299,7 +280,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		filter(service -> service.getType().equals(getSelectedImpl())).//
 		map(ManagedService::getClass). //
 		findFirst().//
-		get();//
+		orElse(null);
     }
 
     @Override

@@ -6,12 +6,12 @@
 
     <parent>
         <groupId>eu.essi_lab</groupId>
-        <artifactId>DAB</artifactId>
+        <artifactId>service</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>service-webdav</artifactId>
-    <name>ESSI-Lab Service WebDAV</name>
+    <artifactId>service-data-hub</artifactId>
+    <name>ESSI-Lab Service DataHub</name>
 
     <dependencies>
 
@@ -23,13 +23,8 @@
 
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>database-api-elasticsearch-impl</artifactId>
+            <artifactId>accessor-datahub</artifactId>
             <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.milton</groupId>
-            <artifactId>milton-server-ce</artifactId>
         </dependency>
 
     </dependencies>

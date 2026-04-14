@@ -586,7 +586,7 @@ public class DataHubService extends AbstractManagedService {
 
 		} else {
 
-		    publish(MessageChannel.MessageLevel.ERROR, "Unable to remove record: " + entityURN);
+		    publish(MessageChannel.MessageLevel.WARN, "Unable to remove record: " + entityURN);
 		}
 
 		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record ENDED: {}", entityURN);
@@ -630,29 +630,7 @@ public class DataHubService extends AbstractManagedService {
      */
     String getAccessToken() throws IOException, InterruptedException {
 
-	HttpResponse<String> response;
-	ObjectMapper mapper = new ObjectMapper();
-
-	try (HttpClient client = HttpClient.newHttpClient()) {
-
-	    Map<String, Object> payload = new HashMap<>();
-	    payload.put("user", tokenUser);
-	    payload.put("psw", tokenPwd);
-	    payload.put("app_to_use", "TUTTE");
-
-	    String body = mapper.writeValueAsString(payload);
-
-	    String tokenUrl = serviceUrl + "/ext-login";
-
-	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(tokenUrl)).header("Content-Type", "application/json")
-		    .POST(HttpRequest.BodyPublishers.ofString(body)).build();
-
-	    response = client.send(request, HttpResponse.BodyHandlers.ofString());
-	}
-
-	JsonNode json = mapper.readTree(response.body());
-
-	return json.get("access_token").asText();
+	return getAccessToken(tokenUser, tokenPwd, serviceUrl);
     }
 
     /**

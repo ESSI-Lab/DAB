@@ -116,7 +116,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 	    wrapper.synch();
 	}
 
-	return result == Result.Created ? UpsertType.INSERTED :  UpsertType.UPDATED;
+	return result == Result.Created ? UpsertType.INSERTION :  UpsertType.UPDATE;
     }
 
     @Override

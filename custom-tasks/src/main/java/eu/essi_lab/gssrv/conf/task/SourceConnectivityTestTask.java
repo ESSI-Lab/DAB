@@ -95,6 +95,17 @@ public class SourceConnectivityTestTask extends AbstractCustomTask {
 	for (GSSource source : viewSources) {
 		GSLoggerFactory.getLogger(getClass()).info("Testing connectivity for source '{}', {}", source.getLabel(),++s+"/"+viewSources.size());
 
+	    HarvestingProperties properties = sourceStorage.retrieveHarvestingProperties(source);
+
+	    int harvestingCount = properties.getHarvestingCount();
+
+	    if(harvestingCount == 0){
+
+		GSLoggerFactory.getLogger(getClass()).debug("Skipping test of not harvested source");
+
+		continue;
+	    }
+
 	    boolean sourceUp = false;
 	    long testStartMs = System.currentTimeMillis();
 
@@ -136,7 +147,6 @@ public class SourceConnectivityTestTask extends AbstractCustomTask {
 
 	    long connectivityTestDurationMs = System.currentTimeMillis() - testStartMs;
 
-	    HarvestingProperties properties = sourceStorage.retrieveHarvestingProperties(source);
 	    properties.setSourceUp(sourceUp);
 	    properties.setConnectivityTestDurationMs(connectivityTestDurationMs);
 	    if (sourceUp) {

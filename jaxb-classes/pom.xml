@@ -13,7 +13,7 @@
 	<artifactId>jaxb-classes</artifactId>
 	<packaging>pom</packaging>
 
-	<name>ESSI-Lab JAXB Classes</name>
+	<name>ESSI-Lab JAXB Classes multi-module</name>
 	<description>ESSI-Lab JAXB Classes</description>
 
 	<modules>

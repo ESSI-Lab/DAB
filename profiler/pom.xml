@@ -10,7 +10,7 @@
 		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<name>ESSI-Lab Profiler</name>
+	<name>ESSI-Lab Profiler multi-module</name>
 	<artifactId>profiler</artifactId>
 	<packaging>pom</packaging>
 

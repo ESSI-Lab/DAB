@@ -21,15 +21,18 @@ package eu.essi_lab.cfga.gs.setting.service;
  * #L%
  */
 
-import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.grid.contextmenu.*;
 import com.vaadin.flow.data.provider.*;
 import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gui.components.grid.*;
 import eu.essi_lab.cfga.gui.components.grid.renderer.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.cfga.gui.directive.*;
 import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.services.*;
 
 import java.util.*;
@@ -74,7 +77,7 @@ public class ServicesTabDescriptor extends TabDescriptor {
 		ColumnDescriptor.create("Messages", 70, s -> ManagedServiceSupport.getInstance().getServiceMessages(s), //
 			ViewerColumnRenderer.create("Messages", "Messages", "View service messages"))
 
-	)).//
+	), getItemsList()).//
 		reloadable(() -> ManagedServiceSupport.getInstance().update(), true).//
 
 		build();
@@ -83,6 +86,70 @@ public class ServicesTabDescriptor extends TabDescriptor {
 	addContentDescriptor(descriptor);
 
 	ManagedServiceSupport.getInstance().update();
+    }
+
+    /**
+     * @return
+     */
+    private List<GridMenuItemHandler> getItemsList() {
+
+	ArrayList<GridMenuItemHandler> list = new ArrayList<>();
+
+	list.add(new ServicesItemHandler());
+
+	return list;
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    private static class ServicesItemHandler extends GridMenuItemHandler {
+
+	/**
+	 * @param event
+	 * @param tabContent
+	 * @param configuration
+	 * @param setting
+	 * @param selected
+	 */
+	@Override
+	public void onClick(GridContextMenu.GridContextMenuItemClickEvent<HashMap<String, String>> event, //
+		TabContent tabContent,//
+		Configuration configuration, //
+		Optional<Setting> setting, //
+		HashMap<String, Boolean> selected) {//
+
+	    Optional<HashMap<String, String>> item = event.getItem();
+
+	    if (setting.isPresent()) {
+
+		Setting set = setting.get();
+
+		set.setEnabled(!set.isEnabled());
+
+		configuration.replace(set);
+
+		try {
+
+		    configuration.flush();
+
+		} catch (Exception e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+
+		    NotificationDialog.getErrorDialog("Unable to save the configuration: " + e.getMessage(), e).open();
+		}
+	    }
+	}
+
+	/**
+	 * @return
+	 */
+	@Override
+	public String getItemText() {
+
+	    return "Start/stop service";
+	}
     }
 
     /**

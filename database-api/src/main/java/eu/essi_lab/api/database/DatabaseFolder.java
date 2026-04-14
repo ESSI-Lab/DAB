@@ -45,11 +45,11 @@ public interface DatabaseFolder {
 	/**
 	 *
 	 */
-	UPDATED,
+	UPDATE,
 	/**
 	 *
 	 */
-	INSERTED
+	INSERTION
     }
 
     /**
