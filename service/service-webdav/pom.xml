@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>eu.essi_lab</groupId>
-        <artifactId>DAB</artifactId>
+        <artifactId>service</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
