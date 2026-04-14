@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -289,21 +289,28 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * The source configuration is read-only,
-     * it can dispatch only {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED}
-     * events after the flush of the cloned configuration
-     * @see GSConfigurationView#onConfigurationFlushed()
+     * The source configuration is read-only, it can dispatch only
+     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED} events after the flush of the cloned
+     * configuration
+     *
      * @param event
+     * @see GSConfigurationView#onConfigurationFlushed()
      */
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
+
+	GSLoggerFactory.getLogger(DABStarter.class).info("Handling configuration auto-reload STARTED");
 
 	if (MultiServiceManager.isInitialized()) {
 
 	    switch (mode) {
 	    case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH, CONFIGURATION -> {
 
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating MultiServiceManager definitions STARTED");
+
 		updateServiceDefinitions();
+
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating MultiServiceManager definitions ENDED");
 	    }
 	    }
 	}
@@ -325,6 +332,7 @@ public class DABStarter implements ConfigurationChangeListener {
 	}
 	}
 
+	GSLoggerFactory.getLogger(DABStarter.class).info("Handling configuration auto-reload ENDED");
     }
 
     /**
@@ -485,15 +493,17 @@ public class DABStarter implements ConfigurationChangeListener {
 	    } else {
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating configuration from existing source");
-		configuration = new Configuration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			ConfigurationWrapper.CONFIG_RELOAD_TIME);
+
+		configuration = new Configuration(//
+			source, //
+			ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,//
+			ConfigurationWrapper.CONFIG_RELOAD_TIME);//
 	    }
 
 	    //
 	    // in execution mode CONFIGURATION and MIXED there is no need to autoreload
 	    // since there is only one node, no shared configuration (also in
-	    // LOCAL_PRODUCTION mode
-	    // but this is done in the next rows...)
+	    // LOCAL_PRODUCTION mode but this is done in the next rows...)
 	    //
 	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED) {
 
@@ -535,9 +545,6 @@ public class DABStarter implements ConfigurationChangeListener {
 	    if (mode == ExecutionMode.LOCAL_PRODUCTION) {
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store STARTED");
-
-		// pause the autoreload to the current config instance, probably not required...
-		configuration.pauseAutoreload();
 
 		//
 		// disables email delivery of reports
@@ -636,6 +643,8 @@ public class DABStarter implements ConfigurationChangeListener {
 			FileSource.switchSource(configuration, path.get()) : //
 			FileSource.switchSource(configuration);
 
+		configuration.pauseAutoreload();
+
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store ENDED");
 	    }
 
@@ -664,6 +673,18 @@ public class DABStarter implements ConfigurationChangeListener {
 	    ConfigurationWrapper.setConfiguration(configuration);
 
 	    configuration.addChangeEventListener(this);
+
+	    if (!configuration.isAutoreloadPaused()) {
+
+		GSLoggerFactory.getLogger(DABStarter.class)
+			.info("Configuration auto-reload time: {}{}",
+				configuration.getAutoreloadInterval().orElse(-1),
+				configuration.getAutoreloadTimeUnit().orElse(null));
+
+	    } else {
+
+		GSLoggerFactory.getLogger(DABStarter.class).info("Configuration auto-reload disabled");
+	    }
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Initializing configuration ENDED");
 
