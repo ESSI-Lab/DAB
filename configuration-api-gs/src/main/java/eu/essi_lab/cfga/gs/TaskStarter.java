@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,9 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
-import org.quartz.SchedulerException;
+import org.quartz.*;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
@@ -68,7 +66,7 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
     protected ConfirmationDialog dialog;
 
     /**
-     * 
+     *
      */
     public TaskStarter() {
     }
@@ -96,7 +94,8 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
 
 	Boolean force = forceVolatileScheduler.getValue();
 
-	Scheduler scheduler = force ? SchedulerFactory.getVolatileScheduler()
+	Scheduler scheduler = force
+		? SchedulerFactory.getVolatileScheduler()
 		: SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
 
 	try {
@@ -109,7 +108,22 @@ public abstract class TaskStarter extends GridMenuItemHandler implements ButtonC
 
 	    scheduler.schedule(setting);
 
-	} catch (SchedulerException e) {
+	} catch (ObjectAlreadyExistsException ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).warn(ex.getMessage(), ex);
+
+	    try {
+
+		scheduler.reschedule(setting);
+
+	    } catch (Exception e) {
+
+		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+		NotificationDialog.getErrorDialog("Error occurred: " + e.getMessage()).open();
+	    }
+
+	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
