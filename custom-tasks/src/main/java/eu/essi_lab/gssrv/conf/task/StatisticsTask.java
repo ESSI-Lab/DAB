@@ -41,6 +41,7 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.access.availability.DownloadInformation;
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
@@ -55,12 +56,15 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -86,6 +90,9 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <li>{@code METADATA_COMPLETENESS_ELEMENTS} — optional comma-separated {@link MetadataElement} identifiers for
  * {@link StatisticsMetric#METADATA_COMPLETENESS}: enum names (e.g. {@code IDENTIFIER,TITLE,BOUNDING_BOX}) or harmonized
  * index names (e.g. {@code fileId,title,bbox}); when omitted, defaults to {@code IDENTIFIER,TITLE}</li>
+ * <li>{@code RECORDS_PER_ELEMENT_ELEMENTS} — comma-separated {@link MetadataElement} identifiers for
+ * {@link StatisticsMetric#RECORDS_PER_ELEMENT} (same token syntax as {@code METADATA_COMPLETENESS_ELEMENTS}); when this
+ * metric is enabled and the line is missing or has no valid entries, the metric is skipped</li>
  * <li>{@code METADATA_SET_COMPLETENESS} — comma-separated set names for {@link StatisticsMetric#METADATA_SET_COMPLETENESS}
  * (e.g. {@code core,optional})</li>
  * <li>{@code METADATA_SET_COMPLETENESS_&lt;name&gt;} — for each set name, comma-separated {@link MetadataElement} values;
@@ -145,6 +152,11 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * (logical AND), within the {@code VIEW_ID} filter if set, otherwise among all records of the source. Percentage
  * {@code 0–100}. Series use label {@code element_set} (see {@code METADATA_SET_COMPLETENESS} and
  * {@code METADATA_SET_COMPLETENESS_&lt;name&gt;}).</dd>
+ *
+ * <dt>{@link StatisticsMetric#RECORDS_PER_ELEMENT RECORDS_PER_ELEMENT} ({@code records_per_element})</dt>
+ * <dd>Per metadata element and per distinct indexed value, the number of records for that source (absolute count).
+ * Labels: {@code source_id}, {@code element} (lowercase enum name, same as metadata completeness), {@code value}. Uses
+ * the same view/source scope as metadata completeness; configure elements via {@code RECORDS_PER_ELEMENT_ELEMENTS}.</dd>
  * </dl>
  *
  * Legacy: a single line without {@code =} is treated as the view id (same as only {@code VIEW_ID} before).
@@ -157,6 +169,8 @@ public class StatisticsTask extends AbstractCustomTask {
 	VIEW_ID,
 	METRICS,
 	METADATA_COMPLETENESS_ELEMENTS,
+	/** Comma-separated {@link MetadataElement} selectors for {@link StatisticsMetric#RECORDS_PER_ELEMENT}. */
+	RECORDS_PER_ELEMENT_ELEMENTS,
 	/** Comma-separated set names; members defined by {@code METADATA_SET_COMPLETENESS_<name>=...} lines. */
 	METADATA_SET_COMPLETENESS
     }
@@ -183,7 +197,11 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	METADATA_SET_COMPLETENESS("metadata_set_completeness",
 		"Per named set: share of records where all listed metadata elements exist (tag element_set); "
-			+ "configured via METADATA_SET_COMPLETENESS and METADATA_SET_COMPLETENESS_<name> lines");
+			+ "configured via METADATA_SET_COMPLETENESS and METADATA_SET_COMPLETENESS_<name> lines"),
+
+	RECORDS_PER_ELEMENT("records_per_element",
+		"Per element and distinct value: record count for the source (tags element, value); "
+			+ "elements from RECORDS_PER_ELEMENT_ELEMENTS");
 
 	private final String prometheusName;
 	private final String description;
@@ -242,6 +260,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	String viewId = null;
 	Set<StatisticsMetric> metrics = EnumSet.allOf(StatisticsMetric.class);
 	List<MetadataElement> metadataCompletenessElements = new ArrayList<>();
+	List<MetadataElement> recordsPerElementElements = new ArrayList<>();
 	List<MetadataCompletenessSet> metadataCompletenessSets = List.of();
 
 	if (structured.isPresent() && !structured.get().isEmpty()) {
@@ -263,6 +282,16 @@ public class StatisticsTask extends AbstractCustomTask {
 	    if (metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)) {
 		metadataCompletenessSets = parseMetadataSetCompleteness(structured.get(), rawTaskOptions.orElse(""));
 	    }
+	    String recordsPerElementLine = structured.get().get(StatisticsTaskOptions.RECORDS_PER_ELEMENT_ELEMENTS);
+	    if (recordsPerElementLine != null && !recordsPerElementLine.isBlank()) {
+		List<MetadataElement> parsed = parseMetadataCompletenessElements(recordsPerElementLine);
+		if (parsed.isEmpty()) {
+		    GSLoggerFactory.getLogger(getClass()).warn(
+			    "RECORDS_PER_ELEMENT_ELEMENTS had no valid entries; records_per_element metrics will be skipped");
+		} else {
+		    recordsPerElementElements = parsed;
+		}
+	    }
 	}
 
 	if (viewId == null || viewId.isEmpty()) {
@@ -270,10 +299,15 @@ public class StatisticsTask extends AbstractCustomTask {
 		    "No view specified (VIEW_ID empty); statistics are computed for all sources (no view filter).");
 	}
 
+	if (metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT) && recordsPerElementElements.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).warn(
+		    "RECORDS_PER_ELEMENT is enabled but RECORDS_PER_ELEMENT_ELEMENTS is missing or empty; skipping records_per_element metrics");
+	}
+
 	GSLoggerFactory.getLogger(getClass()).info(
-		"Updating metrics for {} (metrics: {}, metadata completeness elements: {}, metadata set completeness: {})",
+		"Updating metrics for {} (metrics: {}, metadata completeness elements: {}, records per element elements: {}, metadata set completeness: {})",
 		(viewId != null && !viewId.isEmpty()) ? ("view " + viewId) : "all sources (no view)",
-		metrics, metadataCompletenessElements, metadataCompletenessSets);
+		metrics, metadataCompletenessElements, recordsPerElementElements, metadataCompletenessSets);
 
 	Optional<String> viewIdForStats = (viewId != null && !viewId.isEmpty()) ? Optional.of(viewId) : Optional.empty();
 	String statsArtifactKey = (viewId != null && !viewId.isEmpty()) ? viewId : "all-sources";
@@ -295,12 +329,22 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	HashMap<String, Double> metadataCompleteness = new HashMap<String, Double>();
 	HashMap<String, Double> metadataCompletenessBySet = new HashMap<String, Double>();
+	HashMap<String, Double> recordsPerElement = new HashMap<String, Double>();
 	GSLoggerFactory.getLogger(getClass()).info("source stats completed");
 
 	Optional<View> reportView = Optional.empty();
 	DatabaseFinder discoveryFinder = null;
+	DatabaseExecutor databaseExecutor = null;
+	if (metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT) && !recordsPerElementElements.isEmpty()) {
+	    try {
+		databaseExecutor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("Cannot obtain database executor for records_per_element: {}", e.getMessage());
+	    }
+	}
 	if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS)
-		|| metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)) {
+		|| metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)
+		|| metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT)) {
 	    try {
 		boolean completenessAllowed = false;
 		if (viewId != null && !viewId.isEmpty()) {
@@ -492,6 +536,30 @@ public class StatisticsTask extends AbstractCustomTask {
 		    }
 		}
 
+		if (metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT) && discoveryFinder != null && databaseExecutor != null
+			&& !recordsPerElementElements.isEmpty()) {
+		    try {
+			DiscoveryMessage perSourceMsg = newDiscoveryMessageForSource(reportView, source);
+			for (MetadataElement rel : recordsPerElementElements) {
+			    final String elementTag = prometheusElementTag(rel);
+			    List<TermFrequencyItem> buckets = collectAllTermFrequencies(databaseExecutor, perSourceMsg, rel);
+			    for (TermFrequencyItem item : buckets) {
+				String valueLabel = item.getTerm() != null ? item.getTerm() : "";
+				double n = item.getFreq();
+				String key = recordsPerElementKey(source, elementTag, valueLabel);
+				recordsPerElement.put(key, n);
+				io.micrometer.core.instrument.Gauge.builder(StatisticsMetric.RECORDS_PER_ELEMENT.prometheusName(), recordsPerElement,
+					g -> g.getOrDefault(key, 0.0))//
+					.description(StatisticsMetric.RECORDS_PER_ELEMENT.description())//
+					.tags("source_id", source, "element", elementTag, "value", valueLabel)//
+					.register(registry);
+			    }
+			}
+		    } catch (GSException e) {
+			GSLoggerFactory.getLogger(getClass()).warn("records_per_element failed for source {}: {}", source, e.getMessage());
+		    }
+		}
+
 		// String content = "<tr><td colspan='15'><br/>"//
 		// + "Data provider: <b>" + source + "</b><br/>"//
 		// + "#Platforms: " + stats.getSiteCount() + "<br/>"//
@@ -565,6 +633,42 @@ public class StatisticsTask extends AbstractCustomTask {
     private static String metadataCompletenessSetKey(String sourceId, String elementSetTag) {
 
 	return sourceId + '\0' + "s:" + elementSetTag;
+    }
+
+    private static String recordsPerElementKey(String sourceId, String elementTag, String value) {
+
+	return sourceId + '\0' + "re:" + elementTag + '\0' + value;
+    }
+
+    /**
+     * Walks composite aggregation pages for the given element; returns empty if the backend executor does not support
+     * {@link DatabaseExecutor#getIndexValues}.
+     */
+    private static List<TermFrequencyItem> collectAllTermFrequencies(DatabaseExecutor executor, DiscoveryMessage message,
+	    MetadataElement element) throws GSException {
+
+	message.setPage(new Page(1000));
+	List<TermFrequencyItem> out = new ArrayList<>();
+	String resumption = null;
+	for (int pageIdx = 0; pageIdx < 100_000; pageIdx++) {
+	    ResultSet<TermFrequencyItem> page = executor.getIndexValues(message, element, 0, resumption);
+	    if (page == null) {
+		return out;
+	    }
+	    if (page.getResultsList() != null) {
+		out.addAll(page.getResultsList());
+	    }
+	    Optional<SearchAfter> sa = page.getSearchAfter();
+	    if (sa.isEmpty()) {
+		break;
+	    }
+	    Optional<List<Object>> vals = sa.get().getValues();
+	    if (vals.isEmpty() || vals.get().isEmpty()) {
+		break;
+	    }
+	    resumption = vals.get().get(0).toString();
+	}
+	return out;
     }
 
     static Map<String, String> extractMetadataSetCompletenessDefinitionLines(String raw) {
