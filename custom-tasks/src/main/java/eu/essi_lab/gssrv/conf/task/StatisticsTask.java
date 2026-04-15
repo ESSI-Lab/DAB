@@ -131,6 +131,10 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * ({@code connectivity_test_duration_ms})</dt>
  * <dd>Duration in milliseconds of the last connectivity test toward the source. Omitted if not recorded.</dd>
  *
+ * <dt>{@link StatisticsMetric#CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS}
+ * ({@code connectivity_test_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch milliseconds when the last connectivity test completed for the source. Omitted if not recorded.</dd>
+ *
  * <dt>{@link StatisticsMetric#LAST_SOURCE_UP_UNIX_TIMESTAMP_MS LAST_SOURCE_UP_UNIX_TIMESTAMP_MS}
  * ({@code last_source_up_unix_timestamp_ms})</dt>
  * <dd>Unix epoch milliseconds when the source was last observed as up during a connectivity test. Omitted if not
@@ -188,6 +192,8 @@ public class StatisticsTask extends AbstractCustomTask {
 	SOURCE_UP("source_up", "Source connectivity status (1=up, 0=down)"),
 	CONNECTIVITY_TEST_DURATION_MS("connectivity_test_duration_ms",
 		"Duration of the last source connectivity test in milliseconds"),
+	CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS("connectivity_test_unix_timestamp_ms",
+		"Unix epoch milliseconds when the last source connectivity test completed"),
 	LAST_SOURCE_UP_UNIX_TIMESTAMP_MS("last_source_up_unix_timestamp_ms",
 		"Unix epoch milliseconds when the source was last observed up in a connectivity test"),
 	PLATFORMS_TOTAL("platforms_total", "Total number of platforms "),
@@ -324,6 +330,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	HashMap<String, Integer> variables = new HashMap<String, Integer>();
 	HashMap<String, Integer> sourceUp = new HashMap<String, Integer>();
 	HashMap<String, Long> connectivityTestDurationMs = new HashMap<String, Long>();
+	HashMap<String, Long> connectivityTestUnixTimestampMs = new HashMap<String, Long>();
 	HashMap<String, Long> lastSourceUpUnixTimestampMs = new HashMap<String, Long>();
 	HashMap<String, Long> lastHarvestingTime = new HashMap<String, Long>();
 
@@ -391,6 +398,7 @@ public class StatisticsTask extends AbstractCustomTask {
 		boolean needHarvestingProps = metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS)
 			|| metrics.contains(StatisticsMetric.SOURCE_UP)
 			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS)
+			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS)
 			|| metrics.contains(StatisticsMetric.LAST_SOURCE_UP_UNIX_TIMESTAMP_MS);
 		HarvestingProperties harvestingProperties = null;
 		if (needHarvestingProps) {
@@ -459,6 +467,19 @@ public class StatisticsTask extends AbstractCustomTask {
 				StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS.prometheusName(), connectivityTestDurationMs,
 				g -> g.get(source))//
 				.description(StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS.description())//
+				.tag("source_id", source).//
+				register(registry);
+		    }
+		}
+
+		if (metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS)) {
+		    Optional<Long> testEndMs = harvestingProperties.getConnectivityTestUnixTimestampMs();
+		    if (testEndMs.isPresent()) {
+			connectivityTestUnixTimestampMs.put(source, testEndMs.get());
+			io.micrometer.core.instrument.Gauge.builder(
+				StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS.prometheusName(), connectivityTestUnixTimestampMs,
+				g -> g.get(source))//
+				.description(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS.description())//
 				.tag("source_id", source).//
 				register(registry);
 		    }
