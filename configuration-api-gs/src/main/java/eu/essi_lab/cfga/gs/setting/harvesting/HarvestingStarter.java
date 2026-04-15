@@ -73,25 +73,52 @@ public class HarvestingStarter extends TaskStarter {
 
 	harvSetting = SettingUtils.downCast(setting.get(), HarvestingSettingLoader.load().getClass());
 
-	if (!harvSetting.getScheduling().isEnabled()) {
+	boolean runOnceSet = harvSetting.getScheduling().isRunOnceSet();
+	boolean enabled = harvSetting.getScheduling().isEnabled();
 
-	    harvSetting.getScheduling().setEnabled(true);
-	    configuration.replace(harvSetting);
+	if (!runOnceSet || !enabled) {
 
-	    try {
+	    Optional<Integer> repeatCount = harvSetting.getScheduling().getRepeatCount();
 
-		configuration.flush();
+	    boolean indefinitely = harvSetting.getScheduling().isRunIndefinitelySet();
 
-	    } catch (Exception e) {
+	    String currentRun = runOnceSet ? ".\n" : " and set to run " + (indefinitely ? "indefinitely.\n" : repeatCount.get() + " times.\n");
 
-		GSLoggerFactory.getLogger(getClass()).error(e);
+	    String message = "Scheduling is " + (enabled ? "enabled" : "disabled") + currentRun;
 
-		NotificationDialog.getErrorDialog("Unable to flush configuration after enabling scheduling: " + e.getMessage()).open();
-		return;
-	    }
+	    message += "To proceed, scheduling will " + (!enabled ? " be enabled and set to run once": " be set to run once");
+
+	    ConfirmationDialog dialog = new ConfirmationDialog(message, (evt) -> {
+
+		harvSetting.getScheduling().setEnabled(true);
+		harvSetting.getScheduling().setRunOnce();
+
+		configuration.replace(harvSetting);
+
+		try {
+
+		    configuration.flush();
+
+		    super.onClick(event, tabContent, configuration, setting, selection);
+
+		} catch (Exception e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+
+		    NotificationDialog.getErrorDialog("Unable to flush configuration after scheduling change: " + e.getMessage()).open();
+		}
+	    });
+
+	    dialog.setHeader("Scheduling change required");
+	    dialog.setConfirmText("Proceed");
+	    dialog.setCancelText("Cancel");
+	    dialog.open();
+
+	} else {
+
+	    super.onClick(event, tabContent, configuration, setting, selection);
 	}
 
-	super.onClick(event, tabContent, configuration, setting, selection);
     }
 
     @Override
