@@ -146,9 +146,11 @@ public class SourceConnectivityTestTask extends AbstractCustomTask {
 	    }
 
 	    long connectivityTestDurationMs = System.currentTimeMillis() - testStartMs;
+	    long connectivityTestUnixTimestampMs = System.currentTimeMillis();
 
 	    properties.setSourceUp(sourceUp);
 	    properties.setConnectivityTestDurationMs(connectivityTestDurationMs);
+	    properties.setConnectivityTestUnixTimestampMs(connectivityTestUnixTimestampMs);
 	    if (sourceUp) {
 		properties.setLastSourceUpUnixTimestampMs(System.currentTimeMillis());
 	    }

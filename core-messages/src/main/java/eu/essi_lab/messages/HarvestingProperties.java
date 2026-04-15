@@ -52,6 +52,7 @@ public class HarvestingProperties extends Properties {
     private static final String COMPLETED_KEY = "completed";
     private static final String SOURCE_UP_KEY = "sourceUp";
     private static final String CONNECTIVITY_TEST_DURATION_MS_KEY = "connectivityTestDurationMs";
+    private static final String CONNECTIVITY_TEST_UNIX_MS_KEY = "connectivityTestUnixTimestampMs";
     private static final String LAST_SOURCE_UP_UNIX_MS_KEY = "lastSourceUpUnixTimestampMs";
 
     /**
@@ -277,6 +278,26 @@ public class HarvestingProperties extends Properties {
     public Optional<Long> getConnectivityTestDurationMs() {
 
 	String property = getProperty(CONNECTIVITY_TEST_DURATION_MS_KEY);
+	if (property == null) {
+	    return Optional.empty();
+	}
+	return Optional.of(Long.parseLong(property));
+    }
+
+    /**
+     * Wall-clock time (milliseconds since Unix epoch) when the last source connectivity test completed.
+     */
+    public void setConnectivityTestUnixTimestampMs(long unixTimestampMs) {
+
+	setProperty(CONNECTIVITY_TEST_UNIX_MS_KEY, String.valueOf(unixTimestampMs));
+    }
+
+    /**
+     * @return time of the last connectivity test end (Unix epoch ms), if recorded
+     */
+    public Optional<Long> getConnectivityTestUnixTimestampMs() {
+
+	String property = getProperty(CONNECTIVITY_TEST_UNIX_MS_KEY);
 	if (property == null) {
 	    return Optional.empty();
 	}

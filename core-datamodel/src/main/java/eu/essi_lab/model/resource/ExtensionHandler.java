@@ -269,15 +269,17 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public void setCountry(String country) {
 	try {
-	    this.metadata.add(MetadataElement.COUNTRY.getName(), country);
 	    Country c = Country.decode(country);
 	    if (c != null && !getCountryISO3().isPresent()) {
 		setCountryISO3(c.getISO3());
+		this.metadata.add(MetadataElement.COUNTRY.getName(), c.getShortName());
+	    }else{
+		this.metadata.add(MetadataElement.COUNTRY.getName(), country);
 	    }
 	} catch (Exception e) {
-
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
+
     }
 
     /**
