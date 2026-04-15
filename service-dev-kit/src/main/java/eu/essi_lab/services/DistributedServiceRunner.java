@@ -75,8 +75,6 @@ public class DistributedServiceRunner {
 	    return;
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Trying to acquire lock for service {}", service.getId());
-
 	boolean acquired = lock.tryAcquire();
 
 	if (acquired) {
