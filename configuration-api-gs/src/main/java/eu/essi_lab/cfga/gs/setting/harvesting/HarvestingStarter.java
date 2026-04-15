@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gs.setting.harvesting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -35,6 +35,7 @@ import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.cfga.setting.SettingUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.lib.utils.*;
+import org.jspecify.annotations.*;
 
 /**
  * @author Fabrizio
@@ -78,15 +79,7 @@ public class HarvestingStarter extends TaskStarter {
 
 	if (!runOnceSet || !enabled) {
 
-	    Optional<Integer> repeatCount = harvSetting.getScheduling().getRepeatCount();
-
-	    boolean indefinitely = harvSetting.getScheduling().isRunIndefinitelySet();
-
-	    String currentRun = runOnceSet ? ".\n" : " and set to run " + (indefinitely ? "indefinitely.\n" : repeatCount.get() + " times.\n");
-
-	    String message = "Scheduling is " + (enabled ? "enabled" : "disabled") + currentRun;
-
-	    message += "To proceed, scheduling will " + (!enabled ? " be enabled and set to run once": " be set to run once");
+	    String message = getMessage(runOnceSet, enabled);
 
 	    ConfirmationDialog dialog = new ConfirmationDialog(message, (evt) -> {
 
@@ -118,7 +111,26 @@ public class HarvestingStarter extends TaskStarter {
 
 	    super.onClick(event, tabContent, configuration, setting, selection);
 	}
+    }
 
+    /**
+     * @param runOnceSet
+     * @param enabled
+     * @return
+     */
+    private @NonNull String getMessage(boolean runOnceSet, boolean enabled) {
+
+	Optional<Integer> repeatCount = harvSetting.getScheduling().getRepeatCount();
+
+	boolean indefinitely = harvSetting.getScheduling().isRunIndefinitelySet();
+
+	String currentRun = runOnceSet ? ".\n" : " and set to run " + (indefinitely ? "indefinitely.\n" : repeatCount.get() + " times.\n");
+
+	String message = "Scheduling is " + (enabled ? "enabled" : "disabled") + currentRun;
+
+	message += "To proceed, scheduling will " + (!enabled ? " be enabled and set to run once" : " be set to run once");
+
+	return message;
     }
 
     @Override
