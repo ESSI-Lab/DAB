@@ -243,8 +243,17 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 				String date = data.optString("datetime");
 
 				if (iso8601OutputFormat == null) {
-				    iso8601OutputFormat = date.contains(" ") ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN)
-					    : new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+
+				    if (date.contains(" ")){
+					iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ITALIAN);
+				    }else{
+					if (date.length()==10){
+					    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ITALIAN);
+					}else{
+					    //2026-02-15T06:00:00+00:00
+					    iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+					}
+				    }
 				    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 				}
 
