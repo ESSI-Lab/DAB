@@ -67,8 +67,6 @@ public class DatabaseWebDAVService extends AbstractManagedService {
     @Override
     public void start() {
 
-	publish(MessageChannel.MessageLevel.INFO, "WebDAV Service " + getId() + " starting");
-
 	int port = getSetting(). //
 		readKeyValue(PORT_KEY).//
 		map(Integer::parseInt).//

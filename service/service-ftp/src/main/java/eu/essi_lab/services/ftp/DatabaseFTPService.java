@@ -56,8 +56,6 @@ public class DatabaseFTPService extends AbstractManagedService {
 
 	try {
 
-	    publish(MessageChannel.MessageLevel.INFO, "FTP Service " + getId() + " starting");
-
 	    FtpServerFactory serverFactory = new FtpServerFactory();
 
 	    //
