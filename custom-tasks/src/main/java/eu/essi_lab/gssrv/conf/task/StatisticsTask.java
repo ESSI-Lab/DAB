@@ -458,7 +458,7 @@ public class StatisticsTask extends AbstractCustomTask {
 				g -> g.get(source))//
 				.description(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS.description())//
 				.tag("source_id", source).//
-				register(registry);0
+				register(registry);
 		    }
 		}
 
