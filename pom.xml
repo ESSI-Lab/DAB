@@ -2305,9 +2305,16 @@
         <module>core-datamodel-iso</module>
 
         <!-- multi module -->
-        <module>profiler</module>
+        <module>service</module>
+        <module>service-dev-kit</module>
 
+        <!-- multi module -->
+        <module>profiler</module>
         <module>profiler-dev-kit</module>
+
+        <!-- multi module -->
+        <module>accessor</module>
+        <module>accessor-dev-kit</module>
 
         <!-- multi module -->
         <module>access-tools-downloader</module>
@@ -2316,23 +2323,16 @@
         <module>access-tools-validator</module>
 
         <!-- multi module -->
-        <module>accessor</module>
-
-        <module>accessor-dev-kit</module>
-
-        <!-- multi module -->
         <module>gs-lib</module>
 
         <!-- multi module -->
         <module>jaxb-classes</module>
 
-        <module>database-api</module>
-        <module>database-api-marklogic-impl</module>
-        <module>database-api-elasticsearch-impl</module>
-        <module>database-api-volatile-impl</module>
-        <module>database-indexes</module>
-        <module>database-wrapper-marklogic</module>
-        <module>database-ftp-server</module>
+        <!-- multi module -->
+        <module>database</module>
+
+        <!-- multi module -->
+        <module>configuration</module>
 
         <module>request-executor</module>
         <module>request-executor-default</module>
@@ -2364,16 +2364,7 @@
 
         <module>runtime-info-provider</module>
 
-        <module>configuration-api</module>
-        <module>configuration-api-gs</module>
-        <module>configuration-api-gui</module>
-        <module>configuration-api-test</module>
-        <module>configuration-api-rest</module>
-
         <module>custom-tasks</module>
-
-        <module>service-dev-kit</module>
-        <module>service</module>
 
     </modules>
 

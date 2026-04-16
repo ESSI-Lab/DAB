@@ -537,6 +537,19 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    KafkaPublisher client = new KafkaPublisher(kafkaHost, Integer.parseInt(kafkaPort));
 
 		    //
+		    // topic
+		    //
+
+		    String kafkaTopic = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_TOPIC.getLabel());
+
+		    if (kafkaTopic == null) {
+
+			GSLoggerFactory.getLogger(getClass()).error("Kafka topic not found!");
+
+			return Optional.empty();
+		    }
+
+		    //
 		    // security
 		    //
 
@@ -557,6 +570,12 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    if (securityProtocol.isPresent() && saslMechanism.isPresent() && kafkaUser.isPresent() && kafkaPwd.isPresent()) {
 
 			client.setSecurity(securityProtocol.get(), saslMechanism.get(), kafkaUser.get(), kafkaPwd.get());
+
+		    } else {
+
+			GSLoggerFactory.getLogger(getClass()).error("One or more required Kafka settings not found!");
+
+			return Optional.empty();
 		    }
 
 		    //

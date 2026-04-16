@@ -267,7 +267,7 @@ public class GSConfigurationView extends ConfigurationView {
     /**
      * Forces the reload of the source configuration so in this node, the changes are already available without waiting for the
      * autoreload.<br> The source configuration, provided by {@link ConfigurationWrapper}, is read-only and it can dispatch only
-     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED} events after the flush of the cloned
+     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_FORCED_RELOADED} events after the flush of the cloned
      * configuration
      */
     @Override

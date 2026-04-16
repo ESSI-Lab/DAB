@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.rest;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -50,9 +50,8 @@ import eu.essi_lab.pdk.ResponseInfoProvider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 
 /**
- * Subclasses provides a concrete implementation of a JAX-RS/JAX-WS service
- * provider which is in charge to serve one or more {@link WebRequest}s by
- * selecting the suitable {@link Profiler}
+ * Subclasses provides a concrete implementation of a JAX-RS/JAX-WS service provider which is in charge to serve one or more
+ * {@link WebRequest}s by selecting the suitable {@link Profiler}
  *
  * @author Fabrizio
  * @see Profiler
@@ -62,13 +61,13 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 public abstract class AbstractProfilerService {
 
     /**
-     * 
+     *
      */
     private static final HashMap<String, Class<? extends Profiler>> PROFILERS_MAP = new HashMap<>();
     private static List<ProfilerSetting> profilerSettings;
 
     /**
-     * 
+     *
      */
     private static final ProfilerSettingsListener LISTENER = new ProfilerSettingsListener();
 
@@ -80,7 +79,8 @@ public abstract class AbstractProfilerService {
 	@Override
 	public void configurationChanged(ConfigurationChangeEvent event) {
 
-	    if (event.getEventType() == EventType.CONFIGURATION_AUTO_RELOADED) {
+	    if (event.getEventType() == EventType.CONFIGURATION_AUTO_RELOADED //
+		    || event.getEventType() == EventType.CONFIGURATION_FORCED_RELOADED) {
 
 		profilerSettings = ConfigurationWrapper.getProfilerSettings();
 	    }
@@ -99,9 +99,8 @@ public abstract class AbstractProfilerService {
     }
 
     /**
-     * Creates a {@link WebRequest} from the given arguments, selects the suitable
-     * {@link Profiler} basing on the given <code>strategy</code> and serves the
-     * request by delegating to the selected {@link Profiler}
+     * Creates a {@link WebRequest} from the given arguments, selects the suitable {@link Profiler} basing on the given
+     * <code>strategy</code> and serves the request by delegating to the selected {@link Profiler}
      *
      * @param strategy
      * @param httpServletRequest
@@ -152,8 +151,8 @@ public abstract class AbstractProfilerService {
 
 		try {
 
-		    optProfiler = Optional
-			    .of(PROFILERS_MAP.get(profilerSetting.get().getConfigurableType()).getDeclaredConstructor().newInstance());
+		    optProfiler = Optional.of(
+			    PROFILERS_MAP.get(profilerSetting.get().getConfigurableType()).getDeclaredConstructor().newInstance());
 
 		} catch (Exception e) {
 
@@ -221,8 +220,8 @@ public abstract class AbstractProfilerService {
 
 	    if (optProfiler.isPresent()) {
 
-		response = optProfiler.get().createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR,
-			ExceptionUtils.getStackTrace(ex));
+		response = optProfiler.get()
+			.createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR, ExceptionUtils.getStackTrace(ex));
 
 	    } else {
 
