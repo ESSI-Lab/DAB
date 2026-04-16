@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.database.ftp.server;
+package eu.essi_lab.services.ftp;
 
 /*-
  * #%L
@@ -24,24 +24,22 @@ package eu.essi_lab.database.ftp.server;
  * #L%
  */
 
-import org.apache.ftpserver.FtpServer;
-import org.apache.ftpserver.FtpServerFactory;
-import org.apache.ftpserver.ftplet.FtpException;
-import org.apache.ftpserver.ftplet.User;
-import org.apache.ftpserver.ftplet.UserManager;
-import org.apache.ftpserver.listener.ListenerFactory;
-import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
-import org.apache.ftpserver.usermanager.UserFactory;
-
-import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.services.impl.*;
+import org.apache.ftpserver.*;
+import org.apache.ftpserver.ftplet.*;
+import org.apache.ftpserver.listener.*;
+import org.apache.ftpserver.usermanager.*;
 
 /**
  * @author Fabrizio
  */
-public class DatabaseFTPService {
+public class DatabaseFTPService extends AbstractManagedService {
 
     private Database database;
     private String storTempDir;
+    private FtpServer server;
 
     /**
      * @param database
@@ -61,10 +59,9 @@ public class DatabaseFTPService {
 	return new DatabaseFTPService(database,storTempDir);
     }
 
-    /**
-     * @throws FtpException
-     */
-    public void start() throws FtpException {
+
+    @Override
+    public void start() {
 
 	FtpServerFactory serverFactory = new FtpServerFactory();
 
@@ -83,7 +80,16 @@ public class DatabaseFTPService {
 	User admin = userFactory.createUser();
 
 	UserManager userManager = userManagerFactory.createUserManager();
-	userManager.save(admin);
+
+	try {
+
+	    userManager.save(admin);
+
+        } catch (FtpException e) {
+
+
+	    throw new RuntimeException(e);
+	}
 
 	serverFactory.setUserManager(userManager);
 
@@ -115,16 +121,44 @@ public class DatabaseFTPService {
 	//
 	//
 
-	FtpServer server = serverFactory.createServer();
+	server = serverFactory.createServer();
 
-	server.start();
+	try {
+
+	    server.start();
+
+        } catch (FtpException e) {
+
+	    throw new RuntimeException(e);
+	}
+    }
+
+    @Override
+    public void stop() {
+
+	server.stop();
     }
 
     /**
      * @param args
      * @throws FtpException
      */
-    public static void main(String[] args) throws FtpException {
+    public static void main(String[] args) throws Exception {
 
+//	StorageInfo osStorageInfo = new StorageInfo(System.getProperty("dbUrl"));
+//	osStorageInfo.setName(System.getProperty("dbName"));
+//	osStorageInfo.setUser(System.getProperty("dbUser"));
+//	osStorageInfo.setPassword(System.getProperty("dbPassword"));
+//	osStorageInfo.setIdentifier(System.getProperty("dbIdentifier"));
+//	osStorageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
+//
+//	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+//
+//	//	OpenSearchDatabase database = new OpenSearchDatabase();
+//	//	database.initialize(osStorageInfo);
+//
+//	DatabaseFTPService service = DatabaseFTPService.get(database, "D:\\Desktop\\FTP\\");
+//
+//	service.start();
     }
 }

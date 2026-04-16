@@ -18,6 +18,7 @@
         <module>service-data-hub</module>
         <module>service-webdav</module>
         <module>service-prometheus</module>
+        <module>service-ftp</module>
     </modules>
 
     <dependencies>

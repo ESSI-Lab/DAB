@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.database.ftp.server;
+package eu.essi_lab.services.ftp;
 
 /*-
  * #%L
@@ -24,15 +24,11 @@ package eu.essi_lab.database.ftp.server;
  * #L%
  */
 
-import java.io.IOException;
+import org.apache.ftpserver.command.impl.*;
+import org.apache.ftpserver.ftplet.*;
+import org.apache.ftpserver.impl.*;
 
-import org.apache.ftpserver.command.impl.OPTS;
-import org.apache.ftpserver.ftplet.FtpException;
-import org.apache.ftpserver.ftplet.FtpReply;
-import org.apache.ftpserver.ftplet.FtpRequest;
-import org.apache.ftpserver.impl.FtpIoSession;
-import org.apache.ftpserver.impl.FtpServerContext;
-import org.apache.ftpserver.impl.LocalizedFtpReply;
+import java.io.*;
 
 /**
  * @author Fabrizio

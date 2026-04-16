@@ -19,7 +19,6 @@
         <module>database-api-elasticsearch-impl</module>
         <module>database-api-marklogic-impl</module>
         <module>database-api-volatile-impl</module>
-        <module>database-ftp-server</module>
         <module>database-indexes</module>
         <module>database-wrapper-marklogic</module>
     </modules>

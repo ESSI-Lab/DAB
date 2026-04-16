@@ -72,12 +72,6 @@
         </dependency>
 
         <dependency>
-            <groupId>eu.essi_lab</groupId>
-            <artifactId>database-ftp-server</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-shapefile</artifactId>
         </dependency>

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.database.ftp.server;
+package eu.essi_lab.services.ftp;
 
 /*-
  * #%L
@@ -24,42 +24,50 @@ package eu.essi_lab.database.ftp.server;
  * #L%
  */
 
-import org.apache.ftpserver.command.Command;
-import org.apache.ftpserver.command.CommandFactory;
-import org.apache.ftpserver.command.impl.DefaultCommandFactory;
+import eu.essi_lab.api.database.*;
+import org.apache.ftpserver.ftplet.*;
 
 /**
  * @author Fabrizio
  */
-public class DatabaseFtpCommandFactory extends DefaultCommandFactory {
+public class DatabaseFileSystemFactory implements FileSystemFactory {
+
+    private Database database;
+    private String tempSTORdir;
 
     /**
-     * @param commandFactory
-     * @return
+     * 
      */
-    public static DatabaseFtpCommandFactory get(CommandFactory commandFactory) {
-
-	return new DatabaseFtpCommandFactory(commandFactory);
+    private DatabaseFileSystemFactory() {
     }
 
-    private CommandFactory commandFactory;
+    /**
+     * @param database
+     */
+    private DatabaseFileSystemFactory(Database database) {
+
+	this.database = database;
+    }
 
     /**
-     * @param commandFactory
+     * @return
      */
-    private DatabaseFtpCommandFactory(CommandFactory commandFactory) {
+    public static DatabaseFileSystemFactory get(Database database) {
 
-	this.commandFactory = commandFactory;
+	return new DatabaseFileSystemFactory(database);
     }
 
     @Override
-    public Command getCommand(final String cmdName) {
+    public FileSystemView createFileSystemView(User user) throws FtpException {
 
-	if (cmdName.equals("OPTS")) {
+	return new DatabaseFileSystemView(database,user,tempSTORdir);
+    }
 
-	    return new OPTS_MLSD();
-	}
-
-	return commandFactory.getCommand(cmdName);
+    /**
+     * @param tempSTORdir
+     */
+    public void setSTORTempDir(String tempSTORdir) {
+	
+	this.tempSTORdir = tempSTORdir;	
     }
 }
