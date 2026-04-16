@@ -374,6 +374,7 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
 	case EventType.CONFIGURATION_CLEARED -> onConfigurationCleared();
 	case EventType.CONFIGURATION_FLUSHED -> onConfigurationFlushed();
 	case EventType.CONFIGURATION_AUTO_RELOADED -> onConfigurationAutoReloaded();
+	case EventType.CONFIGURATION_FORCED_RELOADED -> onConfigurationForcedReloaded();
 	}
     }
 
@@ -705,6 +706,14 @@ public abstract class ConfigurationView extends AppLayout implements Configurati
     protected void onConfigurationAutoReloaded() {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Configuration auto-reloaded");
+    }
+
+    /**
+     *
+     */
+    protected void onConfigurationForcedReloaded() {
+
+	GSLoggerFactory.getLogger(getClass()).debug("Configuration forced-reloaded");
     }
 
     /**

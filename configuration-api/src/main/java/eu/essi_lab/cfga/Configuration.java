@@ -10,12 +10,12 @@ package eu.essi_lab.cfga;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -154,7 +154,7 @@ public class Configuration {
 		}
 
 		try {
-		    reload();
+		    reload(false);
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(Configuration.class).error(e.getMessage(), e);
 		}
@@ -187,16 +187,7 @@ public class Configuration {
      */
     public synchronized boolean reload() throws Exception {
 
-	if (getState() == State.SYNCH) {
-
-	    list = source.list();
-
-	    dispatchEvent(ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED);
-
-	    return true;
-	}
-
-	return false;
+	return reload(true);
     }
 
     /**
@@ -672,6 +663,26 @@ public class Configuration {
     void setWritable(boolean writable) {
 
 	this.writable = writable;
+    }
+
+    /**
+     *
+     * @param forced
+     * @return
+     * @throws Exception
+     */
+    private synchronized boolean reload(boolean forced) throws Exception {
+
+	if (getState() == State.SYNCH) {
+
+	    list = source.list();
+
+	    dispatchEvent(forced ? ConfigurationChangeListener.EventType.CONFIGURATION_FORCED_RELOADED : ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED);
+
+	    return true;
+	}
+
+	return false;
     }
 
     /**

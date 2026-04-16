@@ -290,7 +290,7 @@ public class DABStarter implements ConfigurationChangeListener {
 
     /**
      * The source configuration is read-only, it can dispatch only
-     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_AUTO_RELOADED} events after the flush of the cloned
+     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_FORCED_RELOADED} events after the flush of the cloned
      * configuration
      *
      * @param event
@@ -298,8 +298,6 @@ public class DABStarter implements ConfigurationChangeListener {
      */
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
-
-	GSLoggerFactory.getLogger(DABStarter.class).info("Handling configuration auto-reload STARTED");
 
 	if (MultiServiceManager.isInitialized()) {
 
@@ -331,8 +329,6 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 	}
 	}
-
-	GSLoggerFactory.getLogger(DABStarter.class).info("Handling configuration auto-reload ENDED");
     }
 
     /**

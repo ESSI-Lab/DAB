@@ -58,7 +58,11 @@ public interface ConfigurationChangeListener {
 	/**
 	 *
 	 */
-	CONFIGURATION_AUTO_RELOADED;
+	CONFIGURATION_AUTO_RELOADED,
+	/**
+	 *
+	 */
+	CONFIGURATION_FORCED_RELOADED;
     }
 
     /**
