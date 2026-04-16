@@ -13,12 +13,12 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -272,7 +272,13 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 				aggregationPageSize, //
 				maxValuesPerField);//
 
-			result.keySet().forEach(key -> modifiedRecords.put(key, result.get(key)));
+			result.keySet().forEach(key -> {
+
+			    if (!result.get(key).isEmpty()) {
+
+				modifiedRecords.put(key, result.get(key));
+			    }
+			});
 		    }
 		}
 
@@ -624,12 +630,11 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		subAggs.put(field, //
 			Aggregation.of(a -> a //
 				.terms(t -> t.field(IndexMapping.toKeywordField("dataFolder")).size(2)) //
-				.aggregations("values",
-					v -> v.terms(tt -> tt //
-						.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()))
-							? field
-							: IndexMapping.toKeywordField(field)) //
-						.size(maxValuesPerField)))));
+				.aggregations("values", v -> v.terms(tt -> tt //
+					.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()))
+						? field
+						: IndexMapping.toKeywordField(field)) //
+					.size(maxValuesPerField)))));
 	    }
 
 	    SearchRequest.Builder builder = new SearchRequest.Builder();
@@ -729,7 +734,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		afterKey = new HashMap<>();
 
 		String key = rawAfterKey.keySet().iterator().next();
-		String value =  rawAfterKey.get(key).to(String.class);
+		String value = rawAfterKey.get(key).to(String.class);
 
 		afterKey.put(key, value);
 
