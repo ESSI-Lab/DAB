@@ -239,7 +239,6 @@ public class MultiServiceManager {
      */
     public synchronized void setSettings(List<ManagedServiceSetting> settings) {
 
-
 	// retains only enabled services
 	this.settings = settings.stream().filter(ManagedServiceSetting::isEnabled).toList();
 
@@ -338,8 +337,6 @@ public class MultiServiceManager {
     private void tryStartService(ManagedServiceSetting setting) {
 
 	ServiceLock lock = buildLock(setting.getServiceId());
-
-	GSLoggerFactory.getLogger(getClass()).info("Trying to acquire lock for service {}", setting.getServiceId());
 
 	if (!lock.tryAcquire()) {
 
