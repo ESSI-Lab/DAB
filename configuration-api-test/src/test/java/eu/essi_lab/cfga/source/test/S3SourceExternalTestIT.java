@@ -77,7 +77,7 @@ public class S3SourceExternalTestIT {
 
 	String endpoint = wrapper.getEndpoint().get();
 
-	Assert.assertEquals("https:s3endpoint", endpoint);
+	Assert.assertEquals("https://s3endpoint", endpoint);
 
 	Assert.assertEquals(System.getProperty("accessKey"), accessKey);
 	Assert.assertEquals(System.getProperty("secretKey"), secretKey);
