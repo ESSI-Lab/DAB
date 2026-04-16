@@ -2331,6 +2331,9 @@
         <!-- multi module -->
         <module>database</module>
 
+        <!-- multi module -->
+        <module>configuration</module>
+
         <module>request-executor</module>
         <module>request-executor-default</module>
 
@@ -2360,12 +2363,6 @@
         <module>gs-driver-local-cache</module>
 
         <module>runtime-info-provider</module>
-
-        <module>configuration-api</module>
-        <module>configuration-api-gs</module>
-        <module>configuration-api-gui</module>
-        <module>configuration-api-test</module>
-        <module>configuration-api-rest</module>
 
         <module>custom-tasks</module>
 

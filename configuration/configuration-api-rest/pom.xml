@@ -4,7 +4,7 @@
 
     <parent>
         <groupId>eu.essi_lab</groupId>
-        <artifactId>DAB</artifactId>
+        <artifactId>configuration</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
