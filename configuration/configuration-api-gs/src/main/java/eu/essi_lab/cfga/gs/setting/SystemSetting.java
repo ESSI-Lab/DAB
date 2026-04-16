@@ -92,6 +92,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	KAFKA_BROKER_SECURITY_PROTOCOL("kafkaBrokerSecurityProtocol"), //
 	KAFKA_BROKER_SASL_MECHANISM("kafkaBrokerSaslMechanism"), //
 	KAFKA_BROKER_REQUEST_TIMEOUT("kafkaBrokerRequestTimeout"), //
+	KAFKA_BROKER_TOPIC("kafkaBrokerTopic"), //
 
 	/**
 	 * Health check options
