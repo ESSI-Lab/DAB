@@ -124,6 +124,14 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <dd>Unix epoch <b>milliseconds</b> of the last harvesting run end time, from harvesting properties. Omitted if no end
  * timestamp is stored.</dd>
  *
+ * <dt>{@link StatisticsMetric#LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS
+ * LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS} ({@code last_successful_ingestion_harvest_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch <b>milliseconds</b> of the last <b>completed</b> harvest end time when {@link HarvestingProperties}
+ * reports {@code resourcesCount &gt; 0} and {@link SourceStorageWorker#consolidatedFolderSurvives()} matches
+ * {@link ResourcesComparatorTask}: the consolidated snapshot does not “survive” (optional empty or {@code false}), i.e.
+ * the same situation where remote-sourced records are processed for comparison. Omitted when the last run was not
+ * completed, left no resources, consolidated survives, or end time is missing.</dd>
+ *
  * <dt>{@link StatisticsMetric#SOURCE_UP SOURCE_UP} ({@code source_up})</dt>
  * <dd>{@code 1} if the source is marked up in harvesting properties, {@code 0} if down or unknown.</dd>
  *
@@ -189,6 +197,9 @@ public class StatisticsTask extends AbstractCustomTask {
 	HARVESTED_RECORDS("harvested_records", "Total number of harvested records "),
 	LAST_HARVESTING_UNIX_TIMESTAMP_MS("last_harvesting_unix_timestamp_ms",
 		"Last harvesting end timestamp in Unix epoch milliseconds"),
+	LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS("last_successful_ingestion_harvest_unix_timestamp_ms",
+		"Last completed harvest end time (Unix ms) when resourcesCount>0 and consolidated folder does not survive "
+			+ "(same gate as ResourcesComparatorTask)"),
 	SOURCE_UP("source_up", "Source connectivity status (1=up, 0=down)"),
 	CONNECTIVITY_TEST_DURATION_MS("connectivity_test_duration_ms",
 		"Duration of the last source connectivity test in milliseconds"),
@@ -333,6 +344,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	HashMap<String, Long> connectivityTestUnixTimestampMs = new HashMap<String, Long>();
 	HashMap<String, Long> lastSourceUpUnixTimestampMs = new HashMap<String, Long>();
 	HashMap<String, Long> lastHarvestingTime = new HashMap<String, Long>();
+	HashMap<String, Long> lastSuccessfulIngestionHarvestTime = new HashMap<String, Long>();
 
 	HashMap<String, Double> metadataCompleteness = new HashMap<String, Double>();
 	HashMap<String, Double> metadataCompletenessBySet = new HashMap<String, Double>();
@@ -396,6 +408,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	    try {
 		Stats stats = overallStats.get(source);
 		boolean needHarvestingProps = metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS)
+			|| metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS)
 			|| metrics.contains(StatisticsMetric.SOURCE_UP)
 			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS)
 			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS)
@@ -434,7 +447,7 @@ public class StatisticsTask extends AbstractCustomTask {
 			    register(registry);
 		}
 
-		if (metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS)) {
+		if (metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS) && harvestingProperties != null) {
 		    String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
 		    Optional<Date> lastHarvesting = ISO8601DateTimeUtils.parseISO8601ToDate(endHarvestingTimestamp);
 		    if (lastHarvesting.isPresent()) {
@@ -445,7 +458,31 @@ public class StatisticsTask extends AbstractCustomTask {
 				g -> g.get(source))//
 				.description(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS.description())//
 				.tag("source_id", source).//
-				register(registry);
+				register(registry);0
+		    }
+		}
+
+		if (metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS)
+			&& harvestingProperties != null) {
+		    if (harvestingProperties.isCompleted().orElse(false) && harvestingProperties.getResourcesCount() > 0) {
+			try {
+			    	String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
+				Optional<Date> endHarvest = ISO8601DateTimeUtils.parseISO8601ToDate(endHarvestingTimestamp);
+				if (endHarvest.isPresent()) {
+				    long ms = endHarvest.get().getTime();
+				    lastSuccessfulIngestionHarvestTime.put(source, ms);
+				    io.micrometer.core.instrument.Gauge.builder(
+					    StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.prometheusName(),
+					    lastSuccessfulIngestionHarvestTime, g -> g.get(source))//
+					    .description(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.description())//
+					    .tag("source_id", source).//
+					    register(registry);
+				}
+
+			} catch (Exception e) {
+			    GSLoggerFactory.getLogger(getClass()).warn("consolidatedFolderSurvives for source {}: {}", source,
+				    e.getMessage());
+			}
 		    }
 		}
 
@@ -654,6 +691,15 @@ public class StatisticsTask extends AbstractCustomTask {
     private static String metadataCompletenessSetKey(String sourceId, String elementSetTag) {
 
 	return sourceId + '\0' + "s:" + elementSetTag;
+    }
+
+    /**
+     * Same condition as {@link ResourcesComparatorTask} uses to run folder comparison (when the consolidated snapshot does
+     * not “survive” the smart-storage threshold): {@code optional} empty, or present {@code false}.
+     */
+    private static boolean consolidatedFolderDoesNotSurviveComparatorGate(Optional<Boolean> consolidatedFolderSurvives) {
+
+	return consolidatedFolderSurvives.isEmpty() || !consolidatedFolderSurvives.get();
     }
 
     private static String recordsPerElementKey(String sourceId, String elementTag, String value) {
