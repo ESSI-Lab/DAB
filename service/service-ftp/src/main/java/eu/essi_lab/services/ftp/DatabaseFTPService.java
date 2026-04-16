@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.services.ftp;
 
@@ -13,20 +13,25 @@ package eu.essi_lab.services.ftp;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.opensearch.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.services.impl.*;
+import eu.essi_lab.services.message.*;
 import org.apache.ftpserver.*;
 import org.apache.ftpserver.ftplet.*;
 import org.apache.ftpserver.listener.*;
@@ -37,99 +42,94 @@ import org.apache.ftpserver.usermanager.*;
  */
 public class DatabaseFTPService extends AbstractManagedService {
 
-    private Database database;
-    private String storTempDir;
+    private static final String TEMP_STORE_DIR_KEY = "tempStoreDir";
     private FtpServer server;
 
     /**
-     * @param database
+     *
      */
-    private DatabaseFTPService(Database database, String storTempDir) {
-
-	this.database = database;
-	this.storTempDir = storTempDir;
+    public DatabaseFTPService() {
     }
-
-    /**
-     * @param database
-     * @return
-     */
-    public static DatabaseFTPService get(Database database, String storTempDir) {
-
-	return new DatabaseFTPService(database,storTempDir);
-    }
-
 
     @Override
     public void start() {
 
-	FtpServerFactory serverFactory = new FtpServerFactory();
-
-	//
-	//
-	//
-
-	PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
-	userManagerFactory.setAdminName("admin");
-
-	UserFactory userFactory = new UserFactory();
-	userFactory.setName("admin");
-	userFactory.setPassword("admin");
-	// userFactory.setHomeDirectory(new File("D://MLCPData").getAbsolutePath());
-
-	User admin = userFactory.createUser();
-
-	UserManager userManager = userManagerFactory.createUserManager();
-
 	try {
+
+	    publish(MessageChannel.MessageLevel.INFO, "FTP Service " + getId() + " starting");
+
+	    FtpServerFactory serverFactory = new FtpServerFactory();
+
+	    //
+	    //
+	    //
+
+	    PropertiesUserManagerFactory userManagerFactory = new PropertiesUserManagerFactory();
+	    userManagerFactory.setAdminName("admin");
+
+	    UserFactory userFactory = new UserFactory();
+	    userFactory.setName("admin");
+	    userFactory.setPassword("admin");
+	    // userFactory.setHomeDirectory(new File("D://MLCPData").getAbsolutePath());
+
+	    User admin = userFactory.createUser();
+
+	    UserManager userManager = userManagerFactory.createUserManager();
 
 	    userManager.save(admin);
 
-        } catch (FtpException e) {
+	    serverFactory.setUserManager(userManager);
 
+	    //
+	    //
+	    //
 
-	    throw new RuntimeException(e);
-	}
+	    OpenSearchDatabase database = new OpenSearchDatabase();
 
-	serverFactory.setUserManager(userManager);
+	    database.initialize(ConfigurationWrapper.getStorageInfo());
 
-	//
-	//
-	//
+	    DatabaseFileSystemFactory factory = DatabaseFileSystemFactory.get(database);
 
-	DatabaseFileSystemFactory factory = DatabaseFileSystemFactory.get(database);
-	factory.setSTORTempDir(storTempDir);
+	    String tempStoreDir = getSetting(). //
+		    readKeyValue(TEMP_STORE_DIR_KEY).//
+		    orElse(FileUtils.getTempDir().getAbsolutePath());//
 
-	serverFactory.setFileSystem(factory);
+	    publish(MessageChannel.MessageLevel.INFO, "Temporary store directory: " + tempStoreDir);
 
-	//
-	//
-	//
+	    factory.setSTORTempDir(tempStoreDir);
 
-	ListenerFactory listenerFactory = new ListenerFactory();
-	listenerFactory.setPort(2221);
-	serverFactory.addListener("default", listenerFactory.createListener());
+	    serverFactory.setFileSystem(factory);
 
-	//
-	//
-	//
+	    //
+	    //
+	    //
 
-	DatabaseFtpCommandFactory commandFactory = DatabaseFtpCommandFactory.get(serverFactory.getCommandFactory());//
-	serverFactory.setCommandFactory(commandFactory);
+	    ListenerFactory listenerFactory = new ListenerFactory();
+	    listenerFactory.setPort(2221);
+	    serverFactory.addListener("default", listenerFactory.createListener());
 
-	//
-	//
-	//
+	    //
+	    //
+	    //
 
-	server = serverFactory.createServer();
+	    DatabaseFtpCommandFactory commandFactory = DatabaseFtpCommandFactory.get(serverFactory.getCommandFactory());//
+	    serverFactory.setCommandFactory(commandFactory);
 
-	try {
+	    //
+	    //
+	    //
+
+	    server = serverFactory.createServer();
 
 	    server.start();
 
-        } catch (FtpException e) {
+	    publish(MessageChannel.MessageLevel.INFO, "FTP Service " + getId() + " started");
 
-	    throw new RuntimeException(e);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    publish(MessageChannel.MessageLevel.ERROR, e.getMessage());
 	}
     }
 
@@ -137,6 +137,8 @@ public class DatabaseFTPService extends AbstractManagedService {
     public void stop() {
 
 	server.stop();
+
+	publish(MessageChannel.MessageLevel.INFO, "FTP Service " + getId() + " stopped");
     }
 
     /**
@@ -145,20 +147,20 @@ public class DatabaseFTPService extends AbstractManagedService {
      */
     public static void main(String[] args) throws Exception {
 
-//	StorageInfo osStorageInfo = new StorageInfo(System.getProperty("dbUrl"));
-//	osStorageInfo.setName(System.getProperty("dbName"));
-//	osStorageInfo.setUser(System.getProperty("dbUser"));
-//	osStorageInfo.setPassword(System.getProperty("dbPassword"));
-//	osStorageInfo.setIdentifier(System.getProperty("dbIdentifier"));
-//	osStorageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
-//
-//	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
-//
-//	//	OpenSearchDatabase database = new OpenSearchDatabase();
-//	//	database.initialize(osStorageInfo);
-//
-//	DatabaseFTPService service = DatabaseFTPService.get(database, "D:\\Desktop\\FTP\\");
-//
-//	service.start();
+	//	StorageInfo osStorageInfo = new StorageInfo(System.getProperty("dbUrl"));
+	//	osStorageInfo.setName(System.getProperty("dbName"));
+	//	osStorageInfo.setUser(System.getProperty("dbUser"));
+	//	osStorageInfo.setPassword(System.getProperty("dbPassword"));
+	//	osStorageInfo.setIdentifier(System.getProperty("dbIdentifier"));
+	//	osStorageInfo.setType(OpenSearchServiceType.OPEN_SEARCH_MANAGED.getProtocol());
+	//
+	//	OpenSearchDatabase database = OpenSearchDatabase.createLocalService();
+	//
+	//	//	OpenSearchDatabase database = new OpenSearchDatabase();
+	//	//	database.initialize(osStorageInfo);
+	//
+	//	DatabaseFTPService service = DatabaseFTPService.get(database, "D:\\Desktop\\FTP\\");
+	//
+	//	service.start();
     }
 }
