@@ -61,9 +61,11 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 
 /**
- * Finds harvested or mixed sources in a {@link View} whose harvesting {@link Scheduling} is disabled, assigns each a
- * staggered start time from a base datetime, enables periodic harvesting at a fixed day interval, then persists the
- * configuration and registers jobs with the scheduler.
+ * Finds harvested or mixed sources in a {@link View} whose harvesting {@link Scheduling} is disabled, or enabled but
+ * {@linkplain Scheduling#isRunOnceSet() run once}, assigns each a staggered start time from a base datetime, and replaces
+ * that with periodic harvesting ({@linkplain Scheduling#setRunIndefinitely() run indefinitely} at the configured day
+ * interval). Then it persists the configuration and registers jobs with the scheduler. Sources that already have
+ * indefinite periodic scheduling are left unchanged.
  * <p>
  * Task options: one {@code key: value} per line (keys are case-insensitive). Empty lines and lines starting with
  * {@code #} are ignored.
@@ -95,6 +97,16 @@ import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 public class ViewHarvestSchedulerTask extends AbstractCustomTask {
 
     private static final DateTimeFormatter START_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+    /**
+     * @return true if this task should replace the current scheduling with an indefinite repeat at {@code repeatDays}
+     */
+    private static boolean shouldApplyPeriodicHarvestSchedule(Scheduling scheduling) {
+	if (!scheduling.isEnabled()) {
+	    return true;
+	}
+	return scheduling.isRunOnceSet();
+    }
 
     /**
      * Recognized option keys (prefix before the first colon on each line).
@@ -295,7 +307,7 @@ public class ViewHarvestSchedulerTask extends AbstractCustomTask {
 	    sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 	}
 
-	List<HarvestingSetting> unscheduled = new ArrayList<>();
+	List<HarvestingSetting> toBeScheduleds = new ArrayList<>();
 	for (GSSource source : harvestedInView) {
 	    Optional<HarvestingSetting> optSetting = ConfigurationWrapper.getHarvestingSettings(source.getUniqueIdentifier());
 	    if (optSetting.isEmpty()) {
@@ -303,43 +315,47 @@ public class ViewHarvestSchedulerTask extends AbstractCustomTask {
 		continue;
 	    }
 	    HarvestingSetting hs = optSetting.get();
-	    if (!hs.getScheduling().isEnabled()) {
-		if (maximumResources.isPresent()) {
-		    int cap = maximumResources.get();
-		    HarvestingProperties hp = sourceStorage.retrieveHarvestingProperties(source);
-		    int count = hp.getResourcesCount();
-		    if (count <= 0) {
-			GSLoggerFactory.getLogger(getClass()).info(
-				"Skipping unscheduled source in view '{}': {} ({}) — resources count unknown (not harvested yet); maximumResources:{} requires a known count",
-				viewId,
-				source.getLabel(),
-				source.getUniqueIdentifier(),
-				cap);
-			continue;
-		    }
-		    if (count >= cap) {
-			GSLoggerFactory.getLogger(getClass()).info(
-				"Skipping unscheduled source in view '{}': {} ({}) — resourcesCount {} is not less than maximumResources {}",
-				viewId,
-				source.getLabel(),
-				source.getUniqueIdentifier(),
-				count,
-				cap);
-			continue;
-		    }
-		}
-		unscheduled.add(hs);
-		GSLoggerFactory.getLogger(getClass()).info("Unscheduled harvested source in view '{}': {} ({}){}",
-			viewId,
-			source.getLabel(),
-			source.getUniqueIdentifier(),
-			maximumResources.map(m -> " [resourcesCount < " + m + "]").orElse(""));
+	    Scheduling sch = hs.getScheduling();
+	    if (!shouldApplyPeriodicHarvestSchedule(sch)) {
+		continue;
 	    }
+	    if (maximumResources.isPresent()) {
+		int cap = maximumResources.get();
+		HarvestingProperties harvestingProperties = sourceStorage.retrieveHarvestingProperties(source);
+		int count = harvestingProperties.getResourcesCount();
+		if (count < 0) {
+		    GSLoggerFactory.getLogger(getClass()).info(
+			    "Skipping source in view '{}': {} ({}) — resources count unknown (not harvested yet); maximumResources:{} requires a known count",
+			    viewId,
+			    source.getLabel(),
+			    source.getUniqueIdentifier(),
+			    cap);
+		    continue;
+		}
+		if (count >= cap) {
+		    GSLoggerFactory.getLogger(getClass()).info(
+			    "Skipping source in view '{}': {} ({}) — resourcesCount {} is not less than maximumResources {}",
+			    viewId,
+			    source.getLabel(),
+			    source.getUniqueIdentifier(),
+			    count,
+			    cap);
+		    continue;
+		}
+	    }
+	    toBeScheduleds.add(hs);
+	    String reason = !sch.isEnabled() ? "scheduling disabled" : "run-once scheduling";
+	    GSLoggerFactory.getLogger(getClass()).info("Harvest source in view '{}': {} ({}) — {}.{}",
+		    viewId,
+		    source.getLabel(),
+		    source.getUniqueIdentifier(),
+		    reason,
+		    maximumResources.map(m -> " [resourcesCount < " + m + "]").orElse(""));
 	}
 
-	if (unscheduled.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).info("No unscheduled harvested sources in view '{}'{}", viewId,
-		    maximumResources.map(m -> " eligible under maximumResources " + m).orElse(""));
+	if (toBeScheduleds.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).info("No harvested sources in view '{}' need periodic scheduling{}", viewId,
+		    maximumResources.map(m -> " (eligible under maximumResources " + m + ")").orElse(""));
 	    return;
 	}
 
@@ -357,10 +373,10 @@ public class ViewHarvestSchedulerTask extends AbstractCustomTask {
 
 	List<HarvestingSetting> forQuartz = new ArrayList<>();
 
-	for (int i = 0; i < unscheduled.size(); i++) {
+	for (int i = 0; i < toBeScheduleds.size(); i++) {
 
-	    HarvestingSetting template = unscheduled.get(i);
-	    String settingId = template.getIdentifier();
+	    HarvestingSetting toBeScheduled = toBeScheduleds.get(i);
+	    String settingId = toBeScheduled.getIdentifier();
 
 	    HarvestingSetting setting = ConfigurationWrapper.getHarvestingSettings().stream()
 		    .filter(s -> s.getIdentifier().equals(settingId))
