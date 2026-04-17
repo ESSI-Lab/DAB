@@ -650,12 +650,10 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			Aggregation.of(a -> a //
 				.terms(t -> t.field(IndexMapping.toKeywordField("dataFolder")).size(2)) //
 				.aggregations("values", v -> v.terms(tt -> tt //
-					.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()))
-						? field
-						: (field.equals(MetadataElement.TEMP_EXTENT_BEGIN.getName()) || field.equals(
-							MetadataElement.TEMP_EXTENT_END.getName())) ?
-
-						  field : IndexMapping.toKeywordField(field)) //
+					.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName())) || //
+						field.equals(MetadataElement.TEMP_EXTENT_BEGIN.getName()) || //
+						field.equals(MetadataElement.TEMP_EXTENT_END.getName()) //
+						? field : IndexMapping.toKeywordField(field)) //
 
 					.size(maxValuesPerField)))));
 	    }
