@@ -152,6 +152,16 @@ public abstract class IndexMapping {
      * @param field
      * @return
      */
+    public static String toDateField(String field) {
+
+	return field + "_date";
+    }
+
+
+    /**
+     * @param field
+     * @return
+     */
     public static String toHashField(String field) {
 
 	return field + "_hash";
