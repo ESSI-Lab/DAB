@@ -104,6 +104,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ONLINE_LINKAGE.getName());
     }
 
+    private String kafkaTopic;
+
     /**
      *
      */
@@ -270,7 +272,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 				fields, //
 				gsSource.getUniqueIdentifier(),//
 				aggregationPageSize, //
-				maxValuesPerField);//
+				maxValuesPerField,
+				deletedRecords);//
 
 			result.keySet().forEach(key -> {
 
@@ -452,35 +455,33 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
     /**
      * @param source
-     * @param topic
+     * @param property
      * @param modified
      * @param client
      * @return
      */
-    private String buildTopic(GSSource source, String topic, boolean modified, MessagePublisher client) {
+    private String buildTopic(GSSource source, String property, boolean modified, MessagePublisher client) {
 
 	if (client instanceof KafkaPublisher) {
 
-	    topic = modified ? "modified_" + topic : topic;
-
-	    return "dab_" + source.getUniqueIdentifier() + "_" + topic;
+	    return kafkaTopic;
 	}
 
-	topic = modified ? "modified/" + topic : topic;
+	property = modified ? "modified/" + property : property;
 
-	return "dab/" + source.getUniqueIdentifier() + "/" + topic;
+	return "dab/" + source.getUniqueIdentifier() + "/" + property;
     }
 
     /**
-     * @param list
+     * @param idsList
      * @param sourceId
      * @param event
      * @param property
      * @return
      */
-    private String buildMessage(List<String> list, String sourceId, String event, Optional<String> property) {
+    private String buildMessage(List<String> idsList, String sourceId, String event, Optional<String> property) {
 
-	return list.stream().map(id -> {
+	return idsList.stream().map(id -> {
 
 	    JSONObject object = new JSONObject();
 	    object.put("metadataId", id);
@@ -540,7 +541,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // topic
 		    //
 
-		    String kafkaTopic = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_TOPIC.getLabel());
+		    kafkaTopic = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_TOPIC.getLabel());
 
 		    if (kafkaTopic == null) {
 
@@ -629,7 +630,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    List<String> targetFields, //
 	    String sourceId, //
 	    int aggregationPageSize, //
-	    int maxValuesPerField)//
+	    int maxValuesPerField,
+	    List<String> deletedRecords)//
 	    throws Exception {
 
 	Map<String, String> afterKey = null;
@@ -702,7 +704,12 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    for (CompositeBucket bucket : composite.buckets().array()) {
 
-		String fileId = bucket.key().get("fileId").toString();
+		String fileId = bucket.key().get("fileId").to(String.class);
+
+		if(deletedRecords.contains(fileId)) {
+
+		    continue;
+		}
 
 		Map<String, Aggregate> aggs = bucket.aggregations();
 
