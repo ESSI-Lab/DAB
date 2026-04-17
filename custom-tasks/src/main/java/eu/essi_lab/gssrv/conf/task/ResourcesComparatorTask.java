@@ -13,12 +13,12 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -272,8 +272,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 				fields, //
 				gsSource.getUniqueIdentifier(),//
 				aggregationPageSize, //
-				maxValuesPerField,
-				deletedRecords);//
+				maxValuesPerField, deletedRecords);//
 
 			result.keySet().forEach(key -> {
 
@@ -630,8 +629,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    List<String> targetFields, //
 	    String sourceId, //
 	    int aggregationPageSize, //
-	    int maxValuesPerField,
-	    List<String> deletedRecords)//
+	    int maxValuesPerField, List<String> deletedRecords)//
 	    throws Exception {
 
 	Map<String, String> afterKey = null;
@@ -654,7 +652,11 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 				.aggregations("values", v -> v.terms(tt -> tt //
 					.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()))
 						? field
-						: IndexMapping.toKeywordField(field)) //
+						: (field.equals(MetadataElement.TEMP_EXTENT_BEGIN.getName()) || field.equals(
+							MetadataElement.TEMP_EXTENT_END.getName())) ?
+
+						  field : IndexMapping.toKeywordField(field)) //
+
 					.size(maxValuesPerField)))));
 	    }
 
@@ -706,7 +708,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		String fileId = bucket.key().get("fileId").to(String.class);
 
-		if(deletedRecords.contains(fileId)) {
+		if (deletedRecords.contains(fileId)) {
 
 		    continue;
 		}
@@ -731,13 +733,25 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			String folder = folderBucket.key();
 
-			StringTermsAggregate values = folderBucket.aggregations().get("values").sterms();
-
 			Set<String> targetSet = "data-1".equals(folder) ? values1 : values2;
 
-			for (StringTermsBucket v : values.buckets().array()) {
+			if (field.equals(MetadataElement.TEMP_EXTENT_BEGIN.getName()) || field.equals(
+				MetadataElement.TEMP_EXTENT_END.getName())) {
 
-			    targetSet.add(v.key());
+			    LongTermsAggregate longValues = folderBucket.aggregations().get("values").lterms();
+
+			    for (LongTermsBucket v : longValues.buckets().array()) {
+
+				targetSet.add(v.key());
+			    }
+			} else {
+
+			    StringTermsAggregate values = folderBucket.aggregations().get("values").sterms();
+
+			    for (StringTermsBucket v : values.buckets().array()) {
+
+				targetSet.add(v.key());
+			    }
 			}
 		    }
 
