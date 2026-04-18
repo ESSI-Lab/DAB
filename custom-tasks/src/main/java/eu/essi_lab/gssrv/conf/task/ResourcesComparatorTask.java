@@ -641,6 +641,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	Map<String, List<String>> out = new HashMap<>();
 
+	List<String> exclusions = new ArrayList<>(deletedRecords);
+	exclusions.addAll(newRecords);
+
 	Function<String, String> map = (field) -> switch (MetadataElement.fromName(field).getContentType()) {
 	    case TEXTUAL -> IndexMapping.toKeywordField(field);
 	    case SPATIAL -> IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName());
@@ -669,7 +672,27 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    SearchRequest request = builder.index(DataFolderMapping.get().getIndex()).size(0) //
 
-		    .query(q -> q.term(t -> t.field(IndexMapping.toKeywordField("sourceId")).value(FieldValue.of(sourceId)))) //
+		    .query(q -> q.bool(b -> {
+
+			b.must(m -> m.term(t ->
+				t.field(IndexMapping.toKeywordField("sourceId"))
+					.value(FieldValue.of(sourceId))
+			));
+
+			if (!exclusions.isEmpty()) {
+
+			    b.mustNot(mn -> mn.terms(t ->
+				    t.field(IndexMapping.toKeywordField("fileId"))
+					    .terms(v -> v.value(
+						    exclusions.stream()
+							    .map(FieldValue::of)
+							    .toList()
+					    ))
+			    ));
+			}
+
+			return b;
+		    }))
 
 		    .aggregations("by_fileId", a -> //
 
