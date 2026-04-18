@@ -55,6 +55,7 @@ import org.opensearch.client.opensearch.core.*;
 import org.quartz.*;
 
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.*;
 
 /**
@@ -272,7 +273,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 				fields, //
 				gsSource.getUniqueIdentifier(),//
 				aggregationPageSize, //
-				maxValuesPerField, deletedRecords);//
+				maxValuesPerField,
+				deletedRecords,
+				newRecords);//
 
 			result.keySet().forEach(key -> {
 
@@ -629,12 +632,20 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    List<String> targetFields, //
 	    String sourceId, //
 	    int aggregationPageSize, //
-	    int maxValuesPerField, List<String> deletedRecords)//
+	    int maxValuesPerField,//
+	    List<String> deletedRecords, //
+	    List<String> newRecords)//
 	    throws Exception {
 
 	Map<String, String> afterKey = null;
 
 	Map<String, List<String>> out = new HashMap<>();
+
+	Function<String, String> map = (field) -> switch (MetadataElement.fromName(field).getContentType()) {
+	    case TEXTUAL -> IndexMapping.toKeywordField(field);
+	    case SPATIAL -> IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName());
+	    default -> field;
+	};
 
 	targetFields.forEach(field -> out.put(field, new ArrayList<>()));
 
@@ -650,11 +661,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			Aggregation.of(a -> a //
 				.terms(t -> t.field(IndexMapping.toKeywordField("dataFolder")).size(2)) //
 				.aggregations("values", v -> v.terms(tt -> tt //
-					.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName())) || //
-						field.equals(MetadataElement.TEMP_EXTENT_BEGIN.getName()) || //
-						field.equals(MetadataElement.TEMP_EXTENT_END.getName()) //
-						? field : IndexMapping.toKeywordField(field)) //
-
+					.field(map.apply(field)) //
 					.size(maxValuesPerField)))));
 	    }
 
@@ -706,7 +713,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		String fileId = bucket.key().get("fileId").to(String.class);
 
-		if (deletedRecords.contains(fileId)) {
+		if (deletedRecords.contains(fileId) || newRecords.contains(fileId)) {
 
 		    continue;
 		}
@@ -733,22 +740,31 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			Set<String> targetSet = "data-1".equals(folder) ? values1 : values2;
 
-			if (field.equals(MetadataElement.TEMP_EXTENT_BEGIN.getName()) || field.equals(
-				MetadataElement.TEMP_EXTENT_END.getName())) {
+			Aggregate aggregate = folderBucket.aggregations().get("values");
 
-			    LongTermsAggregate longValues = folderBucket.aggregations().get("values").lterms();
+			if (aggregate.isSterms()) {
+
+			    StringTermsAggregate values = aggregate.sterms();
+
+			    for (StringTermsBucket v : values.buckets().array()) {
+
+				targetSet.add(v.key());
+			    }
+			} else if (aggregate.isLterms()) {
+
+			    LongTermsAggregate longValues = aggregate.lterms();
 
 			    for (LongTermsBucket v : longValues.buckets().array()) {
 
 				targetSet.add(v.key());
 			    }
-			} else {
+			} else if (aggregate.isDterms()) {
 
-			    StringTermsAggregate values = folderBucket.aggregations().get("values").sterms();
+			    DoubleTermsAggregate values = aggregate.dterms();
 
-			    for (StringTermsBucket v : values.buckets().array()) {
+			    for (DoubleTermsBucket v : values.buckets().array()) {
 
-				targetSet.add(v.key());
+				targetSet.add(String.valueOf(v.key()));
 			    }
 			}
 		    }
