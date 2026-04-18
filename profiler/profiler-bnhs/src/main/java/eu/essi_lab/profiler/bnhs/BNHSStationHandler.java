@@ -82,6 +82,8 @@ import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.rip.RuntimeInfoProvider;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 /**
@@ -154,6 +156,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    discoveryMessage.setIteratedWorkflow(IterationMode.FULL_RESPONSE);
 	    discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
 	    discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+	    discoveryMessage.setWebRequest(webRequest);
 
 	    Set<Bond> operands = new HashSet<>();
 
@@ -276,7 +279,16 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    discoveryMessage.setUserBond(bond);
 	    discoveryMessage.setNormalizedBond(bond);
 
+	    Optional.ofNullable(webRequest.getProfilerName()).ifPresent(discoveryMessage::setProfilerName);
+
+	    Optional<ElasticsearchInfoPublisher> runtimePublisher = ElasticsearchInfoPublisher.create(webRequest);
+	    publishRuntimeInfo(runtimePublisher, discoveryMessage);
+
 	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
+
+	    Optional.ofNullable(webRequest.getProfilerName()).ifPresent(resultSet::setProfilerName);
+
+	    publishRuntimeInfo(runtimePublisher, resultSet);
 
 	    List<GSResource> resources = resultSet.getResultsList();
 
@@ -692,6 +704,23 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    builder = builder.entity(html).type(new MediaType("text", "html"));
 
 	    return builder.build();
+	}
+    }
+
+    /**
+     * Publishes runtime statistics when Elasticsearch runtime-info publishing is enabled (same pattern as
+     * {@link eu.essi_lab.pdk.handler.ProfilerHandler}). The REST layer typically flushes the batch after the response is built.
+     */
+    private void publishRuntimeInfo(Optional<ElasticsearchInfoPublisher> publisher, RuntimeInfoProvider provider) {
+
+	if (publisher.isEmpty() || provider == null) {
+	    return;
+	}
+
+	try {
+	    publisher.get().publish(provider);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error initializing ElasticSearch: {}", e.getMessage());
 	}
     }
 
