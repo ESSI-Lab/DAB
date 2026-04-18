@@ -10,12 +10,12 @@ package eu.essi_lab.model.resource;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -611,12 +611,13 @@ public enum MetadataElement implements Queryable {
     //
     // WORLDCEREAL SPECIFIC QUERYABLES
     //
-    CROP_TYPES(MetadataElement.CROP_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), QUANTITY_TYPES(
-	    MetadataElement.QUANTITY_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), LAND_COVER_TYPES(
-	    MetadataElement.LAND_COVER_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), IRRIGATION_TYPES(
-	    MetadataElement.IRRIGATION_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), CONFIDENCE_CROP_TYPE("cropConfidence",
-	    ContentType.DOUBLE), CONFIDENCE_IRR_TYPE("irrigationConfidence", ContentType.DOUBLE), CONFIDENCE_LC_TYPE("landCoverConfidence",
-	    ContentType.DOUBLE),
+    CROP_TYPES(MetadataElement.CROP_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    QUANTITY_TYPES(MetadataElement.QUANTITY_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    LAND_COVER_TYPES(MetadataElement.LAND_COVER_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    IRRIGATION_TYPES(MetadataElement.IRRIGATION_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    CONFIDENCE_CROP_TYPE("cropConfidence", ContentType.DOUBLE), //
+    CONFIDENCE_IRR_TYPE("irrigationConfidence", ContentType.DOUBLE), //
+    CONFIDENCE_LC_TYPE("landCoverConfidence", ContentType.DOUBLE),
 
     // ----------------------------------------------------------
     //
