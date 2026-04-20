@@ -377,18 +377,21 @@ public class ViewHarvestSchedulerTask extends AbstractCustomTask {
 
 	    HarvestingSetting setting = toBeScheduleds.get(i);
 
+	    setting = SettingUtils.downCast(SelectionUtils.resetAndSelect(setting, false), HarvestingSettingLoader.load().getClass());
+
 	    Scheduling scheduling = setting.getScheduling();
 	    scheduling.setEnabled(true);
 
 	    scheduling.setRunIndefinitely();
 	    scheduling.setRepeatInterval(repeatDays, TimeUnit.DAYS);
 
-	    SelectionUtils.deepClean(setting);
-
 	    ZonedDateTime start = baseZoned.plusMinutes((long) i * staggerMinutes);
 	    ZonedDateTime inUserZone = start.withZoneSameInstant(zoneId);
 	    String formattedStart = inUserZone.format(START_FORMAT);
 	    scheduling.setStartTime(formattedStart);
+
+	    SelectionUtils.deepClean(setting);
+	    SelectionUtils.deepAfterClean(setting);
 
 	    boolean replaced = configuration.replace(setting);
 	    if (!replaced) {
