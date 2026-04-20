@@ -82,6 +82,13 @@ public class ZRXPDocument {
 
 		} else if (isHeaderLine(line)) { // header line
 
+		    if (tmpBlock != null && tmpBlock.getStartDataLine() != null) {
+			// Next block starts with new headers immediately after data (no "## end of block")
+			tmpBlock.setEndDataLine(d);
+			ret.add(tmpBlock);
+			tmpBlock = null;
+		    }
+
 		    if (tmpBlock == null) {
 
 			tmpBlock = new ZRXPBlock(file, i);
@@ -106,6 +113,13 @@ public class ZRXPDocument {
 
 		}
 
+	    }
+
+	    if (tmpBlock != null) {
+		if (tmpBlock.getEndDataLine() == null && tmpBlock.getStartDataLine() != null) {
+		    tmpBlock.setEndDataLine(d);
+		}
+		ret.add(tmpBlock);
 	    }
 
 	} finally {
