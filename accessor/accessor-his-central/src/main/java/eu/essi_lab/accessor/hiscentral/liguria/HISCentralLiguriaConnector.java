@@ -241,8 +241,12 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 			    public void notifyJSONObject(JSONObject object) {
 
 				try {
-				    if (index == 0) {
-					startTime = object.optString("DTRF");
+				    String dtrf = object.optString("DTRF");
+				    if (dtrf != null && !dtrf.isEmpty()) {
+					// Response rows are not ordered; use earliest DTRF (lexical order matches time for YYYYMMDDHHmm).
+					if (startTime == null || dtrf.compareTo(startTime) < 0) {
+					    startTime = dtrf;
+					}
 				    }
 				    index++;
 				    Iterator<String> iterator = object.keys();
