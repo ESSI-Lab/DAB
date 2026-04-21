@@ -37,7 +37,8 @@ public class CKANRequest {
     public enum APIParameters {
 	LIMIT("limit"), //
 	OFFSET("offset", "start"), //
-
+	/** CKAN {@code package_show} dataset id or name */
+	ID("id"), //
 	;
 
 	private String[] keys;
