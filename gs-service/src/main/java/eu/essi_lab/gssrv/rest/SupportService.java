@@ -357,8 +357,8 @@ public class SupportService {
 	    }
 
 	    // Execute access request
-	    ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
-	    IAccessExecutor accessExecutor = accessLoader.iterator().next();
+	    ServiceLoader<AccessExecutor> accessLoader = ServiceLoader.load(AccessExecutor.class);
+	    AccessExecutor accessExecutor = accessLoader.iterator().next();
 
 	    AccessMessage accessMessage = new AccessMessage();
 	    accessMessage.setOnlineId(onlineId);

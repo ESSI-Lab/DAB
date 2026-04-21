@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package eu.essi_lab.request.executor;
 
 /*-
@@ -21,32 +24,46 @@ package eu.essi_lab.request.executor;
  * #L%
  */
 
-import eu.essi_lab.messages.AccessMessage;
-import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.count.CountSet;
+import eu.essi_lab.authorization.xacml.XACMLAuthorizer;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.RequestMessage;
+import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.model.resource.data.DataDescriptor;
-import eu.essi_lab.model.resource.data.DataObject;
 
 /**
  * @author Fabrizio
  */
-public interface IAccessExecutor extends IRequestExecutor<AccessMessage, DataObject, CountSet, ResultSet<DataObject>> {
+public abstract class AuthorizerDecorator {
 
     /**
      * @param message
+     * @param policy
+     * @param errorId
      * @return
      * @throws GSException
      */
-    public CountSet count(AccessMessage message) throws GSException;
+    public boolean isAuthorized(//
+	    RequestMessage message, //
+	    String errorId) throws GSException {
 
-    /**
-     * @param message
-     * @return
-     * @throws GSException
-     */
-    public ResultSet<DataObject> retrieve(AccessMessage message) throws GSException;
+	try {
 
-    public ResultSet<DataObject> retrieve(GSResource resource, String onlineId, DataDescriptor targetDescriptor) throws GSException;
+	    XACMLAuthorizer authorizer = new XACMLAuthorizer();
+
+	    return authorizer.isAuthorized(message);
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    errorId, //
+		    e);
+	}
+     }
 }

@@ -29,7 +29,7 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
-import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.AccessExecutor;
 import eu.essi_lab.request.executor.IRequestExecutor;
 
 /**
@@ -49,8 +49,8 @@ public class AccessHandler<T> extends ProfilerHandler<AccessMessage, DataObject,
     @Override
     protected IRequestExecutor<AccessMessage, DataObject, CountSet, ResultSet<DataObject>> createExecutor() {
 
-	ServiceLoader<IAccessExecutor> loader = ServiceLoader.load(IAccessExecutor.class);
-	for (IAccessExecutor e : loader) {
+	ServiceLoader<AccessExecutor> loader = ServiceLoader.load(AccessExecutor.class);
+	for (AccessExecutor e : loader) {
 
 	    return e;
 	}

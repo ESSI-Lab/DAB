@@ -48,7 +48,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataReference;
 import eu.essi_lab.model.resource.data.DataReferences;
-import eu.essi_lab.request.executor.impl.AuthorizerDecorator;
+import eu.essi_lab.request.executor.AuthorizerDecorator;
 import eu.essi_lab.request.executor.IBulkDownloadExecutor;
 
 /**

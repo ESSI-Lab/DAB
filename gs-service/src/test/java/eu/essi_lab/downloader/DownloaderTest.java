@@ -1,6 +1,6 @@
 package eu.essi_lab.downloader;
 
-import java.util.Date;
+import java.util.*;
 
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.access.DataDownloaderFactory;
@@ -19,7 +19,8 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataType;
-import eu.essi_lab.request.executor.access.AccessExecutor;
+import eu.essi_lab.request.executor.*;
+import eu.essi_lab.request.executor.access.*;
 import eu.essi_lab.validator.wof.WML_1_1Validator;
 
 public class DownloaderTest {
@@ -52,7 +53,7 @@ public class DownloaderTest {
 	DataDownloader downloader = DataDownloaderFactory.getDataDownloader(resource, onlineId);
 	System.out.println(downloader.getClass().getSimpleName());
 	// DataDescriptor descriptor = downloader.getRemoteDescriptors().get(0);
-	AccessExecutor executor = new AccessExecutor();
+	AccessExecutor executor = ServiceLoader.load(AccessExecutor.class).iterator().next();
 
 	Date begin = new Date(new Date().getTime() - 1000 * 60 * 60 * 24l);
 	Date end = new Date();

@@ -40,7 +40,7 @@ import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
-import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.AccessExecutor;
 
 public class LayerFeatureRetrieval {
 
@@ -66,8 +66,8 @@ public class LayerFeatureRetrieval {
 	    targetDescriptor.setDataType(DataType.VECTOR);
 	    targetDescriptor.setCRS(CRS.EPSG_4326());
 	    targetDescriptor.setDataFormat(DataFormat.WKT());
-	    ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
-	    IAccessExecutor accessExecutor = accessLoader.iterator().next();
+	    ServiceLoader<AccessExecutor> accessLoader = ServiceLoader.load(AccessExecutor.class);
+	    AccessExecutor accessExecutor = accessLoader.iterator().next();
 	    ResultSet<GSResource> resource = AccessQueryUtils.findResource(UUID.randomUUID().toString(), Optional.empty(), layerName);
 	    ResultSet<DataObject> retrieved = accessExecutor.retrieve(resource.getResultsList().getFirst(), layerName, targetDescriptor);
 	    try {

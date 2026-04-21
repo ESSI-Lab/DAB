@@ -44,7 +44,7 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.AccessExecutor;
 import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
 
 /**
@@ -60,14 +60,14 @@ public abstract class StreamingRequestHandler extends DefaultRequestHandler {
     private static final Object LOCK = new Object();
 
     private static IDiscoveryStringExecutor discoveryExecutor;
-    private static IAccessExecutor accessExecutor;
+    private static AccessExecutor accessExecutor;
     private static XACMLAuthorizer authorizer;
 
     static {
 	ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
 	discoveryExecutor = loader.iterator().next();
 
-	ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
+	ServiceLoader<AccessExecutor> accessLoader = ServiceLoader.load(AccessExecutor.class);
 	accessExecutor = accessLoader.iterator().next();
 
 	try {

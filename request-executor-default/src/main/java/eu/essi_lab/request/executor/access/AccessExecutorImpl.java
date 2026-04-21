@@ -50,8 +50,8 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
-import eu.essi_lab.request.executor.impl.AuthorizerDecorator;
-import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.AuthorizerDecorator;
+import eu.essi_lab.request.executor.AccessExecutor;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 import eu.essi_lab.workflow.blocks.grid.NetCDFOnlyReprojector;
@@ -64,7 +64,7 @@ import eu.essi_lab.workflow.builder.WorkflowBuilder;
 /**
  * @author Fabrizio
  */
-public class AccessExecutor extends AuthorizerDecorator implements IAccessExecutor {
+public class AccessExecutorImpl extends AuthorizerDecorator implements AccessExecutor {
 
     private static final String ACCESS_EXECUTOR_UNKNOWN_ONLINE_ID = "ACCESS_EXECUTOR_UNKNOWN_ONLINE_ID";
     private static final String ACCESS_EXECUTOR_TOO_MANY_RESOURCES = "ACCESS_EXECUTOR_TOO_MANY_RESOURCES";
@@ -165,7 +165,7 @@ public class AccessExecutor extends AuthorizerDecorator implements IAccessExecut
 
 	} else {
 
-	    publisher = ElasticsearchInfoPublisher.create(UUID.randomUUID().toString(), "AccessExecutor");
+	    publisher = ElasticsearchInfoPublisher.create(UUID.randomUUID().toString(), "AccessExecutorImpl");
 	}
 
 	if (publisher.isPresent()) {
