@@ -1,0 +1,582 @@
+package eu.essi_lab.cfga.gui.components.grid;
+
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB)
+ * %%
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.grid.*;
+import com.vaadin.flow.component.grid.contextmenu.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.textfield.*;
+import com.vaadin.flow.data.provider.*;
+import com.vaadin.flow.data.renderer.*;
+import com.vaadin.flow.data.value.*;
+import com.vaadin.flow.function.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gui.components.*;
+import eu.essi_lab.cfga.gui.components.grid.renderer.*;
+import eu.essi_lab.cfga.gui.components.setting.*;
+import eu.essi_lab.cfga.gui.components.tabs.*;
+import eu.essi_lab.cfga.setting.*;
+
+import java.util.*;
+import java.util.stream.*;
+
+/**
+ * @author Fabrizio
+ */
+@SuppressWarnings("serial")
+public class GridComponent extends Grid<HashMap<String, String>> {
+
+    private final GridInfo gridInfo;
+    private final TabContent tabContent;
+    private HeaderRow filterRow;
+    private GridFilter gridFilter;
+    private final ListDataProvider<HashMap<String, String>> dataProvider;
+    private boolean legendsViewer;
+
+    /**
+     * @param gridInfo
+     * @param list
+     * @param configuration
+     * @param tabContent
+     * @param readOnly
+     * @param refresh
+     * @param withTabSheet
+     */
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public GridComponent(//
+	    GridInfo gridInfo, //
+	    List<Setting> list, //
+	    Configuration configuration, //
+	    TabContent tabContent, //
+	    boolean readOnly, //
+	    boolean refresh, //
+	    boolean withTabSheet) {
+
+	//
+	//
+	//
+
+	this.gridInfo = gridInfo;
+	this.tabContent = tabContent;
+
+	if (!refresh) {
+
+	    GridFilter.clear();
+	    ColumnsHider.clearValuesCache();
+	}
+
+	//
+	// handles the context menu items
+	//
+
+	if (!gridInfo.getGridMenuItemHandlers().isEmpty()) {
+
+	    GridContextMenu<HashMap<String, String>> menu = addContextMenu();
+
+	    //
+	    // a listener called when the grid context menu is opened. it enables/disables
+	    // the menu items according to the ContextMenuItem.isEnabled method
+	    //
+	    menu.addGridContextMenuOpenedListener(event -> {
+
+		GridContextMenu<HashMap<String, String>> source = event.getSource();
+
+		List<GridMenuItem<HashMap<String, String>>> menuItems = source.getItems();
+
+		Optional<HashMap<String, String>> eventItem = event.getItem();
+
+		HashMap<String, Boolean> map = createSelectionMap();
+
+		Optional<Setting> setting = findEventSetting(configuration, eventItem);
+
+		for (GridMenuItem<HashMap<String, String>> menuItem : menuItems) {
+
+		    String menuItemId = menuItem.getId().get();
+
+		    //
+		    // finds the menu item handler related to the current menu item
+		    // according to their identifier
+		    //
+		    GridMenuItemHandler gmih = gridInfo.//
+			    getGridMenuItemHandlers().//
+			    stream().//
+			    filter(i -> i.getIdentifier().equals(menuItemId)).//
+			    findFirst().//
+			    get();
+
+		    if (eventItem.isPresent()) {
+
+			menuItem.setEnabled(gmih.isEnabled(eventItem.get(), tabContent, configuration, setting.get(), map));
+
+		    } else {
+
+			// if no context is selected, only the non-contextual items are enabled
+			menuItem.setEnabled(!gmih.isContextual());
+		    }
+		}
+	    });
+
+	    //
+	    // adds the menu item to the grid context menu
+	    //
+	    gridInfo.getGridMenuItemHandlers().forEach(gmih -> {
+
+		// adds an optional top divider
+		if (gmih.withTopDivider()) {
+
+		    Hr hr = ComponentFactory.createHr();
+		    menu.addComponent(hr);
+		}
+
+		// adds the item and set its id according to the related handler
+		GridMenuItem<HashMap<String, String>> gridMenuItem = menu.addItem(gmih.getItemText(), event -> {
+
+		    Optional<HashMap<String, String>> eventItem = event.getItem();
+
+		    HashMap<String, Boolean> map = createSelectionMap();
+
+		    // the setting is not found in case of non-contextual menu items
+		    // since they are enabled also if no context is selected
+		    Optional<Setting> setting = findEventSetting(configuration, eventItem);
+
+		    gmih.onClick(event, tabContent, configuration, setting, map);
+		});
+
+		// set the identifier according to its handler
+		gridMenuItem.setId(gmih.getIdentifier());
+
+		// adds an optional bottom divider
+		if (gmih.withBottomDivider()) {
+
+		    Hr hr = ComponentFactory.createHr();
+		    menu.add(hr);
+		}
+	    });
+	}
+
+	//
+	//
+	//
+
+	getStyle().set("font-size", "13px");
+
+	addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+
+	//
+	//
+	//
+
+	ArrayList<HashMap<String, String>> items = createItems(list);
+
+	setItems(items);
+
+	//
+	//
+	//
+
+	setSelectionMode(gridInfo.getSelectionMode());
+
+	//
+	// shows the setting component when the user clicks on a row
+	//
+	setItemDetailsRenderer(createItemDetailsRenderer(configuration, readOnly, tabContent));
+
+	//
+	//
+	//
+
+	dataProvider = (ListDataProvider) getDataProvider();
+
+	gridInfo.getColumnsDescriptors().forEach(descriptor -> {
+
+	    Grid.Column<HashMap<String, String>> column;
+
+	    if (descriptor.getRenderer().isPresent()) {
+
+		GridColumnRenderer<?> renderer = descriptor.getRenderer().get();
+
+		column = addColumn(renderer);
+
+		renderer.getLegend().ifPresent(tabContent::addLegend);
+
+		legendsViewer = renderer.getLegend().isPresent();
+
+	    } else {
+
+		column = addColumn(new MapValueProvider(descriptor.getColumnName()));
+
+		column.setEditorComponent(new TextArea());
+	    }
+
+	    column.setKey(descriptor.getColumnName());
+
+	    column.setResizable(true);
+
+	    if (!descriptor.isColumnVisible()) {
+
+		column.setVisible(false);
+	    }
+
+	    column.setSortable(descriptor.isSortable());//
+
+	    if (descriptor.getComparator().isPresent()) {
+
+		column.setComparator(descriptor.getComparator().get());
+	    }
+
+	    if (descriptor.getColumnName().equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
+
+		column.setHeader("");
+
+	    } else {
+
+		column.setHeader(descriptor.getColumnName());
+	    }
+
+	    if (descriptor.getColumnWidth() > 0) {
+
+		column.setWidth(descriptor.getColumnWidth() + "px");
+		column.setFlexGrow(0);
+
+	    } else {
+
+		// column.setAutoWidth(true);
+		column.setFlexGrow(1);
+	    }
+
+	    if (descriptor.isFiltered() || (descriptor.getRenderer().isPresent() && //
+		    !(descriptor.getRenderer().get() instanceof ViewerColumnRenderer))) {
+
+		addFilter(descriptor, column);
+	    }
+	});
+
+	//
+	// computes the grid height
+
+	// no columns header / legends viewer and no tab sheet
+	int _offset = ComponentFactory.MIN_HEIGHT_OFFSET;
+
+	if ((gridInfo.isShowColumnsHider() || legendsViewer)) {
+
+	    _offset = !withTabSheet ? ComponentFactory.MIN_HEIGHT_OFFSET + 30 : ComponentFactory.MIN_HEIGHT_OFFSET + 90;
+	}
+
+	final int offset = _offset;
+
+	UI.getCurrent().getPage().retrieveExtendedClientDetails(receiver -> {
+
+	    int screenHeight = receiver.getScreenHeight();
+	    setHeight(screenHeight - offset, Unit.PIXELS);
+	});
+
+	//
+	//
+	//
+
+	setPageSize(gridInfo.getPageSize());
+    }
+
+    /**
+     * @return
+     */
+    public Component createColumnsHider() {
+
+	return new ColumnsHider(this, gridInfo);
+    }
+
+    /**
+     * @return
+     */
+    public Component createLegendViewer(List<Component> legends) {
+
+	return new LegendViewer(legends);
+    }
+
+    /**
+     * @param component
+     */
+    public void addSettingComponent(SettingComponent component) {
+
+	HashMap<String, String> item = createItems(Collections.singletonList(component.getSetting())).getFirst();
+
+	this.dataProvider.getItems().add(item);
+
+	this.dataProvider.refreshAll();
+    }
+
+    /**
+     * @param oldComponent
+     * @param newComponent
+     */
+    public void replaceSettingComponent(SettingComponent oldComponent, SettingComponent newComponent) {
+
+	HashMap<String, String> hashMap = dataProvider.getItems().stream()
+		.filter(map -> map.get("identifier").equals(oldComponent.getSetting().getIdentifier())).findFirst().get();
+
+	this.dataProvider.getItems().remove(hashMap);
+
+	HashMap<String, String> items = createItems(Collections.singletonList(newComponent.getSetting())).getFirst();
+
+	this.dataProvider.getItems().add(items);
+
+	this.dataProvider.refreshAll();
+    }
+
+    /**
+     * Setting id is also required since when we get here, the setting has already been removed from the configuration so the method
+     * SettingComponent.getSetting would fail because the setting would be searched in the configuration
+     *
+     * @param component
+     * @param settingIdentifier
+     */
+    public void removeSettingComponent(SettingComponent component, String settingIdentifier) {
+
+	HashMap<String, String> items = dataProvider.//
+		getItems().//
+		stream().//
+		filter(map -> map.get("identifier").equals(settingIdentifier)).//
+		findFirst().//
+		get();
+
+	this.dataProvider.getItems().remove(items);
+
+	this.dataProvider.refreshAll();
+    }
+
+    /**
+     * @param settingIdentifiers
+     */
+    public void removeSettingComponents(List<String> settingIdentifiers) {
+
+	List<HashMap<String, String>> list = settingIdentifiers.//
+		stream().map(id -> dataProvider.//
+		getItems().//
+		stream().//
+		filter(map -> map.get("identifier").equals(id)).//
+		findFirst().//
+		get()).toList();
+
+	this.dataProvider.getItems().removeAll(list);
+
+	this.dataProvider.refreshAll();
+    }
+
+    /**
+     * @return
+     */
+    private HashMap<String, Boolean> createSelectionMap() {
+
+	List<String> selIds = getSelectedItems().//
+		stream().//
+		map(item -> item.get("identifier")).//
+		toList();
+
+	Stream<HashMap<String, String>> items = getListDataView().getItems();
+
+	HashMap<String, Boolean> map = new HashMap<>();
+
+	items.forEach(item -> {
+
+	    String identifier = item.get("identifier");
+
+	    if (selIds.contains(identifier)) {
+
+		map.put(identifier, true);
+
+	    } else {
+
+		map.put(identifier, false);
+	    }
+	});
+
+	return map;
+    }
+
+    /**
+     * @param configuration
+     * @param eventItem
+     * @return
+     */
+    private Optional<Setting> findEventSetting(Configuration configuration, Optional<HashMap<String, String>> eventItem) {
+
+	return configuration.list().//
+		stream().//
+		filter(s -> eventItem.isPresent() && s.getIdentifier().equals(eventItem.get().get("identifier"))).//
+		findFirst();
+    }
+
+    /**
+     * @param configuration
+     * @param readOnly
+     * @param container
+     * @return
+     */
+    private Renderer<HashMap<String, String>> createItemDetailsRenderer(//
+	    Configuration configuration,//
+	    boolean readOnly,//
+	    TabContent container) {
+
+	return new ComponentRenderer<>((source) -> {
+
+	    String settingId = source.get("identifier");
+
+	    SettingComponent comp = SettingComponentFactory.createSettingComponent(//
+		    configuration, //
+		    configuration.get(settingId).get(), //
+		    readOnly, //
+		    false,// forceHideHeader
+		    container);
+
+	    comp.getElement().getStyle().set("border", "2px solid #f4f5f8");
+	    comp.getElement().getStyle().set("padding-left", "10px");
+	    comp.getElement().getStyle().set("padding-right", "10px");
+	    comp.getElement().getStyle().set("padding-top", "10px");
+	    comp.getElement().getStyle().set("border-radius", "0");
+
+	    comp.getElement().getStyle().set("width", "auto");
+
+	    return comp;
+	});
+    }
+
+    /**
+     * @param descriptor
+     * @param column
+     */
+    private void addFilter(ColumnDescriptor descriptor, Grid.Column<HashMap<String, String>> column) {
+
+	//
+	//
+	//
+
+	if (filterRow == null) {
+
+	    filterRow = appendHeaderRow();
+
+	    gridFilter = new GridFilter();
+
+	    dataProvider.setFilter(item -> gridFilter.test(item));
+	}
+
+	//
+	//
+	//
+
+	TextField filterField = new TextField();
+	filterField.getStyle().set("font-size", "13px");
+
+	filterField.addValueChangeListener(event -> {
+
+	    gridFilter.filter(tabContent.getTabDesc().getLabel(), descriptor.getColumnName(), event.getValue());
+
+	    dataProvider.refreshAll();
+	});
+
+	filterField.setValueChangeMode(ValueChangeMode.EAGER);
+
+	filterRow.getCell(column).setComponent(filterField);
+
+	filterField.setSizeFull();
+	filterField.setPlaceholder("Filter");
+	filterField.getElement().setAttribute("focus-target", "");
+
+	GridFilter.get(
+		tabContent.getTabDesc().getLabel(),//
+		descriptor.getColumnName()).//
+		ifPresent(filterField::setValue);
+    }
+
+    /**
+     * A {@link Grid} of {@link Setting} would be to heavy to handle, so we convert each {@link Setting} in a {@link HashMap} of strings,
+     * according to the value providers retrieved from the given <code>gridInfo</code>
+     *
+     * @param gridInfo
+     * @param list
+     * @return
+     */
+    private ArrayList<HashMap<String, String>> createItems(List<Setting> list) {
+
+	ArrayList<HashMap<String, String>> items = new ArrayList<>();
+
+	list.forEach(setting -> {
+
+	    HashMap<String, String> map = new HashMap<>();
+
+	    map.put("identifier", setting.getIdentifier());
+
+	    gridInfo.getColumnsDescriptors().forEach(desc -> {
+
+		String columnName = desc.getColumnName();
+
+		ValueProvider<Setting, String> valueProvider = desc.getValueProvider();
+
+		if (valueProvider != null) {
+
+		    String value = valueProvider.apply(setting);
+
+		    map.put(columnName, value);
+		}
+	    });
+
+	    items.add(map);
+	});
+
+	return items;
+    }
+
+    /**
+     * Provides values from the given map, according to the supplied column name which is used as map key
+     *
+     * @author Fabrizio
+     */
+    private class MapValueProvider implements ValueProvider<HashMap<String, String>, String> {
+
+	private final String column;
+
+	/**
+	 * The column name used as map key
+	 *
+	 * @param column
+	 */
+	private MapValueProvider(String column) {
+
+	    this.column = column;
+	}
+
+	@Override
+	public String apply(HashMap<String, String> source) {
+
+	    if (column.equals(ColumnDescriptor.POSITIONAL_COLUMN_NAME)) {
+
+		return String.valueOf(//
+			GridComponent.this.getListDataView().//
+				getItems().//
+				toList().//
+				indexOf(source) + 1);
+	    }
+
+	    return source.get(column);
+	}
+    }
+}

@@ -45,15 +45,24 @@ import eu.essi_lab.model.exceptions.GSException;
  */
 public class ServletListener implements ServletContextListener {
 
+    /**
+     * @param sce the ServletContextEvent containing the ServletContext that is being initialized
+     */
     public void contextInitialized(final ServletContextEvent sce) {
 
 	// TMP dir check
 	String tmpDir = System.getProperty("java.io.tmpdir");
+
 	File tmpDirFile = new File(tmpDir);
+
 	if (!tmpDirFile.exists()) {
+
 	    GSLoggerFactory.getLogger(getClass()).error("Creating Java TMP dir as it was not found: {}", tmpDir);
+
 	    boolean success = tmpDirFile.mkdir();
+
 	    if (!success) {
+
 		GSLoggerFactory.getLogger(getClass()).error("Java TMP dir not found and unable to create it: {}", tmpDir);
 		System.exit(1);
 	    }
@@ -86,9 +95,12 @@ public class ServletListener implements ServletContextListener {
 	GSLoggerFactory.getLogger(ServletListener.class).info("DAB initialization time: {}", chronometer.formatElapsedTime());
     }
 
+    /**
+     * @param sce the ServletContextEvent containing the ServletContext that is being destroyed
+     */
     public void contextDestroyed(ServletContextEvent sce) {
 
-	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng STARTED");
+	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroying STARTED");
 
 	try {
 	    StorageInfo uri = ConfigurationWrapper.getStorageInfo();
@@ -111,12 +123,12 @@ public class ServletListener implements ServletContextListener {
 
 	} catch (SchedulerException e) {
 
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 
 	    System.exit(1);
 	}
 
-	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroyng ENDED");
+	GSLoggerFactory.getLogger(ServletListener.class).info("Context destroying ENDED");
     }
 
     private DABStarter getStarter() {

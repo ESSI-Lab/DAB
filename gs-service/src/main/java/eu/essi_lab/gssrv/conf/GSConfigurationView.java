@@ -265,6 +265,35 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
+     * Forces the reload of the source configuration so in this node, the changes are already available without waiting for the
+     * autoreload.<br> The source configuration, provided by {@link ConfigurationWrapper}, is read-only and it can dispatch only
+     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_FORCED_RELOADED} events after the flush of the cloned
+     * configuration
+     */
+    @Override
+    protected void onConfigurationFlushed() {
+
+	//
+	// in very particular cases, the configuration can be flushed also without
+	// pressing the save button,
+	// for example in case of ServicesTabDescriptor where a menu handler
+	// can start/stop a service. in that case, the service setting is replaced with an
+	// enabled/disabled setting, and the config is flushed. this changes also enable
+	// the save button in #configurationChanged and here, it is disabled again
+	//
+	getSaveButton().setEnabled(false);
+
+	try {
+
+	    DABStarter.configuration.reload();
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	}
+    }
+
+    /**
      * @param event
      */
     @Override
@@ -473,16 +502,15 @@ public class GSConfigurationView extends ConfigurationView {
     }
 
     /**
-     * This method is called every time the client window is loaded.<br> Returns a clone with disabled autoreload of the
+     * This method is called when the client window is loaded.<br> Returns a clone with disabled autoreload of the
      * {@link DABStarter#configuration}. Changes applied to this configuration instance are not applied to the source configuration until
-     * this configuration is flushed and the source configuration performs the autoreload.<br> This avoid to apply intermediate
-     * configuration changes to the source configuration which is the core of the {@link ConfigurationWrapper}.<br> When this cloned
-     * configuration is flushed, the source configuration and all the other instances of the other suite nodes will apply the changes in
-     * maximum <i>autoreload-time</i>, that is currently set in 30 seconds.<br>
+     * this configuration is <i>flushed</i> and the source configuration performs the autoreload.<br> This avoids to apply intermediate
+     * configuration changes to the source configuration which is the core of the {@link ConfigurationWrapper}. It also allows to compare
+     * the two configurations to enable/disable the save button.<br> When this cloned configuration is flushed, the source configuration of
+     * this node is suddenly updated (see {@link SaveConfirmationDialog#onConfigurationFlushConfirmed()}).<br> The other cluster nodes,
+     * having only a single read-only copy of the source configuration, will apply the changes in maximum <i>autoreload-time</i>, that is
+     * currently set in 5 minutes.<br>
      * <br>
-     * The source event is read-only and has the autoreload enabled, so this is the only event that the configuration can dispatch. Because
-     * of this, in order to receive these events, this view should register itself as listener also to the source configuration (the
-     * registration to the this returned instance is done by the superclass). At the moment this is not done since not strictly required
      */
     @Override
     protected Configuration initConfiguration() {
@@ -498,7 +526,7 @@ public class GSConfigurationView extends ConfigurationView {
 	return Arrays.asList(//
 		new AsynchDownloadDescriptor(),//
 		new ViewsDescriptor(),//
-		new ManagedServiceSettingTabDescriptorProvider(),//
+		new ServicesTabDescriptor(),//
 		new AugmenterWorkerSetting.TabDescriptorProvider(),//
 		new CustomTaskSetting.TabDescriptorProvider(),//
 		new OAuthSetting.TabDescriptorProvider(),//

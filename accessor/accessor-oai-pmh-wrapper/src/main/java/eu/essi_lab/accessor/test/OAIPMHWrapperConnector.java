@@ -54,6 +54,9 @@ public class OAIPMHWrapperConnector extends HarvestedQueryConnector<OAIPMHWrappe
 
     private static final int SETS_STEP = 10;
 
+    /** Records emitted in the current harvesting run (across resumption batches). */
+    private int harvestRecordCount;
+
     @Override
     public String getType() {
 
@@ -81,6 +84,15 @@ public class OAIPMHWrapperConnector extends HarvestedQueryConnector<OAIPMHWrappe
 
 	int index = request.getResumptionToken() != null ? Integer.valueOf(request.getResumptionToken()) : 0;
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	if (!unlimited && mr.isPresent() && harvestRecordCount >= mr.get()) {
+	    ListRecordsResponse<OriginalMetadata> empty = new ListRecordsResponse<>();
+	    empty.setResumptionToken(null);
+	    harvestRecordCount = 0;
+	    return empty;
+	}
+
 	try {
 
 	    if (sets == null) {
@@ -96,6 +108,12 @@ public class OAIPMHWrapperConnector extends HarvestedQueryConnector<OAIPMHWrappe
 	    int end = Math.min(index + SETS_STEP, sets.size());
 
 	    for (int i = index; i < end; i++) {
+
+		if (!unlimited && mr.isPresent() && harvestRecordCount >= mr.get()) {
+		    response.setResumptionToken(null);
+		    harvestRecordCount = 0;
+		    return response;
+		}
 
 		String set = sets.get(i);
 
@@ -125,6 +143,7 @@ public class OAIPMHWrapperConnector extends HarvestedQueryConnector<OAIPMHWrappe
 		metadataRecord.setMetadata(metadata);
 
 		response.addRecord(metadataRecord);
+		harvestRecordCount++;
 
 		GSLoggerFactory.getLogger(getClass()).info("SET [{}/{}] '{}' ENDED", (i + 1), sets.size(), set);
 	    }
@@ -132,7 +151,8 @@ public class OAIPMHWrapperConnector extends HarvestedQueryConnector<OAIPMHWrappe
 	    if (end == sets.size()) {
 
 		response.setResumptionToken(null);
-		
+		harvestRecordCount = 0;
+
 	    } else {
 
 		index += SETS_STEP;

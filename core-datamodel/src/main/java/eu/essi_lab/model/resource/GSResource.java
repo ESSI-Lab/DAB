@@ -24,8 +24,11 @@ package eu.essi_lab.model.resource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+
+import javax.xml.transform.stream.StreamSource;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -312,13 +315,19 @@ public abstract class GSResource extends DOMSerializer {
 
 	Unmarshaller unmarshaller = new GSResource() {
 	}.createUnmarshaller();
-	GSResource ret = (GSResource) unmarshaller.unmarshal(stream);
+	// Match create(String): decode as UTF-8 characters before parsing. Unmarshalling a raw
+	// InputStream lets SAX apply the declared encoding and strict UTF-8 checks on bytes, which
+	// breaks for the same payloads that IOUtils.toString(..., UTF_8) + create(String) accept.
+	InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
 	try {
-	    stream.close();
-	} catch (IOException e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return (GSResource) unmarshaller.unmarshal(new StreamSource(reader));
+	} finally {
+	    try {
+		reader.close();
+	    } catch (IOException e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+	    }
 	}
-	return ret;
     }
 
     @Override

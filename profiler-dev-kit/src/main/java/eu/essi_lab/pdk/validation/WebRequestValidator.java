@@ -41,7 +41,7 @@ public interface WebRequestValidator {
      * the error description.<br>
      * When a <code>RequestValidator</code> is dispatched to handle the {@link WebRequest}, the {@link Profiler} first
      * invokes
-     * this method and only if the validation is successful, the query execution can proceeds
+     * this method and only if the validation is successful, the query execution can proceed
      */
-    public ValidationMessage validate(WebRequest request) throws GSException;
+    ValidationMessage validate(WebRequest request) throws GSException;
 }

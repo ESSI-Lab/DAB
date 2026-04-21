@@ -81,20 +81,19 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
 
 
-	Optional<String> optionalView = webRequest.extractViewId();
-	String viewId = optionalView.isPresent() ? optionalView.get() : null;
-
 	return new StreamingOutput() {
 
 	    @Override
 	    public void write(OutputStream output) throws IOException, WebApplicationException {
+
+		Optional<String> optionalView = webRequest.extractViewId();
+		String viewId = optionalView.isPresent() ? optionalView.get() : null;
+
 		OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 		if (viewId == null) {
-		    writer.write("A view id is needed to get metrics");
-		    writer.flush();
-		    writer.close();
-		    return;
+		    viewId = "all-sources";
 		}
+
 		getS3TransferManager();
 		if (manager.isPresent()) {
 		    File tmpFile = File.createTempFile(getClass().getSimpleName() + "-" + viewId, ".txt");

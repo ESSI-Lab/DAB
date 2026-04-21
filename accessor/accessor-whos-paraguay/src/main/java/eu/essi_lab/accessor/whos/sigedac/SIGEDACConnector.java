@@ -129,18 +129,34 @@ public class SIGEDACConnector extends HarvestedQueryConnector<SIGEDACConnectorSe
 	    if (stationList.isEmpty())
 		populateStations(client);
 
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+
 	    if (start < stationList.size()) {
 
+		// maxRecords limits metadata records (partialNumbers), not station index
+		if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		    ret.setResumptionToken(null);
+		    partialNumbers = 0;
+		    return ret;
+		}
+
 		SIGEDACStation station = stationList.get(start);
-		int variableCount = 0;
+		int addedThisStation = 0;
+		boolean stoppedByMax = false;
 		GSLoggerFactory.getLogger(getClass()).info("Adding station " + station.getName());
-		for (RESOLUTION r : RESOLUTION.values()) {
+		res: for (RESOLUTION r : RESOLUTION.values()) {
 		    String sId = station.getId();
 		    if(r.resolution.equals("null")) {
 			sId = station.getCode();
 		    }
 		    List<SIGEDACProperty> variables = client.getProperties(sId, r.resolution);
 		    for (SIGEDACProperty variable : variables) {
+
+			if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+			    stoppedByMax = true;
+			    break res;
+			}
 
 			Dataset dataset = new Dataset();
 			dataset.setSource(source.get());
@@ -328,22 +344,22 @@ public class SIGEDACConnector extends HarvestedQueryConnector<SIGEDACConnectorSe
 			record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 			record.setMetadata(dataset.asString(true));
 			ret.addRecord(record);
-			variableCount++;
+			partialNumbers++;
+			addedThisStation++;
 		    }
 		}
-		partialNumbers += variableCount;
-		ret.setResumptionToken(String.valueOf(start + 1));
 
-		GSLoggerFactory.getLogger(getClass()).info("Found {} variable for station {} ", variableCount, station.getName());
-		if (getSetting().getMaxRecords().isPresent() && start == getSetting().getMaxRecords().get()) {
-
-		    GSLoggerFactory.getLogger(getClass())
-			    .info("Max number of stations [" + getSetting().getMaxRecords().get() + "] reached");
+		if (stoppedByMax) {
 		    ret.setResumptionToken(null);
-
+		    partialNumbers = 0;
+		    GSLoggerFactory.getLogger(getClass()).info("Max records reached after {} variables for station {}",
+			    addedThisStation, station.getName());
 		    return ret;
 		}
-		// }
+
+		ret.setResumptionToken(String.valueOf(start + 1));
+
+		GSLoggerFactory.getLogger(getClass()).info("Found {} variable for station {} ", addedThisStation, station.getName());
 		GSLoggerFactory.getLogger(getClass()).info("Stations added");
 	    } else {
 		ret.setResumptionToken(null);

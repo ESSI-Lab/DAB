@@ -122,25 +122,6 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
     }
 
     /**
-     * @param id
-     * @param clazz
-     * @return
-     */
-    public static ManagedServiceSetting of(String id, Class<? extends ManagedService> clazz) {
-
-	ManagedServiceSetting setting = new ManagedServiceSetting();
-
-	setting.loadServiceImpl();
-
-	setting.setServiceId(id);
-	setting.selectImpl(clazz.getName());
-
-	SelectionUtils.deepClean(setting);
-
-	return setting;
-    }
-
-    /**
      * @author Fabrizio
      */
     public static class ManagedServiceValidator implements Validator {
@@ -299,7 +280,7 @@ public class ManagedServiceSetting extends Setting implements EditableSetting, K
 		filter(service -> service.getType().equals(getSelectedImpl())).//
 		map(ManagedService::getClass). //
 		findFirst().//
-		get();//
+		orElse(null);
     }
 
     @Override

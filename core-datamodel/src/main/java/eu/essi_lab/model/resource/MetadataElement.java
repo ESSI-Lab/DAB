@@ -611,12 +611,13 @@ public enum MetadataElement implements Queryable {
     //
     // WORLDCEREAL SPECIFIC QUERYABLES
     //
-    CROP_TYPES(MetadataElement.CROP_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), QUANTITY_TYPES(
-	    MetadataElement.QUANTITY_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), LAND_COVER_TYPES(
-	    MetadataElement.LAND_COVER_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), IRRIGATION_TYPES(
-	    MetadataElement.IRRIGATION_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), CONFIDENCE_CROP_TYPE("cropConfidence",
-	    ContentType.DOUBLE), CONFIDENCE_IRR_TYPE("irrigationConfidence", ContentType.DOUBLE), CONFIDENCE_LC_TYPE("landCoverConfidence",
-	    ContentType.DOUBLE),
+    CROP_TYPES(MetadataElement.CROP_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    QUANTITY_TYPES(MetadataElement.QUANTITY_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    LAND_COVER_TYPES(MetadataElement.LAND_COVER_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    IRRIGATION_TYPES(MetadataElement.IRRIGATION_TYPES_EL_NAME, false, true, ContentType.TEXTUAL, true), //
+    CONFIDENCE_CROP_TYPE("cropConfidence", ContentType.DOUBLE), //
+    CONFIDENCE_IRR_TYPE("irrigationConfidence", ContentType.DOUBLE), //
+    CONFIDENCE_LC_TYPE("landCoverConfidence", ContentType.DOUBLE),
 
     // ----------------------------------------------------------
     //

@@ -72,6 +72,10 @@ public class DemoConnector extends HarvestedQueryConnector<DemoConnectorSetting>
 
 	    ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
 
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
+
 	    //
 	    // - 3 -
 	    //
@@ -83,6 +87,10 @@ public class DemoConnector extends HarvestedQueryConnector<DemoConnectorSetting>
 	    //
 
 	    for (String href : hrefLinks) {
+
+		if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		    break;
+		}
 
 		Downloader downloader = new Downloader();
 		Optional<String> jsonMetadata = downloader.downloadString(href);
@@ -96,6 +104,7 @@ public class DemoConnector extends HarvestedQueryConnector<DemoConnectorSetting>
 		    original.setSchemeURI(DemoMapper.DEMO_METADATA_SCHEMA);
 
 		    response.addRecord(original);
+		    added++;
 		}
 	    }
 

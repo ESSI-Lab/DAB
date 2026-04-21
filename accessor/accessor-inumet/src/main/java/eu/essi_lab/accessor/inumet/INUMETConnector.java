@@ -24,6 +24,7 @@ package eu.essi_lab.accessor.inumet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.json.JSONObject;
 
@@ -82,7 +83,16 @@ public class INUMETConnector extends HarvestedQueryConnector<INUMETConnectorSett
 
 	    JSONObject metadata = new JSONObject();
 
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
+
 	    for (Map<String, String> station : stations) {
+
+		if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		    break;
+		}
+
 		JSONObject stationJson = new JSONObject();
 		for (String key : station.keySet()) {
 		    String value = station.get(key);
@@ -94,6 +104,7 @@ public class INUMETConnector extends HarvestedQueryConnector<INUMETConnectorSett
 		metadataRecord.setSchemeURI(CommonNameSpaceContext.INUMET_URI);
 		metadataRecord.setMetadata(metadata.toString());
 		ret.addRecord(metadataRecord);
+		added++;
 	    }
 
 	}

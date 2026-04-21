@@ -141,6 +141,7 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 
 	if (id == null) {
 	    siteNumber = 0;
+	    recordsReturned = 0;
 	} else {
 	    siteNumber = decodeResumptionToken(id);
 	}
@@ -159,6 +160,7 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 		} else {
 		    ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 		    ret.setResumptionToken(null);
+		    recordsReturned = 0;
 		    return ret;
 		}
 	    }
@@ -249,6 +251,7 @@ public class CUAHSIHISServerConnector<C extends FirstSiteConnectorSetting> exten
 			GSLoggerFactory.getLogger(this.getClass()).info("Reached max records of {}", mr.get());
 
 			ret.setResumptionToken(null);
+			recordsReturned = 0;
 
 			return ret;
 

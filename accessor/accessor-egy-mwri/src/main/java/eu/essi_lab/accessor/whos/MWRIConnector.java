@@ -95,10 +95,19 @@ public class MWRIConnector extends HarvestedQueryConnector<MWRIConnectorSetting>
 
 	try {
 	    List<MWRIStation> stations = client.getStations();
-	    for (MWRIStation station : stations) {
+
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
+
+	    stations: for (MWRIStation station : stations) {
 		GSLoggerFactory.getLogger(getClass()).info("Adding station " + station.getName());
 
 		for (MWRIParameter variable : MWRIParameter.values()) {
+
+		    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+			break stations;
+		    }
 
 		    Dataset dataset = new Dataset();
 		    dataset.setSource(source.get());
@@ -236,6 +245,7 @@ public class MWRIConnector extends HarvestedQueryConnector<MWRIConnectorSetting>
 		    record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 		    record.setMetadata(dataset.asString(true));
 		    ret.addRecord(record);
+		    added++;
 		}
 	    }
 	    GSLoggerFactory.getLogger(getClass()).info("Stations added");

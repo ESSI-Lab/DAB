@@ -38,6 +38,7 @@ import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
+import eu.essi_lab.cfga.gs.setting.service.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
@@ -46,6 +47,7 @@ import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.*;
 import eu.essi_lab.cfga.source.*;
 import eu.essi_lab.configuration.*;
+import eu.essi_lab.gssrv.conf.*;
 import eu.essi_lab.gssrv.conf.task.*;
 import eu.essi_lab.gssrv.health.*;
 import eu.essi_lab.gssrv.servlet.*;
@@ -286,38 +288,46 @@ public class DABStarter implements ConfigurationChangeListener {
 	MultiServiceManager.get().setSettings(configSettings);
     }
 
+    /**
+     * The source configuration is read-only, it can dispatch only
+     * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_FORCED_RELOADED} events after the flush of the cloned
+     * configuration
+     *
+     * @param event
+     * @see GSConfigurationView#onConfigurationFlushed()
+     */
     @Override
     public void configurationChanged(ConfigurationChangeEvent event) {
 
-	if (MultiServiceManager.isInitialized() && (event.getEventType() == CONFIGURATION_FLUSHED
-		|| event.getEventType() == CONFIGURATION_AUTO_RELOADED)) {
+	if (MultiServiceManager.isInitialized()) {
 
 	    switch (mode) {
 	    case MIXED, LOCAL_PRODUCTION, SERVICE, BATCH, CONFIGURATION -> {
 
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating MultiServiceManager definitions STARTED");
+
 		updateServiceDefinitions();
+
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating MultiServiceManager definitions ENDED");
 	    }
 	    }
 	}
 
-	if (event.getEventType() == CONFIGURATION_AUTO_RELOADED) {
+	switch (mode) {
+	case BATCH, AUGMENTER, BULK -> {
 
-	    switch (mode) {
-	    case BATCH, AUGMENTER, BULK -> {
+	    if (!schedulerSetting.equals(ConfigurationWrapper.getSchedulerSetting())) {
 
-		if (!schedulerSetting.equals(ConfigurationWrapper.getSchedulerSetting())) {
+		GSLoggerFactory.getLogger(DABStarter.class).info("Detected scheduler setting changes");
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler STARTED");
 
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Detected scheduler setting changes");
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler STARTED");
+		schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 
-		    schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+		SchedulerFactory.getScheduler(schedulerSetting, true);
 
-		    SchedulerFactory.getScheduler(schedulerSetting, true);
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler ENDED");
-		}
+		GSLoggerFactory.getLogger(DABStarter.class).info("Updating scheduler ENDED");
 	    }
-	    }
+	}
 	}
     }
 
@@ -479,19 +489,11 @@ public class DABStarter implements ConfigurationChangeListener {
 	    } else {
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating configuration from existing source");
-		configuration = new Configuration(source, ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,
-			ConfigurationWrapper.CONFIG_RELOAD_TIME);
-	    }
 
-	    //
-	    // in execution mode CONFIGURATION and MIXED there is no need to autoreload
-	    // since there is only one node, no shared configuration (also in
-	    // LOCAL_PRODUCTION mode
-	    // but this is done in the next rows...)
-	    //
-	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED) {
-
-		configuration.pauseAutoreload();
+		configuration = new Configuration(//
+			source, //
+			ConfigurationWrapper.CONFIG_RELOAD_TIME_UNIT,//
+			ConfigurationWrapper.CONFIG_RELOAD_TIME);//
 	    }
 
 	    //
@@ -529,9 +531,6 @@ public class DABStarter implements ConfigurationChangeListener {
 	    if (mode == ExecutionMode.LOCAL_PRODUCTION) {
 
 		GSLoggerFactory.getLogger(DABStarter.class).info("Creating local config with VOLATILE job store STARTED");
-
-		// pause the autoreload to the current config instance, probably not required...
-		configuration.pauseAutoreload();
 
 		//
 		// disables email delivery of reports
@@ -650,6 +649,15 @@ public class DABStarter implements ConfigurationChangeListener {
 	    customPatch.patch();
 
 	    //
+	    // in these mode there is no need to autoreload
+	    // since there is only one node, no shared configuration
+	    //
+	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED || mode == LOCAL_PRODUCTION) {
+
+		configuration.pauseAutoreload();
+	    }
+
+	    //
 	    //
 	    // ---------------------------------------------------------------
 
@@ -658,6 +666,17 @@ public class DABStarter implements ConfigurationChangeListener {
 	    ConfigurationWrapper.setConfiguration(configuration);
 
 	    configuration.addChangeEventListener(this);
+
+	    if (!configuration.isAutoreloadPaused()) {
+
+		GSLoggerFactory.getLogger(DABStarter.class)
+			.info("Configuration auto-reload time: {} {}", configuration.getAutoreloadInterval().orElse(-1),
+				configuration.getAutoreloadTimeUnit().orElse(null));
+
+	    } else {
+
+		GSLoggerFactory.getLogger(DABStarter.class).info("Configuration auto-reload disabled");
+	    }
 
 	    GSLoggerFactory.getLogger(DABStarter.class).info("Initializing configuration ENDED");
 

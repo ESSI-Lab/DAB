@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 
@@ -75,7 +76,16 @@ public class CSWTestDataConnector extends HarvestedQueryConnector<CSWTestDataCon
 		"Record_ab42a8c4-95e8-4630-bf79-33e59241605a.xml" };
 
 	try {
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
+
 	    for (String record : records) {
+
+		if (!unlimited && mr.isPresent() && added >= mr.get()) {
+		    break;
+		}
+
 		GSLoggerFactory.getLogger(getClass()).info("Loading record: " + record);
 		InputStream stream = CSWTestDataConnector.class.getClassLoader().getResourceAsStream("csw-test-data/" + record);
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -87,6 +97,7 @@ public class CSWTestDataConnector extends HarvestedQueryConnector<CSWTestDataCon
 		metadata.setSchemeURI(CommonNameSpaceContext.CSW_NS_URI);
 		metadata.setMetadata(str);
 		ret.addRecord(metadata);
+		added++;
 	    }
 	} catch (IOException e) {
   	    

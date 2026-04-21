@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,8 @@ public class AVISOConnector extends HarvestedQueryConnector<AVISOConnectorSettin
     public AVISOConnector() {
     }
 
+    private int partialNumbers;
+
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 
@@ -80,6 +83,14 @@ public class AVISOConnector extends HarvestedQueryConnector<AVISOConnectorSettin
 
 	ListRecordsResponse<OriginalMetadata> response = new ListRecordsResponse<>();
 
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+	    response.setResumptionToken(null);
+	    partialNumbers = 0;
+	    return response;
+	}
+
 	if (start + offset < names.size()) {
 	    end = start + offset;
 	    response.setResumptionToken(String.valueOf(end));
@@ -88,6 +99,12 @@ public class AVISOConnector extends HarvestedQueryConnector<AVISOConnectorSettin
 	}
 
 	for (int i = start; i < end; i++) {
+
+	    if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		response.setResumptionToken(null);
+		partialNumbers = 0;
+		return response;
+	    }
 
 	    String fileName = names.get(i);
 
@@ -120,6 +137,7 @@ public class AVISOConnector extends HarvestedQueryConnector<AVISOConnectorSettin
 		metadata.setAdditionalInfo(propertyHandler);
 
 		response.addRecord(metadata);
+		partialNumbers++;
 
 	    } catch (Exception ex) {
 
@@ -129,6 +147,9 @@ public class AVISOConnector extends HarvestedQueryConnector<AVISOConnectorSettin
 	    GSLoggerFactory.getLogger(getClass()).info("Handling file [" + i + "/" + names.size() + "] " + fileName + " ENDED");
 	}
 
+	if (start + offset >= names.size()) {
+	    partialNumbers = 0;
+	}
 	return response;
     }
 

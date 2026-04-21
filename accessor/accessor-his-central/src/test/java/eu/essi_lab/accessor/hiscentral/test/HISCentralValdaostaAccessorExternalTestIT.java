@@ -163,6 +163,9 @@ public class HISCentralValdaostaAccessorExternalTestIT {
 
 	List<GSResource> recordsAsList = listRecordsResponse.getRecordsAsList();
 
+	for(GSResource record : recordsAsList) {
+	    System.out.println(record.getOriginalMetadata().getMetadata());
+	}
 	Assert.assertEquals(64, recordsAsList.size());
 
 	GSResource gsResource = recordsAsList.get(0);
@@ -174,4 +177,12 @@ public class HISCentralValdaostaAccessorExternalTestIT {
 	Assert.assertTrue(object.has("dataset-info"));
 	Assert.assertTrue(object.has("sensor-info"));
     }
+
+    public static void main(String[] args) throws Exception {
+	HISCentralValdaostaConnector.email = System.getProperty("aosta.user");
+	HISCentralValdaostaConnector.password = System.getProperty("aosta.password");
+	HISCentralValdaostaAccessorExternalTestIT it = new HISCentralValdaostaAccessorExternalTestIT();
+	it.listRecordsTest();
+    }
+
 }

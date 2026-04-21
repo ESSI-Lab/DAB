@@ -210,7 +210,9 @@ GIAPI.UI_Utils = new function(){
     *  @static
     */
     obj.openNodeInfoPage = function(dabNode, targetNodeId){
-    	
+
+		 targetNodeId = encodeURIComponent(targetNodeId);
+
     	 var endpoint = dabNode.endpoint();
     	 if(!endpoint.endsWith('/')){
     		 endpoint += '/';

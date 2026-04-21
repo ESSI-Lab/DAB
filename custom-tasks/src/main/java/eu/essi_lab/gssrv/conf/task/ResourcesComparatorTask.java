@@ -55,10 +55,11 @@ import org.opensearch.client.opensearch.core.*;
 import org.quartz.*;
 
 import java.util.*;
+import java.util.function.*;
 import java.util.stream.*;
 
 /**
- * This task must be embedded
+ * Embedded task executed before harvesting end
  *
  * @author Fabrizio
  */
@@ -103,6 +104,8 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.KEYWORD.getName());
 	DEFAULT_COMPARISON_PROPERTIES.add(MetadataElement.ONLINE_LINKAGE.getName());
     }
+
+    private String kafkaTopic;
 
     /**
      *
@@ -215,65 +218,15 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    // successive harvesting, comparing data-1 and data-2 folders
 		    //
 
-		    List<String> currIds = new ArrayList<>();
-		    List<String> prevIds = new ArrayList<>();
-
-		    if (worker.isData1WritingFolder()) {
-
-			currIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
-			prevIds.addAll(data2Folder.listIdentifiers(IdentifierType.PUBLIC));
-
-		    } else {
-
-			currIds.addAll(data2Folder.listIdentifiers(IdentifierType.PUBLIC));
-			prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
-		    }
-
-		    //
-		    // deleted
-		    //
-
-		    deletedRecords = prevIds.//
-			    parallelStream().//
-			    filter(id -> !currIds.contains(id)).//
-			    collect(Collectors.toList());
-		    //
-		    // new
-		    //
-
-		    newRecords = currIds.//
-			    parallelStream().//
-			    filter(id -> !prevIds.contains(id)).//
-			    collect(Collectors.toList());
-
-		    //
-		    // common
-		    //
-
-		    comparisonFields = comparisonFields.stream().map(f -> {
-
-			if (f.equals(MetadataElement.BOUNDING_BOX.getName())) {
-
-			    return DataFolderMapping.toHashField(MetadataElement.BOUNDING_BOX.getName());
-			}
-
-			return f;
-
-		    }).toList();
-
-		    List<List<String>> partition = Lists.partition(comparisonFields, maxAggFields);
-
-		    for (List<String> fields : partition) {
-
-			Map<String, List<String>> result = compare(//
-				((OpenSearchDatabase) finder.getDatabase()).getClient(), //
-				fields, //
-				gsSource.getUniqueIdentifier(),//
-				aggregationPageSize, //
-				maxValuesPerField);//
-
-			result.keySet().forEach(key -> modifiedRecords.put(key, result.get(key)));
-		    }
+		    handleFullHarvesting( //
+			    worker,//
+			    comparisonFields,//
+			    maxAggFields,//
+			    finder,//
+			    gsSource,//
+			    aggregationPageSize,//
+			    maxValuesPerField,//
+			    modifiedRecords);//
 		}
 
 		break;
@@ -284,101 +237,15 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		// successive selective harvesting
 		//
 
-		//
-		// 1) searching for new records. if the returned records are in the ListRecordsRequest modified list,
-		// they will be removed from the new records list
-		//
+		handleSelectiveHarvesting( //
+			worker,//
+			gsSource,//
+			discoveryPageSize,//
+			finder,//
+			queryables,//
+			modifiedRecords);//
 
-		Optional<SearchAfter> searchAfter = Optional.empty();
-
-		do {
-
-		    String startTimeStamp = worker.getStartTimeStamp();
-		    String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
-
-		    ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
-			    ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
-
-		    ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.LESS,
-			    ResourceProperty.RESOURCE_TIME_STAMP, untilDateStamp);
-
-		    ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
-
-		    LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
-
-		    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
-
-		    discoveryMessage.setExcludeResourceBinary(true);
-		    discoveryMessage.setUseCachedSourcesDataFolderMap(false);
-
-		    ResourceSelector resourceSelector = new ResourceSelector();
-		    resourceSelector.addIndex(MetadataElement.IDENTIFIER);
-
-		    discoveryMessage.setResourceSelector(resourceSelector);
-		    discoveryMessage.setSources(List.of(gsSource));
-		    discoveryMessage.setUserBond(andBond);
-		    discoveryMessage.setNormalizedBond(andBond);
-		    discoveryMessage.setPermittedBond(andBond);
-		    discoveryMessage.setIncludeDeleted(false);
-		    discoveryMessage.setPage(new Page(1, discoveryPageSize));
-
-		    searchAfter.ifPresent(discoveryMessage::setSearchAfter);
-
-		    ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
-
-		    resultSet.//
-			    getResultsList().//
-			    forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER.getName()).getFirst()));
-
-		    searchAfter = resultSet.getSearchAfter();
-
-		} while (searchAfter.isPresent());
-
-		//
-		// 2) deleted records
-		//
-
-		getListRecordsRequest().getIncrementalDeletedResources().forEach(res -> deletedRecords.add(res.getOriginalId().get()));
-
-		//
-		// 3) modified records
-		//
-
-		//
-		// these are the previous records, now replaced by the ones in the writing folder
-		// with the same original ids
-		//
-		List<GSResource> modifiedResources = getListRecordsRequest().//
-			getIncrementalModifiedResources().//
-			stream().//
-			// deleted records can be found also in the modified records list, they must be discarded
-				filter(res -> !deletedRecords.contains(res.getOriginalId().get())).//
-				filter(res -> res.getOriginalId().isPresent()).//
-				collect(Collectors.toList());
-
-		DatabaseFolder writingFolder = worker.getWritingFolder();
-
-		for (GSResource modified : modifiedResources) {
-
-		    // modified records are also new (because of the resource time stamp), so here they are removed from
-		    // the new records list
-		    newRecords.remove(modified.getPublicId());
-
-		    GSResource incoming = writingFolder.get(IdentifierType.PUBLIC, modified.getPublicId()).get();
-
-		    ComparisonResponse response = GSResourceComparator.compare(queryables, incoming, modified);
-
-		    // at least one change is expected!
-		    if (!response.getProperties().isEmpty()) {
-
-			for (Queryable prop : response.getProperties()) {
-
-			    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
-
-			    list.add(modified.getPublicId());
-			}
-		    }
-		}
+		break;
 	    }
 	} else {
 
@@ -432,6 +299,208 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	return "Resources comparator task";
     }
 
+    @Override
+    public ExecutionStage getExecutionStage() {
+
+	return ExecutionStage.BEFORE_HARVESTING_END;
+    }
+
+    /**
+     * @param worker
+     * @param comparisonFields
+     * @param maxAggFields
+     * @param finder
+     * @param gsSource
+     * @param aggregationPageSize
+     * @param maxValuesPerField
+     * @param modifiedRecords
+     * @throws Exception
+     */
+    private void handleFullHarvesting( //
+	    SourceStorageWorker worker, //
+	    List<String> comparisonFields, //
+	    int maxAggFields, //
+	    DatabaseFinder finder,//
+	    GSSource gsSource, //
+	    int aggregationPageSize, //
+	    int maxValuesPerField, //
+	    Map<String, List<String>> modifiedRecords) throws Exception {
+
+	//
+	// successive harvesting, comparing data-1 and data-2 folders
+	//
+
+	List<String> currIds = new ArrayList<>();
+	List<String> prevIds = new ArrayList<>();
+
+	if (worker.isData1WritingFolder()) {
+
+	    currIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
+	    prevIds.addAll(data2Folder.listIdentifiers(IdentifierType.PUBLIC));
+
+	} else {
+
+	    currIds.addAll(data2Folder.listIdentifiers(IdentifierType.PUBLIC));
+	    prevIds.addAll(data1Folder.listIdentifiers(IdentifierType.PUBLIC));
+	}
+
+	//
+	// deleted
+	//
+
+	deletedRecords = prevIds.//
+		parallelStream().//
+		filter(id -> !currIds.contains(id)).//
+		collect(Collectors.toList());
+	//
+	// new
+	//
+
+	newRecords = currIds.//
+		parallelStream().//
+		filter(id -> !prevIds.contains(id)).//
+		collect(Collectors.toList());
+
+	//
+	// common
+	//
+
+	List<List<String>> partition = Lists.partition(comparisonFields, maxAggFields);
+
+	for (List<String> fields : partition) {
+
+	    Map<String, List<String>> result = compare(//
+		    ((OpenSearchDatabase) finder.getDatabase()).getClient(), //
+		    fields, //
+		    gsSource.getUniqueIdentifier(),//
+		    aggregationPageSize, //
+		    maxValuesPerField, //
+		    deletedRecords, //
+		    newRecords);//
+
+	    result.keySet().forEach(key -> {
+
+		if (!result.get(key).isEmpty()) {
+
+		    modifiedRecords.put(key, result.get(key));
+		}
+	    });
+	}
+    }
+
+    /**
+     * @param worker
+     * @param gsSource
+     * @param discoveryPageSize
+     * @param finder
+     * @param queryables
+     * @param modifiedRecords
+     * @throws Exception
+     */
+    private void handleSelectiveHarvesting(SourceStorageWorker worker, //
+	    GSSource gsSource,  //
+	    int discoveryPageSize, //
+	    DatabaseFinder finder, //
+	    List<Queryable> queryables, //
+	    Map<String, List<String>> modifiedRecords) throws Exception {
+
+	//
+	// 1) searching for new records. if the returned records are in the ListRecordsRequest modified list,
+	// they will be removed from the new records list
+	//
+
+	Optional<SearchAfter> searchAfter = Optional.empty();
+
+	do {
+
+	    String startTimeStamp = worker.getStartTimeStamp();
+	    String untilDateStamp = ISO8601DateTimeUtils.getISO8601DateTimeWithMilliseconds();
+
+	    ResourcePropertyBond minTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.GREATER_OR_EQUAL,
+		    ResourceProperty.RESOURCE_TIME_STAMP, String.valueOf(startTimeStamp));
+
+	    ResourcePropertyBond maxTimeStampBond = BondFactory.createResourcePropertyBond(BondOperator.LESS,
+		    ResourceProperty.RESOURCE_TIME_STAMP, untilDateStamp);
+
+	    ResourcePropertyBond sourceIdBond = BondFactory.createSourceIdentifierBond(gsSource.getUniqueIdentifier());
+
+	    LogicalBond andBond = BondFactory.createAndBond(minTimeStampBond, maxTimeStampBond, sourceIdBond);
+
+	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+
+	    discoveryMessage.setExcludeResourceBinary(true);
+	    discoveryMessage.setUseCachedSourcesDataFolderMap(false);
+
+	    ResourceSelector resourceSelector = new ResourceSelector();
+	    resourceSelector.addIndex(MetadataElement.IDENTIFIER);
+
+	    discoveryMessage.setResourceSelector(resourceSelector);
+	    discoveryMessage.setSources(List.of(gsSource));
+	    discoveryMessage.setUserBond(andBond);
+	    discoveryMessage.setNormalizedBond(andBond);
+	    discoveryMessage.setPermittedBond(andBond);
+	    discoveryMessage.setIncludeDeleted(false);
+	    discoveryMessage.setPage(new Page(1, discoveryPageSize));
+
+	    searchAfter.ifPresent(discoveryMessage::setSearchAfter);
+
+	    ResultSet<GSResource> resultSet = finder.discover(discoveryMessage);
+
+	    resultSet.//
+		    getResultsList().//
+		    forEach(res -> newRecords.add(res.getIndexesMetadata().read(MetadataElement.IDENTIFIER.getName()).getFirst()));
+
+	    searchAfter = resultSet.getSearchAfter();
+
+	} while (searchAfter.isPresent());
+
+	//
+	// 2) deleted records
+	//
+
+	getListRecordsRequest().getIncrementalDeletedResources().forEach(res -> deletedRecords.add(res.getOriginalId().get()));
+
+	//
+	// 3) modified records
+	//
+
+	//
+	// these are the previous records, now replaced by the ones in the writing folder
+	// with the same original ids
+	//
+	List<GSResource> modifiedResources = getListRecordsRequest().//
+		getIncrementalModifiedResources().//
+		stream().//
+		// deleted records can be found also in the modified records list, they must be discarded
+			filter(res -> !deletedRecords.contains(res.getOriginalId().get())).//
+			filter(res -> res.getOriginalId().isPresent()).//
+			collect(Collectors.toList());
+
+	DatabaseFolder writingFolder = worker.getWritingFolder();
+
+	for (GSResource modified : modifiedResources) {
+
+	    // modified records are also new (because of the resource time stamp), so here they are removed from
+	    // the new records list
+	    newRecords.remove(modified.getPublicId());
+
+	    GSResource incoming = writingFolder.get(IdentifierType.PUBLIC, modified.getPublicId()).get();
+
+	    ComparisonResponse response = GSResourceComparator.compare(queryables, incoming, modified);
+
+	    // at least one change is expected!
+	    if (!response.getProperties().isEmpty()) {
+
+		for (Queryable prop : response.getProperties()) {
+
+		    List<String> list = modifiedRecords.computeIfAbsent(prop.getName(), k -> new ArrayList<>());
+
+		    list.add(modified.getPublicId());
+		}
+	    }
+	}
+    }
+
     /**
      * @param source
      * @param topic
@@ -446,35 +515,33 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
     /**
      * @param source
-     * @param topic
+     * @param property
      * @param modified
      * @param client
      * @return
      */
-    private String buildTopic(GSSource source, String topic, boolean modified, MessagePublisher client) {
+    private String buildTopic(GSSource source, String property, boolean modified, MessagePublisher client) {
 
 	if (client instanceof KafkaPublisher) {
 
-	    topic = modified ? "modified_" + topic : topic;
-
-	    return "dab_" + source.getUniqueIdentifier() + "_" + topic;
+	    return kafkaTopic;
 	}
 
-	topic = modified ? "modified/" + topic : topic;
+	property = modified ? "modified/" + property : property;
 
-	return "dab/" + source.getUniqueIdentifier() + "/" + topic;
+	return "dab/" + source.getUniqueIdentifier() + "/" + property;
     }
 
     /**
-     * @param list
+     * @param idsList
      * @param sourceId
      * @param event
      * @param property
      * @return
      */
-    private String buildMessage(List<String> list, String sourceId, String event, Optional<String> property) {
+    private String buildMessage(List<String> idsList, String sourceId, String event, Optional<String> property) {
 
-	return list.stream().map(id -> {
+	return idsList.stream().map(id -> {
 
 	    JSONObject object = new JSONObject();
 	    object.put("metadataId", id);
@@ -531,6 +598,19 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    KafkaPublisher client = new KafkaPublisher(kafkaHost, Integer.parseInt(kafkaPort));
 
 		    //
+		    // topic
+		    //
+
+		    kafkaTopic = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_TOPIC.getLabel());
+
+		    if (kafkaTopic == null) {
+
+			GSLoggerFactory.getLogger(getClass()).error("Kafka topic not found!");
+
+			return Optional.empty();
+		    }
+
+		    //
 		    // security
 		    //
 
@@ -551,6 +631,12 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    if (securityProtocol.isPresent() && saslMechanism.isPresent() && kafkaUser.isPresent() && kafkaPwd.isPresent()) {
 
 			client.setSecurity(securityProtocol.get(), saslMechanism.get(), kafkaUser.get(), kafkaPwd.get());
+
+		    } else {
+
+			GSLoggerFactory.getLogger(getClass()).error("One or more required Kafka settings not found!");
+
+			return Optional.empty();
 		    }
 
 		    //
@@ -585,17 +671,14 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	return Optional.empty();
     }
 
-    @Override
-    public ExecutionStage getExecutionStage() {
-
-	return ExecutionStage.BEFORE_HARVESTING_END;
-    }
-
     /**
      * @param client
      * @param targetFields
      * @param sourceId
      * @param aggregationPageSize
+     * @param maxValuesPerField
+     * @param deletedRecords
+     * @param newRecords
      * @return
      * @throws Exception
      */
@@ -604,16 +687,33 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    List<String> targetFields, //
 	    String sourceId, //
 	    int aggregationPageSize, //
-	    int maxValuesPerField)//
+	    int maxValuesPerField,//
+	    List<String> deletedRecords, //
+	    List<String> newRecords)//
 	    throws Exception {
 
 	Map<String, String> afterKey = null;
 
 	Map<String, List<String>> out = new HashMap<>();
 
+	List<String> exclusions = new ArrayList<>(deletedRecords);
+	exclusions.addAll(newRecords);
+
+	Function<String, String> map = (field) -> switch (MetadataElement.fromName(field).getContentType()) {
+	    case TEXTUAL -> IndexMapping.toKeywordField(field);
+	    case SPATIAL -> IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName());
+	    default -> field;
+	};
+
 	targetFields.forEach(field -> out.put(field, new ArrayList<>()));
 
+	String compositeName = "by_fileId";
+
 	while (true) {
+
+	    //
+	    // request
+	    //
 
 	    Map<String, String> finalAfterKey = afterKey;
 
@@ -623,22 +723,34 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		subAggs.put(field, //
 			Aggregation.of(a -> a //
-				.terms(t -> t.field(IndexMapping.toKeywordField("dataFolder")).size(2)) //
-				.aggregations("values",
-					v -> v.terms(tt -> tt //
-						.field(field.equals(IndexMapping.toHashField(MetadataElement.BOUNDING_BOX.getName()))
-							? field
-							: IndexMapping.toKeywordField(field)) //
-						.size(maxValuesPerField)))));
+				.terms(t -> t.field(IndexMapping.toKeywordField(MetaFolderMapping.DATA_FOLDER)).size(2)) //
+				.aggregations("values", v -> v.terms(tt -> tt //
+					.field(map.apply(field)) //
+					.size(maxValuesPerField)))));
 	    }
 
 	    SearchRequest.Builder builder = new SearchRequest.Builder();
 
 	    SearchRequest request = builder.index(DataFolderMapping.get().getIndex()).size(0) //
 
-		    .query(q -> q.term(t -> t.field(IndexMapping.toKeywordField("sourceId")).value(FieldValue.of(sourceId)))) //
+		    .query(q -> q.bool(b -> {
 
-		    .aggregations("by_fileId", a -> //
+			// filtering by source id
+			b.must(m -> m.term(
+				t -> t.field(IndexMapping.toKeywordField(MetaFolderMapping.SOURCE_ID)).value(FieldValue.of(sourceId))));
+
+			// excluding new and deleted records
+			if (!exclusions.isEmpty()) {
+
+			    b.mustNot(mn -> //
+				    mn.terms(t -> t.field(IndexMapping.toKeywordField(MetadataElement.IDENTIFIER.getName())).//
+					    terms(v -> v.value(exclusions.stream().map(FieldValue::of).toList()))));//
+			}
+
+			return b;
+		    }))
+
+		    .aggregations(compositeName, a -> //
 
 			    a.composite(c -> {
 
@@ -646,10 +758,10 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 					CompositeAggregationSource fileIdSource = new CompositeAggregationSource.Builder()//
 
-						.terms(t -> t.field(IndexMapping.toKeywordField("fileId"))).build();//
+						.terms(t -> t.field(IndexMapping.toKeywordField(MetadataElement.IDENTIFIER.getName()))).build();//
 
 					//noinspection unchecked
-					c.sources(Map.of("fileId", fileIdSource));//
+					c.sources(Map.of(MetadataElement.IDENTIFIER.getName(), fileIdSource));//
 
 					if (finalAfterKey != null) {
 
@@ -663,6 +775,10 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    ).build();
 
+	    //
+	    // response
+	    //
+
 	    SearchResponse<Void> response = client.search(request, Void.class);
 
 	    if (!OpenSearchDatabase.debugQueries()) {
@@ -674,11 +790,15 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		GSLoggerFactory.getLogger(getClass()).debug(resObject.toString(3));
 	    }
 
-	    CompositeAggregate composite = response.aggregations().get("by_fileId").composite();
+	    //
+	    // compares fields values of records with same fileId in data-1 and data-2 folder
+	    //
+
+	    CompositeAggregate composite = response.aggregations().get(compositeName).composite();
 
 	    for (CompositeBucket bucket : composite.buckets().array()) {
 
-		String fileId = bucket.key().get("fileId").toString();
+		String fileId = bucket.key().get(MetadataElement.IDENTIFIER.getName()).to(String.class);
 
 		Map<String, Aggregate> aggs = bucket.aggregations();
 
@@ -700,13 +820,34 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			String folder = folderBucket.key();
 
-			StringTermsAggregate values = folderBucket.aggregations().get("values").sterms();
+			Set<String> targetSet = SourceStorageWorker.DATA_1_SHORT_POSTFIX.equals(folder) ? values1 : values2;
 
-			Set<String> targetSet = "data-1".equals(folder) ? values1 : values2;
+			Aggregate aggregate = folderBucket.aggregations().get("values");
 
-			for (StringTermsBucket v : values.buckets().array()) {
+			if (aggregate.isSterms()) {
 
-			    targetSet.add(v.key());
+			    StringTermsAggregate values = aggregate.sterms();
+
+			    for (StringTermsBucket v : values.buckets().array()) {
+
+				targetSet.add(v.key());
+			    }
+			} else if (aggregate.isLterms()) {
+
+			    LongTermsAggregate longValues = aggregate.lterms();
+
+			    for (LongTermsBucket v : longValues.buckets().array()) {
+
+				targetSet.add(v.key());
+			    }
+			} else if (aggregate.isDterms()) {
+
+			    DoubleTermsAggregate values = aggregate.dterms();
+
+			    for (DoubleTermsBucket v : values.buckets().array()) {
+
+				targetSet.add(String.valueOf(v.key()));
+			    }
 			}
 		    }
 
@@ -717,10 +858,18 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		}
 	    }
 
+	    //
+	    // loop termination check
+	    //
+
 	    if (composite.buckets().array().size() < aggregationPageSize) {
 
 		break;
 	    }
+
+	    //
+	    // search after
+	    //
 
 	    Map<String, JsonData> rawAfterKey = composite.afterKey();
 
@@ -729,7 +878,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		afterKey = new HashMap<>();
 
 		String key = rawAfterKey.keySet().iterator().next();
-		String value =  rawAfterKey.get(key).to(String.class);
+		String value = rawAfterKey.get(key).to(String.class);
 
 		afterKey.put(key, value);
 
@@ -746,5 +895,4 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	return out;
     }
-
 }

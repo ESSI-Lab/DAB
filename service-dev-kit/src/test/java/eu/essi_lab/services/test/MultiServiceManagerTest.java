@@ -1,5 +1,6 @@
 package eu.essi_lab.services.test;
 
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.services.*;
 import eu.essi_lab.services.impl.*;
 import redis.clients.jedis.*;
@@ -16,23 +17,23 @@ public class MultiServiceManagerTest {
     public static void main(String[] args) throws Exception {
 
 	JedisPool pool = new JedisPool("localhost", 6379);
-//
+	//
 	Jedis resource = pool.getResource();
-//
+	//
 	String ping = resource.ping();
 
 	String nodeId = java.net.InetAddress.getLocalHost().getHostName();
 
-	ManagedServiceSetting set0 = ManagedServiceSetting.of("0", TestService.class);
-	ManagedServiceSetting set1 = ManagedServiceSetting.of("1", TestService.class);
-	ManagedServiceSetting set2 = ManagedServiceSetting.of("2", TestService.class);
-	ManagedServiceSetting set3 = ManagedServiceSetting.of("3", TestService.class);
-	ManagedServiceSetting set4 = ManagedServiceSetting.of("4", TestService.class);
-	ManagedServiceSetting set5 = ManagedServiceSetting.of("5", TestService.class);
-	ManagedServiceSetting set6 = ManagedServiceSetting.of("6", TestService.class);
-	ManagedServiceSetting set7 = ManagedServiceSetting.of("7", TestService.class);
-	ManagedServiceSetting set8 = ManagedServiceSetting.of("8", TestService.class);
-	ManagedServiceSetting set9 = ManagedServiceSetting.of("9", TestService.class);
+	ManagedServiceSetting set0 = create("0", TestService.class);
+	ManagedServiceSetting set1 = create("1", TestService.class);
+	ManagedServiceSetting set2 = create("2", TestService.class);
+	ManagedServiceSetting set3 = create("3", TestService.class);
+	ManagedServiceSetting set4 = create("4", TestService.class);
+	ManagedServiceSetting set5 = create("5", TestService.class);
+	ManagedServiceSetting set6 = create("6", TestService.class);
+	ManagedServiceSetting set7 = create("7", TestService.class);
+	ManagedServiceSetting set8 = create("8", TestService.class);
+	ManagedServiceSetting set9 = create("9", TestService.class);
 
 	ManagedService service = set0.createService();
 
@@ -143,4 +144,24 @@ public class MultiServiceManagerTest {
 	//
 
     }
+
+    /**
+     * @param id
+     * @param clazz
+     * @return
+     */
+    private static ManagedServiceSetting create(String id, Class<? extends ManagedService> clazz) {
+
+	ManagedServiceSetting setting = new ManagedServiceSetting();
+
+	setting.loadServiceImpl();
+
+	setting.setServiceId(id);
+	setting.selectImpl(clazz.getName());
+
+	SelectionUtils.deepClean(setting);
+
+	return setting;
+    }
+
 }

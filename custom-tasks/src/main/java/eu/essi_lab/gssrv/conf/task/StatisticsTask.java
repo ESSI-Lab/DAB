@@ -41,6 +41,7 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.access.availability.AvailabilityMonitor;
 import eu.essi_lab.access.availability.DownloadInformation;
 import eu.essi_lab.api.database.Database;
+import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
@@ -55,12 +56,15 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.HarvestingProperties;
+import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
+import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -77,12 +81,18 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * 
  * Task options (line-based {@code KEY=value}):
  * <ul>
- * <li>{@code VIEW_ID} — required view identifier</li>
+ * <li>{@code VIEW_ID} — optional view identifier; when omitted, aggregate statistics and metadata completeness use all
+ * sources with no view bond (per-source counts include every record for that source). When set, the view’s bond
+ * restricts which records completeness percentages apply to; if the view id is invalid, metadata completeness metrics
+ * are skipped</li>
  * <li>{@code METRICS} — optional comma-separated list of {@link StatisticsMetric} names; when omitted, all metrics are
  * computed</li>
  * <li>{@code METADATA_COMPLETENESS_ELEMENTS} — optional comma-separated {@link MetadataElement} identifiers for
  * {@link StatisticsMetric#METADATA_COMPLETENESS}: enum names (e.g. {@code IDENTIFIER,TITLE,BOUNDING_BOX}) or harmonized
  * index names (e.g. {@code fileId,title,bbox}); when omitted, defaults to {@code IDENTIFIER,TITLE}</li>
+ * <li>{@code RECORDS_PER_ELEMENT_ELEMENTS} — comma-separated {@link MetadataElement} identifiers for
+ * {@link StatisticsMetric#RECORDS_PER_ELEMENT} (same token syntax as {@code METADATA_COMPLETENESS_ELEMENTS}); when this
+ * metric is enabled and the line is missing or has no valid entries, the metric is skipped</li>
  * <li>{@code METADATA_SET_COMPLETENESS} — comma-separated set names for {@link StatisticsMetric#METADATA_SET_COMPLETENESS}
  * (e.g. {@code core,optional})</li>
  * <li>{@code METADATA_SET_COMPLETENESS_&lt;name&gt;} — for each set name, comma-separated {@link MetadataElement} values;
@@ -90,6 +100,77 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * {@code METADATA_SET_COMPLETENESS_core=IDENTIFIER} and
  * {@code METADATA_SET_COMPLETENESS_optional=IDENTIFIER,TITLE,BOUNDING_BOX}</li>
  * </ul>
+ *
+ * <h3>Available Prometheus metrics ({@link StatisticsMetric})</h3>
+ * <p>
+ * Each metric is registered as a Micrometer/Prometheus gauge. Most are per {@code source_id}; metadata completeness
+ * metrics use {@code VIEW_ID} when set to filter records, or all records per source when it is omitted. Subset via
+ * {@code METRICS}.
+ * </p>
+ * <dl>
+ * <dt>{@link StatisticsMetric#SOURCE_INFO SOURCE_INFO} ({@code source_info})</dt>
+ * <dd>Constant {@code 1} used as a carrier for labels {@code source_id} and {@code source_label} (human-readable name),
+ * so monitoring systems can resolve source identity alongside other series.</dd>
+ *
+ * <dt>{@link StatisticsMetric#DOWNLOAD_AVAILABILITY DOWNLOAD_AVAILABILITY} ({@code download_availability})</dt>
+ * <dd>{@code 1} if the last successful download is newer than the last failed download (or there is no failed download),
+ * {@code 0} otherwise. Reflects whether downloads from the source are currently considered available.</dd>
+ *
+ * <dt>{@link StatisticsMetric#HARVESTED_RECORDS HARVESTED_RECORDS} ({@code harvested_records})</dt>
+ * <dd>Number of harvested time series for the source (from semantic statistics: time series count).</dd>
+ *
+ * <dt>{@link StatisticsMetric#LAST_HARVESTING_UNIX_TIMESTAMP_MS LAST_HARVESTING_UNIX_TIMESTAMP_MS}
+ * ({@code last_harvesting_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch <b>milliseconds</b> of the last harvesting run end time, from harvesting properties. Omitted if no end
+ * timestamp is stored.</dd>
+ *
+ * <dt>{@link StatisticsMetric#LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS
+ * LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS} ({@code last_successful_ingestion_harvest_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch <b>milliseconds</b> of the last <b>completed</b> harvest end time when {@link HarvestingProperties}
+ * reports {@code resourcesCount &gt; 0} and {@link SourceStorageWorker#consolidatedFolderSurvives()} matches
+ * {@link ResourcesComparatorTask}: the consolidated snapshot does not “survive” (optional empty or {@code false}), i.e.
+ * the same situation where remote-sourced records are processed for comparison. Omitted when the last run was not
+ * completed, left no resources, consolidated survives, or end time is missing.</dd>
+ *
+ * <dt>{@link StatisticsMetric#SOURCE_UP SOURCE_UP} ({@code source_up})</dt>
+ * <dd>{@code 1} if the source is marked up in harvesting properties, {@code 0} if down or unknown.</dd>
+ *
+ * <dt>{@link StatisticsMetric#CONNECTIVITY_TEST_DURATION_MS CONNECTIVITY_TEST_DURATION_MS}
+ * ({@code connectivity_test_duration_ms})</dt>
+ * <dd>Duration in milliseconds of the last connectivity test toward the source. Omitted if not recorded.</dd>
+ *
+ * <dt>{@link StatisticsMetric#CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS}
+ * ({@code connectivity_test_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch milliseconds when the last connectivity test completed for the source. Omitted if not recorded.</dd>
+ *
+ * <dt>{@link StatisticsMetric#LAST_SOURCE_UP_UNIX_TIMESTAMP_MS LAST_SOURCE_UP_UNIX_TIMESTAMP_MS}
+ * ({@code last_source_up_unix_timestamp_ms})</dt>
+ * <dd>Unix epoch milliseconds when the source was last observed as up during a connectivity test. Omitted if not
+ * recorded.</dd>
+ *
+ * <dt>{@link StatisticsMetric#PLATFORMS_TOTAL PLATFORMS_TOTAL} ({@code platforms_total})</dt>
+ * <dd>Total number of platforms (sites) for the source in semantic statistics.</dd>
+ *
+ * <dt>{@link StatisticsMetric#VARIABLES_TOTAL VARIABLES_TOTAL} ({@code variables_total})</dt>
+ * <dd>Total number of variables (attributes) for the source in semantic statistics.</dd>
+ *
+ * <dt>{@link StatisticsMetric#METADATA_COMPLETENESS METADATA_COMPLETENESS} ({@code metadata_completeness})</dt>
+ * <dd>Per metadata element, the fraction of records (for that source) where the element is present, within the
+ * {@code VIEW_ID} filter if set, otherwise among all records of the source. Expressed as a percentage {@code 0–100}.
+ * Series are distinguished by label {@code element} (see {@code METADATA_COMPLETENESS_ELEMENTS}).</dd>
+ *
+ * <dt>{@link StatisticsMetric#METADATA_SET_COMPLETENESS METADATA_SET_COMPLETENESS} ({@code metadata_set_completeness})</dt>
+ * <dd>Per named set, the fraction of records (for that source) where <b>all</b> elements in that set are present
+ * (logical AND), within the {@code VIEW_ID} filter if set, otherwise among all records of the source. Percentage
+ * {@code 0–100}. Series use label {@code element_set} (see {@code METADATA_SET_COMPLETENESS} and
+ * {@code METADATA_SET_COMPLETENESS_&lt;name&gt;}).</dd>
+ *
+ * <dt>{@link StatisticsMetric#RECORDS_PER_ELEMENT RECORDS_PER_ELEMENT} ({@code records_per_element})</dt>
+ * <dd>Per metadata element and per distinct indexed value, the number of records for that source (absolute count).
+ * Labels: {@code source_id}, {@code element} (lowercase enum name, same as metadata completeness), {@code value}. Uses
+ * the same view/source scope as metadata completeness; configure elements via {@code RECORDS_PER_ELEMENT_ELEMENTS}.</dd>
+ * </dl>
+ *
  * Legacy: a single line without {@code =} is treated as the view id (same as only {@code VIEW_ID} before).
  * 
  * @author boldrini
@@ -100,6 +181,8 @@ public class StatisticsTask extends AbstractCustomTask {
 	VIEW_ID,
 	METRICS,
 	METADATA_COMPLETENESS_ELEMENTS,
+	/** Comma-separated {@link MetadataElement} selectors for {@link StatisticsMetric#RECORDS_PER_ELEMENT}. */
+	RECORDS_PER_ELEMENT_ELEMENTS,
 	/** Comma-separated set names; members defined by {@code METADATA_SET_COMPLETENESS_<name>=...} lines. */
 	METADATA_SET_COMPLETENESS
     }
@@ -113,10 +196,15 @@ public class StatisticsTask extends AbstractCustomTask {
 	DOWNLOAD_AVAILABILITY("download_availability", "Download availability "),
 	HARVESTED_RECORDS("harvested_records", "Total number of harvested records "),
 	LAST_HARVESTING_UNIX_TIMESTAMP_MS("last_harvesting_unix_timestamp_ms",
-		"Last harvesting end timestamp in epoch seconds"),
+		"Last harvesting end timestamp in Unix epoch milliseconds"),
+	LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS("last_successful_ingestion_harvest_unix_timestamp_ms",
+		"Last completed harvest end time (Unix ms) when resourcesCount>0 and consolidated folder does not survive "
+			+ "(same gate as ResourcesComparatorTask)"),
 	SOURCE_UP("source_up", "Source connectivity status (1=up, 0=down)"),
 	CONNECTIVITY_TEST_DURATION_MS("connectivity_test_duration_ms",
 		"Duration of the last source connectivity test in milliseconds"),
+	CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS("connectivity_test_unix_timestamp_ms",
+		"Unix epoch milliseconds when the last source connectivity test completed"),
 	LAST_SOURCE_UP_UNIX_TIMESTAMP_MS("last_source_up_unix_timestamp_ms",
 		"Unix epoch milliseconds when the source was last observed up in a connectivity test"),
 	PLATFORMS_TOTAL("platforms_total", "Total number of platforms "),
@@ -126,7 +214,11 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	METADATA_SET_COMPLETENESS("metadata_set_completeness",
 		"Per named set: share of records where all listed metadata elements exist (tag element_set); "
-			+ "configured via METADATA_SET_COMPLETENESS and METADATA_SET_COMPLETENESS_<name> lines");
+			+ "configured via METADATA_SET_COMPLETENESS and METADATA_SET_COMPLETENESS_<name> lines"),
+
+	RECORDS_PER_ELEMENT("records_per_element",
+		"Per element and distinct value: record count for the source (tags element, value); "
+			+ "elements from RECORDS_PER_ELEMENT_ELEMENTS");
 
 	private final String prometheusName;
 	private final String description;
@@ -185,6 +277,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	String viewId = null;
 	Set<StatisticsMetric> metrics = EnumSet.allOf(StatisticsMetric.class);
 	List<MetadataElement> metadataCompletenessElements = new ArrayList<>();
+	List<MetadataElement> recordsPerElementElements = new ArrayList<>();
 	List<MetadataCompletenessSet> metadataCompletenessSets = List.of();
 
 	if (structured.isPresent() && !structured.get().isEmpty()) {
@@ -206,37 +299,38 @@ public class StatisticsTask extends AbstractCustomTask {
 	    if (metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)) {
 		metadataCompletenessSets = parseMetadataSetCompleteness(structured.get(), rawTaskOptions.orElse(""));
 	    }
-	}
-
-	if (viewId == null) {
-	    Optional<String> raw = rawTaskOptions;
-	    if (raw.isPresent()) {
-		String r = raw.get().trim();
-		if (!r.contains("=")) {
-		    viewId = r.split("\\R", 2)[0].trim();
+	    String recordsPerElementLine = structured.get().get(StatisticsTaskOptions.RECORDS_PER_ELEMENT_ELEMENTS);
+	    if (recordsPerElementLine != null && !recordsPerElementLine.isBlank()) {
+		List<MetadataElement> parsed = parseMetadataCompletenessElements(recordsPerElementLine);
+		if (parsed.isEmpty()) {
+		    GSLoggerFactory.getLogger(getClass()).warn(
+			    "RECORDS_PER_ELEMENT_ELEMENTS had no valid entries; records_per_element metrics will be skipped");
+		} else {
+		    recordsPerElementElements = parsed;
 		}
 	    }
 	}
 
 	if (viewId == null || viewId.isEmpty()) {
-
-	    GSLoggerFactory.getLogger(getClass()).info("No view specified by statistics task");
-
-	    status.setPhase(JobPhase.CANCELED);
-	    return;
+	    GSLoggerFactory.getLogger(getClass()).info(
+		    "No view specified (VIEW_ID empty); statistics are computed for all sources (no view filter).");
 	}
 
-	if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS) && metadataCompletenessElements.isEmpty()) {
-	    metadataCompletenessElements = new ArrayList<>(List.of(MetadataElement.IDENTIFIER, MetadataElement.TITLE));
+	if (metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT) && recordsPerElementElements.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).warn(
+		    "RECORDS_PER_ELEMENT is enabled but RECORDS_PER_ELEMENT_ELEMENTS is missing or empty; skipping records_per_element metrics");
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info(
-		"Updating metrics for view {} (metrics: {}, metadata completeness elements: {}, metadata set completeness: {})",
-		viewId, metrics, metadataCompletenessElements, metadataCompletenessSets);
+		"Updating metrics for {} (metrics: {}, metadata completeness elements: {}, records per element elements: {}, metadata set completeness: {})",
+		(viewId != null && !viewId.isEmpty()) ? ("view " + viewId) : "all sources (no view)",
+		metrics, metadataCompletenessElements, recordsPerElementElements, metadataCompletenessSets);
 
+	Optional<String> viewIdForStats = (viewId != null && !viewId.isEmpty()) ? Optional.of(viewId) : Optional.empty();
+	String statsArtifactKey = (viewId != null && !viewId.isEmpty()) ? viewId : "all-sources";
 	SourceStatistics sourceStats = null;
 	try {
-	    sourceStats = new SourceStatistics(null, Optional.of(viewId), ResourceProperty.SOURCE_ID);
+	    sourceStats = new SourceStatistics(null, viewIdForStats, ResourceProperty.SOURCE_ID);
 	} catch (Exception e1) {
 	    e1.printStackTrace();
 	}
@@ -247,23 +341,43 @@ public class StatisticsTask extends AbstractCustomTask {
 	HashMap<String, Integer> variables = new HashMap<String, Integer>();
 	HashMap<String, Integer> sourceUp = new HashMap<String, Integer>();
 	HashMap<String, Long> connectivityTestDurationMs = new HashMap<String, Long>();
+	HashMap<String, Long> connectivityTestUnixTimestampMs = new HashMap<String, Long>();
 	HashMap<String, Long> lastSourceUpUnixTimestampMs = new HashMap<String, Long>();
 	HashMap<String, Long> lastHarvestingTime = new HashMap<String, Long>();
+	HashMap<String, Long> lastSuccessfulIngestionHarvestTime = new HashMap<String, Long>();
 
 	HashMap<String, Double> metadataCompleteness = new HashMap<String, Double>();
 	HashMap<String, Double> metadataCompletenessBySet = new HashMap<String, Double>();
+	HashMap<String, Double> recordsPerElement = new HashMap<String, Double>();
 	GSLoggerFactory.getLogger(getClass()).info("source stats completed");
 
 	Optional<View> reportView = Optional.empty();
 	DatabaseFinder discoveryFinder = null;
-	if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS)
-		|| metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)) {
+	DatabaseExecutor databaseExecutor = null;
+	if (metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT) && !recordsPerElementElements.isEmpty()) {
 	    try {
-		reportView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
-		if (reportView.isEmpty()) {
-		    GSLoggerFactory.getLogger(getClass()).warn("View {} not found; metadata completeness metrics will be skipped",
-			    viewId);
+		databaseExecutor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("Cannot obtain database executor for records_per_element: {}", e.getMessage());
+	    }
+	}
+	if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS)
+		|| metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS)
+		|| metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT)) {
+	    try {
+		boolean completenessAllowed = false;
+		if (viewId != null && !viewId.isEmpty()) {
+		    reportView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+		    if (reportView.isEmpty()) {
+			GSLoggerFactory.getLogger(getClass()).warn(
+				"View {} not found; metadata completeness metrics will be skipped", viewId);
+		    } else {
+			completenessAllowed = true;
+		    }
 		} else {
+		    completenessAllowed = true;
+		}
+		if (completenessAllowed) {
 		    discoveryFinder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
 		}
 	    } catch (GSException e) {
@@ -281,6 +395,10 @@ public class StatisticsTask extends AbstractCustomTask {
 	    GSLoggerFactory.getLogger(getClass()).info("Processing source "+source+" "+ ++si+"/"+overallStats.size());
 
 	    GSSource s = ConfigurationWrapper.getSource(source);
+	    if (s==null){
+		GSLoggerFactory.getLogger(getClass()).error("Source "+source+" not found,skipping");
+		continue;
+	    }
 	    if (metrics.contains(StatisticsMetric.SOURCE_INFO)) {
 		Gauge.builder(StatisticsMetric.SOURCE_INFO.prometheusName(), () -> 1)//
 			.description(StatisticsMetric.SOURCE_INFO.description())//
@@ -290,8 +408,10 @@ public class StatisticsTask extends AbstractCustomTask {
 	    try {
 		Stats stats = overallStats.get(source);
 		boolean needHarvestingProps = metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS)
+			|| metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS)
 			|| metrics.contains(StatisticsMetric.SOURCE_UP)
 			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS)
+			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS)
 			|| metrics.contains(StatisticsMetric.LAST_SOURCE_UP_UNIX_TIMESTAMP_MS);
 		HarvestingProperties harvestingProperties = null;
 		if (needHarvestingProps) {
@@ -327,7 +447,7 @@ public class StatisticsTask extends AbstractCustomTask {
 			    register(registry);
 		}
 
-		if (metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS)) {
+		if (metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS) && harvestingProperties != null) {
 		    String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
 		    Optional<Date> lastHarvesting = ISO8601DateTimeUtils.parseISO8601ToDate(endHarvestingTimestamp);
 		    if (lastHarvesting.isPresent()) {
@@ -342,7 +462,32 @@ public class StatisticsTask extends AbstractCustomTask {
 		    }
 		}
 
+		if (metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS)
+			&& harvestingProperties != null) {
+		    if (harvestingProperties.isCompleted().orElse(false) && harvestingProperties.getResourcesCount() > 0) {
+			try {
+			    	String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
+				Optional<Date> endHarvest = ISO8601DateTimeUtils.parseISO8601ToDate(endHarvestingTimestamp);
+				if (endHarvest.isPresent()) {
+				    long ms = endHarvest.get().getTime();
+				    lastSuccessfulIngestionHarvestTime.put(source, ms);
+				    io.micrometer.core.instrument.Gauge.builder(
+					    StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.prometheusName(),
+					    lastSuccessfulIngestionHarvestTime, g -> g.get(source))//
+					    .description(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.description())//
+					    .tag("source_id", source).//
+					    register(registry);
+				}
+
+			} catch (Exception e) {
+			    GSLoggerFactory.getLogger(getClass()).warn("consolidatedFolderSurvives for source {}: {}", source,
+				    e.getMessage());
+			}
+		    }
+		}
+
 		if (metrics.contains(StatisticsMetric.SOURCE_UP)) {
+		    
 		    int up = harvestingProperties.isSourceUp().orElse(false) ? 1 : 0;
 		    sourceUp.put(source, up);
 		    io.micrometer.core.instrument.Gauge.builder(StatisticsMetric.SOURCE_UP.prometheusName(), sourceUp, g -> g.get(source))//
@@ -359,6 +504,19 @@ public class StatisticsTask extends AbstractCustomTask {
 				StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS.prometheusName(), connectivityTestDurationMs,
 				g -> g.get(source))//
 				.description(StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS.description())//
+				.tag("source_id", source).//
+				register(registry);
+		    }
+		}
+
+		if (metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS)) {
+		    Optional<Long> testEndMs = harvestingProperties.getConnectivityTestUnixTimestampMs();
+		    if (testEndMs.isPresent()) {
+			connectivityTestUnixTimestampMs.put(source, testEndMs.get());
+			io.micrometer.core.instrument.Gauge.builder(
+				StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS.prometheusName(), connectivityTestUnixTimestampMs,
+				g -> g.get(source))//
+				.description(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS.description())//
 				.tag("source_id", source).//
 				register(registry);
 		    }
@@ -395,12 +553,11 @@ public class StatisticsTask extends AbstractCustomTask {
 			    register(registry);
 		}
 
-		if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS) && discoveryFinder != null && reportView.isPresent()) {
+		if (metrics.contains(StatisticsMetric.METADATA_COMPLETENESS) && discoveryFinder != null) {
 		    try {
-			View v = reportView.get();
-			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(v, source)).getCount();
+			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(reportView, source)).getCount();
 			for (MetadataElement completenessElement : metadataCompletenessElements) {
-			    double pct = occurrencePercentGivenTotal(discoveryFinder, newDiscoveryMessageForSource(v, source),
+			    double pct = occurrencePercentGivenTotal(discoveryFinder, newDiscoveryMessageForSource(reportView, source),
 				    totalRecords, completenessElement);
 			    final String elementTag = prometheusElementTag(completenessElement);
 			    final String completenessKey = metadataCompletenessKey(source, elementTag);
@@ -417,12 +574,11 @@ public class StatisticsTask extends AbstractCustomTask {
 		    }
 		}
 
-		if (metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS) && discoveryFinder != null && reportView.isPresent()) {
+		if (metrics.contains(StatisticsMetric.METADATA_SET_COMPLETENESS) && discoveryFinder != null) {
 		    try {
-			View v = reportView.get();
-			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(v, source)).getCount();
+			int totalRecords = discoveryFinder.count(newDiscoveryMessageForSource(reportView, source)).getCount();
 			for (MetadataCompletenessSet mcs : metadataCompletenessSets) {
-			    double pct = occurrencePercentAllElements(discoveryFinder, newDiscoveryMessageForSource(v, source),
+			    double pct = occurrencePercentAllElements(discoveryFinder, newDiscoveryMessageForSource(reportView, source),
 				    totalRecords, mcs.elements);
 			    final String setKey = metadataCompletenessSetKey(source, mcs.setNameTag);
 			    metadataCompletenessBySet.put(setKey, pct);
@@ -435,6 +591,30 @@ public class StatisticsTask extends AbstractCustomTask {
 		    } catch (GSException e) {
 			GSLoggerFactory.getLogger(getClass()).warn("metadata set completeness count failed for source {}: {}", source,
 				e.getMessage());
+		    }
+		}
+
+		if (metrics.contains(StatisticsMetric.RECORDS_PER_ELEMENT) && discoveryFinder != null && databaseExecutor != null
+			&& !recordsPerElementElements.isEmpty()) {
+		    try {
+			DiscoveryMessage perSourceMsg = newDiscoveryMessageForSource(reportView, source);
+			for (MetadataElement rel : recordsPerElementElements) {
+			    final String elementTag = prometheusElementTag(rel);
+			    List<TermFrequencyItem> buckets = collectAllTermFrequencies(databaseExecutor, perSourceMsg, rel);
+			    for (TermFrequencyItem item : buckets) {
+				String valueLabel = item.getTerm() != null ? item.getTerm() : "";
+				double n = item.getFreq();
+				String key = recordsPerElementKey(source, elementTag, valueLabel);
+				recordsPerElement.put(key, n);
+				io.micrometer.core.instrument.Gauge.builder(StatisticsMetric.RECORDS_PER_ELEMENT.prometheusName(), recordsPerElement,
+					g -> g.getOrDefault(key, 0.0))//
+					.description(StatisticsMetric.RECORDS_PER_ELEMENT.description())//
+					.tags("source_id", source, "element", elementTag, "value", valueLabel)//
+					.register(registry);
+			    }
+			}
+		    } catch (GSException e) {
+			GSLoggerFactory.getLogger(getClass()).warn("records_per_element failed for source {}: {}", source, e.getMessage());
 		    }
 		}
 
@@ -463,7 +643,7 @@ public class StatisticsTask extends AbstractCustomTask {
 		    && (lastCancelCheckMs == 0 || now - lastCancelCheckMs >= CANCEL_CHECK_INTERVAL_MS)) {
 		lastCancelCheckMs = now;
 		if (ConfigurationWrapper.isJobCanceled(context)) {
-		    GSLoggerFactory.getLogger(getClass()).info("Statistics task CANCELED view id {} ", viewId);
+		    GSLoggerFactory.getLogger(getClass()).info("Statistics task CANCELED (view / artifact key: {})", statsArtifactKey);
 
 		    status.setPhase(JobPhase.CANCELED);
 		    return;
@@ -472,7 +652,8 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Updated metrics for view {}", viewId);
+	GSLoggerFactory.getLogger(getClass()).info("Updated metrics for {}",
+		(viewId != null && !viewId.isEmpty()) ? ("view " + viewId) : "all sources (no view)");
 
 	Optional<S3TransferWrapper> optS3TransferManager = getS3TransferManager();
 
@@ -483,7 +664,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	    S3TransferWrapper manager = optS3TransferManager.get();
 	    manager.setACLPublicRead(true);
 
-	    File tempFile = File.createTempFile(getClass().getSimpleName() + viewId, ".txt");
+	    File tempFile = File.createTempFile(getClass().getSimpleName() + statsArtifactKey, ".txt");
 
 	    String text = registry.scrape();
 
@@ -492,7 +673,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	    manager.uploadFile(
 		    tempFile.getAbsolutePath(), 
 		    "dabreporting", 
-		    "monitoring/" + viewId + ".txt");
+		    "monitoring/" + statsArtifactKey + ".txt");
 
 	    tempFile.delete();
 
@@ -510,6 +691,51 @@ public class StatisticsTask extends AbstractCustomTask {
     private static String metadataCompletenessSetKey(String sourceId, String elementSetTag) {
 
 	return sourceId + '\0' + "s:" + elementSetTag;
+    }
+
+    /**
+     * Same condition as {@link ResourcesComparatorTask} uses to run folder comparison (when the consolidated snapshot does
+     * not “survive” the smart-storage threshold): {@code optional} empty, or present {@code false}.
+     */
+    private static boolean consolidatedFolderDoesNotSurviveComparatorGate(Optional<Boolean> consolidatedFolderSurvives) {
+
+	return consolidatedFolderSurvives.isEmpty() || !consolidatedFolderSurvives.get();
+    }
+
+    private static String recordsPerElementKey(String sourceId, String elementTag, String value) {
+
+	return sourceId + '\0' + "re:" + elementTag + '\0' + value;
+    }
+
+    /**
+     * Walks composite aggregation pages for the given element; returns empty if the backend executor does not support
+     * {@link DatabaseExecutor#getIndexValues}.
+     */
+    private static List<TermFrequencyItem> collectAllTermFrequencies(DatabaseExecutor executor, DiscoveryMessage message,
+	    MetadataElement element) throws GSException {
+
+	message.setPage(new Page(1000));
+	List<TermFrequencyItem> out = new ArrayList<>();
+	String resumption = null;
+	for (int pageIdx = 0; pageIdx < 100_000; pageIdx++) {
+	    ResultSet<TermFrequencyItem> page = executor.getIndexValues(message, element, 0, resumption);
+	    if (page == null) {
+		return out;
+	    }
+	    if (page.getResultsList() != null) {
+		out.addAll(page.getResultsList());
+	    }
+	    Optional<SearchAfter> sa = page.getSearchAfter();
+	    if (sa.isEmpty()) {
+		break;
+	    }
+	    Optional<List<Object>> vals = sa.get().getValues();
+	    if (vals.isEmpty() || vals.get().isEmpty()) {
+		break;
+	    }
+	    resumption = vals.get().get(0).toString();
+	}
+	return out;
     }
 
     static Map<String, String> extractMetadataSetCompletenessDefinitionLines(String raw) {
@@ -613,11 +839,19 @@ public class StatisticsTask extends AbstractCustomTask {
 	return out;
     }
 
-    private static DiscoveryMessage newDiscoveryMessageForSource(View view, String sourceId) {
+    /**
+     * Discovery query for one source. When {@code view} is empty, the view bond is {@link BondFactory#getTrueBond()}
+     * (same as an unconstrained view), so counts include all records for that source.
+     */
+    private static DiscoveryMessage newDiscoveryMessageForSource(Optional<View> view, String sourceId) {
 
+	Bond viewBond = view.map(View::getBond).orElse(BondFactory.getTrueBond());
+	Bond base = BondFactory.createAndBond(viewBond, BondFactory.createSourceIdentifierBond(sourceId));
 	DiscoveryMessage message = new DiscoveryMessage();
-	message.setView(view);
-	Bond base = BondFactory.createAndBond(view.getBond(), BondFactory.createSourceIdentifierBond(sourceId));
+	List<GSSource> sources = new ArrayList<>();
+	sources.add(ConfigurationWrapper.getSource(sourceId));
+	message.setSources(sources);
+	view.ifPresent(message::setView);
 	message.setUserBond(base);
 	message.setPermittedBond(base);
 	return message;
@@ -635,8 +869,10 @@ public class StatisticsTask extends AbstractCustomTask {
 	    return 0.0;
 	}
 	Bond baseClone = baseMessage.getUserBond().get().clone();
-	SimpleValueBond exists = BondFactory.createExistsSimpleValueBond(element);
-	Bond withElement = BondFactory.createAndBond(exists, baseClone);
+	Bond target = getBond(element);
+
+	Bond withElement = BondFactory.createAndBond(target, baseClone);
+
 	baseMessage.setUserBond(withElement);
 	baseMessage.setPermittedBond(withElement);
 	int withCount = finder.count(baseMessage).getCount();
@@ -655,12 +891,25 @@ public class StatisticsTask extends AbstractCustomTask {
 	}
 	Bond combined = baseMessage.getUserBond().get().clone();
 	for (MetadataElement el : elements) {
-	    combined = BondFactory.createAndBond(BondFactory.createExistsSimpleValueBond(el), combined);
+	    combined = BondFactory.createAndBond(getBond(el), combined);
 	}
 	baseMessage.setUserBond(combined);
 	baseMessage.setPermittedBond(combined);
 	int withCount = finder.count(baseMessage).getCount();
 	return 100.0 * withCount / totalRecords;
+    }
+
+    private static Bond getBond(MetadataElement element) {
+	Bond target = null;
+	switch (element){
+	case TEMP_EXTENT:
+	    target = BondFactory.createOrBond(BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_BEGIN),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_END),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_BEGIN_NOW),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_END_NOW),BondFactory.createExistsSimpleValueBond(MetadataElement.TEMP_EXTENT_BEGIN_BEFORE_NOW));
+	    break;
+	default:
+	    target = BondFactory.createExistsSimpleValueBond(element);
+	    break;
+	}
+	return target;
     }
 
     /**

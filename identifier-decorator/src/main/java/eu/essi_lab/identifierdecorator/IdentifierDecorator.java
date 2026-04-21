@@ -316,12 +316,19 @@ public class IdentifierDecorator {
 	return identifier.replace(source.getUniqueIdentifier(), "").replace(PID_SEPARATOR, "");
     }
 
-    public String generatePersistentIdentifier(String originalid, String sourceid) {
+    /**
+     *
+     * @param originalId
+     * @param sourceId
+     * @return
+     */
+    public static String generatePersistentIdentifier(String originalId, String sourceId) {
+
 	StringBuilder builder = new StringBuilder();
 
-	builder.append(originalid);
+	builder.append(originalId);
 	builder.append(PID_SEPARATOR);
-	builder.append(sourceid);
+	builder.append(sourceId);
 
 	return builder.toString();
     }

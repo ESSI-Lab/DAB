@@ -115,10 +115,19 @@ public class MCHConnector extends HarvestedQueryConnector<MCHConnectorSetting> {
 	    MCHClient client = new MCHClient(getSourceURL());
 	    List<MCHStation> stations = client.getStations();
 	    MCHCountry country = client.getCountry();
-	    for (MCHStation station : stations) {
+
+	    Optional<Integer> mr = getSetting().getMaxRecords();
+	    boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	    int added = 0;
+
+	    stations: for (MCHStation station : stations) {
 		GSLoggerFactory.getLogger(getClass()).info("Adding station " + station.getStationName());
 		List<MCHAvailability> avails = client.getAvailability(station.getStationName());
 		for (MCHAvailability avail : avails) {
+
+		    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+			break stations;
+		    }
 
 		    Dataset dataset = new Dataset();
 
@@ -285,6 +294,7 @@ public class MCHConnector extends HarvestedQueryConnector<MCHConnectorSetting> {
 		    record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 		    record.setMetadata(dataset.asString(true));
 		    ret.addRecord(record);
+		    added++;
 
 		}
 	    }

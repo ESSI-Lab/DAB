@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -59,6 +60,9 @@ public class LocalFileSystemConnector extends HarvestedQueryConnector<LocalFileS
     private int dirCount;
     private int filesCount;
     private int validFiles;
+
+    /** Metadata records emitted in the current harvesting run (across resumption lists). */
+    private int harvestEmitted;
 
     /**
      * 
@@ -95,6 +99,14 @@ public class LocalFileSystemConnector extends HarvestedQueryConnector<LocalFileS
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
+
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	if (!unlimited && mr.isPresent() && harvestEmitted >= mr.get()) {
+	    ret.setResumptionToken(null);
+	    harvestEmitted = 0;
+	    return ret;
+	}
 
 	String token = request.getResumptionToken();
 
@@ -148,6 +160,13 @@ public class LocalFileSystemConnector extends HarvestedQueryConnector<LocalFileS
 
 	int listValids = 0;
 	for (LocalFile localFile : l) {
+
+	    if (!unlimited && mr.isPresent() && harvestEmitted >= mr.get()) {
+		ret.setResumptionToken(null);
+		harvestEmitted = 0;
+		return ret;
+	    }
+
 	    try {
 
 		String nsURI = localFile.getNsURI();
@@ -172,6 +191,7 @@ public class LocalFileSystemConnector extends HarvestedQueryConnector<LocalFileS
 		    validFiles++;
 		    listValids++;
 		    ret.addRecord(metadata);
+		    harvestEmitted++;
 		}
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(this.getClass()).error("Error handling local file " + l.toString());
@@ -190,6 +210,7 @@ public class LocalFileSystemConnector extends HarvestedQueryConnector<LocalFileS
 	    logFinalReport();
 
 	    ret.setResumptionToken(null);
+	    harvestEmitted = 0;
 	}
 
 	return ret;

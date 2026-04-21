@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.iso.datamodel.classes.Citation;
@@ -72,6 +73,10 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int added = 0;
 
 	MGnifyClient client = new MGnifyClient(getSourceURL());
 
@@ -124,6 +129,9 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 		GSLoggerFactory.getLogger(getClass()).info("Study page {} out of {}", studyPages.getPage(), studyPages.getPages());
 
 		for (Study study : studies) {
+		    if (!unlimited && mr.isPresent() && added >= mr.get()) {
+			return ret;
+		    }
 		    // START STUDY
 		    try {
 			HashSet<String> parameters = new HashSet<>();
@@ -336,6 +344,7 @@ public class MGnifyConnector extends HarvestedQueryConnector<MGnifyConnectorSett
 			record.setMetadata(str);
 			record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
 			ret.addRecord(record);
+			added++;
 
 			// END STUDY
 
