@@ -43,7 +43,7 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.AbstractAuthorizedExecutor;
+import eu.essi_lab.request.executor.impl.AuthorizerDecorator;
 import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
 import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
@@ -54,7 +54,7 @@ import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
 /**
  * @author Fabrizio
  */
-public class DiscoveryExecutor extends AbstractAuthorizedExecutor
+public class DiscoveryExecutor extends AuthorizerDecorator
 	implements IDiscoveryExecutor, IDiscoveryNodeExecutor, IDiscoveryStringExecutor {
 
     private QueryExecutorInitializer queryExecutorInitializer;

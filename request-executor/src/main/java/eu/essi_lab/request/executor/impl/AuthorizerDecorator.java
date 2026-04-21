@@ -1,7 +1,7 @@
 /**
  * 
  */
-package eu.essi_lab.request.executor;
+package eu.essi_lab.request.executor.impl;
 
 /*-
  * #%L
@@ -33,7 +33,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public abstract class AbstractAuthorizedExecutor {
+public abstract class AuthorizerDecorator {
 
     /**
      * @param message
@@ -46,13 +46,11 @@ public abstract class AbstractAuthorizedExecutor {
 	    RequestMessage message, //
 	    String errorId) throws GSException {
 
-	boolean authorized = true;
-
 	try {
 
 	    XACMLAuthorizer authorizer = new XACMLAuthorizer();
 
-	    authorized = authorizer.isAuthorized(message);
+	    return authorizer.isAuthorized(message);
 
 	} catch (Exception e) {
 
@@ -67,7 +65,5 @@ public abstract class AbstractAuthorizedExecutor {
 		    errorId, //
 		    e);
 	}
-
-	return authorized;
-    }
+     }
 }
