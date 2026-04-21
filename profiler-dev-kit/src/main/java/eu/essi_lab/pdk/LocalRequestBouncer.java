@@ -51,7 +51,7 @@ public class LocalRequestBouncer extends AbstractRequestBouncer {
     // a semaphore for each IP address
     private final Map<String, Integer> currentRequestsPerIP = new HashMap<>();
     // here the next ip will be the first element
-    private final LinkedList<SimpleEntry<String, Integer>> ipQueue = new LinkedList();
+    private final LinkedList<SimpleEntry<String, Integer>> ipQueue = new LinkedList<>();
     // by default it waits one second
     private int waitTime = 1000;
 
@@ -99,7 +99,6 @@ public class LocalRequestBouncer extends AbstractRequestBouncer {
 	    synchronized (ipQueue) {
 		// if it's the turn of this ip address
 		SimpleEntry<String, Integer> first = ipQueue.getFirst();
-		;
 		if (first.getKey().equals(ipAddress)) {
 		    // if the maximum requests constraint is not met
 		    if (currentRequests < getMaximumConcurrentRequests()) {

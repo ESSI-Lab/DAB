@@ -54,7 +54,7 @@ public class JSONSemanticResponseFormatter extends SemanticResultSetFormatter<JS
 
 	List<PathSegment> pathSegments = uriInfo.getPathSegments();
 
-	PathSegment lastSegment = pathSegments.get(pathSegments.size() - 1);
+	PathSegment lastSegment = pathSegments.getLast();
 
 	Page page = message.getPage();
 
@@ -80,16 +80,12 @@ public class JSONSemanticResponseFormatter extends SemanticResultSetFormatter<JS
 	//
 	if ((message.getBrowsingOperation().isPresent() && message.getBrowsingOperation().get().getSubjectId().isPresent()) ||
 
-		!message.getBrowsingOperation().isPresent()) {
+		message.getBrowsingOperation().isEmpty()) {
 
 	    out.put("results", array);
 
 	    Optional<JSONObject> parent = response.getParentObject();
-	    if (parent.isPresent()) {
-
-		JSONObject parentConcept = parent.get();
-		out.put("parentConcept", parentConcept);
-	    }
+	    parent.ifPresent(parentConcept -> out.put("parentConcept", parentConcept));
 
 	} else {
 

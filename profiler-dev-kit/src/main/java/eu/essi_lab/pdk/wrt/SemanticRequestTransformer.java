@@ -97,20 +97,14 @@ public abstract class SemanticRequestTransformer extends WebRequestTransformer<S
 	SemanticOperation operation = getOperation(message.getWebRequest());
 	message.setOperation(operation);
 
-	if (operation instanceof SemanticBrowsing) {
-
-	    SemanticBrowsing browsing = (SemanticBrowsing) operation;
+	if (operation instanceof SemanticBrowsing browsing) {
 
 	    Optional<String> subjectId = getSubjectId(message.getWebRequest());
-	    if (subjectId.isPresent()) {
-		browsing.setSubjectId(subjectId.get());
-	    }
+	    subjectId.ifPresent(browsing::setSubjectId);
 	}
 
 	Optional<String> ontologyId = getOntologyId(message.getWebRequest());
-	if (ontologyId.isPresent()) {
-	    operation.setOntologyId(ontologyId.get());
-	}
+	ontologyId.ifPresent(operation::setOntologyId);
 
 	List<String> searchTerms = getSearchTerms(message.getWebRequest());
 	if (!searchTerms.isEmpty()) {
@@ -118,14 +112,10 @@ public abstract class SemanticRequestTransformer extends WebRequestTransformer<S
 	}
 
 	Optional<GSKnowledgeScheme> scheme = getScheme(message.getWebRequest());
-	if (scheme.isPresent()) {
-	    operation.setScheme(scheme.get());
-	}
+	scheme.ifPresent(operation::setScheme);
 
 	Optional<Bond> bond = getUserBond(message.getWebRequest());
-	if (bond.isPresent()) {
-	    message.setUserBond(bond.get());
-	}
+	bond.ifPresent(message::setUserBond);
 
 	Optional<ElasticsearchInfoPublisher> publisher = ElasticsearchInfoPublisher.create(message.getWebRequest());
 

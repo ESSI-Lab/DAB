@@ -231,7 +231,7 @@ public abstract class WebRequestParameter {
     @SuppressWarnings("unchecked")
     public static <T extends WebRequestParameter> List<T> findParameters(Class<?> containerClass) {
 
-	ArrayList<WebRequestParameter> out = new ArrayList<WebRequestParameter>();
+	ArrayList<WebRequestParameter> out = new ArrayList<>();
 	Field[] fields = containerClass.getDeclaredFields();
 	for (Field field : fields) {
 	    try {

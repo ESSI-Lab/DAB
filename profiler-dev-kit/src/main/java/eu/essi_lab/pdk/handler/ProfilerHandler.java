@@ -22,10 +22,8 @@ package eu.essi_lab.pdk.handler;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.AbstractMap.SimpleEntry;
 
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -267,7 +265,7 @@ public abstract class ProfilerHandler//
 	// set the property handler to the mapped response
 	mappedResponse.setPropertyHandler(executorResponse.getPropertyHandler());
 
-	message.getProfilerName().ifPresent(name -> mappedResponse.setProfilerName(name));
+	message.getProfilerName().ifPresent(mappedResponse::setProfilerName);
 
 	publish(message, mappedResponse);
 
@@ -345,7 +343,7 @@ public abstract class ProfilerHandler//
 	    // set the search after to the message according to the executor response
 	    //
 	    if (executorResponse != null) {
-		executorResponse.getSearchAfter().ifPresent(sa -> message.setSearchAfter(sa));
+		executorResponse.getSearchAfter().ifPresent(message::setSearchAfter);
 	    }
 
 	    //

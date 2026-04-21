@@ -47,24 +47,21 @@ public class BondUtils {
 
 	ArrayList<Bond> operands = new ArrayList<>();
 
-	Arrays.asList(searchFields.split(",")).stream().map(v -> v.toLowerCase()).forEach(sf -> {
+	Arrays.stream(searchFields.split(",")).map(String::toLowerCase).forEach(sf -> MetadataElement.listValues().forEach(el -> {
 
-	    MetadataElement.listValues().forEach(el -> {
+	    if (el == MetadataElement.ABSTRACT) {
 
-		if (el == MetadataElement.ABSTRACT) {
-
-		    if (sf.equals(el.getName().toLowerCase()) || sf.equals("description")) {
-			operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, searchValue));
-		    }
-
-		} else {
-
-		    if (sf.equals(el.getName().toLowerCase())) {
-			operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, searchValue));
-		    }
+		if (sf.equals(el.getName().toLowerCase()) || sf.equals("description")) {
+		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, searchValue));
 		}
-	    });
-	});
+
+	    } else {
+
+		if (sf.equals(el.getName().toLowerCase())) {
+		    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, el, searchValue));
+		}
+	    }
+	}));
 
 	return BondFactory.aggregate(operands, LogicalOperator.OR);
     }

@@ -75,7 +75,7 @@ public class AccessResultSetFormatterInline extends AccessResultSetFormatter<Dat
 	    return handleException(message, mappedResultSet, errors);
 	}
 
-	DataObject dataObject = mappedResultSet.getResultsList().get(0);
+	DataObject dataObject = mappedResultSet.getResultsList().getFirst();
 
 	refineDataObject(dataObject);
 
@@ -106,25 +106,21 @@ public class AccessResultSetFormatterInline extends AccessResultSetFormatter<Dat
 
 	} else {
 
-	    StreamingOutput stream = new StreamingOutput() {
-		@Override
-		public void write(OutputStream out) throws IOException, WebApplicationException {
-		    try (FileInputStream inp = new FileInputStream(file)) {
-			byte[] buff = new byte[1024];
-			int len = 0;
-			while ((len = inp.read(buff)) >= 0) {
-			    out.write(buff, 0, len);
-			}
-			out.flush();
-			out.close();
-			inp.close();
-		    } catch (Exception e) {
-			throw new IOException("Stream error: " + e.getMessage());
-		    } finally {
-			file.delete();
+	    StreamingOutput stream = out -> {
+		try (FileInputStream inp = new FileInputStream(file)) {
+		    byte[] buff = new byte[1024];
+		    int len = 0;
+		    while ((len = inp.read(buff)) >= 0) {
+			out.write(buff, 0, len);
 		    }
+		    out.flush();
+		    out.close();
+		    inp.close();
+		} catch (Exception e) {
+		    throw new IOException("Stream error: " + e.getMessage());
+		} finally {
+		    file.delete();
 		}
-
 	    };
 
 	    builder = builder.entity(stream);

@@ -105,12 +105,11 @@ public class DiscoveryResultSetFormatterFactory {
 	Class current = formatter.getClass();
 	Type genericSuperclass = current.getGenericSuperclass();
 	
-	while (!(genericSuperclass instanceof ParameterizedType)) {
+	while (!(genericSuperclass instanceof ParameterizedType eventHandlerInterface)) {
 	    current = current.getSuperclass();
 	    genericSuperclass = current.getGenericSuperclass();
 	}
-	
-	ParameterizedType eventHandlerInterface = (ParameterizedType) genericSuperclass;
+
 	Type type = eventHandlerInterface.getActualTypeArguments()[0];
 	return type;
     }

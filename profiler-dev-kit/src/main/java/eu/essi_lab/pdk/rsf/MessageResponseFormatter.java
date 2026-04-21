@@ -76,12 +76,12 @@ public interface MessageResponseFormatter<//
      * @return
      * @throws GSException
      */
-    public Response format(M message, MR messageResponse) throws GSException;
+    Response format(M message, MR messageResponse) throws GSException;
 
     /**
      * A {@link FormattingEncoding} which describes this formatting
      * 
      * @return a non <code>null</code> {@link FormattingEncoding}
      */
-    public FormattingEncoding getEncoding();
+    FormattingEncoding getEncoding();
 }

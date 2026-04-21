@@ -110,10 +110,9 @@ public class JSONSpatialRepresentationMapper {
 		if (spatialRep == null || spatialRep.getAbstractMDSpatialRepresentation() == null)
 		    continue;
 		AbstractMDSpatialRepresentationType value = spatialRep.getAbstractMDSpatialRepresentation().getValue();
-		if (!(value instanceof MDVectorSpatialRepresentationType))
+		if (!(value instanceof MDVectorSpatialRepresentationType vector))
 		    continue;
 
-		MDVectorSpatialRepresentationType vector = (MDVectorSpatialRepresentationType) value;
 		JSONObject out = new JSONObject();
 
 		MDTopologyLevelCodePropertyType topologyLevel = vector.getTopologyLevel();
@@ -141,14 +140,14 @@ public class JSONSpatialRepresentationMapper {
 			if (geometric.getGeometricObjectCount() != null && geometric.getGeometricObjectCount().getInteger() != null) {
 			    geometricJson.put("geometric_object_count", geometric.getGeometricObjectCount().getInteger().intValue());
 			}
-			if (geometricJson.length() > 0)
+			if (!geometricJson.isEmpty())
 			    geometricObjects.put(geometricJson);
 		    }
-		    if (geometricObjects.length() > 0)
+		    if (!geometricObjects.isEmpty())
 			out.put("geometric_objects", geometricObjects);
 		}
 
-		return out.length() > 0 ? out : null;
+		return !out.isEmpty() ? out : null;
 	    }
 	} catch (Exception e) {
 	    return null;
@@ -192,7 +191,7 @@ public class JSONSpatialRepresentationMapper {
 		    res.put("value", resVal == Math.floor(resVal) ? resVal.intValue() : resVal);
 		o.put("resolution", res);
 	    }
-	    return o.length() > 0 ? o : null;
+	    return !o.isEmpty() ? o : null;
 	} catch (Exception e) {
 	    return null;
 	}

@@ -62,7 +62,7 @@ public enum DublinCore_ElementName {
      */
     public static Document subset(Document metadata, DublinCore_ElementName[] properties) throws Exception {
 
-	List<String> xpaths = new ArrayList<String>();
+	List<String> xpaths = new ArrayList<>();
 	for (DublinCore_ElementName property : properties) {
 	    String mapping = property.getXPath();
 	    xpaths.add(mapping);
@@ -82,8 +82,7 @@ public enum DublinCore_ElementName {
 
 	name = name.toLowerCase();
 	DublinCore_ElementName[] values = values();
-	for (int i = 0; i < values.length; i++) {
-	    DublinCore_ElementName set = values[i];
+	for (DublinCore_ElementName set : values) {
 	    if (set.getName().toLowerCase().contains(name) || name.contains(set.getName().toLowerCase())) {
 		return set;
 	    }
@@ -93,7 +92,7 @@ public enum DublinCore_ElementName {
 
     private String xPath;
 
-    private DublinCore_ElementName(String xPath) {
+    DublinCore_ElementName(String xPath) {
 
 	this.xPath = xPath;
     }

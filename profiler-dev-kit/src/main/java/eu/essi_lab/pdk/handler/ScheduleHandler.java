@@ -44,7 +44,6 @@ public class ScheduleHandler<M extends RequestMessage, I, O, CR extends Abstract
 
 	ProfilerHandler<RequestMessage, ScheduleReport, T, CountSet, ResultSet<ScheduleReport>, ResultSet<T>> {
 
-    @SuppressWarnings("unchecked")
     public ScheduleHandler(ProfilerHandler<M, I, O, CR, IN, OUT> workerHandler) {
 	super();
 

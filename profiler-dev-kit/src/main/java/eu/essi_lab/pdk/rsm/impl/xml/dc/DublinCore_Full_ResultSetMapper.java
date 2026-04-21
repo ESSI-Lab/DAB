@@ -300,7 +300,7 @@ public class DublinCore_Full_ResultSetMapper extends DiscoveryResultSetMapper<El
 	MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
 	Iterator<String> titles = miMetadata.getAggregatedResourcesIdentifiers();
 	while (titles.hasNext()) {
-	    String title = (String) titles.next();
+	    String title = titles.next();
 	    SimpleLiteral simpleLiteral = new SimpleLiteral();
 	    simpleLiteral.getContent().add(title);
 	    JAXBElement<SimpleLiteral> element = ObjectFactories.DCE().createRelation(simpleLiteral);
@@ -428,18 +428,12 @@ public class DublinCore_Full_ResultSetMapper extends DiscoveryResultSetMapper<El
 		    SimpleLiteral simpleLiteral = new SimpleLiteral();
 		    simpleLiteral.getContent().add(name);
 
-		    JAXBElement<SimpleLiteral> element = null;
-		    switch (code) {
-		    case "originator":
-			element = ObjectFactories.DCE().createCreator(simpleLiteral);
-			break;
-		    case "publisher":
-			element = ObjectFactories.DCE().createPublisher(simpleLiteral);
-			break;
-		    case "author":
-			element = ObjectFactories.DCE().createContributor(simpleLiteral);
-			break;
-		    }
+		    JAXBElement<SimpleLiteral> element = switch (code) {
+		        case "originator" -> ObjectFactories.DCE().createCreator(simpleLiteral);
+		        case "publisher" -> ObjectFactories.DCE().createPublisher(simpleLiteral);
+		        case "author" -> ObjectFactories.DCE().createContributor(simpleLiteral);
+		        default -> null;
+		    };
 		    record.getDCElements().add(element);
 		}
 	    }

@@ -121,7 +121,7 @@ public abstract class DiscoveryResultSetMapper<T>
 	// converts the incoming ResultSet<GSResource> in a ResultSet<T>
 	//
 
-	ResultSet<T> mappedResSet = new ResultSet<T>(resultSet);
+	ResultSet<T> mappedResSet = new ResultSet<>(resultSet);
 
 	// set the property handler
 	mappedResSet.setPropertyHandler(resultSet.getPropertyHandler());

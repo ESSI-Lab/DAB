@@ -85,7 +85,7 @@ public class GS_XML_ResultSetFormatter extends DiscoveryResultSetFormatter<Strin
     @Override
     public Response format(DiscoveryMessage message, ResultSet<String> mappedResultSet) throws GSException {
 
-	String templateClone = new String(template);
+	String templateClone = template;
 
 	templateClone = templateClone.replace("TIMESTAMP", ISO8601DateTimeUtils.getISO8601DateTime());
 

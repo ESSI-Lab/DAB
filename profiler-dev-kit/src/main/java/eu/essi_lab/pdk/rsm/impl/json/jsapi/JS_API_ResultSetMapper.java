@@ -180,19 +180,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	// hierarchy level code
 	// --------------------
 
-	mi_Metadata.getHierarchyLevelScopeCodeListValues().forEachRemaining(value -> {
-
-	    report.put("hierarchyLevel", value);
-	});
+	mi_Metadata.getHierarchyLevelScopeCodeListValues().forEachRemaining(value -> report.put("hierarchyLevel", value));
 
 	// --------------------------
 	// raster mosaic
 	// --------------------------
 
-	resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> {
-
-	    report.put("rasterMosaic", mosaic);
-	});
+	resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> report.put("rasterMosaic", mosaic));
 
 	// --------------------------------------------
 	// distributor and owner org.name from contacts
@@ -203,10 +197,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	ArrayList<ResponsibleParty> contacts = Lists.newArrayList(mi_Metadata.getContacts());//
 
-	contacts.forEach(contact -> {
-
-	    handleOrgName(contact, ownerOrgNameArray, distOrgNameArray);
-	});
+	contacts.forEach(contact -> handleOrgName(contact, ownerOrgNameArray, distOrgNameArray));
 
 	// -----------
 	// native EPSG

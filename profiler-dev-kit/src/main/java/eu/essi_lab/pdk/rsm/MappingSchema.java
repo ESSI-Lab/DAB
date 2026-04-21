@@ -10,12 +10,12 @@ package eu.essi_lab.pdk.rsm;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -29,48 +29,33 @@ import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.GSResource;
 
 /**
- * A POJO which provides information about the schema used by a {@link DiscoveryResultSetMapper} to map
- * {@link GSResource}s. The schema is
- * also used by the {@link DiscoveryResultSetMapperFactory} to load one or more mappers which satisfy the given mapping
- * properties <br>
+ * A POJO which provides information about the schema used by a {@link DiscoveryResultSetMapper} to map {@link GSResource}s. The schema is
+ * also used by the {@link DiscoveryResultSetMapperFactory} to load one or more mappers which satisfy the given mapping properties <br>
  * <li>Metadata elements and their encoding</li><br>
- * The schema <i>name and version</i> refer to the conceptual model which define the set of metadata elements used to
- * map a {@link
- * GSResource}. For example, a schema with name "ISO19115" and version "2003", indicates that the metadata elements
- * derive from the <i>ISO
- * Geographic information Standard 19115 version 2003.</i> In order to simplify the choice of a
- * {@link DiscoveryResultSetMapper} using the
- * {@link DiscoveryResultSetMapperFactory}, it is recommended to use when possible, well known names like in the
- * previous example.<br>
+ * The schema <i>name and version</i> refer to the conceptual model which define the set of metadata elements used to map a
+ * {@link GSResource}. For example, a schema with name "ISO19115" and version "2003", indicates that the metadata elements derive from the
+ * <i>ISO Geographic information Standard 19115 version 2003.</i> In order to simplify the choice of a {@link DiscoveryResultSetMapper}
+ * using the {@link DiscoveryResultSetMapperFactory}, it is recommended to use when possible, well known names like in the previous
+ * example.<br>
  * <br>
- * While a schema define an abstract dictionary, the <i>encoding name and version</i> define a way to implement that
- * dictionary on a
- * particular <i>media type</i>.<br>
- * In the example above, a mapper {@link Provider} can choose to implement the ISO 19115 dictionary using
- * the "ISO 19139:2007" which defines a standard XML encoding for ISO 19115; in this case the encoding name will be
- * "ISO19139", the version
- * "2007" and the media type "application/xml".<br>
- * The same provider (or other providers) can also define an own non standard XML encoding
- * (with the proper encoding name and version ) which best fits his needs.<br>
- * In another case, the ISO 19115 metadata elements can be
- * implemented on a JSON format content with the media type "application/json". The mapping of the ISO 19115 terms to
- * the JSON objects, can
- * be provided using different encoding names and/or versions. For example an encoding name "ISO115-JSON" version
- * "2017-1" could implement
- * the "fileIdentifier" element with a JSON object having the key "fileid", and another version "2017-2" with a JSON
- * object having key
+ * While a schema define an abstract dictionary, the <i>encoding name and version</i> define a way to implement that dictionary on a
+ * particular <i>media type</i>.<br> In the example above, a mapper {@link Provider} can choose to implement the ISO 19115 dictionary using
+ * the "ISO 19139:2007" which defines a standard XML encoding for ISO 19115; in this case the encoding name will be "ISO19139", the version
+ * "2007" and the media type "application/xml".<br> The same provider (or other providers) can also define an own non standard XML encoding
+ * (with the proper encoding name and version ) which best fits his needs.<br> In another case, the ISO 19115 metadata elements can be
+ * implemented on a JSON format content with the media type "application/json". The mapping of the ISO 19115 terms to the JSON objects, can
+ * be provided using different encoding names and/or versions. For example an encoding name "ISO115-JSON" version "2017-1" could implement
+ * the "fileIdentifier" element with a JSON object having the key "fileid", and another version "2017-2" with a JSON object having key
  * "FileID".<br>
  * <br>
- * The schema mapping can also provide a human readable {@link #getDescription()} which can helps developers to choose a
- * proper mapper<br>
+ * The schema mapping can also provide a human readable {@link #getDescription()} which can helps developers to choose a proper mapper<br>
  * <br>
  * <li>Usage note</li><br>
- * None of the mapping schema properties are mandatory but more properties are defined, the easier it will identify the
- * right mapper using
+ * None of the mapping schema properties are mandatory but more properties are defined, the easier it will identify the right mapper using
  * the {@link DiscoveryResultSetMapperFactory}<br>
  * <br>
- * See {@link #getName()}, {@link #getVersion()}, {@link #getEncoding()}, {@link #getEncodingVersion()}, {@link
- * #getEncodingMediaType()}<br>
+ * See {@link #getName()}, {@link #getVersion()}, {@link #getEncoding()}, {@link #getEncodingVersion()},
+ * {@link #getEncodingMediaType()}<br>
  * <br>
  *
  * @author Fabrizio
@@ -219,28 +204,27 @@ public class MappingSchema {
 	if (object == null)
 	    return false;
 
-	if (!(object instanceof MappingSchema))
+	if (!(object instanceof MappingSchema schema)) {
 	    return false;
+	}
 
-	MappingSchema enc = (MappingSchema) object;
+	return ((this.getVersion() == null && schema.getVersion() == null) || (this.getVersion() != null && schema.getVersion() != null
+		&& this.getVersion().equals(schema.getVersion())))
 
-	return ((this.getVersion() == null && enc.getVersion() == null)
-		|| (this.getVersion() != null && enc.getVersion() != null && this.getVersion().equals(enc.getVersion())))
+		&& ((this.getName() == null && schema.getName() == null) || (this.getName() != null && schema.getName() != null
+		&& this.getName().equals(schema.getName())))
 
-		&& ((this.getName() == null && enc.getName() == null)
-			|| (this.getName() != null && enc.getName() != null && this.getName().equals(enc.getName())))
+		&& ((this.getEncoding() == null && schema.getEncoding() == null) || (this.getEncoding() != null
+		&& schema.getEncoding() != null && this.getEncoding().equals(schema.getEncoding())))
 
-		&& ((this.getEncoding() == null && enc.getEncoding() == null)
-			|| (this.getEncoding() != null && enc.getEncoding() != null && this.getEncoding().equals(enc.getEncoding())))
+		&& ((this.getEncodingVersion() == null && schema.getEncodingVersion() == null) || (this.getEncodingVersion() != null
+		&& schema.getEncodingVersion() != null && this.getEncodingVersion().equals(schema.getEncodingVersion())))
 
-		&& ((this.getEncodingVersion() == null && enc.getEncodingVersion() == null) || (this.getEncodingVersion() != null
-			&& enc.getEncodingVersion() != null && this.getEncodingVersion().equals(enc.getEncodingVersion())))
+		&& ((this.getEncodingMediaType() == null && schema.getEncodingMediaType() == null) || (this.getEncodingMediaType() != null
+		&& schema.getEncodingMediaType() != null && this.getEncodingMediaType().equals(schema.getEncodingMediaType())))
 
-		&& ((this.getEncodingMediaType() == null && enc.getEncodingMediaType() == null) || (this.getEncodingMediaType() != null
-			&& enc.getEncodingMediaType() != null && this.getEncodingMediaType().equals(enc.getEncodingMediaType())))
-
-		&& ((this.getUri() == null && enc.getUri() == null)
-			|| (this.getUri() != null && enc.getUri() != null && this.getUri().equals(enc.getUri())));
+		&& ((this.getUri() == null && schema.getUri() == null) || (this.getUri() != null && schema.getUri() != null && this.getUri()
+		.equals(schema.getUri())));
 
     }
 

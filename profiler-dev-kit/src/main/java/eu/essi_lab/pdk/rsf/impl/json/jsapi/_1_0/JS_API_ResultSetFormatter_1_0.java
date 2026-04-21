@@ -37,6 +37,7 @@ import org.json.*;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.core.Response.*;
 import java.io.*;
+import java.nio.charset.*;
 import java.util.*;
 
 /**
@@ -200,7 +201,7 @@ public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<S
 
 	mapper.writeValue(outputStream, type);
 
-	JSONObject tfMap = new JSONObject(outputStream.toString("UTF-8"));
+	JSONObject tfMap = new JSONObject(outputStream.toString(StandardCharsets.UTF_8));
 	JSONArray sourceId = tfMap.getJSONArray("sourceId");
 
 	for (GSSource gsSource : sources) {
@@ -228,7 +229,7 @@ public class JS_API_ResultSetFormatter_1_0 extends DiscoveryResultSetFormatter<S
 	Set<String> toRemove = new HashSet<>();
 	for (String key : keySet) {
 	    JSONArray obj = tfMap.getJSONArray(key);
-	    if (obj.length() == 0) {
+	    if (obj.isEmpty()) {
 		toRemove.add(key);
 	    }
 	}

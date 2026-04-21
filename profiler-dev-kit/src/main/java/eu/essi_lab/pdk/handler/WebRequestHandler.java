@@ -47,6 +47,6 @@ public interface WebRequestHandler  {
      * @param webRequest a non <code>null</code> {@link WebRequest} to handle
      * @return a non <code>null</code> {@link Response} suitable for the client
      */
-    public Response handle(WebRequest webRequest) throws GSException;
+    Response handle(WebRequest webRequest) throws GSException;
 
 }

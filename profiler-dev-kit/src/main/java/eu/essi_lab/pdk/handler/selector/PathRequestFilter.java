@@ -122,12 +122,12 @@ public abstract class PathRequestFilter implements WebRequestFilter {
 
 	if (expectedPath != null && requestPath != null) {
 
-	    List<String> expPaths = Arrays.asList(expectedPath.split("/")).//
-		    stream().//
+	    //
+	    List<String> expPaths = Arrays.stream(expectedPath.split("/")).//
 		    filter(s -> !s.isEmpty()).// removes the initial /
 		    collect(Collectors.toList());
 
-	    List<String> reqPaths = new ArrayList<String>(Arrays.asList(requestPath.split("/")));
+	    List<String> reqPaths = new ArrayList<>(Arrays.asList(requestPath.split("/")));
 
 	    //
 	    // 1) replaces the 'token' and the 'view' segments and their values with a # char

@@ -274,39 +274,15 @@ public class GETRequestFilter extends PathRequestFilter {
 	    return false;
 	}
 
-	switch (strategy) {
-
-	case EXACT_MATCH:
-
-	    return actualString.equals(expectedString);
-
-	case IGNORE_CASE_EXACT_MATCH:
-
-	    return actualString.equalsIgnoreCase(expectedString);
-
-	case EXACT_DISCARD:
-
-	    return !actualString.equals(expectedString);
-
-	case IGNORE_CASE_LIKE_DISCARD:
-
-	    return !actualString.toLowerCase().contains(expectedString.toLowerCase());
-
-	case LIKE_DISCARD:
-
-	    return !actualString.contains(expectedString);
-
-	case IGNORE_CASE_EXACT_DISCARD:
-
-	    return !actualString.equalsIgnoreCase(expectedString);
-
-	case LIKE_MATCH:
-
-	    return actualString.contains(expectedString);
-
-	case IGNORE_CASE_LIKE_MATCH:
-	default:
-	    return actualString.toLowerCase().contains(expectedString.toLowerCase());
-	}
+	return switch (strategy) {
+	    case EXACT_MATCH -> actualString.equals(expectedString);
+	    case IGNORE_CASE_EXACT_MATCH -> actualString.equalsIgnoreCase(expectedString);
+	    case EXACT_DISCARD -> !actualString.equals(expectedString);
+	    case IGNORE_CASE_LIKE_DISCARD -> !actualString.toLowerCase().contains(expectedString.toLowerCase());
+	    case LIKE_DISCARD -> !actualString.contains(expectedString);
+	    case IGNORE_CASE_EXACT_DISCARD -> !actualString.equalsIgnoreCase(expectedString);
+	    case LIKE_MATCH -> actualString.contains(expectedString);
+	    default -> actualString.toLowerCase().contains(expectedString.toLowerCase());
+        };
     }
 }

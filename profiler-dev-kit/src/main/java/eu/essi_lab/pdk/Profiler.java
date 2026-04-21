@@ -379,10 +379,8 @@ public abstract class Profiler<PS extends ProfilerSetting> implements Configurab
 		WebRequestValidator validator = null;
 		RequestType requestType = null;
 
-		if (handler instanceof ProfilerHandler) {
+		if (handler instanceof @SuppressWarnings("rawtypes")ProfilerHandler dh) {
 
-		    @SuppressWarnings("rawtypes")
-		    ProfilerHandler dh = (ProfilerHandler) handler;
 		    validator = dh.getRequestTransformer();
 
 		    if (handler instanceof DiscoveryHandler<?>) {

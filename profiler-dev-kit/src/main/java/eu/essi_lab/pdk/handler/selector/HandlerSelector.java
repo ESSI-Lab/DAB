@@ -57,7 +57,7 @@ public class HandlerSelector {
      */
     public void register(WebRequestFilter filter, WebRequestHandler handler) {
 
-	SimpleEntry<WebRequestFilter, WebRequestHandler> entry = new SimpleEntry<WebRequestFilter, WebRequestHandler>(//
+	SimpleEntry<WebRequestFilter, WebRequestHandler> entry = new SimpleEntry<>(//
 		filter, //
 		handler); //
 

@@ -308,12 +308,12 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 		    switch (bond.getOperator()) {
 		    case EQUAL:
 
-			allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).forEach(s -> sources.add(s));
+			allSources.stream().filter(s -> s.getUniqueIdentifier().equals(value)).forEach(sources::add);
 
 			break;
 		    case TEXT_SEARCH:
 
-			allSources.stream().filter(s -> s.getUniqueIdentifier().contains(value)).forEach(s -> sources.add(s));
+			allSources.stream().filter(s -> s.getUniqueIdentifier().contains(value)).forEach(sources::add);
 
 			break;
 		    default:
@@ -376,7 +376,7 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	});
 
 	if (!excList.isEmpty()) {
-	    throw excList.get(0);
+	    throw excList.getFirst();
 	}
 
 	if (sources.isEmpty()) {

@@ -21,7 +21,6 @@ package eu.essi_lab.pdk;
  * #L%
  */
 
-import com.google.api.client.util.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.iso.datamodel.classes.*;

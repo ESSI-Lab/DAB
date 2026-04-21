@@ -89,7 +89,7 @@ public enum GMD_ElementName {
 		GMD_ElementName.SERVICE_TYPE_VERSION, //
 		GMD_ElementName.TITLE, //
 		GMD_ElementName.TYPE };
-    };
+    }
 
     /**
      * @return
@@ -129,7 +129,7 @@ public enum GMD_ElementName {
 		GMD_ElementName.TITLE, //
 		GMD_ElementName.TOPIC_CATEGORY, //
 		GMD_ElementName.TYPE };
-    };
+    }
 
     /**
      * @param metadata
@@ -164,7 +164,7 @@ public enum GMD_ElementName {
      */
     public static Document subset(Document metadata, GMD_ElementName[] properties) throws Exception {
 
-	List<String> xpaths = new ArrayList<String>();
+	List<String> xpaths = new ArrayList<>();
 	for (GMD_ElementName property : properties) {
 	    String mapping = property.getXPath();
 	    xpaths.add(mapping);
@@ -184,8 +184,7 @@ public enum GMD_ElementName {
 
 	name = name.toLowerCase();
 	GMD_ElementName[] values = values();
-	for (int i = 0; i < values.length; i++) {
-	    GMD_ElementName set = values[i];
+	for (GMD_ElementName set : values) {
 	    if (set.getName().toLowerCase().contains(name) || name.contains(set.getName().toLowerCase())) {
 		return set;
 	    }
@@ -195,7 +194,7 @@ public enum GMD_ElementName {
 
     private String xPath;
 
-    private GMD_ElementName(String xPath) {
+    GMD_ElementName(String xPath) {
 
 	this.xPath = xPath;
     }

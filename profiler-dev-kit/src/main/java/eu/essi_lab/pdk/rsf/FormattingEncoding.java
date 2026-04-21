@@ -10,12 +10,12 @@ package eu.essi_lab.pdk.rsf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -98,13 +98,13 @@ public class FormattingEncoding {
     @Override
     public boolean equals(Object object) {
 
-	if (object == null)
+	if (object == null) {
 	    return false;
+	}
 
-	if (!(object instanceof FormattingEncoding))
+	if (!(object instanceof FormattingEncoding enc)) {
 	    return false;
-
-	FormattingEncoding enc = (FormattingEncoding) object;
+	}
 
 	return ((this.getEncoding() == null && enc.getEncoding() == null) || (this.getEncoding() != null && enc.getEncoding() != null
 		&& this.getEncoding().equals(enc.getEncoding())))

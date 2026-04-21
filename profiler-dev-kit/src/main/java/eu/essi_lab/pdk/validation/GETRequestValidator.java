@@ -65,7 +65,7 @@ public class GETRequestValidator extends AbstractValidator {
 	for (String mandatoryKey : mandatoryKeys) {
 	    boolean found = false;
 	    for (String actualKey : actualParameters.keySet()) {
-		if (actualKey != null && actualKey.toLowerCase().equals(mandatoryKey.toLowerCase())) {
+		if (actualKey != null && actualKey.equalsIgnoreCase(mandatoryKey)) {
 		    found = true;
 		    break;
 		}
