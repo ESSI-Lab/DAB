@@ -35,32 +35,48 @@ public class JSONSpatialRepresentationMapper {
      * @param mi
      * @return
      */
-    public JSONObject map() {
+    public Optional<JSONObject> map() {
 	try {
+
 	    JSONObject vectorSpatialRepresentation = vectorSpatialRepresentationInfoToJson(metadata);
+
 	    if (vectorSpatialRepresentation != null) {
 		JSONObject spatialRepInfo = new JSONObject();
 		spatialRepInfo.put("vector_spatial_representation", vectorSpatialRepresentation);
-		return spatialRepInfo;
+
+		return Optional.of(spatialRepInfo);
 	    }
 
 	    GridSpatialRepresentation grid = metadata.getGridSpatialRepresentation();
-	    if (grid == null)
-		return null;
+
+	    if (grid == null) {
+
+		return Optional.empty();
+	    }
+
 	    JSONObject gridRep = new JSONObject();
 	    Integer numDim = grid.getNumberOfDimensions();
-	    if (numDim != null)
+
+	    if (numDim != null) {
 		gridRep.put("number_of_dimensions", numDim);
+	    }
+
 	    String cellGeometry = grid.getCellGeometryCode();
+
 	    if (cellGeometry != null) {
 		String cellUri = gridCellGeometryUri(grid);
 		gridRep.put("cell_geometry", codeObj(cellGeometry, cellUri));
 	    }
+
 	    BooleanPropertyType transParam = grid.getElementType().getTransformationParameterAvailability();
-	    if (transParam != null)
+
+	    if (transParam != null) {
 		gridRep.put("transformation_parameter_availability", transParam.isBoolean());
+	    }
+
 	    JSONArray axisArr = new JSONArray();
 	    Iterator<Dimension> dimIt = grid.getAxisDimensions();
+
 	    if (dimIt != null) {
 		while (dimIt.hasNext()) {
 		    JSONObject axisObj = axisDimensionToJson(dimIt.next());
@@ -68,13 +84,20 @@ public class JSONSpatialRepresentationMapper {
 			axisArr.put(axisObj);
 		}
 	    }
-	    if (axisArr.length() > 0)
+
+	    if (!axisArr.isEmpty()) {
 		gridRep.put("axis_dimension_properties", axisArr);
+	    }
+
 	    JSONObject spatialRepInfo = new JSONObject();
+
 	    spatialRepInfo.put("grid_spatial_representation", gridRep);
-	    return spatialRepInfo;
+
+	    return Optional.of(spatialRepInfo);
+
 	} catch (Exception e) {
-	    return null;
+
+	    return Optional.empty();
 	}
     }
 

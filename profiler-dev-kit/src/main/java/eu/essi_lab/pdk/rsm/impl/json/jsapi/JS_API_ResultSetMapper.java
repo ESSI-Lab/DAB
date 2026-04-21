@@ -94,7 +94,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
     @Override
     public String map(DiscoveryMessage message, GSResource resource) {
 
-	GSSource gsSource = resource.getSource();
+		GSSource gsSource = resource.getSource();
 
 	if (message.isOutputSources()) {
 
@@ -400,10 +400,14 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	normalizeText(firstId.getAbstract()).ifPresent(desc -> report.put("description", desc));
 
+	// ---------------------------
+	// spatial representation info
+	// ---------------------------
+
 	JSONSpatialRepresentationMapper mapper = new JSONSpatialRepresentationMapper(
 		resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata());
 
-	JSONObject map = mapper.map();
+	mapper.map().ifPresent(info -> report.put("spatial_representation_info", info));
 
 	// ---------------------------------------------
 	//

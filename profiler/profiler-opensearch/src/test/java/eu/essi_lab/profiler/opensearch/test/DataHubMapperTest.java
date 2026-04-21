@@ -30,7 +30,7 @@ public class DataHubMapperTest {
 	GSResource res = mapper.map(original, source);
 
 	//	System.out.println(res.asString(false));
-	String jsonMetadata = DatahubJsonMapper.toJson(res);
+	String jsonMetadata = new DatahubJsonMapper().toJson(res);
 	System.out.println(new JSONObject(jsonMetadata).toString(2));
     }
 

@@ -10,12 +10,12 @@ package eu.essi_lab.profiler.os.handler.discover.datahub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,9 +26,10 @@ import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.jaxb.iso19139_2.gmi.v_1_0.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.model.resource.*;
+import eu.essi_lab.pdk.rsm.impl.json.jsapi.*;
 import jakarta.ws.rs.core.MediaType;
 
- import eu.essi_lab.messages.DiscoveryMessage;
+import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
@@ -39,12 +40,10 @@ import net.opengis.iso19139.gmd.v_20060504.*;
 import net.opengis.iso19139.srv.v_20060504.*;
 import org.json.*;
 
-import java.math.*;
 import java.util.*;
 
 /**
- * Mapper for DataHub JSON output format (v3.8 metadata model).
- * Maps GSResource to DataHub JSON
+ * Mapper for DataHub JSON output format (v3.8 metadata model). Maps GSResource to DataHub JSON
  */
 public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 
@@ -67,7 +66,6 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
      * The {@link MappingSchema} for this DataHub JSON format.
      */
     public static final MappingSchema DATAHUB_JSON_MAPPING_SCHEMA = new MappingSchema();
-    private static Dimension dim;
 
     static {
 	DATAHUB_JSON_MAPPING_SCHEMA.setUri("https://www.essi-lab.eu/datahub-json/1.0");
@@ -84,28 +82,18 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return toJson(resource);
     }
 
-    @Override
-    public MappingSchema getMappingSchema() {
-
-	return DATAHUB_JSON_MAPPING_SCHEMA;
-    }
-
-    @Override
-    public Provider getProvider() {
-
-	return new ESSILabProvider();
-    }
-
     /**
      * Converts a GSResource to DataHub JSON string (v3.8 metadata model).
      *
      * @param resource the resource (harmonized metadata)
      * @return JSON string; never null
      */
-    public static String toJson(GSResource resource) {
+    public String toJson(GSResource resource) {
+
 	if (resource == null) {
 	    return new JSONObject().put("placeholder", true).put("message", "No resource").toString();
 	}
+
 	try {
 	    eu.essi_lab.model.resource.HarmonizedMetadata harmonized = resource.getHarmonizedMetadata();
 	    if (harmonized == null) {
@@ -122,17 +110,31 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject minimalJson(String identifier, String title) {
+    @Override
+    public MappingSchema getMappingSchema() {
+
+	return DATAHUB_JSON_MAPPING_SCHEMA;
+    }
+
+    @Override
+    public Provider getProvider() {
+
+	return new ESSILabProvider();
+    }
+
+    private JSONObject minimalJson(String identifier, String title) {
 	JSONObject o = new JSONObject();
-	if (identifier != null) o.put("identifier", identifier);
-	if (title != null) o.put("title", title);
+	if (identifier != null)
+	    o.put("identifier", identifier);
+	if (title != null)
+	    o.put("title", title);
 	o.put("hierarchy_level", codeObj("dataset"));
 	o.put("resource_constraints", new JSONObject().put("other_constraints", ""));
 	o.put("online_resources", new JSONArray());
 	return o;
     }
 
-    private static JSONObject toJson(CoreMetadata core, GSResource resource) {
+    private JSONObject toJson(CoreMetadata core, GSResource resource) {
 	JSONObject out = new JSONObject();
 	MDMetadata mi = core.getMIMetadata();
 	String hierarchyLevel = resolveHierarchyLevel(mi);
@@ -151,7 +153,8 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	mapQualityInformation(out, mi, resource);
 	mapExtensionFields(out, resource);
 
-	if ("dataset".equalsIgnoreCase(hierarchyLevel) || "document".equalsIgnoreCase(hierarchyLevel) || "series".equalsIgnoreCase(hierarchyLevel)) {
+	if ("dataset".equalsIgnoreCase(hierarchyLevel) || "document".equalsIgnoreCase(hierarchyLevel) || "series".equalsIgnoreCase(
+		hierarchyLevel)) {
 	    mapDatasetSpecific(out, core, identification);
 	}
 	if ("service".equalsIgnoreCase(hierarchyLevel)) {
@@ -171,12 +174,13 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return out;
     }
 
-    private static String resolveHierarchyLevel(MDMetadata mi) {
+    private String resolveHierarchyLevel(MDMetadata mi) {
 	try {
 	    Iterator<String> it = mi.getHierarchyLevelScopeCodeListValues();
 	    if (it != null && it.hasNext()) {
 		String v = it.next();
-		if (v != null && !v.isEmpty()) return v;
+		if (v != null && !v.isEmpty())
+		    return v;
 	    }
 	} catch (Exception e) {
 	    // ignore
@@ -184,38 +188,40 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return "dataset";
     }
 
-    private static Identification getIdentification(CoreMetadata core, String hierarchyLevel) {
+    private Identification getIdentification(CoreMetadata core, String hierarchyLevel) {
 	if ("service".equalsIgnoreCase(hierarchyLevel)) {
 	    ServiceIdentification svc = core.getMIMetadata().getServiceIdentification();
-	    if (svc != null) return svc;
+	    if (svc != null)
+		return svc;
 	}
 	return core.getMIMetadata().getDataIdentification();
     }
 
-    private static void putOpt(JSONObject o, String key, Object value) {
-	if (value != null && !JSONObject.NULL.equals(value)) o.put(key, value);
+    private void putOpt(JSONObject o, String key, Object value) {
+	if (value != null && !JSONObject.NULL.equals(value))
+	    o.put(key, value);
     }
 
-
-
-    private static String unwrapOptional(Optional<String> opt) {
+    private String unwrapOptional(Optional<String> opt) {
 	return opt != null && opt.isPresent() ? opt.get() : null;
     }
 
-    private static JSONObject codeObj(String value) {
+    private JSONObject codeObj(String value) {
 	return codeObj(value, null);
     }
 
-    private static JSONObject codeObj(String value, String uri) {
-	if (value == null) return null;
+    private JSONObject codeObj(String value, String uri) {
+	if (value == null)
+	    return null;
 	JSONObject o = new JSONObject();
-	if (uri != null) o.put("uri", uri);
+	if (uri != null)
+	    o.put("uri", uri);
 	o.put("value", value);
 	return o;
     }
 
-    private static void mapBasicIdentification(JSONObject out, CoreMetadata core, MDMetadata mi,
-	    Identification identification, String hierarchyLevel, GSResource resource) {
+    private void mapBasicIdentification(JSONObject out, CoreMetadata core, MDMetadata mi, Identification identification,
+	    String hierarchyLevel, GSResource resource) {
 	putOpt(out, "identifier", core.getIdentifier());
 	putOpt(out, "title", identification.getCitationTitle());
 	putOpt(out, "abstract", identification.getAbstract());
@@ -229,7 +235,8 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	putOpt(out, "edition", getCitationEdition(identification));
 	putOpt(out, "edition_date", identification.getCitationEditionDate());
 	putOpt(out, "date_of_next_update", getDateOfNextUpdate(identification));
-	putOpt(out, "hierarchy_level", codeObj(hierarchyLevel, "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode"));
+	putOpt(out, "hierarchy_level",
+		codeObj(hierarchyLevel, "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode"));
 	putOpt(out, "character_set", charSetObj(mi.getCharacterSetCode()));
 	putOpt(out, "presentation_form", presentationFormObj(identification));
 	putOpt(out, "status", statusObj(identification));
@@ -241,71 +248,79 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static String getCitationExpiryDate(Identification id) {
+    private String getCitationExpiryDate(Identification id) {
 	try {
 	    Object d = id.getCitationDate("expiry");
 	    return d != null ? d.toString() : null;
-	} catch (Exception e) { return null; }
+	} catch (Exception e) {
+	    return null;
+	}
     }
 
-    private static String getCitationEdition(Identification id) {
+    private String getCitationEdition(Identification id) {
 	try {
 	    CICitationPropertyType citationProp = id.getElementType().getCitation();
-	    if (citationProp == null) return null;
+	    if (citationProp == null)
+		return null;
 	    CICitationType firstCitation = citationProp.getCICitation();
-	    if (firstCitation == null) return null;
+	    if (firstCitation == null)
+		return null;
 	    return ISOMetadata.getStringFromCharacterString(firstCitation.getEdition());
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static String getDateOfNextUpdate(Identification id) {
+    private String getDateOfNextUpdate(Identification id) {
 	return getDateOfNextUpdateFromMaintenance(id);
     }
 
-    private static JSONObject metadataProfile(String name, String version) {
-	if (name == null && version == null) return null;
+    private JSONObject metadataProfile(String name, String version) {
+	if (name == null && version == null)
+	    return null;
 	JSONObject o = new JSONObject();
-	if (name != null) o.put("name", name);
-	if (version != null) o.put("version", version);
+	if (name != null)
+	    o.put("name", name);
+	if (version != null)
+	    o.put("version", version);
 	return o;
     }
 
-    private static final String MD_CHARACTER_SET_CODE_URI = "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode";
+    private final String MD_CHARACTER_SET_CODE_URI = "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CharacterSetCode";
 
-    private static JSONObject charSetObj(String value) {
-	if (value == null) return null;
+    private JSONObject charSetObj(String value) {
+	if (value == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	o.put("uri", MD_CHARACTER_SET_CODE_URI);
 	o.put("value", value);
 	return o;
     }
 
-    private static JSONObject presentationFormObj(Identification id) {
+    private JSONObject presentationFormObj(Identification id) {
 	try {
 	    JSONObject ret = new JSONObject();
 	    List<CIPresentationFormCodePropertyType> pf = id.getFirstCitation().getPresentationForm();
-	    if (pf==null){
+	    if (pf == null) {
 		return null;
 	    }
 	    CIPresentationFormCodePropertyType cpcpt;
-	    if (pf.isEmpty()){
+	    if (pf.isEmpty()) {
 		return null;
-	    }else{
+	    } else {
 		cpcpt = pf.getFirst();
 	    }
 	    CodeListValueType code = cpcpt.getCIPresentationFormCode();
-	    if (code==null){
+	    if (code == null) {
 		return null;
 	    }
 	    String cdv = code.getCodeListValue();
-	    if (cdv!=null){
-		ret.put("value",cdv);
+	    if (cdv != null) {
+		ret.put("value", cdv);
 	    }
 	    String uri = code.getCodeList();
-	    if (uri!=null){
-		ret.put("uri",uri);
+	    if (uri != null) {
+		ret.put("uri", uri);
 	    }
 
 	    return ret;
@@ -316,22 +331,28 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return null;
     }
 
-    private static JSONObject statusObj(Identification identification) {
-	return codeFromIdentificationType(identification, "getStatus", "getMDProgressCode", "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode");
+    private JSONObject statusObj(Identification identification) {
+	return codeFromIdentificationType(identification, "getStatus", "getMDProgressCode",
+		"https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ProgressCode");
     }
 
-    private static String getDateOfNextUpdateFromMaintenance(Identification id) {
+    private String getDateOfNextUpdateFromMaintenance(Identification id) {
 	try {
 	    AbstractMDIdentificationType elementType = id.getElementType();
-	    if (elementType == null) return null;
+	    if (elementType == null)
+		return null;
 	    List<MDMaintenanceInformationPropertyType> maintenanceList = elementType.getResourceMaintenance();
-	    if (maintenanceList == null || maintenanceList.isEmpty()) return null;
+	    if (maintenanceList == null || maintenanceList.isEmpty())
+		return null;
 	    MDMaintenanceInformationPropertyType first = maintenanceList.get(0);
-	    if (first == null) return null;
+	    if (first == null)
+		return null;
 	    MDMaintenanceInformationType info = first.getMDMaintenanceInformation();
-	    if (info == null) return null;
+	    if (info == null)
+		return null;
 	    DatePropertyType dateProp = info.getDateOfNextUpdate();
-	    if (dateProp == null) return null;
+	    if (dateProp == null)
+		return null;
 	    String dt = dateProp.getDate();
 	    return dt;
 	} catch (Exception e) {
@@ -339,22 +360,29 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject updateFrequencyObj(Identification id) {
+    private JSONObject updateFrequencyObj(Identification id) {
 	String defaultUri = "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_MaintenanceFrequencyCode";
 	try {
 	    AbstractMDIdentificationType elementType = id.getElementType();
-	    if (elementType == null) return null;
+	    if (elementType == null)
+		return null;
 	    List<MDMaintenanceInformationPropertyType> maintenanceList = elementType.getResourceMaintenance();
-	    if (maintenanceList == null || maintenanceList.isEmpty()) return null;
+	    if (maintenanceList == null || maintenanceList.isEmpty())
+		return null;
 	    MDMaintenanceInformationPropertyType first = maintenanceList.get(0);
-	    if (first == null) return null;
+	    if (first == null)
+		return null;
 	    MDMaintenanceInformationType info = first.getMDMaintenanceInformation();
-	    if (info == null) return null;
+	    if (info == null)
+		return null;
 	    MDMaintenanceFrequencyCodePropertyType freqProp = info.getMaintenanceAndUpdateFrequency();
-	    if (freqProp == null) return null;
+	    if (freqProp == null)
+		return null;
 	    Object codeObj = freqProp.getMDMaintenanceFrequencyCode();
-	    if (codeObj instanceof JAXBElement) codeObj = ((JAXBElement<?>) codeObj).getValue();
-	    if (!(codeObj instanceof CodeListValueType)) return null;
+	    if (codeObj instanceof JAXBElement)
+		codeObj = ((JAXBElement<?>) codeObj).getValue();
+	    if (!(codeObj instanceof CodeListValueType))
+		return null;
 	    String val = ((CodeListValueType) codeObj).getCodeListValue();
 	    return val != null ? codeObj(val, defaultUri) : null;
 	} catch (Exception e) {
@@ -362,19 +390,19 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-
-
-    private static JSONObject codeFromIdentificationType(Identification id, String getterName, String codeGetter, String defaultUri) {
+    private JSONObject codeFromIdentificationType(Identification id, String getterName, String codeGetter, String defaultUri) {
 	try {
 	    List<MDProgressCodePropertyType> status = id.getElementType().getStatus();
-	    if (status == null||status.isEmpty()) return null;
+	    if (status == null || status.isEmpty())
+		return null;
 	    MDProgressCodePropertyType first = status.getFirst();
 	    if (first != null) {
 		CodeListValueType code = first.getMDProgressCode();
 		if (code != null) {
 
 		    String val = code.getCodeListValue();
-		    if (val != null) return codeObj( val, defaultUri);
+		    if (val != null)
+			return codeObj(val, defaultUri);
 		}
 	    }
 
@@ -384,13 +412,12 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return null;
     }
 
-
-
-    private static JSONObject graphicOverview(Identification identification) {
+    private JSONObject graphicOverview(Identification identification) {
 	try {
 	    if (identification instanceof DataIdentification) {
 		BrowseGraphic bg = ((DataIdentification) identification).getGraphicOverview();
-		if (bg == null) return null;
+		if (bg == null)
+		    return null;
 		JSONObject o = new JSONObject();
 		putOpt(o, "url", bg.getFileName());
 		putOpt(o, "description", bg.getFileDescription());
@@ -399,7 +426,8 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	    }
 	    if (identification instanceof ServiceIdentification) {
 		BrowseGraphic bg = ((ServiceIdentification) identification).getGraphicOverview();
-		if (bg == null) return null;
+		if (bg == null)
+		    return null;
 		JSONObject o = new JSONObject();
 		putOpt(o, "url", bg.getFileName());
 		putOpt(o, "description", bg.getFileDescription());
@@ -412,22 +440,25 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return null;
     }
 
-    private static void mapResponsibleParties(JSONObject out, CoreMetadata core, MDMetadata mi, Identification identification) {
+    private void mapResponsibleParties(JSONObject out, CoreMetadata core, MDMetadata mi, Identification identification) {
 	ResponsibleParty metadataOwner = null;
 	if (mi != null) {
 	    Iterator<ResponsibleParty> contacts = mi.getContacts();
-	    if (contacts != null && contacts.hasNext()) metadataOwner = contacts.next();
+	    if (contacts != null && contacts.hasNext())
+		metadataOwner = contacts.next();
 	}
 	putOpt(out, "metadata_owner", responsiblePartyToJson(metadataOwner));
 	putOpt(out, "point_of_contact", responsiblePartyToJson(identification.getPointOfContact()));
 	putOpt(out, "resource_owner", getCitedPartyByRole(identification, "owner"));
 	putOpt(out, "resource_provider", resourceProvider(core));
 	List<JSONObject> other = otherRoles(identification);
-	if (!other.isEmpty()) out.put("other_roles", new JSONArray(other));
+	if (!other.isEmpty())
+	    out.put("other_roles", new JSONArray(other));
     }
 
-    private static JSONObject responsiblePartyToJson(ResponsibleParty party) {
-	if (party == null) return null;
+    private JSONObject responsiblePartyToJson(ResponsibleParty party) {
+	if (party == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	putOpt(o, "organisation_name", party.getOrganisationName());
 	putOpt(o, "individual_name", party.getIndividualName());
@@ -435,7 +466,8 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	Contact contact = party.getContact();
 	if (contact != null) {
 	    String email = contact.getAddress() != null ? contact.getAddress().getElectronicMailAddress() : null;
-	    if (email != null) o.put("address", new JSONObject().put("email", email));
+	    if (email != null)
+		o.put("address", new JSONObject().put("email", email));
 	    Online online = contact.getOnline();
 	    if (online != null && online.getLinkage() != null) {
 		o.put("link", online.getLinkage());
@@ -444,12 +476,14 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return o;
     }
 
-    private static JSONObject getCitedPartyByRole(Identification identification, String role) {
+    private JSONObject getCitedPartyByRole(Identification identification, String role) {
 	try {
 	    List<ResponsibleParty> list = identification.getCitationResponsibleParties();
-	    if (list == null) return null;
+	    if (list == null)
+		return null;
 	    for (ResponsibleParty p : list) {
-		if (role.equalsIgnoreCase(p.getRoleCode())) return responsiblePartyToJson(p);
+		if (role.equalsIgnoreCase(p.getRoleCode()))
+		    return responsiblePartyToJson(p);
 	    }
 	} catch (Exception e) {
 	    // ignore
@@ -457,24 +491,27 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return null;
     }
 
-    private static JSONObject resourceProvider(CoreMetadata core) {
+    private JSONObject resourceProvider(CoreMetadata core) {
 	try {
 	    List<ResponsibleParty> list = core.getMIMetadata().getDistribution().getDistributorParties();
-	    if (list != null && !list.isEmpty()) return responsiblePartyToJson(list.get(0));
+	    if (list != null && !list.isEmpty())
+		return responsiblePartyToJson(list.get(0));
 	} catch (Exception e) {
 	    // ignore
 	}
 	return null;
     }
 
-    private static List<JSONObject> otherRoles(Identification identification) {
+    private List<JSONObject> otherRoles(Identification identification) {
 	List<JSONObject> list = new ArrayList<>();
 	try {
 	    List<ResponsibleParty> cited = identification.getCitationResponsibleParties();
-	    if (cited == null) return list;
+	    if (cited == null)
+		return list;
 	    for (ResponsibleParty p : cited) {
 		String role = p.getRoleCode();
-		if (role == null || "owner".equalsIgnoreCase(role)) continue;
+		if (role == null || "owner".equalsIgnoreCase(role))
+		    continue;
 		list.add(responsiblePartyToJson(p));
 	    }
 	} catch (Exception e) {
@@ -483,12 +520,12 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return list;
     }
 
-    private static final String SPATIAL_SCOPE_THESAURUS_NAME = "Spatial scope";
-    private static final String SPATIAL_SCOPE_THESAURUS_URL_FRAGMENT = "SpatialScope";
-    private static final String INSPIRE_PRIORITY_DATASET_THESAURUS_NAME = "INSPIRE priority data set";
-    private static final String INSPIRE_PRIORITY_DATASET_THESAURUS_URL_FRAGMENT = "PriorityDataset";
+    private final String SPATIAL_SCOPE_THESAURUS_NAME = "Spatial scope";
+    private final String SPATIAL_SCOPE_THESAURUS_URL_FRAGMENT = "SpatialScope";
+    private final String INSPIRE_PRIORITY_DATASET_THESAURUS_NAME = "INSPIRE priority data set";
+    private final String INSPIRE_PRIORITY_DATASET_THESAURUS_URL_FRAGMENT = "PriorityDataset";
 
-    private static void mapKeywords(JSONObject out, Identification identification) {
+    private void mapKeywords(JSONObject out, Identification identification) {
 	JSONArray descriptiveKeywords = new JSONArray();
 	try {
 	    Iterator<Keywords> it = identification.getKeywords();
@@ -506,10 +543,12 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 			String uri = ISOMetadata.getHREFStringFromCharacterString(first);
 			JSONObject keywordsObj = new JSONObject();
 			keywordsObj.put("label", label != null ? label : "");
-			if (uri != null && !uri.isEmpty()) keywordsObj.put("uri", uri);
+			if (uri != null && !uri.isEmpty())
+			    keywordsObj.put("uri", uri);
 			JSONObject spatialScope = new JSONObject();
 			spatialScope.put("keywords", keywordsObj);
-			if (thObj != null) spatialScope.put("thesaurus", thObj);
+			if (thObj != null)
+			    spatialScope.put("thesaurus", thObj);
 			out.put("spatial_scope", spatialScope);
 			continue;
 		    }
@@ -519,10 +558,12 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 			String uri = ISOMetadata.getHREFStringFromCharacterString(first);
 			JSONObject keywordsObj = new JSONObject();
 			keywordsObj.put("label", label != null ? label : "");
-			if (uri != null && !uri.isEmpty()) keywordsObj.put("uri", uri);
+			if (uri != null && !uri.isEmpty())
+			    keywordsObj.put("uri", uri);
 			JSONObject inspirePriorityDataset = new JSONObject();
 			inspirePriorityDataset.put("keywords", keywordsObj);
-			if (thObj != null) inspirePriorityDataset.put("thesaurus", thObj);
+			if (thObj != null)
+			    inspirePriorityDataset.put("thesaurus", thObj);
 			out.put("inspire_priority_dataset", inspirePriorityDataset);
 			continue;
 		    }
@@ -534,85 +575,105 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 			    String uri = ISOMetadata.getHREFStringFromCharacterString(prop);
 			    JSONObject ko = new JSONObject();
 			    ko.put("label", label != null ? label : "");
-			    if (uri != null && !uri.isEmpty()) ko.put("uri", uri);
+			    if (uri != null && !uri.isEmpty())
+				ko.put("uri", uri);
 			    kwArr.put(ko);
 			}
 		    }
 		    group.put("keywords", kwArr);
-		    if (thObj != null) group.put("thesaurus", thObj);
+		    if (thObj != null)
+			group.put("thesaurus", thObj);
 		    descriptiveKeywords.put(group);
 		}
 	    }
 	} catch (Exception e) {
 	    // ignore
 	}
-	if (descriptiveKeywords.length() > 0) out.put("descriptive_keywords", descriptiveKeywords);
+	if (descriptiveKeywords.length() > 0)
+	    out.put("descriptive_keywords", descriptiveKeywords);
     }
 
-    private static boolean isSpatialScopeThesaurus(JSONObject thesaurusObj) {
-	if (thesaurusObj == null) return false;
+    private boolean isSpatialScopeThesaurus(JSONObject thesaurusObj) {
+	if (thesaurusObj == null)
+	    return false;
 	String name = thesaurusObj.optString("name", null);
-	if (name != null && SPATIAL_SCOPE_THESAURUS_NAME.equalsIgnoreCase(name.trim())) return true;
+	if (name != null && SPATIAL_SCOPE_THESAURUS_NAME.equalsIgnoreCase(name.trim()))
+	    return true;
 	String url = thesaurusObj.optString("url", null);
 	return url != null && url.contains(SPATIAL_SCOPE_THESAURUS_URL_FRAGMENT);
     }
 
-    private static boolean isInspirePriorityDatasetThesaurus(JSONObject thesaurusObj) {
-	if (thesaurusObj == null) return false;
+    private boolean isInspirePriorityDatasetThesaurus(JSONObject thesaurusObj) {
+	if (thesaurusObj == null)
+	    return false;
 	String name = thesaurusObj.optString("name", null);
-	if (name != null && INSPIRE_PRIORITY_DATASET_THESAURUS_NAME.equalsIgnoreCase(name.trim())) return true;
+	if (name != null && INSPIRE_PRIORITY_DATASET_THESAURUS_NAME.equalsIgnoreCase(name.trim()))
+	    return true;
 	String url = thesaurusObj.optString("url", null);
 	return url != null && url.contains(INSPIRE_PRIORITY_DATASET_THESAURUS_URL_FRAGMENT);
     }
 
-    private static JSONObject thesaurusToJson(Citation th) {
-	if (th == null) return null;
+    private JSONObject thesaurusToJson(Citation th) {
+	if (th == null)
+	    return null;
 	String name = th.getTitle();
 	String url = thesaurusCitationUrl(th);
 	String publicationDate = thesaurusCitationPublicationDate(th);
 	String revisionDate = thesaurusCitationRevisionDate(th);
-	if (name == null && url == null && publicationDate == null && revisionDate == null) return null;
+	if (name == null && url == null && publicationDate == null && revisionDate == null)
+	    return null;
 	JSONObject o = new JSONObject();
-	if (name != null) o.put("name", name);
-	if (url != null) o.put("url", url);
-	if (publicationDate != null) o.put("publication_date", publicationDate);
-	if (revisionDate != null) o.put("revision_date", revisionDate);
+	if (name != null)
+	    o.put("name", name);
+	if (url != null)
+	    o.put("url", url);
+	if (publicationDate != null)
+	    o.put("publication_date", publicationDate);
+	if (revisionDate != null)
+	    o.put("revision_date", revisionDate);
 	return o;
     }
 
-    private static String thesaurusCitationUrl(Citation th) {
+    private String thesaurusCitationUrl(Citation th) {
 	CharacterStringPropertyType titleProp = th.getElementType().getTitle();
-	if (titleProp == null) return null;
+	if (titleProp == null)
+	    return null;
 	return ISOMetadata.getHREFStringFromCharacterString(titleProp);
     }
 
-    private static String thesaurusCitationPublicationDate(Citation th) {
+    private String thesaurusCitationPublicationDate(Citation th) {
 	return thesaurusCitationDateByType(th, "publication");
     }
 
-    private static String thesaurusCitationRevisionDate(Citation th) {
+    private String thesaurusCitationRevisionDate(Citation th) {
 	return thesaurusCitationDateByType(th, "revision");
     }
 
-    private static String thesaurusCitationDateByType(Citation th, String dateTypeCode) {
+    private String thesaurusCitationDateByType(Citation th, String dateTypeCode) {
 	try {
 	    List<CIDatePropertyType> dateList = th.getElementType().getDate();
-	    if (dateList == null) return null;
+	    if (dateList == null)
+		return null;
 	    for (CIDatePropertyType dateItem : dateList) {
-		if (dateItem == null) continue;
+		if (dateItem == null)
+		    continue;
 		CIDateType ciDate = dateItem.getCIDate();
-		if (ciDate == null) continue;
+		if (ciDate == null)
+		    continue;
 		CIDateTypeCodePropertyType dateType = ciDate.getDateType();
-		if (dateType == null) continue;
+		if (dateType == null)
+		    continue;
 		Object codeVal = dateType.getCIDateTypeCode();
-		if (codeVal instanceof JAXBElement) codeVal = ((JAXBElement<?>) codeVal).getValue();
+		if (codeVal instanceof JAXBElement)
+		    codeVal = ((JAXBElement<?>) codeVal).getValue();
 		if (codeVal instanceof CodeListValueType) {
 		    String typeStr = ((CodeListValueType) codeVal).getCodeListValue();
 		    if (typeStr != null && dateTypeCode.equalsIgnoreCase(typeStr)) {
 			DatePropertyType dateProp = ciDate.getDate();
 			if (dateProp != null) {
 			    String dt = dateProp.getDate();
-			    if (dt != null) return dt;
+			    if (dt != null)
+				return dt;
 			}
 			break;
 		    }
@@ -624,11 +685,13 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return null;
     }
 
-    private static void mapSpatialInformation(JSONObject out, CoreMetadata core, Identification identification) {
+    private void mapSpatialInformation(JSONObject out, CoreMetadata core, Identification identification) {
 	try {
 	    GeographicBoundingBox bbox = identification instanceof DataIdentification
 		    ? ((DataIdentification) identification).getGeographicBoundingBox()
-		    : (identification instanceof ServiceIdentification ? ((ServiceIdentification) identification).getGeographicBoundingBox() : null);
+		    : (identification instanceof ServiceIdentification
+		       ? ((ServiceIdentification) identification).getGeographicBoundingBox()
+			    : null);
 	    if (bbox != null && bbox.getWest() != null && bbox.getEast() != null && bbox.getSouth() != null && bbox.getNorth() != null) {
 		JSONObject b = new JSONObject();
 		b.put("west_bound_longitude", bbox.getWest());
@@ -642,15 +705,18 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
 	try {
 	    Iterator<BoundingPolygon> polyIt = null;
-	    if (identification instanceof DataIdentification) polyIt = ((DataIdentification) identification).getBoundingPolygons();
-	    else if (identification instanceof ServiceIdentification) polyIt = ((ServiceIdentification) identification).getBoundingPolygons();
+	    if (identification instanceof DataIdentification)
+		polyIt = ((DataIdentification) identification).getBoundingPolygons();
+	    else if (identification instanceof ServiceIdentification)
+		polyIt = ((ServiceIdentification) identification).getBoundingPolygons();
 	    if (polyIt != null && polyIt.hasNext()) {
 		Iterator<Double> coords = polyIt.next().getCoordinates();
 		if (coords != null) {
 		    List<String> points = new ArrayList<>();
 		    while (coords.hasNext()) {
 			Double x = coords.next();
-			if (!coords.hasNext()) break;
+			if (!coords.hasNext())
+			    break;
 			Double y = coords.next();
 			points.add(x + " " + y);
 		    }
@@ -666,19 +732,22 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	    // ignore
 	}
 	mapVerticalExtent(out, identification);
-	if (core == null) return;
+	if (core == null)
+	    return;
 	try {
 	    Iterator<ReferenceSystem> it = core.getMIMetadata().getReferenceSystemInfos();
 	    if (it != null && it.hasNext()) {
 		ReferenceSystem ref = it.next();
-		CharacterStringPropertyType codeProp = ref.getElementType() != null
-			&& ref.getElementType().getReferenceSystemIdentifier() != null
-			&& ref.getElementType().getReferenceSystemIdentifier().getRSIdentifier() != null
-			? ref.getElementType().getReferenceSystemIdentifier().getRSIdentifier().getCode()
-			: null;
+		CharacterStringPropertyType codeProp =
+			ref.getElementType() != null && ref.getElementType().getReferenceSystemIdentifier() != null
+				&& ref.getElementType().getReferenceSystemIdentifier().getRSIdentifier() != null ? ref.getElementType()
+														   .getReferenceSystemIdentifier()
+														   .getRSIdentifier()
+														   .getCode() : null;
 		// When set with setCodeWithAnchor(url, label): url = href, label = anchor value
 		String url = codeProp != null ? ISOMetadata.getHREFStringFromCharacterString(codeProp) : null;
-		if (url == null) url = ref.getCodeString().orElse(null);
+		if (url == null)
+		    url = ref.getCodeString().orElse(null);
 		if (url != null) {
 		    JSONObject nativeEpsg = new JSONObject();
 		    nativeEpsg.put("url", url);
@@ -694,12 +763,15 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static void mapVerticalExtent(JSONObject out, Identification identification) {
+    private void mapVerticalExtent(JSONObject out, Identification identification) {
 	try {
 	    VerticalExtent verticalExtent = identification instanceof DataIdentification
 		    ? ((DataIdentification) identification).getVerticalExtent()
-		    : (identification instanceof ServiceIdentification ? ((ServiceIdentification) identification).getVerticalExtent() : null);
-	    if (verticalExtent == null) return;
+		    : (identification instanceof ServiceIdentification
+		       ? ((ServiceIdentification) identification).getVerticalExtent()
+			    : null);
+	    if (verticalExtent == null)
+		return;
 
 	    JSONObject vertical = new JSONObject();
 	    putOpt(vertical, "minimum_value", verticalExtent.getMinimumValue());
@@ -722,18 +794,22 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static void mapTemporalInformation(JSONObject out, Identification identification) {
+    private void mapTemporalInformation(JSONObject out, Identification identification) {
 	try {
 	    TemporalExtent te = identification instanceof DataIdentification
 		    ? ((DataIdentification) identification).getTemporalExtent()
-		    : (identification instanceof ServiceIdentification ? ((ServiceIdentification) identification).getTemporalExtent() : null);
+		    : (identification instanceof ServiceIdentification
+		       ? ((ServiceIdentification) identification).getTemporalExtent()
+			    : null);
 	    if (te != null) {
 		String start = te.getBeginPosition();
 		String end = te.getEndPosition();
 		if (start != null || end != null) {
 		    JSONObject t = new JSONObject();
-		    if (start != null) t.put("start_date", start);
-		    if (end != null) t.put("end_date", end);
+		    if (start != null)
+			t.put("start_date", start);
+		    if (end != null)
+			t.put("end_date", end);
 		    out.put("temporal_extent", t);
 		}
 	    }
@@ -742,15 +818,18 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static void mapConstraints(JSONObject out, Identification identification) {
+    private void mapConstraints(JSONObject out, Identification identification) {
 	try {
 	    Iterator<LegalConstraints> it = identification.getLegalConstraints();
-	    if (it == null || !it.hasNext()) return;
+	    if (it == null || !it.hasNext())
+		return;
 	    LegalConstraints lc = it.next();
 	    JSONObject rc = new JSONObject();
 	    putOpt(rc, "use_limitation", lc.getUseLimitation());
-	    putOpt(rc, "access_constraints", codeObj(lc.getAccessConstraintCode(), "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"));
-	    putOpt(rc, "use_constraints", codeObj(lc.getUseConstraintsCode(), "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"));
+	    putOpt(rc, "access_constraints", codeObj(lc.getAccessConstraintCode(),
+		    "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"));
+	    putOpt(rc, "use_constraints", codeObj(lc.getUseConstraintsCode(),
+		    "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_RestrictionCode"));
 	    putOpt(rc, "other_constraints", lc.getOtherConstraint());
 	    mapSecurityConstraints(rc, identification);
 	    out.put("resource_constraints", rc);
@@ -759,17 +838,22 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static void mapSecurityConstraints(JSONObject rc, Identification identification) {
+    private void mapSecurityConstraints(JSONObject rc, Identification identification) {
 	try {
 	    AbstractMDIdentificationType elementType = identification.getElementType();
-	    if (elementType == null) return;
+	    if (elementType == null)
+		return;
 	    List<MDConstraintsPropertyType> constraintsList = elementType.getResourceConstraints();
-	    if (constraintsList == null) return;
+	    if (constraintsList == null)
+		return;
 	    for (MDConstraintsPropertyType item : constraintsList) {
-		if (item == null) continue;
+		if (item == null)
+		    continue;
 		Object constraintObj = item.getMDConstraints();
-		if (constraintObj instanceof JAXBElement) constraintObj = ((JAXBElement<?>) constraintObj).getValue();
-		if (constraintObj == null || !(constraintObj instanceof MDSecurityConstraintsType)) continue;
+		if (constraintObj instanceof JAXBElement)
+		    constraintObj = ((JAXBElement<?>) constraintObj).getValue();
+		if (constraintObj == null || !(constraintObj instanceof MDSecurityConstraintsType))
+		    continue;
 		MDSecurityConstraintsType constraint = (MDSecurityConstraintsType) constraintObj;
 		String classification = null, classificationUri = null, note = null;
 		MDClassificationCodePropertyType classProp = constraint.getClassification();
@@ -777,13 +861,17 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		    CodeListValueType code = classProp.getMDClassificationCode();
 		    if (code != null) {
 			classification = code.getCodeListValue();
-			if (code.getCodeList() != null) classificationUri = code.getCodeList();
+			if (code.getCodeList() != null)
+			    classificationUri = code.getCodeList();
 		    }
 		}
 		CharacterStringPropertyType userNoteProp = constraint.getUserNote();
-		if (userNoteProp != null) note = ISOMetadata.getStringFromCharacterString(userNoteProp);
-		if (classification != null) putOpt(rc, "security_classification", codeObj(classification, classificationUri));
-		if (note != null) putOpt(rc, "security_note", note);
+		if (userNoteProp != null)
+		    note = ISOMetadata.getStringFromCharacterString(userNoteProp);
+		if (classification != null)
+		    putOpt(rc, "security_classification", codeObj(classification, classificationUri));
+		if (note != null)
+		    putOpt(rc, "security_note", note);
 		break;
 	    }
 	} catch (Exception e) {
@@ -791,37 +879,34 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject formatNameObj(Format f) {
-	if (f == null) return new JSONObject().put("label", "");
+    private JSONObject formatNameObj(Format f) {
+	if (f == null)
+	    return new JSONObject().put("label", "");
 	String label = f.getName();
 	String uri = formatNameUri(f);
 	JSONObject o = new JSONObject();
 	o.put("label", label != null ? label : "");
-	if (uri != null) o.put("uri", uri);
+	if (uri != null)
+	    o.put("uri", uri);
 	return o;
     }
 
-    private static String formatNameUri(Format f) {
+    private String formatNameUri(Format f) {
 	CharacterStringPropertyType nameProp = f.getElementType().getName();
-	if (nameProp == null) return null;
+	if (nameProp == null)
+	    return null;
 	return ISOMetadata.getHREFStringFromCharacterString(nameProp);
     }
 
-    private static final String MD_SPATIAL_REPRESENTATION_TYPE_CODE_URI =
-	    "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode";
-    private static final String MD_CELL_GEOMETRY_CODE_URI =
-	    "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode";
-    private static final String MD_DIMENSION_NAME_TYPE_CODE_URI =
-	    "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode";
-    private static final String MD_TOPOLOGY_LEVEL_CODE_URI =
-	    "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_TopologyLevelCode";
-    private static final String MD_GEOMETRIC_OBJECT_TYPE_CODE_URI =
-	    "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_GeometricObjectTypeCode";
+    private final String MD_SPATIAL_REPRESENTATION_TYPE_CODE_URI = "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_SpatialRepresentationTypeCode";
+    private final String MD_CELL_GEOMETRY_CODE_URI = "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode";
+    private final String MD_DIMENSION_NAME_TYPE_CODE_URI = "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode";
 
-    private static void mapDistribution(JSONObject out, CoreMetadata core) {
+    private void mapDistribution(JSONObject out, CoreMetadata core) {
 	try {
 	    Distribution dist = core.getMIMetadata().getDistribution();
-	    if (dist == null) return;
+	    if (dist == null)
+		return;
 	    Iterator<Format> fmtIt = dist.getFormats();
 	    if (fmtIt != null && fmtIt.hasNext()) {
 		JSONArray formats = new JSONArray();
@@ -837,11 +922,14 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	    List<JSONObject> onlines = new ArrayList<>();
 	    Iterator<Online> onIt = dist.getDistributionOnlines();
 	    if (onIt != null) {
-		while (onIt.hasNext()) onlines.add(onlineToJson(onIt.next()));
+		while (onIt.hasNext())
+		    onlines.add(onlineToJson(onIt.next()));
 	    }
 	    try {
 		List<EXT_Online> extList = dist.getExtendedDistributionOnlines();
-		if (extList != null) for (EXT_Online ext : extList) onlines.add(onlineToJson(ext));
+		if (extList != null)
+		    for (EXT_Online ext : extList)
+			onlines.add(onlineToJson(ext));
 	    } catch (Exception e) {
 		// ignore
 	    }
@@ -854,8 +942,9 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject onlineToJson(Online online) {
-	if (online == null) return null;
+    private JSONObject onlineToJson(Online online) {
+	if (online == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	putOpt(o, "url", online.getLinkage());
 	putOpt(o, "name", online.getName());
@@ -874,35 +963,41 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		JSONObject layerStyle = new JSONObject();
 		putOpt(layerStyle, "name", extType.getLayerStyleName());
 		putOpt(layerStyle, "workspace", extType.getLayerStyleWorkspace());
-		if (layerStyle.length() > 0) o.put("layer_style", layerStyle);
+		if (layerStyle.length() > 0)
+		    o.put("layer_style", layerStyle);
 	    }
 	}
 	return o;
     }
 
-    private static int onlineSortRank(JSONObject online) {
+    private int onlineSortRank(JSONObject online) {
 	String functionValue = null;
 	JSONObject function = online.optJSONObject("function");
-	if (function != null) functionValue = function.optString("value", null);
+	if (function != null)
+	    functionValue = function.optString("value", null);
 	// Keep ordering stable/deterministic for DataHub JSON:
 	// expected sequence is `download` first, then `view`.
-	if ("download".equalsIgnoreCase(functionValue)) return 0;
-	if ("view".equalsIgnoreCase(functionValue)) return 1;
+	if ("download".equalsIgnoreCase(functionValue))
+	    return 0;
+	if ("view".equalsIgnoreCase(functionValue))
+	    return 1;
 	return 2;
     }
 
-    private static String descriptionLabel(Online online) {
+    private String descriptionLabel(Online online) {
 	try {
 	    CharacterStringPropertyType description = online.getElementType().getDescription();
-	    if (description == null) return online.getDescription();
+	    if (description == null)
+		return online.getDescription();
 	    JAXBElement<?> jaxbElement = description.getCharacterString();
 	    if (jaxbElement != null && jaxbElement.getValue() instanceof net.opengis.iso19139.gmx.v_20060504.AnchorType) {
-		net.opengis.iso19139.gmx.v_20060504.AnchorType anchor =
-			(net.opengis.iso19139.gmx.v_20060504.AnchorType) jaxbElement.getValue();
+		net.opengis.iso19139.gmx.v_20060504.AnchorType anchor = (net.opengis.iso19139.gmx.v_20060504.AnchorType) jaxbElement.getValue();
 		// In ISO19139 `gmx:Anchor`, the human-readable label is usually in `xlink:title`
 		// while `value` can be empty. We prefer the value when present, otherwise fallback to title.
-		if (anchor.getValue() != null && !anchor.getValue().isEmpty()) return anchor.getValue();
-		if (anchor.getTitle() != null && !anchor.getTitle().isEmpty()) return anchor.getTitle();
+		if (anchor.getValue() != null && !anchor.getValue().isEmpty())
+		    return anchor.getValue();
+		if (anchor.getTitle() != null && !anchor.getTitle().isEmpty())
+		    return anchor.getTitle();
 	    }
 	    return stringFromCharProp(description);
 	} catch (Exception e) {
@@ -910,67 +1005,80 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject descriptionObj(String label, String uri) {
-	if (label == null && uri == null) return null;
+    private JSONObject descriptionObj(String label, String uri) {
+	if (label == null && uri == null)
+	    return null;
 	JSONObject o = new JSONObject();
-	if (label != null) o.put("label", label);
-	if (uri != null) o.put("uri", uri);
+	if (label != null)
+	    o.put("label", label);
+	if (uri != null)
+	    o.put("uri", uri);
 	return o;
     }
 
-    private static JSONObject protocolObj(Online online) {
+    private JSONObject protocolObj(Online online) {
 	try {
 	    String uri = online.getProtocolGmxAnchorHref();
 	    String label = online.getProtocolGmxAnchorTitle();
-	    if (label == null) label = online.getProtocol();
-	    if (uri == null && label == null) return null;
+	    if (label == null)
+		label = online.getProtocol();
+	    if (uri == null && label == null)
+		return null;
 	    JSONObject o = new JSONObject();
-	    if (uri != null) o.put("uri", uri);
-	    if (label != null) o.put("label", label);
+	    if (uri != null)
+		o.put("uri", uri);
+	    if (label != null)
+		o.put("label", label);
 	    return o;
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static JSONObject functionObj(Online online) {
+    private JSONObject functionObj(Online online) {
 	try {
 	    String v = online.getFunctionCode();
 	    String uri = online.getFunctionCodeURI();
-	    return v != null ? codeObj(v,uri) : null;
+	    return v != null ? codeObj(v, uri) : null;
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static JSONObject applicationProfileObj(Online online) {
+    private JSONObject applicationProfileObj(Online online) {
 	try {
 	    String label = online.getApplicationProfile();
 	    String uri = applicationProfileUri(online);
-	    if (label == null && uri == null) return null;
+	    if (label == null && uri == null)
+		return null;
 	    JSONObject o = new JSONObject();
-	    if (label != null) o.put("label", label);
-	    if (uri != null) o.put("uri", uri);
+	    if (label != null)
+		o.put("label", label);
+	    if (uri != null)
+		o.put("uri", uri);
 	    return o;
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static String applicationProfileUri(Online online) {
+    private String applicationProfileUri(Online online) {
 	CharacterStringPropertyType appProfile = online.getElementType().getApplicationProfile();
-	if (appProfile == null) return null;
+	if (appProfile == null)
+	    return null;
 	return ISOMetadata.getHREFStringFromCharacterString(appProfile);
     }
 
-    private static void mapQualityInformation(JSONObject out, MDMetadata mi, GSResource resource) {
+    private void mapQualityInformation(JSONObject out, MDMetadata mi, GSResource resource) {
 	try {
 	    Iterator<DataQuality> dqIt = mi.getDataQualities();
-	    if (dqIt == null || !dqIt.hasNext()) return;
+	    if (dqIt == null || !dqIt.hasNext())
+		return;
 	    DataQuality dq = dqIt.next();
 	    putOpt(out, "lineage_statement", dq.getLineageStatement());
 	    List<JSONObject> lineageSources = lineageSourcesFromDataQuality(dq);
-	    if (lineageSources != null && !lineageSources.isEmpty()) out.put("lineage_source", new JSONArray(lineageSources));
+	    if (lineageSources != null && !lineageSources.isEmpty())
+		out.put("lineage_source", new JSONArray(lineageSources));
 	    List<JSONObject> processSteps = lineageProcessStepsFromDataQuality(dq);
 	    if (processSteps != null && !processSteps.isEmpty()) {
 		if (resource != null && resource.getExtensionHandler() != null) {
@@ -997,18 +1105,21 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		out.put("lineage_process_step", new JSONArray(processSteps));
 	    }
 	    List<JSONObject> conformity = conformanceResultsFromDataQuality(dq);
-	    if (conformity != null && !conformity.isEmpty()) out.put("conformity", new JSONArray(conformity));
+	    if (conformity != null && !conformity.isEmpty())
+		out.put("conformity", new JSONArray(conformity));
 	    JSONObject positionalAccuracy = positionalAccuracyFromDataQuality(dq);
-	    if (positionalAccuracy != null) out.put("positional_accuracy", positionalAccuracy);
+	    if (positionalAccuracy != null)
+		out.put("positional_accuracy", positionalAccuracy);
 	    putOpt(out, "quality_scope", qualityScopeObj(dq));
 	} catch (Exception e) {
 	    // ignore
 	}
     }
 
-    private static void mapExtensionFields(JSONObject out, GSResource resource) {
+    private void mapExtensionFields(JSONObject out, GSResource resource) {
 	try {
-	    if (resource == null || resource.getExtensionHandler() == null) return;
+	    if (resource == null || resource.getExtensionHandler() == null)
+		return;
 	    resource.getExtensionHandler().getRasterMosaic().ifPresent(value -> out.put("raster_mosaic", value));
 	    resource.getExtensionHandler().getAttributeMissingValue().ifPresent(value -> {
 		try {
@@ -1022,20 +1133,25 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static List<JSONObject> lineageSourcesFromDataQuality(DataQuality dq) {
+    private List<JSONObject> lineageSourcesFromDataQuality(DataQuality dq) {
 	List<JSONObject> list = new ArrayList<>();
 	try {
 	    LILineagePropertyType lineageProp = dq.getElementType().getLineage();
-	    if (lineageProp == null) return list;
+	    if (lineageProp == null)
+		return list;
 	    LILineageType lineageType = lineageProp.getLILineage();
-	    if (lineageType == null) return list;
+	    if (lineageType == null)
+		return list;
 	    List<LISourcePropertyType> sources = lineageType.getSource();
-	    if (sources == null) return list;
+	    if (sources == null)
+		return list;
 	    for (LISourcePropertyType sp : sources) {
 		LISourceType liSource = sp.getLISource();
-		if (liSource == null) continue;
+		if (liSource == null)
+		    continue;
 		JSONObject srcJson = lineageSourceToJson(liSource);
-		if (srcJson != null) list.add(srcJson);
+		if (srcJson != null)
+		    list.add(srcJson);
 	    }
 	} catch (Exception e) {
 	    // ignore
@@ -1043,21 +1159,27 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return list;
     }
 
-    private static List<JSONObject> lineageProcessStepsFromDataQuality(DataQuality dq) {
+    private List<JSONObject> lineageProcessStepsFromDataQuality(DataQuality dq) {
 	List<JSONObject> list = new ArrayList<>();
 	try {
 	    LILineagePropertyType lineageProp = dq.getElementType().getLineage();
-	    if (lineageProp == null) return list;
+	    if (lineageProp == null)
+		return list;
 	    LILineageType lineageType = lineageProp.getLILineage();
-	    if (lineageType == null) return list;
+	    if (lineageType == null)
+		return list;
 	    List<LIProcessStepPropertyType> steps = lineageType.getProcessStep();
-	    if (steps == null) return list;
+	    if (steps == null)
+		return list;
 	    for (LIProcessStepPropertyType stepProp : steps) {
-		if (stepProp == null || !stepProp.isSetLIProcessStep()) continue;
+		if (stepProp == null || !stepProp.isSetLIProcessStep())
+		    continue;
 		LIProcessStepType step = stepProp.getLIProcessStep();
-		if (step == null) continue;
+		if (step == null)
+		    continue;
 		JSONObject ps = processStepToJson(step);
-		if (ps != null) list.add(ps);
+		if (ps != null)
+		    list.add(ps);
 	    }
 	} catch (Exception e) {
 	    // ignore
@@ -1065,8 +1187,9 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return list;
     }
 
-    private static JSONObject processStepToJson(LIProcessStepType step) {
-	if (step == null) return null;
+    private JSONObject processStepToJson(LIProcessStepType step) {
+	if (step == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	putOpt(o, "description", stringFromCharProp(step.getDescription()));
 	putOpt(o, "rationale", stringFromCharProp(step.getRationale()));
@@ -1082,14 +1205,16 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	    if (first != null && first.getCIResponsibleParty() != null) {
 		ResponsibleParty rp = new ResponsibleParty(first.getCIResponsibleParty());
 		JSONObject proc = responsiblePartyToJson(rp);
-		if (proc != null) o.put("processor", proc);
+		if (proc != null)
+		    o.put("processor", proc);
 	    }
 	}
 	if (step.isSetSource() && step.getSource() != null && !step.getSource().isEmpty()) {
 	    LISourcePropertyType firstSource = step.getSource().get(0);
 	    if (firstSource != null && firstSource.getLISource() != null) {
 		JSONObject src = lineageSourceToJson(firstSource.getLISource());
-		if (src != null) o.put("source", src);
+		if (src != null)
+		    o.put("source", src);
 	    }
 	}
 	if (step instanceof LEProcessStepType) {
@@ -1098,78 +1223,93 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		LESourcePropertyType firstOutput = leStep.getOutput().get(0);
 		if (firstOutput != null && firstOutput.getLESource() != null) {
 		    JSONObject outputJson = lineageSourceToJson(firstOutput.getLESource());
-		    if (outputJson != null) o.put("output", outputJson);
+		    if (outputJson != null)
+			o.put("output", outputJson);
 		}
 	    }
 	    if (leStep.getProcessingInformation() != null && leStep.getProcessingInformation().getLEProcessing() != null) {
 		JSONObject procInfoJson = processingInformationToJson(leStep.getProcessingInformation().getLEProcessing());
-		if (procInfoJson != null) o.put("processing_information", procInfoJson);
+		if (procInfoJson != null)
+		    o.put("processing_information", procInfoJson);
 	    }
 	    if (leStep.isSetReport() && leStep.getReport() != null && !leStep.getReport().isEmpty()) {
 		LEProcessStepReportPropertyType firstReportProp = leStep.getReport().get(0);
 		if (firstReportProp != null && firstReportProp.getLEProcessStepReport() != null) {
 		    JSONObject reportJson = processStepReportToJson(firstReportProp.getLEProcessStepReport());
-		    if (reportJson != null) o.put("report", reportJson);
+		    if (reportJson != null)
+			o.put("report", reportJson);
 		}
 	    }
 	}
 	return o.length() > 0 ? o : null;
     }
 
-    private static JSONObject processingInformationToJson(LEProcessingType proc) {
-	if (proc == null) return null;
+    private JSONObject processingInformationToJson(LEProcessingType proc) {
+	if (proc == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	if (proc.isSetIdentifier() && proc.getIdentifier() != null) {
 	    Object idVal = proc.getIdentifier().getMDIdentifier();
-	    if (idVal instanceof JAXBElement) idVal = ((JAXBElement<?>) idVal).getValue();
+	    if (idVal instanceof JAXBElement)
+		idVal = ((JAXBElement<?>) idVal).getValue();
 	    if (idVal instanceof MDIdentifierType) {
 		String code = ISOMetadata.getStringFromCharacterString(((MDIdentifierType) idVal).getCode());
-		if (code != null) o.put("id", code);
+		if (code != null)
+		    o.put("id", code);
 	    }
 	}
 	if (proc.isSetSoftwareReference() && proc.getSoftwareReference() != null && !proc.getSoftwareReference().isEmpty()) {
 	    JSONObject swRef = lineageSourceCitationToJson(proc.getSoftwareReference().get(0));
-	    if (swRef != null) o.put("software_reference", swRef);
+	    if (swRef != null)
+		o.put("software_reference", swRef);
 	}
 	putOpt(o, "procedure_description", stringFromCharProp(proc.getProcedureDescription()));
 	if (proc.isSetDocumentation() && proc.getDocumentation() != null && !proc.getDocumentation().isEmpty()) {
 	    List<JSONObject> docList = new ArrayList<>();
 	    for (CICitationPropertyType docProp : proc.getDocumentation()) {
 		JSONObject docJson = lineageSourceCitationToJson(docProp);
-		if (docJson != null) docList.add(docJson);
+		if (docJson != null)
+		    docList.add(docJson);
 	    }
-	    if (!docList.isEmpty()) o.put("documentation", new JSONArray(docList));
+	    if (!docList.isEmpty())
+		o.put("documentation", new JSONArray(docList));
 	}
 	putOpt(o, "run_time_parameters", stringFromCharProp(proc.getRunTimeParameters()));
 	if (proc.isSetAlgorithm() && proc.getAlgorithm() != null && !proc.getAlgorithm().isEmpty()) {
 	    LEAlgorithmPropertyType firstAlg = proc.getAlgorithm().get(0);
 	    if (firstAlg != null && firstAlg.getLEAlgorithm() != null) {
 		JSONObject algJson = algorithmToJson(firstAlg.getLEAlgorithm());
-		if (algJson != null) o.put("algorithm", algJson);
+		if (algJson != null)
+		    o.put("algorithm", algJson);
 	    }
 	}
 	return o.length() > 0 ? o : null;
     }
 
-    private static String normalizeDateTime(String value) {
-	if (value == null) return null;
-	if (value.endsWith(".000Z")) return value.replace(".000Z", "Z");
+    private String normalizeDateTime(String value) {
+	if (value == null)
+	    return null;
+	if (value.endsWith(".000Z"))
+	    return value.replace(".000Z", "Z");
 	return value;
     }
 
-    private static JSONObject algorithmToJson(LEAlgorithmType alg) {
-	if (alg == null) return null;
+    private JSONObject algorithmToJson(LEAlgorithmType alg) {
+	if (alg == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	if (alg.getCitation() != null) {
 	    JSONObject citJson = lineageSourceCitationToJson(alg.getCitation());
-	    if (citJson != null) o.put("citation", citJson);
+	    if (citJson != null)
+		o.put("citation", citJson);
 	}
 	putOpt(o, "description", stringFromCharProp(alg.getDescription()));
 	return o.length() > 0 ? o : null;
     }
 
-    private static JSONObject processStepReportToJson(LEProcessStepReportType report) {
-	if (report == null) return null;
+    private JSONObject processStepReportToJson(LEProcessStepReportType report) {
+	if (report == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	putOpt(o, "description", stringFromCharProp(report.getDescription()));
 	putOpt(o, "file_type", stringFromCharProp(report.getFileType()));
@@ -1177,33 +1317,40 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return o.length() > 0 ? o : null;
     }
 
-    private static JSONObject lineageSourceToJson(LISourceType liSource) {
+    private JSONObject lineageSourceToJson(LISourceType liSource) {
 	try {
 	    String description = ISOMetadata.getStringFromCharacterString(liSource.getDescription());
 	    JSONObject sourceCitation = lineageSourceCitationToJson(liSource.getSourceCitation());
 	    JSONObject o = new JSONObject();
-	    if (description != null) o.put("description", description);
-	    if (sourceCitation != null && sourceCitation.length() > 0) o.put("source_citation", sourceCitation);
+	    if (description != null)
+		o.put("description", description);
+	    if (sourceCitation != null && sourceCitation.length() > 0)
+		o.put("source_citation", sourceCitation);
 	    return o.length() > 0 ? o : null;
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static JSONObject lineageSourceCitationToJson(CICitationPropertyType citationProp) {
-	if (citationProp == null) return null;
+    private JSONObject lineageSourceCitationToJson(CICitationPropertyType citationProp) {
+	if (citationProp == null)
+	    return null;
 	CICitationType cit = citationProp.getCICitation();
-	if (cit == null) return null;
+	if (cit == null)
+	    return null;
 	JSONObject o = new JSONObject();
 	String title = ISOMetadata.getStringFromCharacterString(cit.getTitle());
-	if (title != null) o.put("title", title);
+	if (title != null)
+	    o.put("title", title);
 	List<JSONObject> onlineResources = new ArrayList<>();
 	List<MDIdentifierPropertyType> identifiers = cit.getIdentifier();
 	if (identifiers != null) {
 	    for (MDIdentifierPropertyType idProp : identifiers) {
-		if (idProp == null) continue;
+		if (idProp == null)
+		    continue;
 		Object idVal = idProp.getMDIdentifier();
-		if (idVal instanceof JAXBElement) idVal = ((JAXBElement<?>) idVal).getValue();
+		if (idVal instanceof JAXBElement)
+		    idVal = ((JAXBElement<?>) idVal).getValue();
 		if (idVal instanceof MDIdentifierType) {
 		    String code = ISOMetadata.getStringFromCharacterString(((MDIdentifierType) idVal).getCode());
 		    if (code != null && !code.isEmpty()) {
@@ -1214,18 +1361,21 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		}
 	    }
 	}
-	if (!onlineResources.isEmpty()) o.put("online_resource", new JSONArray(onlineResources));
+	if (!onlineResources.isEmpty())
+	    o.put("online_resource", new JSONArray(onlineResources));
 	return o.length() > 0 ? o : null;
     }
 
-    private static List<JSONObject> conformanceResultsFromDataQuality(DataQuality dq) {
+    private List<JSONObject> conformanceResultsFromDataQuality(DataQuality dq) {
 	List<JSONObject> list = new ArrayList<>();
 	try {
 	    List<?> reports = dq.getReports();
-	    if (reports == null) return list;
+	    if (reports == null)
+		return list;
 	    for (Object r : reports) {
 		JSONObject co = conformanceResultToJson(r);
-		if (co != null) list.add(co);
+		if (co != null)
+		    list.add(co);
 	    }
 	} catch (Exception e) {
 	    // ignore
@@ -1233,13 +1383,16 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return list;
     }
 
-    private static JSONObject conformanceResultToJson(Object reportElement) {
+    private JSONObject conformanceResultToJson(Object reportElement) {
 	try {
-	    if (reportElement == null || !(reportElement instanceof DQElementPropertyType)) return null;
+	    if (reportElement == null || !(reportElement instanceof DQElementPropertyType))
+		return null;
 	    JAXBElement<? extends AbstractDQElementType> element = ((DQElementPropertyType) reportElement).getAbstractDQElement();
-	    if (element == null) return null;
+	    if (element == null)
+		return null;
 	    AbstractDQElementType value = element.getValue();
-	    if (value == null) return null;
+	    if (value == null)
+		return null;
 	    if (value instanceof DQDomainConsistencyType dqct) {
 		List<DQResultPropertyType> resultList = dqct.getResult();
 		if (resultList != null && !resultList.isEmpty()) {
@@ -1254,7 +1407,8 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		}
 		return null;
 	    }
-	    if (!DQConformanceResultType.class.isInstance(value)) return null;
+	    if (!DQConformanceResultType.class.isInstance(value))
+		return null;
 	    DQConformanceResultType result = DQConformanceResultType.class.cast(value);
 	    return buildConformanceResultJson(result);
 	} catch (Exception e) {
@@ -1262,7 +1416,7 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject buildConformanceResultJson(DQConformanceResultType result) {
+    private JSONObject buildConformanceResultJson(DQConformanceResultType result) {
 	try {
 	    String specTitle = null;
 	    String specPublicationDate = null;
@@ -1274,18 +1428,23 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		    List<CIDatePropertyType> dateList = citationRef.getDate();
 		    if (dateList != null) {
 			for (CIDatePropertyType dateItem : dateList) {
-			    if (dateItem == null) continue;
+			    if (dateItem == null)
+				continue;
 			    CIDateType ciDate = dateItem.getCIDate();
-			    if (ciDate == null) continue;
+			    if (ciDate == null)
+				continue;
 			    CIDateTypeCodePropertyType dateType = ciDate.getDateType();
-			    if (dateType == null) continue;
+			    if (dateType == null)
+				continue;
 			    Object codeVal = dateType.getCIDateTypeCode();
-			    if (codeVal instanceof JAXBElement) codeVal = ((JAXBElement<?>) codeVal).getValue();
+			    if (codeVal instanceof JAXBElement)
+				codeVal = ((JAXBElement<?>) codeVal).getValue();
 			    if (codeVal instanceof CodeListValueType) {
 				String typeStr = ((CodeListValueType) codeVal).getCodeListValue();
 				if (typeStr != null && "publication".equalsIgnoreCase(typeStr)) {
 				    DatePropertyType dateProp = ciDate.getDate();
-				    if (dateProp != null) specPublicationDate = dateProp.getDate();
+				    if (dateProp != null)
+					specPublicationDate = dateProp.getDate();
 				    break;
 				}
 			    }
@@ -1296,24 +1455,31 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	    String explanation = ISOMetadata.getStringFromCharacterString(result.getExplanation());
 	    Boolean pass = null;
 	    BooleanPropertyType passProp = result.getPass();
-	    if (passProp != null) pass = passProp.isBoolean();
+	    if (passProp != null)
+		pass = passProp.isBoolean();
 	    JSONObject o = new JSONObject();
-	    if (specTitle != null) o.put("specification_title", specTitle);
-	    if (specPublicationDate != null) o.put("specification_publication_date", specPublicationDate);
-	    if (explanation != null) o.put("explanation", explanation);
-	    if (pass != null) o.put("pass", pass);
+	    if (specTitle != null)
+		o.put("specification_title", specTitle);
+	    if (specPublicationDate != null)
+		o.put("specification_publication_date", specPublicationDate);
+	    if (explanation != null)
+		o.put("explanation", explanation);
+	    if (pass != null)
+		o.put("pass", pass);
 	    return o.length() > 0 ? o : null;
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static JSONObject qualityScopeObj(DataQuality dq) {
+    private JSONObject qualityScopeObj(DataQuality dq) {
 	try {
 	    DQScopePropertyType scopeProp = dq.getElementType().getScope();
-	    if (scopeProp == null) return null;
+	    if (scopeProp == null)
+		return null;
 	    DQScopeType scope = scopeProp.getDQScope();
-	    if (scope == null) return null;
+	    if (scope == null)
+		return null;
 	    String scopeCode = null;
 	    String scopeDetails = null;
 	    MDScopeCodePropertyType level = scope.getLevel();
@@ -1336,34 +1502,45 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		    }
 		}
 	    }
-	    if (scopeCode == null && scopeDetails == null) return null;
+	    if (scopeCode == null && scopeDetails == null)
+		return null;
 	    JSONObject o = new JSONObject();
-	    if (scopeCode != null) o.put("scope_code", codeObj(scopeCode, "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode"));
-	    if (scopeDetails != null) o.put("scope_details", scopeDetails);
+	    if (scopeCode != null)
+		o.put("scope_code", codeObj(scopeCode, "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ScopeCode"));
+	    if (scopeDetails != null)
+		o.put("scope_details", scopeDetails);
 	    return o;
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static JSONObject positionalAccuracyFromDataQuality(DataQuality dq) {
+    private JSONObject positionalAccuracyFromDataQuality(DataQuality dq) {
 	try {
 	    List<?> reports = dq.getReports();
-	    if (reports == null) return null;
+	    if (reports == null)
+		return null;
 	    for (Object reportElement : reports) {
-		if (!(reportElement instanceof DQElementPropertyType)) continue;
+		if (!(reportElement instanceof DQElementPropertyType))
+		    continue;
 		JAXBElement<? extends AbstractDQElementType> element = ((DQElementPropertyType) reportElement).getAbstractDQElement();
-		if (element == null) continue;
+		if (element == null)
+		    continue;
 		AbstractDQElementType value = element.getValue();
-		if (!(value instanceof DQAbsoluteExternalPositionalAccuracyType dqAccuracy)) continue;
+		if (!(value instanceof DQAbsoluteExternalPositionalAccuracyType dqAccuracy))
+		    continue;
 		List<DQResultPropertyType> results = dqAccuracy.getResult();
-		if (results == null || results.isEmpty()) continue;
+		if (results == null || results.isEmpty())
+		    continue;
 		for (DQResultPropertyType resultProperty : results) {
-		    if (resultProperty == null) continue;
+		    if (resultProperty == null)
+			continue;
 		    JAXBElement<? extends AbstractDQResultType> resultElement = resultProperty.getAbstractDQResult();
-		    if (resultElement == null) continue;
+		    if (resultElement == null)
+			continue;
 		    AbstractDQResultType resultValue = resultElement.getValue();
-		    if (!(resultValue instanceof DQQuantitativeResultType quantitative)) continue;
+		    if (!(resultValue instanceof DQQuantitativeResultType quantitative))
+			continue;
 
 		    JSONObject out = new JSONObject();
 
@@ -1401,8 +1578,9 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return null;
     }
 
-    private static Double parseDouble(String rawValue) {
-	if (rawValue == null || rawValue.isEmpty()) return null;
+    private Double parseDouble(String rawValue) {
+	if (rawValue == null || rawValue.isEmpty())
+	    return null;
 	try {
 	    return Double.parseDouble(rawValue);
 	} catch (NumberFormatException e) {
@@ -1410,23 +1588,31 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static void mapDatasetSpecific(JSONObject out, CoreMetadata core, Identification identification) {
-	if (!(identification instanceof DataIdentification)) return;
+    private void mapDatasetSpecific(JSONObject out, CoreMetadata core, Identification identification) {
+	if (!(identification instanceof DataIdentification))
+	    return;
 	DataIdentification di = (DataIdentification) identification;
 	try {
 	    Iterator<String> langIt = di.getLanguages();
-	    if (langIt != null && langIt.hasNext()) putOpt(out, "data_language", langIt.next());
+	    if (langIt != null && langIt.hasNext())
+		putOpt(out, "data_language", langIt.next());
 	    putOpt(out, "parent_identifier", core.getMIMetadata().getParentIdentifier());
 	    String datasetType = di.getSpatialRepresentationTypeCodeListValue();
-	    if (datasetType != null) putOpt(out, "dataset_type", codeObj(datasetType, MD_SPATIAL_REPRESENTATION_TYPE_CODE_URI));
+	    if (datasetType != null)
+		putOpt(out, "dataset_type", codeObj(datasetType, MD_SPATIAL_REPRESENTATION_TYPE_CODE_URI));
 	    Integer equivScale = null;
 	    Iterator<Integer> denIt = di.getDenominators();
-	    if (denIt != null && denIt.hasNext()) equivScale = denIt.next();
-	    if (equivScale != null && equivScale > 0) putOpt(out, "equivalent_scale", equivScale);
+	    if (denIt != null && denIt.hasNext())
+		equivScale = denIt.next();
+	    if (equivScale != null && equivScale > 0)
+		putOpt(out, "equivalent_scale", equivScale);
 	    JSONArray topicCategories = new JSONArray();
 	    Iterator<String> it = di.getTopicCategoriesStrings();
-	    if (it != null) while (it.hasNext()) topicCategories.put(it.next());
-	    if (topicCategories.length() > 0) out.put("topic_categories", topicCategories);
+	    if (it != null)
+		while (it.hasNext())
+		    topicCategories.put(it.next());
+	    if (topicCategories.length() > 0)
+		out.put("topic_categories", topicCategories);
 	    MDResolution res = di.getSpatialResolution();
 	    if (res != null && res.getDistanceValue() != null) {
 		JSONObject sr = new JSONObject();
@@ -1434,184 +1620,41 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		sr.put("uom", res.getDistanceUOM() != null ? res.getDistanceUOM() : "m");
 		out.put("spatial_resolution", sr);
 	    }
-	    JSONObject spatialRepInfo = spatialRepresentationInfoToJson(core.getMIMetadata());
-	    if (spatialRepInfo != null) putOpt(out, "spatial_representation_info", spatialRepInfo);
+
+	    JSONSpatialRepresentationMapper mapper = new JSONSpatialRepresentationMapper(core.getMIMetadata());
+	    mapper.map().ifPresent(info -> putOpt(out, "spatial_representation_info", info));
+
 	} catch (Exception e) {
 	    // ignore
 	}
     }
 
-    public static JSONObject spatialRepresentationInfoToJson(MDMetadata mi) {
-	try {
-	    JSONObject vectorSpatialRepresentation = vectorSpatialRepresentationInfoToJson(mi);
-	    if (vectorSpatialRepresentation != null) {
-		JSONObject spatialRepInfo = new JSONObject();
-		spatialRepInfo.put("vector_spatial_representation", vectorSpatialRepresentation);
-		return spatialRepInfo;
-	    }
-
-	    GridSpatialRepresentation grid = mi.getGridSpatialRepresentation();
-	    if (grid == null) return null;
-	    JSONObject gridRep = new JSONObject();
-	    Integer numDim = grid.getNumberOfDimensions();
-	    if (numDim != null) gridRep.put("number_of_dimensions", numDim);
-	    String cellGeometry = grid.getCellGeometryCode();
-	    if (cellGeometry != null) {
-		String cellUri = gridCellGeometryUri(grid);
-		gridRep.put("cell_geometry", codeObj(cellGeometry, cellUri));
-	    }
-	    BooleanPropertyType transParam = grid.getElementType().getTransformationParameterAvailability();
-	    if (transParam != null) gridRep.put("transformation_parameter_availability", transParam.isBoolean());
-	    JSONArray axisArr = new JSONArray();
-	    Iterator<Dimension> dimIt = grid.getAxisDimensions();
-	    if (dimIt != null) {
-		while (dimIt.hasNext()) {
-		    JSONObject axisObj = axisDimensionToJson(dimIt.next());
-		    if (axisObj != null) axisArr.put(axisObj);
-		}
-	    }
-	    if (axisArr.length() > 0) gridRep.put("axis_dimension_properties", axisArr);
-	    JSONObject spatialRepInfo = new JSONObject();
-	    spatialRepInfo.put("grid_spatial_representation", gridRep);
-	    return spatialRepInfo;
-	} catch (Exception e) {
-	    return null;
-	}
-    }
-
-    private static JSONObject vectorSpatialRepresentationInfoToJson(MDMetadata mi) {
-	try {
-	    List<MDSpatialRepresentationPropertyType> spatialReps = mi.getElementType().getSpatialRepresentationInfo();
-	    if (spatialReps == null) return null;
-	    for (MDSpatialRepresentationPropertyType spatialRep : spatialReps) {
-		if (spatialRep == null || spatialRep.getAbstractMDSpatialRepresentation() == null) continue;
-		AbstractMDSpatialRepresentationType value = spatialRep.getAbstractMDSpatialRepresentation().getValue();
-		if (!(value instanceof MDVectorSpatialRepresentationType)) continue;
-
-		MDVectorSpatialRepresentationType vector = (MDVectorSpatialRepresentationType) value;
-		JSONObject out = new JSONObject();
-
-		MDTopologyLevelCodePropertyType topologyLevel = vector.getTopologyLevel();
-		if (topologyLevel != null && topologyLevel.getMDTopologyLevelCode() != null) {
-		    CodeListValueType topologyCode = topologyLevel.getMDTopologyLevelCode();
-		    out.put("topology_level", codeObj(
-			    topologyCode.getCodeListValue(),
-			    normalizeCodelistUri(topologyCode.getCodeList(), MD_TOPOLOGY_LEVEL_CODE_URI)));
-		}
-
-		if (vector.getGeometricObjects() != null && !vector.getGeometricObjects().isEmpty()) {
-		    JSONArray geometricObjects = new JSONArray();
-		    for (MDGeometricObjectsPropertyType geometricProperty : vector.getGeometricObjects()) {
-			if (geometricProperty == null) continue;
-			MDGeometricObjectsType geometric = geometricProperty.getMDGeometricObjects();
-			if (geometric == null) continue;
-			JSONObject geometricJson = new JSONObject();
-			if (geometric.getGeometricObjectType() != null &&
-				geometric.getGeometricObjectType().getMDGeometricObjectTypeCode() != null) {
-			    CodeListValueType geometricCode = geometric.getGeometricObjectType().getMDGeometricObjectTypeCode();
-			    geometricJson.put("geometric_object_type", codeObj(
-				    geometricCode.getCodeListValue(),
-				    normalizeCodelistUri(geometricCode.getCodeList(), MD_GEOMETRIC_OBJECT_TYPE_CODE_URI)));
-			}
-			if (geometric.getGeometricObjectCount() != null &&
-				geometric.getGeometricObjectCount().getInteger() != null) {
-			    geometricJson.put("geometric_object_count", geometric.getGeometricObjectCount().getInteger().intValue());
-			}
-			if (geometricJson.length() > 0) geometricObjects.put(geometricJson);
-		    }
-		    if (geometricObjects.length() > 0) out.put("geometric_objects", geometricObjects);
-		}
-
-		return out.length() > 0 ? out : null;
-	    }
-	} catch (Exception e) {
-	    return null;
-	}
-	return null;
-    }
-
-    private static String gridCellGeometryUri(GridSpatialRepresentation grid) {
-	try {
-	    MDCellGeometryCodePropertyType prop = grid.getElementType().getCellGeometry();
-	    if (prop == null) return null;
-	    Object code = prop.getMDCellGeometryCode();
-	    if (code instanceof CodeListValueType) {
-		String uri = ((CodeListValueType) code).getCodeList();
-		return normalizeCodelistUri(uri, MD_CELL_GEOMETRY_CODE_URI);
-	    }
-	    return null;
-	} catch (Exception e) {
-	    return MD_CELL_GEOMETRY_CODE_URI;
-	}
-    }
-
-    private static JSONObject axisDimensionToJson(Dimension dim) {
-	try {
-	    JSONObject o = new JSONObject();
-	    String dimNameVal = dim.getDimensionNameTypeCode();
-	    String dimNameUri = dimensionNameTypeCodeUri(dim);
-	    if (dimNameVal != null) o.put("dimension_name", codeObj(dimNameVal, dimNameUri));
-	    BigInteger size = dim.getDimensionSize();
-	    if (size != null) o.put("dimension_size", size.intValue() == 0 ? "unknown" : size.intValue());
-	    Double resVal = dim.getResolutionValue();
-	    String resUom = dim.getResolutionUOM();
-	    if (resVal != null || resUom != null) {
-		JSONObject res = new JSONObject();
-		if (resUom != null) res.put("uom", resUom);
-		if (resVal != null) res.put("value", resVal == Math.floor(resVal) ? resVal.intValue() : resVal);
-		o.put("resolution", res);
-	    }
-	    return o.length() > 0 ? o : null;
-	} catch (Exception e) {
-	    return null;
-	}
-    }
-
-    private static String dimensionNameTypeCodeUri(Dimension dim) {
-        DatahubJsonMapper.dim = dim;
-	try {
-	    MDDimensionNameTypeCodePropertyType prop = dim.getElementType().getDimensionName();
-	    if (prop == null) return null;
-	    Object code = prop.getMDDimensionNameTypeCode();
-	    if (code instanceof JAXBElement) code = ((JAXBElement<?>) code).getValue();
-	    if (code instanceof CodeListValueType) {
-		String uri = ((CodeListValueType) code).getCodeList();
-		return normalizeCodelistUri(uri, MD_DIMENSION_NAME_TYPE_CODE_URI);
-	    }
-	    return null;
-	} catch (Exception e) {
-	    return MD_DIMENSION_NAME_TYPE_CODE_URI;
-	}
-    }
-
-    private static String normalizeCodelistUri(String uri, String fallback) {
-	if (uri == null || uri.isEmpty()) return fallback;
-	if (uri.startsWith("http://www.isotc211.org/2005/resources/codeList.xml#")) {
-	    return uri.replace("http://www.isotc211.org/2005/resources/codeList.xml#", "https://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#");
-	}
-	return uri;
-    }
-
-    private static void mapServiceSpecific(JSONObject out, MDMetadata mi) {
+    private void mapServiceSpecific(JSONObject out, MDMetadata mi) {
 	try {
 	    ServiceIdentification svc = mi.getServiceIdentification();
-	    if (svc == null) return;
+	    if (svc == null)
+		return;
 	    putOpt(out, "service_type", svc.getServiceType());
 	    putOpt(out, "service_type_version", svc.getServiceTypeVersion());
 	    putOpt(out, "service_coupling_type", svc.getCouplingType());
 	    JSONArray operatesOn = new JSONArray();
 	    Iterator<String> it = svc.getOperatesOnIdentifiers();
-	    if (it != null) while (it.hasNext()) operatesOn.put(it.next());
-	    if (operatesOn.length() > 0) out.put("service_operates_on", operatesOn);
+	    if (it != null)
+		while (it.hasNext())
+		    operatesOn.put(it.next());
+	    if (operatesOn.length() > 0)
+		out.put("service_operates_on", operatesOn);
 	    JSONArray serviceOps = serviceOperationsToJson(svc);
-	    if (serviceOps != null && serviceOps.length() > 0) out.put("service_operations", serviceOps);
+	    if (serviceOps != null && serviceOps.length() > 0)
+		out.put("service_operations", serviceOps);
 	} catch (Exception e) {
 	    // ignore
 	}
     }
 
-    private static void mapModelSpecific(JSONObject out, GSResource resource, CoreMetadata core) {
-	if (resource == null) return;
+    private void mapModelSpecific(JSONObject out, GSResource resource, CoreMetadata core) {
+	if (resource == null)
+	    return;
 	try {
 	    ModelSpecificFields m = resource.getExtensionHandler().getModelSpecificFields().orElse(null);
 	    if (m != null) {
@@ -1620,12 +1663,14 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 		putOpt(out, "model_methodology_description", m.getModelMethodologyDescription());
 		if (m.getModelTypes() != null && !m.getModelTypes().isEmpty()) {
 		    JSONArray arr = new JSONArray();
-		    for (String t : m.getModelTypes()) arr.put(t);
+		    for (String t : m.getModelTypes())
+			arr.put(t);
 		    out.put("model_types", arr);
 		}
 		if (m.getSupportedPlatforms() != null && !m.getSupportedPlatforms().isEmpty()) {
 		    JSONArray arr = new JSONArray();
-		    for (String p : m.getSupportedPlatforms()) arr.put(p);
+		    for (String p : m.getSupportedPlatforms())
+			arr.put(p);
 		    out.put("supported_platforms", arr);
 		}
 		if (m.getCpu() != null || m.getGpu() != null || m.getRam() != null || m.getStorage() != null) {
@@ -1649,24 +1694,29 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject modelQualityInformationToJson(CoreMetadata core) {
-	if (core == null) return null;
+    private JSONObject modelQualityInformationToJson(CoreMetadata core) {
+	if (core == null)
+	    return null;
 	try {
 	    Iterator<DataQuality> dqIt = core.getMIMetadata().getDataQualities();
-	    if (dqIt == null || !dqIt.hasNext()) return null;
+	    if (dqIt == null || !dqIt.hasNext())
+		return null;
 	    String modelQualityReport = null;
 	    JSONArray modelMetrics = new JSONArray();
 	    while (dqIt.hasNext()) {
 		DataQuality dq = dqIt.next();
-		if (dq == null) continue;
+		if (dq == null)
+		    continue;
 		List<DQElementPropertyType> reports = dq.getReports();
-		if (reports == null) continue;
+		if (reports == null)
+		    continue;
 		for (DQElementPropertyType report : reports) {
-		    if (report == null || !report.isSetAbstractDQElement()) continue;
+		    if (report == null || !report.isSetAbstractDQElement())
+			continue;
 		    Object elem = report.getAbstractDQElement().getValue();
-		    if (!(elem instanceof DQDomainConsistencyType)) continue;
-		    DQDomainConsistencyType dqElem =
-			    (DQDomainConsistencyType) elem;
+		    if (!(elem instanceof DQDomainConsistencyType))
+			continue;
+		    DQDomainConsistencyType dqElem = (DQDomainConsistencyType) elem;
 		    List<DQResultPropertyType> results = dqElem.getResult();
 		    boolean hasQuantitativeResult = results != null && !results.isEmpty();
 		    if (!hasQuantitativeResult) {
@@ -1684,11 +1734,12 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 				name = ISOMetadata.getStringFromCharacterString(dqElem.getNameOfMeasure().get(0));
 			    }
 			}
-			String description = dqElem.isSetMeasureDescription()
-				? ISOMetadata.getStringFromCharacterString(dqElem.getMeasureDescription()) : null;
+			String description = dqElem.isSetMeasureDescription() ? ISOMetadata.getStringFromCharacterString(
+				dqElem.getMeasureDescription()) : null;
 			Double valueNum = null;
 			for (DQResultPropertyType r : results) {
-			    if (r == null || !r.isSetAbstractDQResult()) continue;
+			    if (r == null || !r.isSetAbstractDQResult())
+				continue;
 			    Object resVal = r.getAbstractDQResult().getValue();
 			    if (resVal instanceof DQQuantitativeResultType) {
 				valueNum = extractQuantitativeValue((DQQuantitativeResultType) resVal);
@@ -1700,35 +1751,42 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 			    putOpt(metric, "id", id);
 			    putOpt(metric, "name", name);
 			    putOpt(metric, "description", description);
-			    if (valueNum != null && !valueNum.isNaN()) metric.put("value", String.valueOf(valueNum));
+			    if (valueNum != null && !valueNum.isNaN())
+				metric.put("value", String.valueOf(valueNum));
 			    modelMetrics.put(metric);
 			}
 		    }
 		}
 	    }
-	    if (modelQualityReport == null && modelMetrics.length() == 0) return null;
+	    if (modelQualityReport == null && modelMetrics.length() == 0)
+		return null;
 	    JSONObject o = new JSONObject();
 	    putOpt(o, "model_quality_report", modelQualityReport);
-	    if (modelMetrics.length() > 0) o.put("model_metrics", modelMetrics);
+	    if (modelMetrics.length() > 0)
+		o.put("model_metrics", modelMetrics);
 	    return o;
 	} catch (Exception e) {
 	    return null;
 	}
     }
 
-    private static Double extractQuantitativeValue(DQQuantitativeResultType quant) {
-	if (quant == null || !quant.isSetValue() || quant.getValue() == null || quant.getValue().isEmpty()) return null;
+    private Double extractQuantitativeValue(DQQuantitativeResultType quant) {
+	if (quant == null || !quant.isSetValue() || quant.getValue() == null || quant.getValue().isEmpty())
+	    return null;
 	try {
 	    RecordPropertyType rp = quant.getValue().get(0);
-	    if (rp == null) return null;
+	    if (rp == null)
+		return null;
 	    Object record = rp.getRecord();
-	    if (record == null) return null;
+	    if (record == null)
+		return null;
 	    try {
 		java.lang.reflect.Method getVal = record.getClass().getMethod("getValue");
 		Object val = getVal.invoke(record);
 		if (val != null) {
 		    String s = val.toString();
-		    if (s != null && !s.isEmpty()) return Double.parseDouble(s);
+		    if (s != null && !s.isEmpty())
+			return Double.parseDouble(s);
 		}
 	    } catch (NoSuchMethodException e) {
 		// record type has no getValue, skip
@@ -1739,18 +1797,23 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	return null;
     }
 
-    private static JSONArray serviceOperationsToJson(ServiceIdentification svc) {
-	if (svc == null) return null;
+    private JSONArray serviceOperationsToJson(ServiceIdentification svc) {
+	if (svc == null)
+	    return null;
 	try {
 	    List<SVOperationMetadataPropertyType> list = svc.getElementType().getContainsOperations();
-	    if (list == null || list.isEmpty()) return null;
+	    if (list == null || list.isEmpty())
+		return null;
 	    JSONArray arr = new JSONArray();
 	    for (SVOperationMetadataPropertyType prop : list) {
-		if (prop == null) continue;
+		if (prop == null)
+		    continue;
 		SVOperationMetadataType op = prop.getSVOperationMetadata();
-		if (op == null) continue;
+		if (op == null)
+		    continue;
 		JSONObject o = operationMetadataToJson(op);
-		if (o != null) arr.put(o);
+		if (o != null)
+		    arr.put(o);
 	    }
 	    return arr.length() > 0 ? arr : null;
 	} catch (Exception e) {
@@ -1758,8 +1821,9 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject operationMetadataToJson(SVOperationMetadataType op) {
-	if (op == null) return null;
+    private JSONObject operationMetadataToJson(SVOperationMetadataType op) {
+	if (op == null)
+	    return null;
 	JSONObject out = new JSONObject();
 	putOpt(out, "operation_name", stringFromCharProp(op.getOperationName()));
 	putOpt(out, "operation_description", stringFromCharProp(op.getOperationDescription()));
@@ -1769,41 +1833,50 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	    JSONArray dcpArr = new JSONArray();
 	    for (Object dcpProp : op.getDCP()) {
 		String code = codeListValueFromDCP(dcpProp);
-		if (code != null) dcpArr.put(code);
+		if (code != null)
+		    dcpArr.put(code);
 	    }
-	    if (dcpArr.length() > 0) out.put("dcp", dcpArr);
+	    if (dcpArr.length() > 0)
+		out.put("dcp", dcpArr);
 	}
 	// connect_point (array of URLs)
 	if (op.isSetConnectPoint() && op.getConnectPoint() != null) {
 	    JSONArray cpArr = new JSONArray();
 	    for (Object cpProp : op.getConnectPoint()) {
 		String url = urlFromConnectPoint(cpProp);
-		if (url != null) cpArr.put(url);
+		if (url != null)
+		    cpArr.put(url);
 	    }
-	    if (cpArr.length() > 0) out.put("connect_point", cpArr);
+	    if (cpArr.length() > 0)
+		out.put("connect_point", cpArr);
 	}
 	// parameters
 	if (op.isSetParameters() && op.getParameters() != null && !op.getParameters().isEmpty()) {
 	    JSONArray paramsArr = new JSONArray();
 	    for (SVParameterPropertyType paramProp : op.getParameters()) {
-		if (paramProp == null) continue;
+		if (paramProp == null)
+		    continue;
 		JSONObject p = parameterToJson(paramProp.getSVParameter());
-		if (p != null) paramsArr.put(p);
+		if (p != null)
+		    paramsArr.put(p);
 	    }
-	    if (paramsArr.length() > 0) out.put("parameters", paramsArr);
+	    if (paramsArr.length() > 0)
+		out.put("parameters", paramsArr);
 	}
 	return out.length() > 0 ? out : null;
     }
 
-    private static String stringFromCharProp(CharacterStringPropertyType p) {
+    private String stringFromCharProp(CharacterStringPropertyType p) {
 	return p != null ? ISOMetadata.getStringFromCharacterString(p) : null;
     }
 
-    private static String codeListValueFromDCP(Object dcpProp) {
+    private String codeListValueFromDCP(Object dcpProp) {
 	try {
-	    if (dcpProp == null) return null;
+	    if (dcpProp == null)
+		return null;
 	    Object listObj = dcpProp.getClass().getMethod("getDCPList").invoke(dcpProp);
-	    if (listObj == null) return null;
+	    if (listObj == null)
+		return null;
 	    Object code = listObj.getClass().getMethod("getCodeListValue").invoke(listObj);
 	    return code != null ? code.toString() : null;
 	} catch (Exception e) {
@@ -1811,13 +1884,16 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static String urlFromConnectPoint(Object cpProp) {
+    private String urlFromConnectPoint(Object cpProp) {
 	try {
-	    if (cpProp == null) return null;
+	    if (cpProp == null)
+		return null;
 	    Object online = cpProp.getClass().getMethod("getCIOnlineResource").invoke(cpProp);
-	    if (online == null) return null;
+	    if (online == null)
+		return null;
 	    Object linkage = online.getClass().getMethod("getLinkage").invoke(online);
-	    if (linkage == null) return null;
+	    if (linkage == null)
+		return null;
 	    Object url = linkage.getClass().getMethod("getURL").invoke(linkage);
 	    return url != null ? url.toString() : null;
 	} catch (Exception e) {
@@ -1825,8 +1901,9 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
     }
 
-    private static JSONObject parameterToJson(SVParameterType param) {
-	if (param == null) return null;
+    private JSONObject parameterToJson(SVParameterType param) {
+	if (param == null)
+	    return null;
 	JSONObject p = new JSONObject();
 	String name = null;
 	if (param.isSetName() && param.getName() != null && param.getName().getAName() != null) {
@@ -1839,7 +1916,8 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	}
 	if (param.isSetOptionality()) {
 	    String opt = stringFromCharProp(param.getOptionality());
-	    if (opt != null) p.put("optionality", Boolean.parseBoolean(opt));
+	    if (opt != null)
+		p.put("optionality", Boolean.parseBoolean(opt));
 	}
 	if (param.isSetRepeatability() && param.getRepeatability() != null && param.getRepeatability().isSetBoolean()) {
 	    p.put("repeatability", param.getRepeatability().isBoolean());
