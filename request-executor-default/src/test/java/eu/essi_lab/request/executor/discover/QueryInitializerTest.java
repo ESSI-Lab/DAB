@@ -1,32 +1,20 @@
 package eu.essi_lab.request.executor.discover;
 
-import java.util.HashSet;
-import java.util.Set;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.junit.*;
+import org.junit.rules.*;
+import org.mockito.*;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
-
-import eu.essi_lab.authorization.converter.IRequestAuthorizationConverter;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.FalseBond;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.MetadataElement;
+import java.util.*;
 
 /**
- * These tests test the initialization of different queries of increasing complexity. For each test, a first sub test is
- * run disabling the request authorization converter (by mocking it letting it return the original bond as the permitted
- * bond). Then, the other sub tests mock the request authorization converter in order to add some predefined set of
- * source bond constraints. The query initialization result is then checked to be equal to the expected result for each
- * case.
+ * These tests test the initialization of different queries of increasing complexity. For each test, a first sub test is run disabling the
+ * request authorization converter (by mocking it letting it return the original bond as the permitted bond). Then, the other sub tests mock
+ * the request authorization converter in order to add some predefined set of source bond constraints. The query initialization result is
+ * then checked to be equal to the expected result for each case.
  *
  * @author boldrini
  */
@@ -52,12 +40,12 @@ public class QueryInitializerTest {
     LogicalBond notBond;
     private QueryInitializer queryInitializer;
     private DiscoveryMessage message;
-    private IRequestAuthorizationConverter requestAuthorizationConverter;
+    private RequestAuthorizationConverter requestAuthorizationConverter;
 
     @Before
     public void init() {
 	this.queryInitializer = new QueryInitializer();
-	this.requestAuthorizationConverter = Mockito.mock(IRequestAuthorizationConverter.class);
+	this.requestAuthorizationConverter = Mockito.mock(RequestAuthorizationConverter.class);
 
 	this.queryInitializer.setRequestAuthorizationConverter(requestAuthorizationConverter);
 	message = new DiscoveryMessage();
@@ -94,8 +82,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Do the test by mocking the request authorization converter returning the authorized bond
-     * that is a set of source bonds (ORed) generated from the given source identifiers
+     * Do the test by mocking the request authorization converter returning the authorized bond that is a set of source bonds (ORed)
+     * generated from the given source identifiers
      *
      * @param sourceIdentifiers
      * @throws GSException
@@ -125,10 +113,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = null -> null
-     * Tests adding S1 -> S1
-     * Tests adding S1, S2 -> S1, S2
-     * Tests adding S1, S2, S3 -> S1, S2, S3
+     * Tests with {@link DiscoveryMessage#BOND} = null -> null Tests adding S1 -> S1 Tests adding S1, S2 -> S1, S2 Tests adding S1, S2, S3
+     * -> S1, S2, S3
      */
     @Test
     public void testNullBond() throws GSException {
@@ -150,10 +136,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = P1 -> P1
-     * Tests adding S1 -> P1 AND S1
-     * Tests adding S1, S2 -> P1 AND S1 OR P1 AND S2
-     * Tests adding S1, S2, S3 -> P1 AND S1 OR P1 AND S2 OR P1 AND S3
+     * Tests with {@link DiscoveryMessage#BOND} = P1 -> P1 Tests adding S1 -> P1 AND S1 Tests adding S1, S2 -> P1 AND S1 OR P1 AND S2 Tests
+     * adding S1, S2, S3 -> P1 AND S1 OR P1 AND S2 OR P1 AND S3
      */
     @Test
     public void testBond() throws GSException {
@@ -169,30 +153,27 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet12);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		property1Bond, source12Bond), //
+			property1Bond, source12Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(property1Bond, source1Bond), //
-		BondFactory.createAndBond(property1Bond, source2Bond))//
+			BondFactory.createAndBond(property1Bond, source1Bond), //
+			BondFactory.createAndBond(property1Bond, source2Bond))//
 		, message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet123);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		property1Bond, source123Bond), //
+			property1Bond, source123Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(property1Bond, source1Bond), //
-		BondFactory.createAndBond(property1Bond, source2Bond), //
-		BondFactory.createAndBond(property1Bond, source3Bond))//
+			BondFactory.createAndBond(property1Bond, source1Bond), //
+			BondFactory.createAndBond(property1Bond, source2Bond), //
+			BondFactory.createAndBond(property1Bond, source3Bond))//
 		, message.getNormalizedBond());
 
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = S1 -> S1
-     * Tests adding S1 -> S1
-     * Tests adding S1, S2 -> S1
-     * Tests adding S1, S2, S3 -> S1
+     * Tests with {@link DiscoveryMessage#BOND} = S1 -> S1 Tests adding S1 -> S1 Tests adding S1, S2 -> S1 Tests adding S1, S2, S3 -> S1
      */
     @Test
     public void testSourceBond() throws GSException {
@@ -217,10 +198,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = S1 AND P1 -> S1 AND P1
-     * Tests adding S1 -> S1 AND P1
-     * Tests adding S1, S2 -> S1 AND P1
-     * Tests adding S1, S2, S3 -> S1 AND P1
+     * Tests with {@link DiscoveryMessage#BOND} = S1 AND P1 -> S1 AND P1 Tests adding S1 -> S1 AND P1 Tests adding S1, S2 -> S1 AND P1 Tests
+     * adding S1, S2, S3 -> S1 AND P1
      */
     @Test
     public void testAndBond() throws GSException {
@@ -245,10 +224,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = S1 OR P1 -> S1 OR P1
-     * Tests adding S1 -> S1
-     * Tests adding S1, S2 -> S1 OR (S2 AND P1)
-     * Tests adding S1, S2, S3 -> S1 OR (S2 AND P1) OR (S3 AND P1)
+     * Tests with {@link DiscoveryMessage#BOND} = S1 OR P1 -> S1 OR P1 Tests adding S1 -> S1 Tests adding S1, S2 -> S1 OR (S2 AND P1) Tests
+     * adding S1, S2, S3 -> S1 OR (S2 AND P1) OR (S3 AND P1)
      */
     @Test
     public void testOrBond() throws GSException {
@@ -278,10 +255,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = NOT(P1) -> NOT(P1)
-     * Tests adding S1 -> S1 AND NOT(P1)
-     * Tests adding S1, S2 -> (S1 AND NOT(P1)) OR (S2 AND NOT(P1))
-     * Tests adding S1, S2, S3 -> (S1 AND NOT(P1)) OR (S2 AND NOT(P1)) OR (S3 AND NOT(P1))
+     * Tests with {@link DiscoveryMessage#BOND} = NOT(P1) -> NOT(P1) Tests adding S1 -> S1 AND NOT(P1) Tests adding S1, S2 -> (S1 AND
+     * NOT(P1)) OR (S2 AND NOT(P1)) Tests adding S1, S2, S3 -> (S1 AND NOT(P1)) OR (S2 AND NOT(P1)) OR (S3 AND NOT(P1))
      */
     @Test
     public void testNotBond() throws GSException {
@@ -300,7 +275,7 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet12);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		notBond, source12Bond), //
+			notBond, source12Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(//
 		BondFactory.createOrBond( //
@@ -311,7 +286,7 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet123);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		notBond, source123Bond), //
+			notBond, source123Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(//
 		BondFactory.createOrBond( //
@@ -323,10 +298,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = NOT(NOT(P1)) -> P1
-     * Tests adding S1 -> S1 AND P1
-     * Tests adding S1, S2 -> (S1 AND P1) OR (S2 AND P1)
-     * Tests adding S1, S2, S3 -> (S1 AND P1) OR (S2 AND P1) OR (S3 AND P1)
+     * Tests with {@link DiscoveryMessage#BOND} = NOT(NOT(P1)) -> P1 Tests adding S1 -> S1 AND P1 Tests adding S1, S2 -> (S1 AND P1) OR (S2
+     * AND P1) Tests adding S1, S2, S3 -> (S1 AND P1) OR (S2 AND P1) OR (S3 AND P1)
      */
     @Test
     public void testNotNotBond() throws GSException {
@@ -370,10 +343,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = NOT(NOT(NOT(P1))) -> NOT(P1)
-     * Tests adding S1 -> S1 AND NOT(P1)
-     * Tests adding S1, S2 -> (S1 AND NOT(P1)) OR (S2 AND NOT(P1))
-     * Tests adding S1, S2, S3 -> (S1 AND NOT(P1)) OR (S2 AND NOT(P1)) OR (S3 AND NOT(P1))
+     * Tests with {@link DiscoveryMessage#BOND} = NOT(NOT(NOT(P1))) -> NOT(P1) Tests adding S1 -> S1 AND NOT(P1) Tests adding S1, S2 -> (S1
+     * AND NOT(P1)) OR (S2 AND NOT(P1)) Tests adding S1, S2, S3 -> (S1 AND NOT(P1)) OR (S2 AND NOT(P1)) OR (S3 AND NOT(P1))
      */
     @Test
     public void testNotNotNotBond() throws GSException {
@@ -394,7 +365,7 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet12);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		userBond, source12Bond), //
+			userBond, source12Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(//
 		BondFactory.createOrBond( //
@@ -405,7 +376,7 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet123);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		userBond, source123Bond), //
+			userBond, source123Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(//
 		BondFactory.createOrBond( //
@@ -417,11 +388,9 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = NOT(P1 AND P2) -> NOT(P1) OR NOT(P2)
-     * Tests adding S1 -> S1 AND (NOT(P1) OR NOT(P2))
-     * Tests adding S1, S2 -> (S1 AND (NOT(P1) OR NOT(P2))) OR (S2 AND (NOT(P1) OR NOT(P2)))
-     * Tests adding S1, S2, S3 -> (S1 AND (NOT(P1) OR NOT(P2))) OR (S2 AND (NOT(P1) OR NOT(P2))) OR (S3 AND (NOT(P1) OR
-     * NOT(P2)))
+     * Tests with {@link DiscoveryMessage#BOND} = NOT(P1 AND P2) -> NOT(P1) OR NOT(P2) Tests adding S1 -> S1 AND (NOT(P1) OR NOT(P2)) Tests
+     * adding S1, S2 -> (S1 AND (NOT(P1) OR NOT(P2))) OR (S2 AND (NOT(P1) OR NOT(P2))) Tests adding S1, S2, S3 -> (S1 AND (NOT(P1) OR
+     * NOT(P2))) OR (S2 AND (NOT(P1) OR NOT(P2))) OR (S3 AND (NOT(P1) OR NOT(P2)))
      */
     @Test
     public void testDistributedNotAndBond() throws GSException {
@@ -445,7 +414,7 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet12);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		userBond, source12Bond), //
+			userBond, source12Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(//
 		BondFactory.createOrBond( //
@@ -456,7 +425,7 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet123);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		userBond, source123Bond), //
+			userBond, source123Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(//
 		BondFactory.createOrBond( //
@@ -468,11 +437,9 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = NOT(P1 OR P2) -> NOT(P1) AND NOT(P2)
-     * Tests adding S1 -> S1 AND NOT(P1) AND NOT(P2)
-     * Tests adding S1, S2 -> (S1 AND NOT(P1) AND NOT(P2)) OR (S2 AND NOT(P1) AND NOT(P2))
-     * Tests adding S1, S2, S3 -> (S1 AND NOT(P1) AND NOT(P2)) OR (S2 AND NOT(P1) AND NOT(P2)) OR (S3 AND NOT(P1) AND
-     * NOT(P2))
+     * Tests with {@link DiscoveryMessage#BOND} = NOT(P1 OR P2) -> NOT(P1) AND NOT(P2) Tests adding S1 -> S1 AND NOT(P1) AND NOT(P2) Tests
+     * adding S1, S2 -> (S1 AND NOT(P1) AND NOT(P2)) OR (S2 AND NOT(P1) AND NOT(P2)) Tests adding S1, S2, S3 -> (S1 AND NOT(P1) AND NOT(P2))
+     * OR (S2 AND NOT(P1) AND NOT(P2)) OR (S3 AND NOT(P1) AND NOT(P2))
      */
     @Test
     public void testDistributedNotOrBond() throws GSException {
@@ -518,7 +485,7 @@ public class QueryInitializerTest {
 
 	doTestWithAuthorizedSources(sourceSet123);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		userBond, source123Bond), //
+			userBond, source123Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(//
 		BondFactory.createOrBond( //
@@ -539,10 +506,8 @@ public class QueryInitializerTest {
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = P1 AND (S1 OR S2) -> (S1 AND P1) OR (S2 AND P1)
-     * Tests adding S1 -> S1 AND P1
-     * Tests adding S1, S2 -> (S1 AND P1) OR (S2 AND P1)
-     * Tests adding S1, S2, S3 -> (S1 AND P1) OR (S2 AND P1)
+     * Tests with {@link DiscoveryMessage#BOND} = P1 AND (S1 OR S2) -> (S1 AND P1) OR (S2 AND P1) Tests adding S1 -> S1 AND P1 Tests adding
+     * S1, S2 -> (S1 AND P1) OR (S2 AND P1) Tests adding S1, S2, S3 -> (S1 AND P1) OR (S2 AND P1)
      */
     @Test
     public void testComplexBond() throws GSException {
@@ -554,8 +519,8 @@ public class QueryInitializerTest {
 	Assert.assertEquals(userBond, //
 		message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		s1p1Bond, //
-		s2p1Bond), //
+			s1p1Bond, //
+			s2p1Bond), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet1);
@@ -569,25 +534,23 @@ public class QueryInitializerTest {
 	// Assert.assertEquals(userBond, //
 	// message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		s1p1Bond, //
-		s2p1Bond), //
+			s1p1Bond, //
+			s2p1Bond), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet123);
 	// Assert.assertEquals(userBond, //
 	// message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		s1p1Bond, //
-		s2p1Bond), //
+			s1p1Bond, //
+			s2p1Bond), //
 		message.getNormalizedBond());
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = (P1 OR P2) AND (S1 OR S2) -> (S1 AND (P1 OR P2)) OR (S2 AND (P1 OR
-     * P2))
-     * Tests adding S1 -> S1 AND (P1 OR P2)
-     * Tests adding S1, S2 -> (S1 AND (P1 OR P2)) OR (S2 AND (P1 OR P2))
-     * Tests adding S1, S2, S3 -> (S1 AND (P1 OR P2)) OR (S2 AND (P1 OR P2))
+     * Tests with {@link DiscoveryMessage#BOND} = (P1 OR P2) AND (S1 OR S2) -> (S1 AND (P1 OR P2)) OR (S2 AND (P1 OR P2)) Tests adding S1 ->
+     * S1 AND (P1 OR P2) Tests adding S1, S2 -> (S1 AND (P1 OR P2)) OR (S2 AND (P1 OR P2)) Tests adding S1, S2, S3 -> (S1 AND (P1 OR P2)) OR
+     * (S2 AND (P1 OR P2))
      */
     @Test
     public void testVeryComplexBond() throws GSException {
@@ -599,46 +562,44 @@ public class QueryInitializerTest {
 	// Assert.assertEquals(userBond, //
 	// message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(source1Bond, //
-			BondFactory.createOrBond(property1Bond, property2Bond)), //
-		BondFactory.createAndBond(source2Bond, //
-			BondFactory.createOrBond(property1Bond, property2Bond))), //
+			BondFactory.createAndBond(source1Bond, //
+				BondFactory.createOrBond(property1Bond, property2Bond)), //
+			BondFactory.createAndBond(source2Bond, //
+				BondFactory.createOrBond(property1Bond, property2Bond))), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet1);
 	// Assert.assertEquals(BondFactory.createAndBond(userBond, //
 	// source1Bond), message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createAndBond(source1Bond, //
-		BondFactory.createOrBond(property1Bond, property2Bond)) //
+			BondFactory.createOrBond(property1Bond, property2Bond)) //
 		, //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet12);
 	// Assert.assertEquals(userBond, message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(source1Bond, //
-			BondFactory.createOrBond(property1Bond, property2Bond)), //
-		BondFactory.createAndBond(source2Bond, //
-			BondFactory.createOrBond(property1Bond, property2Bond))), //
+			BondFactory.createAndBond(source1Bond, //
+				BondFactory.createOrBond(property1Bond, property2Bond)), //
+			BondFactory.createAndBond(source2Bond, //
+				BondFactory.createOrBond(property1Bond, property2Bond))), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet123);
 	// Assert.assertEquals(userBond, //
 	// message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(source1Bond, //
-			BondFactory.createOrBond(property1Bond, property2Bond)), //
-		BondFactory.createAndBond(source2Bond, //
-			BondFactory.createOrBond(property1Bond, property2Bond))), //
+			BondFactory.createAndBond(source1Bond, //
+				BondFactory.createOrBond(property1Bond, property2Bond)), //
+			BondFactory.createAndBond(source2Bond, //
+				BondFactory.createOrBond(property1Bond, property2Bond))), //
 		message.getNormalizedBond());
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = ((P1 OR P2) AND (S1 OR S2)) OR P3 -> (S1 AND (P1 OR P2 OR P3)) OR
-     * (S2 AND (P1 OR P2 OR P3))
-     * Tests adding S1 -> (S1 AND (P1 OR P2 OR P3))
-     * Tests adding S1, S2 -> (S1 AND (P1 OR P2 OR P3)) OR (S2 AND (P1 OR P2 OR P3))
-     * Tests adding S1, S2, S3 -> (S1 AND (P1 OR P2 OR P3)) OR (S2 AND (P1 OR P2 OR P3)) OR (S3 AND P3)
+     * Tests with {@link DiscoveryMessage#BOND} = ((P1 OR P2) AND (S1 OR S2)) OR P3 -> (S1 AND (P1 OR P2 OR P3)) OR (S2 AND (P1 OR P2 OR
+     * P3)) Tests adding S1 -> (S1 AND (P1 OR P2 OR P3)) Tests adding S1, S2 -> (S1 AND (P1 OR P2 OR P3)) OR (S2 AND (P1 OR P2 OR P3)) Tests
+     * adding S1, S2, S3 -> (S1 AND (P1 OR P2 OR P3)) OR (S2 AND (P1 OR P2 OR P3)) OR (S3 AND P3)
      */
     @Test
     public void testVeryVeryComplexBond() throws GSException {
@@ -652,50 +613,48 @@ public class QueryInitializerTest {
 	Assert.assertEquals(userBond, //
 		message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(source1Bond, //
-			BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
-		BondFactory.createAndBond(source2Bond, //
-			BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)) //
-	), //
+			BondFactory.createAndBond(source1Bond, //
+				BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
+			BondFactory.createAndBond(source2Bond, //
+				BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)) //
+		), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet1);
 	Assert.assertEquals(BondFactory.createAndBond(userBond, //
 		source1Bond), message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createAndBond(source1Bond, //
-		BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
+			BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet12);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		userBond, source12Bond), //
+			userBond, source12Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(source1Bond, //
-			BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
-		BondFactory.createAndBond(source2Bond, //
-			BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)) //
-	), //
+			BondFactory.createAndBond(source1Bond, //
+				BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
+			BondFactory.createAndBond(source2Bond, //
+				BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)) //
+		), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet123);
 	Assert.assertEquals(BondFactory.createAndBond( //
-		userBond, source123Bond), //
+			userBond, source123Bond), //
 		message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		BondFactory.createAndBond(source1Bond, //
-			BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
-		BondFactory.createAndBond(source2Bond, //
-			BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
-		BondFactory.createAndBond(source3Bond, property3Bond)), //
+			BondFactory.createAndBond(source1Bond, //
+				BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
+			BondFactory.createAndBond(source2Bond, //
+				BondFactory.createOrBond(BondFactory.createOrBond(property1Bond, property2Bond), property3Bond)), //
+			BondFactory.createAndBond(source3Bond, property3Bond)), //
 		message.getNormalizedBond());
     }
 
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = S1 OR (S2 AND P1) OR S4 -> S1 OR (S2 AND P1) OR S4
-     * Tests adding S1 -> S1 
-     * Tests adding S1, S2 -> S1 OR (S2 AND P1)
-     * Tests adding S1, S2, S3 -> S1 OR (S2 AND P1)
+     * Tests with {@link DiscoveryMessage#BOND} = S1 OR (S2 AND P1) OR S4 -> S1 OR (S2 AND P1) OR S4 Tests adding S1 -> S1 Tests adding S1,
+     * S2 -> S1 OR (S2 AND P1) Tests adding S1, S2, S3 -> S1 OR (S2 AND P1)
      */
     @Test
     public void testSourcesSpeedupBond() throws GSException {
@@ -719,9 +678,9 @@ public class QueryInitializerTest {
 	// userBond, source12Bond), //
 	// message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		source1Bond, BondFactory.createAndBond( //
-			property1Bond, source2Bond) //
-	), //
+			source1Bond, BondFactory.createAndBond( //
+				property1Bond, source2Bond) //
+		), //
 		message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet123);
@@ -729,23 +688,20 @@ public class QueryInitializerTest {
 	// userBond, source123Bond), //
 	// message.getPermittedBond());
 	Assert.assertEquals(BondFactory.createOrBond( //
-		source1Bond, BondFactory.createAndBond( //
-			property1Bond, source2Bond) //
-	), //
+			source1Bond, BondFactory.createAndBond( //
+				property1Bond, source2Bond) //
+		), //
 		message.getNormalizedBond());
     }
-    
+
     /**
-     * Tests with {@link DiscoveryMessage#BOND} = S2 AND P1 -> S2 AND P1
-     * Tests adding S1 -> []
-     * Tests adding S1, S2 -> S2 AND P1
-     * Tests adding S1, S2, S3 -> S2 AND P1
+     * Tests with {@link DiscoveryMessage#BOND} = S2 AND P1 -> S2 AND P1 Tests adding S1 -> [] Tests adding S1, S2 -> S2 AND P1 Tests adding
+     * S1, S2, S3 -> S2 AND P1
      */
     @Test
     public void testConstrainedSourceBond() throws GSException {
-	LogicalBond userBond = 
-		BondFactory.createAndBond( //
-			property1Bond, source2Bond) //
+	LogicalBond userBond = BondFactory.createAndBond( //
+		property1Bond, source2Bond) //
 		;
 	message.setUserBond(userBond);
 	doTest();
@@ -756,7 +712,7 @@ public class QueryInitializerTest {
 	doTestWithAuthorizedSources(sourceSet1);
 	// Assert.assertEquals(BondFactory.createAndBond(userBond, //
 	// source1Bond), message.getPermittedBond());
-	Assert.assertEquals(BondFactory.getFalseBond(),  message.getNormalizedBond());
+	Assert.assertEquals(BondFactory.getFalseBond(), message.getNormalizedBond());
 
 	doTestWithAuthorizedSources(sourceSet12);
 	// Assert.assertEquals(BondFactory.createAndBond( //

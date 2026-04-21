@@ -10,7 +10,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
-import eu.essi_lab.authorization.converter.IRequestAuthorizationConverter;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
@@ -27,12 +26,12 @@ public class QueryInitializerTest2 {
 
     private QueryInitializer queryInitializer;
     private DiscoveryMessage message;
-    private IRequestAuthorizationConverter requestAuthorizationConverter;
+    private RequestAuthorizationConverter requestAuthorizationConverter;
 
     @Before
     public void init() {
 	this.queryInitializer = new QueryInitializer();
-	this.requestAuthorizationConverter = Mockito.mock(IRequestAuthorizationConverter.class);
+	this.requestAuthorizationConverter = Mockito.mock(RequestAuthorizationConverter.class);
 
 	this.queryInitializer.setRequestAuthorizationConverter(requestAuthorizationConverter);
 	message = new DiscoveryMessage();

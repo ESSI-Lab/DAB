@@ -10,20 +10,17 @@ package eu.essi_lab.request.executor.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.api.database.*;
-import eu.essi_lab.api.database.factory.*;
-import eu.essi_lab.authorization.converter.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.messages.bond.*;
@@ -32,7 +29,6 @@ import eu.essi_lab.messages.bond.parser.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
-import eu.essi_lab.request.executor.*;
 import org.logicng.formulas.*;
 
 import java.util.*;
@@ -57,17 +53,16 @@ import java.util.*;
  * @author boldrini
  * @see IQueryInitializer
  */
-public class QueryInitializer implements IQueryInitializer {
+public class QueryInitializer {
 
     private static final String NORMALIZATION_FAILED_IRREDUCIBLE_INPUT = "Normalization failed because irreducible input";
     private static final String NORMALIZATION_FAILED_UNEXPECTED_SYNTAX = "Normalization failed because unexpected error";
     private static final String UNEXPECTED_LOGICAL_OPERATOR_MESSAGE_PREFIX = "Not expected logical operator: ";
-    private IRequestAuthorizationConverter requestAuthorizationConverter = null;
+    private RequestAuthorizationConverter requestAuthorizationConverter = null;
 
     /**
      * @see IQueryInitializer#initializeQuery(DiscoveryMessage)
      */
-    @Override
     public void initializeQuery(QueryInitializerMessage message) throws GSException {
 
 	String sourceDeployment = null;
@@ -103,7 +98,8 @@ public class QueryInitializer implements IQueryInitializer {
 	    // permission given to all sources
 
 	    if (sourceDeployment != null) {
-		authorizedBond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_DEPLOYMENT, sourceDeployment);
+		authorizedBond = BondFactory.createResourcePropertyBond(BondOperator.EQUAL, ResourceProperty.SOURCE_DEPLOYMENT,
+			sourceDeployment);
 	    } else {
 
 		authorizedBond = generateDefaultAuthorizedBond(message);
@@ -150,11 +146,51 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     /**
-     * Simplify the permitted bond, eliminating repeated sources that may have been introduced by permitted bond
-     * generation. <br/>
-     * E.g. User
-     * bond: (T1 AND S1) Authorized bond: (S1 OR S2) -> T1 AND S1 <br/>
-     * It will work only with authorizedBonds of the form:
+     * @param converter
+     */
+    public void setRequestAuthorizationConverter(RequestAuthorizationConverter converter) {
+
+	this.requestAuthorizationConverter = converter;
+    }
+
+    /**
+     * Normalizes the given bond, according to the steps described in {@link QueryInitializer}
+     *
+     * @param bond the bond to normalize
+     * @return a normalized bond
+     * @throws GSException in case the normalization failed, for whatever reason
+     */
+    public Bond normalizeBond(Bond bond) throws GSException {
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - preliminary simplification");
+	Bond simpleAndsForm = getNestedConjunctionsSimplifiedForm(bond);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - sources simplification");
+	Bond repeatedBondSimplification = getRepeatedBondSimplifiedForm(simpleAndsForm);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - repeated bond simplification");
+	Bond simplifiedForm = getSourcesSimplifiedForm(repeatedBondSimplification);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - negational form");
+	Bond negationNormalForm = getNegationNormalForm(simplifiedForm);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - aggregating simple bonds");
+	Bond aggregatedSimpleBonds = getAggregateSimpleBonds(negationNormalForm);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - disjunctive form");
+	// using the naive algorithm, as the library based algorithm seems to require more time!
+	Bond disjunctiveNormalForm = getDisjunctiveNormalFormNaive(aggregatedSimpleBonds);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - simplified conjunctions");
+	Bond cleanDisjunctiveNormalForm = simplifyConjunctions(disjunctiveNormalForm);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - aggregated conjunctions");
+	Bond aggregatedConjunctions = aggregateConjunctions(cleanDisjunctiveNormalForm);
+
+	Bond likeSourcesSimplification = getLikeSourcesSimplifiedForm(aggregatedConjunctions);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - cleanup");
+	// this seems not to be needed... already per source aggregated at this point!
+	// Bond ret = getPerSourceAggregation(aggregatedConjunctions);
+	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - done");
+	return likeSourcesSimplification;
+
+    }
+
+    /**
+     * Simplify the permitted bond, eliminating repeated sources that may have been introduced by permitted bond generation. <br/> E.g. User
+     * bond: (T1 AND S1) Authorized bond: (S1 OR S2) -> T1 AND S1 <br/> It will work only with authorizedBonds of the form:
      * <ol>
      * <li>S1</li>
      * <li>S1 OR S2 ... OR SN</li>
@@ -162,7 +198,7 @@ public class QueryInitializer implements IQueryInitializer {
      *
      * @param message
      */
-    public Bond simplifyAuthorizedBond(Bond userBond, Bond authorizedBond) {
+    private Bond simplifyAuthorizedBond(Bond userBond, Bond authorizedBond) {
 
 	List<Bond> authorizedSourceBonds;
 	if (authorizedBond == null) {
@@ -216,21 +252,21 @@ public class QueryInitializer implements IQueryInitializer {
 		if (!getSourceIdentifiersFromOR(logicalBond).isEmpty()) {
 		    userSourceIdentifiers = getSourceIdentifiersFromOR(logicalBond);
 		} else
-		// case 2) 3)
-		if (logicalBond.getLogicalOperator().equals(LogicalOperator.AND)) {
-		    operands = logicalBond.getOperands();
-		    for (Bond bond : operands) {
-			if (!getSourceIdentifiersFromOR(bond).isEmpty()) {
-			    userSourceIdentifiers = getSourceIdentifiersFromOR(bond);
-			} else {
-			    sbh = new SourceBondHandler(bond);
-			    if (!sbh.getSourceIdentifiers().isEmpty()) {
-				userSourceIdentifiers.clear();
-				break;
+		    // case 2) 3)
+		    if (logicalBond.getLogicalOperator().equals(LogicalOperator.AND)) {
+			operands = logicalBond.getOperands();
+			for (Bond bond : operands) {
+			    if (!getSourceIdentifiersFromOR(bond).isEmpty()) {
+				userSourceIdentifiers = getSourceIdentifiersFromOR(bond);
+			    } else {
+				sbh = new SourceBondHandler(bond);
+				if (!sbh.getSourceIdentifiers().isEmpty()) {
+				    userSourceIdentifiers.clear();
+				    break;
+				}
 			    }
 			}
 		    }
-		}
 	    } else if (userBond instanceof ResourcePropertyBond) {
 		if (!getSourceIdentifiersFromOR(userBond).isEmpty()) {
 		    // case 0)
@@ -289,47 +325,12 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     /**
-     * Normalizes the given bond, according to the steps described in {@link QueryInitializer}
-     *
-     * @param bond the bond to normalize
-     * @return a normalized bond
-     * @throws GSException in case the normalization failed, for whatever reason
-     */
-    public Bond normalizeBond(Bond bond) throws GSException {
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - preliminary simplification");
-	Bond simpleAndsForm = getNestedConjunctionsSimplifiedForm(bond);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - sources simplification");
-	Bond repeatedBondSimplification = getRepeatedBondSimplifiedForm(simpleAndsForm);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - repeated bond simplification");
-	Bond simplifiedForm = getSourcesSimplifiedForm(repeatedBondSimplification);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - negational form");
-	Bond negationNormalForm = getNegationNormalForm(simplifiedForm);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - aggregating simple bonds");
-	Bond aggregatedSimpleBonds = getAggregateSimpleBonds(negationNormalForm);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - disjunctive form");
-	// using the naive algorithm, as the library based algorithm seems to require more time!
-	Bond disjunctiveNormalForm = getDisjunctiveNormalFormNaive(aggregatedSimpleBonds);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - simplified conjunctions");
-	Bond cleanDisjunctiveNormalForm = simplifyConjunctions(disjunctiveNormalForm);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - aggregated conjunctions");
-	Bond aggregatedConjunctions = aggregateConjunctions(cleanDisjunctiveNormalForm);
-
-	Bond likeSourcesSimplification = getLikeSourcesSimplifiedForm(aggregatedConjunctions);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - cleanup");
-	// this seems not to be needed... already per source aggregated at this point!
-	// Bond ret = getPerSourceAggregation(aggregatedConjunctions);
-	// GSLoggerFactory.getLogger(getClass()).trace("Normalization - done");
-	return likeSourcesSimplification;
-
-    }
-
-    /**
      * aggregate per source e.g. : 1) S1 AND A AND B -> S1 AND (A AND B)
      *
      * @param bond
      * @return
      */
-    public Bond getPerSourceAggregation(Bond bond) {
+    private Bond getPerSourceAggregation(Bond bond) {
 	if (bond == null) {
 	    return null;
 	}
@@ -362,6 +363,10 @@ public class QueryInitializer implements IQueryInitializer {
 	}
     }
 
+    /**
+     * @param bond
+     * @return
+     */
     private Bond getPerSourceAggregationFromConjunction(LogicalBond bond) {
 	List<Bond> operands = bond.getOperands();
 	Bond sourceBond = null;
@@ -382,8 +387,7 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     /**
-     * In case of same bond repeated inside a logical operator, just delete all of them except one. E.g. A AND A AND A
-     * AND B -> A AND B
+     * In case of same bond repeated inside a logical operator, just delete all of them except one. E.g. A AND A AND A AND B -> A AND B
      *
      * @param bond
      * @return
@@ -526,6 +530,11 @@ public class QueryInitializer implements IQueryInitializer {
 	return bond;
     }
 
+    /**
+     * @param sources1
+     * @param sources2
+     * @return
+     */
     private Bond simplifySourceBonds(Bond sources1, Bond sources2) {
 	HashMap<String, List<Bond>> operands1 = getSourceOperands(sources1);
 	HashMap<String, List<Bond>> operands2 = getSourceOperands(sources2);
@@ -752,14 +761,6 @@ public class QueryInitializer implements IQueryInitializer {
 	return bond;
     }
 
-    protected ViewManager createViewManager(StorageInfo databaseURI) throws GSException {
-	DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
-	DatabaseWriter writer = DatabaseProviderFactory.getWriter(databaseURI);
-	ViewManager ret = new ViewManager();
-	ret.setDatabaseReader(reader);
-	return ret;
-    }
-
     /**
      * The default generation assumes that the user can access every sources<br>
      * <br>
@@ -850,6 +851,10 @@ public class QueryInitializer implements IQueryInitializer {
 
     }
 
+    /**
+     * @param otherBonds
+     * @return
+     */
     private Bond createOrBond(HashSet<Bond> otherBonds) {
 	if (otherBonds.size() == 1) {
 	    return otherBonds.iterator().next();
@@ -858,6 +863,10 @@ public class QueryInitializer implements IQueryInitializer {
 	}
     }
 
+    /**
+     * @param otherBonds
+     * @return
+     */
     private Bond createAndBond(HashSet<Bond> otherBonds) {
 	if (otherBonds.size() == 1) {
 	    return otherBonds.iterator().next();
@@ -867,10 +876,8 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     /**
-     * Computes the negation normal form of the given bond with De Morgan's laws and resolving double negations. A
-     * formula is in negation
-     * normal form if the negation operator NOT is only applied to variables and the only other allowed Boolean
-     * operators are AND , and OR.
+     * Computes the negation normal form of the given bond with De Morgan's laws and resolving double negations. A formula is in negation
+     * normal form if the negation operator NOT is only applied to variables and the only other allowed Boolean operators are AND , and OR.
      *
      * @param bond
      * @return
@@ -946,19 +953,17 @@ public class QueryInitializer implements IQueryInitializer {
 
 	}
 	return bond;
-
     }
 
     /**
-     * Converts bond to disjunctive normal form by distributing AND over OR A disjunctive normal form (DNF) is a
-     * normalization of a logical
+     * Converts bond to disjunctive normal form by distributing AND over OR A disjunctive normal form (DNF) is a normalization of a logical
      * formula which is a disjunction of conjunctive clauses.
      *
      * @param bond
      * @return
      * @throws GSException
      */
-    public Bond getDisjunctiveNormalForm(Bond bond) throws GSException {
+    private Bond getDisjunctiveNormalForm(Bond bond) throws GSException {
 	if (bond == null) {
 	    return null;
 	}
@@ -970,14 +975,14 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     /**
-     * Aggregates simple bonds (e.g. not involving source bonds) when mixed with source bonds. E.g. A AND S1 AND S2 AND
-     * B -> (A AND B) AND S1 AND S2
-     * 
+     * Aggregates simple bonds (e.g. not involving source bonds) when mixed with source bonds. E.g. A AND S1 AND S2 AND B -> (A AND B) AND
+     * S1 AND S2
+     *
      * @param bond
      * @return
      * @throws GSException
      */
-    public Bond getAggregateSimpleBonds(Bond bond) throws GSException {
+    private Bond getAggregateSimpleBonds(Bond bond) throws GSException {
 	if (bond == null) {
 	    return null;
 	}
@@ -1012,15 +1017,15 @@ public class QueryInitializer implements IQueryInitializer {
     }
 
     /**
-     * Converts bond to disjunctive normal form by distributing AND over OR A disjunctive normal form (DNF) is a
-     * normalization of a logical formula which is a disjunction of conjunctive clauses. Attention: bonds that are not
-     * source related aren't distributed, because the aim is to obtain the normalization with respect to sources.
+     * Converts bond to disjunctive normal form by distributing AND over OR A disjunctive normal form (DNF) is a normalization of a logical
+     * formula which is a disjunction of conjunctive clauses. Attention: bonds that are not source related aren't distributed, because the
+     * aim is to obtain the normalization with respect to sources.
      *
      * @param bond
      * @return
      * @throws GSException
      */
-    public Bond getDisjunctiveNormalFormNaive(Bond bond) throws GSException {
+    private Bond getDisjunctiveNormalFormNaive(Bond bond) throws GSException {
 	// if bond is null, nothing has to be done
 	if (bond == null) {
 	    return null;
@@ -1098,6 +1103,11 @@ public class QueryInitializer implements IQueryInitializer {
 
     }
 
+    /**
+     * @param operator
+     * @param dnfChild
+     * @return
+     */
     private Set<Bond> getHomogeneousOperands(LogicalOperator operator, Bond dnfChild) {
 	Set<Bond> newOperands = new HashSet<>();
 	if (dnfChild instanceof LogicalBond) {
@@ -1115,6 +1125,11 @@ public class QueryInitializer implements IQueryInitializer {
 	return newOperands;
     }
 
+    /**
+     * @param bond
+     * @return
+     * @throws GSException
+     */
     private Bond simplifyConjunctions(Bond bond) throws GSException {
 	// if bond is null, nothing has to be done
 	if (bond == null) {
@@ -1152,8 +1167,8 @@ public class QueryInitializer implements IQueryInitializer {
 			positiveSourceBonds.add(sourceBond);
 		    } else if (child instanceof LogicalBond) {
 			LogicalBond logicalChild = (LogicalBond) child;
-			if (logicalChild.getLogicalOperator().equals(LogicalOperator.NOT)
-				&& isSourceIdentifierBond(logicalChild.getFirstOperand())) {
+			if (logicalChild.getLogicalOperator().equals(LogicalOperator.NOT) && isSourceIdentifierBond(
+				logicalChild.getFirstOperand())) {
 			    negativeSourceBonds.add((ResourcePropertyBond) logicalChild.getFirstOperand());
 			} else {
 			    newOperands.add(child);
@@ -1354,8 +1369,8 @@ public class QueryInitializer implements IQueryInitializer {
 		for (Bond operand : operands) {
 		    if (operand instanceof LogicalBond) {
 			LogicalBond childLogicalBond = (LogicalBond) operand;
-			if (childLogicalBond.getLogicalOperator().equals(LogicalOperator.NOT)
-				&& isSourceIdentifierBond(childLogicalBond.getFirstOperand())) {
+			if (childLogicalBond.getLogicalOperator().equals(LogicalOperator.NOT) && isSourceIdentifierBond(
+				childLogicalBond.getFirstOperand())) {
 
 			    throwNegatedSourceException();
 
@@ -1419,34 +1434,41 @@ public class QueryInitializer implements IQueryInitializer {
 	}
     }
 
+    /**
+     * @param bond
+     * @return
+     */
     private boolean isSourceIdentifierBond(Bond bond) {
 
 	if (bond == null) {
 	    return false;
 	}
+
 	boolean bool = BondFactory.isResourcePropertyBond(bond, ResourceProperty.SOURCE_ID);
+
 	if (bool) {
 	    return (((ResourcePropertyBond) bond).getOperator().equals(BondOperator.EQUAL));
 	}
+
 	return bool;
     }
 
+    /**
+     * @param bond
+     * @return
+     */
     private boolean isSourceIdentifierLikeBond(Bond bond) {
 
 	if (bond == null) {
 	    return false;
 	}
+
 	boolean bool = BondFactory.isResourcePropertyBond(bond, ResourceProperty.SOURCE_ID);
+
 	if (bool) {
 	    return (((ResourcePropertyBond) bond).getOperator().equals(BondOperator.TEXT_SEARCH));
 	}
+
 	return bool;
     }
-
-    @Override
-    public void setRequestAuthorizationConverter(IRequestAuthorizationConverter requestAuthorizationConverter) {
-	this.requestAuthorizationConverter = requestAuthorizationConverter;
-
-    }
-
 }
