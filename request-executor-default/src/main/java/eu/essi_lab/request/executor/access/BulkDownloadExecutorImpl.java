@@ -49,12 +49,11 @@ import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataReference;
 import eu.essi_lab.model.resource.data.DataReferences;
 import eu.essi_lab.request.executor.AuthorizerDecorator;
-import eu.essi_lab.request.executor.IBulkDownloadExecutor;
 
 /**
  * @author boldrini
  */
-public class BulkDownloadExecutor extends AuthorizerDecorator implements IBulkDownloadExecutor {
+public class BulkDownloadExecutorImpl extends AuthorizerDecorator implements eu.essi_lab.request.executor.BulkDownloadExecutor {
 
     /**
      * 
@@ -116,7 +115,7 @@ public class BulkDownloadExecutor extends AuthorizerDecorator implements IBulkDo
 			    d = new DirectDownloader(linkage);
 			}
 
-			synchronized (BulkDownloadExecutor.class) {
+			synchronized (BulkDownloadExecutorImpl.class) {
 
 			    String completed = d.download();
 			    long end = System.currentTimeMillis();
@@ -149,7 +148,7 @@ public class BulkDownloadExecutor extends AuthorizerDecorator implements IBulkDo
 		String linkage = reference.getLinkage();
 
 		try {
-		    synchronized (BulkDownloadExecutor.class) {
+		    synchronized (BulkDownloadExecutorImpl.class) {
 
 			Future<String> result = results.get(i);
 

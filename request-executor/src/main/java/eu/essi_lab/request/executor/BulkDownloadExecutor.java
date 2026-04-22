@@ -30,7 +30,7 @@ import eu.essi_lab.model.resource.data.DataObject;
 /**
  * @author boldrini
  */
-public interface IBulkDownloadExecutor extends IRequestExecutor<BulkDownloadMessage, DataObject, CountSet, ResultSet<DataObject>> {
+public interface BulkDownloadExecutor extends IRequestExecutor<BulkDownloadMessage, DataObject, CountSet, ResultSet<DataObject>> {
 
     /**
      * @param message
