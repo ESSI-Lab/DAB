@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import eu.essi_lab.request.executor.*;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
@@ -43,26 +44,21 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.AuthorizerDecorator;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
-import eu.essi_lab.request.executor.IDistributor;
 import eu.essi_lab.request.executor.query.IQueryExecutor;
 import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
 
 /**
  * @author Fabrizio
  */
-public class DiscoveryExecutor extends AuthorizerDecorator
-	implements IDiscoveryExecutor, IDiscoveryNodeExecutor, IDiscoveryStringExecutor {
+public class DiscoveryExecutorImpl extends AuthorizerDecorator
+	implements DiscoveryExecutor, DiscoveryNodeExecutor, DiscoveryStringExecutor {
 
     private QueryExecutorInitializer queryExecutorInitializer;
 
     /**
      * 
      */
-    public DiscoveryExecutor() {
+    public DiscoveryExecutorImpl() {
 
 	queryExecutorInitializer = new QueryExecutorInitializer();
     }

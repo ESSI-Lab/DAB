@@ -39,8 +39,7 @@ import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.*;
 
 /**
  * @author Fabrizio
@@ -92,9 +91,9 @@ public class DiscoveryMethod implements GSPingMethod {
      */
     IRequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
 
-	Iterator<IDiscoveryExecutor> it = loader.iterator();
+	Iterator<DiscoveryExecutor> it = loader.iterator();
 
 	if (it.hasNext()) {
 	    return it.next();

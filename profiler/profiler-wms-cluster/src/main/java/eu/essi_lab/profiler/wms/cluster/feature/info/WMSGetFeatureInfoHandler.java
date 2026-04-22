@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -72,7 +73,6 @@ import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 /**
  * @author boldrini
@@ -387,8 +387,8 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    userPage.setSize(maxRecords);
 		    discoveryMessage.setPage(userPage);
 
-		    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-		    IDiscoveryExecutor discoveryExecutor = loader.iterator().next();
+		    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+		    DiscoveryExecutor discoveryExecutor = loader.iterator().next();
 
 		    ResultSet<GSResource> resultSet = discoveryExecutor.retrieve(discoveryMessage);
 		    List<GSResource> results = resultSet.getResultsList();

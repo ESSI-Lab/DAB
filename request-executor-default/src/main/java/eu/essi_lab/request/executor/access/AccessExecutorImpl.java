@@ -50,9 +50,7 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
-import eu.essi_lab.request.executor.AuthorizerDecorator;
-import eu.essi_lab.request.executor.AccessExecutor;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.*;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 import eu.essi_lab.workflow.blocks.grid.NetCDFOnlyReprojector;
 import eu.essi_lab.workflow.blocks.grid.NetCDFReprojector;
@@ -85,8 +83,8 @@ public class AccessExecutorImpl extends AuthorizerDecorator implements AccessExe
 	// GSLoggerFactory.getLogger(getClass()).info("Counting online with id " +
 	// onlineId + " STARTED");
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage(message);
 
@@ -110,9 +108,9 @@ public class AccessExecutorImpl extends AuthorizerDecorator implements AccessExe
 	String onlineId = accessMessage.getOnlineId();
 	GSLoggerFactory.getLogger(getClass()).debug("[ACCESS] Accessing online with id " + onlineId + " STARTED");
 
-	// ServiceLoader<IDiscoveryExecutor> loader =
-	// ServiceLoader.load(IDiscoveryExecutor.class);
-	// IDiscoveryExecutor executor = loader.iterator().next();
+	// ServiceLoader<DiscoveryExecutor> loader =
+	// ServiceLoader.load(DiscoveryExecutor.class);
+	// DiscoveryExecutor executor = loader.iterator().next();
 
 	// DiscoveryMessage discoveryMessage = new DiscoveryMessage(accessMessage);
 

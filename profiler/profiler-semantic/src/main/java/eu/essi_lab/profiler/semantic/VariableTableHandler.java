@@ -21,15 +21,12 @@ package eu.essi_lab.profiler.semantic;
  * #L%
  */
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -61,7 +58,6 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 public class VariableTableHandler implements WebRequestHandler, WebRequestValidator {
@@ -98,8 +94,8 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	String content = "<table border='1px'>";
 	for (GSSource s : sources) {
 
-	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor executor = loader.iterator().next();
+	    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    DiscoveryExecutor executor = loader.iterator().next();
 
 	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	    discoveryMessage.setRequestId(webRequest.getRequestId());

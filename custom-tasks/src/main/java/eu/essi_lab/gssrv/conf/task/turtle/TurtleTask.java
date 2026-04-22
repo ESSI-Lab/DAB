@@ -62,7 +62,7 @@ import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
 import software.amazon.awssdk.transfer.s3.model.UploadFileRequest;
 
 /**
@@ -385,8 +385,8 @@ public class TurtleTask extends AbstractCustomTask {
     private void downloadData(String sourceId, String tmpSourcedir, boolean test) throws Exception {
 	int pageSize = 250;
 	File sourceDir = new File(tmpSourcedir);
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	discoveryMessage.setRequestId("turtle-task-" + sourceId + "-" + UUID.randomUUID());

@@ -60,7 +60,7 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.profiler.wms.WMSProfilerSetting;
 import eu.essi_lab.profiler.wms.WMSRequest.Parameter;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
 
 public class WMSMapTransformer extends AccessRequestTransformer {
 
@@ -157,8 +157,8 @@ public class WMSMapTransformer extends AccessRequestTransformer {
     private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier) throws GSException {
 	GSResource ret = cache.get(onlineIdentifier);
 	if (ret == null) {
-	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor executor = loader.iterator().next();
+	    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    DiscoveryExecutor executor = loader.iterator().next();
 
 	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	    discoveryMessage.setRequestId(requestId);

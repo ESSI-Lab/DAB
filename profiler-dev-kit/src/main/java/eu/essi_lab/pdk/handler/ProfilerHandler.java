@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -47,8 +48,6 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IRequestExecutor;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 
@@ -69,7 +68,7 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * {@link WebRequestTransformer#transform(WebRequest)} method</li>
  * <li>the transformed {@link RequestMessage} is checked according to the
  * {@link IRequestExecutor#isAuthorized(RequestMessage, AnonymousUserPolicy)} method</li>
- * <li>the discovery/access operation is executed by an internal implementation of {@link IDiscoveryExecutor} and the
+ * <li>the discovery/access operation is executed by an internal implementation of {@link DiscoveryExecutor} and the
  * {@link MessageResponse} of type &ltI&gt is retrieved</li>
  * <li>the {@link MessageResponse} of type &ltI&gt is mapped in to a {@link MessageResponse} of type &ltT&gt by the
  * {@link #getMessageResponseMapper()} invoking the {@link MessageResponseMapper#map(RequestMessage, MessageResponse)}
@@ -88,7 +87,7 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * invoking the
  * {@link WebRequestTransformer#transform(WebRequest)} method</li>
  * <li><b>the {@link #onTransformedRequest(RequestMessage)} method is invoked</b></li>
- * <li>the discovery/access operation is executed by an internal implementation of {@link IDiscoveryExecutor} and the
+ * <li>the discovery/access operation is executed by an internal implementation of {@link DiscoveryExecutor} and the
  * {@link MessageResponse} of of type &ltI&gt is retrieved</li>
  * <li><b>the {@link #onRetrievedMessageResponse(RequestMessage, MessageResponse)} method is invoked</b></li>
  * <li>the {@link MessageResponse} of of type &ltI&gt is mapped in to a {@link MessageResponse} of type &ltT&gt by the
@@ -199,7 +198,7 @@ public abstract class ProfilerHandler//
     /**
      * Handles the supplied <code>request</code> by executing the following workflow:
      * <ol>
-     * <li>the discovery/access operation is executed by an internal implementation of {@link IDiscoveryExecutor} and
+     * <li>the discovery/access operation is executed by an internal implementation of {@link DiscoveryExecutor} and
      * the
      * {@link MessageResponse} of type &lt;I&gt; is retrieved</li>
      * <li>the {@link #onRetrievedMessageResponse(RequestMessage, MessageResponse)} method is invoked</li>

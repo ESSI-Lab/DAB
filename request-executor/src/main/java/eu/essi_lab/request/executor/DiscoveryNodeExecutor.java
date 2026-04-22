@@ -21,19 +21,22 @@ package eu.essi_lab.request.executor;
  * #L%
  */
 
+import org.w3c.dom.Node;
+
+import eu.essi_lab.authorization.MessageAuthorizer;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
 
 /**
- * At the very high level the main functionality of IDiscoverExecutor is the discovery of the resources matching the
+ * At the very high level the main functionality of IDiscoverExecutor is the discovery of the resources (nodes) matching
+ * the
  * user discovery queries (both count and retrieval).
  * 
  * @author boldrini
  */
-public interface IDiscoveryExecutor extends IRequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> {
+public interface DiscoveryNodeExecutor extends MessageAuthorizer<DiscoveryMessage> {
 
     /**
      * @param message
@@ -43,10 +46,12 @@ public interface IDiscoveryExecutor extends IRequestExecutor<DiscoveryMessage, G
     public CountSet count(DiscoveryMessage message) throws GSException;
 
     /**
+     * faster discovery
+     * 
      * @param message
      * @return
      * @throws GSException
      */
-    public ResultSet<GSResource> retrieve(DiscoveryMessage message) throws GSException;
+    public ResultSet<Node> retrieveNodes(DiscoveryMessage message) throws GSException;
 
 }

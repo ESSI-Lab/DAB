@@ -65,7 +65,7 @@ import eu.essi_lab.profiler.wis.WISRequest.Parameter;
 import eu.essi_lab.profiler.wis.WISRequest.TopRequest;
 import eu.essi_lab.profiler.wis.WISTransformer;
 import eu.essi_lab.profiler.wis.WISUtils;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
+import eu.essi_lab.request.executor.DiscoveryStringExecutor;
 
 /**
  * @author boldrini
@@ -220,8 +220,8 @@ public class WISStationInfoHandler extends DefaultRequestHandler {
 	    } else {
 		// here stations are retrieved from the database
 		// (there isn't however information about number of observations)
-		ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
-		IDiscoveryStringExecutor discoveryExecutor = loader.iterator().next();
+		ServiceLoader<DiscoveryStringExecutor> loader = ServiceLoader.load(DiscoveryStringExecutor.class);
+		DiscoveryStringExecutor discoveryExecutor = loader.iterator().next();
 		WISTransformer transformer = new WISTransformer();
 		DiscoveryMessage discoveryMessage = transformer.transform(webRequest);
 		ResultSet<String> resultSet = null;
@@ -369,7 +369,7 @@ public class WISStationInfoHandler extends DefaultRequestHandler {
 
     }
 
-    private List<String> getStations(IDiscoveryStringExecutor discoveryExecutor, DiscoveryMessage discoveryMessage, int offset, int page)
+    private List<String> getStations(DiscoveryStringExecutor discoveryExecutor, DiscoveryMessage discoveryMessage, int offset, int page)
 	    throws Exception {
 
 	List<String> ret = new ArrayList<>();

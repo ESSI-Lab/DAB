@@ -3,6 +3,7 @@ package eu.essi_lab.request.executor.discover;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.essi_lab.request.executor.*;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +18,6 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 /**
  * @author ilsanto
@@ -30,7 +30,7 @@ public class BondReducerTest2 {
 
 	String parentid1 = "testParentId";
 
-	IDiscoveryExecutor executor = Mockito.mock(IDiscoveryExecutor.class);
+	DiscoveryExecutor executor = Mockito.mock(DiscoveryExecutor.class);
 
 	BondReducer reducer = new BondReducer();
 
@@ -77,7 +77,7 @@ public class BondReducerTest2 {
 	String parentid1 = "testParentId";
 	String parentid2 = "testParentId2";
 
-	IDiscoveryExecutor executor = Mockito.mock(IDiscoveryExecutor.class);
+	DiscoveryExecutor executor = Mockito.mock(DiscoveryExecutor.class);
 
 	BondReducer reducer = new BondReducer();
 
@@ -124,7 +124,7 @@ public class BondReducerTest2 {
 
 	String parentid1 = "testParentId";
 
-	IDiscoveryExecutor executor = Mockito.mock(IDiscoveryExecutor.class);
+	DiscoveryExecutor executor = Mockito.mock(DiscoveryExecutor.class);
 
 	BondReducer reducer = new BondReducer();
 

@@ -271,8 +271,8 @@ public class SupportService {
 	}
 
 	try {
-	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor executor = loader.iterator().next();
+	    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    DiscoveryExecutor executor = loader.iterator().next();
 
 	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	    discoveryMessage.setRequestId("rating-curves-" + UUID.randomUUID().toString());

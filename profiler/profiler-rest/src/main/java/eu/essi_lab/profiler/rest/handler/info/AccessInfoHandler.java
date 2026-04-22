@@ -52,7 +52,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
 import eu.essi_lab.workflow.processor.ProcessorCapabilities;
 
 /**
@@ -202,8 +202,8 @@ public class AccessInfoHandler extends RestInfoHandler {
     @Override
     protected String createXMLResponse(WebRequest webRequest) throws GSException {
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	int maxReports = 10;
 	int startIndex = 1;

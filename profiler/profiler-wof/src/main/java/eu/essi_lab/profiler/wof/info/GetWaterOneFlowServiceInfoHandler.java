@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.ws.rs.core.MediaType;
 
@@ -67,7 +66,7 @@ import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wof.HISCentralProfiler;
 import eu.essi_lab.profiler.wof.WOFMapperUtils;
-import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
+import eu.essi_lab.request.executor.DiscoveryNodeExecutor;
 import eu.essi_lab.request.executor.IStatisticsExecutor;
 
 /**
@@ -415,8 +414,8 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 
 	GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
-	ServiceLoader<IDiscoveryNodeExecutor> loader = ServiceLoader.load(IDiscoveryNodeExecutor.class);
-	IDiscoveryNodeExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryNodeExecutor> loader = ServiceLoader.load(DiscoveryNodeExecutor.class);
+	DiscoveryNodeExecutor executor = loader.iterator().next();
 
 	ResultSet<Node> nodes = executor.retrieveNodes(message);
 	for (Node node : nodes.getResultsList()) {

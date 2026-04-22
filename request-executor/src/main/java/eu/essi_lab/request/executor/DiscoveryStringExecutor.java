@@ -33,7 +33,7 @@ import eu.essi_lab.model.exceptions.GSException;
  * 
  * @author boldrini
  */
-public interface IDiscoveryStringExecutor extends MessageAuthorizer<DiscoveryMessage>{
+public interface DiscoveryStringExecutor extends MessageAuthorizer<DiscoveryMessage>{
 
     /**
      * @param message

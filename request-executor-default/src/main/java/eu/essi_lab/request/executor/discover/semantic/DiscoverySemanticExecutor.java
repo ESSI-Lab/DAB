@@ -55,9 +55,7 @@ import eu.essi_lab.model.ontology.GSPredicate;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IDiscoverySemanticExecutor;
-import eu.essi_lab.request.executor.ISemanticExecutor;
+import eu.essi_lab.request.executor.*;
 
 /**
  * @author Fabrizio
@@ -69,8 +67,8 @@ public class DiscoverySemanticExecutor implements IDiscoverySemanticExecutor {
 
 	message = augmentMessage(message);
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	return executor.count(message);
     }
@@ -80,8 +78,8 @@ public class DiscoverySemanticExecutor implements IDiscoverySemanticExecutor {
 
 	message = augmentMessage(message);
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	return executor.retrieve(message);
     }

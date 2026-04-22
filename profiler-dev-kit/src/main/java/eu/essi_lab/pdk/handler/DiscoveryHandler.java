@@ -30,8 +30,7 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.*;
 
 /**
  * Overrides the superclass in order to provide an implementation specific for discovery requests
@@ -50,8 +49,8 @@ public class DiscoveryHandler<T> extends ProfilerHandler<DiscoveryMessage, GSRes
     @Override
     protected IRequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	for (IDiscoveryExecutor e : loader) {
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	for (DiscoveryExecutor e : loader) {
 
 	    return e;
 	}

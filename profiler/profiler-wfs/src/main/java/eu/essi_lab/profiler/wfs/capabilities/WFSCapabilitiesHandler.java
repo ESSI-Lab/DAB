@@ -138,8 +138,8 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 	    //
 	    // // computes union of bboxes
 	    //
-	    // ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    // IDiscoveryExecutor executor = loader.iterator().next();
+	    // ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    // DiscoveryExecutor executor = loader.iterator().next();
 	    //
 	    // ResultSet<GSResource> response = executor.retrieve(discoveryMessage);
 

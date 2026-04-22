@@ -28,6 +28,7 @@ import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import eu.essi_lab.request.executor.*;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.access.DataDownloader;
@@ -58,7 +59,6 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.data.DataReference;
 import eu.essi_lab.model.resource.data.DataReferences;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<BulkDownloadMessage> {
 
@@ -95,8 +95,8 @@ public class GWPSBulkDownloadRequestTransformer extends WebRequestTransformer<Bu
 	    stream.close();
 	    Node[] nodes = reader.evaluateNodes("//*:Input");
 
-	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor executor = loader.iterator().next();
+	    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    DiscoveryExecutor executor = loader.iterator().next();
 
 	    TaskListExecutor<ValidationMessage> barrier = new TaskListExecutor<ValidationMessage>(nodes.length);
 	    for (int i = 0; i < nodes.length; i++) {

@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.request.executor.*;
 import org.json.JSONObject;
 import org.json.XML;
 
@@ -59,7 +60,6 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.profiler.rest.handler.info.MessageFormat;
 import eu.essi_lab.profiler.rest.handler.info.RestParameter;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class RestAccessRequestTransformer extends AccessRequestTransformer {
 
@@ -87,8 +87,8 @@ public class RestAccessRequestTransformer extends AccessRequestTransformer {
 
 	String id = parser.getValue(RestParameter.IDENTIFIER.getName());
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

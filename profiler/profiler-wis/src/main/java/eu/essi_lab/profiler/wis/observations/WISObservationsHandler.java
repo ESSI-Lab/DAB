@@ -58,7 +58,7 @@ import eu.essi_lab.profiler.wis.WISRequest.CollectionItems;
 import eu.essi_lab.profiler.wis.WISRequest.Parameter;
 import eu.essi_lab.profiler.wis.WISRequest.TopRequest;
 import eu.essi_lab.profiler.wis.WISUtils;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
+import eu.essi_lab.request.executor.DiscoveryStringExecutor;
 
 /**
  * @author boldrini
@@ -339,7 +339,7 @@ public class WISObservationsHandler extends DefaultRequestHandler {
 
     }
 
-    private List<String> getStations(IDiscoveryStringExecutor discoveryExecutor, DiscoveryMessage discoveryMessage, int offset, int page)
+    private List<String> getStations(DiscoveryStringExecutor discoveryExecutor, DiscoveryMessage discoveryMessage, int offset, int page)
 	    throws Exception {
 
 	List<String> ret = new ArrayList<>();
