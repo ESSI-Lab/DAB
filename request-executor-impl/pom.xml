@@ -10,7 +10,7 @@
 	</parent>
 
 	<name>ESSI-Lab Request Executor (Default)</name>
-	<artifactId>request-executor-default</artifactId>
+	<artifactId>request-executor-impl</artifactId>
 
 	<dependencies>
 		
