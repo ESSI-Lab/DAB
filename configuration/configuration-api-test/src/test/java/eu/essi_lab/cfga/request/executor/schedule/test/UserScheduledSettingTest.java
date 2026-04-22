@@ -15,7 +15,7 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.schedule.UserScheduledSetting;
+import eu.essi_lab.request.executor.impl.schedule.UserScheduledSetting;
 
 /**
  * @author Fabrizio

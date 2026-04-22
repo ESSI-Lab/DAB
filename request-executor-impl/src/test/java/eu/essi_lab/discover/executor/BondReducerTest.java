@@ -18,10 +18,10 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.request.executor.discover.BondReducer;
-import eu.essi_lab.request.executor.discover.BrokeringStrategyResolver;
-import eu.essi_lab.request.executor.discover.DistributorImpl;
-import eu.essi_lab.request.executor.discover.submitter.DistributedQueryExecutor;
+import eu.essi_lab.request.executor.impl.discover.BondReducer;
+import eu.essi_lab.request.executor.impl.discover.BrokeringStrategyResolver;
+import eu.essi_lab.request.executor.impl.discover.DistributorImpl;
+import eu.essi_lab.request.executor.impl.discover.submitter.DistributedQueryExecutor;
 
 /**
  * These tests the bond reduction made by the {@link DistributorImpl} delegating to the {@link BondReducer} when submitting

@@ -23,7 +23,7 @@ package eu.essi_lab.gssrv.health.methods;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
-import eu.essi_lab.request.executor.discover.DistributorImpl;
+import eu.essi_lab.request.executor.impl.discover.DistributorImpl;
 
 /**
  * @author Fabrizio

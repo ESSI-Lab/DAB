@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.request.executor.discover.DefaultSourceComparator;
+import eu.essi_lab.request.executor.impl.discover.DefaultSourceComparator;
 
 public class DefaultSourceComparatorTest {
 

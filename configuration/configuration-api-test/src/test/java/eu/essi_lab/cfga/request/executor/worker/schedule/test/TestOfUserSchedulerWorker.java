@@ -25,7 +25,7 @@ import eu.essi_lab.cfga.scheduler.SchedulerUtils;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.messages.AccessMessage;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.request.executor.schedule.UserScheduledSetting;
+import eu.essi_lab.request.executor.impl.schedule.UserScheduledSetting;
 
 /**
  * @author Fabrizio

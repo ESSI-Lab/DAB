@@ -20,7 +20,6 @@ import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.request.executor.*;
-import eu.essi_lab.request.executor.access.*;
 import eu.essi_lab.validator.wof.WML_1_1Validator;
 
 public class DownloaderTest {

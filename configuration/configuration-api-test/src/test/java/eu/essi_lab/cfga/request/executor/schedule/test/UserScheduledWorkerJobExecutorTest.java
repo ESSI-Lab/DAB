@@ -5,8 +5,8 @@ import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.request.executor.schedule.UserScheduledSetting;
-import eu.essi_lab.request.executor.schedule.UserScheduledWorkerJobExecutor;
+import eu.essi_lab.request.executor.impl.schedule.UserScheduledSetting;
+import eu.essi_lab.request.executor.impl.schedule.UserScheduledWorkerJobExecutor;
 
 /**
  * @author Fabrizio

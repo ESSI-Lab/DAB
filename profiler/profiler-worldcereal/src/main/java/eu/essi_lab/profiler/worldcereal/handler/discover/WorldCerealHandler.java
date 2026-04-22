@@ -64,8 +64,8 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
 import eu.essi_lab.request.executor.DiscoveryExecutor;
-import eu.essi_lab.request.executor.discover.BondReducer;
-import eu.essi_lab.request.executor.discover.QueryInitializer;
+import eu.essi_lab.request.executor.impl.discover.BondReducer;
+import eu.essi_lab.request.executor.impl.discover.QueryInitializer;
 
 public class WorldCerealHandler extends DiscoveryHandler<String> {
 

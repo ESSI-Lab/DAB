@@ -1,1 +1,1 @@
-eu.essi_lab.request.executor.statistics.StatisticsExecutorImpl
+eu.essi_lab.request.executor.impl.statistics.StatisticsExecutorImpl

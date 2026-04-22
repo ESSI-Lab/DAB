@@ -25,7 +25,7 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.discover.DistributorImpl;
+import eu.essi_lab.request.executor.impl.discover.DistributorImpl;
 import eu.essi_lab.request.executor.query.DistributedQueryExecutor;
 import eu.essi_lab.request.executor.query.QueryExecutor.Type;
 
