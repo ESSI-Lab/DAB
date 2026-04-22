@@ -20,11 +20,11 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.discover.BondReducer;
 import eu.essi_lab.request.executor.discover.BrokeringStrategyResolver;
-import eu.essi_lab.request.executor.discover.Distributor;
+import eu.essi_lab.request.executor.discover.DistributorImpl;
 import eu.essi_lab.request.executor.discover.submitter.DistributedQueryExecutor;
 
 /**
- * These tests the bond reduction made by the {@link Distributor} delegating to the {@link BondReducer} when submitting
+ * These tests the bond reduction made by the {@link DistributorImpl} delegating to the {@link BondReducer} when submitting
  * a query to a {@link
  * DistributedQueryExecutor}
  *

@@ -46,14 +46,13 @@ import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.IDistributor;
 import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
 import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
 import eu.essi_lab.request.executor.query.IQueryExecutor;
 import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
 
 /**
- * The default implementation of {@link IDistributor} is initialized with an ordered list of query submitters. It
+ * The default implementation of {@link eu.essi_lab.request.executor.Distributor} is initialized with an ordered list of query submitters. It
  * distributes the discovery
  * message to the query submitters and collect back the results.
  * <p>
@@ -65,7 +64,7 @@ import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
  *
  * @author boldrini
  */
-public class Distributor implements IDistributor {
+public class DistributorImpl implements eu.essi_lab.request.executor.Distributor {
 
     /**
      * 
@@ -104,11 +103,11 @@ public class Distributor implements IDistributor {
 	synchronized (timeoutErrorsDuringCount) {
 	    timeoutErrorsDuringCount++;
 	}
-	GSLoggerFactory.getLogger(Distributor.class).info("Added distributor count error ({}s timeout) (now {})", timeout,
+	GSLoggerFactory.getLogger(DistributorImpl.class).info("Added distributor count error ({}s timeout) (now {})", timeout,
 		getTimeoutErrorsDuringCount());
     }
 
-    public Distributor() {
+    public DistributorImpl() {
 
 	bondReducer = new BondReducer();
     }

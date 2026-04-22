@@ -37,7 +37,7 @@ import eu.essi_lab.request.executor.query.IQueryExecutor;
  * 
  * @author boldrini
  */
-public interface IDistributor {
+public interface Distributor {
 
     /**
      * Counts the results of the discovery request represented by the given message

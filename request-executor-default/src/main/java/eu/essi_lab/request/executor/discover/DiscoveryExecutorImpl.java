@@ -1,7 +1,7 @@
 package eu.essi_lab.request.executor.discover;
 
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
 
 /*-
  * #%L
@@ -24,13 +24,13 @@ import java.util.Arrays;
  * #L%
  */
 
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import eu.essi_lab.request.executor.*;
+import eu.essi_lab.request.executor.Distributor;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
@@ -68,7 +68,7 @@ public class DiscoveryExecutorImpl extends AuthorizerDecorator
 
 	new QueryInitializer().initializeQuery(message);
 
-	IDistributor distributor = initDistributor(message);
+	Distributor distributor = initDistributor(message);
 
 	CountSet result = distributor.count(message);
 
@@ -114,7 +114,7 @@ public class DiscoveryExecutorImpl extends AuthorizerDecorator
 	ResultSet<R> result = null;
 
 	//
-	// if the request do not include distributed sources, the Distributor is bypassed and the request
+	// if the request do not include distributed sources, the DistributorImpl is bypassed and the request
 	// is directly handled by the DatabaseFinder
 	//
 	if (!ConfigurationWrapper.hasDistributedSources(message)) {
@@ -218,10 +218,10 @@ public class DiscoveryExecutorImpl extends AuthorizerDecorator
 	} else {
 
 	    //
-	    // the Distributor is necessary if distributed sources are included
+	    // the DistributorImpl is necessary if distributed sources are included
 	    //
 
-	    IDistributor distributor = initDistributor(message);
+	    Distributor distributor = initDistributor(message);
 
 	    if (clazz.equals(GSResource.class)) {
 
@@ -286,9 +286,9 @@ public class DiscoveryExecutorImpl extends AuthorizerDecorator
      * @return
      * @throws GSException
      */
-    private IDistributor initDistributor(DiscoveryMessage message) throws GSException {
+    private Distributor initDistributor(DiscoveryMessage message) throws GSException {
 
-	Distributor distributor = new Distributor();
+	Distributor distributor = ServiceLoader.load(Distributor.class).iterator().next();
 
 	List<IQueryExecutor> querySubmitters = queryExecutorInitializer.initQueryExecutors(message);
 

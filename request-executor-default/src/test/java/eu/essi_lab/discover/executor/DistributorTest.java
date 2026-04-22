@@ -25,7 +25,7 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.discover.Distributor;
+import eu.essi_lab.request.executor.discover.DistributorImpl;
 import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
 import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
 
@@ -52,7 +52,7 @@ public class DistributorTest {
     List<IDistributedQueryExecutor> querySubmitters = new ArrayList<>();
     List<IDistributedQueryExecutor> badQuerySubmitters = new ArrayList<>();
     private DiscoveryMessage message;
-    private Distributor distributor;
+    private DistributorImpl distributor;
 
     private IDistributedQueryExecutor querySubmitter1;
     private IDistributedQueryExecutor querySubmitter2;
@@ -60,7 +60,7 @@ public class DistributorTest {
     private IDistributedQueryExecutor querySubmitterE;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    private Distributor badDistributor;
+    private DistributorImpl badDistributor;
 
     @Before
     public void init() throws GSException {
@@ -79,14 +79,14 @@ public class DistributorTest {
 	querySubmitters.add(querySubmitter1);
 	querySubmitters.add(querySubmitter2);
 	querySubmitters.add(querySubmitter3);
-	this.distributor = new Distributor();
+	this.distributor = new DistributorImpl();
 	distributor.setQuerySubmitters(querySubmitters);
 
 	querySubmitterE = getExceptionMock("source2", new GSResource[] { getR("4"), getR("5"), getR("6") });
 	badQuerySubmitters.add(querySubmitter1);
 	badQuerySubmitters.add(querySubmitterE);
 	badQuerySubmitters.add(querySubmitter3);
-	this.badDistributor = new Distributor();
+	this.badDistributor = new DistributorImpl();
 	badDistributor.setQuerySubmitters(badQuerySubmitters);
 
     }

@@ -32,7 +32,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ResourceProperty;
 
 /**
- * Utility class used by the {@link Distributor} to calculate a bond reduced with respect to a source (i.e. the subset
+ * Utility class used by the {@link DistributorImpl} to calculate a bond reduced with respect to a source (i.e. the subset
  * of the original bond
  * that is pertinent to the given source). It will raise exception if the arguments are not consistent (e.g. it was
  * asked to calculate a
