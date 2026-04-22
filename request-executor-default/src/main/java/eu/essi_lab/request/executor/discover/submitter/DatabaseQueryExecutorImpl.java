@@ -36,14 +36,14 @@ import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
+import eu.essi_lab.request.executor.query.DatabaseQueryExecutor;
 
 /**
  * @author Fabrizio
  */
-public class DatabaseQueryExecutor implements IDatabaseQueryExecutor {
+public class DatabaseQueryExecutorImpl implements DatabaseQueryExecutor {
 
-    public DatabaseQueryExecutor() {
+    public DatabaseQueryExecutorImpl() {
     }
 
     @Override

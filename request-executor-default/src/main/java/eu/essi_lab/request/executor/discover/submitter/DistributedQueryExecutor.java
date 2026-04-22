@@ -49,11 +49,10 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.shared.SharedContent;
 import eu.essi_lab.model.shared.SharedContent.SharedContentType;
-import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
 import eu.essi_lab.shared.driver.DriverFactory;
 import eu.essi_lab.shared.driver.ISharedRepositoryDriver;
 
-public class DistributedQueryExecutor implements IDistributedQueryExecutor {
+public class DistributedQueryExecutor implements eu.essi_lab.request.executor.query.DistributedQueryExecutor {
 
     /**
      * 

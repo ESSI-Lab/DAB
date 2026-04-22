@@ -26,8 +26,8 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.request.executor.discover.DistributorImpl;
-import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
-import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
+import eu.essi_lab.request.executor.query.DistributedQueryExecutor;
+import eu.essi_lab.request.executor.query.QueryExecutor.Type;
 
 /**
  * Tests the distributor query execution, by setting a predefined mocked set of query submitters and a series of queries
@@ -49,15 +49,15 @@ import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
  */
 public class DistributorTest {
 
-    List<IDistributedQueryExecutor> querySubmitters = new ArrayList<>();
-    List<IDistributedQueryExecutor> badQuerySubmitters = new ArrayList<>();
+    List<DistributedQueryExecutor> querySubmitters = new ArrayList<>();
+    List<DistributedQueryExecutor> badQuerySubmitters = new ArrayList<>();
     private DiscoveryMessage message;
     private DistributorImpl distributor;
 
-    private IDistributedQueryExecutor querySubmitter1;
-    private IDistributedQueryExecutor querySubmitter2;
-    private IDistributedQueryExecutor querySubmitter3;
-    private IDistributedQueryExecutor querySubmitterE;
+    private DistributedQueryExecutor querySubmitter1;
+    private DistributedQueryExecutor querySubmitter2;
+    private DistributedQueryExecutor querySubmitter3;
+    private DistributedQueryExecutor querySubmitterE;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     private DistributorImpl badDistributor;
@@ -98,8 +98,8 @@ public class DistributorTest {
 	return ret;
     }
 
-    private IDistributedQueryExecutor getDistributedQuerySubmitterMock(String sourceIdentifier, GSResource[] resources) throws GSException {
-	IDistributedQueryExecutor ret = Mockito.mock(IDistributedQueryExecutor.class);
+    private DistributedQueryExecutor getDistributedQuerySubmitterMock(String sourceIdentifier, GSResource[] resources) throws GSException {
+	DistributedQueryExecutor ret = Mockito.mock(DistributedQueryExecutor.class);
 	Mockito.when(ret.getType()).thenReturn(Type.DISTRIBUTED);
 	Mockito.when(ret.getSourceIdentifier()).thenReturn(sourceIdentifier);
 	Mockito.doAnswer(new Answer<SimpleEntry<String, DiscoveryCountResponse>>() {
@@ -128,8 +128,8 @@ public class DistributorTest {
 	return ret;
     }
 
-    private IDistributedQueryExecutor getExceptionMock(String sourceIdentifier, GSResource[] resources) throws GSException {
-	IDistributedQueryExecutor ret = Mockito.mock(IDistributedQueryExecutor.class);
+    private DistributedQueryExecutor getExceptionMock(String sourceIdentifier, GSResource[] resources) throws GSException {
+	DistributedQueryExecutor ret = Mockito.mock(DistributedQueryExecutor.class);
 	Mockito.when(ret.getType()).thenReturn(Type.DISTRIBUTED);
 	Mockito.when(ret.getSourceIdentifier()).thenReturn(sourceIdentifier);
 	Mockito.doAnswer(new Answer<SimpleEntry<String, DiscoveryCountResponse>>() {

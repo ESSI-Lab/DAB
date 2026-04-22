@@ -31,6 +31,7 @@ import java.util.concurrent.Future;
 
 import eu.essi_lab.request.executor.*;
 import eu.essi_lab.request.executor.Distributor;
+import eu.essi_lab.request.executor.query.*;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
@@ -44,8 +45,7 @@ import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.query.IQueryExecutor;
-import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
+import eu.essi_lab.request.executor.query.QueryExecutor.Type;
 
 /**
  * @author Fabrizio
@@ -290,7 +290,7 @@ public class DiscoveryExecutorImpl extends AuthorizerDecorator
 
 	Distributor distributor = ServiceLoader.load(Distributor.class).iterator().next();
 
-	List<IQueryExecutor> querySubmitters = queryExecutorInitializer.initQueryExecutors(message);
+	List<QueryExecutor> querySubmitters = queryExecutorInitializer.initQueryExecutors(message);
 
 	distributor.setQuerySubmitters(querySubmitters);
 	return distributor;

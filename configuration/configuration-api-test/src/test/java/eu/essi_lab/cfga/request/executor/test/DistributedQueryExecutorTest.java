@@ -28,7 +28,7 @@ import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.request.executor.discover.submitter.DistributedQueryExecutor;
-import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
+import eu.essi_lab.request.executor.query.QueryExecutor.Type;
 
 public class DistributedQueryExecutorTest {
 

@@ -18,10 +18,10 @@
 //import eu.essi_lab.model.GSSource;
 //import eu.essi_lab.model.exceptions.GSException;
 //import eu.essi_lab.request.executor.discover.QueryExecutorInitializer;
-//import eu.essi_lab.request.executor.query.IQueryExecutor;
+//import eu.essi_lab.request.executor.query.QueryExecutor;
 //
 ///**
-// * Checks that the query submitter creates the correct {@link IQueryExecutor} set for the given discovery message.
+// * Checks that the query submitter creates the correct {@link QueryExecutor} set for the given discovery message.
 // *
 // * @author boldrini
 // */
@@ -67,7 +67,7 @@
 //	sources.add(getDistributedSource());
 //	sources.add(getDistributedSource());
 //	message.setSources(sources);
-//	List<IQueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
+//	List<QueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
 //	Assert.assertEquals(3, querySubmitters.size());
 //    }
 //
@@ -77,7 +77,7 @@
 //	List<GSSource> sources = new ArrayList<>();
 //	sources.add(getMixedSource());
 //	message.setSources(sources);
-//	List<IQueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
+//	List<QueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
 //	Assert.assertEquals(1, querySubmitters.size());
 //    }
 //
@@ -90,7 +90,7 @@
 //	sources.add(getHarvestedSource());
 //	sources.add(getDistributedSource());
 //	message.setSources(sources);
-//	List<IQueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
+//	List<QueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
 //	Assert.assertEquals(2, querySubmitters.size());
 //    }
 //
@@ -104,7 +104,7 @@
 //	sources.add(getHarvestedSource());
 //	sources.add(getDistributedSource());
 //	message.setSources(sources);
-//	List<IQueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
+//	List<QueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
 //	Assert.assertEquals(3, querySubmitters.size());
 //    }
 //
@@ -117,7 +117,7 @@
 //	sources.add(getHarvestedSource());
 //	sources.add(getHarvestedSource());
 //	message.setSources(sources);
-//	List<IQueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
+//	List<QueryExecutor> querySubmitters = initializer.initQueryExecutors(message);
 //	Assert.assertEquals(2, querySubmitters.size());
 //    }
 //

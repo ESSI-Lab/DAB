@@ -30,6 +30,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import eu.essi_lab.request.executor.query.*;
 import org.slf4j.Logger;
 import org.w3c.dom.Node;
 
@@ -46,10 +47,7 @@ import eu.essi_lab.messages.count.DiscoveryCountResponse;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.query.IDatabaseQueryExecutor;
-import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
-import eu.essi_lab.request.executor.query.IQueryExecutor;
-import eu.essi_lab.request.executor.query.IQueryExecutor.Type;
+import eu.essi_lab.request.executor.query.QueryExecutor.Type;
 
 /**
  * The default implementation of {@link eu.essi_lab.request.executor.Distributor} is initialized with an ordered list of query submitters. It
@@ -89,7 +87,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 
     private BondReducer bondReducer;
 
-    private List<? extends IQueryExecutor> queryExecutors = new ArrayList<>();
+    private List<? extends QueryExecutor> queryExecutors = new ArrayList<>();
 
     private Logger log = GSLoggerFactory.getLogger(getClass());
 
@@ -113,13 +111,13 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
     }
 
     @Override
-    public void setQuerySubmitters(List<? extends IQueryExecutor> querySubmitters) {
+    public void setQuerySubmitters(List<? extends QueryExecutor> querySubmitters) {
 	this.queryExecutors = querySubmitters;
 
     }
 
-    public IQueryExecutor getDistributedQuerySubmitter(String sourceIdentifier) {
-	for (IQueryExecutor querySubmitter : queryExecutors) {
+    public QueryExecutor getDistributedQuerySubmitter(String sourceIdentifier) {
+	for (QueryExecutor querySubmitter : queryExecutors) {
 	    if (querySubmitter.getType().equals(Type.DISTRIBUTED) && querySubmitter.getSourceIdentifier().equals(sourceIdentifier)) {
 		return querySubmitter;
 	    }
@@ -127,8 +125,8 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 	return null;
     }
 
-    public IQueryExecutor getDatabaseQuerySubmitter() {
-	for (IQueryExecutor querySubmitter : queryExecutors) {
+    public QueryExecutor getDatabaseQuerySubmitter() {
+	for (QueryExecutor querySubmitter : queryExecutors) {
 	    if (querySubmitter.getType().equals(Type.DATABASE)) {
 		return querySubmitter;
 	    }
@@ -140,7 +138,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
     public CountSet count(DiscoveryMessage message) throws GSException {
 	int size = queryExecutors.size();
 	TaskListExecutor<SimpleEntry<String, DiscoveryCountResponse>> taskList = new TaskListExecutor<>(size);
-	for (IQueryExecutor queryExecutor : queryExecutors) {
+	for (QueryExecutor queryExecutor : queryExecutors) {
 
 	    switch (queryExecutor.getType()) {
 	    case DISTRIBUTED:
@@ -153,7 +151,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 		try {
 		    reducedBond = bondReducer.getReducedBond(normalizedBond, sourceIdentifier);
 		    ReducedDiscoveryMessage reducedMessage = new ReducedDiscoveryMessage(message, reducedBond);
-		    taskList.addTask(() -> ((IDistributedQueryExecutor) queryExecutor).count(reducedMessage));
+		    taskList.addTask(() -> ((DistributedQueryExecutor) queryExecutor).count(reducedMessage));
 
 		    // GSLoggerFactory.getLogger(getClass()).info("Distributed counting task created for source {}",
 		    // sourceIdentifier);
@@ -167,7 +165,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 	    case DATABASE:
 	    default:
 		// the Database is able to directly execute the normalized bond
-		taskList.addTask(() -> ((IDatabaseQueryExecutor) queryExecutor).count(message));
+		taskList.addTask(() -> ((DatabaseQueryExecutor) queryExecutor).count(message));
 
 		// GSLoggerFactory.getLogger(getClass()).info("Harvested counting task created");
 
@@ -314,7 +312,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 	int count = page.getSize();
 	int queryExecutorStart = 0;
 
-	for (IQueryExecutor queryExecutor : queryExecutors) {
+	for (QueryExecutor queryExecutor : queryExecutors) {
 
 	    String sourceIdentifier = queryExecutor.getSourceIdentifier();
 	    Integer executorCount = countSet.getCount(sourceIdentifier);
@@ -356,7 +354,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 
 				@Override
 				public ResultSet<T> call() throws Exception {
-				    return (ResultSet<T>) ((IDistributedQueryExecutor) queryExecutor).retrieve(newMessage, newPage);
+				    return (ResultSet<T>) ((DistributedQueryExecutor) queryExecutor).retrieve(newMessage, newPage);
 				}
 			    });
 
@@ -365,7 +363,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 
 				@Override
 				public ResultSet<T> call() throws Exception {
-				    return (ResultSet<T>) ((IDistributedQueryExecutor) queryExecutor).retrieveNodes(newMessage, newPage);
+				    return (ResultSet<T>) ((DistributedQueryExecutor) queryExecutor).retrieveNodes(newMessage, newPage);
 				}
 			    });
 
@@ -374,7 +372,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 
 				@Override
 				public ResultSet<T> call() throws Exception {
-				    return (ResultSet<T>) ((IDistributedQueryExecutor) queryExecutor).retrieveStrings(newMessage, newPage);
+				    return (ResultSet<T>) ((DistributedQueryExecutor) queryExecutor).retrieveStrings(newMessage, newPage);
 				}
 			    });
 
@@ -396,7 +394,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 		    if (clazz.equals(GSResource.class)) {
 			taskList.addTask(new Callable<ResultSet<T>>() {
 			    public eu.essi_lab.messages.ResultSet<T> call() throws Exception {
-				return (ResultSet<T>) ((IDatabaseQueryExecutor) queryExecutor).retrieve(message, newPage);
+				return (ResultSet<T>) ((DatabaseQueryExecutor) queryExecutor).retrieve(message, newPage);
 			    };
 			});
 		    } else if (clazz.equals(Node.class)) {
@@ -404,7 +402,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 
 			    @Override
 			    public ResultSet<T> call() throws Exception {
-				return (ResultSet<T>) ((IDatabaseQueryExecutor) queryExecutor).retrieveNodes(message, newPage);
+				return (ResultSet<T>) ((DatabaseQueryExecutor) queryExecutor).retrieveNodes(message, newPage);
 			    }
 			});
 
@@ -413,7 +411,7 @@ public class DistributorImpl implements eu.essi_lab.request.executor.Distributor
 
 			    @Override
 			    public ResultSet<T> call() throws Exception {
-				return (ResultSet<T>) ((IDatabaseQueryExecutor) queryExecutor).retrieveStrings(message, newPage);
+				return (ResultSet<T>) ((DatabaseQueryExecutor) queryExecutor).retrieveStrings(message, newPage);
 			    }
 			});
 

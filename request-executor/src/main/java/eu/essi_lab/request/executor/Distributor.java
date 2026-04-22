@@ -23,6 +23,7 @@ package eu.essi_lab.request.executor;
 
 import java.util.List;
 
+import eu.essi_lab.request.executor.query.*;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -30,7 +31,6 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
-import eu.essi_lab.request.executor.query.IQueryExecutor;
 
 /**
  * Delegates the incoming query request to a set of query submitters and collect back the results.
@@ -80,6 +80,6 @@ public interface Distributor {
      * 
      * @param querySubmitters
      */
-    void setQuerySubmitters(List<? extends IQueryExecutor> querySubmitters);
+    void setQuerySubmitters(List<? extends QueryExecutor> querySubmitters);
 
 }

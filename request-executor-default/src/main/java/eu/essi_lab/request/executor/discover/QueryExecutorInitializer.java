@@ -10,12 +10,12 @@ package eu.essi_lab.request.executor.discover;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.request.executor.query.*;
 import org.slf4j.Logger;
 
 import eu.essi_lab.adk.AccessorFactory;
@@ -38,10 +39,7 @@ import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.request.executor.discover.submitter.DatabaseQueryExecutor;
-import eu.essi_lab.request.executor.discover.submitter.DistributedQueryExecutor;
-import eu.essi_lab.request.executor.query.IDistributedQueryExecutor;
-import eu.essi_lab.request.executor.query.IQueryExecutor;
+import eu.essi_lab.request.executor.discover.submitter.DatabaseQueryExecutorImpl;
 
 /**
  * Initializes the query executors from the ordered source list that is present in the discovery message
@@ -89,13 +87,13 @@ public class QueryExecutorInitializer {
      * @return
      * @throws GSException if more than one harvested block of sources is present
      */
-    public List<IQueryExecutor> initQueryExecutors(DiscoveryMessage message) throws GSException {
+    public List<QueryExecutor> initQueryExecutors(DiscoveryMessage message) throws GSException {
 
 	List<GSSource> sources = message.getSources();
 
-	List<IQueryExecutor> ret = new ArrayList<>();
+	List<QueryExecutor> ret = new ArrayList<>();
 
-	DatabaseQueryExecutor dbQuerySubmitter = null;
+	DatabaseQueryExecutorImpl dbQuerySubmitter = null;
 	for (GSSource source : sources) {
 	    BrokeringStrategy strategy = source.getBrokeringStrategy();
 	    if (strategy == null) {
@@ -119,7 +117,7 @@ public class QueryExecutorInitializer {
 
 		try {
 
-		    IDistributedQueryExecutor querySubmitter = createDistributedExecutor(source);
+		    DistributedQueryExecutor querySubmitter = createDistributedExecutor(source);
 
 		    IdentifierDecorator decorator = new IdentifierDecorator();
 		    querySubmitter.setIdentifierDecorator(decorator);
@@ -137,9 +135,8 @@ public class QueryExecutorInitializer {
 
 		if (dbQuerySubmitter == null) {
 		    dbQuerySubmitter = createDatabaseQueryExecutor();
-		    ret.add(0, dbQuerySubmitter);
+		    ret.addFirst(dbQuerySubmitter);
 		}
-
 
 		break;
 	    default:
@@ -154,20 +151,21 @@ public class QueryExecutorInitializer {
     /**
      * Creates the database query executor
      *
-     * @return {@link DatabaseQueryExecutor}
+     * @return {@link DatabaseQueryExecutorImpl}
      */
-    protected DatabaseQueryExecutor createDatabaseQueryExecutor() {
-	return new DatabaseQueryExecutor();
+    protected DatabaseQueryExecutorImpl createDatabaseQueryExecutor() {
+
+	return new DatabaseQueryExecutorImpl();
     }
 
     /**
      * Creates the distributed query executor, given a source
      *
      * @param source
-     * @return {@link DistributedQueryExecutor}
+     * @return {@link eu.essi_lab.request.executor.discover.submitter.DistributedQueryExecutor}
      * @throws GSException
      */
-    private IDistributedQueryExecutor createDistributedExecutor(GSSource source) throws GSException {
+    private DistributedQueryExecutor createDistributedExecutor(GSSource source) throws GSException {
 
 	Optional<AccessorSetting> accessorSetting = ConfigurationWrapper.getAccessorSetting(source);
 
@@ -178,11 +176,10 @@ public class QueryExecutorInitializer {
 		@SuppressWarnings("rawtypes")
 		IDistributedAccessor accessor = AccessorFactory.getConfiguredDistributedAccessor(accessorSetting.get());
 
-		return new DistributedQueryExecutor(accessor, source.getUniqueIdentifier());
+		return new eu.essi_lab.request.executor.discover.submitter.DistributedQueryExecutor(accessor, source.getUniqueIdentifier());
 
 	    } catch (Exception e) {
 
-		e.printStackTrace();
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 
 		throw GSException.createException(//

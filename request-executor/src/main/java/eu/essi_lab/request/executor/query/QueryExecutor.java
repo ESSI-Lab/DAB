@@ -21,7 +21,7 @@ package eu.essi_lab.request.executor.query;
  * #L%
  */
 
-public interface IQueryExecutor {
+public interface QueryExecutor {
 
     /**
      * 
