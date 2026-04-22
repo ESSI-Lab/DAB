@@ -47,7 +47,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wis.WISRequest;
 import eu.essi_lab.profiler.wis.WISUtils;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
+import eu.essi_lab.request.executor.StatisticsExecutor;
 
 /**
  * @author boldrini
@@ -97,8 +97,8 @@ public class WISMetadataTask extends AbstractCustomTask {
 		statisticsMessage);
 	statisticsMessage.setSources(new ArrayList<GSSource>(Arrays.asList(ConfigurationWrapper.getSource(targetSource))));
 
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	// pagination works with grouped results. in this case there is one result item for each
 	// source.

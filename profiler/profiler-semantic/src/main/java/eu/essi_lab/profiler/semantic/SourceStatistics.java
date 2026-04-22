@@ -39,7 +39,7 @@ import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
+import eu.essi_lab.request.executor.StatisticsExecutor;
 
 public class SourceStatistics {
 
@@ -103,8 +103,8 @@ public class SourceStatistics {
 
 	// statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
 	
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	StatisticsResponse response = executor.compute(statisticsMessage);
 	List<ResponseItem> items = response.getItems();

@@ -194,8 +194,8 @@ public class SOSCapabilitiesHandler extends DefaultRequestHandler {
 
 	    statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
 
-	    ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	    IStatisticsExecutor executor = loader.iterator().next();
+	    ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	    StatisticsExecutor executor = loader.iterator().next();
 
 	    StatisticsResponse response = executor.compute(statisticsMessage);
 

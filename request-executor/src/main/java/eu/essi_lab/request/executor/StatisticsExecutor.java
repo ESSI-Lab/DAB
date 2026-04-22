@@ -31,7 +31,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public interface IStatisticsExecutor {
+public interface StatisticsExecutor {
 
     /**
      * @param message

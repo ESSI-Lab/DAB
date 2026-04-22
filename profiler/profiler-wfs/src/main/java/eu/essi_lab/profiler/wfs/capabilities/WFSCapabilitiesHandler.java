@@ -320,8 +320,8 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 		// set the user bond
 		statisticsMessage.setUserBond(bond);
 
-		ServiceLoader<IStatisticsExecutor> statsLoader = ServiceLoader.load(IStatisticsExecutor.class);
-		IStatisticsExecutor statsExecutor = statsLoader.iterator().next();
+		ServiceLoader<StatisticsExecutor> statsLoader = ServiceLoader.load(StatisticsExecutor.class);
+		StatisticsExecutor statsExecutor = statsLoader.iterator().next();
 
 		Page spage = new Page();
 		spage.setStart(1);

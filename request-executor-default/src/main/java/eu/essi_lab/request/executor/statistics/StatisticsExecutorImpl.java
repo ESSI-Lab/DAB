@@ -31,13 +31,13 @@ import eu.essi_lab.messages.stats.StatisticsMessage;
 import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
+import eu.essi_lab.request.executor.StatisticsExecutor;
 import eu.essi_lab.request.executor.discover.QueryInitializer;
 
 /**
  * @author Fabrizio
  */
-public class StatisticsExecutor implements IStatisticsExecutor {
+public class StatisticsExecutorImpl implements StatisticsExecutor {
 
     @Override
     public StatisticsResponse compute(StatisticsMessage message) throws GSException {

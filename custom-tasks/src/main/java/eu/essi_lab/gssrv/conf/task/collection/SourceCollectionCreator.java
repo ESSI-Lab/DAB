@@ -305,8 +305,8 @@ class SourceCollectionCreator {
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	// pagination works with grouped results. in this case there is one result item for each
 	// source/country/etc.

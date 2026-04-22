@@ -67,7 +67,7 @@ import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wof.HISCentralProfiler;
 import eu.essi_lab.profiler.wof.WOFMapperUtils;
 import eu.essi_lab.request.executor.DiscoveryNodeExecutor;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
+import eu.essi_lab.request.executor.StatisticsExecutor;
 
 /**
  * @author Fabrizio
@@ -168,8 +168,8 @@ public class GetWaterOneFlowServiceInfoHandler extends DefaultRequestHandler {
 	List<StatisticsMessage> statisticsMessages = generator.getStatisticMessages(webRequest, viewId.get(), selected, allSources,
 		andBond);
 
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	ArrayOfServiceInfo arrayOfServiceInfo = new ArrayOfServiceInfo();
 
