@@ -21,7 +21,6 @@ package eu.essi_lab.request.executor.semantic;
  * #L%
  */
 
-import eu.essi_lab.api.database.DatabaseReader;
 import eu.essi_lab.api.database.DatabaseSemanticsExecutor;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -31,12 +30,11 @@ import eu.essi_lab.messages.sem.SemanticResponse;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
-import eu.essi_lab.request.executor.ISemanticExecutor;
 
 /**
  * @author Fabrizio
  */
-public class SemanticExecutor implements ISemanticExecutor {
+public class SemanticExecutorImpl implements eu.essi_lab.request.executor.SemanticExecutor {
 
     @Override
     public SemanticCountResponse count(SemanticMessage message) throws GSException {

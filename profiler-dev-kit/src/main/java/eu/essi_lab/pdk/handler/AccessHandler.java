@@ -30,7 +30,7 @@ import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
 import eu.essi_lab.request.executor.AccessExecutor;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
 
 /**
  * Overrides the superclass in order to provide an implementation specific for access requests
@@ -47,7 +47,7 @@ public class AccessHandler<T> extends ProfilerHandler<AccessMessage, DataObject,
     }
 
     @Override
-    protected IRequestExecutor<AccessMessage, DataObject, CountSet, ResultSet<DataObject>> createExecutor() {
+    protected RequestExecutor<AccessMessage, DataObject, CountSet, ResultSet<DataObject>> createExecutor() {
 
 	ServiceLoader<AccessExecutor> loader = ServiceLoader.load(AccessExecutor.class);
 	for (AccessExecutor e : loader) {

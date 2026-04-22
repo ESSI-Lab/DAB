@@ -46,7 +46,7 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.ScheduleReport;
-import eu.essi_lab.request.executor.IScheduleExecutor;
+import eu.essi_lab.request.executor.ScheduleExecutor;
 
 /**
  * It implements asynchronous execution of user requests through scheduling of a correspondent Quartz job
@@ -55,7 +55,7 @@ import eu.essi_lab.request.executor.IScheduleExecutor;
  * @author boldrini
  */
 public class UserScheduledWorkerJobExecutor<M extends RequestMessage, I, CR extends AbstractCountResponse, MR extends MessageResponse<I, CR>>
-	implements IScheduleExecutor<M, I, CR, MR> {
+	implements ScheduleExecutor<M, I, CR, MR> {
 
     public static final String EXCEPTION_MISSING_CLASSES = "suje_missing_classes";
     public static final String EXCEPTION_MISSING_STORAGE_URI_COMPLEX = "suje_missing_result_storage_uri_complex";

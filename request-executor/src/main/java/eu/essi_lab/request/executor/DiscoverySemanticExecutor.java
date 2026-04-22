@@ -34,7 +34,7 @@ import eu.essi_lab.model.resource.GSResource;
  * @author Fabrizio
  */
 public interface DiscoverySemanticExecutor
-	extends IRequestExecutor<DiscoverySemanticMessage, GSResource, CountSet, ResultSet<GSResource>> {
+	extends RequestExecutor<DiscoverySemanticMessage, GSResource, CountSet, ResultSet<GSResource>> {
 
     @Override
     public CountSet count(DiscoverySemanticMessage message) throws GSException;

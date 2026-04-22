@@ -89,7 +89,7 @@ public class DiscoveryMethod implements GSPingMethod {
     /**
      * @return
      */
-    IRequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
+    RequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
 
 	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
 

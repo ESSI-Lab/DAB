@@ -35,8 +35,8 @@ import eu.essi_lab.model.resource.ScheduleReport;
 /**
  * @author Fabrizio
  */
-public interface IScheduleExecutor<M extends RequestMessage, I, CR extends AbstractCountResponse, MR extends MessageResponse<I, CR>>
-	extends IRequestExecutor<RequestMessage, ScheduleReport, CountSet, ResultSet<ScheduleReport>> {
+public interface ScheduleExecutor<M extends RequestMessage, I, CR extends AbstractCountResponse, MR extends MessageResponse<I, CR>>
+	extends RequestExecutor<RequestMessage, ScheduleReport, CountSet, ResultSet<ScheduleReport>> {
 
     /**
      * @param message

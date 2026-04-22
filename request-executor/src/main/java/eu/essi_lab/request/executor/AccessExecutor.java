@@ -32,7 +32,7 @@ import eu.essi_lab.model.resource.data.DataObject;
 /**
  * @author Fabrizio
  */
-public interface AccessExecutor extends IRequestExecutor<AccessMessage, DataObject, CountSet, ResultSet<DataObject>> {
+public interface AccessExecutor extends RequestExecutor<AccessMessage, DataObject, CountSet, ResultSet<DataObject>> {
 
     /**
      * @param message

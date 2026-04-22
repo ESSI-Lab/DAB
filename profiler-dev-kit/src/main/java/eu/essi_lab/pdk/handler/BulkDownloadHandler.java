@@ -30,7 +30,7 @@ import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
 import eu.essi_lab.request.executor.BulkDownloadExecutor;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
 
 /**
  * Overrides the superclass in order to provide an implementation specific for bulk download requests
@@ -47,7 +47,7 @@ public class BulkDownloadHandler<T> extends ProfilerHandler<BulkDownloadMessage,
     }
 
     @Override
-    protected IRequestExecutor<BulkDownloadMessage, DataObject, CountSet, ResultSet<DataObject>> createExecutor() {
+    protected RequestExecutor<BulkDownloadMessage, DataObject, CountSet, ResultSet<DataObject>> createExecutor() {
 
 	ServiceLoader<BulkDownloadExecutor> loader = ServiceLoader.load(BulkDownloadExecutor.class);
 	for (BulkDownloadExecutor e : loader) {

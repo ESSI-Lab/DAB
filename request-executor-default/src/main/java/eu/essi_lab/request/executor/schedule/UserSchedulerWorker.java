@@ -43,7 +43,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.ProfilerHandler;
 import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
 import eu.essi_lab.pdk.rsm.MessageResponseMapper;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
 import eu.essi_lab.shared.driver.ConfiguredDriverUtils;
 import eu.essi_lab.shared.resultstorage.ResultStorage;
 import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
@@ -140,7 +140,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 	ProfilerHandler wrapperHandler = new ProfilerHandler() {
 
 	    @Override
-	    protected IRequestExecutor createExecutor() {
+	    protected RequestExecutor createExecutor() {
 		return handler.getExecutor();
 	    }
 

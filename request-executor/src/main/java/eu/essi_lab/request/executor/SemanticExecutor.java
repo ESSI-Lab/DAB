@@ -30,7 +30,7 @@ import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
 /**
  * @author Fabrizio
  */
-public interface ISemanticExecutor extends IRequestExecutor<SemanticMessage, GSKnowledgeResourceDescription, SemanticCountResponse,
+public interface SemanticExecutor extends RequestExecutor<SemanticMessage, GSKnowledgeResourceDescription, SemanticCountResponse,
         SemanticResponse<GSKnowledgeResourceDescription>> {
 
     /**

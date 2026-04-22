@@ -47,7 +47,7 @@ public class DiscoveryHandler<T> extends ProfilerHandler<DiscoveryMessage, GSRes
     }
 
     @Override
-    protected IRequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
+    protected RequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
 
 	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
 	for (DiscoveryExecutor e : loader) {

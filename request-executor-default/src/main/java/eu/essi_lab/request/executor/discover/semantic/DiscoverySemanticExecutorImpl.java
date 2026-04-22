@@ -97,8 +97,8 @@ public class DiscoverySemanticExecutorImpl implements DiscoverySemanticExecutor 
      */
     private DiscoverySemanticMessage augmentMessage(DiscoverySemanticMessage message) throws GSException {
 
-	ServiceLoader<ISemanticExecutor> loader = ServiceLoader.load(ISemanticExecutor.class);
-	ISemanticExecutor executor = loader.iterator().next();
+	ServiceLoader<SemanticExecutor> loader = ServiceLoader.load(SemanticExecutor.class);
+	SemanticExecutor executor = loader.iterator().next();
 
 	// the search terms to expand
 	List<String> searchTerms = message.getTermsToExpand();
@@ -282,7 +282,7 @@ public class DiscoverySemanticExecutorImpl implements DiscoverySemanticExecutor 
      * @return
      * @throws GSException
      */
-    private List<GSKnowledgeResourceDescription> execSearch(ISemanticExecutor executor, List<String> searchTerms,
+    private List<GSKnowledgeResourceDescription> execSearch(SemanticExecutor executor, List<String> searchTerms,
 	    DiscoverySemanticMessage message) throws GSException {
 
 	//
@@ -315,7 +315,7 @@ public class DiscoverySemanticExecutorImpl implements DiscoverySemanticExecutor 
      * @throws GSException
      */
     private Set<String> execBrowsing(//
-	    ISemanticExecutor executor, //
+	    SemanticExecutor executor, //
 	    String subjectId, //
 	    BrowsingAction action, //
 	    DiscoverySemanticMessage message) throws GSException {

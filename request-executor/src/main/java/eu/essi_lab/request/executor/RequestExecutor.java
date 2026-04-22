@@ -34,7 +34,7 @@ import eu.essi_lab.model.exceptions.GSException;
  * @param <CR> the type to provide as result of the {@link #count(RequestMessage)} operation
  * @param <MR> the type to provide as result of the {@link #retrieve(RequestMessage)} operation
  */
-public interface IRequestExecutor<M extends RequestMessage, I, CR extends AbstractCountResponse, MR extends MessageResponse<I, CR>> extends MessageAuthorizer<M>{
+public interface RequestExecutor<M extends RequestMessage, I, CR extends AbstractCountResponse, MR extends MessageResponse<I, CR>> extends MessageAuthorizer<M>{
 
     /**
      * @param message

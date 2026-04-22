@@ -33,7 +33,7 @@ import eu.essi_lab.model.resource.GSResource;
  * 
  * @author boldrini
  */
-public interface DiscoveryExecutor extends IRequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> {
+public interface DiscoveryExecutor extends RequestExecutor<DiscoveryMessage, GSResource, CountSet, ResultSet<GSResource>> {
 
     /**
      * @param message

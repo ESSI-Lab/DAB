@@ -67,7 +67,7 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * invoking the
  * {@link WebRequestTransformer#transform(WebRequest)} method</li>
  * <li>the transformed {@link RequestMessage} is checked according to the
- * {@link IRequestExecutor#isAuthorized(RequestMessage, AnonymousUserPolicy)} method</li>
+ * {@link RequestExecutor#isAuthorized(RequestMessage, AnonymousUserPolicy)} method</li>
  * <li>the discovery/access operation is executed by an internal implementation of {@link DiscoveryExecutor} and the
  * {@link MessageResponse} of type &ltI&gt is retrieved</li>
  * <li>the {@link MessageResponse} of type &ltI&gt is mapped in to a {@link MessageResponse} of type &ltT&gt by the
@@ -101,7 +101,7 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * <li><b>the {@link #onHandlingEnded(Response)} method is invoked</b></li>
  * </ol>
  * <h3>Usage Notes</h3>
- * This handler is a <i>strong composition</i> of {@link IRequestExecutor}, {@link WebRequestTransformer},
+ * This handler is a <i>strong composition</i> of {@link RequestExecutor}, {@link WebRequestTransformer},
  * {@link MessageResponseMapper} and {@link MessageResponseFormatter}. According to the <i>strategy pattern</i>
  * its behavior can be modified also at runtime using the the <code>set</code> methods. Because of this, in the most
  * part of the cases,
@@ -114,7 +114,7 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * @param <O> the type of the resources provided by the {@link MessageResponse} <code>OUT</code>
  * @param <CR> the type of the {@link AbstractCountResponse} provided as parameter to <code>IN</code> and
  *        <code>OUT</code>
- * @param <IN> the type of {@link MessageResponse} provided as input to the {@link IRequestExecutor} and {@link
+ * @param <IN> the type of {@link MessageResponse} provided as input to the {@link RequestExecutor} and {@link
  *        MessageResponseMapper}</code>
  * @param <OUT> the type of the {@link MessageResponse} generated as result of the mapping by the
  *        {@link MessageResponseMapper} and provided
@@ -136,7 +136,7 @@ public abstract class ProfilerHandler//
      */
     private static final int PARTIAL_MODE_PAGE_SIZE = 10;
 
-    private IRequestExecutor<M, I, CR, IN> executor;
+    private RequestExecutor<M, I, CR, IN> executor;
     private WebRequestTransformer<M> transformer;
     private MessageResponseMapper<M, I, O, CR, IN, OUT> mapper;
     private MessageResponseFormatter<M, O, CR, OUT> formatter;
@@ -447,12 +447,12 @@ public abstract class ProfilerHandler//
     /**
      * @return
      */
-    protected abstract IRequestExecutor<M, I, CR, IN> createExecutor();
+    protected abstract RequestExecutor<M, I, CR, IN> createExecutor();
 
     /**
      * @return
      */
-    public IRequestExecutor<M, I, CR, IN> getExecutor() {
+    public RequestExecutor<M, I, CR, IN> getExecutor() {
 
 	return executor;
     }

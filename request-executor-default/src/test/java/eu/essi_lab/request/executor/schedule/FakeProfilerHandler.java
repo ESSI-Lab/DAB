@@ -7,14 +7,14 @@ import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.messages.count.AbstractCountResponse;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.ProfilerHandler;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
 
 @SuppressWarnings("rawtypes")
 public class FakeProfilerHandler extends ProfilerHandler {
 
     @Override
-    protected IRequestExecutor createExecutor() {
-	return new IRequestExecutor() {
+    protected RequestExecutor createExecutor() {
+	return new RequestExecutor() {
 
 	    @Override
 	    public AbstractCountResponse count(RequestMessage message) throws GSException {
