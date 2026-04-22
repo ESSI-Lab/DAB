@@ -28,14 +28,13 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
+import eu.essi_lab.lib.utils.*;
 import org.apache.commons.io.IOUtils;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.request.executor.utils.MimeTypeConstants;
 import eu.essi_lab.shared.resultstorage.ResultStorage;
 import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
 

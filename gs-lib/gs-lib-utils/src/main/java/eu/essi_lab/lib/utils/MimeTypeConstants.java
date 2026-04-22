@@ -1,4 +1,4 @@
-package eu.essi_lab.request.executor.utils;
+package eu.essi_lab.lib.utils;
 
 /*-
  * #%L
@@ -21,8 +21,7 @@ package eu.essi_lab.request.executor.utils;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class MimeTypeConstants {
 
