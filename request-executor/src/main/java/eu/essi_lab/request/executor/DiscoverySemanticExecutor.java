@@ -33,7 +33,7 @@ import eu.essi_lab.model.resource.GSResource;
 /**
  * @author Fabrizio
  */
-public interface IDiscoverySemanticExecutor
+public interface DiscoverySemanticExecutor
 	extends IRequestExecutor<DiscoverySemanticMessage, GSResource, CountSet, ResultSet<GSResource>> {
 
     @Override

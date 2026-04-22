@@ -60,7 +60,7 @@ import eu.essi_lab.request.executor.*;
 /**
  * @author Fabrizio
  */
-public class DiscoverySemanticExecutor implements IDiscoverySemanticExecutor {
+public class DiscoverySemanticExecutorImpl implements DiscoverySemanticExecutor {
 
     @Override
     public CountSet count(DiscoverySemanticMessage message) throws GSException {
