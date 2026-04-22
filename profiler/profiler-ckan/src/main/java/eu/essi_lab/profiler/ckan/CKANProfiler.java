@@ -32,7 +32,6 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.handler.selector.GETRequestFilter;
 import eu.essi_lab.pdk.handler.selector.HandlerSelector;
 
 /**
@@ -68,7 +67,8 @@ public class CKANProfiler extends Profiler<CKANProfilerSetting> {
 	//
 	// :rtype: list of strings
 
-	selector.register(new GETRequestFilter(CKANOperation.PACKAGE_LIST.getPath()), new PackageListHandler());
+	selector.register(new CKANPathRequestFilter(CKANOperation.PACKAGE_SHOW.getPath()), new PackageShowHandler());
+	selector.register(new CKANPathRequestFilter(CKANOperation.PACKAGE_LIST.getPath()), new PackageListHandler());
 	////////////////////
 	// group list
 	////////////////////
