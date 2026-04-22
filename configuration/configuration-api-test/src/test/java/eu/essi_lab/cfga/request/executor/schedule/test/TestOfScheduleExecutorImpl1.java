@@ -23,7 +23,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class TestOfUserScheduledWorkerJobExecutor1 {
+public class TestOfScheduleExecutorImpl1 {
 
     private volatile boolean jobExecuted;
     private volatile boolean jobError;
@@ -55,7 +55,7 @@ public class TestOfUserScheduledWorkerJobExecutor1 {
 	//
 	//
 
-	UserScheduledWorkerJobExecutorTest executor = new UserScheduledWorkerJobExecutorTest();
+	ScheduleExecutorImplTest executor = new ScheduleExecutorImplTest();
 
 	executor.setWorkerHandler(//
 		TestProfilerHandler.class.getName(), //
@@ -86,7 +86,7 @@ public class TestOfUserScheduledWorkerJobExecutor1 {
 	//
 	//
 
-	UserScheduledWorkerJobExecutorTest executor = new UserScheduledWorkerJobExecutorTest();
+	ScheduleExecutorImplTest executor = new ScheduleExecutorImplTest();
 
 	//
 	// inputs not set, error expected

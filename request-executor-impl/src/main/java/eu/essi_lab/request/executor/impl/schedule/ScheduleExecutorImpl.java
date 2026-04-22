@@ -54,7 +54,7 @@ import eu.essi_lab.request.executor.ScheduleExecutor;
  * @author Fabrizio
  * @author boldrini
  */
-public class UserScheduledWorkerJobExecutor<M extends RequestMessage, I, CR extends AbstractCountResponse, MR extends MessageResponse<I, CR>>
+public class ScheduleExecutorImpl<M extends RequestMessage, I, CR extends AbstractCountResponse, MR extends MessageResponse<I, CR>>
 	implements ScheduleExecutor<M, I, CR, MR> {
 
     public static final String EXCEPTION_MISSING_CLASSES = "suje_missing_classes";
@@ -67,7 +67,7 @@ public class UserScheduledWorkerJobExecutor<M extends RequestMessage, I, CR exte
     protected String workerMapperClass;
     protected String workerFormatterClass;
 
-    public UserScheduledWorkerJobExecutor() {
+    public ScheduleExecutorImpl() {
     }
 
     @Override
@@ -179,18 +179,18 @@ public class UserScheduledWorkerJobExecutor<M extends RequestMessage, I, CR exte
      */
     private void checkInputs(RequestMessage message) throws GSException {
 
-	if (workerHandlerClass == null || workerHandlerClass.length() == 0 || //
-		workerMapperClass == null || workerMapperClass.length() == 0 || //
-		workerFormatterClass == null || workerFormatterClass.length() == 0 //
+	if (workerHandlerClass == null || workerHandlerClass.isEmpty() || //
+		workerMapperClass == null || workerMapperClass.isEmpty() || //
+		workerFormatterClass == null || workerFormatterClass.isEmpty() //
 	) {
 	    String missing = "";
-	    if (workerHandlerClass == null || workerHandlerClass.length() == 0) {
+	    if (workerHandlerClass == null || workerHandlerClass.isEmpty()) {
 		missing += "handler, ";
 	    }
-	    if (workerMapperClass == null || workerMapperClass.length() == 0) {
+	    if (workerMapperClass == null || workerMapperClass.isEmpty()) {
 		missing += "mapper, ";
 	    }
-	    if (workerFormatterClass == null || workerFormatterClass.length() == 0) {
+	    if (workerFormatterClass == null || workerFormatterClass.isEmpty()) {
 		missing += "formatter, ";
 	    }
 	    throw createException(EXCEPTION_MISSING_CLASSES, "Needed classes (names) to be instantiated are missing: " + missing);
@@ -201,10 +201,10 @@ public class UserScheduledWorkerJobExecutor<M extends RequestMessage, I, CR exte
 	if (resultStorageURI == null) {
 	    throw createException(EXCEPTION_MISSING_STORAGE_URI_COMPLEX, "Missing result storage URI object in the message");
 	}
-	if (resultStorageURI.getUri() == null || resultStorageURI.getUri().length() == 0) {
+	if (resultStorageURI.getUri() == null || resultStorageURI.getUri().isEmpty()) {
 	    throw createException(EXCEPTION_MISSING_STORAGE_URI, "Missing result storage URI in the message");
 	}
-	if (resultStorageURI.getName() == null || resultStorageURI.getName().length() == 0) {
+	if (resultStorageURI.getName() == null || resultStorageURI.getName().isEmpty()) {
 	    throw createException(EXCEPTION_MISSING_STORAGE_NAME, "Missing result storage name in the message");
 	}
     }

@@ -13,7 +13,7 @@ import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.request.executor.impl.schedule.UserScheduledWorkerJobExecutor;
+import eu.essi_lab.request.executor.impl.schedule.ScheduleExecutorImpl;
 
 public class ScheduleUserJobExecutor1Test {
 
@@ -32,7 +32,7 @@ public class ScheduleUserJobExecutor1Test {
     @Test
     public void testInputs1() {
 	try {
-	    UserScheduledWorkerJobExecutor executor = new UserScheduledWorkerJobExecutor<>();
+	    ScheduleExecutorImpl executor = new ScheduleExecutorImpl<>();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    StorageInfo uri = new StorageInfo("http://localhost");
 	    uri.setName("dataBaseName");
@@ -40,14 +40,14 @@ public class ScheduleUserJobExecutor1Test {
 	    executor.retrieve(message);
 	    fail("Should have thrown exception");
 	} catch (GSException e) {
-	    assertEquals(UserScheduledWorkerJobExecutor.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
+	    assertEquals(ScheduleExecutorImpl.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
 	}
     }
 
     @Test
     public void testInputs2() {
 	try {
-	    UserScheduledWorkerJobExecutor executor = new UserScheduledWorkerJobExecutor<>();
+	    ScheduleExecutorImpl executor = new ScheduleExecutorImpl<>();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    StorageInfo uri = new StorageInfo("http://localhost");
 	    uri.setName("dataBaseName");
@@ -56,14 +56,14 @@ public class ScheduleUserJobExecutor1Test {
 	    executor.retrieve(message);
 	    fail("Should have thrown exception");
 	} catch (GSException e) {
-	    assertEquals(UserScheduledWorkerJobExecutor.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
+	    assertEquals(ScheduleExecutorImpl.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
 	}
     }
 
     @Test
     public void testInputs3() {
 	try {
-	    UserScheduledWorkerJobExecutor executor = new UserScheduledWorkerJobExecutor<>();
+	    ScheduleExecutorImpl executor = new ScheduleExecutorImpl<>();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    StorageInfo uri = new StorageInfo("http://localhost");
 	    uri.setName("dataBaseName");
@@ -72,14 +72,14 @@ public class ScheduleUserJobExecutor1Test {
 	    executor.retrieve(message);
 	    fail("Should have thrown exception");
 	} catch (GSException e) {
-	    assertEquals(UserScheduledWorkerJobExecutor.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
+	    assertEquals(ScheduleExecutorImpl.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
 	}
     }
 
     @Test
     public void testInputs4() {
 	try {
-	    UserScheduledWorkerJobExecutor executor = new UserScheduledWorkerJobExecutor<>();
+	    ScheduleExecutorImpl executor = new ScheduleExecutorImpl<>();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    StorageInfo uri = new StorageInfo("http://localhost");
 	    uri.setName("dataBaseName");
@@ -88,27 +88,27 @@ public class ScheduleUserJobExecutor1Test {
 	    executor.retrieve(message);
 	    fail("Should have thrown exception");
 	} catch (GSException e) {
-	    assertEquals(UserScheduledWorkerJobExecutor.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
+	    assertEquals(ScheduleExecutorImpl.EXCEPTION_MISSING_CLASSES, e.getErrorInfoList().get(0).getErrorId());
 	}
     }
 
     @Test
     public void testInputs5() {
 	try {
-	    UserScheduledWorkerJobExecutor executor = new UserScheduledWorkerJobExecutor<>();
+	    ScheduleExecutorImpl executor = new ScheduleExecutorImpl<>();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    executor.setWorkerHandler("class1", "class2", "class3");
 	    executor.retrieve(message);
 	    fail("Should have thrown exception");
 	} catch (GSException e) {
-	    assertEquals(UserScheduledWorkerJobExecutor.EXCEPTION_MISSING_STORAGE_URI_COMPLEX, e.getErrorInfoList().get(0).getErrorId());
+	    assertEquals(ScheduleExecutorImpl.EXCEPTION_MISSING_STORAGE_URI_COMPLEX, e.getErrorInfoList().get(0).getErrorId());
 	}
     }
 
     @Test
     public void testInputs6() {
 	try {
-	    UserScheduledWorkerJobExecutor executor = new UserScheduledWorkerJobExecutor<>();
+	    ScheduleExecutorImpl executor = new ScheduleExecutorImpl<>();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    StorageInfo uri = new StorageInfo();
 	    uri.setName("dataBaseName");
@@ -117,14 +117,14 @@ public class ScheduleUserJobExecutor1Test {
 	    executor.retrieve(message);
 	    fail("Should have thrown exception");
 	} catch (GSException e) {
-	    assertEquals(UserScheduledWorkerJobExecutor.EXCEPTION_MISSING_STORAGE_URI, e.getErrorInfoList().get(0).getErrorId());
+	    assertEquals(ScheduleExecutorImpl.EXCEPTION_MISSING_STORAGE_URI, e.getErrorInfoList().get(0).getErrorId());
 	}
     }
 
     @Test
     public void testInputs7() {
 	try {
-	    UserScheduledWorkerJobExecutor executor = new UserScheduledWorkerJobExecutor<>();
+	    ScheduleExecutorImpl executor = new ScheduleExecutorImpl<>();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    StorageInfo uri = new StorageInfo("http://localhost");
 	    message.setUserJobStorageURI(uri);
@@ -132,14 +132,14 @@ public class ScheduleUserJobExecutor1Test {
 	    executor.retrieve(message);
 	    fail("Should have thrown exception");
 	} catch (GSException e) {
-	    assertEquals(UserScheduledWorkerJobExecutor.EXCEPTION_MISSING_STORAGE_NAME, e.getErrorInfoList().get(0).getErrorId());
+	    assertEquals(ScheduleExecutorImpl.EXCEPTION_MISSING_STORAGE_NAME, e.getErrorInfoList().get(0).getErrorId());
 	}
     }
 
     @Test
     public void testInputs10() {
 	try {
-	    UserScheduledWorkerJobExecutor noInitExecutor = new UserScheduledWorkerJobExecutor();
+	    ScheduleExecutorImpl noInitExecutor = new ScheduleExecutorImpl();
 	    DiscoveryMessage message = new DiscoveryMessage();
 	    StorageInfo uri = new StorageInfo("http://localhost");
 	    uri.setName("dataBaseName");

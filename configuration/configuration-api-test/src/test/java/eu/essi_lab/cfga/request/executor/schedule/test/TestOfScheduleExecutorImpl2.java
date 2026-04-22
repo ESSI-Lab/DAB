@@ -22,11 +22,11 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.impl.schedule.UserScheduledWorkerJobExecutor;
+import eu.essi_lab.request.executor.impl.schedule.ScheduleExecutorImpl;
 
-public class TestOfUserScheduledWorkerJobExecutor2 {
+public class TestOfScheduleExecutorImpl2 {
 
-    Logger logger = GSLoggerFactory.getLogger(TestOfUserScheduledWorkerJobExecutor2.class);
+    Logger logger = GSLoggerFactory.getLogger(TestOfScheduleExecutorImpl2.class);
 
     @Rule
     public ExpectedException exceptions = ExpectedException.none();
@@ -40,7 +40,7 @@ public class TestOfUserScheduledWorkerJobExecutor2 {
 
 	ConfigurationWrapper.setConfiguration(configuration);
 
-	UserScheduledWorkerJobExecutor scheduleExecutor = new UserScheduledWorkerJobExecutor() {
+	ScheduleExecutorImpl scheduleExecutor = new ScheduleExecutorImpl() {
 
 	    protected Scheduler getScheduler() throws GSException {
 
@@ -86,7 +86,7 @@ public class TestOfUserScheduledWorkerJobExecutor2 {
     }
 
     @SuppressWarnings("rawtypes")
-    private void executeTest(UserScheduledWorkerJobExecutor scheduleExecutor, DiscoveryMessage message1, DiscoveryMessage message2)
+    private void executeTest(ScheduleExecutorImpl scheduleExecutor, DiscoveryMessage message1, DiscoveryMessage message2)
 	    throws Exception {
 	scheduleExecutor.retrieve(message1);
 

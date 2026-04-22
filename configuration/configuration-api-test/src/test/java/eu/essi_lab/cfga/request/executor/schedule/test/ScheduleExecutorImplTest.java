@@ -6,13 +6,13 @@ import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.messages.RequestMessage;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.request.executor.impl.schedule.UserScheduledSetting;
-import eu.essi_lab.request.executor.impl.schedule.UserScheduledWorkerJobExecutor;
+import eu.essi_lab.request.executor.impl.schedule.ScheduleExecutorImpl;
 
 /**
  * @author Fabrizio
  */
 @SuppressWarnings("rawtypes")
-public class UserScheduledWorkerJobExecutorTest extends UserScheduledWorkerJobExecutor {
+public class ScheduleExecutorImplTest extends ScheduleExecutorImpl {
     
     /**
      * @param setting
