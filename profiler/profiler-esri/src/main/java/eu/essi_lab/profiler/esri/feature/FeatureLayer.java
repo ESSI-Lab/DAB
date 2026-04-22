@@ -46,7 +46,7 @@ import eu.essi_lab.model.pluggable.Pluggable;
 import eu.essi_lab.model.pluggable.PluginsLoader;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
+import eu.essi_lab.request.executor.StatisticsExecutor;
 
 /**
  * @author boldrini
@@ -131,8 +131,8 @@ public abstract class FeatureLayer implements Pluggable {
 	//
 	StatisticsMessage statisticsMessage = getStatisticsMessage(request);
 
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	StatisticsResponse response = executor.compute(statisticsMessage);
 

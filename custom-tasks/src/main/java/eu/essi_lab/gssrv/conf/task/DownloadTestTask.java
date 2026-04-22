@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
+import eu.essi_lab.request.executor.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.access.augmenter.AccessAugmenter;
@@ -37,7 +38,6 @@ import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -52,7 +52,6 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 /**
  * Tests the download from all the sources of a given view. For each source only
@@ -87,8 +86,8 @@ public class DownloadTestTask extends AbstractCustomTask {
 	    return;
 	}
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

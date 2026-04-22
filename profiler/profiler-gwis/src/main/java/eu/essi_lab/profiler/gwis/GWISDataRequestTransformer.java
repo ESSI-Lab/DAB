@@ -55,7 +55,7 @@ import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.profiler.gwis.request.data.GWISDataRequest;
 import eu.essi_lab.profiler.gwis.request.data.GWISDataRequest.Parameter;
 import eu.essi_lab.profiler.gwis.request.data.GWISDataRequestValidator;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.*;
 
 public class GWISDataRequestTransformer extends AccessRequestTransformer {
 
@@ -127,8 +127,8 @@ public class GWISDataRequestTransformer extends AccessRequestTransformer {
     }
 
     private String getOnlineId(String requestId, String siteCode, String variableCode) throws GSException {
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	discoveryMessage.setRequestId(requestId);
@@ -207,8 +207,8 @@ public class GWISDataRequestTransformer extends AccessRequestTransformer {
     }
 
     private GSResource retrieveResource(String onlineIdentifier) throws GSException {
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

@@ -22,7 +22,7 @@ import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.schedule.UserScheduledWorkerJobExecutor;
+import eu.essi_lab.request.executor.impl.schedule.UserScheduledWorkerJobExecutor;
 
 public class TestOfUserScheduledWorkerJobExecutor2 {
 

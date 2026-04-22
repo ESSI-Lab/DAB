@@ -18,7 +18,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.handler.ProfilerHandler;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
 
 @SuppressWarnings("rawtypes")
 public class TestProfilerHandler extends ProfilerHandler {
@@ -27,8 +27,8 @@ public class TestProfilerHandler extends ProfilerHandler {
 
     @SuppressWarnings("rawtypes")
     @Override
-    protected IRequestExecutor createExecutor() {
-	return new IRequestExecutor() {
+    protected RequestExecutor createExecutor() {
+	return new RequestExecutor() {
 
 	    @Override
 	    public AbstractCountResponse count(RequestMessage message) throws GSException {

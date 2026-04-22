@@ -46,7 +46,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.*;
 
 public class WOFQueryUtils {
     private static ExpiringCache<String> onlineCache;
@@ -80,8 +80,8 @@ public class WOFQueryUtils {
 	    }
 	}
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

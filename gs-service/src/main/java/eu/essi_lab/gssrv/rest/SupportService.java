@@ -175,8 +175,8 @@ public class SupportService {
 
 	// statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
 
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	StatisticsResponse statResponse = null;
 	try {
@@ -271,8 +271,8 @@ public class SupportService {
 	}
 
 	try {
-	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor executor = loader.iterator().next();
+	    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    DiscoveryExecutor executor = loader.iterator().next();
 
 	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	    discoveryMessage.setRequestId("rating-curves-" + UUID.randomUUID().toString());
@@ -357,8 +357,8 @@ public class SupportService {
 	    }
 
 	    // Execute access request
-	    ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
-	    IAccessExecutor accessExecutor = accessLoader.iterator().next();
+	    ServiceLoader<AccessExecutor> accessLoader = ServiceLoader.load(AccessExecutor.class);
+	    AccessExecutor accessExecutor = accessLoader.iterator().next();
 
 	    AccessMessage accessMessage = new AccessMessage();
 	    accessMessage.setOnlineId(onlineId);
@@ -521,8 +521,8 @@ public class SupportService {
 		Arrays.asList(//
 			MetadataElement.ONLINE_ID//
 		));
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	StatisticsResponse response = executor.compute(statisticsMessage);
 	List<ResponseItem> items = response.getItems();

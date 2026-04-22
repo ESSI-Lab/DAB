@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -64,7 +63,7 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wis.station.info.WISStationInfoHandler;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
 import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 import net.opengis.iso19139.gmx.v_20060504.AnchorType;
 
@@ -428,8 +427,8 @@ public class WISUtils {
     }
 
     public static ResultSet<GSResource> getMetadataItems(String metadataIdentifier, Optional<String> optionalView) throws GSException {
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

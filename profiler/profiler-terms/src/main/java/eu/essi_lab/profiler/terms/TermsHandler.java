@@ -58,11 +58,10 @@ import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.profiler.terms.TermsRequest.APIParameters;
-import eu.essi_lab.request.executor.discover.QueryInitializer;
+import eu.essi_lab.request.executor.impl.discover.QueryInitializer;
 
 public class TermsHandler extends StreamingRequestHandler {
 

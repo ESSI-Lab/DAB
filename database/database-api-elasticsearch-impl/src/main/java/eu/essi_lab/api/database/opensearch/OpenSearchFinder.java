@@ -39,7 +39,7 @@ import eu.essi_lab.messages.termfrequency.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
-import eu.essi_lab.request.executor.query.IQueryExecutor.*;
+import eu.essi_lab.request.executor.query.QueryExecutor.*;
 import jakarta.xml.bind.*;
 import org.json.*;
 import org.opensearch.client.opensearch._types.*;

@@ -57,7 +57,7 @@
 //import eu.essi_lab.profiler.esri.feature.ESRIFieldType;
 //import eu.essi_lab.profiler.esri.feature.FeatureLayer;
 //import eu.essi_lab.profiler.esri.feature.query.ESRIRequest;
-//import eu.essi_lab.request.executor.IDiscoveryExecutor;
+//import eu.essi_lab.request.executor.DiscoveryExecutor;
 //
 ///**
 // * @author boldrini
@@ -98,8 +98,8 @@
 //
 //	    response.put("objectIdFieldName", layer.getField(ESRIFieldType.OID).getName());
 //
-//	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-//	    IDiscoveryExecutor executor = loader.iterator().next();
+//	    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+//	    DiscoveryExecutor executor = loader.iterator().next();
 //
 //	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 //	    discoveryMessage.setRequestId(request.getRequestId());
@@ -144,8 +144,8 @@
 //	    if (response == null) {
 //		response = new JSONObject();
 //
-//		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-//		IDiscoveryExecutor executor = loader.iterator().next();
+//		ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+//		DiscoveryExecutor executor = loader.iterator().next();
 //
 //		List<String> identifiers = new ArrayList<String>();
 //

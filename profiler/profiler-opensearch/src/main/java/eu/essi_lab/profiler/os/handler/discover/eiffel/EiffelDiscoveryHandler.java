@@ -58,7 +58,7 @@ import eu.essi_lab.profiler.os.OSParameters;
 import eu.essi_lab.profiler.os.OSProfilerSetting;
 import eu.essi_lab.profiler.os.OSRequestParser;
 import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper.CountSetWrapper;
-import eu.essi_lab.request.executor.discover.QueryInitializer;
+import eu.essi_lab.request.executor.impl.discover.QueryInitializer;
 
 /**
  * @author Fabrizio

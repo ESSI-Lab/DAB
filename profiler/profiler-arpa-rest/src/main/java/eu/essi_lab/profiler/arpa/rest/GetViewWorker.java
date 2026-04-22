@@ -56,7 +56,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
+import eu.essi_lab.request.executor.StatisticsExecutor;
 
 public class GetViewWorker extends ViewWorker {
 
@@ -189,8 +189,8 @@ public class GetViewWorker extends ViewWorker {
 	    GSLoggerFactory.getLogger(getClass())
 		    .info("Calculating stats for view (" + i + "/" + viewIdentifiers.size() + "): " + viewIdentifier);
 
-	    ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	    IStatisticsExecutor executor = loader.iterator().next();
+	    ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	    StatisticsExecutor executor = loader.iterator().next();
 
 	    Optional<View> optionalView = reader.getView(viewIdentifier);
 	    View view;

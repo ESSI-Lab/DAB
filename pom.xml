@@ -2335,7 +2335,7 @@
         <module>configuration</module>
 
         <module>request-executor</module>
-        <module>request-executor-default</module>
+        <module>request-executor-impl</module>
 
         <module>identifier-decorator</module>
         <module>gs-service</module>

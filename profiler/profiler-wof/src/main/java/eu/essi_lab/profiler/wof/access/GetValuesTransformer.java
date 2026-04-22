@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.xml.bind.JAXBElement;
 
 import org.cuahsi.waterml._1.ObjectFactory;
@@ -56,8 +57,6 @@ import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
@@ -76,7 +75,6 @@ import eu.essi_lab.profiler.wof.TimeFormatConverter;
 import eu.essi_lab.profiler.wof.WOFQueryUtils;
 import eu.essi_lab.profiler.wof.WOFRequest;
 import eu.essi_lab.profiler.wof.WOFRequest.Parameter;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 /**
  * @author boldrini
@@ -273,8 +271,8 @@ public class GetValuesTransformer extends AccessRequestTransformer {
 
 	GSLoggerFactory.getLogger(getClass()).info("Resource discovery STARTED");
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	ResultSet<GSResource> resultSet = executor.retrieve(message);
 

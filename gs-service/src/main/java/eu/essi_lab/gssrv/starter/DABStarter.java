@@ -38,7 +38,6 @@ import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
-import eu.essi_lab.cfga.gs.setting.service.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
@@ -65,7 +64,7 @@ import eu.essi_lab.profiler.esri.feature.*;
 import eu.essi_lab.profiler.esri.feature.query.*;
 import eu.essi_lab.profiler.wms.extent.*;
 import eu.essi_lab.profiler.wms.extent.map.*;
-import eu.essi_lab.request.executor.schedule.*;
+import eu.essi_lab.request.executor.impl.schedule.*;
 import eu.essi_lab.services.*;
 import eu.essi_lab.shared.driver.es.stats.*;
 import jakarta.ws.rs.ext.*;
@@ -79,7 +78,6 @@ import java.security.cert.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static eu.essi_lab.cfga.ConfigurationChangeListener.EventType.*;
 import static eu.essi_lab.configuration.ExecutionMode.*;
 
 /**
