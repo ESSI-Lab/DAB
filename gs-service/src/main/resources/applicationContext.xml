@@ -80,7 +80,6 @@
 	</jaxrs:server>
 
 	<bean id="configService" class="eu.essi_lab.gssrv.rest.ConfigService" />
-		
-	<bean id="jsonProvider" class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
 
+	<bean id="jsonProvider" class="com.fasterxml.jackson.jakarta.rs.json.JacksonJsonProvider" />
 </beans>
