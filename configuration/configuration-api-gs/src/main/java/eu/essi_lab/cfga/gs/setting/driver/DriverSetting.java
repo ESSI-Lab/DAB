@@ -36,6 +36,7 @@ import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 /**
  * @author Fabrizio
  */
+@Deprecated
 public abstract class DriverSetting extends Setting implements EditableSetting {
 
     /**
