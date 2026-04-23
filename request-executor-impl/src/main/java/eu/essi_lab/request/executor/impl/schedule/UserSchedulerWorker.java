@@ -35,9 +35,10 @@ import eu.essi_lab.pdk.handler.*;
 import eu.essi_lab.pdk.rsf.*;
 import eu.essi_lab.pdk.rsm.*;
 import eu.essi_lab.request.executor.*;
-import eu.essi_lab.shared.resultstorage.*;
+import eu.essi_lab.request.executor.storage.*;
 import jakarta.ws.rs.core.*;
 import org.quartz.*;
+import eu.essi_lab.pdk.handler.ProfilerHandler;
 
 import java.io.*;
 import java.util.*;
@@ -130,10 +131,10 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 	    @Override
 	    protected void onHandlingEnded(Response response) {
 
-		GSLoggerFactory.getLogger(this.getClass()).info("Executor handling ended, storing the result...");
+		GSLoggerFactory.getLogger(getClass()).info("Executor handling ended, storing the result...");
 
 		if (response == null || response.getEntity() == null) {
-		    GSLoggerFactory.getLogger(this.getClass()).error("Empty response!");
+		    GSLoggerFactory.getLogger(getClass()).error("Empty response!");
 		    return;
 		}
 
@@ -151,22 +152,16 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 
 		    DownloadStorage downloadStorage = downloadSetting.getDownloadStorage();
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Uploading file to {} STARTED", downloadStorage.getLabel());
+		    GSLoggerFactory.getLogger(getClass()).info("Uploading file to {} STARTED", downloadStorage.getLabel());
 
 		    ResultStorage storage = null;
 		    StorageInfo resultStorageURI = message.getUserJobStorageURI();
 
 		    switch (downloadStorage) {
 
-		    case LOCAL_DOWNLOAD_STORAGE:
+		    case LOCAL_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createLocalResultStorage(downloadSetting);
+		    case S3_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createAmazonS3ResultStorage(downloadSetting);
 
-			storage = ResultStorageFactory.createLocalResultStorage(resultStorageURI);
-			break;
-
-		    case S3_DOWNLOAD_STORAGE:
-
-			storage = ResultStorageFactory.createAmazonS3ResultStorage(resultStorageURI);
-			break;
 		    }
 
 		    //
@@ -174,7 +169,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 		    //
 		    String get = storage.getStorageLocation(objectName);
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Storing to {} STARTED", get);
+		    GSLoggerFactory.getLogger(getClass()).info("Storing to {} STARTED", get);
 
 		    jakarta.ws.rs.core.StreamingOutput streamingOutput = response.readEntity(jakarta.ws.rs.core.StreamingOutput.class);
 
@@ -189,9 +184,9 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 
 		    tmpFile.delete();
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Uploading file to {} ENDED", downloadStorage.getLabel());
+		    GSLoggerFactory.getLogger(getClass()).info("Uploading file to {} ENDED", downloadStorage.getLabel());
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Storing to {} ENDED", get);
+		    GSLoggerFactory.getLogger(getClass()).info("Storing to {} ENDED", get);
 
 		    //
 		    // Updates the status
@@ -207,7 +202,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 		} catch (Exception e) {
 
 		    e.printStackTrace();
-		    GSLoggerFactory.getLogger(this.getClass()).error("Storing failed: " + e.getMessage());
+		    GSLoggerFactory.getLogger(getClass()).error("Storing failed: " + e.getMessage());
 
 		    status.setErrorPhase();
 		    status.addErrorMessage(e.getMessage());

@@ -21,28 +21,20 @@ package eu.essi_lab.request.executor.impl.access;
  * #L%
  */
 
-import java.io.*;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.JobStatus.*;
 import eu.essi_lab.model.*;
-import org.json.JSONObject;
+import eu.essi_lab.model.exceptions.*;
+import org.json.*;
 
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.JobStatus.JobPhase;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.shared.SharedContent;
-import eu.essi_lab.model.shared.SharedContent.SharedContentType;
-import eu.essi_lab.shared.driver.DriverFactory;
-import eu.essi_lab.shared.driver.ISharedRepositoryDriver;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class GWPSDownloader extends DirectDownloader {
 
@@ -131,6 +123,7 @@ public class GWPSDownloader extends DirectDownloader {
 
 		    switch (phase) {
 		    case COMPLETED:
+
 			GSLoggerFactory.getLogger(getClass()).info("Successful download operation");
 			return jobStatus.getDataUri().orElse("missing");
 
