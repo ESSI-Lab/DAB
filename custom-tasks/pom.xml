@@ -143,12 +143,6 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>gs-driver-local-cache</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-
 		<!-- accessors -->
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
@@ -895,12 +889,6 @@
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>gs-driver-elasticsearch</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>gs-driver-database</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 

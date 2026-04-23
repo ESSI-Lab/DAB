@@ -2367,8 +2367,6 @@
 
         <!-- drivers -->
         <module>gs-driver-elasticsearch</module>
-        <module>gs-driver-database</module>
-        <module>gs-driver-local-cache</module>
 
         <module>runtime-info-provider</module>
 
