@@ -68,7 +68,7 @@
 
 		<dependency>
 			<groupId>eu.essi_lab</groupId>
-			<artifactId>gs-driver-elasticsearch</artifactId>
+			<artifactId>elasticsearch-client</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 

@@ -1,5 +1,0 @@
-{ "properties": {
-			"RESULT_SET_TIME_STAMP_MILLIS": { "type": "date" },
-			"RESULT_SET_RETURNED": { "type": "long" },
-			"RESULT_SET_MATCHED": { "type": "long" }
-}}

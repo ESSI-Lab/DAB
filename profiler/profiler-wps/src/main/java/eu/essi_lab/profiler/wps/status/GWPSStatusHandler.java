@@ -10,38 +10,34 @@ package eu.essi_lab.profiler.wps.status;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.List;
-import java.util.stream.Collectors;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.messages.JobStatus.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.ValidationMessage.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.pdk.handler.*;
+import jakarta.ws.rs.core.*;
+import org.json.*;
 
-import jakarta.ws.rs.core.MediaType;
-
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.JobStatus.JobPhase;
-import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.ValidationMessage.ValidationResult;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.shared.SharedContent;
-import eu.essi_lab.model.shared.SharedContent.SharedContentType;
-import eu.essi_lab.pdk.handler.DefaultRequestHandler;
-import eu.essi_lab.shared.driver.DriverFactory;
-import eu.essi_lab.shared.driver.ISharedRepositoryDriver;
+import java.io.*;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -86,9 +82,13 @@ public class GWPSStatusHandler extends DefaultRequestHandler {
 	String id = getId(webRequest);
 
 	ValidationMessage ret = new ValidationMessage();
+
 	if (id == null) {
+
 	    ret.setResult(ValidationResult.VALIDATION_FAILED);
+
 	} else {
+
 	    ret.setResult(ValidationResult.VALIDATION_SUCCESSFUL);
 	}
 
@@ -99,24 +99,32 @@ public class GWPSStatusHandler extends DefaultRequestHandler {
     @Override
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
-	SharedPersistentDriverSetting driverSetting = ConfigurationWrapper.getSharedPersistentDriverSetting();
-
-	@SuppressWarnings("rawtypes")
-	ISharedRepositoryDriver driver = DriverFactory.getConfiguredDriver(driverSetting, true);
-
 	String id = getId(webRequest);
 
-	SharedContent<JSONObject> response = getResponse(driver, id);
+	JSONObject content = null;
+
+	try {
+
+	    InputStream binary = getCacheFolder().getBinary(id);
+
+	    if (binary != null) {
+
+		content = new JSONObject(new String(binary.readAllBytes()));
+	    }
+
+	} catch (Exception e) {
+
+	    throw GSException.createException(getClass(), "DatabaseGetCachedResourceError", e);
+	}
 
 	JSONObject output = new JSONObject();
 
-	if (response == null) {
+	if (content == null) {
 
 	    output.put("status", "DOWNLOADING DATA");
 	    output.put("message", "Transformation request has started");
-	} else {
 
-	    JSONObject content = response.getContent();
+	} else {
 
 	    SchedulerJobStatus status = new SchedulerJobStatus(content);
 	    JobPhase phase = status.getPhase();
@@ -134,7 +142,9 @@ public class GWPSStatusHandler extends DefaultRequestHandler {
 	    case CANCELED:
 
 		output.put("status", "ERROR");
+
 		List<String> errorMessages = status.getErrorMessages();
+
 		if (!errorMessages.isEmpty()) {
 		    output.put("message", errorMessages.stream().collect(Collectors.joining(",")));
 		}
@@ -153,17 +163,15 @@ public class GWPSStatusHandler extends DefaultRequestHandler {
 	return output.toString();
     }
 
-    @SuppressWarnings("unchecked")
-    private SharedContent<JSONObject> getResponse(@SuppressWarnings("rawtypes") ISharedRepositoryDriver driver, String id) {
+    /**
+     * @return
+     * @throws GSException
+     */
+    private DatabaseFolder getCacheFolder() throws GSException {
 
-	try {
-	    return driver.read(id, SharedContentType.JSON_TYPE);
-	} catch (GSException e) {
+	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-	}
-
-	return null;
+	return DatabaseFactory.get(storageInfo).getCacheFolder();
     }
 
     @Override

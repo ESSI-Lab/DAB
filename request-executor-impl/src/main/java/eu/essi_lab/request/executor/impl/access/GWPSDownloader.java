@@ -10,44 +10,40 @@ package eu.essi_lab.request.executor.impl.access;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.JobStatus.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import org.json.*;
 
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.JobStatus.JobPhase;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.shared.SharedContent;
-import eu.essi_lab.model.shared.SharedContent.SharedContentType;
-import eu.essi_lab.shared.driver.DriverFactory;
-import eu.essi_lab.shared.driver.ISharedRepositoryDriver;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class GWPSDownloader extends DirectDownloader {
 
     /**
-     * 
+     *
      */
     private static final long POLL_INTERVAL = 10000;
     /**
-     * 
+     *
      */
     private static final long TIMEOUT = TimeUnit.HOURS.toMillis(1);
 
@@ -83,10 +79,7 @@ public class GWPSDownloader extends DirectDownloader {
 
 	    GSLoggerFactory.getLogger(getClass()).trace("Job ID: {}", jobId);
 
-	    SharedPersistentDriverSetting driverSetting = ConfigurationWrapper.getSharedPersistentDriverSetting();
 	    @SuppressWarnings("rawtypes")
-	    ISharedRepositoryDriver driver = DriverFactory.getConfiguredDriver(driverSetting, true);
-
 	    long start = System.currentTimeMillis();
 
 	    while (true) {
@@ -107,41 +100,39 @@ public class GWPSDownloader extends DirectDownloader {
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 		}
 
-		SharedContent<JSONObject> sharedContent = null;
+		JSONObject content = null;
 
 		try {
-		    sharedContent = driver.read(jobId, SharedContentType.JSON_TYPE);
 
-		} catch (GSException e) {
+		    InputStream binary = getCacheFolder().getBinary(jobId);
 
-		    String errors = e.getErrorInfoList().stream().map(i -> i.getErrorDescription()).filter(Objects::nonNull)
-			    .collect(Collectors.joining(","));
+		    if (binary != null) {
 
-		    if (!errors.isEmpty()) {
-			GSLoggerFactory.getLogger(getClass()).error("Following errors detected: {}", errors);
+			content = new JSONObject(new String(binary.readAllBytes()));
 		    }
 
-		    //
-		    // since valid codes are until 399, ES driver throws an exception if a resource is not found, error code 404
-		    // but here is normal when a job status is not found, since the job is still running and its status is
-		    // not yet stored in the ES, so there is no reason to throw an exception
-		    // simply another attempt will be done, until the status is ready
-		    //
-		    // throw new RuntimeException(errors);
+		} catch (Exception e) {
+
+		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}
 
-		if (sharedContent != null) {
+		if (content != null) {
 
-		    SchedulerJobStatus jobStatus = new SchedulerJobStatus(sharedContent.getContent());
+		    SchedulerJobStatus jobStatus = new SchedulerJobStatus(content);
 		    JobPhase phase = jobStatus.getPhase();
+
 		    switch (phase) {
 		    case COMPLETED:
+
 			GSLoggerFactory.getLogger(getClass()).info("Successful download operation");
-			String ret = jobStatus.getDataUri().orElse("missing");
-			return ret;
+			return jobStatus.getDataUri().orElse("missing");
+
 		    case ERROR:
-			String msg = jobStatus.getErrorMessages().stream().collect(Collectors.joining(","));
+
+			String msg = String.join(",", jobStatus.getErrorMessages());
+
 			if (msg.isEmpty()) {
+
 			    msg = "Failed download operation";
 			}
 
@@ -162,6 +153,17 @@ public class GWPSDownloader extends DirectDownloader {
 
 	    throw new RuntimeException(msg);
 	}
+    }
+
+    /**
+     * @return
+     * @throws GSException
+     */
+    private DatabaseFolder getCacheFolder() throws GSException {
+
+	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
+
+	return DatabaseFactory.get(storageInfo).getCacheFolder();
     }
 
     /**

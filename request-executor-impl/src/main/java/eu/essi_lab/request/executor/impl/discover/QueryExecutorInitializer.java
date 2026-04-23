@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.request.executor.impl.discover.submitter.*;
 import eu.essi_lab.request.executor.query.*;
 import org.slf4j.Logger;
 
@@ -32,14 +33,12 @@ import eu.essi_lab.adk.AccessorFactory;
 import eu.essi_lab.adk.distributed.IDistributedAccessor;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
-import eu.essi_lab.identifierdecorator.IdentifierDecorator;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.model.BrokeringStrategy;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.request.executor.impl.discover.submitter.DatabaseQueryExecutorImpl;
 
 /**
  * Initializes the query executors from the ordered source list that is present in the discovery message
@@ -119,9 +118,6 @@ public class QueryExecutorInitializer {
 
 		    DistributedQueryExecutor querySubmitter = createDistributedExecutor(source);
 
-		    IdentifierDecorator decorator = new IdentifierDecorator();
-		    querySubmitter.setIdentifierDecorator(decorator);
-
 		    ret.add(querySubmitter);
 
 		} catch (GSException e) {
@@ -162,7 +158,7 @@ public class QueryExecutorInitializer {
      * Creates the distributed query executor, given a source
      *
      * @param source
-     * @return {@link eu.essi_lab.request.executor.impl.discover.submitter.DistributedQueryExecutor}
+     * @return {@link DistributedQueryExecutorImpl}
      * @throws GSException
      */
     private DistributedQueryExecutor createDistributedExecutor(GSSource source) throws GSException {
@@ -176,7 +172,7 @@ public class QueryExecutorInitializer {
 		@SuppressWarnings("rawtypes")
 		IDistributedAccessor accessor = AccessorFactory.getConfiguredDistributedAccessor(accessorSetting.get());
 
-		return new eu.essi_lab.request.executor.impl.discover.submitter.DistributedQueryExecutor(accessor, source.getUniqueIdentifier());
+		return new DistributedQueryExecutorImpl(accessor, source.getUniqueIdentifier());
 
 	    } catch (Exception e) {
 

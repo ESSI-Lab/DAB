@@ -1,4 +1,4 @@
-package eu.essi_lab.request.executor.query;
+package eu.essi_lab.request.executor.storage;
 
 /*-
  * #%L
@@ -21,29 +21,58 @@ package eu.essi_lab.request.executor.query;
  * #L%
  */
 
-public interface QueryExecutor {
+import java.io.File;
+
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.model.StorageInfo;
+
+/**
+ * @author Fabrizio
+ */
+public abstract class ResultStorage {
+
+    private DownloadSetting setting;
 
     /**
-     * @author Fabrizio
+     *
      */
-    enum Type {
-	/**
-	 *
-	 */
-	DISTRIBUTED,
-	/**
-	 *
-	 */
-	DATABASE
+    public ResultStorage() {
     }
 
     /**
      * @return
      */
-    Type getType();
+    public StorageInfo getResultStorageURI() {
+
+	return setting.getStorageUri();
+    }
+
+    /**
+     * @param storageUri
+     */
+    public ResultStorage(DownloadSetting setting) {
+
+	this.setting = setting;
+    }
+
+    /**
+     * @param objectName
+     * @param file
+     * @throws Exception
+     */
+    public abstract void store(String objectName, File file) throws Exception;
+
+    /**
+     * @param objectName
+     * @return
+     */
+    public abstract String getStorageLocation(String objectName);
 
     /**
      * @return
      */
-    String getSourceIdentifier();
+    public DownloadSetting getSetting() {
+
+	return setting;
+    }
 }

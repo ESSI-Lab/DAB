@@ -574,19 +574,6 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <!-- shared content -->
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>gs-shared-content</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>gs-driver-local-cache</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
         <!-- accessors -->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -1209,19 +1196,9 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <!-- <dependency> <groupId>com.github.stefanbirkner</groupId>
-        <artifactId>system-rules</artifactId>
-            <scope>test</scope> </dependency> -->
-
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
-            <artifactId>gs-driver-elasticsearch</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>gs-driver-database</artifactId>
+            <artifactId>elasticsearch-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
 

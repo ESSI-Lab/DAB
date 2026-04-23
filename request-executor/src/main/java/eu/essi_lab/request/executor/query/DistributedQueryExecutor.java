@@ -35,10 +35,6 @@ import eu.essi_lab.model.resource.GSResource;
 
 public interface DistributedQueryExecutor extends QueryExecutor {
 
-    IdentifierDecorator getIdentifierDecorator();
-
-    void setIdentifierDecorator(IdentifierDecorator identifierDecorator);
-
     SimpleEntry<String, DiscoveryCountResponse> count(ReducedDiscoveryMessage message) throws GSException;
 
     ResultSet<GSResource> retrieve(ReducedDiscoveryMessage message, Page page) throws GSException;

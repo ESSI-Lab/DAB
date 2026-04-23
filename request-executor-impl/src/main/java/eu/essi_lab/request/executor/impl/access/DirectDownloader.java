@@ -10,34 +10,28 @@ package eu.essi_lab.request.executor.impl.access;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.http.HttpHeaders;
-import java.net.http.HttpResponse;
-import java.util.Optional;
-
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.lib.net.downloader.*;
 import eu.essi_lab.lib.utils.*;
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
+import eu.essi_lab.request.executor.storage.*;
+import org.apache.commons.io.*;
+import org.slf4j.*;
 
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.shared.resultstorage.ResultStorage;
-import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
+import java.io.*;
+import java.net.http.*;
+import java.util.*;
 
 public class DirectDownloader {
 
@@ -50,8 +44,9 @@ public class DirectDownloader {
     }
 
     public String download() {
+
 	Downloader d = new Downloader();
-	 Optional<HttpResponse<InputStream>> ret = d.downloadOptionalResponse(linkage);
+	Optional<HttpResponse<InputStream>> ret = d.downloadOptionalResponse(linkage);
 
 	InputStream stream;
 
@@ -98,17 +93,12 @@ public class DirectDownloader {
 	    DownloadSetting downloadSetting = ConfigurationWrapper.getDownloadSetting();
 
 	    ResultStorage storage = null;
-	    StorageInfo resultStorageURI = downloadSetting.getStorageUri();
 
 	    switch (downloadSetting.getDownloadStorage()) {
 
-	    case LOCAL_DOWNLOAD_STORAGE:
+	    case LOCAL_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createLocalResultStorage(downloadSetting);
 
-		storage = ResultStorageFactory.createLocalResultStorage(resultStorageURI);
-
-	    case S3_DOWNLOAD_STORAGE:
-
-		storage = ResultStorageFactory.createAmazonS3ResultStorage(resultStorageURI);
+	    case S3_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createAmazonS3ResultStorage(downloadSetting);
 	    }
 
 	    String get = storage.getStorageLocation(objectName);
@@ -124,7 +114,9 @@ public class DirectDownloader {
 	    FileOutputStream fos = new FileOutputStream(tmpFile);
 	    IOUtils.copy(stream, fos);
 	    fos.close();
+
 	    storage.store(objectName, tmpFile);
+
 	    tmpFile.delete();
 
 	    logger.info("Storing to {} ENDED", get);

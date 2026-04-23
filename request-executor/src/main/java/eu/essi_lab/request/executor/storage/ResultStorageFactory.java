@@ -1,4 +1,4 @@
-package eu.essi_lab.request.executor.query;
+package eu.essi_lab.request.executor.storage;
 
 /*-
  * #%L
@@ -10,40 +10,42 @@ package eu.essi_lab.request.executor.query;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-public interface QueryExecutor {
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.model.StorageInfo;
+
+/**
+ * @author Fabrizio
+ */
+public class ResultStorageFactory {
 
     /**
-     * @author Fabrizio
+     *
+     * @param setting
+     * @return
      */
-    enum Type {
-	/**
-	 *
-	 */
-	DISTRIBUTED,
-	/**
-	 *
-	 */
-	DATABASE
+    public static ResultStorage createLocalResultStorage(DownloadSetting setting) {
+
+	return new LocalResultStorage(setting);
     }
 
     /**
+     *
+     * @param setting
      * @return
      */
-    Type getType();
+    public static ResultStorage createAmazonS3ResultStorage(DownloadSetting setting) {
 
-    /**
-     * @return
-     */
-    String getSourceIdentifier();
+	return new AmazonS3ResultStorage(setting);
+    }
 }

@@ -12,21 +12,25 @@
 	<artifactId>harvester</artifactId>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>core-datamodel</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-dev-kit</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>identifier-decorator</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>augmenter</artifactId>
@@ -50,21 +54,19 @@
 			<artifactId>accessor-ckan</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>database-indexes</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>database-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>		
-		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>gs-shared-content</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
+
 	</dependencies>
 
 	<profiles>
