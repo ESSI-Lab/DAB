@@ -599,7 +599,8 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 			// these properties have at the moment no related statistical element
 			//
 			//
-			String name = b.getProperty().getName();
+
+			String name = getName() + RuntimeInfoElement.NAME_SEPARATOR + b.getProperty().getName();
 
 			List<String> list = null;
 
@@ -611,7 +612,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 			list.add(b.getPropertyValue().toString());
 
-			map.put(getName() + RuntimeInfoElement.NAME_SEPARATOR + b.getProperty().getName(), list);
+			map.put(name, list);
 		    }
 		} else if (bond instanceof QueryableBond<?>) {
 

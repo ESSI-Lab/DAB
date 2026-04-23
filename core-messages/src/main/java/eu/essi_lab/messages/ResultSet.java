@@ -108,6 +108,8 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 
 		List<String> discResourceTitlesList = new ArrayList<>();
 		List<String> discResourceAttributeTitlesList = new ArrayList<>();
+		List<String> discResourceAttributeURIsList = new ArrayList<>();
+
 		List<String> discResourceIdsList = new ArrayList<>();
 
 		List<String> discSourceIdsList = new ArrayList<>();
@@ -140,6 +142,17 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 
 			} catch (Exception e) {
 			}
+
+			try {
+			    Optional<String> opu = resource.getExtensionHandler().getObservedPropertyURI();
+			    if (opu.isPresent()) {
+				discResourceAttributeURIsList.add(opu.get());
+			    }
+
+			} catch (Exception e) {
+			}
+
+
 
 			//
 			//
@@ -260,6 +273,10 @@ public class ResultSet<T> extends MessageResponse<T, CountSet> {
 
 		if (!discResourceAttributeTitlesList.isEmpty()) {
 		    map.put(RuntimeInfoElement.RESULT_SET_ATTRIBUTE_TITLE.getName(), discResourceAttributeTitlesList);
+		}
+
+		if (!discResourceAttributeURIsList.isEmpty()) {
+		    map.put(RuntimeInfoElement.RESULT_SET_ATTRIBUTE_URI.getName(), discResourceAttributeURIsList);
 		}
 
 		if (!discBboxNorthList.isEmpty()) {
