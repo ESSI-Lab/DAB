@@ -1061,7 +1061,6 @@ public class ConfigurationWrapper {
 
 	manager.setAccessKey(accessKey);
 	manager.setSecretKey(secretKey);
-
 	endpoint.ifPresent(manager::setEndpoint);
 
 	manager.initialize();
