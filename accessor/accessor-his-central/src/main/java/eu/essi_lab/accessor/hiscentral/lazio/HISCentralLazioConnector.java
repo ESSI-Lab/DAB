@@ -390,21 +390,21 @@ public class HISCentralLazioConnector extends HarvestedQueryConnector<HISCentral
 	params.put("client_id", ConfigurationWrapper.getCredentialsSetting().getLazioClientId().orElse(null));
 	params.put("client_instance", ConfigurationWrapper.getCredentialsSetting().getLazioClientInstance().orElse(null));
 
-	HttpRequest request = HttpRequestUtils.build(//
-		MethodWithBody.POST, //
-		TOKEN_URL, //
-		params);
-	
-	System.out.println(params);
-
-	HttpResponse<InputStream> response = new Downloader().downloadResponse(request);
-
- 	JSONObject obj = new JSONObject(IOStreamUtils.asUTF8String(response.body()));
-
-	if (obj != null) {
-	    String bearer = obj.optString("access_token");
-	    System.out.println(bearer);
-	}
+//	HttpRequest request = HttpRequestUtils.build(//
+//		MethodWithBody.POST, //
+//		TOKEN_URL, //
+//		params);
+//
+//	System.out.println(params);
+//
+//	HttpResponse<InputStream> response = new Downloader().downloadResponse(request);
+//
+// 	JSONObject obj = new JSONObject(IOStreamUtils.asUTF8String(response.body()));
+//
+//	if (obj != null) {
+//	    String bearer = obj.optString("access_token");
+//	    System.out.println(bearer);
+//	}
 
     }
 

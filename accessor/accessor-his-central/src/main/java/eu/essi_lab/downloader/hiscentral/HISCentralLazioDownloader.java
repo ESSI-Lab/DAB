@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioClient;
 import org.apache.commons.io.IOUtils;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.json.JSONArray;
@@ -292,10 +293,15 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	String result = null;
 	String token = null;
 
+
+
 	try {
 
-	    if (HISCentralLazioConnector.BEARER_TOKEN == null) {
-		HISCentralLazioConnector.BEARER_TOKEN = HISCentralLazioConnector.getBearerToken(connector.getSourceURL());
+	    HISCentralLazioClient client = new HISCentralLazioClient();
+
+
+	    if (HISCentralLazioClient.BEARER_TOKEN == null) {
+		HISCentralLazioClient.BEARER_TOKEN = HISCentralLazioClient.getBeareToken(HISCentralLazioClient.TOKEN_URL);
 	    }
 	    GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
 
@@ -307,33 +313,37 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	    downloader.setConnectionTimeout(TimeUnit.SECONDS, timeout);
 	    downloader.setResponseTimeout(TimeUnit.SECONDS, responseTimeout);
 
-	    HttpResponse<InputStream> streamResponse = downloader.downloadResponse(//
-		    linkage.trim(), //
-		    HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
 
-	    stream = streamResponse.body();
+
+//
+//	    HttpResponse<InputStream> streamResponse = downloader.downloadResponse(//
+//		    linkage.trim(), //
+//		    HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
+
+	    String res =  client.getData(linkage);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
 
-	    int responseCode = streamResponse.statusCode();
-	    if (responseCode > 400) {
-		// repeat again
-		HISCentralLazioConnector.BEARER_TOKEN = HISCentralLazioConnector.getBearerToken(connector.getSourceURL());
+//	    int responseCode = streamResponse.statusCode();
+//	    if (res != null) {
+//		// repeat again
+//		HISCentralLazioConnector.BEARER_TOKEN = HISCentralLazioConnector.getBearerToken(connector.getSourceURL());
+//
+//		streamResponse = downloader.downloadResponse(//
+//			linkage.trim(), //
+//			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
+//
+//		stream = streamResponse.body();
+//
+//		GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
+//	    }
 
-		streamResponse = downloader.downloadResponse(//
-			linkage.trim(), //
-			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
-
-		stream = streamResponse.body();
-
-		GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
-	    }
-
-	    if (stream != null) {
+	    if (res != null) {
 		Path tmpFile = Files.createTempFile(getClass().getSimpleName(), ".json");
 		FileOutputStream fos = new FileOutputStream(tmpFile.toFile());
-		IOUtils.copy(stream, fos);
-		stream.close();
+		byte[] strToBytes = res.getBytes();
+		fos.write(strToBytes);
+		fos.close();
 		return tmpFile.toFile();
 	    }
 
@@ -379,7 +389,7 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralLazioConnector.BASE_URL) && //
+		online.getLinkage().contains(HISCentralLazioClient.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_LAZIO_NS_URI));
     }
