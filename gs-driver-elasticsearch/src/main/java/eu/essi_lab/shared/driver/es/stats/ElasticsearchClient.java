@@ -157,7 +157,6 @@ import eu.essi_lab.model.Queryable;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.shared.driver.es.connector.aws.AWSRequestSigningApacheInterceptor;
 
 public class ElasticsearchClient {
 

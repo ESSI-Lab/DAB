@@ -1,4 +1,4 @@
-package eu.essi_lab.shared.driver.es.connector.aws;
+package eu.essi_lab.shared.driver.es.stats;
 
 /*-
  * #%L

@@ -21,33 +21,26 @@ package eu.essi_lab.request.executor.impl.schedule;
  * #L%
  */
 
-import java.io.*;
-import java.util.Date;
-import java.util.Optional;
-
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.*;
+import eu.essi_lab.cfga.scheduler.*;
 import eu.essi_lab.lib.utils.*;
-import jakarta.ws.rs.core.Response;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.pdk.handler.*;
+import eu.essi_lab.pdk.rsf.*;
+import eu.essi_lab.pdk.rsm.*;
+import eu.essi_lab.request.executor.*;
+import eu.essi_lab.shared.resultstorage.*;
+import jakarta.ws.rs.core.*;
+import org.quartz.*;
 
-import org.quartz.JobExecutionContext;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.cfga.scheduler.SchedulerWorker;
-import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.pdk.handler.ProfilerHandler;
-import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
-import eu.essi_lab.pdk.rsm.MessageResponseMapper;
-import eu.essi_lab.request.executor.RequestExecutor;
-import eu.essi_lab.shared.driver.ConfiguredDriverUtils;
-import eu.essi_lab.shared.resultstorage.ResultStorage;
-import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
+import java.io.*;
+import java.util.*;
 
 /**
  * {@link UserSchedulerWorker} represents a scheduled job correspondent to a user asynchronous request (e.g. typically a delayed access
