@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.UUID;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -49,7 +50,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 /**
  * CKAN-style {@code package_show}: returns one dataset dict for the given {@code id} (harmonized public identifier).
@@ -83,8 +83,8 @@ public class PackageShowHandler extends StreamingRequestHandler {
 		    return;
 		}
 
-		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-		IDiscoveryExecutor executor = loader.iterator().next();
+		ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+		DiscoveryExecutor executor = loader.iterator().next();
 		ResultSet<GSResource> resultSet;
 		try {
 		    resultSet = executor.retrieve(message);
