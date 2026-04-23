@@ -574,13 +574,6 @@
             <version>${project.parent.version}</version>
         </dependency>
 
-        <!-- shared content -->
-        <dependency>
-            <groupId>${project.parent.groupId}</groupId>
-            <artifactId>gs-shared-content</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
         <!-- accessors -->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>

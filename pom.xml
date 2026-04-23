@@ -2355,8 +2355,6 @@
         <module>augmenter</module>
         <module>augmenter-worker</module>
 
-        <module>gs-shared-content</module>
-
         <!-- access tools -->
         <module>access-tools</module>
         <module>access-tools-workflow-engine</module>

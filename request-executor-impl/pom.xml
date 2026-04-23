@@ -75,12 +75,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>${project.parent.groupId}</groupId>
-			<artifactId>gs-shared-content</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency> 
-
-		<dependency>
 			<groupId>org.logicng</groupId>
 			<artifactId>logicng-j11</artifactId>
 		</dependency>
