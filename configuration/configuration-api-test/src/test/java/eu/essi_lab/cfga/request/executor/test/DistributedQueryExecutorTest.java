@@ -3,6 +3,7 @@ package eu.essi_lab.cfga.request.executor.test;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 
+import eu.essi_lab.request.executor.impl.discover.submitter.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,7 +28,6 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.impl.discover.submitter.DistributedQueryExecutor;
 import eu.essi_lab.request.executor.query.QueryExecutor.Type;
 
 public class DistributedQueryExecutorTest {
@@ -37,7 +37,7 @@ public class DistributedQueryExecutorTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    private DistributedQueryExecutor createExecutor() throws GSException {
+    private DistributedQueryExecutorImpl createExecutor() throws GSException {
 
 	@SuppressWarnings("rawtypes")
 	IDistributedAccessor accessor = Mockito.mock(IDistributedAccessor.class);
@@ -55,10 +55,7 @@ public class DistributedQueryExecutorTest {
 	source.setUniqueIdentifier(sourceId);
 	originalDataset.setSource(source);
 
-	DistributedQueryExecutor executor = new DistributedQueryExecutor(accessor, sourceId);
-
-	IdentifierDecorator identifierDecorator = new IdentifierDecorator();
-	executor.setIdentifierDecorator(identifierDecorator);
+	DistributedQueryExecutorImpl executor = new DistributedQueryExecutorImpl(accessor, sourceId);
 
 	return executor;
     }
@@ -66,71 +63,72 @@ public class DistributedQueryExecutorTest {
     @Test
     public void test() throws Exception {
 
-	DistributedQueryExecutor executor = createExecutor();
+	DistributedQueryExecutorImpl executor = createExecutor();
+
+	//
+	//
+	//
 
 	DiscoveryMessage message = new DiscoveryMessage();
 	ReducedDiscoveryMessage rdm = new ReducedDiscoveryMessage(message, null);
 
 	ResultSet<GSResource> resultSet = executor.retrieve(rdm, null);
 
-	// waits the executor service of the DistributedQueryExecutor which stores the YP
-	Thread.sleep(1000);
-
 	List<GSResource> resources = resultSet.getResultsList();
+
 	Assert.assertEquals(1, resources.size());
-	GSResource resource = resources.get(0);
+
+	GSResource resource = resources.getFirst();
+
 	Assert.assertEquals(ORIGINAL_ID, resource.getOriginalId().get());
 	Assert.assertEquals(resource.getPublicId(), resource.getPrivateId());
-	// System.out.println("Public id: "+resource.getPublicId());
 	Assert.assertNotEquals(ORIGINAL_ID, resource.getPublicId());
 
+	//
+	//
+	//
+
 	Bond reducedBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, resource.getPublicId());
+
 	message.setUserBond(reducedBond);
+
 	ReducedDiscoveryMessage reducedDiscoveryMessage = new ReducedDiscoveryMessage(message, reducedBond);
+
 	ResultSet<GSResource> result = executor.retrieve(reducedDiscoveryMessage, null);
 
-	// waits the executor service of the DistributedQueryExecutor which stores the YP
-	Thread.sleep(1000);
-
 	Assert.assertEquals(1, result.getResultsList().size());
-	Assert.assertEquals(resource.getPublicId(), result.getResultsList().get(0).getPublicId());
+	Assert.assertEquals(resource.getPublicId(), result.getResultsList().getFirst().getPublicId());
+
 	SimpleEntry<String, DiscoveryCountResponse> countSet = executor.count(reducedDiscoveryMessage);
+
 	Assert.assertNotNull(countSet);
 	Assert.assertEquals(1, countSet.getValue().getCount());
 
+	//
+	//
+	//
+
 	reducedBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, resource.getOriginalId().get());
 	message.setUserBond(reducedBond);
+
 	reducedDiscoveryMessage = new ReducedDiscoveryMessage(message, reducedBond);
+
 	result = executor.retrieve(reducedDiscoveryMessage, null);
 
-	// waits the executor service of the DistributedQueryExecutor which stores the YP
-	Thread.sleep(5000);
-
 	Assert.assertTrue(result.getResultsList().isEmpty());
+
 	countSet = executor.count(reducedDiscoveryMessage);
+
 	Assert.assertNotNull(countSet);
 	Assert.assertEquals(0, countSet.getValue().getCount());
     }
 
     @Test
     public void simpleTest() throws GSException {
-	
-	DistributedQueryExecutor executor = createExecutor();
+
+	DistributedQueryExecutorImpl executor = createExecutor();
 
 	Assert.assertEquals(Type.DISTRIBUTED, executor.getType());
-    }
-
-    @Test
-    public void testException1() throws GSException {
-	
-	DiscoveryMessage message = new DiscoveryMessage();
-	ReducedDiscoveryMessage rdm = new ReducedDiscoveryMessage(message, null);
-	thrown.expect(GSException.class);
-
-	DistributedQueryExecutor executor = createExecutor();
-
-	executor.setIdentifierDecorator(null);
-	executor.retrieve(rdm, null);
     }
 
     @Before
@@ -138,7 +136,7 @@ public class DistributedQueryExecutorTest {
 
 	DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
 	defaultConfiguration.clean();
-	
+
 	ConfigurationWrapper.setConfiguration(defaultConfiguration);
     }
 }
