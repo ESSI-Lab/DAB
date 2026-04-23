@@ -112,6 +112,8 @@ public final class IndexedRuntimeInfoElements extends IndexedElementsGroup {
 	    RuntimeInfoElement.DISCOVERY_MESSAGE_SUBJECT); //
     public static final IndexedRuntimeInfoElement DISCOVERY_MESSAGE_TITLE = new IndexedRuntimeInfoElement(
 	    RuntimeInfoElement.DISCOVERY_MESSAGE_TITLE); //
+    public static final IndexedRuntimeInfoElement DISCOVERY_MESSAGE_ATTRIBUTE_TITLE = new IndexedRuntimeInfoElement(
+	    RuntimeInfoElement.DISCOVERY_MESSAGE_ATTRIBUTE_TITLE); //
     public static final IndexedRuntimeInfoElement DISCOVERY_MESSAGE_KEYWORD = new IndexedRuntimeInfoElement(
 	    RuntimeInfoElement.DISCOVERY_MESSAGE_KEYWORD); //
     public static final IndexedRuntimeInfoElement DISCOVERY_MESSAGE_ORGANISATION_NAME = new IndexedRuntimeInfoElement(

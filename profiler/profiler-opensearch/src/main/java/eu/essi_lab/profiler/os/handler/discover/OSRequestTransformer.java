@@ -438,7 +438,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    }
 
 	    //
-	    // attribute title
+	    // attribute title: constraints go on the user bond and are stored in request statistics as
+	    // {@link RuntimeInfoElement#DISCOVERY_MESSAGE_ATTRIBUTE_TITLE} (field {@code DISCOVERY_MESSAGE_attributeTitle});
+	    // see {@link DiscoveryMessage#provideInfo()}.
 	    //
 
 	    Optional<String> attrTitle = parser.optParse(OSParameters.ATTRIBUTE_TITLE);

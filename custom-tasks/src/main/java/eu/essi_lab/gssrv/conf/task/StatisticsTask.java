@@ -192,6 +192,11 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <dd>From request statistics: all-time counts per {@code source_id} (same aggregation), filtered by
  * {@code VIEW_ID=.tag("view", PORTAL_SEARCHES_VIEW)//}, {@code PROFILER_NAME=OMProfiler}. Requires statistics DB settings.</dd>
  *
+ * <dt>{@link StatisticsMetric#SEARCH_ATTRIBUTE_TITLE_TOTAL SEARCH_ATTRIBUTE_TITLE_TOTAL} ({@code search_attribute_title_total})</dt>
+ * <dd>From request statistics: all-time counts per {@code attribute_title} (terms on
+ * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_ATTRIBUTE_TITLE}), filtered by {@code VIEW_ID} (when set) and
+ * {@code PROFILER_NAME=OSProfiler}. Labels: {@code attribute_title}, {@code view}. Requires statistics DB settings.</dd>
+ *
  * <dt>{@link StatisticsMetric#PORTAL_SEARCHES_TOTAL PORTAL_SEARCHES_TOTAL} ({@code portal_search_total})</dt>
  * <dd>From request statistics: all-time count of requests with {@code VIEW_ID=view1} and {@code PROFILER_NAME=OSProfiler}.
  * Label {@code view} is the view id. Requires statistics DB settings.</dd>
@@ -253,6 +258,9 @@ public class StatisticsTask extends AbstractCustomTask {
 		"Request counts per source_id (BNHS / view / timeseries discovery) from OpenSearch statistics"),
 
 	OM_DOWNLOADS_TOTAL("om_downloads_total", "Request counts per source_id (OMProfiler / view) from OpenSearch statistics"),
+
+	SEARCH_ATTRIBUTE_TITLE_TOTAL("search_attribute_title_total",
+		"Request counts per DISCOVERY_MESSAGE_attributeTitle bucket (OSProfiler / view) from OpenSearch statistics"),
 
 	PORTAL_SEARCHES_TOTAL("portal_search_total",
 		"All-time OpenSearch request count for VIEW_ID=view1 and PROFILER_NAME=OSProfiler (label view)");
@@ -750,12 +758,14 @@ public class StatisticsTask extends AbstractCustomTask {
 
     /**
      * Registers OpenSearch-backed runtime metrics: {@link StatisticsMetric#STATION_PAGE_VISITS_TOTAL},
-     * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequestsByBucket}),
+     * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL}, {@link StatisticsMetric#SEARCH_ATTRIBUTE_TITLE_TOTAL}
+     * ({@link ElasticsearchClient#countRuntimeInfoRequestsByBucket}),
      * {@link StatisticsMetric#PORTAL_SEARCHES_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequests}).
      */
     private void registerElasticsearchRuntimeMetrics(PrometheusMeterRegistry registry, Set<StatisticsMetric> metrics,String viewId) {
 
 	if (!metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL) && !metrics.contains(StatisticsMetric.OM_DOWNLOADS_TOTAL)
+		&& !metrics.contains(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL)
 		&& !metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)) {
 	    return;
 	}
@@ -777,6 +787,7 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	Map<String, Double> stationVisits = new HashMap<>();
 	Map<String, Double> omDownloads = new HashMap<>();
+	Map<String, Double> searchAttributeTitleTotal = new HashMap<>();
 
 	if (metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL)) {
 	    try {
@@ -814,6 +825,23 @@ public class StatisticsTask extends AbstractCustomTask {
 	    }
 	}
 
+	if (metrics.contains(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL)) {
+	    try {
+		LogicalBond bond = BondFactory.createAndBond();
+		if (viewId != null) {
+		    bond.getOperands()
+			    .add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.VIEW_ID, viewId));
+		}
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.PROFILER_NAME,
+			PORTAL_SEARCHES_PROFILER_OS));
+		StatisticsResponse resp = es.countRuntimeInfoRequestsByBucket(bond, RuntimeInfoElement.DISCOVERY_MESSAGE_ATTRIBUTE_TITLE,
+			RUNTIME_STATS_MAX_BUCKETS);
+		searchAttributeTitleTotal.putAll(parseRuntimeInfoFrequencyByBucket(resp));
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("SEARCH_ATTRIBUTE_TITLE_TOTAL query failed: {}", e.getMessage());
+	    }
+	}
+
 	AtomicLong portalSearchesTotal = new AtomicLong(0L);
 	if (metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)) {
 	    try {
@@ -847,6 +875,15 @@ public class StatisticsTask extends AbstractCustomTask {
 	    Gauge.builder(StatisticsMetric.OM_DOWNLOADS_TOTAL.prometheusName(), omDownloads, g -> g.getOrDefault(sid, 0.0))//
 		    .description(StatisticsMetric.OM_DOWNLOADS_TOTAL.description())//
 		    .tag("source_id", sid)//
+		    .tag("view", viewId)//
+		    .register(registry);
+	}
+	for (String title : searchAttributeTitleTotal.keySet()) {
+	    final String t = title;
+	    Gauge.builder(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL.prometheusName(), searchAttributeTitleTotal,
+		    g -> g.getOrDefault(t, 0.0))//
+		    .description(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL.description())//
+		    .tag("attribute_title", t)//
 		    .tag("view", viewId)//
 		    .register(registry);
 	}

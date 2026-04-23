@@ -112,6 +112,8 @@ public enum RuntimeInfoElement implements Queryable {
     DISCOVERY_MESSAGE_ABSTRACT("DISCOVERY_MESSAGE_abstract"), //
     DISCOVERY_MESSAGE_SUBJECT("DISCOVERY_MESSAGE_subject"), //
     DISCOVERY_MESSAGE_TITLE("DISCOVERY_MESSAGE_title"), //
+    /** Attribute-title search (OpenSearch {@code attributeTitle} param); not resource title. */
+    DISCOVERY_MESSAGE_ATTRIBUTE_TITLE("DISCOVERY_MESSAGE_attributeTitle"), //
     DISCOVERY_MESSAGE_KEYWORD("DISCOVERY_MESSAGE_keyword"), //
     DISCOVERY_MESSAGE_ORGANISATION_NAME("DISCOVERY_MESSAGE_organisationName"), //
     DISCOVERY_MESSAGE_VIEW_ID("DISCOVERY_MESSAGE_VIEW_ID"), //
