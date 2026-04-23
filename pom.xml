@@ -2364,7 +2364,7 @@
         <!-- <module>demo-extensions-pack</module> -->
 
         <!-- drivers -->
-        <module>gs-driver-elasticsearch</module>
+        <module>elasticsearch-client</module>
 
         <module>runtime-info-provider</module>
 
