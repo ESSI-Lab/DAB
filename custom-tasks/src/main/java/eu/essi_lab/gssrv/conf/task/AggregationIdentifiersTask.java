@@ -67,7 +67,7 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.index.IndexedMetadataElement;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.discover.ResourcePropertyConstraintAdder;
+import eu.essi_lab.request.executor.impl.discover.ResourcePropertyConstraintAdder;
 
 /**
  * @author Fabrizio

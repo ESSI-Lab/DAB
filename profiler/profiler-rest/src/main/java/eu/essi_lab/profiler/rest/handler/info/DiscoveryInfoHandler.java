@@ -43,7 +43,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.rsf.impl.xml.gs.TermFrequencyMapFormatter;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
 
 /**
  * @author Fabrizio
@@ -93,8 +93,8 @@ public class DiscoveryInfoHandler extends RestInfoHandler {
 
     protected CountSet count(String requestId) throws GSException {
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	discoveryMessage.setRequestId(requestId);

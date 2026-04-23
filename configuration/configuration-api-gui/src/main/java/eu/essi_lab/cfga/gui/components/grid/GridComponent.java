@@ -169,7 +169,7 @@ public class GridComponent extends Grid<HashMap<String, String>> {
 		if (gmih.withBottomDivider()) {
 
 		    Hr hr = ComponentFactory.createHr();
-		    menu.add(hr);
+		    menu.addComponent(hr);
 		}
 	    });
 	}

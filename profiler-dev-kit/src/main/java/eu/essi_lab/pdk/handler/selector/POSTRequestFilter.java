@@ -56,7 +56,7 @@ public class POSTRequestFilter extends PathRequestFilter {
 
 	return postRequest //
 		&& accept(request.getBodyStream())//
-		&& (!acceptPath.isPresent() || acceptPath.get());
+		&& (acceptPath.isEmpty() || acceptPath.get());
     }
 
     /**

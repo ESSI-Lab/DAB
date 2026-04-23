@@ -10,12 +10,12 @@ package eu.essi_lab.pdk.rsm.impl.json.jsapi;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -180,19 +180,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	// hierarchy level code
 	// --------------------
 
-	mi_Metadata.getHierarchyLevelScopeCodeListValues().forEachRemaining(value -> {
-
-	    report.put("hierarchyLevel", value);
-	});
+	mi_Metadata.getHierarchyLevelScopeCodeListValues().forEachRemaining(value -> report.put("hierarchyLevel", value));
 
 	// --------------------------
 	// raster mosaic
 	// --------------------------
 
-	resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> {
-
-	    report.put("rasterMosaic", mosaic);
-	});
+	resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> report.put("rasterMosaic", mosaic));
 
 	// --------------------------------------------
 	// distributor and owner org.name from contacts
@@ -203,10 +197,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	ArrayList<ResponsibleParty> contacts = Lists.newArrayList(mi_Metadata.getContacts());//
 
-	contacts.forEach(contact -> {
-
-	    handleOrgName(contact, ownerOrgNameArray, distOrgNameArray);
-	});
+	contacts.forEach(contact -> handleOrgName(contact, ownerOrgNameArray, distOrgNameArray));
 
 	// -----------
 	// native EPSG

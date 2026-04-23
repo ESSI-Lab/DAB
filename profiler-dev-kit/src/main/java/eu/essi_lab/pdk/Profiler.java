@@ -62,7 +62,7 @@ import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.rsm.MappingSchema;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 
@@ -124,7 +124,7 @@ import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
  * <tr>
  * <td style="background-color: yellow">Harmonized discovery response</td>
  * <td>represented by {@link ResultSet} of {@link GSResource}s</td>
- * <td>provided by internal implementation of {@link IDiscoveryExecutor}</td>
+ * <td>provided by internal implementation of {@link DiscoveryExecutor}</td>
  * </tr>
  * <tr>
  * <td style="background-color: orange">Service metadata records</td>
@@ -379,10 +379,8 @@ public abstract class Profiler<PS extends ProfilerSetting> implements Configurab
 		WebRequestValidator validator = null;
 		RequestType requestType = null;
 
-		if (handler instanceof ProfilerHandler) {
+		if (handler instanceof @SuppressWarnings("rawtypes")ProfilerHandler dh) {
 
-		    @SuppressWarnings("rawtypes")
-		    ProfilerHandler dh = (ProfilerHandler) handler;
 		    validator = dh.getRequestTransformer();
 
 		    if (handler instanceof DiscoveryHandler<?>) {

@@ -31,7 +31,6 @@ import eu.essi_lab.access.DataValidatorErrorCode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.pluggable.ESSILabProvider;
 import eu.essi_lab.model.pluggable.Provider;
 import eu.essi_lab.model.resource.GSResource;
@@ -41,7 +40,7 @@ import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataObject;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
-import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.AccessExecutor;
 
 public class LayerFeatureRetrieval {
 
@@ -67,12 +66,12 @@ public class LayerFeatureRetrieval {
 	    targetDescriptor.setDataType(DataType.VECTOR);
 	    targetDescriptor.setCRS(CRS.EPSG_4326());
 	    targetDescriptor.setDataFormat(DataFormat.WKT());
-	    ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
-	    IAccessExecutor accessExecutor = accessLoader.iterator().next();
+	    ServiceLoader<AccessExecutor> accessLoader = ServiceLoader.load(AccessExecutor.class);
+	    AccessExecutor accessExecutor = accessLoader.iterator().next();
 	    ResultSet<GSResource> resource = AccessQueryUtils.findResource(UUID.randomUUID().toString(), Optional.empty(), layerName);
-	    ResultSet<DataObject> retrieved = accessExecutor.retrieve(resource.getResultsList().get(0), layerName, targetDescriptor);
+	    ResultSet<DataObject> retrieved = accessExecutor.retrieve(resource.getResultsList().getFirst(), layerName, targetDescriptor);
 	    try {
-		File ff = retrieved.getResultsList().get(0).getFile();
+		File ff = retrieved.getResultsList().getFirst().getFile();
 		byte[] bytes = Files.readAllBytes(ff.toPath());
 		String str = new String(bytes);
 		ff.delete();

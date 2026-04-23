@@ -36,6 +36,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.UUID;
 
+import eu.essi_lab.request.executor.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -57,7 +58,6 @@ import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.ommdk.GMIResourceMapper;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
 
@@ -100,8 +100,8 @@ public class DuplicatedOnlineIdentifiersTask extends AbstractCustomTask {
     private void downloadData(String sourceId, String tmpSourcedir, boolean test) throws Exception {
 	int pageSize = 250;
 	File sourceDir = new File(tmpSourcedir);
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	discoveryMessage.setRequestId("duplicated-online-id-task-" + sourceId + "-" + UUID.randomUUID());

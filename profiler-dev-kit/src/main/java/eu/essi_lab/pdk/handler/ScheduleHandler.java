@@ -32,8 +32,8 @@ import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.count.AbstractCountResponse;
 import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.resource.ScheduleReport;
-import eu.essi_lab.request.executor.IRequestExecutor;
-import eu.essi_lab.request.executor.IScheduleExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
+import eu.essi_lab.request.executor.ScheduleExecutor;
 
 /**
  * @author Fabrizio
@@ -44,11 +44,10 @@ public class ScheduleHandler<M extends RequestMessage, I, O, CR extends Abstract
 
 	ProfilerHandler<RequestMessage, ScheduleReport, T, CountSet, ResultSet<ScheduleReport>, ResultSet<T>> {
 
-    @SuppressWarnings("unchecked")
     public ScheduleHandler(ProfilerHandler<M, I, O, CR, IN, OUT> workerHandler) {
 	super();
 
-	IScheduleExecutor<M, I, CR, IN> scheduleExecutor = (IScheduleExecutor<M, I, CR, IN>) getExecutor();
+	ScheduleExecutor<M, I, CR, IN> scheduleExecutor = (ScheduleExecutor<M, I, CR, IN>) getExecutor();
 
 	String workerHandlerClass = workerHandler.getClass().getName();
 	String workerMapperClass = workerHandler.getMessageResponseMapper().getClass().getName();
@@ -59,10 +58,10 @@ public class ScheduleHandler<M extends RequestMessage, I, O, CR extends Abstract
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected IRequestExecutor<RequestMessage, ScheduleReport, CountSet, ResultSet<ScheduleReport>> createExecutor() {
+    protected RequestExecutor<RequestMessage, ScheduleReport, CountSet, ResultSet<ScheduleReport>> createExecutor() {
 
-	ServiceLoader<IScheduleExecutor> loader = ServiceLoader.load(IScheduleExecutor.class);
-	for (IScheduleExecutor e : loader) {
+	ServiceLoader<ScheduleExecutor> loader = ServiceLoader.load(ScheduleExecutor.class);
+	for (ScheduleExecutor e : loader) {
 
 	    return e;
 	}

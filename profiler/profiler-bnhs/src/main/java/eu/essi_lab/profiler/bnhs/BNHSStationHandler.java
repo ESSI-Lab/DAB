@@ -81,7 +81,7 @@ import eu.essi_lab.pdk.SemanticSearchSupport;
 import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
@@ -143,8 +143,8 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 
 	    // String json = "[\n";
 
-	    ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor executor = loader.iterator().next();
+	    ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    DiscoveryExecutor executor = loader.iterator().next();
 
 	    DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

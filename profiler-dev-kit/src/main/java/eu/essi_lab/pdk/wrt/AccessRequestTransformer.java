@@ -34,7 +34,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.pdk.handler.AccessHandler;
-import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.AccessExecutor;
 
 /**
  * Validates and transforms an "access query" in the correspondent {@link AccessMessage}. The access query is
@@ -129,7 +129,7 @@ public abstract class AccessRequestTransformer extends WebRequestTransformer<Acc
      * 	  An empty optional means that no transformation is required, so the data will be downloaded and returned
      *           as it is.<br>
      *           Otherwise, the returned {@link DataDescriptor} should has only the properties that require a
-     *           transformation. The missing properties are added by the {@link IAccessExecutor} implementation using
+     *           transformation. The missing properties are added by the {@link AccessExecutor} implementation using
      *           the {@link DataDescriptor#fillMissingInformationOf(DataDescriptor)} method
      * @param request the {@link WebRequest} triggered by the {@link AccessProfiler} supported client
      * @return {@link Optional} possible empty which describes a {@link DataDescriptor} representing the supplied

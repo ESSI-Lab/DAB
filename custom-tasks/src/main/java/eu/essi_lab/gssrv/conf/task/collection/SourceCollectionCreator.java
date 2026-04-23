@@ -64,8 +64,7 @@ import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
+import eu.essi_lab.request.executor.*;
 
 class SourceCollectionCreator {
 
@@ -306,8 +305,8 @@ class SourceCollectionCreator {
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 	// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 
-	ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	IStatisticsExecutor executor = loader.iterator().next();
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
 
 	// pagination works with grouped results. in this case there is one result item for each
 	// source/country/etc.
@@ -378,8 +377,8 @@ class SourceCollectionCreator {
 
     protected HashSet<PropertyResult> getProperties(String sourceId) throws GSException {
 	HashSet<PropertyResult> ret = new HashSet<>();
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

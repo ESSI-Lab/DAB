@@ -21,15 +21,11 @@ package eu.essi_lab.profiler.worldcereal.handler.discover;
  * #L%
  */
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,8 +43,6 @@ import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -57,7 +51,6 @@ import eu.essi_lab.messages.ReducedDiscoveryMessage;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
-import eu.essi_lab.messages.ValidationException;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.bond.Bond;
@@ -65,16 +58,14 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.parser.DiscoveryBondParser;
 import eu.essi_lab.messages.bond.parser.ParentIdBondHandler;
-import eu.essi_lab.messages.count.CountSet;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.handler.DiscoveryHandler;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.discover.BondReducer;
-import eu.essi_lab.request.executor.discover.QueryInitializer;
+import eu.essi_lab.request.executor.DiscoveryExecutor;
+import eu.essi_lab.request.executor.impl.discover.BondReducer;
+import eu.essi_lab.request.executor.impl.discover.QueryInitializer;
 
 public class WorldCerealHandler extends DiscoveryHandler<String> {
 
@@ -147,8 +138,8 @@ public class WorldCerealHandler extends DiscoveryHandler<String> {
 
 		String parentid = getParentId(reducedMessage);
 
-		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-		IDiscoveryExecutor executor = loader.iterator().next();
+		ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+		DiscoveryExecutor executor = loader.iterator().next();
 		DiscoveryMessage discMessage = new DiscoveryMessage();
 		discMessage.setRequestId(rid);
 		discMessage.setUserBond(BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.IDENTIFIER, parentid));

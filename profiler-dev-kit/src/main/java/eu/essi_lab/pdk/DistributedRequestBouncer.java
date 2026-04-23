@@ -396,7 +396,7 @@ public class DistributedRequestBouncer extends AbstractRequestBouncer {
 		    // if facilitate other ip mode is active and
 		    // if a request from the same ip is executed then:
 		    // it sleeps a bit to facilitate executions from different ips
-		    if (facilitateOtherIps && executingOnIp.size() > 0) {
+		    if (facilitateOtherIps && !executingOnIp.isEmpty()) {
 			List<String> requests = jedis.lrange(getPrefix() + REQUESTS_KEY, 0, -1);
 			boolean otherWaiting = false;
 			for (String reqId : requests) {
@@ -425,7 +425,6 @@ public class DistributedRequestBouncer extends AbstractRequestBouncer {
 		    } else {
 			// some other thread has executed before
 			sleep();
-			continue;
 		    }
 		}
 	    } catch (Exception e) {

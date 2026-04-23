@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.Set;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.xml.bind.JAXBElement;
 
@@ -94,8 +95,6 @@ import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.sos.SOSUtils;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
-import eu.essi_lab.request.executor.IStatisticsExecutor;
 
 /**
  * @author boldrini
@@ -195,8 +194,8 @@ public class SOSCapabilitiesHandler extends DefaultRequestHandler {
 
 	    statisticsMessage.computeSum(Arrays.asList(MetadataElement.DATA_SIZE));
 
-	    ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-	    IStatisticsExecutor executor = loader.iterator().next();
+	    ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	    StatisticsExecutor executor = loader.iterator().next();
 
 	    StatisticsResponse response = executor.compute(statisticsMessage);
 
@@ -274,8 +273,8 @@ public class SOSCapabilitiesHandler extends DefaultRequestHandler {
 
 	    List<Offering> offerings = new ArrayList<>();
 
-	    ServiceLoader<IDiscoveryExecutor> discoveryLoader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    IDiscoveryExecutor discoveryExecutor = discoveryLoader.iterator().next();
+	    ServiceLoader<DiscoveryExecutor> discoveryLoader = ServiceLoader.load(DiscoveryExecutor.class);
+	    DiscoveryExecutor discoveryExecutor = discoveryLoader.iterator().next();
 
 	    DiscoveryMessage message = new DiscoveryMessage();
 

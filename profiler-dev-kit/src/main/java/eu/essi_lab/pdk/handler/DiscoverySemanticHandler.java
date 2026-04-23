@@ -34,8 +34,8 @@ import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
 import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
 import eu.essi_lab.pdk.wrt.DiscoverySemanticRequestTransformer;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoverySemanticExecutor;
-import eu.essi_lab.request.executor.IRequestExecutor;
+import eu.essi_lab.request.executor.DiscoverySemanticExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
 
 /**
  * @author Fabrizio
@@ -49,10 +49,10 @@ public class DiscoverySemanticHandler<T>
     }
 
     @Override
-    protected IRequestExecutor<DiscoverySemanticMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
+    protected RequestExecutor<DiscoverySemanticMessage, GSResource, CountSet, ResultSet<GSResource>> createExecutor() {
 
-	ServiceLoader<IDiscoverySemanticExecutor> loader = ServiceLoader.load(IDiscoverySemanticExecutor.class);
-	for (IDiscoverySemanticExecutor e : loader) {
+	ServiceLoader<DiscoverySemanticExecutor> loader = ServiceLoader.load(DiscoverySemanticExecutor.class);
+	for (DiscoverySemanticExecutor e : loader) {
 
 	    return e;
 	}

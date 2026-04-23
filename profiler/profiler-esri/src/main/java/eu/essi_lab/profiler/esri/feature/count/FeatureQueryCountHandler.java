@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.esri.feature.count;
 import java.io.ByteArrayInputStream;
 import java.util.ServiceLoader;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -45,7 +46,6 @@ import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.profiler.esri.feature.query.ESRIRequest;
 import eu.essi_lab.profiler.esri.feature.query.FeatureQueryRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 /**
  * @author boldrini
@@ -61,8 +61,8 @@ public class FeatureQueryCountHandler implements WebRequestHandler, WebRequestVa
 
 	JSONObject ret = new JSONObject();
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	FeatureQueryRequestTransformer transformer = new FeatureQueryRequestTransformer();
 	DiscoveryMessage discoveryMessage = transformer.transform(request);

@@ -47,7 +47,7 @@ public class AccessResultSetFormatterAttachment extends AccessResultSetFormatter
 	    return handleException(message, mappedResultSet, errors);
 	}
 
-	DataObject dataObject = mappedResultSet.getResultsList().get(0);
+	DataObject dataObject = mappedResultSet.getResultsList().getFirst();
 
 	ResponseBuilder builder = getBuilder(dataObject);
 

@@ -24,7 +24,6 @@ package eu.essi_lab.access.augmenter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -57,7 +56,6 @@ import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
-import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.augmenter.ResourceAugmenter;
@@ -86,7 +84,7 @@ import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataObject;
-import eu.essi_lab.request.executor.IAccessExecutor;
+import eu.essi_lab.request.executor.AccessExecutor;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 
 /**
@@ -324,8 +322,8 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		}
 	    }
 	    targetDescriptor.setTemporalDimension(begin, end);
-	    ServiceLoader<IAccessExecutor> accessLoader = ServiceLoader.load(IAccessExecutor.class);
-	    IAccessExecutor accessExecutor = accessLoader.iterator().next();
+	    ServiceLoader<AccessExecutor> accessLoader = ServiceLoader.load(AccessExecutor.class);
+	    AccessExecutor accessExecutor = accessLoader.iterator().next();
 
 	    ResultSet<DataObject> retrieved = retrieveAndCatch(accessExecutor, resource, onlineId, targetDescriptor);
 
@@ -750,7 +748,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
      * @param targetDescriptor
      * @return
      */
-    private ResultSet<DataObject> retrieveAndCatch(IAccessExecutor accessExecutor, GSResource resource, String onlineId,
+    private ResultSet<DataObject> retrieveAndCatch(AccessExecutor accessExecutor, GSResource resource, String onlineId,
 	    DataDescriptor targetDescriptor) {
 
 	try {

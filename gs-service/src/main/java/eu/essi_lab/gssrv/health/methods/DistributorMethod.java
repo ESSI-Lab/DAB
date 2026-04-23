@@ -23,7 +23,7 @@ package eu.essi_lab.gssrv.health.methods;
 
 import eu.essi_lab.configuration.ExecutionMode;
 import eu.essi_lab.gssrv.health.GSPingMethod;
-import eu.essi_lab.request.executor.discover.Distributor;
+import eu.essi_lab.request.executor.impl.discover.DistributorImpl;
 
 /**
  * @author Fabrizio
@@ -38,7 +38,7 @@ public class DistributorMethod implements GSPingMethod {
     @Override
     public void ping() throws Exception {
 
-	int timeouts = Distributor.getTimeoutErrorsDuringCount();
+	int timeouts = DistributorImpl.getTimeoutErrorsDuringCount();
 
 	if (timeouts > MAX_DISTRIBUTOR_TIMEOUT_ERRORS) {
 
@@ -49,7 +49,7 @@ public class DistributorMethod implements GSPingMethod {
     @Override
     public String getDescription() {
 
-	return "Verifies that no errors occur during the count execution in the Distributor";
+	return "Verifies that no errors occur during the count execution in the DistributorImpl";
     }
 
     @Override

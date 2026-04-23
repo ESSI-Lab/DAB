@@ -21,7 +21,6 @@ package eu.essi_lab.pdk.rsm.access;
  * #L%
  */
 
-import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.concurrent.TimeUnit;
@@ -37,12 +36,10 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.*;
 
 public class AccessQueryUtils {
 
@@ -77,8 +74,8 @@ public class AccessQueryUtils {
 	    }
 	}
 
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	discoveryMessage.setRequestId(requestId);
@@ -86,7 +83,7 @@ public class AccessQueryUtils {
 	discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
 	discoveryMessage.setPage(new Page(1, 1));
 
-	view.ifPresent(v -> discoveryMessage.setView(v));
+	view.ifPresent(discoveryMessage::setView);
 
 	discoveryMessage.setSources(view.isPresent() //
 		? ConfigurationWrapper.getViewSources(view.get()) //

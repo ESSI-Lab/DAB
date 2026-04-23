@@ -97,7 +97,7 @@ public class ProxyCache {
 		IOUtils.copy(c, baos);
 		c.close();
 		baos.close();
-		body = new String(baos.toByteArray());
+		body = baos.toString();
 	    } catch (IOException e) {
 		e.printStackTrace();
 	    }
@@ -125,8 +125,7 @@ public class ProxyCache {
 	if (entity instanceof StreamingOutput) {
 	    // not to be cached
 	    return null;
-	} else if (entity instanceof String) {
-	    String stringEntity = (String) entity;
+	} else if (entity instanceof String stringEntity) {
 	    originalInputStream = new ByteArrayInputStream(stringEntity.getBytes());
 	} else if (entity instanceof InputStream) {
 	    originalInputStream = (InputStream) entity;

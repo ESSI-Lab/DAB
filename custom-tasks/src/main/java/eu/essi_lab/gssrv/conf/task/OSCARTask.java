@@ -15,6 +15,7 @@ import java.util.UUID;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 
+import eu.essi_lab.request.executor.*;
 import org.json.JSONObject;
 
 /*-
@@ -64,14 +65,12 @@ import eu.essi_lab.messages.SortedFields;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WIGOS_MAPPER;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 public class OSCARTask extends AbstractCustomTask {
 
@@ -236,8 +235,8 @@ public class OSCARTask extends AbstractCustomTask {
 		    discoveryMessage.setSearchAfter(searchAfter);
 		}
 
-		ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-		IDiscoveryExecutor executor = loader.iterator().next();
+		ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+		DiscoveryExecutor executor = loader.iterator().next();
 		ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 		if (resultSet.getSearchAfter().isPresent()) {
 		    searchAfter = resultSet.getSearchAfter().get();

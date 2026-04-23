@@ -43,7 +43,7 @@ import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wfs.WFSProfiler;
 import eu.essi_lab.profiler.wfs.WFSQueryHandler;
 import eu.essi_lab.profiler.wfs.WFSRequest.Parameter;
-import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
+import eu.essi_lab.request.executor.DiscoveryNodeExecutor;
 
 public class GetFeatureQueryHandler extends WFSQueryHandler {
 
@@ -79,8 +79,8 @@ public class GetFeatureQueryHandler extends WFSQueryHandler {
 
 	FeatureType featureType = findFeatureType(type);
 
-	ServiceLoader<IDiscoveryNodeExecutor> loader = ServiceLoader.load(IDiscoveryNodeExecutor.class);
-	IDiscoveryNodeExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryNodeExecutor> loader = ServiceLoader.load(DiscoveryNodeExecutor.class);
+	DiscoveryNodeExecutor executor = loader.iterator().next();
 
 	ResultSet<Node> resultSet = null;
 	ResultSet<Node> tmpResultSet = new ResultSet<>();

@@ -56,7 +56,7 @@ public class PUTRequestFilter extends PathRequestFilter {
 
 	return putRequest //
 		&& accept(request.getBodyStream())//
-		&& (!acceptPath.isPresent() || acceptPath.get());
+		&& (acceptPath.isEmpty() || acceptPath.get());
     }
 
     /**

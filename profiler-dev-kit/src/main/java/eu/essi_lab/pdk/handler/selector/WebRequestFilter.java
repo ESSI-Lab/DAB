@@ -47,5 +47,5 @@ public interface WebRequestFilter {
      * @see HandlerSelector
      * @see Profiler#getSelector()
      */
-    public boolean accept(WebRequest request) throws GSException;
+    boolean accept(WebRequest request) throws GSException;
 }

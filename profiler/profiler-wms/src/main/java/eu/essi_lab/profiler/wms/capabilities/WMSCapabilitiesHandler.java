@@ -33,6 +33,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
 
@@ -85,7 +86,6 @@ import eu.essi_lab.model.resource.data.dimension.DataDimension;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.wms.WMSProfilerSetting;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
 
 /**
  * @author boldrini
@@ -190,8 +190,8 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 
 			// computes union of bboxes
 
-			ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-			IDiscoveryExecutor executor = loader.iterator().next();
+			ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+			DiscoveryExecutor executor = loader.iterator().next();
 
 			ResultSet<GSResource> response = executor.retrieve(discoveryMessage);
 

@@ -81,12 +81,11 @@ import eu.essi_lab.model.SortOrder;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.resource.BNHSProperty;
 import eu.essi_lab.model.resource.MetadataElement;
-import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.esri.feature.ESRIFieldType;
 import eu.essi_lab.profiler.esri.feature.FeatureLayer;
 import eu.essi_lab.profiler.esri.feature.Field;
-import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
+import eu.essi_lab.request.executor.DiscoveryNodeExecutor;
 
 public class CachedCollections {
     private static CachedCollections instance = new CachedCollections();
@@ -133,8 +132,8 @@ public class CachedCollections {
 		try {
 		    DefaultFeatureCollection c = new DefaultFeatureCollection();
 
-		    ServiceLoader<IDiscoveryNodeExecutor> loader = ServiceLoader.load(IDiscoveryNodeExecutor.class);
-		    IDiscoveryNodeExecutor executor = loader.iterator().next();
+		    ServiceLoader<DiscoveryNodeExecutor> loader = ServiceLoader.load(DiscoveryNodeExecutor.class);
+		    DiscoveryNodeExecutor executor = loader.iterator().next();
 
 		    ResultSet<Node> resultSet = null;
 		    ResultSet<Node> tmpResultSet = new ResultSet<>();

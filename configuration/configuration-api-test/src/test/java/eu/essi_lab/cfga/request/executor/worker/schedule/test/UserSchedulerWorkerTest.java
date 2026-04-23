@@ -7,7 +7,7 @@ import eu.essi_lab.cfga.request.executor.test.TestMessageResponseMapper;
 import eu.essi_lab.cfga.request.executor.test.TestProfilerHandler;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.request.executor.schedule.UserSchedulerWorker;
+import eu.essi_lab.request.executor.impl.schedule.UserSchedulerWorker;
 
 /**
  * This test implementation do not execute the request, it is used to

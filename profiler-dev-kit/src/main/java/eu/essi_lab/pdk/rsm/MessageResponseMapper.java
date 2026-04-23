@@ -70,7 +70,7 @@ public interface MessageResponseMapper<//
      * @return the mapped {@link MessageResponse}
      * @throws GSException
      */
-    public OUT map(M message, IN messageResponse) throws GSException;
+    OUT map(M message, IN messageResponse) throws GSException;
 
     /**
      * Returns the mapping schema also used by the factories to load one or more
@@ -78,6 +78,6 @@ public interface MessageResponseMapper<//
      * 
      * @return a non <code>null</code> {@link MappingSchema}
      */
-    public MappingSchema getMappingSchema();
+    MappingSchema getMappingSchema();
 
 }

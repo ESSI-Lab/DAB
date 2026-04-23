@@ -51,7 +51,7 @@ import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.pdk.wrt.AccessRequestTransformer;
 import eu.essi_lab.profiler.thredds.THREDDSProfilerSetting;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.*;
 
 public class NCSSTransformer extends AccessRequestTransformer {
 
@@ -108,8 +108,8 @@ public class NCSSTransformer extends AccessRequestTransformer {
     }
 
     private DataDescriptor getDefaultDescriptor(String requestId, String onlineIdentifier) throws GSException {
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 	discoveryMessage.setRequestId(requestId);

@@ -85,7 +85,7 @@ public abstract class SemanticResponseMapper<T> implements
 
 	    GSKnowledgeResourceDescription object = parentObject.get();
 	    T parent = mapParentConcept(object);
-	    out.setParentObject((T) parent);
+	    out.setParentObject(parent);
 	}
 
 	return out;
@@ -137,7 +137,7 @@ public abstract class SemanticResponseMapper<T> implements
 
 	List<PathSegment> pathSegments = uriInfo.getPathSegments();
 
-	PathSegment lastSegment = pathSegments.get(pathSegments.size() - 1);
+	PathSegment lastSegment = pathSegments.getLast();
 
 	T object = null;
 

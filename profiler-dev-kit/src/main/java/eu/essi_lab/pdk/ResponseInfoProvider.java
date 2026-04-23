@@ -66,8 +66,8 @@ public class ResponseInfoProvider implements RuntimeInfoProvider {
 	if (values == null) {
 	    return null;
 	} else {
-	    List<String> stringValues = new ArrayList<String>(values.size());
-	    HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
+	    List<String> stringValues = new ArrayList<>(values.size());
+	    HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.getFirst());
 	    for (Object value : values) {
 		String actualValue = hd == null ? value.toString() : hd.toString(value);
 		stringValues.add(actualValue);

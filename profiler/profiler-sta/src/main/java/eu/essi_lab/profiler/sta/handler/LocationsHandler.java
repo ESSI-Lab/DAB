@@ -21,7 +21,6 @@
 
 package eu.essi_lab.profiler.sta.handler;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -57,7 +56,7 @@ import eu.essi_lab.profiler.sta.STARequest;
 import eu.essi_lab.profiler.sta.ThingsTransformer;
 import eu.essi_lab.pdk.handler.StreamingRequestHandler;
 import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
-import eu.essi_lab.request.executor.IDiscoveryStringExecutor;
+import eu.essi_lab.request.executor.DiscoveryStringExecutor;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -68,13 +67,13 @@ import jakarta.ws.rs.core.StreamingOutput;
  */
 public class LocationsHandler extends StreamingRequestHandler {
 
-    private IDiscoveryStringExecutor executor;
+    private DiscoveryStringExecutor executor;
     private DatabaseExecutor databaseExecutor;
 
     public LocationsHandler() {
 	try {
-	    ServiceLoader<IDiscoveryStringExecutor> loader = ServiceLoader.load(IDiscoveryStringExecutor.class);
-	    Iterator<IDiscoveryStringExecutor> it = loader.iterator();
+	    ServiceLoader<DiscoveryStringExecutor> loader = ServiceLoader.load(DiscoveryStringExecutor.class);
+	    Iterator<DiscoveryStringExecutor> it = loader.iterator();
 	    executor = it.hasNext() ? it.next() : null;
 	} catch (Exception e) {
 	    executor = null;

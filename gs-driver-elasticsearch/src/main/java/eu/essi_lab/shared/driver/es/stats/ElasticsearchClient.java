@@ -268,6 +268,262 @@ public class ElasticsearchClient {
     }
 
     /**
+     * Counts documents in the {@code {dbName}-request} index matching the given bond. Temporal filters should be
+     * expressed as {@link RuntimeInfoElementBond}s (e.g. range on {@link RuntimeInfoElement#CHRONOMETER_TIME_STAMP} or
+     * millis fields that normalize to it), combined with {@link LogicalBond} AND as in {@link #compute(StatisticsMessage)}.
+     *
+     * @param bond normalized bond (typically AND of {@link RuntimeInfoElementBond}s); may be {@code null} to count all
+     *        documents
+     * @return number of matching requests
+     */
+    public long countRuntimeInfoRequests(Bond bond) throws GSException {
+
+	try {
+
+	    BoolQueryBuilder query = buildBoolQueryFromRuntimeInfoBonds(bond);
+	    CountRequest countRequest = new CountRequest(dbName + "-request");
+	    countRequest.query(query);
+	    CountResponse countResponse = client.count(countRequest, RequestOptions.DEFAULT);
+	    return countResponse.getCount();
+
+	} catch (Exception e) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    e); //
+	}
+    }
+
+    /**
+     * Like {@link #countRuntimeInfoRequests(Bond)} but adds a terms aggregation on the given {@link RuntimeInfoElement}
+     * (e.g. {@link RuntimeInfoElement#VIEW_ID} for counts per view). Uses the same {@code .keyword} subfield as
+     * {@link #compute(StatisticsMessage)} frequency queries. For {@link RuntimeInfoElement#DISCOVERY_MESSAGE_BBOX},
+     * delegates to the existing bbox-by-region implementation.
+     *
+     * @param bond       filter bond; may be {@code null}
+     * @param bucketField field to aggregate on
+     * @param maxBuckets  max number of terms buckets (must be positive)
+     */
+    /**
+     * Same as {@link #countRuntimeInfoRequestsByBucket(Bond, RuntimeInfoElement, int)} with {@code maxBuckets = 10000}.
+     */
+    public StatisticsResponse countRuntimeInfoRequestsByBucket(Bond bond, RuntimeInfoElement bucketField) throws GSException {
+
+	return countRuntimeInfoRequestsByBucket(bond, bucketField, 10000);
+    }
+
+    public StatisticsResponse countRuntimeInfoRequestsByBucket(Bond bond, RuntimeInfoElement bucketField, int maxBuckets)
+	    throws GSException {
+
+	if (bucketField == null) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "bucketField is required", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    (Throwable) null);
+	}
+
+	if (maxBuckets < 1) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "maxBuckets must be >= 1", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    (Throwable) null);
+	}
+
+	GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_STARTED);
+
+	StatisticsResponse ret = new StatisticsResponse();
+
+	try {
+
+	    BoolQueryBuilder query = buildBoolQueryFromRuntimeInfoBonds(bond);
+	    SearchRequest searchRequest = new SearchRequest(dbName + "-request");
+	    SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+	    searchRequest.source(sourceBuilder);
+	    sourceBuilder.query(query);
+	    sourceBuilder.from(0);
+	    sourceBuilder.size(0);
+	    sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+
+	    if (bucketField.equals(RuntimeInfoElement.DISCOVERY_MESSAGE_BBOX)) {
+
+		return computeBBOX(bucketField.getName(), searchRequest, sourceBuilder, query);
+	    }
+
+	    TermsAggregationBuilder aggregation = AggregationBuilders.terms("runtime_info_bucket").field(termsAggregationFieldName(bucketField));
+	    aggregation.size(maxBuckets);
+	    sourceBuilder.aggregation(aggregation);
+
+	    SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+
+	    Aggregations aggregations = searchResponse.getAggregations();
+	    if (aggregations == null) {
+
+		ret.setItemsCount(0);
+		return ret;
+	    }
+
+	    Aggregation aggregationResult = aggregations.get("runtime_info_bucket");
+	    if (!(aggregationResult instanceof ParsedStringTerms)) {
+
+		ret.setItemsCount(0);
+		return ret;
+	    }
+
+	    ResponseItem responseItem = new ResponseItem();
+	    ret.getItems().add(responseItem);
+	    ComputationResult frequencyResult = new ComputationResult();
+	    frequencyResult.setTarget(bucketField.getName());
+	    responseItem.addFrequency(frequencyResult);
+	    ParsedStringTerms pst = (ParsedStringTerms) aggregationResult;
+	    List<? extends Bucket> buckets = pst.getBuckets();
+	    String frequencyValue = "";
+	    for (Bucket bucket : buckets) {
+		frequencyValue += URLEncoder.encode(bucket.getKeyAsString(), "UTF-8") + ComputationResult.FREQUENCY_ITEM_SEP
+			+ bucket.getDocCount() + " ";
+	    }
+	    frequencyResult.setValue(frequencyValue.trim());
+	    ret.setItemsCount(1);
+
+	    GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_ENDED);
+
+	    return ret;
+
+	} catch (Exception e) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    e); //
+	}
+    }
+
+    /**
+     * OpenSearch terms aggregation field name for a {@link RuntimeInfoElement}, aligned with {@link #compute(StatisticsMessage)}.
+     */
+    private String termsAggregationFieldName(RuntimeInfoElement bucketField) {
+
+	return bucketField.getName() + ".keyword";
+    }
+
+    /**
+     * Builds a bool query from {@link RuntimeInfoElementBond} operands (same rules as {@link #compute(StatisticsMessage)}).
+     */
+    private BoolQueryBuilder buildBoolQueryFromRuntimeInfoBonds(Bond bond) {
+
+	BoolQueryBuilder query = QueryBuilders.boolQuery();
+	if (bond == null) {
+	    return query;
+	}
+	Set<Bond> bonds = new HashSet<>();
+	if (bond instanceof LogicalBond) {
+	    LogicalBond logicalBond = (LogicalBond) bond;
+	    if (logicalBond.getLogicalOperator().equals(LogicalOperator.AND)) {
+		for (Bond b : logicalBond.getOperands()) {
+		    bonds.add(b);
+		}
+	    } else {
+		bonds.add(logicalBond);
+	    }
+	} else {
+	    bonds.add(bond);
+	}
+	for (Bond b : bonds) {
+	    if (b != null) {
+		if (b instanceof LogicalBond) {
+		    LogicalBond lb = (LogicalBond) b;
+		    if (lb.getLogicalOperator().equals(LogicalOperator.NOT)) {
+			Bond fo = lb.getFirstOperand();
+			if (fo instanceof RuntimeInfoElementBond) {
+			    RuntimeInfoElementBond rfo = (RuntimeInfoElementBond) fo;
+			    BondOperator negatedOperator = BondOperator.negate(rfo.getOperator());
+			    if (negatedOperator != null) {
+				rfo.setOperator(negatedOperator);
+				b = rfo;
+			    }
+			}
+		    }
+		}
+
+		if (b instanceof RuntimeInfoElementBond) {
+		    RuntimeInfoElementBond rieb = (RuntimeInfoElementBond) b;
+		    RuntimeInfoElement property = rieb.getProperty();
+		    String value = rieb.getPropertyValue();
+		    switch (property) {
+		    case CHRONOMETER_TIME_STAMP:
+		    case ACCESS_MESSAGE_TIME_STAMP:
+		    case BULK_DOWNLOAD_MESSAGE_TIME_STAMP:
+		    case DISCOVERY_MESSAGE_TIME_STAMP:
+		    case RESULT_SET_TIME_STAMP:
+		    case WEB_REQUEST_TIME_STAMP:
+			property = RuntimeInfoElement.CHRONOMETER_TIME_STAMP;
+			break;
+		    case WEB_REQUEST_TIME_STAMP_MILLIS:
+		    case CHRONOMETER_TIME_STAMP_MILLIS:
+		    case ACCESS_MESSAGE_TIME_STAMP_MILLIS:
+		    case BULK_DOWNLOAD_MESSAGE_TIME_STAMP_MILLIS:
+		    case DISCOVERY_MESSAGE_TIME_STAMP_MILLIS:
+		    case PROFILER_TIME_STAMP_MILLIS:
+		    case RESULT_SET_TIME_STAMP_MILLIS:
+			property = RuntimeInfoElement.CHRONOMETER_TIME_STAMP;
+			value = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.parseLong(value)));
+			break;
+		    default:
+			break;
+		    }
+		    BondOperator operator = rieb.getOperator();
+		    QueryBuilder qb = null;
+		    boolean unexpected = false;
+		    switch (operator) {
+		    case LESS:
+			qb = QueryBuilders.rangeQuery(property.getName()).lt(value);
+			break;
+		    case LESS_OR_EQUAL:
+			qb = QueryBuilders.rangeQuery(property.getName()).lte(value);
+			break;
+		    case GREATER:
+			qb = QueryBuilders.rangeQuery(property.getName()).gt(value);
+			break;
+		    case GREATER_OR_EQUAL:
+			qb = QueryBuilders.rangeQuery(property.getName()).gte(value);
+			break;
+		    case EQUAL:
+			qb = QueryBuilders.termQuery(property.getName() + ".keyword", value);
+			break;
+		    default:
+			unexpected = true;
+			break;
+		    }
+		    if (!unexpected) {
+			if (qb != null) {
+			    query.must(qb);
+			}
+		    }
+		}
+	    }
+	}
+	return query;
+    }
+
+    /**
      * @param message
      * @return
      * @throws GSException
@@ -300,95 +556,8 @@ public class ElasticsearchClient {
 
 	try {
 
-	    BoolQueryBuilder query = QueryBuilders.boolQuery();
 	    Bond bond = message.getNormalizedBond();
-	    Set<Bond> bonds = new HashSet<>();
-	    if (bond instanceof LogicalBond) {
-		LogicalBond logicalBond = (LogicalBond) bond;
-		if (logicalBond.getLogicalOperator().equals(LogicalOperator.AND)) {
-		    for (Bond b : logicalBond.getOperands()) {
-			bonds.add(b);
-		    }
-		} else {
-		    bonds.add(logicalBond);
-		}
-	    } else {
-		bonds.add(bond);
-	    }
-	    for (Bond b : bonds) {
-		if (b != null) {
-		    if (b instanceof LogicalBond) {
-			LogicalBond lb = (LogicalBond) b;
-			if (lb.getLogicalOperator().equals(LogicalOperator.NOT)) {
-			    Bond fo = lb.getFirstOperand();
-			    if (fo instanceof RuntimeInfoElementBond) {
-				RuntimeInfoElementBond rfo = (RuntimeInfoElementBond) fo;
-				BondOperator negatedOperator = BondOperator.negate(rfo.getOperator());
-				if (negatedOperator != null) {
-				    rfo.setOperator(negatedOperator);
-				    b = rfo;
-				}
-			    }
-			}
-		    }
-
-		    if (b instanceof RuntimeInfoElementBond) {
-			RuntimeInfoElementBond rieb = (RuntimeInfoElementBond) b;
-			RuntimeInfoElement property = rieb.getProperty();
-			String value = rieb.getPropertyValue();
-			switch (property) {
-			case CHRONOMETER_TIME_STAMP:
-			case ACCESS_MESSAGE_TIME_STAMP:
-			case BULK_DOWNLOAD_MESSAGE_TIME_STAMP:
-			case DISCOVERY_MESSAGE_TIME_STAMP:
-			case RESULT_SET_TIME_STAMP:
-			case WEB_REQUEST_TIME_STAMP:
-			    property = RuntimeInfoElement.CHRONOMETER_TIME_STAMP;
-			    break;
-			case WEB_REQUEST_TIME_STAMP_MILLIS:
-			case CHRONOMETER_TIME_STAMP_MILLIS:
-			case ACCESS_MESSAGE_TIME_STAMP_MILLIS:
-			case BULK_DOWNLOAD_MESSAGE_TIME_STAMP_MILLIS:
-			case DISCOVERY_MESSAGE_TIME_STAMP_MILLIS:
-			case PROFILER_TIME_STAMP_MILLIS:
-			case RESULT_SET_TIME_STAMP_MILLIS:
-			    property = RuntimeInfoElement.CHRONOMETER_TIME_STAMP;
-			    value = ISO8601DateTimeUtils.getISO8601DateTime(new Date(Long.parseLong(value)));
-			    break;
-			default:
-			    break;
-			}
-			BondOperator operator = rieb.getOperator();
-			QueryBuilder qb = null;
-			boolean unexpected = false;
-			switch (operator) {
-			case LESS:
-			    qb = QueryBuilders.rangeQuery(property.getName()).lt(value);
-			    break;
-			case LESS_OR_EQUAL:
-			    qb = QueryBuilders.rangeQuery(property.getName()).lte(value);
-			    break;
-			case GREATER:
-			    qb = QueryBuilders.rangeQuery(property.getName()).gt(value);
-			    break;
-			case GREATER_OR_EQUAL:
-			    qb = QueryBuilders.rangeQuery(property.getName()).gte(value);
-			    break;
-			case EQUAL:
-			    qb = QueryBuilders.termQuery(property.getName() + ".keyword", value);
-			    break;
-			default:
-			    unexpected = true;
-			    break;
-			}
-			if (!unexpected) {
-			    if (qb != null) {
-				query.must(qb);
-			    }
-			}
-		    }
-		}
-	    }
+	    BoolQueryBuilder query = buildBoolQueryFromRuntimeInfoBonds(bond);
 	    SearchRequest searchRequest = new SearchRequest(dbName + "-request");
 
 	    SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();

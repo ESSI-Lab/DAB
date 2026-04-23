@@ -48,7 +48,7 @@ import eu.essi_lab.pdk.handler.WebRequestHandler;
 import eu.essi_lab.pdk.validation.WebRequestValidator;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.esri.feature.FeatureLayer;
-import eu.essi_lab.request.executor.IDiscoveryNodeExecutor;
+import eu.essi_lab.request.executor.DiscoveryNodeExecutor;
 
 public class FeatureQueryHandler implements WebRequestHandler, WebRequestValidator {
 
@@ -100,8 +100,8 @@ public class FeatureQueryHandler implements WebRequestHandler, WebRequestValidat
 	    }
 	}
 
-	ServiceLoader<IDiscoveryNodeExecutor> loader = ServiceLoader.load(IDiscoveryNodeExecutor.class);
-	IDiscoveryNodeExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryNodeExecutor> loader = ServiceLoader.load(DiscoveryNodeExecutor.class);
+	DiscoveryNodeExecutor executor = loader.iterator().next();
 
 	ResultSet<Node> resultSet = null;
 	ResultSet<Node> tmpResultSet = new ResultSet<>();

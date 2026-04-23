@@ -138,8 +138,8 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 	    //
 	    // // computes union of bboxes
 	    //
-	    // ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	    // IDiscoveryExecutor executor = loader.iterator().next();
+	    // ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	    // DiscoveryExecutor executor = loader.iterator().next();
 	    //
 	    // ResultSet<GSResource> response = executor.retrieve(discoveryMessage);
 
@@ -320,8 +320,8 @@ public class WFSCapabilitiesHandler extends DefaultRequestHandler {
 		// set the user bond
 		statisticsMessage.setUserBond(bond);
 
-		ServiceLoader<IStatisticsExecutor> statsLoader = ServiceLoader.load(IStatisticsExecutor.class);
-		IStatisticsExecutor statsExecutor = statsLoader.iterator().next();
+		ServiceLoader<StatisticsExecutor> statsLoader = ServiceLoader.load(StatisticsExecutor.class);
+		StatisticsExecutor statsExecutor = statsLoader.iterator().next();
 
 		Page spage = new Page();
 		spage.setStart(1);

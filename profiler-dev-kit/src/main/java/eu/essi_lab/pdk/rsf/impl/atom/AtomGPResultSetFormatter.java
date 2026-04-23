@@ -74,7 +74,7 @@ public class AtomGPResultSetFormatter extends DiscoveryResultSetFormatter<String
 	out.append("http://www.georss.org/georss http://essi-lab.eu/schemas/geo-rss/geo_rss_1.1_specification.xsd  \n");
 	out.append("http://www.opengis.net/gml http://schemas.opengis.net/gml/3.1.1/base/gml.xsd\">  \n");
 	out.append("<title>Search results</title>  \n");
-	out.append("<id>" + UUID.randomUUID().toString() + "</id>  \n");
+	out.append("<id>" + UUID.randomUUID() + "</id>  \n");
 	out.append("<link href=\"" + message.getWebRequest().getUriInfo().getRequestUri().//
 		toString().//
 		replace("&", "&amp;").//
@@ -94,7 +94,7 @@ public class AtomGPResultSetFormatter extends DiscoveryResultSetFormatter<String
 	List<GSSource> sources = message.getSources();
 
 	boolean usgsSource = sources.size() == 1 && //
-		sources.get(0).getUniqueIdentifier().equals(USGS_EARTHQUAKE_SOURCE_ID);
+		sources.getFirst().getUniqueIdentifier().equals(USGS_EARTHQUAKE_SOURCE_ID);
 
 	if (!message.isOutputSources() && !usgsSource) {// the portal do not expects any map from a USGS Earthquake
 							// query
@@ -110,7 +110,7 @@ public class AtomGPResultSetFormatter extends DiscoveryResultSetFormatter<String
 		for (TermFrequencyItem termFrequencyItem : items) {
 		    Optional<String> firstTF = sources.stream().//
 			    filter(s -> s.getUniqueIdentifier().equals(termFrequencyItem.getTerm())).//
-			    map(s -> s.getLabel()).//
+			    map(GSSource::getLabel).//
 			    findFirst();
 		    if (firstTF.isPresent())
 			if(firstTF.get().contains("PANGAEA ‒ Data Publisher for Earth")) {

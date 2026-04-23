@@ -47,9 +47,9 @@ public abstract class AccessResultSetMapper<T>
 	// converts the incoming ResultSet<DataObject> in a ResultSet<T>
 	//
 	//
-	ResultSet<T> mappedResSet = new ResultSet<T>(resultSet);
+	ResultSet<T> mappedResSet = new ResultSet<>(resultSet);
 
-	List<T> out = new ArrayList<T>();
+	List<T> out = new ArrayList<>();
 	mappedResSet.setResultsList(out);
 
 	for (DataObject res : resultSet.getResultsList()) {

@@ -102,7 +102,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
     private String formatSourceEntry(GSSource gsSource) {
 
 	String out = "<entry>\n";
-	out += "   <title>" + gsSource.getLabel().toString().replace("&", "&amp;") + "</title>\n";
+	out += "   <title>" + gsSource.getLabel().replace("&", "&amp;") + "</title>\n";
 	out += "  <id>" + gsSource.getUniqueIdentifier() + "</id>\n";
 
 	out += "  <category label=\"service\" term=\"hlevel\"/> \n";
@@ -112,7 +112,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	//
 	// out += " <category label=\"" + gsSource.getLabel() + "\" term=\"serviceType\"/> \n";
 	out += "  <contributor> \n";
-	out += "     <orgName>" + gsSource.getLabel().toString().replace("&", "&amp;") + "</orgName> \n";
+	out += "     <orgName>" + gsSource.getLabel().replace("&", "&amp;") + "</orgName> \n";
 	out += "     <indName/> \n";
 	out += "     <email/> \n";
 	out += "     <role/> \n";
@@ -220,7 +220,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    filterResults(dist);
 
 	    String formats = StreamUtils.iteratorToStream(dist.getFormats()).//
-		    map(f -> f.getName()).//
+		    map(Format::getName).//
 		    filter(f -> f != null && !f.equals("")).//
 		    collect(Collectors.joining(" ")).//
 		    trim();
@@ -260,7 +260,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	getDataIdsStream(coreMetadata).flatMap(//
 		di -> StreamUtils.iteratorToStream(//
 			di.getKeywordsValues()))
-		.map(kwd -> encodeEntities(kwd)).//
+		.map(this::encodeEntities).//
 		forEach(kwd -> gpEntry.addCategory(kwd, "keywords"));
 
 	//
@@ -285,7 +285,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	//
 	Optional<DataIdentification> first = getDataIdsStream(coreMetadata).findFirst();
 
-	ResponsibleParty originator = first.isPresent() ? first.get().getPointOfContact("originator") : null;
+	ResponsibleParty originator = first.map(dataIdentification -> dataIdentification.getPointOfContact("originator")).orElse(null);
 	Iterator<ResponsibleParty> contacts = coreMetadata.getMIMetadata().getContacts();
 	if (originator == null && contacts.hasNext()) {
 	    while (contacts.hasNext()) {
@@ -347,12 +347,12 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // Parent network and / or other comment(s)
 	    List<String> parentNetworks = handler.getOriginatorOrganisationDescriptions();
 	    if (parentNetworks != null && !parentNetworks.isEmpty()) {
-		gpEntry.setGEOMountainsNetwork(parentNetworks.get(0));
+		gpEntry.setGEOMountainsNetwork(parentNetworks.getFirst());
 	    }
 	    // Operating Organisation
 	    List<String> opOrg = handler.getOriginatorOrganisationIdentifiers();
 	    if (opOrg != null && !opOrg.isEmpty()) {
-		gpEntry.setGEOMountainsOrg(opOrg.get(0));
+		gpEntry.setGEOMountainsOrg(opOrg.getFirst());
 	    }
 	    String resourceIdentifier = coreMetadata.getDataIdentification().getResourceIdentifier();
 	    if (resourceIdentifier != null && !resourceIdentifier.isEmpty()) {
@@ -360,12 +360,10 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    }
 
 	    Optional<String> category = handler.getThemeCategory();
-	    if (category.isPresent()) {
-		gpEntry.setGEOMountainsCategory(category.get());
-	    }
+	    category.ifPresent(gpEntry::setGEOMountainsCategory);
 
 	    Iterator<CoverageDescription> coverageDescr = coreMetadata.getMIMetadata().getCoverageDescriptions();
-	    List<String> list = new ArrayList<String>();
+	    List<String> list = new ArrayList<>();
 	    while (coverageDescr.hasNext()) {
 		String s = coverageDescr.next().getAttributeTitle();
 		list.add(s);
@@ -380,18 +378,13 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	// country
 	//
 	Optional<String> country = handler.getCountry();
-	if (country.isPresent()) {
-	    gpEntry.setCountry(country.get());
-	}
+	country.ifPresent(gpEntry::setCountry);
 
 	//
 	// magnitude level
 	//
 	Optional<String> magnitudeLevel = handler.getMagnitudeLevel();
-	if (magnitudeLevel.isPresent()) {
-
-	    gpEntry.setMagnitude(magnitudeLevel.get());
-	}
+	magnitudeLevel.ifPresent(gpEntry::setMagnitude);
 
 	//
 	// license
@@ -485,7 +478,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    List<Double> percentageList = coreMetadata.getMIMetadata().getCloudCoverPercentageList();
 	    Double ccp = null;
 	    if (!percentageList.isEmpty()) {
-		ccp = percentageList.get(0);
+		ccp = percentageList.getFirst();
 	    }
 
 	    if (satelliteScene.getOrigin().equals("landsat")) {
@@ -637,9 +630,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	Optional<String> availableGranules = resource.getExtensionHandler().getAvailableGranules();
 
-	if (availableGranules.isPresent()) {
-	    gpEntry.setAvailableGranules(availableGranules.get());
-	}
+	availableGranules.ifPresent(gpEntry::setAvailableGranules);
 
 	//
 	// distribution
@@ -661,13 +652,13 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    }
 
 	    List<DataComplianceReport> reports = new ReportsMetadataHandler(resource).getReports();
-	    Map<String, String> distributionMap = new HashMap<String, String>();
+	    Map<String, String> distributionMap = new HashMap<>();
 
 	    String singleTransferOptionString2 = "";
 
 	    Iterator<Online> iterator = dist.getDistributionOnlines();
 	    List<String> listId = new ArrayList<>();
-	    Map<String, String> mapNames = new HashMap<String, String>();
+	    Map<String, String> mapNames = new HashMap<>();
 	    while (iterator.hasNext()) {
 		Online it = iterator.next();
 		listId.add(it.getIdentifier());
@@ -823,7 +814,7 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 			singleTransferOptionString2 + transferOption);
 
 		for (Map.Entry<String, String> map : distributionMap.entrySet()) {
-		    String toadd = "" + map.getValue();
+		    String toadd = map.getValue();
 		    toadd = formatOnline(toadd);
 		    singleTransferOptionString = singleTransferOptionString.replace(//
 			    transferOption, //
@@ -958,13 +949,12 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 	    Iterator<Online> ot = transfer.getOnlines();
 	    int i = 0;
-	    List<Online> recoveryOnlines = new ArrayList<Online>();
+	    List<Online> recoveryOnlines = new ArrayList<>();
 	    while (ot.hasNext()) {
 		Online res = ot.next();
 		i++;
 		if (res.getLinkage() != null
 			&& (res.getLinkage().contains("axe.geodab.eu") || res.getLinkage().contains("geodab-gi-axe"))) {
-		    continue;
 		} else {
 		    recoveryOnlines.add(res);
 		}
@@ -1047,20 +1037,14 @@ public class AtomGPResultSetMapper extends DiscoveryResultSetMapper<String> {
 			protocol = "NO_PROTOCOL";
 		    }
 
-		    List<Online> onList = protocolToOnlineMap.get(protocol);
-
-		    if (onList == null) {
-
-			onList = new ArrayList<Online>();
-			protocolToOnlineMap.put(protocol, onList);
-		    }
+		    List<Online> onList = protocolToOnlineMap.computeIfAbsent(protocol, k -> new ArrayList<>());
 
 		    if (onList.size() < MAX_ONLINE_PER_PROTOCOL) {
 			onList.add(online);
 		    }
 		}
 
-		protocolToOnlineMap.values().forEach(onlineList -> onlineList.forEach(online -> dist.addDistributionOnline(online)));
+		protocolToOnlineMap.values().forEach(onlineList -> onlineList.forEach(dist::addDistributionOnline));
 	    }
 
 	    out += dist.asString(true);

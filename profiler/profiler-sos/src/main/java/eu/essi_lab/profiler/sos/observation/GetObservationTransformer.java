@@ -62,7 +62,7 @@ import eu.essi_lab.profiler.sos.SOSProfilerSetting;
 import eu.essi_lab.profiler.sos.SOSRequest;
 import eu.essi_lab.profiler.sos.SOSRequest.Parameter;
 import eu.essi_lab.profiler.sos.SOSUtils;
-import eu.essi_lab.request.executor.IDiscoveryExecutor;
+import eu.essi_lab.request.executor.*;
 
 public class GetObservationTransformer extends AccessRequestTransformer {
 
@@ -100,8 +100,8 @@ public class GetObservationTransformer extends AccessRequestTransformer {
     }
 
     private String getOnlineId(Optional<String> optionalViewId, String siteCode, String variableCode) throws GSException {
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 
@@ -309,8 +309,8 @@ public class GetObservationTransformer extends AccessRequestTransformer {
     }
 
     private DataDescriptor getDefaultDescriptor(String onlineIdentifier) throws GSException {
-	ServiceLoader<IDiscoveryExecutor> loader = ServiceLoader.load(IDiscoveryExecutor.class);
-	IDiscoveryExecutor executor = loader.iterator().next();
+	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+	DiscoveryExecutor executor = loader.iterator().next();
 
 	DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 

@@ -60,10 +60,10 @@ public class JSONSemanticResponseMapper extends SemanticResponseMapper<JSONObjec
 	JSONObject object = new JSONObject();
 
 	object.put(DESCRIPTION_KEY, !entryPoint.getValues(D2KGSPredicate.DEFINITION).isEmpty()
-		? entryPoint.getValues(D2KGSPredicate.DEFINITION).get(0).stringValue() : MISSING_DESCRIPTION);
+		? entryPoint.getValues(D2KGSPredicate.DEFINITION).getFirst().stringValue() : MISSING_DESCRIPTION);
 
 	object.put(NAME_KEY, !entryPoint.getValues(D2KGSPredicate.LABEL).isEmpty()
-		? entryPoint.getValues(D2KGSPredicate.LABEL).get(0).stringValue() : MISSING_NAME);
+		? entryPoint.getValues(D2KGSPredicate.LABEL).getFirst().stringValue() : MISSING_NAME);
 
 	object.put(ID_KEY, entryPoint.getResource().stringValue());
 

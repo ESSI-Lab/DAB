@@ -28,8 +28,8 @@ import eu.essi_lab.messages.count.SemanticCountResponse;
 import eu.essi_lab.messages.sem.SemanticMessage;
 import eu.essi_lab.messages.sem.SemanticResponse;
 import eu.essi_lab.model.ontology.GSKnowledgeResourceDescription;
-import eu.essi_lab.request.executor.IRequestExecutor;
-import eu.essi_lab.request.executor.ISemanticExecutor;
+import eu.essi_lab.request.executor.RequestExecutor;
+import eu.essi_lab.request.executor.SemanticExecutor;
 
 /**
  * @author Fabrizio
@@ -43,11 +43,11 @@ public class SemanticHandler<T> extends
     }
 
     @Override
-    protected IRequestExecutor<SemanticMessage, GSKnowledgeResourceDescription, SemanticCountResponse, SemanticResponse<GSKnowledgeResourceDescription>> createExecutor() {
+    protected RequestExecutor<SemanticMessage, GSKnowledgeResourceDescription, SemanticCountResponse, SemanticResponse<GSKnowledgeResourceDescription>> createExecutor() {
 
-	ServiceLoader<ISemanticExecutor> loader = ServiceLoader.load(ISemanticExecutor.class);
+	ServiceLoader<SemanticExecutor> loader = ServiceLoader.load(SemanticExecutor.class);
 
-	Iterator<ISemanticExecutor> it = loader.iterator();
+	Iterator<SemanticExecutor> it = loader.iterator();
 
 	if (it.hasNext())
 	    return it.next();

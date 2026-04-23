@@ -22,6 +22,9 @@ package eu.essi_lab.gssrv.conf.task;
  */
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.quartz.JobExecutionContext;
 
@@ -47,6 +51,7 @@ import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
@@ -62,16 +67,22 @@ import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
+import eu.essi_lab.messages.bond.LogicalBond;
 import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.messages.count.DiscoveryCountResponse;
+import eu.essi_lab.messages.stats.ComputationResult;
+import eu.essi_lab.messages.stats.StatisticsResponse;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.model.GSSource;
+import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.semantic.SourceStatistics;
 import eu.essi_lab.profiler.semantic.Stats;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
@@ -99,6 +110,8 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * metric is the share of records having <b>all</b> listed elements (logical AND). Ex.:
  * {@code METADATA_SET_COMPLETENESS_core=IDENTIFIER} and
  * {@code METADATA_SET_COMPLETENESS_optional=IDENTIFIER,TITLE,BOUNDING_BOX}</li>
+ * <li>{@code PUBLISH_ON_S3} — when {@code false}, {@code 0}, or {@code no}, skip uploading the Prometheus scrape to S3;
+ * default is {@code true} (publish).</li>
  * </ul>
  *
  * <h3>Available Prometheus metrics ({@link StatisticsMetric})</h3>
@@ -169,6 +182,19 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <dd>Per metadata element and per distinct indexed value, the number of records for that source (absolute count).
  * Labels: {@code source_id}, {@code element} (lowercase enum name, same as metadata completeness), {@code value}. Uses
  * the same view/source scope as metadata completeness; configure elements via {@code RECORDS_PER_ELEMENT_ELEMENTS}.</dd>
+ *
+ * <dt>{@link StatisticsMetric#STATION_PAGE_VISITS_TOTAL STATION_PAGE_VISITS_TOTAL} ({@code station_page_visits_total})</dt>
+ * <dd>From request statistics (OpenSearch): all-time request counts per {@code source_id} (aggregation on
+ * {@link RuntimeInfoElement#RESULT_SET_DISCOVERY_SOURCE_ID}), filtered by {@code VIEW_ID=view},
+ * {@code PROFILER_NAME=BNHSProfiler}, {@code DISCOVERY_MESSAGE_isTimeseries=true}. Requires statistics DB settings.</dd>
+ *
+ * <dt>{@link StatisticsMetric#OM_DOWNLOADS_TOTAL OM_DOWNLOADS_TOTAL} ({@code om_downloads_total})</dt>
+ * <dd>From request statistics: all-time counts per {@code source_id} (same aggregation), filtered by
+ * {@code VIEW_ID=.tag("view", PORTAL_SEARCHES_VIEW)//}, {@code PROFILER_NAME=OMProfiler}. Requires statistics DB settings.</dd>
+ *
+ * <dt>{@link StatisticsMetric#PORTAL_SEARCHES_TOTAL PORTAL_SEARCHES_TOTAL} ({@code portal_search_total})</dt>
+ * <dd>From request statistics: all-time count of requests with {@code VIEW_ID=view1} and {@code PROFILER_NAME=OSProfiler}.
+ * Label {@code view} is the view id. Requires statistics DB settings.</dd>
  * </dl>
  *
  * Legacy: a single line without {@code =} is treated as the view id (same as only {@code VIEW_ID} before).
@@ -184,7 +210,10 @@ public class StatisticsTask extends AbstractCustomTask {
 	/** Comma-separated {@link MetadataElement} selectors for {@link StatisticsMetric#RECORDS_PER_ELEMENT}. */
 	RECORDS_PER_ELEMENT_ELEMENTS,
 	/** Comma-separated set names; members defined by {@code METADATA_SET_COMPLETENESS_<name>=...} lines. */
-	METADATA_SET_COMPLETENESS
+	METADATA_SET_COMPLETENESS,
+
+	/** If set to false, skip S3 upload of the metrics scrape (default: publish). */
+	PUBLISH_ON_S3
     }
 
     /**
@@ -218,7 +247,15 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	RECORDS_PER_ELEMENT("records_per_element",
 		"Per element and distinct value: record count for the source (tags element, value); "
-			+ "elements from RECORDS_PER_ELEMENT_ELEMENTS");
+			+ "elements from RECORDS_PER_ELEMENT_ELEMENTS"),
+
+	STATION_PAGE_VISITS_TOTAL("station_page_visits_total",
+		"Request counts per source_id (BNHS / view / timeseries discovery) from OpenSearch statistics"),
+
+	OM_DOWNLOADS_TOTAL("om_downloads_total", "Request counts per source_id (OMProfiler / view) from OpenSearch statistics"),
+
+	PORTAL_SEARCHES_TOTAL("portal_search_total",
+		"All-time OpenSearch request count for VIEW_ID=view1 and PROFILER_NAME=OSProfiler (label view)");
 
 	private final String prometheusName;
 	private final String description;
@@ -242,6 +279,16 @@ public class StatisticsTask extends AbstractCustomTask {
     }
 
     private static final long CANCEL_CHECK_INTERVAL_MS = 10_000L;
+
+    /** Matches {@link RuntimeInfoElement#VIEW_ID} for HIS Central runtime statistics filters. */
+
+    private static final String RUNTIME_STATS_PROFILER_BNHS = "BNHSProfiler";
+
+    private static final String RUNTIME_STATS_PROFILER_OM = "OMProfiler";
+
+    private static final String PORTAL_SEARCHES_PROFILER_OS = "OSProfiler";
+
+    private static final int RUNTIME_STATS_MAX_BUCKETS = 10_000;
 
     private static final String METADATA_SET_COMPLETENESS_LINE_PREFIX = "METADATA_SET_COMPLETENESS_";
 
@@ -279,6 +326,14 @@ public class StatisticsTask extends AbstractCustomTask {
 	List<MetadataElement> metadataCompletenessElements = new ArrayList<>();
 	List<MetadataElement> recordsPerElementElements = new ArrayList<>();
 	List<MetadataCompletenessSet> metadataCompletenessSets = List.of();
+
+	boolean publishOnS3 = true;
+	if (structured.isPresent()) {
+	    String publishOpt = structured.get().get(StatisticsTaskOptions.PUBLISH_ON_S3);
+	    if (publishOpt != null && !publishOpt.isBlank()) {
+		publishOnS3 = parsePublishOnS3(publishOpt);
+	    }
+	}
 
 	if (structured.isPresent() && !structured.get().isEmpty()) {
 	    viewId = structured.get().get(StatisticsTaskOptions.VIEW_ID);
@@ -652,12 +707,22 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	}
 
+	registerElasticsearchRuntimeMetrics(registry, metrics, viewId);
+
 	GSLoggerFactory.getLogger(getClass()).info("Updated metrics for {}",
 		(viewId != null && !viewId.isEmpty()) ? ("view " + viewId) : "all sources (no view)");
 
 	Optional<S3TransferWrapper> optS3TransferManager = getS3TransferManager();
 
-	if (optS3TransferManager.isPresent()) {
+	if (!publishOnS3) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("S3 publish skipped, printing to logs");
+
+	    String text = registry.scrape();
+
+	    GSLoggerFactory.getLogger(getClass()).info(text);
+
+	} else if (optS3TransferManager.isPresent()) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("Transfer download stats to s3 STARTED");
 
@@ -681,6 +746,147 @@ public class StatisticsTask extends AbstractCustomTask {
 	}
 
 	log(status, "Statistics task ENDED");
+    }
+
+    /**
+     * Registers OpenSearch-backed runtime metrics: {@link StatisticsMetric#STATION_PAGE_VISITS_TOTAL},
+     * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequestsByBucket}),
+     * {@link StatisticsMetric#PORTAL_SEARCHES_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequests}).
+     */
+    private void registerElasticsearchRuntimeMetrics(PrometheusMeterRegistry registry, Set<StatisticsMetric> metrics,String viewId) {
+
+	if (!metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL) && !metrics.contains(StatisticsMetric.OM_DOWNLOADS_TOTAL)
+		&& !metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)) {
+	    return;
+	}
+	Optional<DatabaseSetting> settingOpt = ConfigurationWrapper.getSystemSettings().getStatisticsSetting();
+	if (settingOpt.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).warn(
+		    "OpenSearch runtime metrics requested but statistics database setting is missing; skipping ES-backed statistics gauges");
+	    return;
+	}
+	DatabaseSetting ds = settingOpt.get();
+	ElasticsearchClient es = new ElasticsearchClient(ds.getDatabaseUri(), ds.getDatabaseUser(), ds.getDatabasePassword());
+	es.setDbName(ds.getDatabaseName());
+	try {
+	    es.init();
+	} catch (IOException e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Elasticsearch init failed for runtime metrics: {}", e.getMessage());
+	    return;
+	}
+
+	Map<String, Double> stationVisits = new HashMap<>();
+	Map<String, Double> omDownloads = new HashMap<>();
+
+	if (metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL)) {
+	    try {
+		LogicalBond bond = BondFactory.createAndBond();
+		if (viewId!=null) {
+		    bond.getOperands()
+			    .add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.VIEW_ID, viewId));
+		}
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.PROFILER_NAME,
+			RUNTIME_STATS_PROFILER_BNHS));
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL,
+			RuntimeInfoElement.DISCOVERY_MESSAGE_IS_TIMESERIES, "true"));
+		StatisticsResponse resp = es.countRuntimeInfoRequestsByBucket(bond, RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID,
+			RUNTIME_STATS_MAX_BUCKETS);
+		stationVisits.putAll(parseRuntimeInfoFrequencyByBucket(resp));
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("STATION_PAGE_VISITS_TOTAL query failed: {}", e.getMessage());
+	    }
+	}
+
+	if (metrics.contains(StatisticsMetric.OM_DOWNLOADS_TOTAL)) {
+	    try {
+		LogicalBond bond = BondFactory.createAndBond();
+		if (viewId!=null) {
+		    bond.getOperands()
+			    .add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.VIEW_ID, viewId));
+		}
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.PROFILER_NAME,
+			RUNTIME_STATS_PROFILER_OM));
+		StatisticsResponse resp = es.countRuntimeInfoRequestsByBucket(bond, RuntimeInfoElement.RESULT_SET_DISCOVERY_SOURCE_ID,
+			RUNTIME_STATS_MAX_BUCKETS);
+		omDownloads.putAll(parseRuntimeInfoFrequencyByBucket(resp));
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("OM_DOWNLOADS_TOTAL query failed: {}", e.getMessage());
+	    }
+	}
+
+	AtomicLong portalSearchesTotal = new AtomicLong(0L);
+	if (metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)) {
+	    try {
+		LogicalBond bond = BondFactory.createAndBond();
+		if (viewId!=null) {
+		    bond.getOperands()
+			    .add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.VIEW_ID, viewId));
+		}
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.PROFILER_NAME,
+			PORTAL_SEARCHES_PROFILER_OS));
+		portalSearchesTotal.set(es.countRuntimeInfoRequests(bond));
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("PORTAL_SEARCHES_TOTAL query failed: {}", e.getMessage());
+	    }
+	    Gauge.builder(StatisticsMetric.PORTAL_SEARCHES_TOTAL.prometheusName(), portalSearchesTotal, a -> (double) a.get())//
+		    .description(StatisticsMetric.PORTAL_SEARCHES_TOTAL.description())//
+		    .tag("view", viewId)//
+		    .register(registry);
+	}
+
+	for (String sourceId : stationVisits.keySet()) {
+	    final String sid = sourceId;
+	    Gauge.builder(StatisticsMetric.STATION_PAGE_VISITS_TOTAL.prometheusName(), stationVisits, g -> g.getOrDefault(sid, 0.0))//
+		    .description(StatisticsMetric.STATION_PAGE_VISITS_TOTAL.description())//
+		    .tag("source_id", sid)//
+		    .tag("view", viewId)//
+		    .register(registry);
+	}
+	for (String sourceId : omDownloads.keySet()) {
+	    final String sid = sourceId;
+	    Gauge.builder(StatisticsMetric.OM_DOWNLOADS_TOTAL.prometheusName(), omDownloads, g -> g.getOrDefault(sid, 0.0))//
+		    .description(StatisticsMetric.OM_DOWNLOADS_TOTAL.description())//
+		    .tag("source_id", sid)//
+		    .tag("view", viewId)//
+		    .register(registry);
+	}
+    }
+
+    /**
+     * Parses {@link StatisticsResponse} from {@link ElasticsearchClient#countRuntimeInfoRequestsByBucket} (frequency
+     * encoding).
+     */
+    static Map<String, Double> parseRuntimeInfoFrequencyByBucket(StatisticsResponse response) {
+
+	Map<String, Double> out = new LinkedHashMap<>();
+	if (response == null || response.getItems().isEmpty()) {
+	    return out;
+	}
+	List<ComputationResult> freqs = response.getItems().get(0).getFrequency();
+	if (freqs == null || freqs.isEmpty()) {
+	    return out;
+	}
+	String packed = freqs.get(0).getValue();
+	if (packed == null || packed.isBlank()) {
+	    return out;
+	}
+	for (String token : packed.split(" ")) {
+	    if (token.isEmpty()) {
+		continue;
+	    }
+	    String[] parts = token.split(ComputationResult.FREQUENCY_ITEM_SEP, 2);
+	    if (parts.length < 2) {
+		continue;
+	    }
+	    try {
+		String key = URLDecoder.decode(parts[0], StandardCharsets.UTF_8);
+		double docCount = Double.parseDouble(parts[1]);
+		out.put(key, docCount);
+	    } catch (RuntimeException e) {
+		GSLoggerFactory.getLogger(StatisticsTask.class).warn("Skipping malformed runtime stats bucket token: {}", token);
+	    }
+	}
+	return out;
     }
 
     private static String metadataCompletenessKey(String sourceId, String elementTag) {
@@ -946,6 +1152,13 @@ public class StatisticsTask extends AbstractCustomTask {
     private static String normalizeKey(String key) {
 
 	return key.replaceAll("[_\\s]", "").toUpperCase();
+    }
+
+    /** Explicit {@code false}, {@code 0}, or {@code no} disables S3 upload; any other non-blank value keeps publishing. */
+    static boolean parsePublishOnS3(String raw) {
+
+	String t = raw.trim();
+	return !"false".equalsIgnoreCase(t) && !"0".equals(t) && !"no".equalsIgnoreCase(t);
     }
 
     @Override
