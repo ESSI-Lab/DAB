@@ -79,7 +79,8 @@ public class ServiceLoaderTest {
 		"HydroServerProfiler", //
 		"CSWISOGeoProfiler", //
 		"KMAOAIPMHProfiler", //
-		"ARPARestProfiler" //
+		"ARPARestProfiler", //
+		"GeoDcatProfiler" //
 	));
 
 	HashSet<String> profilerNames = new HashSet<String>();

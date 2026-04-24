@@ -44,6 +44,7 @@
 		<module>profiler-gwis</module>
 		<module>profiler-ssc-feed</module>
 		<module>profiler-worldcereal</module>
+		<module>profiler-geodcat</module>
 	</modules>
 
 	<dependencies>

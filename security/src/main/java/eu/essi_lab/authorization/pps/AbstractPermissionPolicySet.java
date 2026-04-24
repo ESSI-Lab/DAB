@@ -566,6 +566,7 @@ public abstract class AbstractPermissionPolicySet implements PolicySetWrapper {
 		"gwps", //
 		"timeseries-api", //"timeseries-api", //
 		"om-api", //
+		"geodcat", //
 		"terms-api", //
 		"semantic", "rest-views");
     }
