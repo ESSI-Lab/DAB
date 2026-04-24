@@ -13,12 +13,12 @@ package eu.essi_lab.cfga.gs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -31,7 +31,6 @@ import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.dc_connector.*;
 import eu.essi_lab.cfga.gs.setting.distribution.*;
-import eu.essi_lab.cfga.gs.setting.driver.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.oauth.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
@@ -40,7 +39,6 @@ import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.gs.task.*;
 import eu.essi_lab.cfga.source.*;
 import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.model.shared.SharedContent.*;
 
 import java.util.concurrent.*;
 
@@ -58,16 +56,6 @@ public class DefaultConfiguration extends Configuration {
 	 *
 	 */
 	DATABASE_SETTING("database"),
-
-	/**
-	 *
-	 */
-	SHARED_CACHE_REPO_SETTING("sharedCacheRepo"),
-
-	/**
-	 *
-	 */
-	SHARED_PERSISTENT_REPO_SETTING("sharedPersistentRepo"),
 
 	/**
 	 *
@@ -158,8 +146,8 @@ public class DefaultConfiguration extends Configuration {
     }
 
     /**
-     * Creates an in-memory only configuration with no related source.<br>
-     * This configuration <i>cannot be flushed</i>, use it only for test purpose
+     * Creates an in-memory only configuration with no related source.<br> This configuration <i>cannot be flushed</i>, use it only for test
+     * purpose
      */
     public DefaultConfiguration() {
 
@@ -309,38 +297,6 @@ public class DefaultConfiguration extends Configuration {
 	schedulerSetting.setIdentifier(SingletonSettingsId.SCHEDULER_SETTING.getLabel());
 
 	put(schedulerSetting);
-
-	//
-	// --- Shared Cache Repo of type Local ---
-	//
-
-	DriverSetting cacheSetting = ConfigurableLoader.load().//
-
-		filter(c -> c.getSetting() instanceof DriverSetting).//
-		map(c -> ((DriverSetting) c.getSetting())).//
-		filter(s -> s.getCategory() == SharedContentCategory.LOCAL_CACHE).//
-		findFirst().//
-		get();
-
-	cacheSetting.setIdentifier(SingletonSettingsId.SHARED_CACHE_REPO_SETTING.getLabel());
-
-	put(cacheSetting);
-
-	//
-	// --- Shared Persistent Repo of type Local ---
-	//
-
-	DriverSetting persistentSetting = ConfigurableLoader.load().//
-
-		filter(c -> c.getSetting() instanceof DriverSetting).//
-		map(c -> ((DriverSetting) c.getSetting())).//
-		filter(s -> s.getCategory() == SharedContentCategory.LOCAL_PERSISTENT).//
-		findFirst().//
-		get();
-
-	persistentSetting.setIdentifier(SingletonSettingsId.SHARED_PERSISTENT_REPO_SETTING.getLabel());
-
-	put(persistentSetting);
 
 	//
 	// --- AugmenterWorker settings - The default one has all the augmenters and the scheduling disabled ---

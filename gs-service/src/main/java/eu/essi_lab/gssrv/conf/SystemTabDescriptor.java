@@ -50,7 +50,6 @@ public class SystemTabDescriptor extends TabDescriptor {
 		new SystemSetting.DescriptorProvider().get(), //
 		new DatabaseSetting.DescriptorProvider().get(),//
 		new SchedulerViewSetting.DescriptorProvider().get(),//
-		new DriverSetting.DescriptorProvider().get(),//
 		new DownloadSetting.DescriptorProvider().get(),//
 		new RateLimiterSetting.DescriptorProvider().get(),//
 		new SessionCoordinatorSetting.DescriptorProvider().get(),//

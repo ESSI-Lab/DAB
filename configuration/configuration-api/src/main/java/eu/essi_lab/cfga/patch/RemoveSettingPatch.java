@@ -31,37 +31,31 @@ import java.util.function.*;
 /**
  * @author Fabrizio
  */
-public class CustomPatch extends Patch {
+public class RemoveSettingPatch extends Patch {
 
     private Predicate<Setting> predicate;
-    private Function<Setting, Setting> function;
 
     /**
      * @param configuration
      * @param predicate
-     * @param function
      */
-    private CustomPatch(Configuration configuration, Predicate<Setting> predicate, Function<Setting, Setting> function) {
+    private RemoveSettingPatch(Configuration configuration, Predicate<Setting> predicate) {
 
 	setConfiguration(configuration);
 
 	this.predicate = predicate;
-	this.function = function;
     }
 
     /**
      * @param configuration
-     * @param property
-     * @param legacyValue
-     * @param newValue
+     * @param predicate
      * @return
      */
-    public static CustomPatch of( //
+    public static RemoveSettingPatch of( //
 	    Configuration configuration, //
-	    Predicate<Setting> predicate,//
-	    Function<Setting, Setting> function) {//
+	    Predicate<Setting> predicate) {//
 
-	return new CustomPatch(configuration, predicate, function);
+	return new RemoveSettingPatch(configuration, predicate);
     }
 
     /**
@@ -82,17 +76,9 @@ public class CustomPatch extends Patch {
 
 	if (!list.isEmpty()) {
 
-	    List<Setting> converted = list.//
-		    stream().//
-		    map(s -> function.apply(s.clone())). //
-		    toList();
-
 	    for (Setting setting : list) {
-		getConfiguration().remove(setting.getIdentifier());
-	    }
 
-	    for (Setting s : converted) {
-		getConfiguration().put(s);
+		getConfiguration().remove(setting.getIdentifier());
 	    }
 
 	    return true;
