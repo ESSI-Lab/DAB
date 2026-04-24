@@ -460,7 +460,7 @@ public class ElasticsearchClient {
 	StatisticsResponse ret = new StatisticsResponse();
 
 	String aggName = "runtime_info_gh";
-	String fieldName = RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE_GEO.getName();
+	String fieldName = RuntimeInfoElement.DISCOVERY_MESSAGE_CENTROID.getName();
 
 	try {
 
