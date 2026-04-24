@@ -73,7 +73,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * @param setting
+     *
      */
     public OSRequestTransformer() {
 
@@ -787,8 +787,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * </table>
      * </body> </html>
      *
-     * @param keyValueParser
-     * @param request
+     *
      * @param eiffelOption
      */
     private Optional<Bond> createSearchTermsBond(//
@@ -865,7 +864,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      * @param parser
-     * @param innerBonds
      * @param searchFields
      * @param searchValue
      */
