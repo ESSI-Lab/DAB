@@ -53,6 +53,8 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.conn.ssl.*;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -101,6 +103,7 @@ import org.opensearch.cluster.metadata.RepositoryMetadata;
 import org.opensearch.common.settings.Settings;
 import org.opensearch.common.unit.TimeValue;
 import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.core.common.Strings;
 import org.opensearch.core.rest.RestStatus;
 import org.opensearch.geometry.Geometry;
 import org.opensearch.geometry.Rectangle;
@@ -416,6 +419,117 @@ public class ElasticsearchClient {
     }
 
     /**
+     * Request counts grouped by {@code geohash_grid} on the {@link RuntimeInfoElement#DISCOVERY_MESSAGE_SHAPE_GEO} field
+     * (geo_shape from user search bounding boxes in runtime statistics), subject to the same filter bond as
+     * {@link #countRuntimeInfoRequestsByBucket(Bond, RuntimeInfoElement, int)}.
+     * <p>
+     * Returns the top {@code size} buckets by document count (OpenSearch {@code geohash_grid} {@code size}).
+     * Shape documents may be counted in multiple cells when a polygon intersects more than one geohash cell.
+     * </p>
+     *
+     * @param bond      filter bond; may be {@code null} for no filter
+     * @param precision geohash length / grid precision (e.g. {@code 3} for ~153km x 153km cells)
+     * @param size      max number of geohash buckets to return
+     */
+    public StatisticsResponse countRuntimeInfoRequestsByGeohash(Bond bond, int precision, int size) throws GSException {
+
+	if (precision < 1) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "geohash precision must be >= 1", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    (Throwable) null);
+	}
+	if (size < 1) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "geohash size must be >= 1", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    (Throwable) null);
+	}
+
+	GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_STARTED);
+	StatisticsResponse ret = new StatisticsResponse();
+
+	String aggName = "runtime_info_gh";
+	String fieldName = RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE_GEO.getName();
+
+	try {
+
+	    BoolQueryBuilder boolQuery = buildBoolQueryFromRuntimeInfoBonds(bond);
+	    String queryJson = Strings.toString(XContentType.JSON, boolQuery);
+	    StringBuilder body = new StringBuilder(256);
+	    body.append("{\"size\":0,\"query\":").append(queryJson).append(",\"aggs\":{\"").append(aggName);
+	    body.append("\":{\"geohash_grid\":{\"field\":\"").append(fieldName);
+	    body.append("\",\"precision\":").append(precision).append(",\"size\":").append(size).append("}}}}");
+
+	    String index = dbName + "-request";
+	    Request request = new Request("POST", "/" + index + "/_search");
+	    request.setEntity(new StringEntity(body.toString(), ContentType.APPLICATION_JSON));
+	    Response response = client.getLowLevelClient().performRequest(request);
+	    String responseBody = EntityUtils.toString(response.getEntity());
+	    JSONObject root = new JSONObject(responseBody);
+	    JSONObject aggs = root.optJSONObject("aggregations");
+	    if (aggs == null) {
+
+		ret.setItemsCount(0);
+		return ret;
+	    }
+	    JSONObject gh = aggs.optJSONObject(aggName);
+	    if (gh == null) {
+
+		ret.setItemsCount(0);
+		return ret;
+	    }
+	    JSONArray buckets = gh.optJSONArray("buckets");
+	    if (buckets == null || buckets.isEmpty()) {
+
+		ret.setItemsCount(0);
+		return ret;
+	    }
+
+	    ResponseItem responseItem = new ResponseItem();
+	    ret.getItems().add(responseItem);
+	    ComputationResult frequencyResult = new ComputationResult();
+	    frequencyResult.setTarget(fieldName);
+	    responseItem.addFrequency(frequencyResult);
+	    StringBuilder frequencyValue = new StringBuilder();
+	    for (int i = 0; i < buckets.length(); i++) {
+		JSONObject b = buckets.getJSONObject(i);
+		String key = b.optString("key", "");
+		long docCount = b.optLong("doc_count", 0L);
+		if (i > 0) {
+		    frequencyValue.append(' ');
+		}
+		frequencyValue.append(URLEncoder.encode(key, "UTF-8")).append(ComputationResult.FREQUENCY_ITEM_SEP).append(docCount);
+	    }
+	    frequencyResult.setValue(frequencyValue.toString().trim());
+	    ret.setItemsCount(1);
+	    GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_ENDED);
+	    return ret;
+
+	} catch (Exception e) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    e); //
+	}
+    }
+
+    /**
      * OpenSearch terms aggregation field name for a {@link RuntimeInfoElement}, aligned with {@link #compute(StatisticsMessage)}.
      */
     private String termsAggregationFieldName(RuntimeInfoElement bucketField) {
@@ -691,7 +805,7 @@ public class ElasticsearchClient {
 	    Geometry shape = new Rectangle(west, east, north, south);
 	    BoolQueryBuilder query2 = QueryBuilders.boolQuery();
 	    query2.must(query);
-	    query2.must(QueryBuilders.geoWithinQuery(RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE.getName(), shape));
+	    query2.must(QueryBuilders.geoWithinQuery(RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE_GEO.getName(), shape));
 	    sourceBuilder.query(query2);
 	    try {
 		SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);

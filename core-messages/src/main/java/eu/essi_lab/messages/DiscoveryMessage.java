@@ -47,6 +47,11 @@ import java.util.stream.Collectors;
  */
 public class DiscoveryMessage extends QueryInitializerMessage {
 
+    /** Geohash string length stored in {@link RuntimeInfoElement#DISCOVERY_MESSAGE_GEOHASH} for bbox-derived points. */
+    private static final int BBOX_GEOHASH_PRECISION = 3;
+
+    private static final String GEOHASH_BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz";
+
     /**
      * forceEiffelAPIDiscoveryOption=disabled eiffelUseFilterAPICache=true eiffelUseMergedIdsCache=true eiffelSortAndFilterAPI=FILTER
      * eiffelAPISearchMinScore=0.7 eiffelAPISearchQueryMethod=semantic eiffelAPISearchTermsSignificance=none eiffelAPIFilterTreshold=0.7
@@ -145,10 +150,8 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      * Creates a new instance of {@link DiscoveryMessage} sharing the following properties with the supplied
      * <code>accessMessage</code>:
      * <ul>
-     * <li>{@link AccessMessage#getSharedRepositoryInfo()}</li>
      * <li>{@link AccessMessage#getSources()}</li>
      * <li>{@link AccessMessage#getCurrentUser()}</li>
-     * <li>{@link AccessMessage#getViewId()}</li>
      * <li>{@link AccessMessage#getWebRequest()}</li>
      * <li>{@link AccessMessage#getDataBaseURI()}</li>
      * </ul>
@@ -296,7 +299,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     }
 
     /**
-     * @param count
+     * @param server
      */
     public void setDataProxyServer(String server) {
 
@@ -373,7 +376,6 @@ public class DiscoveryMessage extends QueryInitializerMessage {
     /**
      * Default value: a non null {@link RankingStrategy}
      *
-     * @param strategy
      */
     public RankingStrategy getRankingStrategy() {
 
@@ -400,7 +402,7 @@ public class DiscoveryMessage extends QueryInitializerMessage {
      * Used to indicate the type of results expected (e.g. datasets only, collection only or datasets and collection). This is useful for
      * the case of mixed sources, to indicate the desired results
      *
-     * @param results priority
+     * @param priority
      */
     public void setResultsPriority(ResultsPriority priority) {
 
@@ -590,7 +592,15 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 
 			String shape = getShape("" + south, "" + east, "" + west, "" + north);
 			if (shape != null) {
-			    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE.getName(), Arrays.asList(shape));
+			    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_SHAPE_GEO.getName(), Arrays.asList(shape));
+
+			    double centroidLat = (south + north) / 2.0;
+			    double centroidLon = centroidLongitude(west, east);
+			    // geo_point WKT: POINT (longitude latitude), same axis order as getShape() POINT/POLYGON vertices
+			    String centroidGeoPoint = String.format(Locale.US, "POINT (%.8f %.8f)", centroidLon, centroidLat);
+			    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_CENTROID.getName(), Arrays.asList(centroidGeoPoint));
+			    map.put(RuntimeInfoElement.DISCOVERY_MESSAGE_GEOHASH.getName(),
+				    Arrays.asList(encodeGeohash(centroidLat, centroidLon, BBOX_GEOHASH_PRECISION)));
 			}
 
 		    } else {
@@ -720,5 +730,74 @@ public class DiscoveryMessage extends QueryInitializerMessage {
 	}
 
 	return null;
+    }
+
+    /**
+     * Longitude of the midpoint of an axis-aligned bbox; if {@code west > east}, the box is treated as crossing the
+     * antimeridian.
+     */
+    private static double centroidLongitude(double west, double east) {
+
+	if (west <= east) {
+	    return (west + east) / 2.0;
+	}
+	double mid = (west + east + 360.0) / 2.0;
+	if (mid > 180.0) {
+	    mid -= 360.0;
+	}
+	return mid;
+    }
+
+    /**
+     * Standard base32 geohash for WGS84 coordinates (same convention as OpenSearch/Elasticsearch {@code geohash_grid}).
+     *
+     * @param latitude  [-90, 90]
+     * @param longitude [-180, 180]
+     * @param precision length of returned hash (typical 1–12)
+     */
+    private static String encodeGeohash(double latitude, double longitude, int precision) {
+
+	if (precision < 1 || precision > 12) {
+	    throw new IllegalArgumentException("geohash precision must be between 1 and 12");
+	}
+
+
+	double minLat = -90.0;
+	double maxLat = 90.0;
+	double minLon = -180.0;
+	double maxLon = 180.0;
+	int bits = 0;
+	int bitCount = 0;
+	boolean evenBit = true;
+	StringBuilder out = new StringBuilder(precision);
+	while (out.length() < precision) {
+	    if (evenBit) {
+		double mid = (minLon + maxLon) / 2.0;
+		if (longitude >= mid) {
+		    bits = (bits << 1) | 1;
+		    minLon = mid;
+		} else {
+		    bits = (bits << 1);
+		    maxLon = mid;
+		}
+	    } else {
+		double mid = (minLat + maxLat) / 2.0;
+		if (latitude >= mid) {
+		    bits = (bits << 1) | 1;
+		    minLat = mid;
+		} else {
+		    bits = (bits << 1);
+		    maxLat = mid;
+		}
+	    }
+	    evenBit = !evenBit;
+	    bitCount++;
+	    if (bitCount == 5) {
+		out.append(GEOHASH_BASE32.charAt(bits));
+		bitCount = 0;
+		bits = 0;
+	    }
+	}
+	return out.toString();
     }
 }

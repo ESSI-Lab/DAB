@@ -102,7 +102,11 @@ public enum RuntimeInfoElement implements Queryable {
     DISCOVERY_MESSAGE_BBOX_WEST("DISCOVERY_MESSAGE_BBOX_WEST", ContentType.DOUBLE), //
     DISCOVERY_MESSAGE_BBOX_NORTH("DISCOVERY_MESSAGE_BBOX_NORTH", ContentType.DOUBLE), //
     DISCOVERY_MESSAGE_BBOX_SOUTH("DISCOVERY_MESSAGE_BBOX_SOUTH", ContentType.DOUBLE), //
-    DISCOVERY_MESSAGE_SHAPE("DISCOVERY_MESSAGE_SHAPE"), //
+    DISCOVERY_MESSAGE_SHAPE_GEO("DISCOVERY_MESSAGE_SHAPE_GEO"), //
+    /** Bbox centroid as {@code lat,lon} for {@code geo_point} indexing in request statistics. */
+    DISCOVERY_MESSAGE_CENTROID("DISCOVERY_MESSAGE_CENTROID"), //
+    /** Geohash (precision 3) of the bbox centroid for aggregations on keyword. */
+    DISCOVERY_MESSAGE_GEOHASH("DISCOVERY_MESSAGE_GEOHASH"), //
     DISCOVERY_MESSAGE_BBOX_SW("DISCOVERY_MESSAGE_BBOX_sw"), //
     DISCOVERY_MESSAGE_BBOX_SE("DISCOVERY_MESSAGE_BBOX_se"), //
     DISCOVERY_MESSAGE_BBOX_NW("DISCOVERY_MESSAGE_BBOX_nw"), //
@@ -112,7 +116,6 @@ public enum RuntimeInfoElement implements Queryable {
     DISCOVERY_MESSAGE_ABSTRACT("DISCOVERY_MESSAGE_abstract"), //
     DISCOVERY_MESSAGE_SUBJECT("DISCOVERY_MESSAGE_subject"), //
     DISCOVERY_MESSAGE_TITLE("DISCOVERY_MESSAGE_title"), //
-    /** Attribute-title search (OpenSearch {@code attributeTitle} param); not resource title. */
     DISCOVERY_MESSAGE_ATTRIBUTE_TITLE("DISCOVERY_MESSAGE_attributeTitle"), //
     DISCOVERY_MESSAGE_KEYWORD("DISCOVERY_MESSAGE_keyword"), //
     DISCOVERY_MESSAGE_ORGANISATION_NAME("DISCOVERY_MESSAGE_organisationName"), //
