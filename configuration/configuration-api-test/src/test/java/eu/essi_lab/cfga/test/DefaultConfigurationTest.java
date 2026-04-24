@@ -1,58 +1,37 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.test;
 
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import eu.essi_lab.accessor.gbif.harvested.*;
+import eu.essi_lab.accessor.oaipmh.*;
+import eu.essi_lab.accessor.wcs.*;
+import eu.essi_lab.augmenter.worker.*;
+import eu.essi_lab.cfga.check.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.*;
+import eu.essi_lab.cfga.gs.setting.accessor.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.dc_connector.*;
+import eu.essi_lab.cfga.gs.setting.distribution.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.oauth.*;
+import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.pdk.*;
+import org.junit.*;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import eu.essi_lab.accessor.gbif.harvested.GBIFHarvestedConnector;
-import eu.essi_lab.accessor.oaipmh.OAIPMHConnector;
-import eu.essi_lab.accessor.wcs.WCSConnectorWrapper;
-import eu.essi_lab.augmenter.worker.AugmenterWorkerSettingImpl;
-import eu.essi_lab.cfga.check.ConfigurationEditableMethod;
-import eu.essi_lab.cfga.check.ConfigurationChecker;
-import eu.essi_lab.cfga.check.ReferencedClassesMethod;
-import eu.essi_lab.cfga.check.RegisteredEditableMethod;
-import eu.essi_lab.cfga.check.SimilarityMethod;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.DefaultConfiguration;
-import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
-import eu.essi_lab.cfga.gs.setting.GDCSourcesSetting;
-import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
-import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
-import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
-import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
-import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
-import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
-import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
-import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting.OAuthProvider;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.ComputationType;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
-import eu.essi_lab.lib.utils.StreamUtils;
-import eu.essi_lab.model.BrokeringStrategy;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
-import eu.essi_lab.pdk.Profiler;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -308,32 +287,6 @@ public class DefaultConfigurationTest {
 	Assert.assertEquals(2, settings.size());
 
 	Assert.assertEquals(JobStoreType.VOLATILE, schedulerSetting.getJobStoreType());
-
-	//
-	// --- Shared Cache Repo of type Local ---
-	//
-
-	SharedCacheDriverSetting sharedCacheDriverSetting = ConfigurationWrapper.getSharedCacheDriverSetting();
-
-	Assert.assertNotNull(sharedCacheDriverSetting);
-
-	settings = sharedCacheDriverSetting.getSettings();
-	Assert.assertEquals(2, settings.size());
-
-	Assert.assertEquals(SharedContentCategory.LOCAL_CACHE, sharedCacheDriverSetting.getCategory());
-
-	//
-	// --- Shared Persistent Repo of type Local ---
-	//
-
-	SharedPersistentDriverSetting sharedPersistentDriverSetting = ConfigurationWrapper.getSharedPersistentDriverSetting();
-
-	Assert.assertNotNull(sharedPersistentDriverSetting);
-
-	settings = sharedPersistentDriverSetting.getSettings();
-	Assert.assertEquals(2, settings.size());
-
-	Assert.assertEquals(SharedContentCategory.LOCAL_PERSISTENT, sharedPersistentDriverSetting.getCategory());
 
 	//
 	// --- AugmenterWorker settings - The default one has no augmenter selected and the scheduling disabled ---

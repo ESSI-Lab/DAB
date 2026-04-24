@@ -10,70 +10,51 @@ package eu.essi_lab.cfga.gs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.DefaultConfiguration.*;
 import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.*;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
+import eu.essi_lab.cfga.gs.setting.accessor.*;
+import eu.essi_lab.cfga.gs.setting.augmenter.worker.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.gs.setting.dc_connector.*;
+import eu.essi_lab.cfga.gs.setting.distribution.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gs.setting.oauth.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import eu.essi_lab.configuration.*;
+import eu.essi_lab.lib.net.s3.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
 import eu.essi_lab.services.*;
-import org.quartz.JobExecutionContext;
+import org.quartz.*;
 
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.ConfigurationUtils;
-import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
-import eu.essi_lab.cfga.gs.setting.augmenter.worker.AugmenterWorkerSetting;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
-import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
-import eu.essi_lab.cfga.gs.setting.distribution.DistributionSetting;
-import eu.essi_lab.cfga.gs.setting.driver.SharedCacheDriverSetting;
-import eu.essi_lab.cfga.gs.setting.driver.SharedPersistentDriverSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
-import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSettingLoader;
-import eu.essi_lab.cfga.gs.setting.oauth.OAuthSetting;
-import eu.essi_lab.cfga.gs.setting.sessioncoordinator.SessionCoordinatorSetting;
-import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
-import eu.essi_lab.cfga.scheduler.SchedulerUtils;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
-import eu.essi_lab.cfga.setting.scheduling.Scheduling;
-import eu.essi_lab.configuration.ExecutionMode;
-import eu.essi_lab.lib.net.s3.S3TransferWrapper;
-import eu.essi_lab.lib.utils.Chronometer;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.DiscoveryMessage;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondOperator;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.BrokeringStrategy;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.ResourceProperty;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -286,26 +267,6 @@ public class ConfigurationWrapper {
 	).//
 		get();
 
-    }
-
-    /**
-     * @return
-     */
-    public static SharedCacheDriverSetting getSharedCacheDriverSetting() {
-
-	return configuration.get(//
-		SingletonSettingsId.SHARED_CACHE_REPO_SETTING.getLabel(), //
-		SharedCacheDriverSetting.class).get();
-    }
-
-    /**
-     * @return
-     */
-    public static SharedPersistentDriverSetting getSharedPersistentDriverSetting() {
-
-	return configuration.get(//
-		SingletonSettingsId.SHARED_PERSISTENT_REPO_SETTING.getLabel(), //
-		SharedPersistentDriverSetting.class).get();
     }
 
     /**
