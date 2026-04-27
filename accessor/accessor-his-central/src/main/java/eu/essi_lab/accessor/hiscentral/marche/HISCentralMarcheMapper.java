@@ -13,12 +13,12 @@ import java.math.RoundingMode;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.h2.table.TableLink;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -81,7 +82,7 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
      * @param sensorInfo
      * @return
      */
-    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo) {
+    static OriginalMetadata create(JSONObject datasetInfo, JSONObject sensorInfo, JSONObject curveInfo) {
 
 	OriginalMetadata originalMetadata = new OriginalMetadata();
 
@@ -90,6 +91,10 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
 	jsonObject.put("sensor-info", sensorInfo);
+
+	if (curveInfo != null) {
+	    jsonObject.put("curve-info", curveInfo);
+	}
 
 	originalMetadata.setMetadata(jsonObject.toString(4));
 
@@ -114,6 +119,15 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	return new JSONObject(metadata.getMetadata()).getJSONObject("sensor-info");
     }
 
+    /**
+     * @param metadata
+     * @return
+     */
+    private JSONObject retrieveCurveInfo(OriginalMetadata metadata) {
+
+	return new JSONObject(metadata.getMetadata()).optJSONObject("curve-info");
+    }
+
     @Override
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
 
@@ -131,9 +145,34 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 
 	JSONObject sensorInfo = retrieveSensorInfo(originalMD);
 
-	//
-	//
-	//
+	JSONObject curveInfo = retrieveCurveInfo(originalMD);
+
+	String linkage = null;
+	String dischargeUom = null;
+	String tempExtenBegin = null;
+	//String stationName = null;
+	String type = null;
+	String timeSeriesId = null;
+	String stageUom = null;
+	String uom = null;
+	String protocol = null;
+	String statisticalFunction = "";
+	String basePhenomenon = null;
+	if (curveInfo != null) {
+	    linkage = curveInfo.optString("tableLink");
+	    dischargeUom = curveInfo.optString("dischargeUom");
+	    tempExtenBegin = curveInfo.optString("availablePeriod");
+	    //stationName = curveInfo.optString("stationName");
+	    type = curveInfo.optString("type");
+	    timeSeriesId = curveInfo.optString("ratingCurveId");
+	    stageUom = curveInfo.optString("stageUom");
+	    protocol = CommonNameSpaceContext.HISCENTRAL_MARCHE_SCALE_DEFLUSSO_NS_URI;
+	    dataset.getPropertyHandler().setIsRatingCurve(true);
+	    statisticalFunction = "average";
+	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
+	    uom = "table";
+	    basePhenomenon = "Rating curves";
+	}
 
 	String resourceLocator = datasetInfo.getString("ResourceLocator");
 
@@ -149,47 +188,46 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	//
 	//
 	//
-
-	String timeSeriesId = sensorInfo.get("timeSeriesId").toString();
-
-	String tempExtenBegin = sensorInfo.getString("temporalExtent");
-
 	String stationName = sensorInfo.getString("name");
 
-	String statisticalFunction = "";
-	if (sensorInfo.getJSONObject("observedProperty").has("statisticalFunction")) {
+	JSONArray pointArray = sensorInfo.getJSONObject("spatialSamplingFeature").getJSONArray("Point");
 
-	    statisticalFunction = sensorInfo.getJSONObject("observedProperty").getString("statisticalFunction");
+	BigDecimal lon = BigDecimal.valueOf(pointArray.getDouble(0)).setScale(5, RoundingMode.HALF_UP);
 
-	    if (statisticalFunction.equals("sum")) {
-		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
-	    } else if (statisticalFunction.equals("accumulation")) {
-		dataset.getExtensionHandler().setTimeInterpolation("accumulation"); // TODO check data
-	    } else if (statisticalFunction.equals("maximum")) {
-		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
-	    }else {
-		dataset.getExtensionHandler().setTimeInterpolation(statisticalFunction);
+	BigDecimal lat = BigDecimal.valueOf(pointArray.getDouble(1)).setScale(5, RoundingMode.HALF_UP);
+
+	if (timeSeriesId == null) {
+	    timeSeriesId = sensorInfo.get("timeSeriesId").toString();
+	}
+
+	if (tempExtenBegin == null) {
+	    tempExtenBegin = sensorInfo.getString("temporalExtent");
+	}
+
+	if (statisticalFunction.isEmpty()) {
+	    if (sensorInfo.getJSONObject("observedProperty").has("statisticalFunction")) {
+
+		statisticalFunction = sensorInfo.getJSONObject("observedProperty").getString("statisticalFunction");
+
+		if (statisticalFunction.equals("sum")) {
+		    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
+		} else if (statisticalFunction.equals("accumulation")) {
+		    dataset.getExtensionHandler().setTimeInterpolation("accumulation"); // TODO check data
+		} else if (statisticalFunction.equals("maximum")) {
+		    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.MAX);
+		} else {
+		    dataset.getExtensionHandler().setTimeInterpolation(statisticalFunction);
+		}
 	    }
 	}
 
-	String uom = sensorInfo.getJSONObject("observedProperty").getString("uom");
-	String basePhenomenon = sensorInfo.getJSONObject("observedProperty").getString("basePhenomenon");
+	if (uom == null) {
+	    uom = sensorInfo.getJSONObject("observedProperty").getString("uom");
+	}
 
-//	String pointLon = sensorInfo.getJSONObject("spatialSamplingFeature").getJSONArray("Point").get(0).toString();
-//	String pointLat = sensorInfo.getJSONObject("spatialSamplingFeature").getJSONArray("Point").get(1).toString();
-	
-	JSONArray pointArray = sensorInfo
-	        .getJSONObject("spatialSamplingFeature")
-	        .getJSONArray("Point");
-
-	BigDecimal lon = BigDecimal
-	        .valueOf(pointArray.getDouble(0))
-	        .setScale(5, RoundingMode.HALF_UP);
-
-	BigDecimal lat = BigDecimal
-	        .valueOf(pointArray.getDouble(1))
-	        .setScale(5, RoundingMode.HALF_UP);
-
+	if(basePhenomenon == null) {
+	    basePhenomenon = sensorInfo.getJSONObject("observedProperty").getString("basePhenomenon");
+	}
 
 	String intendedObservationSpacing = sensorInfo.getString("intendedObservationSpacing");
 
@@ -210,10 +248,6 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setTimeAggregationDuration8601(intendedObservationSpacing);
 
 	}
-
-	//
-	//
-	//
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
@@ -300,11 +334,18 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	// temp extent
 	//
 
-	String beginPosition = normalizeUTCPosition(tempExtenBegin);
-
 	TemporalExtent temporalExtent = new TemporalExtent();
-	temporalExtent.setBeginPosition(beginPosition);
-	temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+
+	String beginPosition = normalizeUTCPosition(tempExtenBegin);
+	if(beginPosition.contains("/")) {
+	    String[] splittedTemporal = beginPosition.split("/");
+	    temporalExtent.setBeginPosition(splittedTemporal[0]);
+	    temporalExtent.setEndPosition(splittedTemporal[1]);
+	} else {
+	    temporalExtent.setBeginPosition(beginPosition);
+	    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+	}
+
 
 	coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
 
@@ -332,13 +373,16 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	    tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	}
 
-	String linkage = HISCentralMarcheConnector.SENSOR_URL + "?id=" + timeSeriesId;
+	if (linkage == null) {
+	    linkage = HISCentralMarcheConnector.SENSOR_URL + "?id=" + timeSeriesId;
+	    protocol = CommonNameSpaceContext.HISCENTRAL_MARCHE_NS_URI;
+	}
 
 	online = new Online();
 	online.setLinkage(linkage);
 	online.setFunctionCode("download");
 	online.setName(stationName + "_" + timeSeriesId);
-	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_MARCHE_NS_URI);
+	online.setProtocol(protocol);
 
 	distribution.addDistributionOnline(online);
 

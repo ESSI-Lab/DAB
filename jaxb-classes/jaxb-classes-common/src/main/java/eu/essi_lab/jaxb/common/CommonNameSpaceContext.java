@@ -147,6 +147,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String HISCENTRAL_EMILIA_NS_URI = "http://essi-lab.eu/his-central/emilia";
 
     public static final String HISCENTRAL_MARCHE_NS_URI = "http://essi-lab.eu/his-central/marche";
+    public static final String HISCENTRAL_MARCHE_SCALE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/marche-scala-deflusso";
     public static final String HISCENTRAL_FRIULI_NS_URI = "http://essi-lab.eu/his-central/friuli";
     public static final String HISCENTRAL_VENETO_NS_URI = "http://essi-lab.eu/his-central/veneto";
     public static final String HISCENTRAL_LAZIO_NS_URI = "http://essi-lab.eu/his-central/lazio";

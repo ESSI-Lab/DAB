@@ -21,10 +21,9 @@ package eu.essi_lab.accessor.hiscentral.marche;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import com.google.api.client.util.ArrayMap;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -88,15 +87,33 @@ public class HISCentralMarcheConnector extends HarvestedQueryConnector<HISCentra
 
 	    JSONArray pointTimeSeriesObservation = object.getJSONArray("pointTimeSeriesObservation");
 
+	    JSONArray ratingCurves = object.getJSONArray("ratingCurves");
+
 	    maxRecords = pointTimeSeriesObservation.length();
 
 	    getSetting().getMaxRecords().ifPresent(v -> maxRecords = v);
 
+	    Map<String, JSONObject> map = new ArrayMap<>();
 	    for (int i = 0; i < maxRecords; i++) {
 
 		JSONObject sensorInfo = pointTimeSeriesObservation.getJSONObject(i);
-		ret.addRecord(HISCentralMarcheMapper.create(datasetMetadata, sensorInfo));
+		String name = sensorInfo.optString("name");
+		map.putIfAbsent(name, sensorInfo);
+		ret.addRecord(HISCentralMarcheMapper.create(datasetMetadata, sensorInfo, null));
 	    }
+
+	    maxRecords = ratingCurves.length();
+
+	    for (int j = 0; j < maxRecords; j++) {
+
+		JSONObject curveInfo = ratingCurves.getJSONObject(j);
+		String stationName = curveInfo.optString("stationName");
+		JSONObject jsonObj = map.get(stationName);
+		if(jsonObj != null) {
+		    ret.addRecord(HISCentralMarcheMapper.create(datasetMetadata, jsonObj, curveInfo));
+		}
+	    }
+
 	}
 
 	return ret;
