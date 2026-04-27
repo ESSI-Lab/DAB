@@ -21,13 +21,14 @@ package eu.essi_lab.api.database.vol;
  * #L%
  */
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.lib.utils.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -49,13 +50,13 @@ public class VolatileFolder implements DatabaseFolder {
      */
     private class ModifiedInputStream {
 
-	private InputStream inputStream;
+	private ClonableInputStream inputStream;
 	private Date dateStamp;
 
 	/**
 	 * @param inputStream
 	 */
-	public ModifiedInputStream(InputStream inputStream) {
+	public ModifiedInputStream(InputStream inputStream) throws IOException {
 
 	   this(inputStream, new Date());
 	}
@@ -64,9 +65,9 @@ public class VolatileFolder implements DatabaseFolder {
 	 * @param inputStream
 	 * @param dateStamp
 	 */
-	public ModifiedInputStream(InputStream inputStream, Date dateStamp) {
+	public ModifiedInputStream(InputStream inputStream, Date dateStamp) throws IOException {
 
-	    this.inputStream = inputStream;
+	    this.inputStream = new ClonableInputStream(inputStream);
 	    this.dateStamp = new Date();
 	}
 
@@ -75,7 +76,7 @@ public class VolatileFolder implements DatabaseFolder {
 	 */
 	public InputStream getInputStream() {
 
-	    return inputStream;
+	    return inputStream.clone();
 	}
 
 	/**
@@ -174,7 +175,7 @@ public class VolatileFolder implements DatabaseFolder {
     @Override
     public InputStream getBinary(String key) throws Exception {
 
-	return streamsMap.get(key).getInputStream();
+	return Optional.ofNullable(streamsMap.get(key)).map(ModifiedInputStream::getInputStream).orElse(null);
     }
 
     @Override

@@ -49,7 +49,6 @@ import eu.essi_lab.profiler.os.handler.srvinfo.*;
 import jakarta.ws.rs.core.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -74,7 +73,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
     }
 
     /**
-     * @param setting
+     *
      */
     public OSRequestTransformer() {
 
@@ -303,8 +302,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    }
 
 	    //
- 	    // supported parameters check
- 	    //
+	    // supported parameters check
+	    //
 
 	    List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
 
@@ -326,8 +325,8 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    }
 
 	    //
- 	    // output format check
- 	    //
+	    // output format check
+	    //
 
 	    String outputFormat = parser.parse(OSParameters.OUTPUT_FORMAT);
 
@@ -438,7 +437,9 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    }
 
 	    //
-	    // attribute title
+	    // attribute title: constraints go on the user bond and are stored in request statistics as
+	    // {@link RuntimeInfoElement#DISCOVERY_MESSAGE_ATTRIBUTE_TITLE} (field {@code DISCOVERY_MESSAGE_attributeTitle});
+	    // see {@link DiscoveryMessage#provideInfo()}.
 	    //
 
 	    Optional<String> attrTitle = parser.optParse(OSParameters.ATTRIBUTE_TITLE);
@@ -658,63 +659,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
 	String sources = parser.parse(OSParameters.SOURCES);
 
-	String viewId = request.extractViewId().orElse(parser.parse(OSParameters.VIEW_ID));
-
-	Optional<View> view = Optional.empty();
-
-	if (viewId != null && !viewId.equals(KeyValueParser.UNDEFINED)) {
-
-	    view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
-	}
-
-	if (sources == null || sources.equals(KeyValueParser.UNDEFINED)) {
-
-	    Stream<GSSource> stream = null;
-
-	    if (view.isPresent()) {
-
-		stream = ConfigurationWrapper.getViewSources(view.get()).stream();
-
-	    } else {
-
-		stream = ConfigurationWrapper.getAllSources().stream();
-	    }
-
-	    value = stream.map(s -> s.getUniqueIdentifier()).collect(Collectors.joining(","));
-
-	    out = osParameter.asBond(value);
-
-	    // } else if (view.isPresent() && view.get().getSourceDeployment() != null) {
-	    //
-	    // String sourceDeployment = view.get().getSourceDeployment();
-	    //
-	    // List<String> sourceIdsByDeployment = ConfigurationWrapper.getAllSources().//
-	    // stream().filter(s -> s.getDeployment().contains(sourceDeployment)).//
-	    // map(s -> s.getUniqueIdentifier()).//
-	    // collect(Collectors.toList());//
-	    //
-	    // List<String> selected = Arrays.asList(sources.split(","));
-	    // List<String> unselected = sourceIdsByDeployment.stream().//
-	    // filter(id -> !selected.contains(id)).//
-	    // collect(Collectors.toList());
-	    //
-	    // int selectedCount = selected.size();
-	    // int unSelectedCount = unselected.size();
-	    //
-	    // if (selectedCount <= unSelectedCount) {
-	    //
-	    // out = osParameter.asBond(value);
-	    //
-	    // } else {
-	    //
-	    // LogicalBond orBond = BondFactory.createOrBond();
-	    // unselected.forEach(id ->
-	    // orBond.getOperands().add(BondFactory.createNotBond(BondFactory.createSourceIdentifierBond(id))));
-	    //
-	    // out = Optional.of(orBond);
-	    // }
-
-	} else {
+	if (sources != null && !sources.equals(KeyValueParser.UNDEFINED)) {
 
 	    out = osParameter.asBond(value);
 	}
@@ -842,8 +787,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
      * </table>
      * </body> </html>
      *
-     * @param keyValueParser
-     * @param request
+     *
      * @param eiffelOption
      */
     private Optional<Bond> createSearchTermsBond(//
@@ -920,7 +864,6 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 
     /**
      * @param parser
-     * @param innerBonds
      * @param searchFields
      * @param searchValue
      */

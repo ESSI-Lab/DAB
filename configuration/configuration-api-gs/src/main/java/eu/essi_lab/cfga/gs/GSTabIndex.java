@@ -107,8 +107,6 @@ public enum GSTabIndex implements TabIndex {
 	    Descriptor.of(SystemSetting.class),//
 	    Descriptor.of(DatabaseSetting.class),//
 	    Descriptor.of(SchedulerViewSetting.class),//
-	    Descriptor.of(SharedCacheDriverSetting.class),//
-	    Descriptor.of(SharedPersistentDriverSetting.class),//
 	    Descriptor.of(DownloadSetting.class),//
 	    Descriptor.of(RateLimiterSetting.class), //
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel()),

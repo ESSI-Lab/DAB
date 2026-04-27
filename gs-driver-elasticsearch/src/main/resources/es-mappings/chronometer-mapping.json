@@ -1,4 +1,0 @@
-{ "properties": {
-			"CHRONOMETER_TIME_STAMP_MILLIS": { "type": "date" },
-			"CHRONOMETER_ELAPSED_TIME_MILLIS": { "type": "long" }
-}}

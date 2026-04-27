@@ -2355,8 +2355,6 @@
         <module>augmenter</module>
         <module>augmenter-worker</module>
 
-        <module>gs-shared-content</module>
-
         <!-- access tools -->
         <module>access-tools</module>
         <module>access-tools-workflow-engine</module>
@@ -2366,9 +2364,7 @@
         <!-- <module>demo-extensions-pack</module> -->
 
         <!-- drivers -->
-        <module>gs-driver-elasticsearch</module>
-        <module>gs-driver-database</module>
-        <module>gs-driver-local-cache</module>
+        <module>elasticsearch-client</module>
 
         <module>runtime-info-provider</module>
 

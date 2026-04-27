@@ -1,5 +1,6 @@
 package eu.essi_lab.discover.executor;
 
+import eu.essi_lab.request.executor.impl.discover.submitter.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -21,12 +22,11 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.impl.discover.BondReducer;
 import eu.essi_lab.request.executor.impl.discover.BrokeringStrategyResolver;
 import eu.essi_lab.request.executor.impl.discover.DistributorImpl;
-import eu.essi_lab.request.executor.impl.discover.submitter.DistributedQueryExecutor;
 
 /**
  * These tests the bond reduction made by the {@link DistributorImpl} delegating to the {@link BondReducer} when submitting
  * a query to a {@link
- * DistributedQueryExecutor}
+ * DistributedQueryExecutorImpl}
  *
  * @author boldrini
  */

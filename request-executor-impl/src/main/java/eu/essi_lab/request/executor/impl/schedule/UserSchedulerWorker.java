@@ -21,56 +21,39 @@ package eu.essi_lab.request.executor.impl.schedule;
  * #L%
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Date;
-import java.util.Optional;
-
-import jakarta.ws.rs.core.Response;
-
-import org.quartz.JobExecutionContext;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting;
-import eu.essi_lab.cfga.gs.setting.DownloadSetting.DownloadStorage;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.cfga.scheduler.SchedulerWorker;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.RequestMessage;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.DownloadSetting.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.pdk.handler.*;
+import eu.essi_lab.pdk.rsf.*;
+import eu.essi_lab.pdk.rsm.*;
+import eu.essi_lab.request.executor.*;
+import eu.essi_lab.request.executor.storage.*;
+import jakarta.ws.rs.core.*;
+import org.quartz.*;
 import eu.essi_lab.pdk.handler.ProfilerHandler;
-import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
-import eu.essi_lab.pdk.rsm.MessageResponseMapper;
-import eu.essi_lab.request.executor.RequestExecutor;
-import eu.essi_lab.shared.driver.ConfiguredDriverUtils;
-import eu.essi_lab.shared.resultstorage.ResultStorage;
-import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
+
+import java.io.*;
+import java.util.*;
 
 /**
- * {@link UserSchedulerWorker} represents a scheduled job correspondent to a user asynchronous request (e.g. typically a
- * delayed access request)
- * 
+ * {@link UserSchedulerWorker} represents a scheduled job correspondent to a user asynchronous request (e.g. typically a delayed access
+ * request)
+ *
  * @author boldrini
  */
 public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 
-    public static final String USER_JOB = "USER_JOB";
-
-    public static final String RESULT_STORAGE_URI = "RESULT_STORAGE_URI";
-
-    public static final String MESSAGE = "MESSAGE";
-
-    public static final String HANDLER = "HANDLER";
-
-    public static final String MAPPER = "MAPPER";
-
     public static final String FORMATTER = "FORMATTER";
 
     public static final String EXCEPTION_MISSING_CLASS = "suj_missing_class";
-
-    public static final String EXCEPTION_MISSING_EXECUTION_ID_HINT = "suj_missing_execution_id_hint";
 
     public static final String EXCEPTION_MISSING_MESSAGE = "suj_missing_message";
 
@@ -148,10 +131,10 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 	    @Override
 	    protected void onHandlingEnded(Response response) {
 
-		GSLoggerFactory.getLogger(this.getClass()).info("Executor handling ended, storing the result...");
+		GSLoggerFactory.getLogger(getClass()).info("Executor handling ended, storing the result...");
 
 		if (response == null || response.getEntity() == null) {
-		    GSLoggerFactory.getLogger(this.getClass()).error("Empty response!");
+		    GSLoggerFactory.getLogger(getClass()).error("Empty response!");
 		    return;
 		}
 
@@ -169,22 +152,16 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 
 		    DownloadStorage downloadStorage = downloadSetting.getDownloadStorage();
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Uploading file to {} STARTED", downloadStorage.getLabel());
+		    GSLoggerFactory.getLogger(getClass()).info("Uploading file to {} STARTED", downloadStorage.getLabel());
 
 		    ResultStorage storage = null;
 		    StorageInfo resultStorageURI = message.getUserJobStorageURI();
 
 		    switch (downloadStorage) {
 
-		    case LOCAL_DOWNLOAD_STORAGE:
+		    case LOCAL_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createLocalResultStorage(downloadSetting);
+		    case S3_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createAmazonS3ResultStorage(downloadSetting);
 
-			storage = ResultStorageFactory.createLocalResultStorage(resultStorageURI);
-			break;
-
-		    case S3_DOWNLOAD_STORAGE:
-
-			storage = ResultStorageFactory.createAmazonS3ResultStorage(resultStorageURI);
-			break;
 		    }
 
 		    //
@@ -192,7 +169,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 		    //
 		    String get = storage.getStorageLocation(objectName);
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Storing to {} STARTED", get);
+		    GSLoggerFactory.getLogger(getClass()).info("Storing to {} STARTED", get);
 
 		    jakarta.ws.rs.core.StreamingOutput streamingOutput = response.readEntity(jakarta.ws.rs.core.StreamingOutput.class);
 
@@ -207,9 +184,9 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 
 		    tmpFile.delete();
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Uploading file to {} ENDED", downloadStorage.getLabel());
+		    GSLoggerFactory.getLogger(getClass()).info("Uploading file to {} ENDED", downloadStorage.getLabel());
 
-		    GSLoggerFactory.getLogger(this.getClass()).info("Storing to {} ENDED", get);
+		    GSLoggerFactory.getLogger(getClass()).info("Storing to {} ENDED", get);
 
 		    //
 		    // Updates the status
@@ -225,7 +202,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 		} catch (Exception e) {
 
 		    e.printStackTrace();
-		    GSLoggerFactory.getLogger(this.getClass()).error("Storing failed: " + e.getMessage());
+		    GSLoggerFactory.getLogger(getClass()).error("Storing failed: " + e.getMessage());
 
 		    status.setErrorPhase();
 		    status.addErrorMessage(e.getMessage());
@@ -278,23 +255,17 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
      */
     protected void checkInputs(String handlerClass, String mapperClass, String formatterClass, RequestMessage message) throws GSException {
 
-	if (handlerClass == null || handlerClass.length() == 0) {
+	if (handlerClass == null || handlerClass.isEmpty()) {
 	    throw createException(EXCEPTION_MISSING_CLASS, "Missing handler class from job data map");
 	}
 
-	if (mapperClass == null || mapperClass.length() == 0) {
+	if (mapperClass == null || mapperClass.isEmpty()) {
 	    throw createException(EXCEPTION_MISSING_CLASS, "Missing mapper class from job data map");
 	}
 
-	if (formatterClass == null || formatterClass.length() == 0) {
+	if (formatterClass == null || formatterClass.isEmpty()) {
 	    throw createException(EXCEPTION_MISSING_CLASS, "Missing formatter class from job data map");
 	}
-
-	// String jobId = getSetting().getJobId();
-	//
-	// if (jobId == null || jobId.length() == 0) {
-	// throw createException(EXCEPTION_MISSING_EXECUTION_ID_HINT, "Missing id from job data map");
-	// }
 
 	if (message == null) {
 	    throw createException(EXCEPTION_MISSING_MESSAGE, "Missing message from job data map");
@@ -305,11 +276,11 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 	    throw createException(EXCEPTION_MISSING_RESULT_STORAGE_URI_COMPLEX, "Missing result storage URI complex object from message");
 	}
 
-	if (resultStorageURI.getUri() == null || resultStorageURI.getUri().length() == 0) {
+	if (resultStorageURI.getUri() == null || resultStorageURI.getUri().isEmpty()) {
 	    throw createException(EXCEPTION_MISSING_RESULT_STORAGE_URI, "Missing result storage URI from message");
 	}
 
-	if (resultStorageURI.getName() == null || resultStorageURI.getName().length() == 0) {
+	if (resultStorageURI.getName() == null || resultStorageURI.getName().isEmpty()) {
 	    throw createException(EXCEPTION_MISSING_RESULT_STORAGE_URI_STORAGE_NAME,
 		    "Missing result storage URI storage name from message");
 	}
@@ -318,7 +289,20 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
     @Override
     protected void storeJobStatus(SchedulerJobStatus status) throws GSException {
 
-	ConfiguredDriverUtils.storeToPersistentStorage(status.getJobIdentifier(), status.getObject());
+	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
+
+	DatabaseFolder cacheFolder = DatabaseFactory.get(storageInfo).getCacheFolder();
+
+	InputStream stream = IOStreamUtils.asStream(status.getObject().toString(3));
+
+	try {
+
+	    cacheFolder.store(status.getJobIdentifier(), DatabaseFolder.FolderEntry.of(stream), DatabaseFolder.EntryType.CACHE_ENTRY);
+
+	} catch (Exception e) {
+
+	    throw GSException.createException(getClass(), "DatabaseStoreCachedResourceError", e);
+	}
     }
 
     @Override
@@ -337,8 +321,7 @@ public class UserSchedulerWorker extends SchedulerWorker<UserScheduledSetting> {
 	GSLoggerFactory.getLogger(this.getClass()).info("Creating instance of class: " + className);
 
 	Class<?> clazz = Class.forName(className);
-	Object ret = clazz.newInstance();
-	return ret;
+	return clazz.newInstance();
     }
 
     /**

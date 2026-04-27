@@ -33,7 +33,7 @@ import java.util.function.*;
  */
 public class CustomPatch extends Patch {
 
-     private Predicate<Setting> predicate;
+    private Predicate<Setting> predicate;
     private Function<Setting, Setting> function;
 
     /**

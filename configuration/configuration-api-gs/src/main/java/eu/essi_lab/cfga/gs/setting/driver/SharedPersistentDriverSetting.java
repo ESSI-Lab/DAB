@@ -36,6 +36,7 @@ import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
 /**
  * @author Fabrizio
  */
+@Deprecated
 public class SharedPersistentDriverSetting extends DriverSetting {
 
     private static final String LOCAL_PERSISTENT_SETTING_ID = "localPersistentSetting";

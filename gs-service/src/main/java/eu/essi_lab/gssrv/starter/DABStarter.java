@@ -647,6 +647,15 @@ public class DABStarter implements ConfigurationChangeListener {
 	    customPatch.patch();
 
 	    //
+	    // this patch removes legacy shared cache and shared persistent repo settings
+	    //
+
+	    RemoveSettingPatch removeSettingPatch = RemoveSettingPatch.of(configuration,
+		    (s) -> s.getIdentifier().equals("sharedCacheRepo") || s.getIdentifier().equals("sharedPersistentRepo"));
+
+	    removeSettingPatch.patch();
+
+	    //
 	    // in these mode there is no need to autoreload
 	    // since there is only one node, no shared configuration
 	    //

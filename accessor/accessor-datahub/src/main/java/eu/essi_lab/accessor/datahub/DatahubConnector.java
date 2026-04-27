@@ -38,7 +38,10 @@ import java.nio.file.*;
 import java.util.*;
 
 /**
- * Connector for retrieving metadata from DataHub
+ * Connector for retrieving metadata from DataHub. Each {@link #listRecords} call authenticates and reloads the
+ * identifier list. The resumption token is a single non-negative integer: how many metadata records have already been
+ * returned in this harvest. Each call replays identifiers from the start until that many successful fetches are
+ * skipped, then fills the next page (so the connector stays stateless and safe to reuse).
  *
  * @author Generated
  */
@@ -53,15 +56,11 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
     private static final String DATAHUB_URL_NOT_FOUND_ERROR = "DATAHUB_URL_NOT_FOUND_ERROR";
     private static final String DATAHUB_AUTH_ERROR = "DATAHUB_AUTH_ERROR";
     private static final String DATAHUB_IDENTIFIERS_ERROR = "DATAHUB_IDENTIFIERS_ERROR";
-    private static final int IDENTIFIER_BATCH_SIZE = 20;
 
-    private List<String> originalMetadata;
-    private int partialNumbers;
     private Logger logger = GSLoggerFactory.getLogger(this.getClass());
     private Downloader downloader;
 
     public DatahubConnector() {
-	this.originalMetadata = new ArrayList<>();
 	this.downloader = new Downloader();
     }
 
@@ -75,70 +74,20 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 
-	if(getSetting().readKeyValue("instantExit").orElse("false").equals("true")){
-
+	if (getSetting().readKeyValue("instantExit").orElse("false").equals("true")) {
 	    return ret;
 	}
-
-	if (originalMetadata.isEmpty()) {
-	    originalMetadata = getOriginalMetadata();
-	}
-
-	String token = request.getResumptionToken();
-	int start = 0;
-	if (token != null) {
-	    start = Integer.valueOf(token);
-	}
-
-	int pageSize = getSetting().getPageSize();
 
 	Optional<Integer> mr = getSetting().getMaxRecords();
-	boolean maxNumberReached = false;
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && start > mr.get() - 1) {
-	    maxNumberReached = true;
-	}
+	boolean unlimited = getSetting().isMaxRecordsUnlimited();
+	int pageSize = Math.max(1, getSetting().getPageSize());
 
-	if (start < originalMetadata.size() && !maxNumberReached) {
-	    int end = start + pageSize;
-	    if (end > originalMetadata.size()) {
-		end = originalMetadata.size();
-	    }
+	int metadataIndex = parseMetadataIndex(request.getResumptionToken(), logger);
 
-	    if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && end > mr.get()) {
-		end = mr.get();
-	    }
-	    int count = 0;
-
-	    for (int i = start; i < end; i++) {
-		String om = originalMetadata.get(i);
-
-		if (om != null && !om.isEmpty()) {
-		    OriginalMetadata metadata = new OriginalMetadata();
-		    metadata.setSchemeURI(DatahubMapper.DATAHUB_NS_URI);
-
-		    metadata.setMetadata(om);
-		    ret.addRecord(metadata);
-		    partialNumbers++;
-		    count++;
-		}
-	    }
-	    ret.setResumptionToken(String.valueOf(start + count));
-	    logger.debug("ADDED {} records. Number of analyzed records: {}", partialNumbers, String.valueOf(start + count));
-
-	} else {
+	if (!unlimited && mr.isPresent() && metadataIndex >= mr.get()) {
 	    ret.setResumptionToken(null);
-	    logger.debug("Added records: {} . TOTAL SIZE: {}", partialNumbers, originalMetadata.size());
-	    partialNumbers = 0;
 	    return ret;
 	}
-
-	return ret;
-    }
-
-    private List<String> getOriginalMetadata() throws GSException {
-	logger.trace("DataHub List Data finding STARTED");
-
-	List<String> ret = new ArrayList<>();
 
 	String endpoint = getSourceURL();
 	if (endpoint == null || endpoint.isEmpty()) {
@@ -150,14 +99,13 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
 		    ErrorInfo.SEVERITY_ERROR, //
 		    DATAHUB_URL_NOT_FOUND_ERROR);
 	}
-
-	// Ensure endpoint doesn't end with /
 	if (endpoint.endsWith("/")) {
 	    endpoint = endpoint.substring(0, endpoint.length() - 1);
 	}
 
+	logger.trace("DataHub listRecords STARTED");
+
 	try {
-	    // Step 1: Get access token
 	    String accessToken = getAccessToken(endpoint);
 	    if (accessToken == null || accessToken.isEmpty()) {
 		throw GSException.createException(//
@@ -168,69 +116,65 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
 			ErrorInfo.SEVERITY_ERROR, //
 			DATAHUB_AUTH_ERROR);
 	    }
-	    logger.debug("Access token obtained successfully");
 
-	    // Step 2: Read identifiers from URL or file
 	    List<String> identifiers = readIdentifiers();
 	    if (identifiers.isEmpty()) {
 		logger.warn("No identifiers found");
+		ret.setResumptionToken(null);
 		return ret;
 	    }
-	    logger.info("Found {} identifiers to process", identifiers.size());
 
-	    // Track failed identifiers
-	    List<String> failedIdentifiers = new ArrayList<>();
 
-	    // Step 3: Process identifiers in blocks of 20
-	    for (int i = 0; i < identifiers.size(); i += IDENTIFIER_BATCH_SIZE) {
-		int end = Math.min(i + IDENTIFIER_BATCH_SIZE, identifiers.size());
-		List<String> batch = identifiers.subList(i, end);
-		logger.debug("Processing batch {}-{} of {} identifiers", i + 1, end, identifiers.size());
+	    if (!unlimited && mr.isPresent() && mr.get() <= 0) {
+		ret.setResumptionToken(null);
+		return ret;
+	    }
 
-		for (String identifier : batch) {
-		    try {
-			identifier = identifier.replace("\",", "");
-			identifier = identifier.replace("\"", "");
-			String metadata = fetch(endpoint, accessToken, identifier);
-			if (metadata != null && !metadata.trim().isEmpty()) {
-				if (metadata.contains("vector_spatial")){
-					System.out.println(metadata);
-				}
-			    ret.add(metadata);
-			    logger.debug("Successfully fetched metadata for identifier: {}", identifier);
-			} else {
-			    logger.warn("Empty metadata returned for identifier: {}", identifier);
-			    failedIdentifiers.add(identifier);
-			}
-		    } catch (Exception e) {
-			logger.error("Error fetching metadata for identifier: {}", identifier, e);
-			failedIdentifiers.add(identifier);
-			// Continue with next identifier
+	    int added = 0;
+
+	    for (int i = metadataIndex; i < identifiers.size(); i++) {
+
+		String rawId = identifiers.get(i);
+		String identifier = rawId.replace("\",", "").replace("\"", "");
+		try {
+		    String metadata = fetch(endpoint, accessToken, identifier);
+		    if (metadata == null || metadata.trim().isEmpty()) {
+			logger.warn("Empty metadata returned for identifier: {}", identifier);
+			continue;
 		    }
+
+		    if (!unlimited && mr.isPresent() && metadataIndex + added >= mr.get()) {
+			break;
+		    }
+		    if (added >= pageSize) {
+			break;
+		    }
+
+		    if (metadata.contains("vector_spatial")) {
+			System.out.println(metadata);
+		    }
+		    OriginalMetadata metadataRecord = new OriginalMetadata();
+		    metadataRecord.setSchemeURI(DatahubMapper.DATAHUB_NS_URI);
+		    metadataRecord.setMetadata(metadata);
+		    ret.addRecord(metadataRecord);
+		    added++;
+
+		} catch (Exception e) {
+		    logger.error("Error fetching metadata for identifier: {}", identifier, e);
 		}
 	    }
 
-	    // Print summary of failed identifiers at the end of harvesting
-	    if (!failedIdentifiers.isEmpty()) {
-		logger.warn("========================================");
-		logger.warn("HARVESTING SUMMARY - FAILED IDENTIFIERS");
-		logger.warn("========================================");
-		logger.warn("Total identifiers processed: {}", identifiers.size());
-		logger.warn("Successfully harvested: {}", ret.size());
-		logger.warn("Failed identifiers: {}", failedIdentifiers.size());
-		logger.warn("----------------------------------------");
-		logger.warn("List of failed identifiers:");
-		for (String failedId : failedIdentifiers) {
-		    logger.warn("  - {}", failedId);
-		}
-		logger.warn("========================================");
-	    }
+	    int totalEmitted = metadataIndex + added;
+	    boolean maxHit = !unlimited && mr.isPresent() && totalEmitted >= mr.get();
+	    boolean pageFilled = added >= pageSize;
 
-	    if (ret.isEmpty()) {
-		logger.warn("No metadata records loaded");
+	    if (maxHit || !pageFilled) {
+		ret.setResumptionToken(null);
 	    } else {
-		logger.info("Loaded {} metadata records", ret.size());
+		ret.setResumptionToken(String.valueOf(totalEmitted));
 	    }
+
+	    logger.debug("DataHub page: {} records this call, total emitted after page {}", added, totalEmitted);
 
 	} catch (GSException e) {
 	    throw e;
@@ -245,8 +189,25 @@ public class DatahubConnector extends HarvestedQueryConnector<DatahubConnectorSe
 		    DATAHUB_URL_NOT_FOUND_ERROR);
 	}
 
-	logger.trace("DataHub List Data finding ENDED");
+	logger.trace("DataHub listRecords ENDED");
 	return ret;
+    }
+
+    /**
+     * Parses the resumption token as the number of metadata records already returned in this harvest. Legacy
+     * {@code identifierIndex:metadataCount} tokens use the second field (metadata count).
+     */
+    private static int parseMetadataIndex(String token, Logger log) {
+	if (token == null || token.isEmpty()) {
+	    return 0;
+	}
+	try {
+	    String number = token.trim();
+	    return Integer.parseInt(number);
+	} catch (NumberFormatException e) {
+	    log.warn("Invalid DataHub resumption token [{}], restarting from beginning", token);
+	    return 0;
+	}
     }
 
     /**

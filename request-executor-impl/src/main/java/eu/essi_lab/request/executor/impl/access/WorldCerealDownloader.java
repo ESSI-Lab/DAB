@@ -29,14 +29,13 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.request.executor.storage.*;
 import org.apache.commons.io.IOUtils;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.DownloadSetting;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.shared.resultstorage.ResultStorage;
-import eu.essi_lab.shared.resultstorage.ResultStorageFactory;
 
 public class WorldCerealDownloader extends DirectDownloader {
 
@@ -99,18 +98,12 @@ public class WorldCerealDownloader extends DirectDownloader {
 		DownloadSetting downloadSetting = ConfigurationWrapper.getDownloadSetting();
 
 		ResultStorage storage = null;
-		StorageInfo resultStorageURI = downloadSetting.getStorageUri();
 
 		switch (downloadSetting.getDownloadStorage()) {
 
-		case LOCAL_DOWNLOAD_STORAGE:
+		case LOCAL_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createLocalResultStorage(downloadSetting);
+		case S3_DOWNLOAD_STORAGE -> storage = ResultStorageFactory.createAmazonS3ResultStorage(downloadSetting);
 
-		    storage = ResultStorageFactory.createLocalResultStorage(resultStorageURI);
-		    break;
-		case S3_DOWNLOAD_STORAGE:
-
-		    storage = ResultStorageFactory.createAmazonS3ResultStorage(resultStorageURI);
-		    break;
 		}
 
 		String get = storage.getStorageLocation(objectName);
@@ -126,7 +119,9 @@ public class WorldCerealDownloader extends DirectDownloader {
 		FileOutputStream fos = new FileOutputStream(tmpFile);
 		IOUtils.copy(stream, fos);
 		fos.close();
+
 		storage.store(objectName, tmpFile);
+
 		tmpFile.delete();
 
 		GSLoggerFactory.getLogger(getClass()).info("Storing to {} ENDED", get);

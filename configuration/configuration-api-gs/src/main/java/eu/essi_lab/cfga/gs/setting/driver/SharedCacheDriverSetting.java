@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting.driver;
 
@@ -24,45 +24,43 @@ package eu.essi_lab.cfga.gs.setting.driver;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.model.shared.SharedContent.*;
+import org.json.*;
 
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.option.IntegerOptionBuilder;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.model.shared.SharedContent.SharedContentCategory;
+import java.util.*;
 
 /**
  * @author Fabrizio
  */
+@Deprecated
 public class SharedCacheDriverSetting extends DriverSetting {
 
     private static final String LOCAL_CACHE_SETTING_ID = "localCacheSetting";
     private static final String DATABASE_CACHE_SETTING_ID = "databaseCacheSetting";
     private static final String CACHE_RETENTION_TIME_KEY = "cacheRetentionTime";
     /**
-     * 
+     *
      */
     public static final Integer DEFAULT_RETENTION_TIME = 12;
 
     /**
-     * 
+     *
      */
     public SharedCacheDriverSetting() {
 
 	super();
 
 	setName("Cached repository settings");
-	setDescription("This kind of repository is used to temporary store the results of the distributed queries. These records will be later retrieved if required for a 'get by id' request");
+	setDescription(
+		"This kind of repository is used to temporary store the results of the distributed queries. These records will be later retrieved if required for a 'get by id' request");
 	setSelectionMode(SelectionMode.SINGLE);
 	enableCompactMode(false);
 
 	setCanBeCleaned(false);
-	
+
 	Option<Integer> retentionTimeOption = IntegerOptionBuilder.get().//
 		withLabel("How long (in hours) resources are kept in cache").//
 		withKey(CACHE_RETENTION_TIME_KEY).//
@@ -103,7 +101,7 @@ public class SharedCacheDriverSetting extends DriverSetting {
 	dbCacheSetting.setEditable(false);
 
 	dbCacheSetting.hideDatabaseConfigurationName();
-	
+
 	addSetting(dbCacheSetting);
     }
 
