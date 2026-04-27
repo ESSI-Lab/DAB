@@ -171,7 +171,7 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	    statisticalFunction = "average";
 	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
 	    uom = "table";
-	    basePhenomenon = "Rating curves";
+	    basePhenomenon = "scala_deflusso";
 	}
 
 	String resourceLocator = datasetInfo.getString("ResourceLocator");
