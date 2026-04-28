@@ -10,12 +10,12 @@ package eu.essi_lab.identifierdecorator;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -248,12 +248,13 @@ public class IdentifierDecorator {
 
 	if (requiresParentIdDecorator(incomingResource, originalId)) {
 
-	    String oldparentid = incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
-	    String newparentid = generatePersistentIdentifier(oldparentid, incomingResource.getSource().getUniqueIdentifier());
+	    String oldParentid = incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
+	    String newParentid = generatePersistentIdentifier(oldParentid, incomingResource.getSource().getUniqueIdentifier());
 
-	    incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(newparentid);
+	    incomingResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(newParentid);
+
 	    GSLoggerFactory.getLogger(getClass())
-		    .debug("Updated parent identifier of {} from {} to {}", incomingResource.getPublicId(), oldparentid, newparentid);
+		    .debug("Updated parent identifier of {} from {} to {}", incomingResource.getPublicId(), oldParentid, newParentid);
 	}
 
     }
@@ -265,22 +266,29 @@ public class IdentifierDecorator {
      */
     public boolean requiresParentIdDecorator(GSResource resource, String originalid) {
 
-	String parentid = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
+	String parentId = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
 
-	boolean validParentId = parentid != null && !parentid.equalsIgnoreCase("") && !parentid.equalsIgnoreCase(
-		resource.getSource().getUniqueIdentifier());
+	boolean validParentId = parentId != null && //
+		!parentId.equalsIgnoreCase("") && //
+		!parentId.equalsIgnoreCase(resource.getSource().getUniqueIdentifier());
 
-	if (!validParentId)
+	if (!validParentId) {
+
 	    return false;
+	}
 
-	if (parentid.equalsIgnoreCase(originalid))
+	if (parentId.equalsIgnoreCase(originalid)) {
+
 	    return !useOriginalId(resource, originalid);
+	}
 
 	GSResource collection = new DatasetCollection();
 	collection.setSource(resource.getSource());
 
-	if (useOriginalId(collection, parentid))
+	if (useOriginalId(collection, parentId)) {
+
 	    return false;
+	}
 
 	return true;
     }
@@ -317,16 +325,15 @@ public class IdentifierDecorator {
     }
 
     /**
-     *
-     * @param originalId
+     * @param resourceId
      * @param sourceId
      * @return
      */
-    public static String generatePersistentIdentifier(String originalId, String sourceId) {
+    public static String generatePersistentIdentifier(String resourceId, String sourceId) {
 
 	StringBuilder builder = new StringBuilder();
 
-	builder.append(originalId);
+	builder.append(resourceId);
 	builder.append(PID_SEPARATOR);
 	builder.append(sourceId);
 
