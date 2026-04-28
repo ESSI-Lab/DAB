@@ -10,21 +10,22 @@ package eu.essi_lab.lib.net.s3;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.File;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.github.jsonldjava.shaded.com.google.common.base.Optional;
 
-import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.*;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -83,25 +84,25 @@ public class S3TransferWrapper {
     private static final long DOWNLOAD_SLEEP_TIME = TimeUnit.SECONDS.toMillis(1);
 
     /**
-     * 
+     *
      */
     public S3TransferWrapper() {
     }
 
     /**
-     * 
+     *
      */
     private String accessKey;
     /**
-     * 
+     *
      */
     private String secreteKey;
     /**
-     * 
+     *
      */
     private String endpoint;
     /**
-     * 
+     *
      */
     private boolean aclPublicRead;
     private S3AsyncClient client;
@@ -439,7 +440,7 @@ public class S3TransferWrapper {
 	    HeadObjectResponse response = client.headObject(headRequest).get();
 	    return new Date(1000l * response.lastModified().getEpochSecond());
 	} catch (Exception e) {
-	   return null;
+	    return null;
 	}
     }
 
@@ -460,7 +461,7 @@ public class S3TransferWrapper {
      * @param destination
      * @throws MalformedURLException
      */
-    public boolean download(String bucketName, String objectKey, File destination){
+    public boolean download(String bucketName, String objectKey, File destination) {
 
 	if (getObjectDate(bucketName, objectKey) == null) {
 	    return false;
@@ -503,8 +504,8 @@ public class S3TransferWrapper {
 
 	List<S3Object> out = new ArrayList<>();
 
-	ListObjectsV2Response objects = virtualDirectoryKeyPrefix == null ? listObjects(bucketName)
-		: listObjects(bucketName, virtualDirectoryKeyPrefix);
+	ListObjectsV2Response objects =
+		virtualDirectoryKeyPrefix == null ? listObjects(bucketName) : listObjects(bucketName, virtualDirectoryKeyPrefix);
 
 	String nextContinuationToken = null;
 
@@ -685,6 +686,7 @@ public class S3TransferWrapper {
 		    myAccessKey, mySecretKey);
 
 	    if (awsCreds != null) {
+
 		GSLoggerFactory.getLogger(getClass()).debug("Creating credentials provider STARTED");
 
 		staticCredentials = StaticCredentialsProvider.create(awsCreds);
@@ -700,6 +702,7 @@ public class S3TransferWrapper {
 	}
 
 	if (getEndpoint().isPresent()) {
+
 	    S3AsyncClientBuilder builder = S3AsyncClient.//
 		    builder().//
 		    region(Region.US_EAST_1);
@@ -715,9 +718,12 @@ public class S3TransferWrapper {
 
 	    S3AsyncClient s3AsyncClient = builder.build();
 
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating client ENDED");
+
 	    return s3AsyncClient;
 
 	} else {
+
 	    S3CrtAsyncClientBuilder builder = S3AsyncClient.//
 		    crtBuilder().//
 		    region(Region.US_EAST_1).//
@@ -731,6 +737,8 @@ public class S3TransferWrapper {
 	    GSLoggerFactory.getLogger(getClass()).debug("Creating client STARTED");
 
 	    S3AsyncClient s3AsyncClient = builder.build();
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Creating client ENDED");
 
 	    return s3AsyncClient;
 	}
