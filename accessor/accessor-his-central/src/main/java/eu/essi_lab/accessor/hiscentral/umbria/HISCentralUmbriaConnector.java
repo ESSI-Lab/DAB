@@ -302,7 +302,8 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 	try {
 	    String sensorType = sensorObj.optString("TIPO_STRUMENTO");
 	    String sensorId = sensorObj.optString("ID_SENSORE");
-
+	    String stationId = sensorObj.optString("ID_STAZIONE");
+	    boolean useStationId = false;
 	    List<String> resourceId = new ArrayList<String>();
 	    List<UMBRIA_Variable> varList = new ArrayList<UMBRIA_Variable>();
 
@@ -324,6 +325,7 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 		    varList.add(UMBRIA_Variable.LIVELLOMIN);
 		    varList.add(UMBRIA_Variable.LIVELLOMAX);
 		} else if (sensorType.toLowerCase().contains("portata")) {
+		    useStationId = true;
 		    resourceId.add(HYSTORICAL_FLOW_RATE_ID);
 		    resourceId.add(CURRENT_FLOW_RATE_ID);
 		    varList.add(UMBRIA_Variable.PORTATAMEDIA);
@@ -348,7 +350,9 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 		    boolean breakLoop = false;
 		    for (String type : timeList) {
 
-			String postRequest = "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
+			String postRequest = useStationId ? "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_STAZIONE\":\"" + stationId
+				+ "\", \"TIPOLOGIA_RILEVAZIONE\":\"" + type + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort
+				+ "\"}": "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
 				+ "\", \"TIPOLOGIA_RILEVAZIONE\":\"" + type + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort
 				+ "\"}";
 
@@ -365,12 +369,15 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 			int statusCode = response.statusCode();
 			if (statusCode > 400) {
 			    breakLoop = true;
-			    postRequest = "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
+			    postRequest = useStationId ? "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_STAZIONE\":\"" + stationId
+				    + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort + "\"}" : "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
 				    + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort + "\"}";
 			    GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).debug("POST REQUEST: " + postRequest);
 			    HttpRequest newRequest = HttpRequestUtils.build(MethodWithBody.POST, BASE_URL, postRequest,
 				    HttpHeaderUtils.build(map));
 			    response = new Downloader().downloadResponse(newRequest);
+			    statusCode = response.statusCode();
+			    breakLoop = statusCode > 400 ? true : false;
 			}
 
 			InputStream input = response.body();
