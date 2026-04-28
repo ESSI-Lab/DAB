@@ -60,7 +60,7 @@ import java.util.*;
  */
 public class HISCentralMarcheScaleDeflussoDownloader extends WMLDataDownloader {
 
-    private static final String HISCENTRAL_MARCHE_SCALE_DEFLUSSO_DOWNLOAD_ERROR = "HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_DOWNLOAD_ERROR";
+    private static final String HISCENTRAL_MARCHE_SCALE_DEFLUSSO_DOWNLOAD_ERROR = "HISCENTRAL_MARCHE_SCALE_DEFLUSSO_DOWNLOAD_ERROR";
 
     private HISCentralMarcheConnector connector;
     private Downloader downloader;
@@ -148,8 +148,9 @@ public class HISCentralMarcheScaleDeflussoDownloader extends WMLDataDownloader {
 	    JSONArray values = obj.optJSONArray("points");
 
 		for(int k=0; k < values.length(); k++){
-		    BigDecimal level = obj.optBigDecimal("livello", null);
-		    BigDecimal discharge = obj.optBigDecimal("portata", null);
+		    JSONObject point = values.getJSONObject(k);
+		    BigDecimal level = point.optBigDecimal("stage", null);
+		    BigDecimal discharge = point.optBigDecimal("discharge", null);
 		    RatingCurve curve = curvesByPeriod.get(key);
 		    if (curve == null) {
 			curve = new RatingCurve(beginDate, endDate);

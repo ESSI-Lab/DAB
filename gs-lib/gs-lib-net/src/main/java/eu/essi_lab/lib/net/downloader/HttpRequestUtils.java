@@ -416,7 +416,7 @@ public class HttpRequestUtils {
      * @param request
      * @return
      */
-    public static Builder fromRequest(HttpRequest request) {
+    public static Builder of(HttpRequest request) {
 
 	Builder builder = HttpRequest.newBuilder();
 
