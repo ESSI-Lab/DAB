@@ -43,6 +43,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
@@ -511,6 +514,161 @@ public class ElasticsearchClient {
 		}
 		frequencyValue.append(URLEncoder.encode(key, "UTF-8")).append(ComputationResult.FREQUENCY_ITEM_SEP).append(docCount);
 	    }
+	    frequencyResult.setValue(frequencyValue.toString().trim());
+	    ret.setItemsCount(1);
+	    GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_ENDED);
+	    return ret;
+
+	} catch (Exception e) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    e); //
+	}
+    }
+
+    /**
+     * Request counts per calendar year for which the user's temporal extent overlaps that year (UTC), subject to the same
+     * filter bond as {@link #countRuntimeInfoRequestsByGeohash(Bond, int, int)}. Documents must have at least one of
+     * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_TMP_EXTENT_BEGIN} or {@link RuntimeInfoElement#DISCOVERY_MESSAGE_TMP_EXTENT_END}.
+     * <p>
+     * Overlap: interval {@code [begin,end]} intersects {@code [Y-01-01, Y-12-31]} with open-ended bounds (missing begin or
+     * end treated as unbounded on that side).
+     * </p>
+     *
+     * @param bond    filter bond; may be {@code null} for no filter
+     * @param minYear first calendar year (inclusive), e.g. {@code 1990}
+     * @param maxYear last calendar year (inclusive), e.g. {@code 2026}
+     */
+    public StatisticsResponse countRuntimeInfoRequestsByOverlappingCalendarYear(Bond bond, int minYear, int maxYear)
+	    throws GSException {
+
+	if (maxYear < minYear) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    "maxYear must be >= minYear", //
+		    null, //
+		    ErrorInfo.ERRORTYPE_INTERNAL, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    EL_SEARCH_CLIENT_ERROR, //
+		    (Throwable) null);
+	}
+
+	String beginField = RuntimeInfoElement.DISCOVERY_MESSAGE_TMP_EXTENT_BEGIN.getName();
+	String endField = RuntimeInfoElement.DISCOVERY_MESSAGE_TMP_EXTENT_END.getName();
+	String aggName = "runtime_info_years";
+	DateTimeFormatter instantFmt = DateTimeFormatter.ISO_INSTANT;
+
+	GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_STARTED);
+	StatisticsResponse ret = new StatisticsResponse();
+
+	try {
+
+	    BoolQueryBuilder bondQuery = buildBoolQueryFromRuntimeInfoBonds(bond);
+	    BoolQueryBuilder hasTemporal = QueryBuilders.boolQuery()//
+		    .should(QueryBuilders.existsQuery(beginField))//
+		    .should(QueryBuilders.existsQuery(endField))//
+		    .minimumShouldMatch(1);
+	    BoolQueryBuilder fullQuery = QueryBuilders.boolQuery().must(bondQuery).must(hasTemporal);
+
+	    String queryJson = Strings.toString(XContentType.JSON, fullQuery);
+
+	    StringBuilder filtersObject = new StringBuilder(4096);
+	    for (int y = minYear; y <= maxYear; y++) {
+
+		if (y > minYear) {
+		    filtersObject.append(',');
+		}
+		LocalDate jan1 = LocalDate.of(y, 1, 1);
+		LocalDate dec31 = LocalDate.of(y, 12, 31);
+		String yStartIso = instantFmt.format(jan1.atStartOfDay(ZoneOffset.UTC).toInstant());
+		String yEndIso = instantFmt.format(dec31.atTime(23, 59, 59, 999_000_000).atZone(ZoneOffset.UTC).toInstant());
+
+		BoolQueryBuilder overlap = QueryBuilders.boolQuery()//
+			.must(QueryBuilders.boolQuery()//
+				.should(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(beginField)))//
+				.should(QueryBuilders.rangeQuery(beginField).lte(yEndIso))//
+				.minimumShouldMatch(1))//
+			.must(QueryBuilders.boolQuery()//
+				.should(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(endField)))//
+				.should(QueryBuilders.rangeQuery(endField).gte(yStartIso))//
+				.minimumShouldMatch(1));
+
+		filtersObject.append('"').append(y).append("\":").append(Strings.toString(XContentType.JSON, overlap));
+	    }
+
+	    StringBuilder body = new StringBuilder(512 + filtersObject.length());
+	    body.append("{\"size\":0,\"query\":").append(queryJson).append(",\"aggs\":{\"").append(aggName);
+	    body.append("\":{\"filters\":{\"filters\":{").append(filtersObject).append("}}}}}");
+
+	    String index = dbName + "-request";
+	    Request request = new Request("POST", "/" + index + "/_search");
+	    request.setEntity(new StringEntity(body.toString(), ContentType.APPLICATION_JSON));
+	    Response response = client.getLowLevelClient().performRequest(request);
+	    String responseBody = EntityUtils.toString(response.getEntity());
+	    JSONObject root = new JSONObject(responseBody);
+	    JSONObject aggs = root.optJSONObject("aggregations");
+	    if (aggs == null) {
+
+		ret.setItemsCount(0);
+		return ret;
+	    }
+	    JSONObject yearsAgg = aggs.optJSONObject(aggName);
+	    if (yearsAgg == null) {
+
+		ret.setItemsCount(0);
+		return ret;
+	    }
+
+	    ResponseItem responseItem = new ResponseItem();
+	    ret.getItems().add(responseItem);
+	    ComputationResult frequencyResult = new ComputationResult();
+	    frequencyResult.setTarget(beginField);
+	    responseItem.addFrequency(frequencyResult);
+	    StringBuilder frequencyValue = new StringBuilder();
+
+	    JSONObject bucketsObject = yearsAgg.optJSONObject("buckets");
+	    if (bucketsObject != null) {
+
+		String[] names = JSONObject.getNames(bucketsObject);
+		for (int i = 0; i < names.length; i++) {
+
+		    String key = names[i];
+		    JSONObject b = bucketsObject.optJSONObject(key);
+		    if (b == null) {
+			continue;
+		    }
+		    long docCount = b.optLong("doc_count", 0L);
+		    if (i > 0) {
+			frequencyValue.append(' ');
+		    }
+		    frequencyValue.append(URLEncoder.encode(key, "UTF-8")).append(ComputationResult.FREQUENCY_ITEM_SEP).append(docCount);
+		}
+	    } else {
+
+		JSONArray buckets = yearsAgg.optJSONArray("buckets");
+		if (buckets != null) {
+
+		    for (int i = 0; i < buckets.length(); i++) {
+
+			JSONObject b = buckets.getJSONObject(i);
+			String key = b.optString("key", "");
+			long docCount = b.optLong("doc_count", 0L);
+			if (i > 0) {
+			    frequencyValue.append(' ');
+			}
+			frequencyValue.append(URLEncoder.encode(key, "UTF-8")).append(ComputationResult.FREQUENCY_ITEM_SEP)
+				.append(docCount);
+		    }
+		}
+	    }
+
 	    frequencyResult.setValue(frequencyValue.toString().trim());
 	    ret.setItemsCount(1);
 	    GSLoggerFactory.getLogger(getClass()).trace(STATS_COMPUTING_ENDED);
