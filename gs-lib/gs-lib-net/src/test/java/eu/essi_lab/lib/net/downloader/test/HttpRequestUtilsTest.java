@@ -38,11 +38,11 @@ import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 public class HttpRequestUtilsTest {
 
     @Test
-    public void fromRequestTest1() throws URISyntaxException {
+    public void ofTest1() throws URISyntaxException {
 
 	HttpRequest request = HttpRequestUtils.build(MethodNoBody.GET, "http://test");
 
-	Builder builder = HttpRequestUtils.fromRequest(request);
+	Builder builder = HttpRequestUtils.of(request);
 
 	Assert.assertEquals("GET", builder.build().method());
 
@@ -52,11 +52,11 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void fromRequestTest2() throws URISyntaxException {
+    public void ofTest2() throws URISyntaxException {
 
 	HttpRequest request = HttpRequestUtils.build(MethodNoBody.HEAD, "http://test");
 
-	Builder builder = HttpRequestUtils.fromRequest(request);
+	Builder builder = HttpRequestUtils.of(request);
 
 	Assert.assertEquals("HEAD", builder.build().method());
 
@@ -67,13 +67,13 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void fromRequestTest3() throws URISyntaxException {
+    public void ofTest3() throws URISyntaxException {
 
 	HttpHeaders httpHeaders = HttpHeaderUtils.build("h1", "v1");
 
 	HttpRequest request = HttpRequestUtils.build(MethodNoBody.HEAD, "http://test", httpHeaders);
 
-	Builder builder = HttpRequestUtils.fromRequest(request);
+	Builder builder = HttpRequestUtils.of(request);
 
 	Assert.assertEquals("HEAD", builder.build().method());
 
@@ -83,11 +83,11 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void fromRequestTest4() throws URISyntaxException {
+    public void ofTest4() throws URISyntaxException {
 
 	HttpRequest request = HttpRequestUtils.build(MethodWithBody.POST, "http://test", "body");
 
-	Builder builder = HttpRequestUtils.fromRequest(request);
+	Builder builder = HttpRequestUtils.of(request);
 
 	Assert.assertEquals("POST", builder.build().method());
 
@@ -100,7 +100,7 @@ public class HttpRequestUtilsTest {
      * @throws URISyntaxException
      */
     @Test
-    public void fromRequestTest5() throws URISyntaxException {
+    public void ofTest5() throws URISyntaxException {
 
 	Builder builder = HttpRequest.newBuilder();
 	builder = builder.uri(new URI("http://test"));
@@ -109,7 +109,7 @@ public class HttpRequestUtilsTest {
 
 	HttpRequest httpRequest1 = builder.build();
 
-	Builder builder2 = HttpRequestUtils.fromRequest(httpRequest1);
+	Builder builder2 = HttpRequestUtils.of(httpRequest1);
 	HttpRequest httpRequest2 = builder2.build();
 
 	Assert.assertEquals(httpRequest1.timeout().get(), httpRequest2.timeout().get());
@@ -117,11 +117,11 @@ public class HttpRequestUtilsTest {
     }
 
     @Test
-    public void fromRequestTest6() throws URISyntaxException {
+    public void ofTest6() throws URISyntaxException {
 
 	HttpRequest request = HttpRequestUtils.build(MethodNoBody.GET, "http://test");
 
-	Builder builder = HttpRequestUtils.fromRequest(request);
+	Builder builder = HttpRequestUtils.of(request);
 
 	Assert.assertTrue(builder.build().version().isEmpty());
     }
