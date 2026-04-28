@@ -551,6 +551,16 @@ public class DataHubService extends AbstractManagedService {
 
 		GSResource resource = mapper.map(original, getSource());
 
+		if (resource.getOriginalId().isPresent()) {
+
+		    error("Current record [" + entityURN + "] has no identifier, skipping record", true);
+		    return;
+		}
+
+		//
+		// original identifier
+		//
+
 		String originalId = IdentifierDecorator.generatePersistentIdentifier( //
 			resource.getOriginalId().get(), //
 			getSource().getUniqueIdentifier());//
