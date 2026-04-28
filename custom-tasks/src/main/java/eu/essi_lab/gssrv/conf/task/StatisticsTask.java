@@ -27,6 +27,8 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.Year;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumMap;
@@ -205,6 +207,13 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_SHAPE_GEO} ({@code geohash_grid} on stored geo_shape from user bboxes), filtered
  * by {@code VIEW_ID} (when set) and {@code PROFILER_NAME=OSProfiler}. Labels: {@code geohash}, {@code view}. Requires
  * statistics DB settings.</dd>
+ *
+ * <dt>{@link StatisticsMetric#SEARCH_REQUESTS_TIME_YEAR_TOTAL SEARCH_REQUESTS_TIME_YEAR_TOTAL}
+ * ({@code search_requests_time_year_total})</dt>
+ * <dd>From request statistics: counts per calendar year where the user temporal interval overlaps that year (UTC), on
+ * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_TMP_EXTENT_BEGIN}/{@link RuntimeInfoElement#DISCOVERY_MESSAGE_TMP_EXTENT_END};
+ * filtered by {@code VIEW_ID} (when set) and {@code PROFILER_NAME=OSProfiler}. Labels: {@code year}, {@code view}. Requires
+ * statistics DB settings.</dd>
  * </dl>
  *
  * Legacy: a single line without {@code =} is treated as the view id (same as only {@code VIEW_ID} before).
@@ -271,7 +280,11 @@ public class StatisticsTask extends AbstractCustomTask {
 		"All-time OpenSearch request count for VIEW_ID=view1 and PROFILER_NAME=OSProfiler (label view)"),
 
 	SEARCH_REQUESTS_GEOHASH_TOTAL("search_requests_geohash_total",
-		"OpenSearch geohash_grid (precision 3, top 50) on DISCOVERY_MESSAGE_SHAPE for OSProfiler / view (labels geohash, view)");
+		"OpenSearch geohash_grid (precision 3, top 50) on DISCOVERY_MESSAGE_SHAPE for OSProfiler / view (labels geohash, view)"),
+
+	SEARCH_REQUESTS_TIME_YEAR_TOTAL("search_requests_time_year_total",
+		"OpenSearch request counts per calendar year overlapping user temporal extent (TMP_EXTENT begin/end); "
+			+ "OSProfiler / view (labels year, view)");
 
 	private final String prometheusName;
 	private final String description;
@@ -314,6 +327,12 @@ public class StatisticsTask extends AbstractCustomTask {
 
     /** Max geohash buckets returned (top by count) for {@link StatisticsMetric#SEARCH_REQUESTS_GEOHASH_TOTAL}. */
     private static final int RUNTIME_STATS_GEOHASH_TOP_BUCKETS = 50;
+
+    /**
+     * Inclusive calendar year range for {@link StatisticsMetric#SEARCH_REQUESTS_TIME_YEAR_TOTAL}; upper bound uses the
+     * current UTC year when the statistics task runs.
+     */
+    private static final int RUNTIME_STATS_YEAR_RANGE_MIN = 1990;
 
     private static final String METADATA_SET_COMPLETENESS_LINE_PREFIX = "METADATA_SET_COMPLETENESS_";
 
@@ -718,17 +737,17 @@ public class StatisticsTask extends AbstractCustomTask {
 		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }
 
-	    long now = System.currentTimeMillis();
-	    if (now - taskStartMs >= CANCEL_CHECK_INTERVAL_MS
-		    && (lastCancelCheckMs == 0 || now - lastCancelCheckMs >= CANCEL_CHECK_INTERVAL_MS)) {
-		lastCancelCheckMs = now;
-		if (ConfigurationWrapper.isJobCanceled(context)) {
-		    GSLoggerFactory.getLogger(getClass()).info("Statistics task CANCELED (view / artifact key: {})", statsArtifactKey);
-
-		    status.setPhase(JobPhase.CANCELED);
-		    return;
-		}
-	    }
+//	    long now = System.currentTimeMillis();
+//	    if (now - taskStartMs >= CANCEL_CHECK_INTERVAL_MS
+//		    && (lastCancelCheckMs == 0 || now - lastCancelCheckMs >= CANCEL_CHECK_INTERVAL_MS)) {
+//		lastCancelCheckMs = now;
+//		if (ConfigurationWrapper.isJobCanceled(context)) {
+//		    GSLoggerFactory.getLogger(getClass()).info("Statistics task CANCELED (view / artifact key: {})", statsArtifactKey);
+//
+//		    status.setPhase(JobPhase.CANCELED);
+//		    return;
+//		}
+//	    }
 
 	}
 
@@ -778,14 +797,17 @@ public class StatisticsTask extends AbstractCustomTask {
      * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL}, {@link StatisticsMetric#SEARCH_ATTRIBUTE_TITLE_TOTAL}
      * ({@link ElasticsearchClient#countRuntimeInfoRequestsByBucket}),
      * {@link StatisticsMetric#PORTAL_SEARCHES_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequests}),
-     * {@link StatisticsMetric#SEARCH_REQUESTS_GEOHASH_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequestsByGeohash}).
+     * {@link StatisticsMetric#SEARCH_REQUESTS_GEOHASH_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequestsByGeohash}),
+     * {@link StatisticsMetric#SEARCH_REQUESTS_TIME_YEAR_TOTAL}
+     * ({@link ElasticsearchClient#countRuntimeInfoRequestsByOverlappingCalendarYear}).
      */
     private void registerElasticsearchRuntimeMetrics(PrometheusMeterRegistry registry, Set<StatisticsMetric> metrics,String viewId) {
 
 	if (!metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL) && !metrics.contains(StatisticsMetric.OM_DOWNLOADS_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL)
 		&& !metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)
-		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_GEOHASH_TOTAL)) {
+		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_GEOHASH_TOTAL)
+		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_TIME_YEAR_TOTAL)) {
 	    return;
 	}
 	Optional<DatabaseSetting> settingOpt = ConfigurationWrapper.getSystemSettings().getStatisticsSetting();
@@ -808,6 +830,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	Map<String, Double> omDownloads = new HashMap<>();
 	Map<String, Double> searchAttributeTitleTotal = new HashMap<>();
 	Map<String, Double> searchRequestsGeohashTotal = new HashMap<>();
+	Map<String, Double> searchRequestsTimeYearTotal = new HashMap<>();
 
 	if (metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL)) {
 	    try {
@@ -879,6 +902,24 @@ public class StatisticsTask extends AbstractCustomTask {
 	    }
 	}
 
+	if (metrics.contains(StatisticsMetric.SEARCH_REQUESTS_TIME_YEAR_TOTAL)) {
+	    try {
+		LogicalBond bond = BondFactory.createAndBond();
+		if (viewId != null) {
+		    bond.getOperands()
+			    .add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.VIEW_ID, viewId));
+		}
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.PROFILER_NAME,
+			PORTAL_SEARCHES_PROFILER_OS));
+		int maxYear = Year.now(ZoneOffset.UTC).getValue();
+		StatisticsResponse resp =
+			es.countRuntimeInfoRequestsByOverlappingCalendarYear(bond, RUNTIME_STATS_YEAR_RANGE_MIN, maxYear);
+		searchRequestsTimeYearTotal.putAll(parseRuntimeInfoFrequencyByBucket(resp));
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("SEARCH_REQUESTS_TIME_YEAR_TOTAL query failed: {}", e.getMessage());
+	    }
+	}
+
 	AtomicLong portalSearchesTotal = new AtomicLong(0L);
 	if (metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)) {
 	    try {
@@ -930,6 +971,15 @@ public class StatisticsTask extends AbstractCustomTask {
 		    g -> g.getOrDefault(gh, 0.0))//
 		    .description(StatisticsMetric.SEARCH_REQUESTS_GEOHASH_TOTAL.description())//
 		    .tag("geohash", gh)//
+		    .tag("view", viewId)//
+		    .register(registry);
+	}
+	for (String yr : searchRequestsTimeYearTotal.keySet()) {
+	    final String y = yr;
+	    Gauge.builder(StatisticsMetric.SEARCH_REQUESTS_TIME_YEAR_TOTAL.prometheusName(), searchRequestsTimeYearTotal,
+		    g -> g.getOrDefault(y, 0.0))//
+		    .description(StatisticsMetric.SEARCH_REQUESTS_TIME_YEAR_TOTAL.description())//
+		    .tag("year", y)//
 		    .tag("view", viewId)//
 		    .register(registry);
 	}
