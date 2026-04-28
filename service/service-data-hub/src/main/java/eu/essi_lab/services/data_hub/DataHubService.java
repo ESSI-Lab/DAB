@@ -10,12 +10,12 @@ package eu.essi_lab.services.data_hub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -553,7 +553,7 @@ public class DataHubService extends AbstractManagedService {
 
 		if (resource.getOriginalId().isPresent()) {
 
-		    error("Current record [" + entityURN + "] has no identifier, skipping record", true);
+		    error("Current record [" + entityURN + "] seems to have no identifier, skipping record", true);
 		    return;
 		}
 
@@ -568,6 +568,21 @@ public class DataHubService extends AbstractManagedService {
 		resource.setPrivateId(StringUtils.URLEncodeUTF8(originalId));
 		resource.setOriginalId(originalId);
 		resource.setPublicId(originalId);
+
+		//
+		// parent identifier
+		//
+
+		String parentId = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier();
+
+		if (parentId != null && !parentId.isEmpty()) {
+
+		    parentId = IdentifierDecorator.generatePersistentIdentifier( //
+			    parentId, //
+			    getSource().getUniqueIdentifier());//
+
+		    resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentId);
+		}
 
 		IndexedElementsWriter.write(resource);
 
