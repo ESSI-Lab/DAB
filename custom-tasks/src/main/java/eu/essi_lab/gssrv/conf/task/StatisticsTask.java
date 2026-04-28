@@ -779,9 +779,15 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	    Files.copy(IOStreamUtils.asStream(text), tempFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
+	    String bucket = "dabreporting";
+	    Optional<String> optionalBucket = ConfigurationWrapper.getDownloadSetting().getS3StorageSetting().getBucketName();
+	    if (optionalBucket.isPresent()) {
+		bucket = optionalBucket.get();
+	    }
+
 	    manager.uploadFile(
 		    tempFile.getAbsolutePath(), 
-		    "dabreporting", 
+		    bucket,
 		    "monitoring/" + statsArtifactKey + ".txt");
 
 	    tempFile.delete();

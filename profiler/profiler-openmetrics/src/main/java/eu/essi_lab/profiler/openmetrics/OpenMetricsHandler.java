@@ -96,8 +96,13 @@ public class OpenMetricsHandler extends StreamingRequestHandler {
 
 		getS3TransferManager();
 		if (manager.isPresent()) {
+		    String bucket = "dabreporting";
+		    Optional<String> optionalBucket = ConfigurationWrapper.getDownloadSetting().getS3StorageSetting().getBucketName();
+		    if (optionalBucket.isPresent()) {
+			bucket = optionalBucket.get();
+		    }
 		    File tmpFile = File.createTempFile(getClass().getSimpleName() + "-" + viewId, ".txt");
-		    boolean result = manager.get().download("dabreporting", "monitoring/" + viewId + ".txt", tmpFile);
+		    boolean result = manager.get().download(bucket, "monitoring/" + viewId + ".txt", tmpFile);
 		    if (!result) {
 			GSLoggerFactory.getLogger(getClass()).error("Exception occurred, please contact DAB administrator");
 		    } else {
