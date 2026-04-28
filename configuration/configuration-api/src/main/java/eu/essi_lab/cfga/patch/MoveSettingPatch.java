@@ -41,7 +41,8 @@ public class MoveSettingPatch extends Patch {
      * @param parent
      * @return
      */
-    public static MoveSettingPatch of(Configuration configuration, //
+    public static MoveSettingPatch of( //
+	    Configuration configuration, //
 	    Class<? extends Setting> target, //
 	    Setting parent) {//
 
@@ -68,7 +69,8 @@ public class MoveSettingPatch extends Patch {
      * @param targetClass
      * @param parent
      */
-    private MoveSettingPatch(Configuration configuration,//
+    private MoveSettingPatch( //
+	    Configuration configuration,//
 	    Class<? extends Setting> targetClass,//
 	    Setting parent) {
 
