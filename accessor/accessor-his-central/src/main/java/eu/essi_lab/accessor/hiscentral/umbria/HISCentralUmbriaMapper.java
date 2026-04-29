@@ -26,13 +26,10 @@ import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import net.opengis.gml.v_3_1_1.OffsetCurveType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -370,9 +367,9 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 
 	// temporal extent
 
-	Map<UMBRIA_Variable, List<String>> postResult = HISCentralUmbriaConnector.postData(sensorObj, SORT_ORDER.DESC, resourceIdentifier);
-	List<String> listRes = postResult.get(variable);
-	String tempExtentEnd = listRes.get(1);
+	Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> postResult = HISCentralUmbriaConnector.postData(sensorObj, SORT_ORDER.DESC, resourceIdentifier);
+	HISCentralUmbriaMeasurementInfo listRes = postResult.get(variable);
+	String tempExtentEnd = listRes.getDate();
 	if (tempExtenBegin != null && tempExtentEnd != null) {
 
 	    coreMetadata.addTemporalExtent(tempExtenBegin, tempExtentEnd);
@@ -638,30 +635,68 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
     }
 
     public static void main(String[] args) {
-	String endTime = "2020-12-02T06:06:30.000+0000";
-	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");// 2020-01-02T06:06:30.000+0000
-	df.setTimeZone(TimeZone.getTimeZone("UTC"));
-	Date d = null;
-	String tt = "2004-01-01T00:00:00";
-	SimpleDateFormat iso8601WMLFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	iso8601WMLFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-	try {
-	    iso8601WMLFormat.parse(tt);
-	} catch (ParseException e1) {
-	    // TODO Auto-generated catch block
-	    e1.printStackTrace();
-	}
-	try {
-	    d = df.parse(endTime);
 
-	} catch (Exception e) {
-	    // TODO: handle exception
-	    e.printStackTrace();
+
+	int pageSize = 100;
+	int offset = 0;
+	String id = "81ac32fd-9a75-4c53-a37d-4b9d134af4e5";
+	String id2 = "50dbe5f8-5339-435f-9161-fe250669a97d";
+	boolean finished = true;
+	Set<String> stations = new HashSet<>();
+	while (finished) {
+
+
+	String url = "https://dati.regione.umbria.it/api/3/action/datastore_search?resource_id="+ id2 +"&limit="+ pageSize+ "&offset="+ offset;
+	Downloader downloader = new Downloader();
+	Optional<String> resp = downloader.downloadOptionalString(url);
+	if(resp.isPresent()) {
+	    JSONObject result = new JSONObject(resp.get());
+	    JSONObject objRes = result.optJSONObject("result");
+	    if (objRes != null) {
+		int num = objRes.optInt("total");
+		JSONArray recordsArray = objRes.optJSONArray("records");
+		if (recordsArray != null && !recordsArray.isEmpty()) {
+			for(int i = 0; i < recordsArray.length(); i++) {
+			    JSONObject stationObj = recordsArray.getJSONObject(i);
+			    String stationName = stationObj.optString("NOME_STAZIONE");
+			    stations.add(stationName);
+			}
+		}else {
+		    finished = false;
+		}
+
+	    }
+
+	    offset += pageSize;
 	}
-	Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-	cal.setTime(d);
-	System.out.println(cal.get(Calendar.YEAR));
-	System.out.println(cal.get(Calendar.MONTH));
-	System.out.println(cal.get(Calendar.DAY_OF_MONTH));
+	}
+	System.out.println(Arrays.toString(stations.toArray()));
+
+
+//	String endTime = "2020-12-02T06:06:30.000+0000";
+//	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");// 2020-01-02T06:06:30.000+0000
+//	df.setTimeZone(TimeZone.getTimeZone("UTC"));
+//	Date d = null;
+//	String tt = "2004-01-01T00:00:00";
+//	SimpleDateFormat iso8601WMLFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+//	iso8601WMLFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+//	try {
+//	    iso8601WMLFormat.parse(tt);
+//	} catch (ParseException e1) {
+//	    // TODO Auto-generated catch block
+//	    e1.printStackTrace();
+//	}
+//	try {
+//	    d = df.parse(endTime);
+//
+//	} catch (Exception e) {
+//	    // TODO: handle exception
+//	    e.printStackTrace();
+//	}
+//	Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+//	cal.setTime(d);
+//	System.out.println(cal.get(Calendar.YEAR));
+//	System.out.println(cal.get(Calendar.MONTH));
+//	System.out.println(cal.get(Calendar.DAY_OF_MONTH));
     }
 }
