@@ -44,6 +44,27 @@
 	</servlet-mapping>
 
 	<!-- ===================== -->
+	<!--  Draft MCP (Model Context Protocol) streamable HTTP -->
+	<!-- ===================== -->
+
+	<servlet>
+		<servlet-name>McpServlet</servlet-name>
+		<servlet-class>eu.essi_lab.gssrv.servlet.mcp.McpServlet</servlet-class>
+		<load-on-startup>10</load-on-startup>
+		<async-supported>true</async-supported>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>McpServlet</servlet-name>
+		<url-pattern>/mcp</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>McpServlet</servlet-name>
+		<url-pattern>/mcp/*</url-pattern>
+	</servlet-mapping>
+
+	<!-- ===================== -->
 	<!-- Authenticator servlet -->
 	<!-- ===================== -->
 
