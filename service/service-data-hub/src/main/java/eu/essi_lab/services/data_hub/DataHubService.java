@@ -551,7 +551,7 @@ public class DataHubService extends AbstractManagedService {
 
 		GSResource resource = mapper.map(original, getSource());
 
-		if (resource.getOriginalId().isPresent()) {
+		if (resource.getOriginalId().isEmpty()) {
 
 		    error("Current record [" + entityURN + "] seems to have no identifier, skipping record", true);
 		    return;
@@ -601,9 +601,14 @@ public class DataHubService extends AbstractManagedService {
 
 		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record STARTED: {}", entityURN);
 
-		String encodedURN = StringUtils.URLEncodeUTF8(entityURN);
+		// attempt with non-encoded urn
+		boolean removed = targetFolder.remove(entityURN);
 
-		boolean removed = targetFolder.remove(encodedURN);
+		if (!removed) {
+
+		    // attempt with encoded urn
+		    removed = targetFolder.remove(StringUtils.URLEncodeUTF8(entityURN));
+		}
 
 		if (removed) {
 
