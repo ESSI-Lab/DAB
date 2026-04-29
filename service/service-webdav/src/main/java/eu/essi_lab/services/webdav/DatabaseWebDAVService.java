@@ -13,12 +13,12 @@ package eu.essi_lab.services.webdav;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -66,6 +66,15 @@ public class DatabaseWebDAVService extends AbstractManagedService {
      */
     @Override
     public void start() {
+
+	if(ConfigurationWrapper.getDatabaseSetting().isVolatile()){
+
+	    GSLoggerFactory.getLogger(getClass()).error("Database volatile not supported, unable to start service");
+
+	    publish(MessageChannel.MessageLevel.ERROR, "Database volatile not supported, unable to start service");
+
+	    return;
+	}
 
 	int port = getSetting(). //
 		readKeyValue(PORT_KEY).//
@@ -119,7 +128,10 @@ public class DatabaseWebDAVService extends AbstractManagedService {
     @Override
     public void stop() {
 
-	server.stop();
+	if (server != null) {
+
+	    server.stop();
+	}
 
 	publish(MessageChannel.MessageLevel.INFO, "WebDAV Service " + getId() + " stopped");
     }
