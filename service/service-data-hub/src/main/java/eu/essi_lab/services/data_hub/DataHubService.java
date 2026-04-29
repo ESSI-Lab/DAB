@@ -601,9 +601,14 @@ public class DataHubService extends AbstractManagedService {
 
 		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record STARTED: {}", entityURN);
 
-		String encodedURN = StringUtils.URLEncodeUTF8(entityURN);
+		// attempt with non-encoded urn
+		boolean removed = targetFolder.remove(entityURN);
 
-		boolean removed = targetFolder.remove(encodedURN);
+		if (!removed) {
+
+		    // attempt with encoded urn
+		    removed = targetFolder.remove(StringUtils.URLEncodeUTF8(entityURN));
+		}
 
 		if (removed) {
 
