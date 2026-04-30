@@ -533,6 +533,7 @@ public class GSConfigurationView extends ConfigurationView {
 		new CredentialsSetting.TabDescriptorProvider(),//
 		new DataCacheConnectorSettingImpl.TabDescriptorProvider(),//
 		new BrokeringTabDescriptor(),//
+		new UsersTabDescriptor(),//
 		new SystemTabDescriptor(),//
  		new AboutTabDescriptor(),//
 		new SemanticTabDescriptor()//

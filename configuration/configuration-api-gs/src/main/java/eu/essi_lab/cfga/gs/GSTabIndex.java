@@ -89,16 +89,21 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    SERVICES(8),
-    /**
-     *
-     */
-    SEMANTICS(9, Descriptor.of(DefaultSemanticSearchSetting.class)), //
+    USERS(8),
 
     /**
      *
      */
-    SYSTEM(10,//
+    SERVICES(9),
+    /**
+     *
+     */
+    SEMANTICS(10, Descriptor.of(DefaultSemanticSearchSetting.class)), //
+
+    /**
+     *
+     */
+    SYSTEM(11,//
 	    Descriptor.of(SystemSetting.class),//
 	    Descriptor.of(DatabaseSetting.class),//
 	    Descriptor.of(SchedulerViewSetting.class),//
