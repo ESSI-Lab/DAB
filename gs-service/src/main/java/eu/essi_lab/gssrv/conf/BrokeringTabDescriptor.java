@@ -23,6 +23,7 @@ package eu.essi_lab.gssrv.conf;
 
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.distribution.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
@@ -46,6 +47,8 @@ public class BrokeringTabDescriptor extends TabDescriptor {
 	addContentDescriptors(//
 		new HarvestingSetting.DescriptorProvider().get(), //
 		new SourcePrioritySetting.DescriptorProvider().get(), //
+		new SourceStorageSetting.DescriptorProvider().get(),//
+		new GDCSourcesSetting.DescriptorProvider().get(),//
 		new RecordsInspector().get(),//
 		new DistributionSetting.DescriptorProvider().get(),//
 		new ProfilerSetting.DescriptorProvider().get()//

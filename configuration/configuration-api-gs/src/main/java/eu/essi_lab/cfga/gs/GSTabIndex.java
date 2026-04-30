@@ -54,56 +54,51 @@ public enum GSTabIndex implements TabIndex {
     /**
      *
      */
-    SOURCES(1, Descriptor.of(SourceStorageSetting.class), Descriptor.of(GDCSourcesSetting.class)),
+    AUGMENTERS(1),
 
     /**
      *
      */
-    AUGMENTERS(2),
+    CUSTOM_TASKS(2),
 
     /**
      *
      */
-    CUSTOM_TASKS(3),
-
-    /**
-     *
-     */
-    AUTHORIZATION(4,
+    AUTHORIZATION(3,
 	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.OAUTH_SETTING.getLabel()), KeycloakProviderSetting::new)),
     /**
      *
      */
-    CREDENTIALS(5, Descriptor.of(CredentialsSetting.class)),
+    CREDENTIALS(4, Descriptor.of(CredentialsSetting.class)),
     /**
      *
      */
-    DATA_CACHE(6, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()),
+    DATA_CACHE(5, Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.DATA_CACHE_CONNECTOR_SETTING.getLabel()),
 	    DataCacheConnectorSettingLoader::load)),
 
     /**
      *
      */
-    ASYNC_DOWNLOADS(7),
+    ASYNC_DOWNLOADS(6),
 
     /**
      *
      */
-    VIEWS(8),
+    VIEWS(7),
 
     /**
      *
      */
-    SERVICES(9),
+    SERVICES(8),
     /**
      *
      */
-    SEMANTICS(10, Descriptor.of(DefaultSemanticSearchSetting.class)), //
+    SEMANTICS(9, Descriptor.of(DefaultSemanticSearchSetting.class)), //
 
     /**
      *
      */
-    SYSTEM(11,//
+    SYSTEM(10,//
 	    Descriptor.of(SystemSetting.class),//
 	    Descriptor.of(DatabaseSetting.class),//
 	    Descriptor.of(SchedulerViewSetting.class),//

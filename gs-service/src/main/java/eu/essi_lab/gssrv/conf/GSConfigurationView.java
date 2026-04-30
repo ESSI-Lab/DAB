@@ -534,8 +534,7 @@ public class GSConfigurationView extends ConfigurationView {
 		new DataCacheConnectorSettingImpl.TabDescriptorProvider(),//
 		new BrokeringTabDescriptor(),//
 		new SystemTabDescriptor(),//
-		new SourcesTabDescriptor(),//
-		new AboutTabDescriptor(),//
+ 		new AboutTabDescriptor(),//
 		new SemanticTabDescriptor()//
 	);
     }
