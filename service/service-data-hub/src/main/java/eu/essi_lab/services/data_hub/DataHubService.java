@@ -558,6 +558,12 @@ public class DataHubService extends AbstractManagedService {
 		}
 
 		//
+		// private identifier
+		//
+
+		resource.setPrivateId(createPrivateId(entityURN));
+
+		//
 		// original identifier
 		//
 
@@ -565,7 +571,6 @@ public class DataHubService extends AbstractManagedService {
 			resource.getOriginalId().get(), //
 			getSource().getUniqueIdentifier());//
 
-		resource.setPrivateId(StringUtils.URLEncodeUTF8(originalId));
 		resource.setOriginalId(originalId);
 		resource.setPublicId(originalId);
 
@@ -584,12 +589,16 @@ public class DataHubService extends AbstractManagedService {
 		    resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentId);
 		}
 
+		//
+		//
+		//
+
 		IndexedElementsWriter.write(resource);
 
 		Document doc = resource.asDocument(true);
 
 		DatabaseFolder.UpsertType upsertResult = targetFolder.upsert( //
-			entityURN,  //
+			createPrivateId(entityURN),  //
 			DatabaseFolder.FolderEntry.of(doc),   //
 			DatabaseFolder.EntryType.GS_RESOURCE);//
 
@@ -601,14 +610,7 @@ public class DataHubService extends AbstractManagedService {
 
 		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record STARTED: {}", entityURN);
 
-		// attempt with non-encoded urn
-		boolean removed = targetFolder.remove(entityURN);
-
-		if (!removed) {
-
-		    // attempt with encoded urn
-		    removed = targetFolder.remove(StringUtils.URLEncodeUTF8(entityURN));
-		}
+		boolean removed = targetFolder.remove(createPrivateId(entityURN));
 
 		if (removed) {
 
@@ -627,6 +629,19 @@ public class DataHubService extends AbstractManagedService {
 
 	    error("Unable to process record: " + e.getMessage(), e, true);
 	}
+    }
+
+    /**
+     * @param entityURN
+     * @return
+     */
+    private String createPrivateId(String entityURN) {
+
+	String identifier = IdentifierDecorator.generatePersistentIdentifier( //
+		entityURN, //
+		getSource().getUniqueIdentifier());//
+
+	return StringUtils.URLEncodeUTF8(identifier);
     }
 
     /**
