@@ -1,13 +1,16 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.gssrv.conf;
 
-import java.io.InputStream;
-import java.util.Properties;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.lib.utils.*;
 
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import java.io.*;
+import java.util.*;
 
 /*-
  * #%L
@@ -19,31 +22,25 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-
 /**
- * 
+ *
  * @author Fabrizio
  */
-public class AboutTabDescriptor extends TabDescriptor {
+class AboutTabDescriptor extends TabDescriptor {
 
     /**
-     * 
+     *
      */
     public AboutTabDescriptor() {
 

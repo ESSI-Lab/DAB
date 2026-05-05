@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,7 +28,6 @@ import com.vaadin.flow.component.orderedlayout.*;
 import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.listener.*;
 import eu.essi_lab.cfga.gui.dialog.*;
-import eu.essi_lab.gssrv.starter.*;
 import eu.essi_lab.lib.utils.*;
 
 /**
@@ -37,7 +36,7 @@ import eu.essi_lab.lib.utils.*;
 @SuppressWarnings("serial")
 class SaveConfirmationDialog extends ConfirmationDialog {
 
-    private GSConfigurationView view;
+    private final GSConfigurationView view;
 
     /**
      *

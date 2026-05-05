@@ -10,26 +10,23 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.component.page.Viewport;
-import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.shared.communication.PushMode;
+import com.vaadin.flow.component.page.*;
+import com.vaadin.flow.server.*;
+import com.vaadin.flow.shared.communication.*;
 
 /**
- * Use the @PWA annotation make the application installable on phones, tablets
- * and some desktop browsers.
+ * Use the @PWA annotation make the application installable on phones, tablets and some desktop browsers.
  */
 @PWA(name = "DAB configuration GUI", shortName = "DAB Configurator")
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")

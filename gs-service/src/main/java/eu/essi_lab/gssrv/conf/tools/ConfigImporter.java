@@ -1,7 +1,7 @@
 /**
  *
  */
-package eu.essi_lab.gssrv.conf.import_export;
+package eu.essi_lab.gssrv.conf.tools;
 
 /*-
  * #%L
@@ -13,12 +13,12 @@ package eu.essi_lab.gssrv.conf.import_export;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -52,7 +52,7 @@ import java.util.*;
 /**
  * @author Fabrizio
  */
-public class ConfigImporter extends VerticalLayout {
+class ConfigImporter extends VerticalLayout {
 
     /**
      *
@@ -83,7 +83,6 @@ public class ConfigImporter extends VerticalLayout {
 	InMemoryUploadHandler handler = UploadHandler.inMemory((metadata, bytes) -> {
 
 	    try {
-
 
 		ClonableInputStream configStream = new ClonableInputStream(new ByteArrayInputStream(bytes));
 
@@ -217,8 +216,7 @@ public class ConfigImporter extends VerticalLayout {
 
 	String info = "Configure the storage ('OpenSearch' or 'S3') where to import the configuration, then click the 'Import from local "
 		+ "configuration file' or 'Import from remote configuration file' button to start the "
-		+ "import into the configured storage. "
-		+ "When the import is done, you can read in the panel above, the "
+		+ "import into the configured storage. " + "When the import is done, you can read in the panel above, the "
 		+ "Java option required to start the DAB with the imported configuration";
 
 	infoDiv.getElement().setProperty("innerHTML", info);

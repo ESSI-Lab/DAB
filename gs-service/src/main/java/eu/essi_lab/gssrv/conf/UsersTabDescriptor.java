@@ -1,40 +1,34 @@
 package eu.essi_lab.gssrv.conf;
 
 import com.vaadin.flow.component.*;
-import com.vaadin.flow.component.button.*;
 import com.vaadin.flow.component.grid.*;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.icon.*;
-import com.vaadin.flow.component.orderedlayout.*;
-import com.vaadin.flow.component.tabs.*;
-import com.vaadin.flow.component.textfield.*;
 import com.vaadin.flow.data.renderer.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
-import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.lib.utils.*;
-import eu.essi_lab.messages.bond.*;
-import eu.essi_lab.messages.bond.jaxb.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.auth.*;
 import eu.essi_lab.model.exceptions.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * @author Fabrizio
  */
-public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridData> {
+class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridData> {
 
     private static final String ID_COLUMN = "Id";
+    private static final String EMAIL_COLUMN = "E-mail";
+    private static final String FIRST_NAME_COLUMN = "First Name";
+    private static final String SECOND_NAME_COLUMN = "Last Name";
+    private static final String REG_DATE_COLUMN = "Registration Date";
+    private static final String INSTITUTION_COLUMN = "Institution";
     private static final String ROLE_COLUMN = "Role";
-    private static final String ID_TYPE_COLUMN = "Id. Type";
+    private static final String ID_TYPE_COLUMN = "Id.Type";
     private static final String ENABLED_COLUMN = "Enabled";
 
     /**
@@ -47,10 +41,24 @@ public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescripto
 	getGrid().addColumn(UsersTabDescriptor.GridData::getPosition).//
 		setHeader("").//
 		setKey("#").//
-		setWidth("15px");
+		setWidth("50px");
 
 	Grid.Column<UsersTabDescriptor.GridData> idCol = addSortableResizableColumn(ID_COLUMN, UsersTabDescriptor.GridData::getIdentifier,
+		350);
+
+	Grid.Column<UsersTabDescriptor.GridData> mailCol = addSortableResizableColumn(EMAIL_COLUMN, UsersTabDescriptor.GridData::getEmail,
 		300);
+	Grid.Column<UsersTabDescriptor.GridData> fNameCol = addSortableResizableColumn(FIRST_NAME_COLUMN,
+		UsersTabDescriptor.GridData::getFirstName, 300);
+
+	Grid.Column<UsersTabDescriptor.GridData> sNameCol = addSortableResizableColumn(SECOND_NAME_COLUMN,
+		UsersTabDescriptor.GridData::getLastName, 300);
+
+	Grid.Column<UsersTabDescriptor.GridData> regDateCol = addSortableResizableColumn(REG_DATE_COLUMN,
+		UsersTabDescriptor.GridData::getRegistrationDate, 300);
+
+	Grid.Column<UsersTabDescriptor.GridData> instCol = addSortableResizableColumn(INSTITUTION_COLUMN,
+		UsersTabDescriptor.GridData::getInstitution, 300);
 
 	Grid.Column<UsersTabDescriptor.GridData> depCol = addSortableResizableColumn(ROLE_COLUMN, UsersTabDescriptor.GridData::getRole,
 		300);
@@ -71,6 +79,11 @@ public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescripto
 	addFilterField(filterRow, enabledCol);
 	addFilterField(filterRow, depCol);
 	addFilterField(filterRow, userIdCol);
+	addFilterField(filterRow, mailCol);
+	addFilterField(filterRow, fNameCol);
+	addFilterField(filterRow, sNameCol);
+	addFilterField(filterRow, regDateCol);
+	addFilterField(filterRow, instCol);
 
 	//
 	//
@@ -97,11 +110,18 @@ public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescripto
      * @return
      * @throws GSException
      */
-    private static DatabaseReader getReader() throws GSException {
+    private static UsersReader getReader() throws GSException {
 
-	DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+	Optional<StorageInfo> usersStorageInfo = ConfigurationWrapper.getUsersStorageInfo();
 
-	return DatabaseProviderFactory.getReader(setting.asStorageInfo());
+	if (usersStorageInfo.isEmpty()) {
+
+	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
+
+	    return DatabaseProviderFactory.getReader(setting.asStorageInfo());
+	}
+
+	return UsersManagerFactory.get(usersStorageInfo.get());
     }
 
     /**
@@ -141,6 +161,13 @@ public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescripto
 
 	    return switch (colum) {
 		case ID_COLUMN -> gridData.getIdentifier();
+		case EMAIL_COLUMN -> gridData.getEmail();
+		case FIRST_NAME_COLUMN -> gridData.getFirstName();
+		case SECOND_NAME_COLUMN -> gridData.getLastName();
+
+		case INSTITUTION_COLUMN -> gridData.getInstitution();
+		case REG_DATE_COLUMN -> gridData.getRegistrationDate();
+
 		case ROLE_COLUMN -> gridData.getRole();
 		case ID_TYPE_COLUMN -> gridData.getUserIdentifierType();
 		case ENABLED_COLUMN -> gridData.isEnabled();
@@ -178,16 +205,15 @@ public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescripto
 
 		List<GSProperty> properties = user.getProperties();
 
-		String content =
-			"<div style='margin: auto; width: 1000px; padding: 15px'><style>\n" + //
+		String content = "<div style='margin: auto; width: 1000px; padding: 15px'><style>\n" + //
 
-				"table { border-collapse: collapse; border: 1px solid lightgray;  width: 100%  }\n" +//
+			"table { border-collapse: collapse; border: 1px solid lightgray;  width: 100%  }\n" +//
 
-				"td { border: 1px solid lightgray; padding: 5px;  }\n" +//
+			"td { border: 1px solid lightgray; padding: 5px;  }\n" +//
 
-				".th { background-color: #f0f0f0; font-weight: bold; padding: 5px;  }\n" +//
+			".th { background-color: #f0f0f0; font-weight: bold; padding: 5px;  }\n" +//
 
-				"</style>\n" ;
+			"</style>\n";
 
 		String table = "<table>";
 
@@ -244,24 +270,6 @@ public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescripto
     }
 
     /**
-     * @return
-     */
-    private TextArea createTextArea(String string) {
-
-	TextArea area = new TextArea();
-	area.getStyle().set("font-size", "13px");
-	area.getStyle().set("vertical-overflow", "auto");
-	area.addClassName("text-area-readonly");
-	area.setHeightFull();
-	area.setWidthFull();
-	area.setReadOnly(true);
-	area.setMaxHeight(500, Unit.PIXELS);
-	area.setValue(string);
-
-	return area;
-    }
-
-    /**
      * @author Fabrizio
      */
     protected static class GridData implements GridDataModel {
@@ -297,6 +305,46 @@ public class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescripto
 	public String getIdentifier() {
 
 	    return Optional.ofNullable(user.getIdentifier()).orElse("");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getEmail() {
+
+	    return user.getStringPropertyValue("email").orElse("");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getFirstName() {
+
+	    return user.getStringPropertyValue("firstName").orElse("");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getLastName() {
+
+	    return user.getStringPropertyValue("lastName").orElse("");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getRegistrationDate() {
+
+	    return user.getStringPropertyValue("registrationDate").orElse("");
+	}
+
+	/**
+	 * @return
+	 */
+	public String getInstitution() {
+
+	    return user.getStringPropertyValue("institution").orElse("");
 	}
 
 	/**

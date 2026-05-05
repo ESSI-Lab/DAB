@@ -3,7 +3,23 @@
  */
 package eu.essi_lab.gssrv.conf;
 
+import com.vaadin.flow.component.grid.Grid.*;
+import com.vaadin.flow.component.grid.*;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import com.vaadin.flow.data.provider.*;
+import com.vaadin.flow.data.renderer.*;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.harvesting.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+
 import java.util.*;
+import java.util.stream.*;
 
 /*-
  * #%L
@@ -15,42 +31,21 @@ import java.util.*;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.stream.*;
-
-import com.vaadin.flow.component.grid.Grid.Column;
-import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.provider.*;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.harvesting.*;
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.GSException;
-
 /**
  * @author Fabrizio
  */
-public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.GridData> {
+class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.GridData> {
 
     private final TabContentDescriptor descriptor;
 
@@ -166,7 +161,7 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 
 	    sdList.addAll(dataFolders.stream().//
 		    filter(f -> DatabaseFolder.computeSourceId(db, f).equals( //
-			    s.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier())).//
+		    s.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier())).//
 		    map(f -> new GridData(f, s)).//
 		    toList());
 	});
@@ -392,7 +387,6 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 	    return (size / total) * 100;
 	}
 
-
 	/**
 	 * @return
 	 */
@@ -411,7 +405,6 @@ public class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.Gr
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	public String getType() {
