@@ -36,6 +36,8 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
@@ -117,6 +119,11 @@ public class EurOBISLdConnector extends HarvestedQueryConnector<EurOBISLdConnect
 					OriginalMetadata metadataRecord = new OriginalMetadata();
 					metadataRecord.setMetadata(original);
 					metadataRecord.setSchemeURI(CommonNameSpaceContext.EUROBIS_LD_NS_URI);
+					List<String> projectUris = client.getCatalogProjectResourceURIs();
+					if (!projectUris.isEmpty()) {
+						metadataRecord.setAdditionalInfo(GSPropertyHandler
+								.of(GSProperty.of(EurOBISLdMapper.CATALOG_PROJECT_URIS_PROPERTY, projectUris)));
+					}
 					ret.addRecord(metadataRecord);
 				} catch (IOException e) {
 					e.printStackTrace();

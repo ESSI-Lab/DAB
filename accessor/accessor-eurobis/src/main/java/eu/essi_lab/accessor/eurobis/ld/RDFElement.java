@@ -188,11 +188,13 @@ public enum RDFElement {
 		"                OPTIONAL{ ?definedTerm schema:inDefinedTermSet ?schemak. " + //
 		" 					?schemak schema:name ?keywordthesaurus" + //
 		"		}\n" + //
+		"                OPTIONAL{ ?definedTerm schema:alternativeType ?keywordAlternativeType }\n" + //
 		"    BIND(CONCAT(" +//
 		"COALESCE(str(?keywordlabel),''), '" + RDFResource.SEPARATOR2 + "', " +//
 		"COALESCE(str(?keyworduri),''), '" + RDFResource.SEPARATOR2 + "', " +//
 		"COALESCE(str(?keywordthesaurus),''), '" + RDFResource.SEPARATOR2 + "', " +//
-		"COALESCE(str(?keywordtype),'')) AS ?" + VAR_PLACEHOLDER + "1)" + //
+		"COALESCE(str(?keywordtype),''), '" + RDFResource.SEPARATOR2 + "', " +//
+		"COALESCE(str(?keywordAlternativeType),'')) AS ?" + VAR_PLACEHOLDER + "1)" + //
 		"  }}"; //
     }
 

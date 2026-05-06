@@ -28,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Envelope;
@@ -48,6 +49,7 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -62,7 +64,15 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
  */
 public class EurOBISLdMapper extends FileIdentifierMapper {
 
+    /**
+     * List of Marineinfo project IRIs from the harvested DCAT catalog ({@code dcat:resource}); see
+     * {@link EurOBISLdClient#getCatalogProjectResourceURIs()}.
+     */
+    public static final String CATALOG_PROJECT_URIS_PROPERTY = "eurobis.ld.catalogProjectUris";
+
     public static Double TOL = Math.pow(10, -8);
+
+    private static final ConcurrentHashMap<String, Optional<String>> PROJECT_STANDARD_TITLE_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
@@ -286,7 +296,7 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    }
 
 	    for (List<String> k : keywordsLabelsAndURIsAndThesaurusAndTypes) {
-		if (k.size()<4) {
+		if (k.size() < 4) {
 		    continue;
 		}
 		String label = k.get(0);
@@ -295,12 +305,9 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 		if (thesaurus == null) {
 		    thesaurus = "";
 		}
-		String type = k.get(3);
-		if (type == null) {
-		    type = "";
-		}else{
-		    type = type.replace("https://standards.iso.org/iso/19115/resources/Codelists/gml/MD_KeywordTypeCode.xml#","");
-		}
+		String rawAdditionalType = k.get(3);
+		String rawAlternativeType = k.size() >= 5 ? k.get(4) : "";
+		String type = resolveDefinedTermKeywordType(rawAdditionalType, rawAlternativeType);
 		Keywords keywords = keywordMap.get(type);
 		if (keywords == null) {
 		    keywords = new Keywords();
@@ -314,6 +321,8 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 		    keywords.addKeyword(label);
 		}
 	    }
+
+	    addCatalogProjectKeywords(keywordMap, originalMD);
 
 	    for (Keywords keywords : keywordMap.values()) {
 		coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keywords);
@@ -566,6 +575,117 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    e.printStackTrace();
 	}
 
+    }
+
+    private static final String MD_KEYWORD_TYPE_CODE_NS = "https://standards.iso.org/iso/19115/resources/Codelists/gml/MD_KeywordTypeCode.xml#";
+
+    /**
+     * Uses {@code schema:additionalType} when present (e.g. ISO keyword type code {@code place}); otherwise
+     * {@code schema:alternativeType} (e.g. {@code Geographic term}).
+     */
+    private static String resolveDefinedTermKeywordType(String rawAdditionalType, String rawAlternativeType) {
+	String fromAdditional = normalizeKeywordTypeFromAdditional(rawAdditionalType);
+	if (!fromAdditional.isEmpty()) {
+	    return fromAdditional;
+	}
+	return cleanKeywordLiteral(rawAlternativeType);
+    }
+
+    private static String normalizeKeywordTypeFromAdditional(String raw) {
+	if (raw == null) {
+	    return "";
+	}
+	String t = cleanKeywordLiteral(raw);
+	if (t.isEmpty()) {
+	    return "";
+	}
+	t = t.replace(MD_KEYWORD_TYPE_CODE_NS, "");
+	if (t.contains("#")) {
+	    t = t.substring(t.lastIndexOf('#') + 1);
+	}
+	return t.trim();
+    }
+
+    private static String cleanKeywordLiteral(String raw) {
+	if (raw == null) {
+	    return "";
+	}
+	String t = raw.trim();
+	if (t.contains("^^")) {
+	    t = t.substring(0, t.indexOf("^^"));
+	}
+	if (t.endsWith("@en")) {
+	    t = t.substring(0, t.length() - 3);
+	} else {
+	    int at = t.lastIndexOf('@');
+	    if (at > 0) {
+		String tag = t.substring(at + 1);
+		if (tag.matches("[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*")) {
+		    t = t.substring(0, at);
+		}
+	    }
+	}
+	t = t.replace("\"", "").replace("\\n", "");
+	return t.trim();
+    }
+
+    private void addCatalogProjectKeywords(HashMap<String, Keywords> keywordMap, OriginalMetadata originalMD) {
+	GSPropertyHandler info = originalMD.getAdditionalInfo();
+	if (info == null) {
+	    return;
+	}
+	@SuppressWarnings("unchecked")
+	List<String> projectUris = info.get(CATALOG_PROJECT_URIS_PROPERTY, List.class);
+	if (projectUris == null || projectUris.isEmpty()) {
+	    return;
+	}
+	Keywords kprojects = keywordMap.computeIfAbsent("project", t -> {
+	    Keywords k = new Keywords();
+	    k.setTypeCode("project");
+	    return k;
+	});
+	for (String uri : projectUris) {
+	    if (uri == null || uri.isBlank()) {
+		continue;
+	    }
+	    String title = resolveMarineinfoProjectStandardTitle(uri);
+	    if (title != null && !title.isBlank()) {
+		kprojects.addKeyword(title.trim(), uri);
+	    } else {
+		kprojects.addKeyword(uri, uri);
+	    }
+	}
+    }
+
+    static String resolveMarineinfoProjectStandardTitle(String projectUri) {
+	Optional<String> cached = PROJECT_STANDARD_TITLE_CACHE.get(projectUri);
+	if (cached != null) {
+	    return cached.orElse(null);
+	}
+	Optional<String> fetched = fetchMarineinfoProjectStandardTitle(projectUri);
+	PROJECT_STANDARD_TITLE_CACHE.put(projectUri, fetched);
+	return fetched.orElse(null);
+    }
+
+    private static Optional<String> fetchMarineinfoProjectStandardTitle(String projectUri) {
+	try {
+	    Downloader d = new Downloader();
+	    Optional<String> res = d.downloadOptionalString(projectUri + ".json");
+	    if (res.isPresent()) {
+		JSONObject obj = new JSONObject(res.get());
+		JSONObject rec = obj.optJSONObject("projectrec");
+		if (rec != null) {
+		    String t = rec.optString("StandardTitle", "").trim();
+		    if (!t.isEmpty()) {
+			return Optional.of(t);
+		    }
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(EurOBISLdMapper.class).debug("Could not read Marineinfo project JSON for {}",
+		    projectUri, e);
+	}
+	return Optional.empty();
     }
 
     // private void retrieveOnline(MIMetadata miMetadata, ExtensionHandler

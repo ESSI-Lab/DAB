@@ -27,9 +27,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -179,10 +182,9 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	JSONArray rows = json.getJSONObject("table").getJSONArray("rows");
 	String title = null;
 	String description = null;
-	LinkedHashSet<String> sensorURNs = new LinkedHashSet<>();
-	LinkedHashSet<String> sensorLabels = new LinkedHashSet<>();
-	LinkedHashSet<String> parameterURNs = new LinkedHashSet<>();
-	LinkedHashSet<String> parameterLabels = new LinkedHashSet<>();
+	LinkedHashMap<String, String> instrumentUriToName = new LinkedHashMap<>();
+	LinkedHashSet<String> instrumentNamesWithoutUri = new LinkedHashSet<>();
+	LinkedHashMap<String, String> parameterUrnToName = new LinkedHashMap<>();
 	String west = null, south = null, east = null, north = null, up = null, down = null;
 	String verticalUnits = null;
 
@@ -230,6 +232,7 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 
 	List<String> tmpPNames = new ArrayList<>();
 	List<String> tmpPCodes = new ArrayList<>();
+	List<String> tmpWmoPlatformCodes = new ArrayList<>();
 	for (int i = 0; i < rows.length(); i++) {
 	    JSONArray row = rows.getJSONArray(i);
 	    String type = row.getString(0);
@@ -241,16 +244,20 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	    // case "NC_GLOBAL":
 	    switch (name) {
 	    case "id":
+		case "doi":
 		dataIdentifier = value;
 		break;
 	    case "title":
 		title = value;
 		break;
 	    case "platform_name":
-		addSeparatedValues(tmpPNames, value);
+		addSeparatedValuesCommaSemicolonOnly(tmpPNames, value);
 		break;
 	    case "platform_code":
-		addSeparatedValues(tmpPCodes, value);
+		addSeparatedValuesCommaSemicolonOnly(tmpPCodes, value);
+		break;
+	    case "wmo_platform_code":
+		addSeparatedValuesCommaSemicolonOnly(tmpWmoPlatformCodes, value);
 		break;
 	    case "license":
 		license = value;
@@ -264,9 +271,14 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	    case "summary":
 		description = value;
 		break;
-	    case "SDN_url":
-		addSeparatedValues(parameterURNs, value);
+	    case "SDN_url": {
+		List<String> sdnUrls = new ArrayList<>();
+		addSeparatedValuesCommaSemicolonOnly(sdnUrls, value);
+		for (String u : sdnUrls) {
+		    putParameterPair(parameterUrnToName, u, null);
+		}
 		break;
+	    }
 	    case "geospatial_lat_max":
 		north = value;
 		break;
@@ -295,47 +307,51 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 		endPosition = value;
 		break;
 	    case "institution":
-		addSeparatedValues(institutions, value);
+		addSeparatedValuesCommaSemicolonOnly(institutions, value);
 		break;
 	    case "creator_name":
-		addSeparatedValues(creatorNames, value);
+		addSeparatedValuesCommaSemicolonOnly(creatorNames, value);
 		break;
 	    case "creator_email":
-		addSeparatedValues(creatorEmails, value);
+		addSeparatedValuesCommaSemicolonOnly(creatorEmails, value);
 		break;
 	    case "creator_type":
-		addSeparatedValues(creatorTypes, value);
+		addSeparatedValuesCommaSemicolonOnly(creatorTypes, value);
 		break;
 	    case "creator_url":
-		addSeparatedValues(creatorURLs, value);
+		addSeparatedValuesCommaSemicolonOnly(creatorURLs, value);
 		break;
 	    case "publisher_name":
-		addSeparatedValues(publisherNames, value);
+		addSeparatedValuesCommaSemicolonOnly(publisherNames, value);
 		break;
 	    case "publisher_email":
-		addSeparatedValues(publisherEmails, value);
+		addSeparatedValuesCommaSemicolonOnly(publisherEmails, value);
 		break;
 	    case "publisher_type":
-		addSeparatedValues(publisherTypes, value);
+		addSeparatedValuesCommaSemicolonOnly(publisherTypes, value);
 		break;
 	    case "publisher_url":
-		addSeparatedValues(publisherURLs, value);
+		addSeparatedValuesCommaSemicolonOnly(publisherURLs, value);
 		break;
 	    case "principal_investigator":
-		addSeparatedValues(piNames, value);
+		addSeparatedValuesCommaSemicolonOnly(piNames, value);
 		break;
 	    case "principal_investigator_email":
-		addSeparatedValues(piEmails, value);
+		addSeparatedValuesCommaSemicolonOnly(piEmails, value);
 		break;
 	    case "keywords_vocabulary":
 		keywordsVoc = value;
 		break;
 	    case "institution_edmo_uri":
-		addSeparatedValues(institutionURIs, value);
+		addSeparatedValuesCommaSemicolonOnly(institutionURIs, value);
+		break;
+	    case "institution_ror_uri":
+		addSeparatedValuesCommaSemicolonOnly(institutionURIs, value);
 		break;
 	    case "keywords":
 		addSeparatedValues(keywords, value);
 		break;
+	    case "date_created":
 	    case "date_update":
 		timeStamp = value;
 		break;
@@ -370,6 +386,12 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	    }
 	}
 
+	List<String> platformMdIdentifiers = new ArrayList<>();
+	for (int i = 0; i < platformNameCode.size(); i++) {
+	    platformMdIdentifiers.add(resolvePlatformMdIdentifier(i, platformNameCode.get(i).getValue(), tmpWmoPlatformCodes));
+	}
+	appendPlatformsFromEmsoVariableRows(attributesByVariable, platformNameCode, platformMdIdentifiers);
+
 	if (dataOwners != null) {
 	    for (int j = 0; j < dataOwners.length(); j++) {
 		JSONArray arr = dataOwners.getJSONArray(j);
@@ -391,6 +413,8 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 
 	}
 
+	expandInstitutionNamesForUriList(institutions, institutionURIs);
+
 	List<String> empty = new ArrayList<>();
 	List<Party> originatorParties = getParties(institutions, institutionURIs, empty, empty, empty, "originator");
 	parties.addAll(originatorParties);
@@ -408,26 +432,10 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	List<Party> piParties = getParties(piNames, empty, piEmails, empty, persons, "principalInvestigator");
 	parties.addAll(piParties);
 
-	Set<String> variables = attributesByVariable.keySet();
-	for (String variable : variables) {
+	for (String variable : new TreeSet<>(attributesByVariable.keySet())) {
 	    HashMap<String, String> attributes = attributesByVariable.get(variable);
-	    String parURN = attributes.get("sdn_parameter_urn");
-	    if (parURN != null) {
-		addSeparatedValues(parameterURNs, parURN);
-	    }
-	    String parLabel = attributes.get("sdn_parameter_name");
-	    if (parLabel != null) {
-		addSeparatedValues(parameterLabels, parLabel);
-	    }
-	    String sURN = attributes.get("sensor_reference");
-	    if (sURN != null && !sURN.isEmpty() && !sURN.equals("NaN")) {
-		addSeparatedValues(sensorURNs, sURN);
-	    }
-	    String sLabel = attributes.get("sensor_model");
-	    if (sLabel != null) {
-		addSeparatedValues(sensorLabels, sLabel);
-	    }
-
+	    collectParametersFromAttributes(attributes, parameterUrnToName);
+	    collectInstrumentsFromAttributes(attributes, instrumentUriToName, instrumentNamesWithoutUri);
 	}
 
 	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
@@ -478,24 +486,24 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	}
 	// keywords and PARAMETER IDENTIFIERS
 
-	if (parameterURNs != null && !parameterURNs.isEmpty()) {
+	if (!parameterUrnToName.isEmpty()) {
 
-	    for (int i = 0; i < parameterURNs.size(); i++) {
+	    for (java.util.Map.Entry<String, String> parameterEntry : parameterUrnToName.entrySet()) {
 
-		String urn = parameterURNs.toArray(new String[] {})[i];
+		String urn = parameterEntry.getKey();
+		String label = parameterEntry.getValue();
 
 		CoverageDescription descr = new CoverageDescription();
-		descr.setAttributeIdentifier(urn);
-		if (parameterLabels.size() == parameterURNs.size()) {
-		    String label = parameterLabels.toArray(new String[] {})[i].trim();
-		    descr.setAttributeTitle(label);
-		    descr.setAttributeDescription(label);
+		descr.setAttributeIdentifier(toNvsHttpsUriIfSdnUrn(urn));
+		if (label != null && !label.isEmpty()) {
+		    descr.setAttributeTitle(label.trim());
+		    descr.setAttributeDescription(label.trim());
 		} else {
 		    NVSClient client = new NVSClient();
-		    String label = client.getLabel(urn);
-		    if (label != null) {
-			descr.setAttributeTitle(label);
-			descr.setAttributeDescription(label);
+		    String resolved = client.getLabel(urn);
+		    if (resolved != null) {
+			descr.setAttributeTitle(resolved);
+			descr.setAttributeDescription(resolved);
 		    }
 		}
 		coreMetadata.getMIMetadata().addCoverageDescription(descr);
@@ -527,22 +535,35 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	Keywords keyword = new Keywords();
 	keyword.setTypeCode("instrument");
 
-	String[] sensorURNsList = sensorURNs.toArray(new String[] {});
-	String[] sensorLabelsList = sensorLabels.toArray(new String[] {});
-	for (int j = 0; j < sensorLabelsList.length; j++) {
-	    String sensorLabel = sensorLabelsList[j];
-	    String sensorURI = null;
-	    if (sensorURNsList.length == sensorLabelsList.length) {
-		sensorURI = sensorURNsList[j];
+	for (java.util.Map.Entry<String, String> instrumentEntry : instrumentUriToName.entrySet()) {
+	    String sensorURI = instrumentEntry.getKey();
+	    if (isUnknownSeaVoXL22InstrumentPlaceholderUri(sensorURI)) {
+		continue;
 	    }
+	    String sensorLabel = instrumentEntry.getValue();
 	    if (sensorLabel == null && sensorURI != null && sensorURI.contains("vocab.nerc.ac.uk")) {
 		NVSClient client = new NVSClient();
 		sensorLabel = client.getLabel(sensorURI);
 	    }
+	    if (isIgnoredSensorModel(sensorLabel)) {
+		sensorLabel = null;
+	    }
 
 	    MIInstrument myInstrument = new MIInstrument();
-	    myInstrument.setMDIdentifierTypeCode(sensorURI);
+	    if (sensorURI != null) {
+		myInstrument.setMDIdentifierTypeCode(sensorURI);
+	    }
 	    keyword.addKeyword(sensorLabel, sensorURI);
+	    myInstrument.setDescription(sensorLabel);
+	    myInstrument.setTitle(sensorLabel);
+
+	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
+
+	    coreMetadata.getMIMetadata().addMIInstrument(myInstrument);
+	}
+	for (String sensorLabel : instrumentNamesWithoutUri) {
+	    MIInstrument myInstrument = new MIInstrument();
+	    keyword.addKeyword(sensorLabel, null);
 	    myInstrument.setDescription(sensorLabel);
 	    myInstrument.setTitle(sensorLabel);
 
@@ -560,13 +581,16 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	    SimpleEntry<String, String> nameCode = platformNameCode.get(i);
 	    String platformName = nameCode.getKey();
 	    String platformCode = nameCode.getValue();
+	    String platformMdIdentifier = platformMdIdentifiers.get(i);
 	    MIPlatform platform = new MIPlatform();
-	    platform.setMDIdentifierCode(platformCode);
+	    if (platformMdIdentifier != null && !platformMdIdentifier.isEmpty()) {
+		platform.setMDIdentifierCode(platformMdIdentifier);
+	    }
 	    Citation platformCitation = new Citation();
 	    platformCitation.setTitle(platformName);
 	    platform.setCitation(platformCitation);
 	    coreMetadata.getMIMetadata().addMIPlatform(platform);
-	    pk.addKeyword(platformName, platformCode);
+	    pk.addKeyword(platformName, platformMdIdentifier != null && !platformMdIdentifier.isEmpty() ? platformMdIdentifier : platformCode);
 	}
 
 	coreMetadata.getMIMetadata().getDataIdentification().addKeywords(pk);
@@ -663,6 +687,20 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 
     }
 
+    /**
+     * One {@code institution} string with several identifiers ({@code institution_edmo_uri},
+     * {@code institution_ror_uri}, …) should yield one party per URI, all with the same organisation name.
+     */
+    private void expandInstitutionNamesForUriList(List<String> institutions, List<String> institutionURIs) {
+
+	if (institutions.size() == 1 && institutionURIs.size() > 1) {
+	    String name = institutions.get(0);
+	    while (institutions.size() < institutionURIs.size()) {
+		institutions.add(name);
+	    }
+	}
+    }
+
     private List<Party> getParties(List<String> names, List<String> uris, List<String> emails, List<String> urls, List<String> types,
 	    String role) {
 	List<Party> ret = new ArrayList<>();
@@ -703,6 +741,275 @@ public class EMODNETPhysicsMapper extends FileIdentifierMapper {
 	}
 
 	return ret;
+    }
+
+    /**
+     * Maps SeaDataNet URNs {@code SDN:<collection>::<notation>} to canonical NVS HTTPS URIs, e.g.
+     * {@code SDN:P01::TEMPPR01} → {@code https://vocab.nerc.ac.uk/collection/P01/current/TEMPPR01/}.
+     */
+    private static String toNvsHttpsUriIfSdnUrn(String identifier) {
+
+	if (identifier == null) {
+	    return null;
+	}
+	String s = identifier.trim();
+	if (s.isEmpty()) {
+	    return identifier;
+	}
+	if (!s.toUpperCase(Locale.ROOT).startsWith("SDN:")) {
+	    return identifier;
+	}
+	String body = s.substring(4);
+	int sepIdx = body.indexOf("::");
+	if (sepIdx <= 0 || sepIdx >= body.length() - 2) {
+	    return identifier;
+	}
+	String collection = body.substring(0, sepIdx).trim();
+	String notation = body.substring(sepIdx + 2).trim();
+	if (collection.isEmpty() || notation.isEmpty()) {
+	    return identifier;
+	}
+	return "https://vocab.nerc.ac.uk/collection/" + collection + "/current/" + notation + "/";
+    }
+
+    private void collectParametersFromAttributes(HashMap<String, String> attributes, LinkedHashMap<String, String> parameterUrnToName) {
+
+	String parURN = attributes.get("sdn_parameter_uri");
+	if (parURN == null || parURN.trim().isEmpty()) {
+	    parURN = attributes.get("sdn_parameter_urn");
+	}
+	String parLabel = attributes.get("sdn_parameter_name");
+	List<String> urns = new ArrayList<>();
+	List<String> labels = new ArrayList<>();
+	if (parURN != null) {
+	    addSeparatedValuesCommaSemicolonOnly(urns, parURN);
+	}
+	if (parLabel != null) {
+	    addSeparatedValuesCommaSemicolonOnly(labels, parLabel);
+	}
+	if (urns.isEmpty()) {
+	    return;
+	}
+	if (urns.size() == labels.size()) {
+	    for (int i = 0; i < urns.size(); i++) {
+		putParameterPair(parameterUrnToName, urns.get(i), labels.get(i));
+	    }
+	} else if (labels.size() == 1) {
+	    for (String urn : urns) {
+		putParameterPair(parameterUrnToName, urn, labels.get(0));
+	    }
+	} else if (urns.size() == 1) {
+	    for (String lab : labels) {
+		putParameterPair(parameterUrnToName, urns.get(0), lab);
+	    }
+	} else {
+	    for (String urn : urns) {
+		putParameterPair(parameterUrnToName, urn, labels.isEmpty() ? null : labels.get(0));
+	    }
+	}
+    }
+
+    private void putParameterPair(LinkedHashMap<String, String> parameterUrnToName, String urnRaw, String labelRaw) {
+
+	if (urnRaw == null) {
+	    return;
+	}
+	String urn = urnRaw.trim();
+	if (urn.isEmpty()) {
+	    return;
+	}
+	String label = labelRaw != null ? labelRaw.trim() : null;
+	if (!parameterUrnToName.containsKey(urn)) {
+	    parameterUrnToName.put(urn, label);
+	} else if (label != null && !label.isEmpty()
+		&& (parameterUrnToName.get(urn) == null || parameterUrnToName.get(urn).isEmpty())) {
+	    parameterUrnToName.put(urn, label);
+	}
+    }
+
+    /**
+     * EMSO ERDDAP: synthetic rows use {@code variable_type=platform} with {@code emso_platform_name} /
+     * {@code emso_platform_uri}, or alternatively {@code emso_site_name} / {@code emso_site_uri}.
+     */
+    private void appendPlatformsFromEmsoVariableRows(HashMap<String, HashMap<String, String>> attributesByVariable,
+	    List<SimpleEntry<String, String>> platformNameCode, List<String> platformMdIdentifiers) {
+
+	for (String variable : new TreeSet<>(attributesByVariable.keySet())) {
+	    HashMap<String, String> attributes = attributesByVariable.get(variable);
+	    if (attributes == null || !"platform".equalsIgnoreCase(attributes.get("variable_type"))) {
+		continue;
+	    }
+	    String platformName = trimToNull(attributes.get("emso_platform_name"));
+	    if (platformName == null) {
+		platformName = trimToNull(attributes.get("emso_site_name"));
+	    }
+	    if (platformName == null) {
+		continue;
+	    }
+
+	    String platformId = trimToNull(attributes.get("platform_id"));
+
+	    String platformUri = trimToNull(attributes.get("emso_platform_uri"));
+	    if (platformUri == null) {
+		platformUri = trimToNull(attributes.get("emso_site_uri"));
+	    }
+	    String wmo = trimToNull(attributes.get("wmo_platform_code"));
+
+	    platformNameCode.add(new SimpleEntry<>(platformName, platformId));
+	    String mdId = platformUri != null ? platformUri : (wmo != null ? wmo : platformId);
+	    platformMdIdentifiers.add(mdId);
+	}
+    }
+
+    private static String trimToNull(String value) {
+
+	if (value == null) {
+	    return null;
+	}
+	String t = value.trim();
+	return t.isEmpty() ? null : t;
+    }
+
+    private static String resolvePlatformMdIdentifier(int platformIndex, String platformCode, List<String> wmoCodes) {
+
+	String wmo = wmoAt(platformIndex, wmoCodes);
+	if (wmo != null && !wmo.isEmpty()) {
+	    return wmo;
+	}
+	return platformCode;
+    }
+
+    private static String wmoAt(int index, List<String> wmoes) {
+
+	if (wmoes == null || wmoes.isEmpty()) {
+	    return null;
+	}
+	if (index < wmoes.size()) {
+	    return wmoes.get(index).trim();
+	}
+	if (wmoes.size() == 1) {
+	    return wmoes.get(0).trim();
+	}
+	return null;
+    }
+
+    /**
+     * Pairs {@code sensor_reference} (instrument URI) with {@code sensor_model} (instrument name) per variable.
+     */
+    private void collectInstrumentsFromAttributes(HashMap<String, String> attributes, LinkedHashMap<String, String> instrumentUriToName,
+	    LinkedHashSet<String> instrumentNamesWithoutUri) {
+
+	String sURN = attributes.get("sensor_reference");
+	String sLabel = attributes.get("sensor_model");
+
+	List<String> urns = new ArrayList<>();
+	List<String> labels = new ArrayList<>();
+	if (sURN != null && !sURN.isEmpty() && !sURN.equals("NaN")) {
+	    addSeparatedValuesCommaSemicolonOnly(urns, sURN);
+	}
+	if (sLabel != null && !sLabel.isEmpty()) {
+	    addSeparatedValuesCommaSemicolonOnly(labels, sLabel);
+	}
+	if (urns.isEmpty() && labels.isEmpty()) {
+	    return;
+	}
+	if (!urns.isEmpty()) {
+	    if (urns.size() == labels.size()) {
+		for (int i = 0; i < urns.size(); i++) {
+		    putInstrumentPair(instrumentUriToName, urns.get(i), labels.get(i));
+		}
+	    } else if (labels.size() == 1) {
+		for (String urn : urns) {
+		    putInstrumentPair(instrumentUriToName, urn, labels.get(0));
+		}
+	    } else if (urns.size() == 1) {
+		for (String lab : labels) {
+		    putInstrumentPair(instrumentUriToName, urns.get(0), lab);
+		}
+	    } else {
+		for (String urn : urns) {
+		    putInstrumentPair(instrumentUriToName, urn, labels.isEmpty() ? null : labels.get(0));
+		}
+	    }
+	} else {
+	    for (String lab : labels) {
+		if (!isIgnoredSensorModel(lab)) {
+		    instrumentNamesWithoutUri.add(lab);
+		}
+	    }
+	}
+    }
+
+    /** NVS SeaVoX L22 placeholder meaning instrument type unknown (prefLabel {@code unknown}), e.g. TOOLZZZ. */
+    private static boolean isUnknownSeaVoXL22InstrumentPlaceholderUri(String uri) {
+
+	if (uri == null || uri.trim().isEmpty()) {
+	    return false;
+	}
+	String lower = uri.trim().toLowerCase(Locale.ROOT);
+	return lower.contains("/l22/current/toolzzz") || lower.contains("sdn:l22::toolzzz");
+    }
+
+    /** CF/ACDD placeholder: do not use {@code sensor_model} literally when it is "unknown". */
+    private static boolean isIgnoredSensorModel(String label) {
+
+	if (label == null) {
+	    return true;
+	}
+	return "unknown".equalsIgnoreCase(label.trim());
+    }
+
+    private void putInstrumentPair(LinkedHashMap<String, String> instrumentUriToName, String urnRaw, String labelRaw) {
+
+	if (urnRaw == null) {
+	    return;
+	}
+	String urn = urnRaw.trim();
+	if (urn.isEmpty() || "NaN".equals(urn)) {
+	    return;
+	}
+	if (isUnknownSeaVoXL22InstrumentPlaceholderUri(urn)) {
+	    return;
+	}
+	String label = labelRaw != null ? labelRaw.trim() : null;
+	if (isIgnoredSensorModel(label)) {
+	    label = null;
+	}
+	if (!instrumentUriToName.containsKey(urn)) {
+	    instrumentUriToName.put(urn, label);
+	} else if (label != null && instrumentUriToName.get(urn) == null) {
+	    instrumentUriToName.put(urn, label);
+	}
+    }
+
+    /**
+     * Splits only on {@code ;} or {@code ,}. Never splits on whitespace — used for {@code sensor_model},
+     * {@code sdn_parameter_name}, organisation/person attributes ({@code institution}, {@code creator_name}, …),
+     * URNs/URLs, and similar phrases that contain spaces.
+     */
+    private void addSeparatedValuesCommaSemicolonOnly(Collection<String> collection, String value) {
+
+	if (value == null || value.isEmpty()) {
+	    return;
+	}
+	value = value.trim();
+	String[] parts;
+	if (value.contains(";")) {
+	    parts = value.split(";");
+	} else if (value.contains(",")) {
+	    parts = value.split(",");
+	} else {
+	    collection.add(value);
+	    return;
+	}
+	for (String v : parts) {
+	    if (v != null) {
+		v = v.trim();
+		if (!v.isEmpty()) {
+		    collection.add(v);
+		}
+	    }
+	}
     }
 
     private void addSeparatedValues(Collection<String> collection, String value) {
