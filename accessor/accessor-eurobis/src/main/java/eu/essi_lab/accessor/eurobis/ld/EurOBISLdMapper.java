@@ -146,6 +146,8 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    List<List<String>> instrumentLabelsAndURIs = turtle.getElementsList(RDFElement.INSTRUMENTLABELSANDURIS);
 	    List<List<String>> urlsAndTypes = turtle.getElementsList(RDFElement.URLS_AND_TYPES);
 	    List<String> creatorsURIs = turtle.getElements(RDFElement.CREATORS);
+	    List<String> contributorsURIs = turtle.getElements(RDFElement.CONTRIBUTORS);
+	    List<List<String>> qualifiedAttributions = turtle.getElementsList(RDFElement.QUALIFIEDATTRIBUTIONS);
 	    List<String> parents = turtle.getElements(RDFElement.ISPARTOF);
 	    List<String> children = turtle.getElements(RDFElement.HASPART);
 
@@ -527,42 +529,21 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    //
 
 	    for (String creatorsURI : creatorsURIs) {
-
-		if (creatorsURI.contains("id/person")) {
+		addOrganizationParty(coreMetadata, creatorsURI, "author");
+	    }
+	    for (String contributorUri : contributorsURIs) {
+		addOrganizationParty(coreMetadata, contributorUri, "collaborator");
+	    }
+	    for (List<String> agentAndRole : qualifiedAttributions) {
+		if (agentAndRole.size() < 2) {
 		    continue;
 		}
-		ResponsibleParty creatorContact = new ResponsibleParty();
-		MarineOrganization organization = new MarineOrganization(creatorsURI + ".ttl");
-		String orgName = organization.getElement(RDFElement.ORGNAME);
-		String mail = organization.getElement(RDFElement.ORGEMAILS);
-		String telephone = organization.getElement(RDFElement.ORGTELEPHONES);
-		String url = organization.getElement(RDFElement.ORGWEBPAGES);
-		String addr = organization.getElement(RDFElement.ORGADDRESS);
-
-		Contact contactInfo = new Contact();
-		Address address = new Address();
-		if (mail != null && !mail.isEmpty()) {
-		    address.addElectronicMailAddress(mail);
+		String agentUri = agentAndRole.get(0);
+		String roleUri = agentAndRole.get(1);
+		if (agentUri == null || agentUri.isBlank()) {
+		    continue;
 		}
-		if (addr != null && !addr.isBlank()) {
-		    address.addDeliveryPoint(addr);
-		}
-		contactInfo.setAddress(address);
-		if (telephone != null && !telephone.isBlank()) {
-		    contactInfo.addPhoneVoice(telephone);
-		}
-		creatorContact.getElementType().setOrganisationName(ISOMetadata.createAnchorPropertyType(creatorsURI, orgName));
-
-		if (url != null && !url.isEmpty()) {
-		    Online online = new Online();
-		    online.setLinkage(url);
-		    contactInfo.setOnline(online);
-		}
-
-		creatorContact.setContactInfo(contactInfo);
-		creatorContact.setRoleCode("author");
-		coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
-
+		addOrganizationParty(coreMetadata, agentUri, marineinfoHadRoleToIsoRole(roleUri));
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("EurOBIS-LD Mappper ENDED");
@@ -573,6 +554,109 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    e.printStackTrace();
 	}
 
+    }
+
+    private void addOrganizationParty(CoreMetadata coreMetadata, String orgUri, String roleCode) {
+	if (orgUri == null || orgUri.isBlank() || orgUri.contains("id/person")) {
+	    return;
+	}
+	if (roleCode == null || roleCode.isBlank()) {
+	    roleCode = "collaborator";
+	}
+	try {
+	    ResponsibleParty party = new ResponsibleParty();
+	    MarineOrganization organization = new MarineOrganization(orgUri + ".ttl");
+	    String orgName = organization.getElement(RDFElement.ORGNAME);
+	    String mail = organization.getElement(RDFElement.ORGEMAILS);
+	    String telephone = organization.getElement(RDFElement.ORGTELEPHONES);
+	    String url = organization.getElement(RDFElement.ORGWEBPAGES);
+	    String addr = organization.getElement(RDFElement.ORGADDRESS);
+
+	    Contact contactInfo = new Contact();
+	    Address address = new Address();
+	    if (mail != null && !mail.isEmpty()) {
+		address.addElectronicMailAddress(mail);
+	    }
+	    if (addr != null && !addr.isBlank()) {
+		address.addDeliveryPoint(addr);
+	    }
+	    contactInfo.setAddress(address);
+	    if (telephone != null && !telephone.isBlank()) {
+		contactInfo.addPhoneVoice(telephone);
+	    }
+	    party.getElementType().setOrganisationName(ISOMetadata.createAnchorPropertyType(orgUri, orgName));
+
+	    if (url != null && !url.isEmpty()) {
+		Online online = new Online();
+		online.setLinkage(url);
+		contactInfo.setOnline(online);
+	    }
+
+	    party.setContactInfo(contactInfo);
+	    party.setRoleCode(roleCode);
+	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(party);
+	} catch (IOException e) {
+	    GSLoggerFactory.getLogger(getClass()).debug("Could not load institute TTL for {}: {}", orgUri, e.getMessage());
+	}
+    }
+
+    /**
+     * Maps Marineinfo {@code dcat:hadRole} IRIs (e.g. {@code .../contribroles#Data_provider}) to ISO 19115
+     * {@code CI_RoleCode} values for {@link ResponsibleParty#setRoleCode(String)}.
+     */
+    static String marineinfoHadRoleToIsoRole(String roleUri) {
+	if (roleUri == null || roleUri.isBlank()) {
+	    return "collaborator";
+	}
+	String frag = cleanKeywordLiteral(roleUri);
+	int h = frag.lastIndexOf('#');
+	if (h >= 0) {
+	    frag = frag.substring(h + 1);
+	} else {
+	    int s = frag.lastIndexOf('/');
+	    if (s >= 0) {
+		frag = frag.substring(s + 1);
+	    }
+	}
+	switch (frag) {
+	case "Data_provider":
+	case "data_provider":
+	    return "resourceProvider";
+	case "Publisher":
+	case "publisher":
+	    return "publisher";
+	case "Data_collector":
+	case "data_collector":
+	    return "originator";
+	case "Custodian":
+	case "custodian":
+	    return "custodian";
+	case "Owner":
+	case "owner":
+	    return "owner";
+	case "Funder":
+	case "funder":
+	    return "sponsor";
+	case "Metadata_provider":
+	case "metadata_provider":
+	    return "custodian";
+	case "Distributor":
+	case "distributor":
+	    return "distributor";
+	case "Rights_holder":
+	case "rights_holder":
+	    return "rightsHolder";
+	case "Processor":
+	case "processor":
+	    return "processor";
+	case "Point_of_contact":
+	case "pointOfContact":
+	    return "pointOfContact";
+	default:
+	    GSLoggerFactory.getLogger(EurOBISLdMapper.class).debug(
+		    "Unknown contribution role fragment {}, using collaborator", frag);
+	    return "collaborator";
+	}
     }
 
     private static final String MD_KEYWORD_TYPE_CODE_NS = "https://standards.iso.org/iso/19115/resources/Codelists/gml/MD_KeywordTypeCode.xml#";
