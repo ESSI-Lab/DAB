@@ -26,10 +26,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -49,7 +51,6 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -64,15 +65,10 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
  */
 public class EurOBISLdMapper extends FileIdentifierMapper {
 
-    /**
-     * List of Marineinfo project IRIs from the harvested DCAT catalog ({@code dcat:resource}); see
-     * {@link EurOBISLdClient#getCatalogProjectResourceURIs()}.
-     */
-    public static final String CATALOG_PROJECT_URIS_PROPERTY = "eurobis.ld.catalogProjectUris";
+    /** Marineinfo project IRI prefix; {@code ProID} from dataset JSON appends the numeric id. */
+    public static final String MARINEINFO_PROJECT_URI_PREFIX = "https://marineinfo.org/id/project/";
 
     public static Double TOL = Math.pow(10, -8);
-
-    private static final ConcurrentHashMap<String, Optional<String>> PROJECT_STANDARD_TITLE_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
@@ -322,7 +318,9 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 		}
 	    }
 
-	    addCatalogProjectKeywords(keywordMap, originalMD);
+	    if (dasid != null && !dasid.isEmpty()) {
+		addDatasetJsonProjectKeywords(keywordMap, dasid);
+	    }
 
 	    for (Keywords keywords : keywordMap.values()) {
 		coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keywords);
@@ -629,63 +627,55 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	return t.trim();
     }
 
-    private void addCatalogProjectKeywords(HashMap<String, Keywords> keywordMap, OriginalMetadata originalMD) {
-	GSPropertyHandler info = originalMD.getAdditionalInfo();
-	if (info == null) {
-	    return;
-	}
-	@SuppressWarnings("unchecked")
-	List<String> projectUris = info.get(CATALOG_PROJECT_URIS_PROPERTY, List.class);
-	if (projectUris == null || projectUris.isEmpty()) {
-	    return;
-	}
-	Keywords kprojects = keywordMap.computeIfAbsent("project", t -> {
-	    Keywords k = new Keywords();
-	    k.setTypeCode("project");
-	    return k;
-	});
-	for (String uri : projectUris) {
-	    if (uri == null || uri.isBlank()) {
-		continue;
-	    }
-	    String title = resolveMarineinfoProjectStandardTitle(uri);
-	    if (title != null && !title.isBlank()) {
-		kprojects.addKeyword(title.trim(), uri);
-	    } else {
-		kprojects.addKeyword(uri, uri);
-	    }
-	}
-    }
-
-    static String resolveMarineinfoProjectStandardTitle(String projectUri) {
-	Optional<String> cached = PROJECT_STANDARD_TITLE_CACHE.get(projectUri);
-	if (cached != null) {
-	    return cached.orElse(null);
-	}
-	Optional<String> fetched = fetchMarineinfoProjectStandardTitle(projectUri);
-	PROJECT_STANDARD_TITLE_CACHE.put(projectUri, fetched);
-	return fetched.orElse(null);
-    }
-
-    private static Optional<String> fetchMarineinfoProjectStandardTitle(String projectUri) {
+    /**
+     * Adds {@code projects} from {@code https://marineinfo.org/id/dataset/{dasId}.json} when present (anchor:
+     * {@link #MARINEINFO_PROJECT_URI_PREFIX} + {@code ProID}, title: {@code StandardTitle}).
+     */
+    private void addDatasetJsonProjectKeywords(HashMap<String, Keywords> keywordMap, String dasid) {
 	try {
+	    Set<String> projectHrefsAdded = new HashSet<>();
 	    Downloader d = new Downloader();
-	    Optional<String> res = d.downloadOptionalString(projectUri + ".json");
-	    if (res.isPresent()) {
-		JSONObject obj = new JSONObject(res.get());
-		JSONObject rec = obj.optJSONObject("projectrec");
-		if (rec != null) {
-		    String t = rec.optString("StandardTitle", "").trim();
-		    if (!t.isEmpty()) {
-			return Optional.of(t);
-		    }
+	    Optional<String> res = d.downloadOptionalString("https://marineinfo.org/id/dataset/" + dasid + ".json");
+	    if (res.isEmpty()) {
+		return;
+	    }
+	    JSONObject root = new JSONObject(res.get());
+	    JSONArray projects = root.optJSONArray("projects");
+	    if (projects == null || projects.length() == 0) {
+		return;
+	    }
+	    Keywords kprojects = keywordMap.computeIfAbsent("project", t -> {
+		Keywords k = new Keywords();
+		k.setTypeCode("project");
+		return k;
+	    });
+	    for (int i = 0; i < projects.length(); i++) {
+		JSONObject p = projects.optJSONObject(i);
+		if (p == null || !p.has("ProID") || p.isNull("ProID")) {
+		    continue;
+		}
+		long proId = p.getLong("ProID");
+		if (proId < 1) {
+		    continue;
+		}
+		String href = MARINEINFO_PROJECT_URI_PREFIX + proId;
+		if (!projectHrefsAdded.add(href)) {
+		    continue;
+		}
+		String stdTitle = p.optString("StandardTitle", "").trim();
+		if (stdTitle.isEmpty()) {
+		    stdTitle = p.optString("Acronym", "").trim();
+		}
+		if (stdTitle.isEmpty()) {
+		    kprojects.addKeyword(href, href);
+		} else {
+		    kprojects.addKeyword(stdTitle, href);
 		}
 	    }
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(EurOBISLdMapper.class).debug("Could not read Marineinfo project JSON for {}",
-		    projectUri, e);
+	    GSLoggerFactory.getLogger(getClass()).debug("Could not merge dataset JSON projects for {}: {}", dasid,
+		    e.getMessage());
 	}
-	return Optional.empty();
     }
 
     // private void retrieveOnline(MIMetadata miMetadata, ExtensionHandler

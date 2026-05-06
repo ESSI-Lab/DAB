@@ -27,14 +27,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileManager;
@@ -50,7 +48,6 @@ public class EurOBISLdClient {
 
 	private String DCAT_NS = "http://www.w3.org/ns/dcat#";
 	private String DATASET_LOCALNAME = "dataset";
-	private String RESOURCE_LOCALNAME = "resource";
 
 	private String endpoint = "";
 
@@ -91,15 +88,11 @@ public class EurOBISLdClient {
 			StmtIterator iter = model.listStatements();
 			while (iter.hasNext()) {
 				Statement statement = iter.nextStatement();
-				Resource subject = statement.getSubject();
 				Property predicate = statement.getPredicate();
 				RDFNode object = statement.getObject();
-				if (isDataset(predicate)) {
+				if (isDataset(predicate) && object.isResource()) {
 					datasetURIs.add(object.asResource().getURI());
-				} else if (isCatalogResource(predicate) && object.isResource()) {
-					catalogResourceURIs.add(object.asResource().getURI());
 				}
-				// System.out.println(subject + " " + predicate + " " + object);
 			}
 			model.close();
 			tempFile.delete();
@@ -113,33 +106,11 @@ public class EurOBISLdClient {
 		return ns.equals(DCAT_NS) && localname.equals(DATASET_LOCALNAME);
 	}
 
-	private boolean isCatalogResource(Property predicate) {
-		String ns = predicate.getNameSpace();
-		String localname = predicate.getLocalName();
-		return ns.equals(DCAT_NS) && localname.equals(RESOURCE_LOCALNAME);
-	}
-
 	private List<String> datasetURIs = new ArrayList<>();
-	private List<String> catalogResourceURIs = new ArrayList<>();
 
 	public List<String> getDatasetURIs() {
 		return datasetURIs;
 
-	}
-
-	/**
-	 * {@code dcat:resource} IRIs from the catalog (e.g. project and publication), for enriching harvested datasets.
-	 */
-	public List<String> getCatalogResourceURIs() {
-		return catalogResourceURIs;
-	}
-
-	/**
-	 * Project IRIs only (Marineinfo <code>/id/project/</code>), suitable for keyword type {@code project}.
-	 */
-	public List<String> getCatalogProjectResourceURIs() {
-		return catalogResourceURIs.stream().filter(u -> u != null && u.contains("/id/project/")).distinct()
-				.collect(Collectors.toList());
 	}
 
 	public void setDatasetURIs(List<String> datasetURIs) {
