@@ -23,10 +23,8 @@ package eu.essi_lab.downloader.hiscentral;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -38,13 +36,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioClient;
-import org.apache.commons.io.IOUtils;
 import org.cuahsi.waterml._1.ValueSingleVariable;
 import org.json.JSONArray;
 
@@ -57,8 +53,6 @@ import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.json.JSONArrayReader;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -87,7 +81,6 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
     private static final String HISCENTRAL_LAZIO_DOWNLOAD_ERROR = "HISCENTRAL_LAZIO_DOWNLOAD_ERROR";
 
     private HISCentralLazioConnector connector;
-    private Downloader downloader;
 
     /**
      * 
@@ -95,7 +88,6 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
     public HISCentralLazioDownloader() {
 
 	connector = new HISCentralLazioConnector();
-	downloader = new Downloader();
     }
 
     @Override
@@ -288,55 +280,16 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
     }
 
     private File getData(String linkage) throws GSException {
-	GSLoggerFactory.getLogger(getClass()).info("Getting BEARER TOKEN from Lazio Datascape service");
-
-	String result = null;
-	String token = null;
-
-
+	GSLoggerFactory.getLogger(getClass()).info("Getting Lazio Datascape data");
 
 	try {
 
-	    HISCentralLazioClient client = new HISCentralLazioClient();
-
-
-	    if (HISCentralLazioClient.BEARER_TOKEN == null) {
-		HISCentralLazioClient.BEARER_TOKEN = HISCentralLazioClient.getBeareToken(HISCentralLazioClient.TOKEN_URL);
-	    }
+	    HISCentralLazioClient client = new HISCentralLazioClient(connector.getSourceURL());
 	    GSLoggerFactory.getLogger(getClass()).info("Getting " + linkage);
 
-	    int timeout = 120;
-	    int responseTimeout = 200;
-	    InputStream stream = null;
-
-	    Downloader downloader = new Downloader();
-	    downloader.setConnectionTimeout(TimeUnit.SECONDS, timeout);
-	    downloader.setResponseTimeout(TimeUnit.SECONDS, responseTimeout);
-
-
-
-//
-//	    HttpResponse<InputStream> streamResponse = downloader.downloadResponse(//
-//		    linkage.trim(), //
-//		    HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
-
-	    String res =  client.getData(linkage);
+	    String res = client.getData(linkage);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
-
-//	    int responseCode = streamResponse.statusCode();
-//	    if (res != null) {
-//		// repeat again
-//		HISCentralLazioConnector.BEARER_TOKEN = HISCentralLazioConnector.getBearerToken(connector.getSourceURL());
-//
-//		streamResponse = downloader.downloadResponse(//
-//			linkage.trim(), //
-//			HttpHeaderUtils.build("Authorization", "Bearer " + HISCentralLazioConnector.BEARER_TOKEN));
-//
-//		stream = streamResponse.body();
-//
-//		GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
-//	    }
 
 	    if (res != null) {
 		Path tmpFile = Files.createTempFile(getClass().getSimpleName(), ".json");
@@ -389,7 +342,7 @@ public class HISCentralLazioDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralLazioClient.BASE_URL) && //
+		HISCentralLazioClient.matchesDownloadLinkage(online.getLinkage(), resource.getSource().getEndpoint()) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_LAZIO_NS_URI));
     }

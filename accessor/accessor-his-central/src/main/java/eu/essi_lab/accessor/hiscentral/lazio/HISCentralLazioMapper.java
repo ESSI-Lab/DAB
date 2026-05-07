@@ -378,7 +378,8 @@ public class HISCentralLazioMapper extends FileIdentifierMapper {
 	    tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	}
 
-	String linkage = HISCentralLazioClient.BASE_URL + "/data/" + timeSeriesId + "?from=" + tempExtenBegin + "&type=Plausible&part=IsoTime&part=Value&part=Quality&part=QualityDescr&timing=Original&elab=None";
+	String linkage = HISCentralLazioClient.apiV1BaseFromConfiguredUrl(dataset.getSource().getEndpoint()) + "data/" + timeSeriesId
+		+ "?from=" + tempExtenBegin + "&type=Plausible&part=IsoTime&part=Value&part=Quality&part=QualityDescr&timing=Original&elab=None";
 
 	Online online = new Online();
 	online.setLinkage(linkage);

@@ -21,31 +21,20 @@ package eu.essi_lab.accessor.hiscentral.lazio;
  * #L%
  */
 
-import java.io.InputStream;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteClient;
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
@@ -107,13 +96,7 @@ public class HISCentralLazioConnector extends HarvestedQueryConnector<HISCentral
 	    page = request.getResumptionToken();
 	}
 	
-	HISCentralLazioClient client = new HISCentralLazioClient();
-
-	// add authorization token
-	String baseUrl = getSourceURL();
-	if (HISCentralLazioClient.BEARER_TOKEN == null) {
-	    HISCentralLazioClient.BEARER_TOKEN = HISCentralLazioClient.getBeareToken(HISCentralLazioClient.TOKEN_URL);
-	}
+	HISCentralLazioClient client = new HISCentralLazioClient(getSourceURL());
 
 	JSONArray stationsArray = null;
 	String getStationPath = STATIONS_URL + "category=All&field=StationName&field=StationId&field=Locality&field=City&field=Prov&field=Longitude&field=Latitude&field=Altitude";
@@ -153,7 +136,6 @@ public class HISCentralLazioConnector extends HarvestedQueryConnector<HISCentral
 
 	} else {
 	    GSLoggerFactory.getLogger(getClass()).info("ERROR getting items.");
-	    HISCentralLazioClient.BEARER_TOKEN = null;
 	}
 
 	return ret;
