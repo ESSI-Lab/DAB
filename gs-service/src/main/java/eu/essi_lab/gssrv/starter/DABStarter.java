@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.starter;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -36,11 +36,9 @@ import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
-import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.RateLimiterSetting.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
-import eu.essi_lab.cfga.patch.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.*;
@@ -632,115 +630,8 @@ public class DABStarter implements ConfigurationChangeListener {
 	    }
 
 	    //
-	    // this patch replaces the random id of the SessionCoordinatorSetting with the right one
+	    // *** possible patches here ***
 	    //
-
-	    CustomPatch customPatch = CustomPatch.of(configuration, //
-		    (s) -> s.getSettingClass().equals(SessionCoordinatorSetting.class) //
-			    && !s.getIdentifier().equals(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel()),//
-		    (s) -> {
-			SelectionUtils.deepClean(s);
-			s.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
-
-			return s;
-		    });
-
-	    customPatch.patch();
-
-	    //
-	    // this patch removes legacy shared cache and shared persistent repo settings
-	    //
-
-	    RemoveSettingPatch removeSettingPatch = RemoveSettingPatch.of(configuration,
-		    (s) -> s.getIdentifier().equals("sharedCacheRepo") || s.getIdentifier().equals("sharedPersistentRepo"));
-
-	    removeSettingPatch.patch();
-
-	    //
-	    //
-	    //
-
-	    GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting patch STARTED");
-
-	    ArrayList<Setting> list = new ArrayList<>();
-
-	    ConfigurationUtils.deepFind(configuration, s -> s.getSettingClass().equals(DefaultSemanticSearchSetting.class), list);
-
-	    if (list.isEmpty()) {
-
-		GSLoggerFactory.getLogger(DABStarter.class).warn("No DefaultSemanticSearchSetting found");
-
-		DefaultSemanticSearchSetting setting = new DefaultSemanticSearchSetting();
-
-		SelectionUtils.deepClean(setting);
-
-		setting.setIdentifier(SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel());
-
-		boolean put = configuration.put(setting);
-
-		if (put) {
-
-		    ConfigurationUtils.backup(configuration);
-		    ConfigurationUtils.flush(configuration);
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("DefaultSemanticSearchSetting correctly put");
-
-		} else {
-
-		    throw GSException.createException( //
-			    getClass(), //
-			    "Unable to put DefaultSemanticSearchSetting", //
-			    ErrorInfo.ERRORTYPE_INTERNAL, //
-			    ErrorInfo.SEVERITY_ERROR,//
-			    "DefaultSemanticSearchSettingPutError");//
-		}
-
-	    } else {
-
-		String identifier = list.getFirst().getIdentifier();
-
-		if (!identifier.equals(SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel())) {
-
-		    GSLoggerFactory.getLogger(DABStarter.class).warn("Found DefaultSemanticSearchSetting with legacy id: {}", identifier);
-
-		    boolean removed = configuration.remove(identifier);
-
-		    if (!removed) {
-
-			throw GSException.createException( //
-				getClass(), //
-				"Unable to remove legacy DefaultSemanticSearchSetting", //
-				ErrorInfo.ERRORTYPE_INTERNAL, //
-				ErrorInfo.SEVERITY_ERROR,//
-				"DefaultSemanticSearchSettingRemoveError");//
-		    }
-
-		    list.getFirst().setIdentifier(SingletonSettingsId.DEFAULT_SEMANTIC_SEARCH_SETTING.getLabel());
-
-		    boolean put = configuration.put(list.getFirst());
-
-		    if (!put) {
-
-			throw GSException.createException( //
-				getClass(), //
-				"Unable to put DefaultSemanticSearchSetting", //
-				ErrorInfo.ERRORTYPE_INTERNAL, //
-				ErrorInfo.SEVERITY_ERROR,//
-				"DefaultSemanticSearchSettingPutError");//
-		    }
-
-		    ConfigurationUtils.backup(configuration);
-		    ConfigurationUtils.flush(configuration);
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("DefaultSemanticSearchSetting identifier correctly updated");
-
-		} else {
-
-		    GSLoggerFactory.getLogger(DABStarter.class).info("No legacy settings found");
-		}
-
-		GSLoggerFactory.getLogger(getClass()).debug("DefaultSemanticSearchSetting patch ENDED");
-	    }
 
 	    //
 	    // in these mode there is no need to autoreload
