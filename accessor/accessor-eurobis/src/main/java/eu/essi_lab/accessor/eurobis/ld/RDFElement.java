@@ -184,10 +184,7 @@ public enum RDFElement {
 		"                OPTIONAL{ ?definedTerm schema:name ?keywordlabel . " + //
 		" ?definedTerm schema:identifier ?keyworduri . " + //
 		"}\n" + //
-		"                OPTIONAL{ ?definedTerm schema:name ?keywordlabel . " + //
-		" ?definedTerm schema:identifier ?keyworduri . " + //
-		" ?definedTerm schema:additionalType ?keywordtype . " + //
-		"}\n" + //
+		"                OPTIONAL{ ?definedTerm schema:additionalType ?keywordtype }\n" + //
 		"                OPTIONAL{ ?definedTerm schema:inDefinedTermSet ?schemak. " + //
 		" 					?schemak schema:name ?keywordthesaurus" + //
 		"		}\n" + //
