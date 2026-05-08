@@ -59,6 +59,14 @@ public class HISCentralLazioClient {
     private GSLogger logger;
     private static String giProxyEndpoint = null;
 
+    private static String lazioClientUserOverride = null;
+
+    private static String lazioClientPasswordOverride = null;
+
+    private static String lazioClientIdOverride = null;
+
+    private static String lazioClientInstanceOverride = null;
+
     /**
      * Normalizes the configured source URL to the Datascape <strong>root</strong> (no trailing slash), without
      * {@code /v1}. Accepts either {@code http://host/datascape}, {@code http://host/datascape/}, or
@@ -97,16 +105,66 @@ public class HISCentralLazioClient {
     }
 
     public static String getGiProxyEndpoint() {
-	if (giProxyEndpoint == null) {
-	    giProxyEndpoint = ConfigurationWrapper.getSystemSettings().getProxyEndpoint().orElse(null);
+	if (giProxyEndpoint != null) {
+	    return giProxyEndpoint;
 	}
-	return giProxyEndpoint;
+	return ConfigurationWrapper.getSystemSettings().getProxyEndpoint().orElse(null);
+	
     }
 
     public static void setGiProxyEndpoint(String endpoint) {
 	giProxyEndpoint = endpoint;
     }
-    
+
+    /**
+     * Overrides Lazio OAuth credentials for token requests (e.g. standalone tests). Per field: a non-null argument
+     * overrides; {@code null} falls back to {@link ConfigurationWrapper} for that field only. If all four arguments
+     * are non-null, the configuration service is not queried for Lazio token login.
+     */
+    public static void setLazioClientCredentials(String username, String password, String clientId, String clientInstance) {
+
+	lazioClientUserOverride = username;
+	lazioClientPasswordOverride = password;
+	lazioClientIdOverride = clientId;
+	lazioClientInstanceOverride = clientInstance;
+    }
+
+    /**
+     * Clears {@link #setLazioClientCredentials(String, String, String, String)} overrides; token login uses
+     * {@link ConfigurationWrapper} again.
+     */
+    public static void clearLazioClientCredentials() {
+
+	lazioClientUserOverride = null;
+	lazioClientPasswordOverride = null;
+	lazioClientIdOverride = null;
+	lazioClientInstanceOverride = null;
+    }
+
+    private static String effectiveLazioClientUser() {
+
+	return lazioClientUserOverride != null ? lazioClientUserOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientUser().orElse(null);
+    }
+
+    private static String effectiveLazioClientPassword() {
+
+	return lazioClientPasswordOverride != null ? lazioClientPasswordOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientPassword().orElse(null);
+    }
+
+    private static String effectiveLazioClientId() {
+
+	return lazioClientIdOverride != null ? lazioClientIdOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientId().orElse(null);
+    }
+
+    private static String effectiveLazioClientInstance() {
+
+	return lazioClientInstanceOverride != null ? lazioClientInstanceOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientInstance().orElse(null);
+    }
+
     /**
      * @param configuredSourceUrl connector endpoint: Datascape root ({@code .../datascape}) or API base
      *        ({@code .../datascape/v1/}); see {@link #normalizeDatascapeRoot(String)}
@@ -178,11 +236,12 @@ public class HISCentralLazioClient {
 	try {
 
 	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put("username", ConfigurationWrapper.getCredentialsSetting().getLazioClientUser().orElse(null));
-	    params.put("password", ConfigurationWrapper.getCredentialsSetting().getLazioClientPassword().orElse(null));
 	    params.put("grant_type", "password");
-	    params.put("client_id", ConfigurationWrapper.getCredentialsSetting().getLazioClientId().orElse(null));
-	    params.put("client_instance", ConfigurationWrapper.getCredentialsSetting().getLazioClientInstance().orElse(null));
+	    params.put("username", effectiveLazioClientUser());
+	    params.put("password", effectiveLazioClientPassword());
+	    params.put("client_id", effectiveLazioClientId());
+	    params.put("client_instance", effectiveLazioClientInstance());
+	    params.put("refresh_token", "");
 
 	    String postUrl = tokenPath;
 	    String proxyEndpoint = getGiProxyEndpoint();
@@ -190,10 +249,14 @@ public class HISCentralLazioClient {
 		postUrl = proxyEndpoint + "/post?url=" + URLEncoder.encode(tokenPath, "UTF-8");
 	    }
 
+	    HashMap<String, String> headers = new HashMap<>();
+	    headers.put("Content-Type", "application/x-www-form-urlencoded");
+
 	    HttpRequest request = HttpRequestUtils.build(//
 		    MethodWithBody.POST, //
 		    postUrl, //
-		    params);
+		    params, //
+		    headers);
 
 	    Downloader downloader = new Downloader();
 
@@ -270,7 +333,10 @@ public class HISCentralLazioClient {
 		postUrl = proxyEndpoint + "/post?url=" + URLEncoder.encode(revokeUrl, "UTF-8");
 	    }
 
-	    HttpRequest request = HttpRequestUtils.build(MethodWithBody.POST, postUrl, params);
+	    HashMap<String, String> headers = new HashMap<>();
+	    headers.put("Content-Type", "application/x-www-form-urlencoded");
+
+	    HttpRequest request = HttpRequestUtils.build(MethodWithBody.POST, postUrl, params, headers);
 
 	    Downloader downloader = new Downloader();
 	    downloader.setConnectionTimeout(TimeUnit.SECONDS, 5);
