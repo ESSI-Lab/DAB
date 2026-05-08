@@ -380,19 +380,20 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     public Iterator<String> getKeywordTypes() {
 
 	ArrayList<String> out = new ArrayList<>();
-	try {
+
 	    List<MDKeywordsPropertyType> descriptiveKeywords = type.getDescriptiveKeywords();
 	    for (MDKeywordsPropertyType kwd : descriptiveKeywords) {
-
+		try {
 		MDKeywordsType mdKeywords = kwd.getMDKeywords();
 
 		MDKeywordTypeCodePropertyType propertyType = mdKeywords.getType();
 		String codeListValue = propertyType.getMDKeywordTypeCode().getCodeListValue();
 		out.add(codeListValue);
+		} catch (NullPointerException | IndexOutOfBoundsException ex) {
+		    // nothing to do here
+		}
 	    }
-	} catch (NullPointerException | IndexOutOfBoundsException ex) {
-	    // nothing to do here
-	}
+
 
 	return out.iterator();
     }
