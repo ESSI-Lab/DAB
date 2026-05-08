@@ -1349,7 +1349,6 @@ public class Identification extends ISOMetadata<AbstractMDIdentificationType> {
     /**
      * Sets the maintenance and update frequency
      *
-     * @param frequency
      */
     public void setMaintenanceAndUpdateFrequency(String uri, String value) {
 
