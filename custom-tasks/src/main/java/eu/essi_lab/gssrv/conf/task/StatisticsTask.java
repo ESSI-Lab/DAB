@@ -198,6 +198,11 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_ATTRIBUTE_TITLE}), filtered by {@code VIEW_ID} (when set) and
  * {@code PROFILER_NAME=OSProfiler}. Labels: {@code attribute_title}, {@code view}. Requires statistics DB settings.</dd>
  *
+ * <dt>{@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI SEARCH_OBSERVED_PROPERTY_URI} ({@code search_observed_property_uri_total})</dt>
+ * <dd>From request statistics: all-time counts per {@code observed_property_uri} (terms on
+ * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_OBSERVED_PROPERTY_URI}), filtered by {@code VIEW_ID} (when set) and
+ * {@code PROFILER_NAME=OSProfiler}. Labels: {@code observed_property_uri}, {@code view}. Requires statistics DB settings.</dd>
+ *
  * <dt>{@link StatisticsMetric#PORTAL_SEARCHES_TOTAL PORTAL_SEARCHES_TOTAL} ({@code portal_search_total})</dt>
  * <dd>From request statistics: all-time count of requests with {@code VIEW_ID=view1} and {@code PROFILER_NAME=OSProfiler}.
  * Label {@code view} is the view id. Requires statistics DB settings.</dd>
@@ -275,6 +280,9 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	SEARCH_ATTRIBUTE_TITLE_TOTAL("search_attribute_title_total",
 		"Request counts per DISCOVERY_MESSAGE_attributeTitle bucket from OpenSearch statistics"),
+
+	SEARCH_OBSERVED_PROPERTY_URI("search_observed_property_uri_total",
+		"Request counts per DISCOVERY_MESSAGE_observedPropertyURI bucket from OpenSearch statistics"),
 
 	PORTAL_SEARCHES_TOTAL("portal_search_total",
 		"All-time OpenSearch request count for VIEW_ID=view1 and PROFILER_NAME=OSProfiler (label view)"),
@@ -800,7 +808,8 @@ public class StatisticsTask extends AbstractCustomTask {
 
     /**
      * Registers OpenSearch-backed runtime metrics: {@link StatisticsMetric#STATION_PAGE_VISITS_TOTAL},
-     * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL}, {@link StatisticsMetric#SEARCH_ATTRIBUTE_TITLE_TOTAL}
+     * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL}, {@link StatisticsMetric#SEARCH_ATTRIBUTE_TITLE_TOTAL},
+     * {@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI}
      * ({@link ElasticsearchClient#countRuntimeInfoRequestsByBucket}),
      * {@link StatisticsMetric#PORTAL_SEARCHES_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequests}),
      * {@link StatisticsMetric#SEARCH_REQUESTS_GEOHASH_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequestsByGeohash}),
@@ -811,6 +820,7 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	if (!metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL) && !metrics.contains(StatisticsMetric.OM_DOWNLOADS_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL)
+		&& !metrics.contains(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI)
 		&& !metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_GEOHASH_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_TIME_YEAR_TOTAL)) {
@@ -835,6 +845,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	Map<String, Double> stationVisits = new HashMap<>();
 	Map<String, Double> omDownloads = new HashMap<>();
 	Map<String, Double> searchAttributeTitleTotal = new HashMap<>();
+	Map<String, Double> searchObservedPropertyUriTotal = new HashMap<>();
 	Map<String, Double> searchRequestsGeohashTotal = new HashMap<>();
 	Map<String, Double> searchRequestsTimeYearTotal = new HashMap<>();
 
@@ -888,6 +899,23 @@ public class StatisticsTask extends AbstractCustomTask {
 		searchAttributeTitleTotal.putAll(parseRuntimeInfoFrequencyByBucket(resp));
 	    } catch (GSException e) {
 		GSLoggerFactory.getLogger(getClass()).warn("SEARCH_ATTRIBUTE_TITLE_TOTAL query failed: {}", e.getMessage());
+	    }
+	}
+
+	if (metrics.contains(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI)) {
+	    try {
+		LogicalBond bond = BondFactory.createAndBond();
+		if (viewId != null) {
+		    bond.getOperands()
+			    .add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.VIEW_ID, viewId));
+		}
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.PROFILER_NAME,
+			PORTAL_SEARCHES_PROFILER_OS));
+		StatisticsResponse resp = es.countRuntimeInfoRequestsByBucket(bond, RuntimeInfoElement.DISCOVERY_MESSAGE_OBSERVED_PROPERTY_URI,
+			RUNTIME_STATS_MAX_BUCKETS);
+		searchObservedPropertyUriTotal.putAll(parseRuntimeInfoFrequencyByBucket(resp));
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("SEARCH_OBSERVED_PROPERTY_URI query failed: {}", e.getMessage());
 	    }
 	}
 
@@ -968,6 +996,15 @@ public class StatisticsTask extends AbstractCustomTask {
 		    g -> g.getOrDefault(t, 0.0))//
 		    .description(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL.description())//
 		    .tag("attribute_title", t)//
+		    .tag("view", viewId)//
+		    .register(registry);
+	}
+	for (String uri : searchObservedPropertyUriTotal.keySet()) {
+	    final String u = uri;
+	    Gauge.builder(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI.prometheusName(), searchObservedPropertyUriTotal,
+		    g -> g.getOrDefault(u, 0.0))//
+		    .description(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI.description())//
+		    .tag("observed_property_uri", u)//
 		    .tag("view", viewId)//
 		    .register(registry);
 	}
