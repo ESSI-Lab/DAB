@@ -126,6 +126,9 @@ public class HISCentralLazioConnector extends HarvestedQueryConnector<HISCentral
 		    if (measuresArray != null) {
 			for (int j = 0; j < measuresArray.length(); j++) {
 			    JSONObject sensorInfo = measuresArray.getJSONObject(j);
+			    if (sensorInfo.optString("elementName").contains("Portata")) {
+				continue;
+			    }
 			    ret.addRecord(HISCentralLazioMapper.create(datasetMetadata, sensorInfo));
 			}
 
