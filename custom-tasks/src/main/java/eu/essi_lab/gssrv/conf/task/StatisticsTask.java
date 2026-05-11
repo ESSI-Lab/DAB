@@ -66,7 +66,6 @@ import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.SearchAfter;
-import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
@@ -198,7 +197,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_ATTRIBUTE_TITLE}), filtered by {@code VIEW_ID} (when set) and
  * {@code PROFILER_NAME=OSProfiler}. Labels: {@code attribute_title}, {@code view}. Requires statistics DB settings.</dd>
  *
- * <dt>{@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI SEARCH_OBSERVED_PROPERTY_URI} ({@code search_observed_property_uri_total})</dt>
+ * <dt>{@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI_TOTAL SEARCH_OBSERVED_PROPERTY_URI} ({@code search_observed_property_uri_total})</dt>
  * <dd>From request statistics: all-time counts per {@code observed_property_uri} (terms on
  * {@link RuntimeInfoElement#DISCOVERY_MESSAGE_OBSERVED_PROPERTY_URI}), filtered by {@code VIEW_ID} (when set) and
  * {@code PROFILER_NAME=OSProfiler}. Labels: {@code observed_property_uri}, {@code view}. Requires statistics DB settings.</dd>
@@ -281,7 +280,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	SEARCH_ATTRIBUTE_TITLE_TOTAL("search_attribute_title_total",
 		"Request counts per DISCOVERY_MESSAGE_attributeTitle bucket from OpenSearch statistics"),
 
-	SEARCH_OBSERVED_PROPERTY_URI("search_observed_property_uri_total",
+	SEARCH_OBSERVED_PROPERTY_URI_TOTAL("search_observed_property_uri_total",
 		"Request counts per DISCOVERY_MESSAGE_observedPropertyURI bucket from OpenSearch statistics"),
 
 	PORTAL_SEARCHES_TOTAL("portal_search_total",
@@ -809,7 +808,7 @@ public class StatisticsTask extends AbstractCustomTask {
     /**
      * Registers OpenSearch-backed runtime metrics: {@link StatisticsMetric#STATION_PAGE_VISITS_TOTAL},
      * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL}, {@link StatisticsMetric#SEARCH_ATTRIBUTE_TITLE_TOTAL},
-     * {@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI}
+     * {@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI_TOTAL}
      * ({@link ElasticsearchClient#countRuntimeInfoRequestsByBucket}),
      * {@link StatisticsMetric#PORTAL_SEARCHES_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequests}),
      * {@link StatisticsMetric#SEARCH_REQUESTS_GEOHASH_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequestsByGeohash}),
@@ -820,7 +819,7 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	if (!metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL) && !metrics.contains(StatisticsMetric.OM_DOWNLOADS_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL)
-		&& !metrics.contains(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI)
+		&& !metrics.contains(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI_TOTAL)
 		&& !metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_GEOHASH_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_TIME_YEAR_TOTAL)) {
@@ -902,7 +901,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	    }
 	}
 
-	if (metrics.contains(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI)) {
+	if (metrics.contains(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI_TOTAL)) {
 	    try {
 		LogicalBond bond = BondFactory.createAndBond();
 		if (viewId != null) {
@@ -1001,9 +1000,9 @@ public class StatisticsTask extends AbstractCustomTask {
 	}
 	for (String uri : searchObservedPropertyUriTotal.keySet()) {
 	    final String u = uri;
-	    Gauge.builder(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI.prometheusName(), searchObservedPropertyUriTotal,
+	    Gauge.builder(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI_TOTAL.prometheusName(), searchObservedPropertyUriTotal,
 		    g -> g.getOrDefault(u, 0.0))//
-		    .description(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI.description())//
+		    .description(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI_TOTAL.description())//
 		    .tag("observed_property_uri", u)//
 		    .tag("view", viewId)//
 		    .register(registry);
