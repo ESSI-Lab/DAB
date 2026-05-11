@@ -465,6 +465,16 @@ public class DatahubJsonMapper extends DiscoveryResultSetMapper<String> {
 	putOpt(o, "role", party.getRoleCode());
 	Contact contact = party.getContact();
 	if (contact != null) {
+	    Iterator<String> phoneVoices = contact.getPhoneVoices();
+	    if (phoneVoices != null && phoneVoices.hasNext()) {
+		String phoneValue = phoneVoices.next();
+		Double phoneNum = parseDouble(phoneValue);
+		if (phoneNum != null && phoneNum == Math.floor(phoneNum) && !phoneNum.isInfinite()) {
+		    o.put("phone", phoneNum.longValue());
+		} else {
+		    putOpt(o, "phone", phoneValue);
+		}
+	    }
 	    String email = contact.getAddress() != null ? contact.getAddress().getElectronicMailAddress() : null;
 	    if (email != null)
 		o.put("address", new JSONObject().put("email", email));
