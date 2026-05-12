@@ -395,8 +395,15 @@ public class USGSMapper extends OriginalIdentifierMapper {
 		    }
 		}
 		if (quantity != null) {
-		    dataset.getExtensionHandler().setTimeSupport("" + quantity);
-		    dataset.getExtensionHandler().setTimeUnits(timeUnits);
+		    try {
+			java.math.BigDecimal value = new java.math.BigDecimal(quantity);
+			javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(value, timeUnits);
+			if (duration != null) {
+			    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
+			}
+		    } catch (Exception e) {
+		    }
 		}
 	    }
 

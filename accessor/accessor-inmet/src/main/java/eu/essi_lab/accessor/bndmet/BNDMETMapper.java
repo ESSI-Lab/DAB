@@ -297,36 +297,27 @@ public class BNDMETMapper extends AbstractResourceMapper {
 
 	dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 
-	String timeUnits;
-	String timeUnitsAbbreviation;
+	String duration8601;
 	switch (parameterPeriod.toLowerCase()) {
 	case "mensal":
-	    timeUnits = "month";
-	    timeUnitsAbbreviation = "month";
+	    duration8601 = "P1M";
 	    break;
 	case "diario":
-	    timeUnits = "day";
-	    timeUnitsAbbreviation = "day";
+	    duration8601 = "P1D";
 	    break;
 	case "horário":
 	case "horario":
-	    timeUnits = "hour";
-	    timeUnitsAbbreviation = "h";
+	    duration8601 = "PT1H";
 	    break;
 	default:
-	    timeUnits = "unknown";
-	    timeUnitsAbbreviation = "unk";
+	    duration8601 = null;
 	    break;
 	}
-	dataset.getExtensionHandler().setTimeUnits(timeUnits);
-	dataset.getExtensionHandler().setTimeUnitsAbbreviation(timeUnitsAbbreviation);
-
-	switch (interpolation) {
-	case CONTINUOUS:
-	    break;
-	default:
-	    dataset.getExtensionHandler().setTimeSupport("1");
-	    break;
+	if (duration8601 != null) {
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration8601);
+	    if (interpolation != InterpolationType.CONTINUOUS) {
+		dataset.getExtensionHandler().setTimeAggregationDuration8601(duration8601);
+	    }
 	}
 
 	dataset.getExtensionHandler().setAttributeMissingValue(MISSING_VALUE);

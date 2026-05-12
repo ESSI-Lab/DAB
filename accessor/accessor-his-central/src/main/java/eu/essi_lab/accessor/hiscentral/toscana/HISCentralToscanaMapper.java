@@ -418,12 +418,10 @@ public class HISCentralToscanaMapper extends FileIdentifierMapper {
 	    if (variableCode.toLowerCase().contains("giornalier")) {
 		dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
 		dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
-		dataset.getExtensionHandler().setTimeUnits("d");
 	    }
 	    if (variableCode.toLowerCase().contains("a 24 ore")) {
 		dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
 		dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
-		dataset.getExtensionHandler().setTimeUnits("d");
 	    }
 	    String attributeTitle = variableCode;
 	    String generalCategory = (variableCode.contains(" ")) ? variableCode.split(" ")[0] : variableCode;

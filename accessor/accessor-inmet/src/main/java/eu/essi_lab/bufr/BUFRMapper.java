@@ -178,8 +178,15 @@ public class BUFRMapper extends OriginalIdentifierMapper {
 
 	    dataset.getExtensionHandler().setTimeInterpolation(variable.getInterpolationType());
 	    if (variable.getTimeSupport() != null) {
-		dataset.getExtensionHandler().setTimeSupport(variable.getTimeSupport().getValue());
-		dataset.getExtensionHandler().setTimeUnits(variable.getTimeSupport().getUnits());
+		try {
+		    BigDecimal value = new BigDecimal(variable.getTimeSupport().getValue());
+		    javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(value, variable.getTimeSupport().getUnits());
+		    if (duration != null) {
+			dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
+		    }
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error("Unable to parse time support: {}", e.getMessage());
+		}
 	    }
 
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword("WMO station number " + first.getWMOStationNumber());

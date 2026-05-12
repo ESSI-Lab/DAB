@@ -217,7 +217,7 @@ public class DataloggersMapper extends FileIdentifierMapper {
 		extensionHandler.setAttributeUnits(uomCod);
 	    }
 	    if (datastreamStep != null && datastreamStep > 0) {
-		extensionHandler.setTimeResolution(String.valueOf(datastreamStep));
+		extensionHandler.setTimeResolutionDuration8601("PT" + datastreamStep + "M");
 	    }
 
 	    // Online resource

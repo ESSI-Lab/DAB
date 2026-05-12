@@ -362,6 +362,15 @@ public class ObservationMapper {
 	    } catch (Exception e) {
 
 	    }
+	} else if (parser.timeAggregationDuration8601 != null && !parser.timeAggregationDuration8601.isEmpty()) {
+	    try {
+		Duration duration = ISO8601DateTimeUtils.getDuration(parser.timeAggregationDuration8601);
+		if (duration != null) {
+		    observation.setAggregationDuration(duration);
+		}
+	    } catch (Exception e) {
+
+	    }
 	}
 
 	if (parser.timeSpacing != null && parser.timeUnits != null && !parser.timeSpacing.isEmpty() && !parser.timeUnits.isEmpty()) {
@@ -375,6 +384,15 @@ public class ObservationMapper {
 		}
 	    } catch (Exception e) {
 		// TODO: handle exception
+	    }
+	} else if (parser.timeResolutionDuration8601 != null && !parser.timeResolutionDuration8601.isEmpty()) {
+	    try {
+		Duration duration = ISO8601DateTimeUtils.getDuration(parser.timeResolutionDuration8601);
+		if (duration != null) {
+		    observation.setIntendedObservationSpacing(duration);
+		}
+	    } catch (Exception e) {
+
 	    }
 	}
 

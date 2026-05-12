@@ -275,28 +275,26 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 
 			dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 
-			String timeUnits = null;
 			String timeSupport = variable.getTimeSupport();
-			if (timeSupport == null || timeSupport.isEmpty() || timeSupport.equals("00:00:00")) {
-			    timeSupport = null;
-			} else {
+			if (timeSupport != null && !timeSupport.isEmpty() && !timeSupport.equals("00:00:00")) {
 			    if (timeSupport.contains(" ")) {
 				String[] splits = timeSupport.split(" ");
-				timeSupport = splits[0];
-				timeUnits = splits[1];
-				switch (timeUnits) {
-				case "mon":
-				    timeUnits = "months";
-				    break;
-				default:
-				    break;
+				String tsValue = splits[0];
+				String tsUnits = splits[1];
+				if (tsUnits.equals("mon")) {
+				    tsUnits = "months";
+				}
+				try {
+				    java.math.BigDecimal value = new java.math.BigDecimal(tsValue);
+				    javax.xml.datatype.Duration duration = eu.essi_lab.lib.utils.ISO8601DateTimeUtils.getDuration(value, tsUnits);
+				    if (duration != null) {
+					dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
+					dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
+				    }
+				} catch (Exception e) {
 				}
 			    }
 			}
-
-			dataset.getExtensionHandler().setTimeUnits(timeUnits);
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation(timeUnits);
-			dataset.getExtensionHandler().setTimeSupport(timeSupport);
 			// dataset.getExtensionHandler().setAttributeMissingValue(MISSING_VALUE);
 			String unitName = units.getName();
 			dataset.getExtensionHandler().setAttributeUnits(unitName);

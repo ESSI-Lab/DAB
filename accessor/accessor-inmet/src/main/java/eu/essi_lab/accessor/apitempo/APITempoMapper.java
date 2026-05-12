@@ -21,6 +21,7 @@ package eu.essi_lab.accessor.apitempo;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Optional;
 
@@ -266,35 +267,16 @@ public class APITempoMapper extends AbstractResourceMapper {
 
 	dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 
-	String timeUnits;
-	String timeUnitsAbbreviation;
-	switch (aggregationPeriodUnits.toLowerCase()) {
-	case "month":
-	    timeUnits = "month";
-	    timeUnitsAbbreviation = "month";
-	    break;
-	case "day":
-	    timeUnits = "day";
-	    timeUnitsAbbreviation = "day";
-	    break;
-	case "hour":
-	    timeUnits = "hour";
-	    timeUnitsAbbreviation = "h";
-	    break;
-	default:
-	    timeUnits = "unknown";
-	    timeUnitsAbbreviation = "unk";
-	    break;
-	}
-	dataset.getExtensionHandler().setTimeUnits(timeUnits);
-	dataset.getExtensionHandler().setTimeUnitsAbbreviation(timeUnitsAbbreviation);
-
-	switch (interpolation) {
-	case CONTINUOUS:
-	    break;
-	default:
-	    dataset.getExtensionHandler().setTimeSupport(aggregationPeriod);
-	    break;
+	try {
+	    BigDecimal value = new BigDecimal(aggregationPeriod);
+	    javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(value, aggregationPeriodUnits);
+	    if (duration != null) {
+		dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
+		if (interpolation != InterpolationType.CONTINUOUS) {
+		    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
+		}
+	    }
+	} catch (Exception e) {
 	}
 
 	dataset.getExtensionHandler().setAttributeMissingValue(MISSING_VALUE);
