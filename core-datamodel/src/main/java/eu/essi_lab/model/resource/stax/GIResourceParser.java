@@ -312,6 +312,8 @@ public class GIResourceParser extends StAXDocumentParser {
     public String timeSupport = "";
     public String timeSpacing = "";
     public String timeUnits = "";
+    public String timeAggregationDuration8601 = "";
+    public String timeResolutionDuration8601 = "";
     public String fileIdentifier = "";
     public String geometry = "";
 
@@ -441,6 +443,11 @@ public class GIResourceParser extends StAXDocumentParser {
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.TIME_RESOLUTION_EL_NAME), v -> this.timeSpacing = v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.TIME_UNITS_EL_NAME), v -> this.timeUnits = v);
+
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME),
+		v -> this.timeAggregationDuration8601 = v);
+	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME),
+		v -> this.timeResolutionDuration8601 = v);
 
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ONLINE_ID.getName()), v -> this.onlineId = v);
 

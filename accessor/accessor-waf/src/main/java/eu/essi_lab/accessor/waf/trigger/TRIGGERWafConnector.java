@@ -482,8 +482,7 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword("hourly");
 
 	ExtensionHandler handler = dataset.getExtensionHandler();
-	handler.setTimeUnits("h");
-	handler.setTimeResolution("1");
+	handler.setTimeResolutionDuration8601("PT1H");
 	handler.setAttributeMissingValue("-9999");
 	handler.setAttributeUnitsAbbreviation(variableUnit);
 

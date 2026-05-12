@@ -227,17 +227,14 @@ public class ANAMapper extends OriginalIdentifierMapper {
 
 	    CoverageDescription coverageDescription = new CoverageDescription();
 
-	    dataset.getExtensionHandler().setTimeUnits("hour");
-	    dataset.getExtensionHandler().setTimeUnits("h");
-
 	    dataset.getExtensionHandler().setTimeInterpolation(decodedVariable.getInterpolation());
 	    dataset.getExtensionHandler().setAttributeUnits(decodedVariable.getUnit());
 	    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(decodedVariable.getAbbreviation());
 
 	    if (decodedVariable.equals(ANAVariable.CHUVA)) {
-		dataset.getExtensionHandler().setTimeSupport("1");
-
-	    }else {
+		dataset.getExtensionHandler().setTimeAggregationDuration8601("PT1H");
+		dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
+	    } else {
 		dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
 	    }
 

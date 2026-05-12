@@ -345,25 +345,11 @@ public class CANADAMSCMapper extends OriginalIdentifierMapper {
 
 	Long resolutionMs = station.getResolutionMs();
 	if (resolutionMs != null) {
-
-	    if (resolutionMs % 1000 == 0) {
-		long resolutionSecs = resolutionMs / 1000;
-
-		if (resolutionSecs % 60 == 0) {
-		    long resolutionMins = resolutionSecs / 60;
-		    dataset.getExtensionHandler().setTimeUnits("min");
-		    dataset.getExtensionHandler().setTimeResolution("" + resolutionMins);
-		} else {
-		    dataset.getExtensionHandler().setTimeUnits("s");
-		    dataset.getExtensionHandler().setTimeResolution("" + resolutionSecs);
-		}
-
-	    } else {
-		dataset.getExtensionHandler().setTimeUnits("ms");
-		dataset.getExtensionHandler().setTimeResolution("" + resolutionMs);
-
+	    java.math.BigDecimal ms = new java.math.BigDecimal(resolutionMs);
+	    javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(ms, "ms");
+	    if (duration != null) {
+		dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
 	    }
-
 	}
 
 	// dataset.getExtensionHandler().setTimeSupport("0");

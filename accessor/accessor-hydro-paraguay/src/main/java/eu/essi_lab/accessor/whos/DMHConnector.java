@@ -201,9 +201,15 @@ public class DMHConnector extends HarvestedQueryConnector<DMHConnectorSetting> {
 		    coverageDescription.setAttributeDescription(variable.getVariableName());
 
 
-		    dataset.getExtensionHandler().setTimeUnits(variable.getAggregationPeriodUnits());
-		    dataset.getExtensionHandler().setTimeUnitsAbbreviation(variable.getAggregationPeriodUnits());
-		    dataset.getExtensionHandler().setTimeSupport(variable.getAggregationPeriod().toString());
+		    try {
+			javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(variable.getAggregationPeriod(),
+				variable.getAggregationPeriodUnits());
+			if (duration != null) {
+			    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
+			}
+		    } catch (Exception e) {
+		    }
 		    // dataset.getExtensionHandler().setAttributeMissingValue(MISSING_VALUE);
 		    String unitName = variable.getUnitOfMeasure();
 		    dataset.getExtensionHandler().setAttributeUnits(unitName);
