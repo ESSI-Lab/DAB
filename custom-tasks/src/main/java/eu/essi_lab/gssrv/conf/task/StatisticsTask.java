@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.quartz.JobExecutionContext;
@@ -58,6 +59,14 @@ import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
+import eu.essi_lab.lib.skos.SKOSClient;
+import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
+import eu.essi_lab.lib.skos.SKOSConcept;
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -77,6 +86,7 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.RuntimeInfoElement;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
@@ -124,6 +134,16 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <dt>{@link StatisticsMetric#SOURCE_INFO SOURCE_INFO} ({@code source_info})</dt>
  * <dd>Constant {@code 1} used as a carrier for labels {@code source_id} and {@code source_label} (human-readable name),
  * so monitoring systems can resolve source identity alongside other series.</dd>
+ *
+ * <dt>{@link StatisticsMetric#OBSERVED_PROPERTY_INFO OBSERVED_PROPERTY_INFO} ({@code observed_property_info})</dt>
+ * <dd>Constant {@code 1} used as a carrier for labels {@code uri}, {@code preferred_label_ita} (Italian) and
+ * {@code preferred_label_eng} (English). Exposes the top 50 observed property URIs from runtime statistics
+ * ({@link RuntimeInfoElement#DISCOVERY_MESSAGE_OBSERVED_PROPERTY_URI}) with human-readable labels resolved via
+ * {@link SKOSClient} using the ontologies configured in the system. Requires statistics DB settings.</dd>
+ *
+ * <dt>{@link StatisticsMetric#COUNTRY_INFO COUNTRY_INFO} ({@code country_info})</dt>
+ * <dd>Constant {@code 1} used as a carrier for labels {@code short_name}, {@code official_name}, {@code iso2} and
+ * {@code iso3}. One gauge per {@link Country} enum value, so monitoring systems can resolve country codes.</dd>
  *
  * <dt>{@link StatisticsMetric#DOWNLOAD_AVAILABILITY DOWNLOAD_AVAILABILITY} ({@code download_availability})</dt>
  * <dd>{@code 1} if the last successful download is newer than the last failed download (or there is no failed download),
@@ -245,6 +265,11 @@ public class StatisticsTask extends AbstractCustomTask {
     public enum StatisticsMetric {
 
 	SOURCE_INFO("source_info", "Metadata about each source."),
+	OBSERVED_PROPERTY_INFO("observed_property_info",
+		"Descriptive info for top observed properties from runtime statistics "
+			+ "(tags: uri, preferred_label_ita, preferred_label_eng)"),
+	COUNTRY_INFO("country_info",
+		"Descriptive info for each country (tags: short_name, official_name, iso2, iso3)"),
 	DOWNLOAD_AVAILABILITY("download_availability", "Download availability "),
 	HARVESTED_RECORDS("harvested_records", "Total number of harvested records "),
 	LAST_HARVESTING_UNIX_TIMESTAMP_MS("last_harvesting_unix_timestamp_ms",
@@ -334,6 +359,15 @@ public class StatisticsTask extends AbstractCustomTask {
 
     /** Max geohash buckets returned (top by count) for {@link StatisticsMetric#SEARCH_REQUESTS_GEOHASH_TOTAL}. */
     private static final int RUNTIME_STATS_GEOHASH_TOP_BUCKETS = 50;
+
+    /** Max observed property URI buckets for {@link StatisticsMetric#OBSERVED_PROPERTY_INFO}. */
+    private static final int OBSERVED_PROPERTY_TOP_BUCKETS = 100;
+
+    /**
+     * JVM-wide cache for resolved observed property labels (key: {@code uri + '\0' + lang}, value: preferred label).
+     * Survives across task runs; ontology labels rarely change.
+     */
+    private static final ConcurrentHashMap<String, String> observedPropertyLabelCache = new ConcurrentHashMap<>();
 
     /**
      * Inclusive calendar year range for {@link StatisticsMetric#SEARCH_REQUESTS_TIME_YEAR_TOTAL}; upper bound uses the
@@ -758,6 +792,17 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	}
 
+	if (metrics.contains(StatisticsMetric.COUNTRY_INFO)) {
+	    for (Country country : Country.values()) {
+		final Country c = country;
+		Gauge.builder(StatisticsMetric.COUNTRY_INFO.prometheusName(), () -> 1)//
+			.description(StatisticsMetric.COUNTRY_INFO.description())//
+			.tags("short_name", c.getShortName(), "official_name", c.getOfficialName(), "iso2", c.getISO2(), "iso3",
+				c.getISO3())//
+			.register(registry);
+	    }
+	}
+
 	registerElasticsearchRuntimeMetrics(registry, metrics, viewId);
 
 	GSLoggerFactory.getLogger(getClass()).info("Updated metrics for {}",
@@ -808,7 +853,8 @@ public class StatisticsTask extends AbstractCustomTask {
     /**
      * Registers OpenSearch-backed runtime metrics: {@link StatisticsMetric#STATION_PAGE_VISITS_TOTAL},
      * {@link StatisticsMetric#OM_DOWNLOADS_TOTAL}, {@link StatisticsMetric#SEARCH_ATTRIBUTE_TITLE_TOTAL},
-     * {@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI_TOTAL}
+     * {@link StatisticsMetric#SEARCH_OBSERVED_PROPERTY_URI_TOTAL},
+     * {@link StatisticsMetric#OBSERVED_PROPERTY_INFO}
      * ({@link ElasticsearchClient#countRuntimeInfoRequestsByBucket}),
      * {@link StatisticsMetric#PORTAL_SEARCHES_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequests}),
      * {@link StatisticsMetric#SEARCH_REQUESTS_GEOHASH_TOTAL} ({@link ElasticsearchClient#countRuntimeInfoRequestsByGeohash}),
@@ -820,6 +866,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	if (!metrics.contains(StatisticsMetric.STATION_PAGE_VISITS_TOTAL) && !metrics.contains(StatisticsMetric.OM_DOWNLOADS_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_ATTRIBUTE_TITLE_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_OBSERVED_PROPERTY_URI_TOTAL)
+		&& !metrics.contains(StatisticsMetric.OBSERVED_PROPERTY_INFO)
 		&& !metrics.contains(StatisticsMetric.PORTAL_SEARCHES_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_GEOHASH_TOTAL)
 		&& !metrics.contains(StatisticsMetric.SEARCH_REQUESTS_TIME_YEAR_TOTAL)) {
@@ -915,6 +962,46 @@ public class StatisticsTask extends AbstractCustomTask {
 		searchObservedPropertyUriTotal.putAll(parseRuntimeInfoFrequencyByBucket(resp));
 	    } catch (GSException e) {
 		GSLoggerFactory.getLogger(getClass()).warn("SEARCH_OBSERVED_PROPERTY_URI query failed: {}", e.getMessage());
+	    }
+	}
+
+	if (metrics.contains(StatisticsMetric.OBSERVED_PROPERTY_INFO)) {
+	    try {
+		LogicalBond bond = BondFactory.createAndBond();
+		if (viewId != null) {
+		    bond.getOperands()
+			    .add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.VIEW_ID, viewId));
+		}
+		bond.getOperands().add(BondFactory.createRuntimeInfoElementBond(BondOperator.EQUAL, RuntimeInfoElement.PROFILER_NAME,
+			PORTAL_SEARCHES_PROFILER_OS));
+		StatisticsResponse resp = es.countRuntimeInfoRequestsByBucket(bond,
+			RuntimeInfoElement.DISCOVERY_MESSAGE_OBSERVED_PROPERTY_URI, OBSERVED_PROPERTY_TOP_BUCKETS);
+		Map<String, Double> topUris = parseRuntimeInfoFrequencyByBucket(resp);
+
+		List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()
+			.filter(s -> s.getOntologyAvailability() == OntologySetting.Availability.ENABLED)
+			.map(OntologySetting::getOntologyEndpoint).toList();
+
+		for (String uri : topUris.keySet()) {
+		    String labelIta = "";
+		    String labelEng = "";
+		    try {
+			labelIta = resolvePreferredLabel(uri, ontologyUrls, "it");
+			labelEng = resolvePreferredLabel(uri, ontologyUrls, "en");
+		    } catch (Exception ex) {
+			GSLoggerFactory.getLogger(getClass()).warn("OBSERVED_PROPERTY_INFO label lookup failed for {}: {}", uri,
+				ex.getMessage());
+		    }
+		    final String fUri = uri;
+		    final String fLabelIta = labelIta;
+		    final String fLabelEng = labelEng;
+		    Gauge.builder(StatisticsMetric.OBSERVED_PROPERTY_INFO.prometheusName(), () -> 1)//
+			    .description(StatisticsMetric.OBSERVED_PROPERTY_INFO.description())//
+			    .tags("uri", fUri, "preferred_label_ita", fLabelIta, "preferred_label_eng", fLabelEng)//
+			    .register(registry);
+		}
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).warn("OBSERVED_PROPERTY_INFO query failed: {}", e.getMessage());
 	    }
 	}
 
@@ -1334,6 +1421,50 @@ public class StatisticsTask extends AbstractCustomTask {
 
 	String t = raw.trim();
 	return !"false".equalsIgnoreCase(t) && !"0".equals(t) && !"no".equalsIgnoreCase(t);
+    }
+
+    /**
+     * Resolves the preferred label for a concept URI using {@link SKOSClient} and the given ontology endpoints.
+     * Results are cached in {@link #observedPropertyLabelCache} to avoid repeated SPARQL queries across task runs.
+     *
+     * @return the preferred label in the requested language, or empty string if not found
+     */
+    private static String resolvePreferredLabel(String conceptUri, List<String> ontologyUrls, String language) {
+
+	if (ontologyUrls == null || ontologyUrls.isEmpty()) {
+	    return "";
+	}
+	String cacheKey = conceptUri + '\0' + language;
+	String cached = observedPropertyLabelCache.get(cacheKey);
+	if (cached != null) {
+	    return cached;
+	}
+	try {
+	    SKOSClient client = new SKOSClient();
+	    client.setOntologyUrls(ontologyUrls);
+	    client.setSearchValue(SearchTarget.CONCEPTS, conceptUri);
+	    client.setSearchLangs(List.of(language));
+	    client.setSourceLangs(List.of(language));
+	    client.setExpansionLevel(ExpansionLevel.NONE);
+	    client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1));
+
+	    SKOSResponse response = client.search();
+	    for (SKOSConcept c : response.getResults()) {
+		if (conceptUri.equals(c.getConceptURI()) && c.getPref().isPresent()) {
+		    observedPropertyLabelCache.put(cacheKey, c.getPref().get());
+		    return c.getPref().get();
+		}
+	    }
+	    List<String> prefLabels = response.getPrefLabels();
+	    if (!prefLabels.isEmpty()) {
+		observedPropertyLabelCache.put(cacheKey, prefLabels.get(0));
+		return prefLabels.get(0);
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(StatisticsTask.class).warn("SKOSClient label resolution failed for {} [{}]: {}",
+		    conceptUri, language, e.getMessage());
+	}
+	return "";
     }
 
     @Override
