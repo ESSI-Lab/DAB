@@ -29,8 +29,8 @@ function generateTimeline(startIso, endIso, stepHours = 1) {
 }
 
 const timeline = generateTimeline(
-  '2026-05-12T06:00:00Z',
-  '2026-05-22T00:00:00Z',
+  '2026-05-13T06:00:00Z',
+  '2026-05-23T00:00:00Z',
   1
 );
 
@@ -199,8 +199,8 @@ const variables = {
     folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/shiwe/',
     filePrefix: 'shiwe',
     availableHours: [0, 6, 12, 18],
-    minDate: '2026-05-12T06:00:00Z',
-    maxDate: '2026-05-15T18:00:00Z',
+    minDate: '2026-05-13T06:00:00Z',
+    maxDate: '2026-05-16T18:00:00Z',
     availability: [
         {
           untilDays: 4,
@@ -215,8 +215,8 @@ const variables = {
   '2t': {
     folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2t/',
     filePrefix: '2t', //
-    minDate: '2026-05-12T01:00:00Z',
-    maxDate: '2026-05-22T00:00:00Z',
+    minDate: '2026-05-13T01:00:00Z',
+    maxDate: '2026-05-23T00:00:00Z',
     availability: [
         {
           untilDays: 4,
@@ -239,8 +239,8 @@ const variables = {
     utci: {
       folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/utci/',
       filePrefix: 'utci', //
-      minDate: '2026-05-12T01:00:00Z',
-      maxDate: '2026-05-22T00:00:00Z',
+      minDate: '2026-05-13T01:00:00Z',
+      maxDate: '2026-05-23T00:00:00Z',
       availability: [
           {
             untilDays: 4,
@@ -263,8 +263,8 @@ const variables = {
     '2r': {
           folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2r/',
           filePrefix: '2r', //
-          minDate: '2026-05-12T01:00:00Z',
-          maxDate: '2026-05-22T00:00:00Z',
+          minDate: '2026-05-13T01:00:00Z',
+          maxDate: '2026-05-23T00:00:00Z',
           availability: [
               {
                 untilDays: 4,
