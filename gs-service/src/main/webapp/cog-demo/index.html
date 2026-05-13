@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Cloud Optimezed GeoTIFF (COG) Demo</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.9.0/ol.css">
+    <link rel="stylesheet" href="main.css">
     <script type="importmap">
         {
           "imports": {
@@ -44,11 +45,21 @@
 -->
 
 
+
 <div id="controls">
-    <button id="prevStep">◀</button>
-    <span id="timeLabel" style="margin: 0 10px"></span>
-    <button id="nextStep">▶</button>
+
+    <div class="time-nav">
+        <button id="prevStep">◀</button>
+        <input type="range" id="forecastSlider">
+        <button id="nextStep">▶</button>
+    </div>
+
+    <div id="timeMain" class="time-main"></div>
+
+    <div id="timeLayers" class="time-layers"></div>
+
 </div>
+
 
 
 <!-- ✅ MAP -->
@@ -76,6 +87,8 @@
     Humidity
 </label>
 
+
+<div id="legend" class="legend"></div>
 
 
 <!-- ✅ SCRIPT -->

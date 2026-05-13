@@ -6,11 +6,10 @@ import WebGLTileLayer from 'ol/layer/WebGLTile.js';
 import GeoTIFF from 'ol/source/GeoTIFF.js';
 
 /* =========================================================
-   1) TIMELINE GLOBALE
+   1) GLOBAL TIMELINE
    ---------------------------------------------------------
-   Qui definisci l'intervallo temporale che vuoi mostrare
-   nello slider.
-   In questo esempio parte da 11 maggio 2026 ore 18 UTC.
+   Here define the tempral extent of the slide.
+   In this case start from 2026-05-11T18:00:00Z
    ========================================================= */
 
 function generateTimeline(startIso, endIso, stepHours = 1) {
@@ -30,21 +29,20 @@ function generateTimeline(startIso, endIso, stepHours = 1) {
 }
 
 const timeline = generateTimeline(
-  '2026-05-11T18:00:00Z',
+  '2026-05-12T06:00:00Z',
   '2026-05-22T00:00:00Z',
   1
 );
 
 /* =========================================================
-   2) CONFIGURAZIONE VARIABILI / LAYER
+   2) VARIABLE/LAYER and Legends configuration
    ---------------------------------------------------------
-   - folderUrl: cartella S3
-   - filePrefix: prefisso reale del file
-   - availableHours: orari disponibili nel giorno
-   - minDate: primo timestamp realmente disponibile
-   - style: stile OpenLayers
+   - folderUrl: S3 folder
+   - filePrefix: real file prefix
+   - availableHours: time available
+   - minDate: first timestamp available
+   - style: Openlayers
    ========================================================= */
-
 
 
 const temperatureStyle = {
@@ -61,9 +59,9 @@ const temperatureStyle = {
     ['<=', ['band', 1], 29],  '#fdae61',
     ['<=', ['band', 1], 36],  '#f46d43',
     ['<=', ['band', 1], 43],  '#d73027',
-
     '#a50026' // > 43
-  ]
+  ],
+  opacity: 1.0
 };
 
 
@@ -80,8 +78,8 @@ const shiweStyle = {
         ['<', ['band', 1], 4.0], '#f03b20',
         ['<', ['band', 1], 4.5], '#bd0026',
         '#800026'
-
-  ]
+  ],
+  opacity: 1.0
 };
 
 const humidityStyle = {
@@ -118,9 +116,81 @@ const utciStyle = {
         ['<=', ['band', 1], 30], '#f46d43',
         ['<=', ['band', 1], 40], '#d73027',
         '#a50026'
-
-  ]
+  ],
+  opacity: 1.0
 };
+
+
+const legends = {
+      shiwe: {
+        title: 'SHIWE (Synthetic Healthiness Index of Workplace Exposure)',
+        items: [
+          { range: '0.0 – 0.5', label: 'No risk',      color: '#006837' },
+          { range: '0.5 – 1.0', label: 'Very low',     color: '#31a354' },
+          { range: '1.0 – 1.5', label: 'Low',          color: '#78c679' },
+          { range: '1.5 – 2.0', label: 'Slight',       color: '#c2e699' },
+          { range: '2.0 – 2.5', label: 'Moderate',     color: '#ffffb2' },
+          { range: '2.5 – 3.0', label: 'High',         color: '#fecc5c' },
+          { range: '3.0 – 3.5', label: 'Very high',    color: '#fd8d3c' },
+          { range: '3.5 – 4.0', label: 'Severe',       color: '#f03b20' },
+          { range: '4.0 – 4.5', label: 'Extreme',      color: '#bd0026' },
+          { range: '4.5 – 5.0', label: 'Critical',     color: '#800026' }
+        ]
+      },
+    '2t': {
+        title: 'Air Temperature at 2 m (°C)',
+        items: [
+          { range: '≤ −20', label: 'Extreme cold', color: '#313695' },
+          { range: '−20 – −13', label: 'Very cold', color: '#4575b4' },
+          { range: '−13 – −6', label: 'Cold',  color: '#74add1' },
+          { range: '−6 – 1',  label: 'Near freezing',  color: '#abd9e9' },
+          { range: '1 – 8',  label: 'Cool',   color: '#e0f3f8' },
+          { range: '8 – 15', label: 'Mild',   color: '#ffffbf' },
+          { range: '15 – 22', label: 'Warm',  color: '#fee090' },
+          { range: '22 – 29', label: 'Hot',  color: '#fdae61' },
+          { range: '29 – 36', label: 'Very hot',  color: '#f46d43' },
+          { range: '36 - 43', label: 'Extreme heat',     color: '#d73027' },
+          { range: '>= 43', label: 'Exceptional heat',     color: '#d73027' },
+        ]
+      },
+
+      utci: {
+        title: 'UTCI (°C)',
+        items: [
+          { range: '≤ −50', label: 'Extreme cold stress',color: '#08306b' },
+          { range: '-50 - −40', label: 'Very strong cold stress',color: '#2171b5' },
+          { range: '-40 - −30', label: 'Strong cold stress',color: '#6baed6' },
+          { range: '−30 – −20', label: 'Moderate cold stress',color: '#bdd7e7' },
+          { range: '−20 – 10', label: 'Slight cold stress',color: '#eff3ff' },
+          { range: '-10 – 0', label: 'No thermal stress', color: '#ffffbf' },
+          { range: '0 – 10', label: 'Moderate heat stress', color: '#fee090' },
+          { range: '10 – 20', label: 'Strong heat stress', color: '#fdae61' },
+          { range: '20 – 30', label: 'Very strong heat stress',color: '#f46d43' },
+          { range: '30 – 40', label: 'Extreme heat stress',color: '#d73027' },
+          { range: '> 40', label: 'Exceptional heat stress',color: '#a50026' }
+        ]
+      },
+
+      '2r': {
+        title: 'Relative Humidity (%)',
+        items: [
+          { range: '0 – 10', label: 'Extremely dry',color: '#ffffcc' },
+          { range: '10 – 20', label: 'Very dry', color: '#ffeda0' },
+          { range: '20 – 30', label: 'Dry',color: '#fed976' },
+          { range: '30 – 40', label: 'Slightly dry',color: '#feb24c' },
+          { range: '40 – 50', label: 'Comfortable',color: '#fd8d3c' },
+          { range: '50 – 60', label: 'Humid',color: '#f03b20' },
+          { range: '60 – 70', label: 'Very humid',color: '#bd0026' },
+          { range: '70 – 80', label: 'Oppressive',color: '#9ecae1' },
+          { range: '80 – 90', label: 'Extremely humid',color: '#4292c6' },
+          { range: '90 – 100', label: 'Near saturation',color: '#08519c' }
+        ]
+      }
+
+};
+
+
+
 
 
 
@@ -129,8 +199,8 @@ const variables = {
     folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/shiwe/',
     filePrefix: 'shiwe',
     availableHours: [0, 6, 12, 18],
-    minDate: '2026-05-11T06:00:00Z',
-    maxDate: '2026-05-14T18:00:00Z',
+    minDate: '2026-05-12T06:00:00Z',
+    maxDate: '2026-05-15T18:00:00Z',
     availability: [
         {
           untilDays: 4,
@@ -139,7 +209,6 @@ const variables = {
       ],
 
     visible: true,
-    opacity: 0.75,
     style: shiweStyle
   },
 
@@ -164,7 +233,6 @@ const variables = {
       ],
 
     visible: false,
-    opacity: 0.80,
     style: temperatureStyle
   },
 
@@ -189,7 +257,6 @@ const variables = {
         ],
 
       visible: false,
-      opacity: 0.80,
       style: utciStyle
     },
 
@@ -214,11 +281,32 @@ const variables = {
             ],
 
           visible: false,
-          opacity: 0.80,
           style: humidityStyle
         }
 
 };
+
+
+
+const legendDiv = document.getElementById('legend');
+
+function updateLegend(layerName) {
+  const legend = legends[layerName];
+  if (!legend) {
+    legendDiv.innerHTML = '';
+    return;
+  }
+
+  legendDiv.innerHTML = `
+    <div class="legend-title">${legend.title}</div>
+    ${legend.items.map(item => `
+      <div class="legend-item">
+        <div class="legend-color" style="background:${item.color}"></div>
+        <div>${item.range} (${item.label})</div>
+      </div>
+    `).join('')}
+  `;
+}
 
 
 
@@ -246,13 +334,6 @@ function formatUtcLabel(date) {
   const hh = String(date.getUTCHours()).padStart(2, '0');
   return `${yyyy}-${mm}-${dd} ${hh}:00 UTC`;
 }
-
-function formatForecastHeader(requestedDate, modelStart) {
-  const lead = hoursBetween(modelStart, requestedDate);
-  const day = Math.floor(lead / 24) + 1;
-  return `T+${lead}h | Day ${day} | ${formatUtcLabel(requestedDate)}`;
-}
-
 
 
 function buildVariableTimeline(cfg) {
@@ -317,13 +398,13 @@ function buildFilename(filePrefix, date) {
 }
 
 /* =========================================================
-   4) GENERAZIONE CANDIDATI TEMPORALI "SAFE"
+   4) SAFE TEMPORAL CANDIDATE GENERATION
    ---------------------------------------------------------
-   Se il file esatto non esiste:
-   - prova l'orario disponibile più vicino
-   - prima nello stesso giorno
-   - poi eventualmente giorno precedente / successivo
-   - sempre rispettando minDate e maxDate
+   If the exact file does not exist:
+   - try the closest available time
+   - first within the same day
+   - then, if necessary, the previous / next day
+   - always respecting minDate and maxDate
    ========================================================= */
 
 
@@ -337,7 +418,7 @@ function getStepHours(cfg, requestedDate) {
     }
   }
 
-  return null; // fuori orizzonte
+  return null; // outside range
 }
 
 
@@ -378,10 +459,11 @@ function buildCandidateDates(targetDate, cfg, searchDays = 2) {
 
 
 /* =========================================================
-   5) CHECK ESISTENZA URL (con cache)
+   5) CHECK URL AVAILABILITY (with cache)
    ---------------------------------------------------------
-   Usa HEAD per evitare download del file.
-   Se il CORS S3 permette HEAD (come dovrebbe), funziona bene.
+    Uses HEAD to avoid downloading the file.
+   If the S3 CORS configuration allows HEAD requests
+   (as it should), it works correctly.
    ========================================================= */
 
 
@@ -408,12 +490,12 @@ const urlExists = (() => {
 
 
 /* =========================================================
-   6) RISOLUZIONE URL MIGLIORE
+   6) BEST URL RESOLUTION
    ---------------------------------------------------------
-   Dato un layer e una data richiesta:
-   - genera candidati vicini
-   - prova in ordine
-   - restituisce il primo URL realmente esistente
+   Given a layer and a requested date:
+   - generates nearby candidates
+   - tries them in order
+   - returns the first URL that actually exists
    ========================================================= */
 
 async function resolveBestUrl(cfg, requestedDate) {
@@ -451,7 +533,7 @@ for (const [name, cfg] of Object.entries(variables)) {
 }
 
 /* =========================================================
-   8) MAPPA DI SFONDO + MAPPA
+   8) BASE MAP and OLMAP
    ========================================================= */
 
 const baseMap = new TileLayer({
@@ -472,133 +554,75 @@ const map = new OLMap({
    9) TIME SLIDER
    ========================================================= */
 
-//const slider = document.getElementById('timeSlider');
-const label = document.getElementById('timeLabel');
-//
-//if (!slider || !label) {
-//  throw new Error(
-//    'HTML missing #timeSlider or #timeLabel. Add them to index.html.'
-//  );
-//}
-//
-//slider.min = 0;
-//slider.max = timeline.length - 1;
-//slider.step = 1;
-//slider.value = 0;
 
-/* =========================================================
-   10) UPDATE TIME SAFE
-   ---------------------------------------------------------
-   - aggiorna la label
-   - per ogni layer trova il file più vicino disponibile
-   - se lo trova, aggiorna il source
-   - se non lo trova, lascia il source precedente
-   - evita race condition se muovi lo slider velocemente
-   ========================================================= */
+const slider = document.getElementById('forecastSlider');
 
-//let updateRequestId = 0;
-//
-//async function updateTime(index) {
-//  const requestId = ++updateRequestId;
-//  const requestedDate = new Date(timeline[index]);
-//
-//  label.textContent =
-//    formatForecastHeader(requestedDate, modelStart) + ' (loading…)';
-//
-//  const promises = Object.entries(layers).map(async ([name, layer]) => {
-//    const cfg = variables[name];
-//    const result = await resolveBestUrl(cfg, requestedDate);
-//    return { name, layer, cfg, result };
-//  });
-//
-//  const results = await Promise.all(promises);
-//
-//  // se parte un update più recente, abbandona
-//  if (requestId !== updateRequestId) return;
-//
-//  const infoParts = [];
-//
-//  for (const { name, layer, cfg, result } of results) {
-//    if (!result) {
-//      layer.setVisible(false); // opzionale ma forecast-like
-//      infoParts.push(`${name}: no forecast`);
-//      continue;
-//    }
-//
-//    layer.setSource(createSource(result.url));
-//
-//    const resolvedLead =
-//      hoursBetween(modelStart, result.resolvedDate);
-//
-//    const snapHours = Math.abs(
-//      hoursBetween(requestedDate, result.resolvedDate)
-//    );
-//
-//    const snapNote = snapHours > 0 ? ` (±${snapHours}h)` : '';
-//
-//    infoParts.push(
-//      `${name}: T+${resolvedLead}h${snapNote}`
-//    );
-//  }
-//
-//  label.textContent =
-//    formatForecastHeader(requestedDate, modelStart) +
-//    ' | ' +
-//    infoParts.join(' | ');
-//}
+slider.min = 0;
+slider.max = timelineMaster.length - 1;
+slider.step = 1;
+slider.value = currentIndex;
 
-
+const timeMain = document.getElementById('timeMain');
+const timeLayers = document.getElementById('timeLayers');
 
 let updateRequestId = 0;
 
 async function updateTimeFromDate(requestedDate) {
   const requestId = ++updateRequestId;
 
-  label.textContent =
-    formatForecastHeader(requestedDate, modelStart) + ' (loading…)';
+
+  const lead = hoursBetween(modelStart, requestedDate);
+  const yyyy = requestedDate.getUTCFullYear();
+  const mm = String(requestedDate.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(requestedDate.getUTCDate()).padStart(2, '0');
+  const hh = String(requestedDate.getUTCHours()).padStart(2, '0');
+
+  timeMain.textContent =
+    `${yyyy}-${mm}-${dd} · ${hh}:00 UTC   (T+${lead}h)`;
+
 
   const promises = Object.entries(layers).map(async ([name, layer]) => {
     const cfg = variables[name];
     const result = await resolveBestUrl(cfg, requestedDate);
-    return { name, layer, cfg, result };
+    return { name, layer, result };
   });
 
   const results = await Promise.all(promises);
   if (requestId !== updateRequestId) return;
 
-  const infoParts = [];
+  const parts = [];
 
   for (const { name, layer, result } of results) {
     if (!result) {
       layer.setVisible(false);
-      infoParts.push(`${name}: no forecast`);
+      parts.push(`${name.toUpperCase()} ✕`);
       continue;
     }
 
     layer.setSource(createSource(result.url));
 
-    const lead = hoursBetween(modelStart, result.resolvedDate);
+    const layerLead = hoursBetween(modelStart, result.resolvedDate);
     const snap = Math.abs(
       hoursBetween(requestedDate, result.resolvedDate)
     );
 
-    infoParts.push(
+    parts.push(
       snap > 0
-        ? `${name}: T+${lead}h (±${snap}h)`
-        : `${name}: T+${lead}h`
+        ? `${name.toUpperCase()} ✓ T+${layerLead}h (±${snap}h)`
+        : `${name.toUpperCase()} ✓ T+${layerLead}h`
     );
   }
 
-  label.textContent =
-    formatForecastHeader(requestedDate, modelStart) +
-    ' | ' +
-    infoParts.join(' | ');
+  timeLayers.textContent = parts.join('   ');
 }
+
+
 
 
 function updateFromIndex(index) {
   if (index < 0 || index >= timelineMaster.length) return;
   currentIndex = index;
+  slider.value = index;
   updateTimeFromDate(timelineMaster[index]);
 }
 
@@ -614,40 +638,58 @@ document.getElementById('nextStep')
 
 
 /* =========================================================
-   11) INIT + EVENTI
+   11) INIT + LISTENERS
    ========================================================= */
 
-//updateTime(0);
 updateFromIndex(0);
 
 
-// 👇 espliciti cosa rendi globale
+// show legend
+for (const [name, cfg] of Object.entries(variables)) {
+  if (cfg.visible) {
+    updateLegend(name);
+    break; // only one
+  }
+}
+
 window.layers = layers;
 
 
 document.getElementById('chkShiwe')
   .addEventListener('change', e => {
     layers.shiwe.setVisible(e.target.checked);
+    if (e.target.checked) updateLegend('shiwe');
   });
 
 document.getElementById('chkTemp')
   .addEventListener('change', e => {
     layers['2t'].setVisible(e.target.checked);
+     if (e.target.checked) updateLegend('2t');
   });
 
 document.getElementById('chkUtci')
   .addEventListener('change', e => {
     layers['utci'].setVisible(e.target.checked);
+     if (e.target.checked) updateLegend('utci');
   });
 
 document.getElementById('chkHumidity')
   .addEventListener('change', e => {
     layers['2r'].setVisible(e.target.checked);
+     if (e.target.checked) updateLegend('2r');
   });
 
+slider.style.accentColor = '#666';
+
+slider.addEventListener('input', e => {
+  updateFromIndex(Number(e.target.value));
+});
 
 
-//slider.addEventListener('input', (e) => {
-//  updateTime(Number(e.target.value));
-//});
+slider.addEventListener('mousemove', e => {
+  const idx = Number(e.target.value);
+  slider.title = formatUtcLabel(timelineMaster[idx]);
+});
+
+
 
