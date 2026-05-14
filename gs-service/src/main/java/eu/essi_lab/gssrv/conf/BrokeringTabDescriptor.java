@@ -43,7 +43,7 @@ class BrokeringTabDescriptor extends TabDescriptor {
 	setIndex(GSTabIndex.BROKERING.getIndex());
 
 	addContentDescriptors(//
-		new HarvestingSetting.DescriptorProvider().get(), //
+		new HarvestingSettingDescriptorProvider().get(), //
 		new SourcePrioritySetting.DescriptorProvider().get(), //
 		new SourceStorageSetting.DescriptorProvider().get(),//
 		new GDCSourcesSetting.DescriptorProvider().get(),//

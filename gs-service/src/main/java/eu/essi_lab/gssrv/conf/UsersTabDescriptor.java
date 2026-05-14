@@ -236,44 +236,44 @@ class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridD
 
 			"</style>\n";
 
-		String table = "<table>";
+		StringBuilder table = new StringBuilder("<table>");
 
-		table += "<tr>";
+		table.append("<tr>");
 
-		table += "<td class='th'>";
+		table.append("<td class='th'>");
 
-		table += "Attribute";
+		table.append("Attribute");
 
-		table += "</td>";
+		table.append("</td>");
 
-		table += "<td class='th'>";
+		table.append("<td class='th'>");
 
-		table += "Value";
+		table.append("Value");
 
-		table += "</td>";
+		table.append("</td>");
 
-		table += "</tr>";
+		table.append("</tr>");
 
 		for (GSProperty property : properties) {
 
-		    table += "<tr>";
+		    table.append("<tr>");
 
-		    table += "<td>";
+		    table.append("<td>");
 
-		    table += property.getName();
+		    table.append(property.getName());
 
-		    table += "</td>";
+		    table.append("</td>");
 
-		    table += "<td>";
+		    table.append("<td>");
 
-		    table += property.getValue();
+		    table.append(property.getValue());
 
-		    table += "</td>";
+		    table.append("</td>");
 
-		    table += "</tr>";
+		    table.append("</tr>");
 		}
 
-		table += "</table>";
+		table.append("</table>");
 
 		content += table;
 

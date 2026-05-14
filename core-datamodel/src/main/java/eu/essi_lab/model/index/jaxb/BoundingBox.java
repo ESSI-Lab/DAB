@@ -10,37 +10,27 @@ package eu.essi_lab.model.index.jaxb;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import eu.essi_lab.iso.datamodel.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.model.*;
+import jakarta.xml.bind.*;
+import jakarta.xml.bind.annotation.*;
+import org.w3c.dom.*;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-import jakarta.xml.bind.annotation.XmlRootElement;
-import jakarta.xml.bind.annotation.XmlTransient;
-
-import org.w3c.dom.Node;
-
-import eu.essi_lab.iso.datamodel.DOMSerializer;
-import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.xml.NameSpace;
-import eu.essi_lab.lib.xml.QualifiedName;
-import eu.essi_lab.model.Queryable;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -100,7 +90,7 @@ public class BoundingBox extends DOMSerializer {
 	    IS_CROSSED_ELEMENT_NAME, NameSpace.GI_SUITE_DATA_MODEL.getPrefix());
 
     /**
-     * 
+     *
      */
     public static final Queryable AREA_QUERYABLE = new Queryable() {
 
@@ -273,6 +263,19 @@ public class BoundingBox extends DOMSerializer {
     protected Object getElement() throws JAXBException {
 
 	return this;
+    }
+
+    @Override
+    public String toString() {
+
+	String west = getCardinalValues().getFirst().getWest();
+	String south = getCardinalValues().getFirst().getSouth();
+
+	String east = getCardinalValues().getFirst().getEast();
+	String north = getCardinalValues().getFirst().getNorth();
+
+	return "s:" + south + ", w:" + west + ", n:" + north + ", e:" + east;
+
     }
 
 }
