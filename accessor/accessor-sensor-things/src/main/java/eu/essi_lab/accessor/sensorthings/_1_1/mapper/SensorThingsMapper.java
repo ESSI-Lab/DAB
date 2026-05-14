@@ -641,7 +641,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 
 	// qualifiers
 
-	JSONObject qualifiers = stream.getProperties().get().optJSONObject("qualifiers");
+	JSONObject qualifiers = stream.getProperties().map(o -> o.optJSONObject("qualifiers")).orElse(null);
 	if (qualifiers != null) {
 	    Set<String> flags = qualifiers.keySet();
 	    for (String flag : flags) {
