@@ -1,0 +1,157 @@
+Documentazione API stazioni meteo di
+Arpae-SIMC
+Introduzione
+Paginazione
+Formato della data
+Interpretazione dei reftime
+Elenco delle stazioni
+Elenco delle tipologie di dati osservati
+Dati osservati
+Introduzione
+Le API per la consultazione dei dati osservati delle stazioni meteo di Arpae-SIMC sono
+basate su Python Eve, la cui documentazione esaustiva è disponibile al seguente URL:
+https://docs.python-eve.org/, dove è possibile, in particolare, trovare informazioni in merito a:
+-​ Struttura e formato delle risposte
+-​ Filtrare le risorse
+-​ Selezionare solo alcuni campi di ogni elemento della risorsa (projection)
+-​ Ordinare i risultati
+-​ Paginazione e numero massimo di risultati per pagina
+Paginazione
+La paginazione merita un paragrafo a parte. Tutte le risorse usano la paginazione ma, per
+questioni di prestazioni, le risposte alle query non contengono il numero totale dei record né
+i link all’ultima pagina della query. Si deve quindi iterare sulla pagine, incrementando il
+parametro GET page fino a che la risposta non è vuota:
+Python
+# Esempio di uso della paginazione: itero da pagina 1 fino a che non ottengo
+una lista vuota di risultati.
+import itertools
+import requests
+url = "https://apps.arpae.it/REST/meteo_opendata_stazioni"
+for page in itertools.count(1):
+response = requests.get(url, params={"page": page}).json()
+items = response["_items"]
+if len(items) == 0:
+​
+break
+else:
+​
+for item in items:​
+​
+print("Item ID", item["_id"])
+Formato della data
+Le date nelle risorse sono espresse nel formato RFC1123 (ex RFC 822), sia nei filtri delle
+richieste che nelle risposte. Ad esempio: Tue, 02 Apr 2013 10:29:13 GMT.
+Interpretazione dei reftime
+Il reftime indicati nella risorse si riferiscono all’istante di validità, quindi all’istante finale
+dell’osservazione. Ad esempio, nel caso di una precipitazione oraria dalle 13:00 alle 14:00
+del giorno X, il reftime corrisponde alle 14:00 del giorno X. Nel caso di precipitazione
+giornaliera dalle 00 del giorno X alle 00 del giorno X+1, il reftime corrisponde alle 00 del
+giorno X+1.
+Elenco delle stazioni
+URL: https://apps.arpae.it/REST/meteo_opendata_stazioni.
+Ogni stazione ha i seguenti campi:
+-​ _id: Identificativo della stazione
+-​name: nome della stazione
+-​height: quota stazione in metri
+-​geometry: posizione della stazione
+-​summaries: lista riassuntivi dei parametri misurati dalla stazione. Ogni elemento
+della lista è un riassuntivo che contiene i seguenti campi:
+-​ reftime_start: istante del primo dato
+-​
+-​reftime_end: istante dell’ultimo dato
+-​href: path della risorsa che contiene i dati
+rating_curves: lista opzionale (null se non disponibile) dello storico delle scale
+di deflusso associate alla stazione. Ogni scala di deflusso ha i seguenti campi:
+-​ validity_start: inizio di validità delle scala
+-​validity_end: fine di validità della scala
+-​equations: elenco delle equazioni. Ogni equazione contiene
+-​lower_level: livello minimo per cui applicare l’equazione
+-​upper_level: livello massimo per cui applicare l’equazione
+-​equation: formula da applicare
+-​river_gauge_datum: zero idrometrico, opzionale (null se non disponibile)
+-​_updated, _created: campi builtin di Python Eve con la data di ultimo
+aggiornamento e creazione del documentoElenco delle tipologie di dati osservati
+URL: https://apps.arpae.it/REST/meteo_opendata_stazioni_dataset
+Questa risorsa fornisce l’elenco dei dataset, cioè dei parametri associati alle stazioni. Ogni
+parametro è disponibile su una diversa risorsa. Ogni elemento ha i seguenti campi:
+-​ _id: identificativo
+-​href: path della risorsa che contiene i dati
+-​reftime_start: istante del primo dato nel dataset
+-​reftime_end: istante dell’ultimo dato nel dataset
+-​unit: unità di misura
+-​-​bcode: codice della tabella B che identifica il parametro (si veda
+https://arpa-simc.github.io/dballe/general_ref/concepts.html#variable-code-varcode).
+level: quota/strato a cui è misurato il parametro. È una lista dei 4 valori numerici
+-​leveltype1, l1, leveltype2, l2 (si veda
+https://arpa-simc.github.io/dballe/general_ref/concepts.html#level-or-layer)
+timerange: aggregazione del dato (e.g. istantaneo, cumulata su 1h, massima su
+-​
+24h, etc). È una lista di 3 valori numerici pindicator, p1, p2 (si veda
+https://arpa-simc.github.io/dballe/general_ref/concepts.html#time-range)
+_updated, _created: campi builtin di Python Eve con la data di ultimo
+aggiornamento e creazione del documento
+Dati osservati
+Ogni risorsa che contiene dei dati osservati (il cui elenco è disponibile nella risorsa descritta
+in questo paragrafo) è composta da un documento per ogni osservazione. Ogni documento
+ha i seguenti campi:
+-​ _id: identificativo (composto dal concatenamento dell’id della stazione e del reftime
+dell’osservazione)
+-​ station_id: id della stazione
+-​reftime: istante di validità dell’osservazione, cioè l’istante finale.
+-​value: valore dell’osservazione o null se non valida
+-​_updated, _created: campi builtin di Python Eve con la data di ultimo
+aggiornamento e creazione del documento
+Esempio di utilizzo delle risorse
+Di seguito, un esempio in Python: lo script seleziona le stazioni con quota superiore a 600
+metri e stampa a video i dati di precipitazione oraria (dataset
+meteo_opendata_stazioni_precipitazione_oraria) con istante di validità tra le
+14:00 UTC e le 16:00 UTC del 3 gennaio 2026.Python
+import requests
+from datetime import datetime, timezone
+import itertools
+import json
+BASE_URL = "https://apps.arpae.it/REST"
+DATASET = "meteo_opendata_stazioni_precipitazione_oraria"
+DATETIME_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
+REFTIME_START = datetime(2026, 1, 3, 14,
+tzinfo=timezone.utc).strftime(DATETIME_FORMAT)
+REFTIME_END = datetime(2026, 1, 3, 18,
+tzinfo=timezone.utc).strftime(DATETIME_FORMAT)
+stations = []
+for page in itertools.count(1):
+resp = requests.get(f"{BASE_URL}/meteo_opendata_stazioni", params={
+"where": json.dumps({
+"height": {
+"$gt": 600
+}
+}),
+"sort": "_id",
+"max_results": 200,
+"page": page,
+})
+resp.raise_for_status()
+items = resp.json()["_items"]
+if len(items) == 0:
+break
+else:
+stations += items
+for station in stations:
+for page in itertools.count(1):
+resp = requests.get(f"{BASE_URL}/{DATASET}", params={
+"where": json.dumps({
+"reftime": {
+"$gt": REFTIME_START,
+"$lt": REFTIME_END,
+},
+"station_id": station["_id"],
+}),
+"sort": "reftime",
+"max_results": 200,
+"page": page,
+})
+resp.raise_for_status()items = resp.json()["_items"]
+if len(items) == 0:
+break
+else:
+for item in items:
+print(item["station_id"], item["reftime"], item["value"])

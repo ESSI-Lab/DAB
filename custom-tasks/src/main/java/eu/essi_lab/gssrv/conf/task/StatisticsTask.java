@@ -89,6 +89,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.model.resource.ResourceType;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.semantic.SourceStatistics;
 import eu.essi_lab.profiler.semantic.Stats;
@@ -103,9 +104,9 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * Task options (line-based {@code KEY=value}):
  * <ul>
  * <li>{@code VIEW_ID} — optional view identifier; when omitted, aggregate statistics and metadata completeness use all
- * sources with no view bond (per-source counts include every record for that source). When set, the view’s bond
- * restricts which records completeness percentages apply to; if the view id is invalid, metadata completeness metrics
- * are skipped</li>
+ * sources with no view bond (per-source completeness counts include every resource of type {@link ResourceType#DATASET}
+ * for that source). When set, the view’s bond restricts which records completeness percentages apply to; if the view id
+ * is invalid, metadata completeness metrics are skipped</li>
  * <li>{@code METRICS} — optional comma-separated list of {@link StatisticsMetric} names; when omitted, all metrics are
  * computed</li>
  * <li>{@code METADATA_COMPLETENESS_ELEMENTS} — optional comma-separated {@link MetadataElement} identifiers for
@@ -117,7 +118,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <li>{@code METADATA_SET_COMPLETENESS} — comma-separated set names for {@link StatisticsMetric#METADATA_SET_COMPLETENESS}
  * (e.g. {@code core,optional})</li>
  * <li>{@code METADATA_SET_COMPLETENESS_&lt;name&gt;} — for each set name, comma-separated {@link MetadataElement} values;
- * metric is the share of records having <b>all</b> listed elements (logical AND). Ex.:
+ * metric is the share of <b>dataset</b> resources having <b>all</b> listed elements (logical AND). Ex.:
  * {@code METADATA_SET_COMPLETENESS_core=IDENTIFIER} and
  * {@code METADATA_SET_COMPLETENESS_optional=IDENTIFIER,TITLE,BOUNDING_BOX}</li>
  * <li>{@code PUBLISH_ON_S3} — when {@code false}, {@code 0}, or {@code no}, skip uploading the Prometheus scrape to S3;
@@ -127,8 +128,8 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <h3>Available Prometheus metrics ({@link StatisticsMetric})</h3>
  * <p>
  * Each metric is registered as a Micrometer/Prometheus gauge. Most are per {@code source_id}; metadata completeness
- * metrics use {@code VIEW_ID} when set to filter records, or all records per source when it is omitted. Subset via
- * {@code METRICS}.
+ * metrics use {@code VIEW_ID} when set to filter records, or all {@link ResourceType#DATASET} resources per source when it
+ * is omitted. Subset via {@code METRICS}.
  * </p>
  * <dl>
  * <dt>{@link StatisticsMetric#SOURCE_INFO SOURCE_INFO} ({@code source_info})</dt>
@@ -136,8 +137,9 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * so monitoring systems can resolve source identity alongside other series.</dd>
  *
  * <dt>{@link StatisticsMetric#OBSERVED_PROPERTY_INFO OBSERVED_PROPERTY_INFO} ({@code observed_property_info})</dt>
- * <dd>Constant {@code 1} used as a carrier for labels {@code uri}, {@code preferred_label_ita} (Italian) and
- * {@code preferred_label_eng} (English). Exposes the top 50 observed property URIs from runtime statistics
+ * <dd>Constant {@code 1} used as a carrier for labels {@code uri}, {@code preferred_label_ita} (Italian),
+ * {@code preferred_label_eng} (English), and {@code view} (same {@code VIEW_ID} filter as the OpenSearch query, when set).
+ * Exposes the top observed property URIs from runtime statistics
  * ({@link RuntimeInfoElement#DISCOVERY_MESSAGE_OBSERVED_PROPERTY_URI}) with human-readable labels resolved via
  * {@link SKOSClient} using the ontologies configured in the system. Requires statistics DB settings.</dd>
  *
@@ -188,20 +190,22 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <dd>Total number of variables (attributes) for the source in semantic statistics.</dd>
  *
  * <dt>{@link StatisticsMetric#METADATA_COMPLETENESS METADATA_COMPLETENESS} ({@code metadata_completeness})</dt>
- * <dd>Per metadata element, the fraction of records (for that source) where the element is present, within the
- * {@code VIEW_ID} filter if set, otherwise among all records of the source. Expressed as a percentage {@code 0–100}.
- * Series are distinguished by label {@code element} (see {@code METADATA_COMPLETENESS_ELEMENTS}).</dd>
+ * <dd>Per metadata element, the fraction of <b>dataset</b> resources (for that source) where the element is present,
+ * within the {@code VIEW_ID} filter if set, otherwise among all {@link ResourceType#DATASET} resources of the source.
+ * Expressed as a percentage {@code 0–100}. Series are distinguished by label {@code element} (see
+ * {@code METADATA_COMPLETENESS_ELEMENTS}).</dd>
  *
  * <dt>{@link StatisticsMetric#METADATA_SET_COMPLETENESS METADATA_SET_COMPLETENESS} ({@code metadata_set_completeness})</dt>
- * <dd>Per named set, the fraction of records (for that source) where <b>all</b> elements in that set are present
- * (logical AND), within the {@code VIEW_ID} filter if set, otherwise among all records of the source. Percentage
- * {@code 0–100}. Series use label {@code element_set} (see {@code METADATA_SET_COMPLETENESS} and
- * {@code METADATA_SET_COMPLETENESS_&lt;name&gt;}).</dd>
+ * <dd>Per named set, the fraction of <b>dataset</b> resources (for that source) where <b>all</b> elements in that set are
+ * present (logical AND), within the {@code VIEW_ID} filter if set, otherwise among all {@link ResourceType#DATASET}
+ * resources of the source. Percentage {@code 0–100}. Series use label {@code element_set} (see
+ * {@code METADATA_SET_COMPLETENESS} and {@code METADATA_SET_COMPLETENESS_&lt;name&gt;}).</dd>
  *
  * <dt>{@link StatisticsMetric#RECORDS_PER_ELEMENT RECORDS_PER_ELEMENT} ({@code records_per_element})</dt>
- * <dd>Per metadata element and per distinct indexed value, the number of records for that source (absolute count).
- * Labels: {@code source_id}, {@code element} (lowercase enum name, same as metadata completeness), {@code value}. Uses
- * the same view/source scope as metadata completeness; configure elements via {@code RECORDS_PER_ELEMENT_ELEMENTS}.</dd>
+ * <dd>Per metadata element and per distinct indexed value, the number of <b>dataset</b> resources for that source
+ * (absolute count). Labels: {@code source_id}, {@code element} (lowercase enum name, same as metadata completeness),
+ * {@code value}. Uses the same view/source/resource-type scope as metadata completeness ({@link ResourceType#DATASET});
+ * configure elements via {@code RECORDS_PER_ELEMENT_ELEMENTS}.</dd>
  *
  * <dt>{@link StatisticsMetric#STATION_PAGE_VISITS_TOTAL STATION_PAGE_VISITS_TOTAL} ({@code station_page_visits_total})</dt>
  * <dd>From request statistics (OpenSearch): all-time request counts per {@code source_id} (aggregation on
@@ -267,7 +271,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	SOURCE_INFO("source_info", "Metadata about each source."),
 	OBSERVED_PROPERTY_INFO("observed_property_info",
 		"Descriptive info for top observed properties from runtime statistics "
-			+ "(tags: uri, preferred_label_ita, preferred_label_eng)"),
+			+ "(tags: uri, preferred_label_ita, preferred_label_eng, view)"),
 	COUNTRY_INFO("country_info",
 		"Descriptive info for each country (tags: short_name, official_name, iso2, iso3)"),
 	DOWNLOAD_AVAILABILITY("download_availability", "Download availability "),
@@ -287,14 +291,14 @@ public class StatisticsTask extends AbstractCustomTask {
 	PLATFORMS_TOTAL("platforms_total", "Total number of platforms "),
 	VARIABLES_TOTAL("variables_total", "Total number of variables "),
 	METADATA_COMPLETENESS("metadata_completeness",
-		"Per-element share where the field exists (tag element); elements from METADATA_COMPLETENESS_ELEMENTS"),
+		"Per-element share among Dataset-type resources where the field exists (tag element); elements from METADATA_COMPLETENESS_ELEMENTS"),
 
 	METADATA_SET_COMPLETENESS("metadata_set_completeness",
-		"Per named set: share of records where all listed metadata elements exist (tag element_set); "
+		"Per named set: share of Dataset-type resources where all listed metadata elements exist (tag element_set); "
 			+ "configured via METADATA_SET_COMPLETENESS and METADATA_SET_COMPLETENESS_<name> lines"),
 
 	RECORDS_PER_ELEMENT("records_per_element",
-		"Per element and distinct value: record count for the source (tags element, value); "
+		"Per element and distinct value: Dataset-type resource count for the source (tags element, value); "
 			+ "elements from RECORDS_PER_ELEMENT_ELEMENTS"),
 
 	STATION_PAGE_VISITS_TOTAL("station_page_visits_total",
@@ -978,6 +982,8 @@ public class StatisticsTask extends AbstractCustomTask {
 			RuntimeInfoElement.DISCOVERY_MESSAGE_OBSERVED_PROPERTY_URI, OBSERVED_PROPERTY_TOP_BUCKETS);
 		Map<String, Double> topUris = parseRuntimeInfoFrequencyByBucket(resp);
 
+		final String viewTag = viewId != null ? viewId : "";
+
 		List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()
 			.filter(s -> s.getOntologyAvailability() == OntologySetting.Availability.ENABLED)
 			.map(OntologySetting::getOntologyEndpoint).toList();
@@ -998,6 +1004,7 @@ public class StatisticsTask extends AbstractCustomTask {
 		    Gauge.builder(StatisticsMetric.OBSERVED_PROPERTY_INFO.prometheusName(), () -> 1)//
 			    .description(StatisticsMetric.OBSERVED_PROPERTY_INFO.description())//
 			    .tags("uri", fUri, "preferred_label_ita", fLabelIta, "preferred_label_eng", fLabelEng)//
+			    .tag("view", viewTag)//
 			    .register(registry);
 		}
 	    } catch (GSException e) {
@@ -1308,13 +1315,16 @@ public class StatisticsTask extends AbstractCustomTask {
     }
 
     /**
-     * Discovery query for one source. When {@code view} is empty, the view bond is {@link BondFactory#getTrueBond()}
-     * (same as an unconstrained view), so counts include all records for that source.
+     * Discovery query for one source, restricted to resources of type {@link ResourceType#DATASET} via
+     * {@link BondFactory#createResourceTypeBond(ResourceType)}. When {@code view} is empty, the view bond is
+     * {@link BondFactory#getTrueBond()} (same as an unconstrained view), so counts include all dataset resources for that
+     * source.
      */
     private static DiscoveryMessage newDiscoveryMessageForSource(Optional<View> view, String sourceId) {
 
 	Bond viewBond = view.map(View::getBond).orElse(BondFactory.getTrueBond());
-	Bond base = BondFactory.createAndBond(viewBond, BondFactory.createSourceIdentifierBond(sourceId));
+	Bond base = BondFactory.createAndBond(viewBond, BondFactory.createSourceIdentifierBond(sourceId),
+		BondFactory.createResourceTypeBond(ResourceType.DATASET));
 	DiscoveryMessage message = new DiscoveryMessage();
 	List<GSSource> sources = new ArrayList<>();
 	sources.add(ConfigurationWrapper.getSource(sourceId));
@@ -1326,9 +1336,9 @@ public class StatisticsTask extends AbstractCustomTask {
     }
 
     /**
-     * Same logic as {@code blue-cloud-report.jsp}: percentage of records where the element exists
-     * ({@link BondFactory#createExistsSimpleValueBond} on the element queryable), relative to {@code totalRecords}
-     * for the same view and source.
+     * Same logic as {@code blue-cloud-report.jsp}: percentage of {@link ResourceType#DATASET} resources where the element
+     * exists ({@link BondFactory#createExistsSimpleValueBond} on the element queryable), relative to {@code totalRecords}
+     * for the same view, source, and resource type.
      */
     private static double occurrencePercentGivenTotal(DatabaseFinder finder, DiscoveryMessage baseMessage, int totalRecords,
 	    MetadataElement element) throws GSException {
@@ -1348,8 +1358,8 @@ public class StatisticsTask extends AbstractCustomTask {
     }
 
     /**
-     * Share of records where <b>all</b> {@link MetadataElement}s exist (successive {@link BondFactory#createAndBond} with
-     * {@link BondFactory#createExistsSimpleValueBond}).
+     * Share of {@link ResourceType#DATASET} resources where <b>all</b> {@link MetadataElement}s exist (successive
+     * {@link BondFactory#createAndBond} with {@link BondFactory#createExistsSimpleValueBond}).
      */
     private static double occurrencePercentAllElements(DatabaseFinder finder, DiscoveryMessage baseMessage, int totalRecords,
 	    List<MetadataElement> elements) throws GSException {
