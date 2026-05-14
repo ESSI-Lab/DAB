@@ -124,7 +124,10 @@ public class ObservationMapper {
 	// JSONTimeseries timeseries = new JSONTimeseries();
 
 	JSONFeature platform;
-	if (!view.isPresent() || !(view.get().getCreator().contains("change") || view.get().getCreator().contains("trigger"))) {
+
+	String creator = Optional.ofNullable(view.get().getCreator()).orElse("");
+
+	if (view.isEmpty() || !(creator.contains("change") || creator.contains("trigger"))) {
 	    platform = new JSONFeature();
 	} else {
 	    platform = new IchangeJSONFeature();
@@ -143,7 +146,7 @@ public class ObservationMapper {
 		String[] split = point.split(" ");
 		decimals.add(new BigDecimal(split[1]));
 		decimals.add(new BigDecimal(split[0]));
-		if (!view.isPresent() || !(view.get().getCreator().contains("change") || view.get().getCreator().contains("trigger"))) {
+		if (!(creator.contains("change") || creator.contains("trigger"))) {
 		    decimals.add(new BigDecimal(split[2]));
 		}
 
@@ -153,10 +156,10 @@ public class ObservationMapper {
 
 	} else if (
 
-		(parser.west != null && !parser.west.equals("") && //
-			parser.east != null && !parser.east.equals("") && //
-			parser.north != null && !parser.north.equals("") && //
-			parser.south != null && !parser.south.equals(""))//
+		(parser.west != null && !parser.west.isEmpty() && //
+			parser.east != null && !parser.east.isEmpty() && //
+			parser.north != null && !parser.north.isEmpty() && //
+			parser.south != null && !parser.south.isEmpty())//
 
 			|| parser.geometry != null && !parser.geometry.isEmpty()) {
 
@@ -173,9 +176,8 @@ public class ObservationMapper {
 
 		    Geometry geometry = optGeometry.get();
 
-		    if (geometry instanceof Point) {
+		    if (geometry instanceof Point point) {
 
-			Point point = (Point) geometry;
 			double x = point.getX();
 			double y = point.getY();
 
@@ -216,11 +218,10 @@ public class ObservationMapper {
 		try {
 		    altitude = new BigDecimal(altitudeString);
 		} catch (Exception e) {
-
 		}
 	    }
 
-	    Double TOL = 0.000000001;
+	    double TOL = 0.000000001;
 	    if ((bign.doubleValue() - bigs.doubleValue() > TOL) && //
 		    (bige.doubleValue() - bigw.doubleValue() > TOL)) {
 
@@ -258,11 +259,11 @@ public class ObservationMapper {
 	    }
 	}
 
-	if (parser.getPlatformName() != null && !parser.getPlatformName().equals("")) {
+	if (parser.getPlatformName() != null && !parser.getPlatformName().isEmpty()) {
 	    platform.setName(parser.getPlatformName());
 	}
 
-	if (parser.uniquePlatformCode != null && !parser.uniquePlatformCode.equals("")) {
+	if (parser.uniquePlatformCode != null && !parser.uniquePlatformCode.isEmpty()) {
 	    platform.setId(parser.uniquePlatformCode);
 	}
 
@@ -315,7 +316,7 @@ public class ObservationMapper {
 	//
 	//
 	//
-	relatedParties.forEach(p -> platform.addRelatedParty(p));
+	relatedParties.forEach(platform::addRelatedParty);
 
 	// timeseries.setFeatureOfInterest(uniquePlatformCode, platformName);
 
@@ -331,7 +332,7 @@ public class ObservationMapper {
 	SKOSConcept ontologyConcept = null;
 	if (parser.getAttributeURI() != null && !parser.getAttributeURI().isEmpty()) {
 	    HydroOntology ontology;
-	    if (!view.isPresent() || !view.get().getCreator().equals("his_central")) {
+	    if (!view.get().getCreator().equals("his_central")) {
 		ontology = new WHOSOntology();
 	    } else {
 		ontology = new HISCentralOntology();
@@ -374,7 +375,6 @@ public class ObservationMapper {
 		    GSLoggerFactory.getLogger(ObservationMapper.class).error("Unknown time spacing: {} {}", bd, parser.timeUnits);
 		}
 	    } catch (Exception e) {
-		// TODO: handle exception
 	    }
 	}
 
@@ -424,13 +424,12 @@ public class ObservationMapper {
 	}
 
 	if (parser.getUnits() == null || parser.getUnits().isEmpty()) {
-	    if (!view.isPresent() || !view.get().getCreator().contains("change")) {
+	    if (!creator.contains("change")) {
 		observation.setUOM(parser.unitsAbbreviation);
 	    } else {
 		String u = parser.unitsAbbreviation;
 		if (u != null && (u.contains("°C") || u.contains("ºC") || u.contains("Kelvin"))) {
 		    u = u.replace("°C", "K").replace("ºC", "K").replace("Kelvin", "K");
-		    ;
 		}
 		if (u != null && (u.contains("percent"))) {
 		    u = u.replace("percent", "%");
@@ -439,14 +438,14 @@ public class ObservationMapper {
 		observation.setUOM(u);
 	    }
 	} else {
-	    if (!view.isPresent() || !view.get().getCreator().contains("change")) {
+	    if (!creator.contains("change")) {
 		observation.setUOM(parser.units);
 	    } else {
 		String u = parser.units;
-		if (u != null && (u.contains("°C") || u.contains("ºC") || u.contains("Kelvin"))) {
+		if (u.contains("°C") || u.contains("ºC") || u.contains("Kelvin")) {
 		    u = u.replace("°C", "K").replace("ºC", "K").replace("Kelvin", "K");
 		}
-		if (u != null && (u.contains("percent"))) {
+		if (u.contains("percent")) {
 		    u = u.replace("percent", "%");
 		}
 		parser.units = u;
