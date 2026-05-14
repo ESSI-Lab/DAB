@@ -11,7 +11,7 @@ body {
 }
 
 #map {
-  flex: 1 1 auto;   /* prende tutto lo spazio rimanente */
+  flex: 1 1 auto;
   position: relative;
 }
 
@@ -50,7 +50,7 @@ body {
 
 .layer-controls {
   position: absolute;
-  top: 80px;              /* sotto i controlli tempo */
+  top: 80px;
   left: 10px;
 
   background: white;
@@ -65,7 +65,7 @@ body {
   flex-direction: column;
   gap: 6px;
 
-  z-index: 1000;          /* sopra la mappa */
+  z-index: 1000;
 }
 
 .layer-controls label {

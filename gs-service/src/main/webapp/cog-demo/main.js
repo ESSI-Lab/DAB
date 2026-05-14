@@ -9,7 +9,7 @@ import GeoTIFF from 'ol/source/GeoTIFF.js';
    1) GLOBAL TIMELINE
    ---------------------------------------------------------
    Here define the tempral extent of the slide.
-   In this case start from 2026-05-11T18:00:00Z
+   In this case start from 2026-05-13T18:00:00Z
    ========================================================= */
 
 function generateTimeline(startIso, endIso, stepHours = 1) {
