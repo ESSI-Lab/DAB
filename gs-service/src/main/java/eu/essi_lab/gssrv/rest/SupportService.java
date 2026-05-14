@@ -267,7 +267,7 @@ public class SupportService {
 	    @QueryParam("token") String token) { //
 
 	if (platformId == null || platformId.isEmpty()) {
-	    return Response.serverError().entity(getErrorResponse("platformId parameter is required").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("platformId parameter is required").toString()).build();
 	}
 
 	try {
@@ -333,12 +333,12 @@ public class SupportService {
 	    List<GSResource> resources = resultSet.getResultsList();
 
 	    if (resources.isEmpty()) {
-		return Response.serverError().entity(getErrorResponse("No rating curves found for platform: " + platformId).toString())
+		return Response.serverError().entity(getXMLErrorResponse("No rating curves found for platform: " + platformId).toString())
 			.build();
 	    }
 
 	    // Perform access request for the first rating curve found
-	    GSResource resource = resources.get(0);
+	    GSResource resource = resources.getFirst();
 
 	    Iterator<Online> onlineIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution()
 		    .getDistributionOnlines();
@@ -353,7 +353,7 @@ public class SupportService {
 	    String onlineId = online.getIdentifier();
 	    
 	    if (onlineId == null || onlineId.isEmpty()) {
-		return Response.serverError().entity(getErrorResponse("Online ID not found for rating curve").toString()).build();
+		return Response.serverError().entity(getXMLErrorResponse("Online ID not found for rating curve").toString()).build();
 	    }
 
 	    // Execute access request
@@ -375,7 +375,7 @@ public class SupportService {
 	    ResultSet<DataObject> accessResult = accessExecutor.retrieve(accessMessage);
 
 	    if (accessResult.getResultsList().isEmpty()) {
-		return Response.serverError().entity(getErrorResponse("Unable to retrieve rating curve data").toString()).build();
+		return Response.serverError().entity(getXMLErrorResponse("Unable to retrieve rating curve data").toString()).build();
 	    }
 
 	    DataObject dataObject = accessResult.getResultsList().get(0);
@@ -389,7 +389,7 @@ public class SupportService {
 		dataFile.delete();
 	    } catch (IOException e) {
 		GSLoggerFactory.getLogger(getClass()).error("Error reading rating curve file", e);
-		return Response.serverError().entity(getErrorResponse("Error reading rating curve data: " + e.getMessage()).toString())
+		return Response.serverError().entity(getXMLErrorResponse("Error reading rating curve data: " + e.getMessage()).toString())
 			.build();
 	    }
 
@@ -397,7 +397,7 @@ public class SupportService {
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error retrieving rating curves", e);
-	    return Response.serverError().entity(getErrorResponse("Error retrieving rating curves: " + e.getMessage()).toString())
+	    return Response.serverError().entity(getXMLErrorResponse("Error retrieving rating curves: " + e.getMessage()).toString())
 		    .build();
 	}
     }
@@ -410,14 +410,14 @@ public class SupportService {
 
 	JSONObject output = new JSONObject();
 	if (view == null || view.isEmpty()) {
-	    return Response.serverError().entity(getErrorResponse("view parameter not specified").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("view parameter not specified").toString()).build();
 	}
 	View v;
 	try {
 	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
 	} catch (GSException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    return Response.serverError().entity(getErrorResponse(e.getMessage()).toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
 	}
 	List<GSSource> sources = ConfigurationWrapper.getViewSources(v);
 	List<String> sourceIdentifiers = new ArrayList<String>();
@@ -430,7 +430,7 @@ public class SupportService {
 		dataCacheConnector = DataCacheConnectorFactory.newDefaultDataCacheConnector();
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error(e);
-		return Response.serverError().entity(getErrorResponse("error init data cache connector").toString()).build();
+		return Response.serverError().entity(getJSONErrorResponse("error init data cache connector").toString()).build();
 
 	    }
 	}
@@ -439,7 +439,7 @@ public class SupportService {
 	    datasetsInDatabase = getDatasetsInDatabase(sources, view);
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    return Response.serverError().entity(getErrorResponse("error counting datasets").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("error counting datasets").toString()).build();
 	}
 
 	Map<String, SourceCacheStats> stats = null;
@@ -447,7 +447,7 @@ public class SupportService {
 	    stats = dataCacheConnector.getCacheStatsPerSource(sourceIdentifiers);
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    return Response.serverError().entity(getErrorResponse("error counting cached datasets").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("error counting cached datasets").toString()).build();
 	}
 
 	JSONArray sourcesArray = new JSONArray();
@@ -542,16 +542,16 @@ public class SupportService {
     public Response getViews(LoginRequest request, @QueryParam("sourceDeployment") String sourceDeployment) {
 
 	if (sourceDeployment == null || sourceDeployment.isEmpty()) {
-	    return Response.serverError().entity(getErrorResponse("sourceDeployment parameter is required").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("sourceDeployment parameter is required").toString()).build();
 	}
 
 	LoginResponse loginResponse = getLoginResponse(request);
 	if (!loginResponse.isSuccess()) {
-	    return Response.serverError().entity(getErrorResponse("Authentication failed").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("Authentication failed").toString()).build();
 	}
 
 	if (!loginResponse.isAdmin()) {
-	    return Response.serverError().entity(getErrorResponse("Admin access required").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("Admin access required").toString()).build();
 	}
 
 	try {
@@ -586,16 +586,31 @@ public class SupportService {
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error retrieving views", e);
-	    return Response.serverError().entity(getErrorResponse("Error retrieving views: " + e.getMessage()).toString())
+	    return Response.serverError().entity(getJSONErrorResponse("Error retrieving views: " + e.getMessage()).toString())
 		    .build();
 	}
     }
 
-    private JSONObject getErrorResponse(String error) {
+    /**
+     *
+     * @param error
+     * @return
+     */
+    private JSONObject getJSONErrorResponse(String error) {
 	JSONObject ret = new JSONObject();
 	ret.put("status", "error");
 	ret.put("message", error);
 	return ret;
+    }
+
+    /**
+     *
+     * @param error
+     * @return
+     */
+    private String getXMLErrorResponse(String error) {
+
+	return "<error>" + error + "</error>";
     }
 
     @SuppressWarnings("rawtypes")
