@@ -286,16 +286,17 @@ const variables = {
 
 };
 
-
+let activeLegendLayer = null;
 
 const legendDiv = document.getElementById('legend');
 
 function updateLegend(layerName) {
   const legend = legends[layerName];
   if (!legend) {
-    legendDiv.innerHTML = '';
     return;
   }
+
+  activeLegendLayer = layerName;
 
   legendDiv.innerHTML = `
     <div class="legend-title">${legend.title}</div>
@@ -550,6 +551,13 @@ const map = new OLMap({
   })
 });
 
+
+const mapEl = map.getTargetElement();
+
+mapEl.appendChild(document.getElementById('layerControls'));
+mapEl.appendChild(document.getElementById('legend'));
+
+
 /* =========================================================
    9) TIME SLIDER
    ========================================================= */
@@ -642,15 +650,16 @@ document.getElementById('nextStep')
    ========================================================= */
 
 updateFromIndex(0);
+updateLegend('shiwe');
 
-
-// show legend
-for (const [name, cfg] of Object.entries(variables)) {
-  if (cfg.visible) {
+// show legend for the first visible layer
+for (const [name, layer] of Object.entries(layers)) {
+  if (layer.getVisible()) {
     updateLegend(name);
-    break; // only one
+    break;
   }
 }
+
 
 window.layers = layers;
 
@@ -690,6 +699,12 @@ slider.addEventListener('mousemove', e => {
   const idx = Number(e.target.value);
   slider.title = formatUtcLabel(timelineMaster[idx]);
 });
+
+
+window.addEventListener('resize', () => {
+  map.updateSize();
+});
+
 
 
 

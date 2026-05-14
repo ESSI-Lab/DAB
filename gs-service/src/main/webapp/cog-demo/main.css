@@ -1,6 +1,25 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#map {
+  flex: 1 1 auto;   /* prende tutto lo spazio rimanente */
+  position: relative;
+}
+
+
 #controls {
   padding: 6px 10px;
   font-family: sans-serif;
+  flex: 0 0 auto;
 }
 
 .time-nav {
@@ -26,6 +45,34 @@
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+
+.layer-controls {
+  position: absolute;
+  top: 80px;              /* sotto i controlli tempo */
+  left: 10px;
+
+  background: white;
+  padding: 8px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+
+  font-family: sans-serif;
+  font-size: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  z-index: 1000;          /* sopra la mappa */
+}
+
+.layer-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
 }
 
 .legend {

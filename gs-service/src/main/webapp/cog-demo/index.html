@@ -13,38 +13,8 @@
           }
         }
     </script>
-    <style>
-        body {
-          margin: 0;
-          font-family: sans-serif;
-        }
-        #controls {
-          padding: 8px;
-          background: #f5f5f5;
-          border-bottom: 1px solid #ccc;
-        }
-        .map {
-          width: 100%;
-          height: 400px;
-        }
-    </style>
 </head>
 <body>
-<!-- ✅ TIME SLIDER
-<div id="controls">
-    <input
-            type="range"
-            id="timeSlider"
-            min="0"
-            step="1"
-            value="0"
-            style="width: 300px"
-    />
-    <span id="timeLabel" style="margin-left: 10px"></span>
-</div>
--->
-
-
 
 <div id="controls">
 
@@ -62,36 +32,40 @@
 
 
 
-<!-- ✅ MAP -->
+<!-- MAP -->
 <div id="map" class="map"></div>
 
 
 
-<label>
-    <input type="checkbox" id="chkShiwe" checked>
-    SHIWE
-</label>
+<div id="layerControls" class="layer-controls">
+    <label>
+        <input type="checkbox" id="chkShiwe" checked>
+        SHIWE
+    </label>
 
-<label>
-    <input type="checkbox" id="chkTemp">
-    Temperature
-</label>
+    <label>
+        <input type="checkbox" id="chkTemp">
+        Temperature
+    </label>
 
-<label>
-    <input type="checkbox" id="chkUtci">
-    UTCI
-</label>
+    <label>
+        <input type="checkbox" id="chkUtci">
+        UTCI
+    </label>
 
-<label>
-    <input type="checkbox" id="chkHumidity">
-    Humidity
-</label>
+    <label>
+        <input type="checkbox" id="chkHumidity">
+        Humidity
+    </label>
+</div>
 
 
 <div id="legend" class="legend"></div>
 
 
-<!-- ✅ SCRIPT -->
+
+
+<!-- script-->
 <script type="module" src="main.js"></script>
 
 </body>
