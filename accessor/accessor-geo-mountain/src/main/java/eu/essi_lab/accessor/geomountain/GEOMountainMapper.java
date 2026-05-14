@@ -413,41 +413,29 @@ public class GEOMountainMapper extends OriginalIdentifierMapper {
 	    //
 
 	    if (temporalFrequency != null && !temporalFrequency.toLowerCase().contains("to complete")) {
+		String duration8601 = null;
 		if (temporalFrequency.toLowerCase().contains("daily")) {
-		    extensionHandler.setTimeUnits("day");
-		    extensionHandler.setTimeUnitsAbbreviation("d");
-		    extensionHandler.setTimeResolution("1");
-		    extensionHandler.setTimeSupport("1");
+		    duration8601 = "P1D";
 		} else if (temporalFrequency.toLowerCase().contains("hourly")) {
-		    extensionHandler.setTimeUnits("hour");
-		    extensionHandler.setTimeUnitsAbbreviation("h");
-		    extensionHandler.setTimeResolution("1");
-		    extensionHandler.setTimeSupport("1");
+		    duration8601 = "PT1H";
 		} else if (temporalFrequency.toLowerCase().contains("monthly")) {
-		    extensionHandler.setTimeUnits("month");
-		    extensionHandler.setTimeUnitsAbbreviation("M");
-		    extensionHandler.setTimeResolution("1");
-		    extensionHandler.setTimeSupport("1");
+		    duration8601 = "P1M";
 		} else if (temporalFrequency.contains(" ")) {
 		    String[] splittedTempFreq = temporalFrequency.split(" ");
-		    if (splittedTempFreq[1].toLowerCase().contains("year")) {
-			extensionHandler.setTimeUnits("year");
-			extensionHandler.setTimeUnitsAbbreviation("Y");
-			extensionHandler.setTimeResolution(splittedTempFreq[0]);
-			extensionHandler.setTimeSupport(splittedTempFreq[0]);
-		    } else if (splittedTempFreq[1].toLowerCase().contains("min")) {
-			extensionHandler.setTimeUnits("minutes");
-			extensionHandler.setTimeUnitsAbbreviation("m");
-			extensionHandler.setTimeResolution(splittedTempFreq[0]);
-			extensionHandler.setTimeSupport(splittedTempFreq[0]);
-		    } else {
-			extensionHandler.setTimeUnits(splittedTempFreq[1]);
-			// dataset.getExtensionHandler().setTimeUnitsAbbreviation("m");
-			extensionHandler.setTimeResolution(splittedTempFreq[0]);
-			extensionHandler.setTimeSupport(splittedTempFreq[0]);
+		    try {
+			java.math.BigDecimal value = new java.math.BigDecimal(splittedTempFreq[0]);
+			javax.xml.datatype.Duration d = eu.essi_lab.lib.utils.ISO8601DateTimeUtils.getDuration(value,
+				splittedTempFreq[1]);
+			if (d != null) {
+			    duration8601 = d.toString();
+			}
+		    } catch (Exception e) {
 		    }
 		}
-
+		if (duration8601 != null) {
+		    extensionHandler.setTimeResolutionDuration8601(duration8601);
+		    extensionHandler.setTimeAggregationDuration8601(duration8601);
+		}
 	    }
 
 	    // -------------------

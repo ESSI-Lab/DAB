@@ -247,10 +247,7 @@ public class INMETMapper extends OriginalIdentifierMapper {
 
 	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
-	dataset.getExtensionHandler().setTimeSupport("-1");
-	dataset.getExtensionHandler().setTimeUnits("hours");
-	dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
-	dataset.getExtensionHandler().setTimeResolution("1");
+	dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
 	dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
 	dataset.getExtensionHandler().setAttributeUnits(variable.getUnit());
 	dataset.getExtensionHandler().setAttributeUnitsAbbreviation(variable.getAbbreviation());

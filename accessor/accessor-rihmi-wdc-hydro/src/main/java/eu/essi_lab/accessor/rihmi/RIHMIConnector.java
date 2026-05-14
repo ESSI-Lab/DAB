@@ -376,15 +376,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 	    }
 	    if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
-		if (aggregationDuration.equals("P1M")) {
-		    dataset.getExtensionHandler().setTimeUnits("month");
-		    dataset.getExtensionHandler().setTimeSupport("1");
-		} else if (aggregationDuration.equals("P1D")) {
-		    dataset.getExtensionHandler().setTimeUnits("day");
-		    dataset.getExtensionHandler().setTimeSupport("1");
-		} else {
-		    GSLoggerFactory.getLogger(getClass()).error("Unrecognized aggregation duration: {}", aggregationDuration);
-		}
+		dataset.getExtensionHandler().setTimeAggregationDuration8601(aggregationDuration);
+		dataset.getExtensionHandler().setTimeResolutionDuration8601(aggregationDuration);
 	    }
 	    
 	    dataset.getExtensionHandler().setAttributeUnits(units);

@@ -239,9 +239,6 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	// 15 -> timeResolution
 	// M -> timeUnits
 	//
-	String timeUnits = intendedObservationSpacing.substring(intendedObservationSpacing.length() - 1);
-
-	dataset.getExtensionHandler().setTimeUnits(timeUnits);
 	dataset.getExtensionHandler().setTimeResolutionDuration8601(intendedObservationSpacing);
 
 	if (aggregationTimePeriod != null && aggregationTimePeriod.equals("0")) {

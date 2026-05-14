@@ -251,14 +251,12 @@ public class SIGEDACConnector extends HarvestedQueryConnector<SIGEDACConnectorSe
 			
 			if (r.resolution.equals("hourly")) {
 			    coreMetadata.getMIMetadata().getDataIdentification().addKeyword("hourly");
-			    dataset.getExtensionHandler().setTimeUnits("h");
-			    dataset.getExtensionHandler().setTimeResolution("1");
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
 			    dataset.getExtensionHandler().setAttributeMissingValue("-9999");
 			    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(variable.getUnitSymbol());
 			} else if (r.resolution.equals("daily")) {
 			    coreMetadata.getMIMetadata().getDataIdentification().addKeyword("daily");
-			    dataset.getExtensionHandler().setTimeUnits("d");
-			    dataset.getExtensionHandler().setTimeResolution("1");
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
 			    dataset.getExtensionHandler().setAttributeMissingValue("-9999");
 			}
 
