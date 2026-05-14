@@ -221,23 +221,23 @@ public class HarvestPreviewStarter extends GridMenuItemHandler implements Button
 
 		"</style>\n";
 
-	String table = "<table>";
+	StringBuilder table = new StringBuilder("<table>");
 
-	table += "<tr>";
+	table.append("<tr>");
 
-	table += "<td class='th'>";
+	table.append("<td class='th'>");
 
-	table += "Property";
+	table.append("Property");
 
-	table += "</td>";
+	table.append("</td>");
 
-	table += "<td class='th'>";
+	table.append("<td class='th'>");
 
-	table += "Value";
+	table.append("Value");
 
-	table += "</td>";
+	table.append("</td>");
 
-	table += "</tr>";
+	table.append("</tr>");
 
 	ArrayList<String> props = new ArrayList<>(indexes.getProperties());
 	props.add(MetadataElement.BOUNDING_BOX.getName());
@@ -254,24 +254,24 @@ public class HarvestPreviewStarter extends GridMenuItemHandler implements Button
 		continue;
 	    }
 
-	    table += "<tr>";
+	    table.append("<tr>");
 
-	    table += "<td>";
+	    table.append("<td>");
 
-	    table += property;
+	    table.append(property);
 
-	    table += "</td>";
+	    table.append("</td>");
 
-	    table += "<td>";
+	    table.append("<td>");
 
-	    table += value;
+	    table.append(value);
 
-	    table += "</td>";
+	    table.append("</td>");
 
-	    table += "</tr>";
+	    table.append("</tr>");
 	}
 
-	table += "</table>";
+	table.append("</table>");
 
 	content += table;
 
