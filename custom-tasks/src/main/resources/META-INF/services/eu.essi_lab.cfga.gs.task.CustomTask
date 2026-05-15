@@ -27,3 +27,4 @@ eu.essi_lab.gssrv.conf.task.DuplicatedOnlineIdentifiersTask
 eu.essi_lab.gssrv.conf.task.HISCentralShapefileInitializer
 eu.essi_lab.gssrv.conf.task.SourceConnectivityTestTask
 eu.essi_lab.gssrv.conf.task.ViewHarvestSchedulerTask
+eu.essi_lab.gssrv.conf.task.trigger.COGS3Task
