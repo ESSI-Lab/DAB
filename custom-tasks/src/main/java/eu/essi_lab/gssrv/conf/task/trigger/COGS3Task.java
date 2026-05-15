@@ -22,10 +22,8 @@ package eu.essi_lab.gssrv.conf.task.trigger;
  */
 
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
-import eu.essi_lab.cfga.gs.task.CustomTaskSetting;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.gssrv.conf.task.BasicDataHarvesterTask;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.quartz.JobExecutionContext;

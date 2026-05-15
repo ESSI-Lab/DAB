@@ -28,6 +28,7 @@ import eu.essi_lab.lib.net.dirlisting.WAF_URL;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operations;
 import org.geotools.gce.geotiff.GeoTiffReader;
@@ -37,27 +38,21 @@ import org.geotools.util.factory.Hints;
 import org.glassfish.jaxb.core.v2.TODO;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class COGS3SyncProcessor {
 
-
     private final S3TransferWrapper s3;
     private final String bucketName;
     private final String[] variables;
     private final String sourceURL;
-    private final Map<String, List<String>> variableFilesMap = new HashMap<>();
-    private final Path outputBase = Paths.get("output");
+    private Map<String, List<String>> variableFilesMap = new HashMap<>();
+
     private static final String TARGET_EPSG = "EPSG:3857";
 
     public COGS3SyncProcessor(S3TransferWrapper s3, String bucketName, String[] variables, String sourceURL) {
@@ -69,7 +64,6 @@ public class COGS3SyncProcessor {
 
     public void execute() throws Exception {
 
-
 	Path tempWorkDir = Files.createTempDirectory("geotiff_processing_");
 	try {
 	    //setupTrustStore();
@@ -80,7 +74,8 @@ public class COGS3SyncProcessor {
 
 	    // 1. Discovery
 	    List<URL> allFiles = WAFClient.listFiles(new WAF_URL(listURL), true, user, pass);
-	    List<URL> tiffUrls = allFiles.stream().filter(url -> url.toString().toLowerCase().contains(".tif")).collect(Collectors.toList());
+	    List<URL> tiffUrls = allFiles.stream().filter(url -> url.toString().toLowerCase().contains(".tif"))
+		    .collect(Collectors.toList());
 
 	    List<URL> filteredURLs = filterURLs(tiffUrls);
 	    //filteredURLs.forEach(System.out::println);
@@ -94,10 +89,10 @@ public class COGS3SyncProcessor {
 	    }
 
 	    // 2. Generazione Indici
-	    generateIndexFiles();
+	    generateIndexFiles(tempWorkDir);
 
 	    // 3. Sincronizzazione S3
-	    //syncToS3();
+	    //syncToS3(tempWorkDir);
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error during the task: " + e.getMessage());
@@ -105,6 +100,7 @@ public class COGS3SyncProcessor {
 	} finally {
 
 	    cleanup(tempWorkDir);
+	    variableFilesMap = new HashMap<>();
 	}
     }
 
@@ -142,7 +138,7 @@ public class COGS3SyncProcessor {
 	    GSLoggerFactory.getLogger(getClass()).error("Error on " + originalName + ": " + e.getMessage());
 	}
     }
-    
+
     private List<URL> filterURLs(List<URL> urls) {
 	List<URL> out = new ArrayList<>();
 	Set<String> seen = new HashSet<>();
@@ -172,24 +168,66 @@ public class COGS3SyncProcessor {
 	return fileName.split("_")[0];
     }
 
-
     private void reprojectTo3857(Path in, Path out) throws Exception {
-	GeoTiffReader r = null; GeoTiffWriter w = null;
-	GridCoverage2D c = null; GridCoverage2D res = null;
+	GeoTiffReader reader = null;
+	GeoTiffWriter writer = null;
+	GridCoverage2D coverage = null;
+	GridCoverage2D resampled = null;
+
 	try {
-	    Hints h = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-	    h.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, CRS.decode("EPSG:4326", true));
-	    r = new GeoTiffReader(in.toFile(), h);
-	    c = r.read(null);
-	    res = (GridCoverage2D) Operations.DEFAULT.resample(c, CRS.decode(TARGET_EPSG, true));
-	    w = new GeoTiffWriter(out.toFile());
-	    w.write(res, null);
+
+	    Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+	    hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, CRS.decode("EPSG:4326", true));
+
+	    reader = new GeoTiffReader(in.toFile(), hints);
+	    coverage = reader.read(null);
+
+	    // EPSG:4326
+	    if (coverage.getCoordinateReferenceSystem() == null) {
+		System.out.println("CRS missing, set predefined EPSG:4326...");
+		// NB: In una pipeline reale qui andrebbe ricostruita la copertura con il CRS corretto
+	    }
+
+	    CoordinateReferenceSystem targetCRS = CRS.decode(TARGET_EPSG, true);
+	    resampled = (GridCoverage2D) Operations.DEFAULT.resample(coverage, targetCRS);
+
+	    writer = new GeoTiffWriter(out.toFile());
+	    writer.write(resampled, null);
+
+	    //
+	    writer.dispose();
+	    writer = null;
+
+	    resampled.dispose(true);
+	    resampled = null;
+
+	    coverage.dispose(true);
+	    coverage = null;
+
+	    reader.dispose();
+	    reader = null;
+
 	} finally {
-	    if (w != null) w.dispose();
-	    if (res != null) res.dispose(true);
-	    if (c != null) c.dispose(true);
-	    if (r != null) r.dispose();
-	    System.gc(); Thread.sleep(300);
+	    // clean
+	    if (writer != null)
+		try {
+		    writer.dispose();
+		} catch (Exception e) {
+		}
+	    if (resampled != null)
+		resampled.dispose(true);
+	    if (coverage != null)
+		coverage.dispose(true);
+	    if (reader != null)
+		try {
+		    reader.dispose();
+		} catch (Exception e) {
+		}
+
+
+	    // Windows workaround
+	    System.gc();
+	    Thread.sleep(500);
 	}
     }
 
@@ -202,16 +240,15 @@ public class COGS3SyncProcessor {
     private void runGdalCog(Path in, Path out) throws Exception {
 	ProcessBuilder pb = new ProcessBuilder("gdal_translate", "-of", "COG", "-co", "COMPRESS=DEFLATE", "-co", "BLOCKSIZE=512",
 		in.toAbsolutePath().toString(), out.toAbsolutePath().toString());
-	if (pb.start().waitFor() != 0) throw new RuntimeException("GDAL failed");
+	if (pb.start().waitFor() != 0)
+	    throw new RuntimeException("GDAL failed");
     }
 
     private void cleanup(Path path) {
 	try {
 	    if (Files.exists(path)) {
-		Files.walk(path)
-			.sorted(Comparator.reverseOrder()) // Cancella prima i file, poi le cartelle
-			.map(Path::toFile)
-			.forEach(File::delete);
+		Files.walk(path).sorted(Comparator.reverseOrder()) // Cancella prima i file, poi le cartelle
+			.map(Path::toFile).forEach(File::delete);
 		GSLoggerFactory.getLogger(getClass()).info("Disk Cleanup Completed: " + path.getFileName());
 	    }
 	} catch (IOException e) {
@@ -219,16 +256,18 @@ public class COGS3SyncProcessor {
 	}
     }
 
-    private void generateIndexFiles() throws IOException {
-	if (variableFilesMap.isEmpty()) return;
+    private void generateIndexFiles(Path workingDir) throws IOException {
+	if (variableFilesMap.isEmpty())
+	    return;
 
 	for (Map.Entry<String, List<String>> entry : variableFilesMap.entrySet()) {
 	    String var = entry.getKey();
 	    List<String> files = entry.getValue();
-	    if (files.isEmpty()) continue;
+	    if (files.isEmpty())
+		continue;
 
 	    Collections.sort(files);
-	    Path varDir = outputBase.resolve(var);
+	    Path varDir = workingDir.resolve(var);
 	    Files.createDirectories(varDir);
 	    Path indexPath = varDir.resolve("index.json");
 
@@ -269,7 +308,6 @@ public class COGS3SyncProcessor {
 	    json.append("      \"url\": \"").append(fileUrl).append("\"\n");
 	    json.append("    }");
 
-
 	    if (i < files.size() - 1)
 		json.append(",");
 	    json.append("\n");
@@ -280,9 +318,10 @@ public class COGS3SyncProcessor {
 	return json.toString();
     }
 
-    private void syncToS3() {
+    private void syncToS3(Path workingDir) {
 	for (String var : variables) {
 	    String prefix = var + "/";
+	    Path varDir = workingDir.resolve(var);
 	    // Clean S3
 	    List<S3Object> existing = s3.listObjectSummaries(bucketName, prefix);
 	    if (!existing.isEmpty()) {
@@ -292,6 +331,22 @@ public class COGS3SyncProcessor {
 	    }
 	    // Upload files in the var directories
 	    //TODO:upload
+	    try (DirectoryStream<Path> stream = Files.newDirectoryStream(varDir)) {
+		for (Path localFile : stream) {
+		    if (Files.isRegularFile(localFile)) {
+			String fileName = localFile.getFileName().toString();
+			String s3Key = prefix + fileName; // Risultato: "shiwe/shiwe_2026.tif"
+
+			String contentType = fileName.endsWith(".json") ? "application/json" : "image/tiff";
+
+			GSLoggerFactory.getLogger(getClass()).info("  - Loading: " + s3Key);
+			s3.uploadFile(localFile.toAbsolutePath().toString(), bucketName, s3Key, contentType);
+		    }
+		}
+	    } catch (IOException e) {
+		GSLoggerFactory.getLogger(getClass()).info("Error S3 for variable " + var);
+		throw new RuntimeException(e);
+	    }
 	}
     }
 
@@ -300,7 +355,13 @@ public class COGS3SyncProcessor {
 	try {
 	    String baseName = filename.substring(0, filename.lastIndexOf('.'));
 	    String ts = baseName.substring(baseName.lastIndexOf('_') + 1).replaceAll("[^0-9]", "");
-	    return String.format("%s-%s-%sT%s:00:00Z", ts.substring(0,4), ts.substring(4,6), ts.substring(6,8), ts.substring(8,10));
-	} catch (Exception e) { return "N/A"; }
+	    return String.format("%s-%s-%sT%s:00:00Z", ts.substring(0, 4), ts.substring(4, 6), ts.substring(6, 8), ts.substring(8, 10));
+	} catch (Exception e) {
+	    return "N/A";
+	}
+    }
+
+    private static void setupTrustStore() throws IOException {
+
     }
 }
