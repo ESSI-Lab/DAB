@@ -114,8 +114,8 @@ public class HarvestingSettingDescriptorProvider {
 
 	ArrayList<GridMenuItemHandler> list = new ArrayList<>();
 
-	list.add(new SettingEditItemHandler());
-	list.add(new HarvestingInfoItemHandler());
+	list.add(new SettingEditItemHandler(false, true));
+
 
 	if (ExecutionMode.get() == ExecutionMode.MIXED || //
 		ExecutionMode.get() == ExecutionMode.LOCAL_PRODUCTION) {
@@ -125,9 +125,11 @@ public class HarvestingSettingDescriptorProvider {
 
 	list.add(new HarvestPreviewStarter());
 
-	list.add(new SettingsRemoveItemHandler(true, true));
+	list.add(new HarvestingInfoItemHandler(true, false));
 
-	list.add(new HarvestingStatsItemHandler());
+	list.add(new HarvestStatsItemHandler(false, false));
+
+	list.add(new SettingsRemoveItemHandler(true, false));
 
 	return list;
     }

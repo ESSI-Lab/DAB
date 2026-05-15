@@ -46,7 +46,7 @@ public class HarvestPreviewStarter extends GridMenuItemHandler implements Button
      */
     public HarvestPreviewStarter() {
 
-	super(true, false);
+	super(false, false);
     }
 
     @Override
