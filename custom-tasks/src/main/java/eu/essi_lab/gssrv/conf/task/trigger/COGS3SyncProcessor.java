@@ -13,6 +13,7 @@ import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.gce.geotiff.GeoTiffWriter;
 import org.geotools.referencing.CRS;
 import org.geotools.util.factory.Hints;
+import org.glassfish.jaxb.core.v2.TODO;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.File;
@@ -46,8 +47,7 @@ public class COGS3SyncProcessor {
     }
 
     public void execute() throws Exception {
-	// 1. Logica di download e processamento GDAL (omessa qui per brevità, è quella già scritta)
-	// ... popola la variableFilesMap ...
+
 
 	Path tempWorkDir = Files.createTempDirectory("geotiff_processing_");
 	try {
@@ -80,9 +80,9 @@ public class COGS3SyncProcessor {
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error during the task: " + e.getMessage());
-	    throw e; // Rilanciamo per far fallire il task ufficialmente
+	    throw e;
 	} finally {
-	    // IL CLEANUP: Accade sempre, anche se il programma crasha
+
 	    cleanup(tempWorkDir);
 	}
     }
@@ -113,12 +113,12 @@ public class COGS3SyncProcessor {
 
 	    variableFilesMap.computeIfAbsent(var, k -> new ArrayList<>()).add(finalCog.getFileName().toString());
 
-	    // Pulizia file intermedi immediatamente
+	    // Clean tmp files
 	    Files.deleteIfExists(raw);
 	    Files.deleteIfExists(reprojected);
 
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Errore su " + originalName + ": " + e.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).error("Error on " + originalName + ": " + e.getMessage());
 	}
     }
     
@@ -229,7 +229,6 @@ public class COGS3SyncProcessor {
 	json.append("  \"projection\": \"").append(TARGET_EPSG).append("\",\n");
 	json.append("  \"format\": \"COG\",\n");
 
-	// NUOVO: Aggiunta del range temporale globale
 	json.append("  \"phenomenonTime\": {\n");
 	json.append("    \"begin\": \"").append(minDate).append("\",\n");
 	json.append("    \"end\": \"").append(maxDate).append("\"\n");
@@ -263,20 +262,20 @@ public class COGS3SyncProcessor {
     private void syncToS3() {
 	for (String var : variables) {
 	    String prefix = var + "/";
-	    // Pulizia batch usando i tuoi metodi della classe S3TransferWrapper
+	    // Clean S3
 	    List<S3Object> existing = s3.listObjectSummaries(bucketName, prefix);
 	    if (!existing.isEmpty()) {
 		List<String> keys = new ArrayList<>();
 		existing.forEach(o -> keys.add(o.key()));
 		s3.deleteObjects(bucketName, keys);
 	    }
-	    // Upload dei file nella cartella varDir...
-	    // (Usa s3.uploadFile per ogni file in output/var/)
+	    // Upload files in the var directories
+	    //TODO:upload
 	}
     }
 
     private String formatIsoTime(String filename) {
-	// Logica basata su lastIndexOf('_') che abbiamo rifinito prima
+	// lastIndexOf('_')
 	try {
 	    String baseName = filename.substring(0, filename.lastIndexOf('.'));
 	    String ts = baseName.substring(baseName.lastIndexOf('_') + 1).replaceAll("[^0-9]", "");
