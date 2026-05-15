@@ -1,4 +1,4 @@
-package eu.essi_lab.cdk;
+package eu.essi_lab.accessor.hiscentral.emilia.simc;
 
 /*-
  * #%L
@@ -21,40 +21,33 @@ package eu.essi_lab.cdk;
  * #L%
  */
 
-import eu.essi_lab.cfga.*;
-import eu.essi_lab.cfga.gs.setting.connector.*;
-import eu.essi_lab.model.*;
-import eu.essi_lab.model.pluggable.*;
+import org.json.JSONObject;
+
+import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 
 /**
- * Generic Connector Interface.
- *
- * @author roncella
+ * Connector settings for the ARPAE-SIMC Eve open-data accessor.
  */
-public interface IDriverConnector<T extends ConnectorSetting> extends Configurable<T>, Pluggable {
+public class HISCentralEmiliaSimcConnectorSetting extends HarvestedConnectorSetting {
 
-    /**
-     * @param source
-     * @return
-     */
-    boolean supports(GSSource source);
-
-    /**
-     * @param url
-     */
-    void setSourceURL(String url);
-
-    /**
-     * @return
-     */
-    String getSourceURL();
-
-    /**
-     * @return
-     */
-    default boolean supportsPreview() {
-
-	return true;
+    public HISCentralEmiliaSimcConnectorSetting() {
     }
 
+    public HISCentralEmiliaSimcConnectorSetting(JSONObject object) {
+	super(object);
+    }
+
+    public HISCentralEmiliaSimcConnectorSetting(String object) {
+	super(object);
+    }
+
+    @Override
+    protected String initConnectorType() {
+	return HISCentralEmiliaSimcConnector.TYPE;
+    }
+
+    @Override
+    protected String initSettingName() {
+	return "SIR Emilia-SIMC Connector settings";
+    }
 }

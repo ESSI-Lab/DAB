@@ -193,7 +193,10 @@ public final class ArpaeSimcMeteoOpenDataClientSample {
 		if (dd != null) {
 		    System.out.println("      unit:          " + nullToDash(dd.unit()));
 		    System.out.println("      bcode:         " + nullToDash(dd.bcode()));
+		    System.out.println("      Observed property: " + nullToDash(BCodes.getInstance().getObservedPropertyLabel(dd.bcode())));
 		    System.out.println("      timerange:     " + describeTimerange(dd.timerange()));
+		    System.out.println("      interpolation: " + nullToDash(BUFRData.interpolationTypeFromTimerange(dd.timerange())));
+		    System.out.println("      aggregation:   " + nullToDash(BUFRData.aggregationPeriodFromTimerange(dd.timerange())));
 		} else {
 		    System.out.println("      unit/bcode/timerange: — (no matching row in " + ArpaeSimcMeteoOpenDataClient.RESOURCE_DATASETS
 			    + " for href / id \"" + datasetLabel + "\")");
@@ -202,7 +205,7 @@ public final class ArpaeSimcMeteoOpenDataClientSample {
 	    }
 	}
 
-	printFirstDatasetLastTwoMonthsObservations(client, st, sums, obsPageSize, maxObservationsToFetch, maxObservationsToPrint);
+	// printFirstDatasetLastTwoMonthsObservations(client, st, sums, obsPageSize, maxObservationsToFetch, maxObservationsToPrint);
 	System.out.println();
     }
 

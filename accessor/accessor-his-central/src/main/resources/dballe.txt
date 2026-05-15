@@ -1,0 +1,630 @@
+ 001001 WMO BLOCK NUMBER                                                 NUMERIC                    0            0   7 NUMERIC                   0          2
+ 001002 WMO STATION NUMBER                                               NUMERIC                    0            0  10 NUMERIC                   0          3
+ 001006 AIRCRAFT FLIGHT NUMBER                                           CCITTIA5                   0            0  64 CHARACTER                 0          8
+ 001007 SATELLITE IDENTIFIER                                             CODE TABLE 1007            0            0  10 CODE TABLE 1007           0          3
+ 001008 AIRCRAFT REGISTRATION NUMBER OR OTHER IDENTIFICATION             CCITTIA5                   0            0  64 CHARACTER                 0          8
+ 001011 SHIP OR MOBILE LAND STATION IDENTIFIER                           CCITTIA5                   0            0  72 CHARACTER                 0          9
+ 001012 DIRECTION OF MOTION OF MOVING OBSERVING PLATFORM**               DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 001013 SPEED OF MOTION OF MOVING OBSERVING PLATFORM*                    M/S                        0            0  10 M/S                       0          3
+ 001019 LONG STATION OR SITE NAME                                        CCITTIA5                   0            0 256 CHARACTER                 0         32
+ 001023 OBSERVATION SEQUENCE NUMBER                                      NUMERIC                    0            0   9 NUMERIC                   0          3
+ 001033 IDENTIFICATION OF ORIGINATING/GENERATING CENTRE                  CODE TABLE 001033          0            0   8 CODE TABLE 001033         0          3
+ 001034 IDENTIFICATION OF ORIGINATING/GENERATING SUB-CENTRE              CODE TABLE 001034          0            0   8 CODE TABLE 001034         0          3
+ 001063 ICAO LOCATION INDICATOR                                          CCITTIA5                   0            0  64 CHARACTER                 0          8
+ 001192 MeteoDB station ID                                               NUMERIC                    0            0  24 NUMERIC                   0          8
+ 001193 Report code                                                      NUMERIC                    0            0  16 NUMERIC                   0          5
+ 001194 Report mnemonic                                                  CCITTIA5                   0            0 128 CHARACTER                 0         16
+ 001212 AIR QUALITY OBSERVING STATION LOCAL CODE                         CCITTIA5                   0            0  56 CHARACTER                 0          7
+ 001213 AIRBASE AIR QUALITY OBSERVING STATION CODE                       CCITTIA5                   0            0  56 CHARACTER                 0          7
+ 001214 GEMS AIR QUALITY OBSERVING STATION CODE                          CCITTIA5                   0            0  48 CHARACTER                 0          6
+ 001215 AIR QUALITY OBSERVING STATION DOMINANT EMISSION SOURCE           CODE TABLE 001215          0            0   3 CODE TABLE 001215         0          1
+ 001216 AIR QUALITY OBSERVING STATION AREA TYPE                          CODE TABLE 001216          0            0   3 CODE TABLE 001216         0          1
+ 001217 AIR QUALITY OBSERVING STATION TERRAIN TYPE                       CODE TABLE 001217          0            0   4 CODE TABLE 001217         0          2
+ 002001 TYPE OF STATION                                                  CODE TABLE 2001            0            0   2 CODE TABLE 2001           0          1
+ 002002 TYPE OF INSTRUMENTATION FOR WIND MEASUREMENT                     FLAG TABLE 2002            0            0   4 FLAG TABLE 2002           0          2
+ 002003 TYPE OF MEASURING EQUIPMENT USED                                 CODE TABLE 2003            0            0   4 CODE TABLE 2003           0          2
+ 002004 TYPE OF INSTRUMENTATION FOR EVAPORATION MEASUREMENT OR TYPE OF C CODE TABLE 2004            0            0   4 CODE TABLE 2004           0          2
+ 002005 PRECISION OF TEMPERATURE OBSERVATION                             K                          2            0   7 K                         2          3
+ 002011 RADIOSONDE TYPE                                                  CODE TABLE 2011            0            0   8 CODE TABLE 2011           0          3
+ 002012 RADIOSONDE COMPUTATIONAL METHOD                                  CODE TABLE 2012            0            0   4 CODE TABLE 2012           0          2
+ 002013 SOLAR AND INFRARED RADIATION CORRECTION                          CODE TABLE 2013            0            0   4 CODE TABLE 2013           0          2
+ 002014 TRACKING TECHNIQUE/STATUS OF SYSTEM USED                         CODE TABLE 2014            0            0   7 CODE TABLE 2014           0          3
+ 002038 METHOD OF WATER TEMPERATURE AND/OR SALINITY MEASUREMENT          CODE TABLE 2038            0            0   4 CODE TABLE 2038           0          2
+ 002039 METHOD OF WET-BULB TEMPERATURE MEASUREMENT                       CODE TABLE 2039            0            0   3 CODE TABLE 2039           0          1
+ 002048 SATELLITE SENSOR INDICATOR                                       CODE TABLE 2048            0            0   4 CODE TABLE 2048           0          2
+ 002061 AIRCRAFT NAVIGATIONAL SYSTEM                                     CODE TABLE 2061            0            0   3 CODE TABLE 2061           0          1
+ 002062 TYPE OF AIRCRAFT DATA RELAY SYSTEM                               CODE TABLE 2062            0            0   4 CODE TABLE 2062           0          2
+ 002063 AIRCRAFT ROLL ANGLE                                              DEGREE                     2       -18000  16 DEGREE                    2          5
+ 002064 AIRCRAFT ROLL ANGLE QUALITY                                      CODE TABLE 2064            0            0   2 CODE TABLE 2064           0          1
+ 002070 ORIGINAL SPECIFICATION OF LATITUDE/LONGITUDE                     CODE TABLE 2070            0            0   4 CODE TABLE 2070           0          2
+ 002099 POLARIZATION                                                     CODE TABLE 2099            0            0   3 CODE TABLE 0              0          1
+ 002121 MEAN FREQUENCY                                                   Hz                        -8            0   7 Hz                       -8          3
+ 002125 PULSE REPETITION FREQUENCY                                       Hz                        -1            0   8 Hz                       -1          3
+ 002192 Signal frequency                                                 Hz                        -5            0  19 Hz                       -5          6
+ 002193 Antenna diameter                                                 M                          2            0   7 M                         2          3
+ 004001 YEAR                                                             YEAR                       0            0  12 YEAR                      0          4
+ 004002 MONTH                                                            MONTH                      0            0   4 MONTH                     0          2
+ 004003 DAY                                                              DAY                        0            0   6 DAY                       0          2
+ 004004 HOUR                                                             HOUR                       0            0   5 HOUR                      0          2
+ 004005 MINUTE                                                           MINUTE                     0            0   6 MINUTE                    0          2
+ 004006 SECOND                                                           SECOND                     0            0   6 SECOND                    0          2
+ 004086 LONG TIME PERIOD OR DISPLACEMENT                                 SECOND                     0        -8192  15 SECOND                    0          5
+ 004192 Time range type                                                  NUMERIC                    0            0  10 NUMERIC                   0          4
+ 004193 Time range P1                                                    NUMERIC                    0   -536870912  31 NUMERIC                   0         10
+ 004194 Time range P2                                                    NUMERIC                    0   -536870912  31 NUMERIC                   0         10
+ 004195 Temperature event - time of occurrence                           MINUTE                     0            0  11 MINUTE                    0          4
+ 004196 Relative humidity event - time of occurrence                     MINUTE                     0            0  11 MINUTE                    0          4
+ 004197 Wind velocity event - time of occurrence                         MINUTE                     0            0  11 MINUTE                    0          4
+ 004198 Pressure event - time of occurrence                              MINUTE                     0            0  11 MINUTE                    0          4
+ 005001 LATITUDE (HIGH ACCURACY)                                         DEGREE                     5     -9000000  25 DEGREE                    5          7
+ 005015 LATITUDE DISPLACEMENT (HIGH ACCURACY)                            DEGREE                     5     -9000000  25 DEGREE                    5          7
+ 005021 BEARING OR AZIMUTH                                               DEGREE TRUE                2            0  16 DEGREE TRUE               2          5
+ 005022 SOLAR AZIMUTH                                                    DEGREE TRUE                2            0  16 DEGREE TRUE               2          5
+ 005040 ORBIT NUMBER                                                     NUMERIC                    0            0  24 NUMERIC                   0          8
+ 005041 SCAN LINE NUMBER                                                 NUMERIC                    0            0   8 NUMERIC                   0          3
+ 005043 FIELD OF VIEW NUMBER                                             NUMERIC                    0            0   8 NUMERIC                   0          3
+ 005192 Latitude of RX antenna                                           DEGREE                     5     -9000000  25 DEGREE                    5          7
+ 006001 LONGITUDE (HIGH ACCURACY)                                        DEGREE                     5    -18000000  26 DEGREE                    5          8
+ 006015 LONGITUDE DISPLACEMENT (HIGH ACCURACY)                           DEGREE                     5    -18000000  26 DEGREE                    5          8
+ 006192 Longitude of RX antenna                                          DEGREE                     5    -18000000  26 DEGREE                    5          8
+ 007002 HEIGHT OR ALTITUDE                                               M                         -1          -40  16 M                        -1          5
+ 007004 PRESSURE                                                         PA                        -1            0  14 PA                       -1          5
+ 007007 HEIGHT                                                           M                          0        -1000  17 M                         0          6
+ 007010 FLIGHT LEVEL                                                     M                          0        -1024  16 FT                       -1          5
+ 007024 SATELLITE ZENITH ANGLE                                           DEGREE                     2        -9000  15 DEGREE                    2          5
+ 007025 SOLAR ZENITH ANGLE                                               DEGREE                     2        -9000  15 DEGREE                    2          5
+ 007030 HEIGHT OF STATION GROUND ABOVE MEAN SEA LEVEL (SEE NOTE 3)       M                          1        -4000  17 M                         1          5
+ 007031 HEIGHT OF BAROMETER ABOVE MEAN SEA LEVEL (SEE NOTE 4)            M                          1        -4000  17 M                         1          5
+ 007032 HEIGHT OF SENSOR ABOVE LOCAL GROUND (OR DECK OF MARINE PLATFORM) M                          2            0  16 M                         2          5
+ 007192 First level type                                                 NUMERIC                    0            0  10 NUMERIC                   0          4
+ 007193 Level L1                                                         NUMERIC                    0   -536870912  31 NUMERIC                   0         10
+ 007194 Level L2                                                         NUMERIC                    0   -536870912  31 NUMERIC                   0         10
+ 007195 Second level type                                                NUMERIC                    0            0  31 NUMERIC                   0          4
+ 007196 Height of RX antenna above mean sea level                        M                          1        -4000  17 M                         1          5
+ 008002 VERTICAL SIGNIFICANCE (SURFACE OBSERVATIONS)                     CODE TABLE 8002            0            0   6 CODE TABLE 8002           0          2
+ 008004 PHASE OF AIRCRAFT FLIGHT                                         CODE TABLE 8004            0            0   3 CODE TABLE 8004           0          1
+ 008009 DETAILED PHASE OF FLIGHT                                         CODE TABLE 8009            0            0   4 CODE TABLE 8009           0          2
+ 008021 TIME SIGNIFICANCE                                                CODE TABLE 8021            0            0   5 CODE TABLE 8021           0          2
+ 008042 EXTENDED VERTICAL SOUNDING SIGNIFICANCE                          FLAG TABLE 8042            0            0  18 FLAG TABLE 8042           0          6
+ 008044 (VAL) CAS REGISTRY NUMBER                                        CCITTIA5                   0            0  88 CHARACTER                 0         11
+ 008192 Number of wind velocity mean values present                      NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008193 Number of wind velocity minimum values present                   NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008194 Number of wind velocity maximum values present                   NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008195 Number of wind prevalent direction values present                NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008196 Number of mean temperature values present                        NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008197 Number of minimum temperature values present                     NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008198 Number of maximum temperature values present                     NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008199 Number of mean relative humidity values present                  NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008200 Number of minimum relative humidity values present               NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008201 Number of maximum relative humidity values present               NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008202 Number of mean pressure values present                           NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008203 Number of minimum pressure values present                        NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008204 Number of maximum pressure values present                        NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008205 Number of precipitation values present                           NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008206 Number of leaf wetness values present                            NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008207 Number of scalar wind velocity mean values present               NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008208 Number of cloud cover mean values present                        NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008209 Number of cloud cover maximum values present                     NUMERIC                    0            0   5 NUMERIC                   0          2
+ 008210 Number of cloud cover minimum values present                     NUMERIC                    0            0   5 NUMERIC                   0          2
+ 010004 PRESSURE                                                         PA                        -1            0  14 PA                       -1          5
+ 010007 HEIGHT                                                           M                          0        -1000  17 M                         0          6
+ 010008 GEOPOTENTIAL                                                     M**2/S**2                  0       -10000  20 M**2/S**2                 0          7
+ 010009 GEOPOTENTIAL HEIGHT                                              GPM                        0        -1000  17 GPM                       0          5
+ 010051 PRESSURE REDUCED TO MEAN SEA LEVEL                               PA                        -1            0  14 PA                       -1          5
+ 010052 ALTIMETER SETTING (QNH)                                          PA                        -1            0  14 PA                       -1          5
+ 010060 PRESSURE CHANGE                                                  PA                        -1        -1024  11 PA                       -1          4
+ 010063 CHARACTERISTIC OF PRESSURE TENDENCY                              CODE TABLE 10063           0            0   4 CODE TABLE 10063          0          2
+ 010087 Ocean depth/land elevation                                       M                          1      -131072  18 M                         1          6
+ 010197 ANEMOMETER HEIGHT                                                M                          0            0   9 M                         0          3
+ 011001 WIND DIRECTION                                                   DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 011002 WIND SPEED                                                       M/S                        1            0  12 M/S                       1          4
+ 011003 U-COMPONENT                                                      M/S                        1        -4096  13 M/S                       1          4
+ 011004 V-COMPONENT                                                      M/S                        1        -4096  13 M/S                       1          4
+ 011005 W-COMPONENT                                                      PA/S                       1         -512  10 PA/S                      1          4
+ 011006 W-COMPONENT                                                      M/S                        2        -4096  13 M/S                       2          4
+ 011016 EXTREME COUNTERCLOCKWISE WIND DIRECTION OF A VARIABLE WIND       DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 011017 EXTREME CLOCKWISE WIND DIRECTION OF A VARIABLE WIND              DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 011031 DEGREE OF TURBULENCE                                             CODE TABLE 11031           0            0   4 CODE TABLE 11031          0          2
+ 011036 MAXIMUM DERIVED EQUIVALENT VERTICAL GUST SPEED                   M/S                        1            0  10 M/S                       1          4
+ 011037 TURBULENCE INDEX                                                 CODE TABLE 11037           0            0   6 CODE TABLE 11037          0          2
+ 011039 EXTENDED TIME OF OCCURRENCE OF PEAK  EDDY DISSIPATION RATE       CODE TABLE 11039           0            0   6 CODE TABLE 11039          0          2
+ 011041 MAXIMUM WIND GUST SPEED                                          M/S                        1            0  12 M/S                       1          4
+ 011043 MAXIMUM WIND GUST DIRECTION                                      DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 011050 STANDARD DEVIATION OF HORIZONTAL WIND SPEED                      M/S                        1            0  12 M/S                       1          4
+ 011061 ABSOLUTE WIND SHEAR IN 1 KM LAYER BELOW                          M/S                        1            0  12 M/S                       1          4
+ 011062 ABSOLUTE WIND SHEAR IN 1 KM LAYER ABOVE                          M/S                        1            0  12 M/S                       1          4
+ 011075 MEAN TURBULENCE INTENSITY (EDDY DISSIPATION RATE)                M**(2/3)/S                 2            0   8 M**(2/3)/S                2          3
+ 011076 PEAK TURBULENCE INTENSITY (EDDY DISSIPATION RATE)                M**(2/3)/S                 2            0   8 M**(2/3)/S                2          3
+ 011077 REPORTING INTERVAL OR AVERAGING TIME FOR EDDY DISSIPATION RATE   S                          0            0  12 S                         0          4
+ 011192 W-component terrain following                                    M/S                        2        -4096  13 M/S                       2          4
+ 011193 Stability class                                                  NUMERIC                    0            0   4 NUMERIC                   0          2
+ 011194 Friction velocity (calmet)                                       M/S                        3            0  14 M/S                       3          4
+ 011195 Mixing height (calmet)                                           M                          0            0  12 M                         0          4
+ 011196 Obukov lenght (calmet)                                           M                          1      -100000  15 M                         1          5
+ 011197 Convective velocitiy scale (calmet)                              M/S                        3            0  14 M/S                       3          4
+ 011198 SQRT(2*TKE)                                                      M/S                        4            0  20 M/S                       4          6
+ 011199 Surface Roughness                                                M                          3            0  14 M                         1          4
+ 011200 U-component of momentum flux                                     N/M**2                     4      -524288  20 N/M**2                    4          6
+ 011201 V-component of momentum flux                                     N/M**2                     4      -524288  20 N/M**2                    4          6
+ 011202 Friction velocity (diagmet)                                      M/S                        3            0  14 M/S                       3          4
+ 011203 Mixing height (diagmet)                                          M                          0            0  12 M                         0          4
+ 011204 Obukov lenght (diagmet)                                          M                          1      -100000  15 M                         1          5
+ 011205 Convective velocitiy scale (diagmet)                             M/S                        3            0  14 M/S                       3          4
+ 011206 Friction velocity (COSMO)                                        M/S                        3            0  14 M/S                       3          4
+ 011207 Obukov lenght (COSMO)                                            M                          1      -100000  15 M                         1          5
+ 011208 Distance covered by the hourly mean wind                         M                          0            0  23 M                         0          7
+ 011209 Persistent wind gust speed                                       M/S                        1            0  12 M/S                       1          4
+ 011210 Maximum persistent wind gust direction                           DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 011211 Wind speed <1 m/s frequency                                      %                          0            0   7 %                         0          3
+ 011212 Wind speed >=1 <2 m/s frequency                                  %                          0            0   7 %                         0          3
+ 011213 Wind speed >=2 <4 m/s frequency                                  %                          0            0   7 %                         0          3
+ 011214 Wind speed >=4 <7 m/s frequency                                  %                          0            0   7 %                         0          3
+ 011215 Wind speed >=7 <10 m/s frequency                                 %                          0            0   7 %                         0          3
+ 011216 Wind speed >=10 m/s frequency                                    %                          0            0   7 %                         0          3
+ 012001 TEMPERATURE/AIR TEMPERATURE                                      K                          1            0  12 C                         1          3
+ 012003 DEW-POINT TEMPERATURE                                            K                          1            0  12 C                         1          3
+ 012030 SOIL TEMPERATURE                                                 K                          1            0  12 C                         1          3
+ 012049 Temperature change over specified period                         K                          0          -30   6 C                         0          2
+ 012063 BRIGHTNESS TEMPERATURE                                           K                          1            0  12 K                         1          4
+ 012101 TEMPERATURE/DRY-BULB TEMPERATURE                                 K                          2            0  16 K                         2          5
+ 012102 WET-BULB TEMPERATURE                                             K                          2            0  16 C                         2          4
+ 012103 DEW-POINT TEMPERATURE                                            K                          2            0  16 K                         2          5
+ 012107 VIRTUAL TEMPERATURE                                              K                          2            0  16 C                         2          4
+ 012121 GROUND MINIMUM TEMPERATURE                                       K                          2            0  16 C                         2          4
+ 012131 SNOW TEMPERATURE                                                 K                          2            0  16 C                         2          4
+ 012161 SKIN TEMPERATURE                                                 K                          2            0  16 C                         2          4
+ 012192 POTENTIAL TEMPERATURE                                            K                          2            0  16 K                         2          5
+ 012193 PSEUDO-EQUIVALENT POTENTIAL TEMPERATURE                          K                          2            0  16 K                         2          5
+ 012194 Air density                                                      KG/M**3                    6            0  20 KG/M**3                   6          6
+ 013001 SPECIFIC HUMIDITY                                                KG/KG                      5            0  14 KG/KG                     5          5
+ 013002 MIXING RATIO                                                     KG/KG                      5            0  14 KG/KG                     5          5
+ 013003 RELATIVE HUMIDITY                                                %                          0            0   7 %                         0          3
+ 013011 TOTAL PRECIPITATION / TOTAL WATER EQUIVALENT                     KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013012 DEPTH OF FRESH SNOW                                              M                          2           -2  12 M                         2          4
+ 013013 TOTAL SNOW DEPTH                                                 M                          3          -20  20 M                         3          6
+ 013031 EVAPOTRANSPIRATION                                               KG/M**2                    1            0   7 KG/M**2                   0          3
+ 013033 EVAPORATION/EVAPOTRANSPIRATION                                   KG/M**2                    1            0  10 KG/M**2                   1          4
+ 013080 WATER PH                                                         pH                         1            0  10 pH                        1          3
+ 013081 WATER CONDUCTIVITY                                               S/M                        3            0  14 S/M                       3          4
+ 013082 WATER TEMPERATURE                                                K                          1            0  12 K                         1          4
+ 013083 DISSOLVED OXYGEN                                                 KG/M**3                    6            0  15 KG/M**3                   6          5
+ 013084 TURBIDITY                                                        LM                         0            0  14 LM                        0          4
+ 013085 OXIDATION REDUCTION POTENTIAL (ORP)                              V                          3            0  14 V                         3          4
+ 013192 Specific cloud liquid water content                              KG/KG                      8            0  27 KG/KG                     8          8
+ 013193 Specific cloud ice content                                       KG/KG                      8            0  27 KG/KG                     8          8
+ 013194 Water table depth                                                M                          3            0  18 M                         3          6
+ 013195 Specific precipitating liquid water content                      KG/KG                      8            0  27 KG/KG                     8          8
+ 013196 Specific precipitating ice content                               KG/KG                      8            0  27 KG/KG                     8          8
+ 013197 Specific total precipitating content (water+ice)                 KG/KG                      8            0  27 KG/KG                     8          8
+ 013198 Specific total liquid water content (cloud+precipitating)        KG/KG                      8            0  27 KG/KG                     8          8
+ 013199 Specific Total ice content (cloud+precipitating)                 KG/KG                      8            0  27 KG/KG                     8          8
+ 013200 Grid-scale liquid precipitation                                  KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013201 Grid-scale snowfall                                              KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013202 Convective liquid precipitation                                  KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013203 Convective snowfall                                              KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013204 Total convective precipitation (liquid + snow)                   KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013205 Snowfall (grid-scale + convective)                               KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013206 Soil water content                                               KG/M**2                    1            0  14 KG/M**2                   1          5
+ 013207 Water skin velocity module                                       M/S                        2            0  13 M/S                       2          4
+ 013208 Total precipitation rate over 1'                                 Kg/m**2/s                  4            0  14 Kg/m**2/s                 4          5
+ 013209 Total precipitation rate over 5'                                 Kg/m**2/s                  4            0  14 Kg/m**2/s                 4          5
+ 013210 Penetration of the probe in the snow                             M                          2            0   9 M                         2          3
+ 013211 Volume of basin (basins <= 2km^3)                                M**3                       0            0  31 M**3                      0         10
+ 013212 Leaf wetness duration                                            S                         -1            0  24 S                        -1          7
+ 013215 River level                                                      M                          2      -100000  18 M                         2          6
+ 013226 River discharge                                                  M**3/S                     2            0  21 M**3/S                    2          7
+ 013227 Soil volumetric water content                                    %                          1            0  10 %                         1          4
+ 013228 Piezometric level                                                M                          3            0  18 M                         3          6
+ 013229 Density of snow                                                  KG/M**3                    1            0  14 KG/M**3                   1          5
+ 013230 Convective Available Potential Energy (CAPE)                     J/KG                       1            0  17 J/KG                      1          5
+ 013231 Ossigeno disciolto sat                                           %                          1            0  13 %                         1          4
+ 013232 Reference evapotranspiration according to Penman Monteith        KG/M**2                    1            0   7 KG/M**2                   0          3
+ 013233 Reference evapotranspiration according to Hargreav.-Samani       KG/M**2                    1            0   7 KG/M**2                   0          3
+ 013234 Lifted Index                                                     K                          2        -8000  14 K                         2          4
+ 013235 Specific graupel content                                         KG/KG                      8            0  27 KG/KG                     8          8
+ 013236 Graupel                                                          KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013237 Total solid precipitation                                        KG/M**2                    1           -1  14 KG/M**2                   1          5
+ 013238 Local horizontal water speed                                     M/S                        3            0  15 M/S                       3          5
+ 013239 Volume of basin (basins > 2km^3)                                 M**3                      -5            0  30 M**3                     -5          9
+ 013240 Specific precipitating graupel content                           KG/KG                      8            0  27 KG/KG                     8          8
+ 014002 Long-wave radiation, integrated over period specified            J/M**2                    -3       -65536  17 J/M**2                   -3          5
+ 014004 Short-wave radiation, integrated over period specified           J/M**2                    -3       -65536  17 J/M**2                   -3          5
+ 014016 NET RADIATION                                                    J/M**2                    -4       -16384  15 J/M**2                   -4          5
+ 014017 INSTANTANEOUS LONG-WAVE RADIATION (incoming)                     W/M**2                     0        -2048  12 W/M**2                    0          4
+ 014018 INSTANTANEOUS SHORT-WAVE RADIATION (incoming)                    W/M**2                     0        -2048  12 W/M**2                   -3          4
+ 014019 SURFACE ALBEDO                                                   %                          0            0   7 %                         0          3
+ 014021 GLOBAL SOLAR RADIATION, INTEGRATED OVER PERIOD SPECIFIED         J/M**2                    -4            0  15 J/M**2                   -4          5
+ 014028 Global solar radiation (high accuracy), integrated over period s J/M**2                    -2            0  20 J/M**2                   -2          6
+ 014029 Diffuse solar radiation (high accuracy), integrated over period  J/M**2                    -2            0  20 J/M**2                   -2          6
+ 014030 Direct solar radiation (high accuracy), integrated over period s J/M**2                    -2            0  20 J/M**2                   -2          6
+ 014031 TOTAL SUNSHINE                                                   MINUTE                     0            0  11 MINUTE                    0          4
+ 014192 Sensible heat flux                                               W/m**2                     0        -1024  11 W/M**2                    0          4
+ 014193 Latent heat flux                                                 W/m**2                     0        -1024  11 W/M**2                    0          4
+ 014194 Direct solar irradiance                                          W/M**2                     0        -2048  12 W/M**2                   -3          4
+ 014195 Diffuse solar irradiance                                         W/M**2                     0        -2048  12 W/M**2                   -3          4
+ 014196 Net long-wave irradiance                                         W/M**2                     0        -2048  12 W/M**2                    0          4
+ 014197 Net short-wave irradiance                                        W/M**2                     0        -2048  12 W/M**2                   -3          4
+ 014198 Global (visible) irradiance (downward)                           W/M**2                     0          -50  11 W/M**2                    0          4
+ 014199 Visible irradiance (upward)                                      W/M**2                     0          -50  11 W/M**2                    0          4
+ 014200 Infrared irradiance (downward)                                   W/M**2                     0            0  11 W/M**2                    0          4
+ 014201 Infrared irradiance (upward)                                     W/M**2                     0            0  11 W/M**2                    0          4
+ 014202 UV index                                                         NUMERIC                    2            0  11 NUMERIC                   2          4
+ 015192 NO Concentration                                                 KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015193 NO2 Concentration                                                KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015194 O3 Concentration                                                 KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015195 PM10 Concentration                                               KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015196 CO Concentration                                                 KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015197 SO2 Concentration                                                KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015198 PM2.5 Concentration                                              KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015199 NOY Concentration                                                KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015200 HCNM Concentration                                               KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015201 ALDE Concentration                                               KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015202 PM5 Concentration (tot. aerosol < 5 ug)                          KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015203 PM1 Concentration (tot. aerosol < 1.25 ug)                       KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015204 PM06 Concentration (tot. aerosol < 0.6 ug)                       KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015205 PM03 Concentration (tot. aerosol < 0.3 ug)                       KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015206 PM015 Concentration (tot. aerosol < 0.15 ug)                     KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015207 PM008 Concentration (tot. aerosol < 0.08 ug)                     KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015208 Concentration of primary particulate matter in PM10              KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015209 Concentration of sulfate in PM10                                 KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015210 Concentration of nitrate in PM10                                 KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015211 Concentration of ammonium in PM10                                KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015212 Concentration of black carbon in PM10                            KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015213 Concentration of organic carbon in PM10                          KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015214 Concentration of dust in PM10                                    KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015215 Concentration of anthrop. A1D in PM10                            KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015216 Concentration of anthrop. BmP in PM10                            KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015217 Concentration of biogenic A1D in PM10                            KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015218 Concentration of biogenic BmP in PM10                            KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015219 Concentration of water in PM10                                   KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015220 Concentration of sea salt in PM10                                KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015221 Concentration of secondary organic aerosol in PM10               KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015222 Total concentration of primary aerosol in PM10                   KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015223 Total concentration of secondary aerosol in PM10                 KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015224 Uncertainity in O3 estimate (Pesco)                              KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015225 Uncertainity in PM10 estimate (Pesco)                            KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015226 Uncertainity in NO2 estimate (Pesco)                             KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015227 Uncertainity in PM2.5 estimate (Pesco)                           KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015228 NH3 Concentration                                                KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015229 Concentration of primary part. matter in aerosol                 KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015230 Concentration of sulfate in aerosol                              KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015231 Concentration of nitrate in aerosol                              KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015232 Concentration of ammonium in aerosol                             KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015233 Concentration of anthrop. sec. org. in aerosol                   KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015234 Concentration of biogenic sec. org. in aerosol                   KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015235 Concentration of ISOPA1 in PM10                                  KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015236 C6H6 Concentration                                               KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015237 Concentration of anthropogenic aerosol in PM10                   KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015238 Concentration of biogenic aerosol in PM10                        KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015239 Concentration of anthropogenic aerosol in PM2.5                  KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015240 Concentration of biogenic aerosol in PM2.5                       KG/M**3                   10            0  20 KG/M**3                  10          6
+ 015241 Aerosol Optical Thickness                                        NUMERIC                    4            0  15 NUMERIC                   4          5
+ 015242 CO2 Concentration                                                KG/M**3                    6            0  16 KG/M**3                   6          5
+ 020001 HORIZONTAL VISIBILITY                                            M                         -1            0  13 M                        -1          4
+ 020003 PRESENT WEATHER (SEE NOTE 1)                                     CODE TABLE 20003           0            0   9 CODE TABLE 20003          0          3
+ 020004 PAST WEATHER (1) (SEE NOTE 2)                                    CODE TABLE 20004           0            0   5 CODE TABLE 20004          0          2
+ 020005 PAST WEATHER (2) (SEE NOTE 2)                                    CODE TABLE 20005           0            0   5 CODE TABLE 20005          0          2
+ 020009 GENERAL WEATHER INDICATOR (TAF/METAR)                            CODE TABLE 20009           0            0   4 CODE TABLE 20009          0          2
+ 020010 CLOUD COVER (TOTAL)                                              %                          0            0   7 %                         0          3
+ 020011 CLOUD AMOUNT                                                     CODE TABLE 20011           0            0   4 CODE TABLE 20011          0          2
+ 020012 CLOUD TYPE                                                       CODE TABLE 20012           0            0   6 CODE TABLE 20012          0          2
+ 020013 HEIGHT OF BASE OF CLOUD                                          M                          0         -400  17 M                         0          5
+ 020017 CLOUD TOP DESCRIPTION                                            CODE TABLE 20017           0            0   4 CODE TABLE 20017          0          2
+ 020019 SIGNIFICANT PRESENT OR FORECAST WEATHER                          CCITTIA5                   0            0  72 CHARACTER                 0          9
+ 020021 TYPE OF PRECIPITATION                                            FLAG TABLE 20021           0            0  30 FLAG TABLE 20021          0         10
+ 020031 ICE DEPOSIT (THICKNESS)                                          M                          2            0   7 M                         2          3
+ 020032 RATE OF ICE ACCRETION                                            CODE TABLE 20032           0            0   3 CODE TABLE 20032          0          1
+ 020033 CAUSE OF ICE ACCRETION                                           FLAG TABLE 20033           0            0   4 FLAG TABLE 20033          0          2
+ 020034 SEA ICE CONCENTRATION                                            CODE TABLE 20034           0            0   5 CODE TABLE 20034          0          2
+ 020035 AMOUNT AND TYPE OF ICE                                           CODE TABLE 20035           0            0   4 CODE TABLE 20035          0          2
+ 020036 ICE SITUATION                                                    CODE TABLE 20036           0            0   5 CODE TABLE 20036          0          2
+ 020037 ICE DEVELOPMENT                                                  CODE TABLE 20037           0            0   5 CODE TABLE 20037          0          2
+ 020038 BEARING OF ICE EDGE (SEE NOTE 3)                                 DEGREE TRUE                0            0  12 DEGREE TRUE               0          3
+ 020042 AIRFRAME ICING PRESENT                                           CODE TABLE 20042           0            0   2 CODE TABLE 20042          0          1
+ 020043 PEAK LIQUID WATER CONTENT                                        KG/M**3                    4            0   7 KG/M**3                   4          2
+ 020044 AVERAGE LIQUID WATER CONTENT                                     KG/M**3                    4            0   7 KG/M**3                   4          2
+ 020045 SUPERCOOLED LARGE DROPLET (SLD) CONDITIONS                       CODE TABLE 20045           0            0   2 CODE TABLE 20045          0          2
+ 020062 STATE OF THE GROUND (WITH OR WITHOUT SNOW)                       CODE TABLE 20062           0            0   5 CODE TABLE 20062          0          2
+ 020192 Presence of rain > 1mm                                           BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020193 Cloud type (METAR)                                               CCITTIA5                   0            0  16 CHARACTER                 0          2
+ 020194 Presence of shower                                               BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020195 Presence of hail                                                 BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020196 Presence of thunderstorm                                         BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020197 Presence of snow                                                 BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020198 Presence of frost                                                BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020199 Presence of dew                                                  BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020200 Presence of fog                                                  BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020201 Presence of water-spout                                          BOOLEAN                    0            0   1 BOOLEAN                   0          1
+ 020202 State of the ground with snow                                    CODE TABLE                 0            0   5 CODE TABLE                0          2
+ 020203 Weather impact                                                   CODE TABLE 20203           0            0   9 CODE TABLE 20203          0          3
+ 021192 Receiving power                                                  dBm                        4     -2000000  22 dBm                       4          7
+ 021193 Transmitting power                                               dBm                        4     -2000000  22 dBm                       4          7
+ 022001 DIRECTION OF WAVES                                               DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 022002 DIRECTION OF WIND WAVES                                          DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 022003 DIRECTION OF SWELL WAVES                                         DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 022004 DIRECTION OF CURRENT                                             DEGREE TRUE                0            0   9 DEGREE TRUE               0          3
+ 022011 PERIOD OF WAVES                                                  S                          0            0   6 S                         0          2
+ 022012 PERIOD OF WIND WAVES                                             S                          0            0   6 S                         0          2
+ 022013 PERIOD OF SWELL WAVES                                            S                          0            0   6 S                         0          2
+ 022021 HEIGHT OF WAVES                                                  M                          1            0  10 M                         1          4
+ 022022 HEIGHT OF WIND WAVES                                             M                          1            0  10 M                         1          4
+ 022023 HEIGHT OF SWELL WAVES                                            M                          1            0  10 M                         1          4
+ 022031 SPEED OF CURRENT                                                 M/S                        2            0  13 M/S                       2          4
+ 022032 SPEED OF SEA SURFACE CURRENT                                     M/S                        2            0  13 M/S                       2          4
+ 022037 Tidal elevation with respect to national land datum              M                          3       -10000  15 M                         3          5
+ 022038 Tidal elevation with respect to local chart datum                M                          3       -10000  15 M                         3          5
+ 022043 SEA/WATER TEMPERATURE                                            K                          2            0  15 K                         2          5
+ 022049 SEA-SURFACE TEMPERATURE                                          K                          2            0  15 K                         2          5
+ 022062 SALINITY                                                         PART PER THOUSAND          2            0  14 PART PER THOUSAND         2          5
+ 022063 TOTAL WATER DEPTH                                                M                          0            0  14 M                         0          5
+ 022066 WATER CONDUCTIVITY                                               S M-1                      6            0  26 S M-1                     6          8
+ 022070 SIGNIFICANT WAVE HEIGHT                                          M                          2            0  13 M                         2          4
+ 022071 SPECTRAL PEAK WAVE PERIOD                                        S                          1            0   9 S                         1          3
+ 022073 MAXIMUM WAVE HEIGHT                                              M                          2            0  13 M                         2          4
+ 022074 AVERAGE WAVE PERIOD                                              S                          1            0   9 S                         1          3
+ 022192 Current X component                                              M/S                        2            0  13 M/S                       2          4
+ 022193 Current Y component                                              M/S                        2            0  13 M/S                       2          4
+ 022194 Concentrazione clorofilla a                                      microg/l                   2            0  17 microg/l                  2          6
+ 022195 Depth below sea surface                                          M                          3            0  23 M                         3          7
+ 022196 Period of maximum wave                                           S                          0            0   6 S                         0          2
+ 023192 Dry deposition of H2SO4                                          MOL/M**2                   5            0  20 MOL/M**3                  5          6
+ 023193 Wet deposition of H2SO4                                          MOL/M**2                   5            0  20 MOL/M**3                  5          6
+ 023194 Dry deposition of NH4                                            MOL/M**2                   5            0  20 MOL/M**3                  5          6
+ 023195 Wet deposition of NH4                                            MOL/M**2                   5            0  20 MOL/M**3                  5          6
+ 023196 Dry deposition of HNO3                                           MOL/M**2                   5            0  20 MOL/M**3                  5          6
+ 023197 Wet deposition of HNO3                                           MOL/M**2                   5            0  20 MOL/M**3                  5          6
+ 023198 Solid transport by river                                         KG/S                       2            0  24 KG/S                      2          8
+ 025025 Battery voltage                                                  V                          1            0   9 V                         1          3
+ 025076 LOG-10 OF (TEMP-RAD CENTRAL WAVENUMBER) FOR ATOVS                LOGM-1                     8            0  30 LOGM-1                    8         10
+ 025192 Battery charge                                                   %                          0            0   7 %                         0          3
+ 025193 Battery current                                                  A                          3        -8191  14 A                         3          5
+ 025194 Photovoltaic panel voltage                                       V                          1            0   9 V                         1          3
+ 029192 Land fraction                                                    %                          1            0  10 %                         1          4
+ 031000 SHORT DELAYED DESCRIPTOR REPLICATION FACTOR                      NUMERIC                    0            0   1 NUMERIC                   0          1
+ 031001 DELAYED DESCRIPTOR REPLICATION FACTOR                            NUMERIC                    0            0   8 NUMERIC                   0          3
+ 031002 EXTENDED DELAYED DESCRIPTOR REPLICATION FACTOR                   NUMERIC                    0            0  16 NUMERIC                   0          5
+ 031011 DELAYED DESCRIPTOR AND DATA REPETITION FACTOR                    NUMERIC                    0            0   8 NUMERIC                   0          3
+ 031012 EXTENDED DELAYED DESCRIPTOR AND DATA REPETITION FACTOR           NUMERIC                    0            0  16 NUMERIC                   0          5
+ 031021 ASSOCIATED FIELD SIGNIFICANCE                                    CODE TABLE 31021           0            0   6 CODE TABLE 31021          0          2
+ 031031 DATA PRESENT INDICATOR                                           FLAG TABLE 31031           0            0   1 FLAG TABLE 31031          0          1
+ 033002 QUALITY INFORMATION                                              CODE TABLE 33002           0            0   2 CODE TABLE 33002          0          1
+ 033003 QUALITY INFORMATION                                              CODE TABLE 33003           0            0   3 CODE TABLE 33003          0          1
+ 033005 QUALITY INFORMATION (AWS DATA)                                   FLAG TABLE 33005           0            0  30 FLAG TABLE 33005          0         10
+ 033006 INTERNAL MEASUREMENT STATUS INFORMATION (AWS)                    CODE TABLE 33006           0            0   3 CODE TABLE 33006          0          1
+ 033007 PER CENT CONFIDENCE                                              %                          0            0   7 %                         0          3
+ 033015 DATA QUALITY CHECK INDICATOR                                     CODE TABLE 33015           0            0   6 CODE TABLE 33015          0          2
+ 033020 QUALITY CONTROL INDICATION OF FOLLOWING VALUE                    CODE TABLE 33020           0            0   3 CODE TABLE 33020          0          1
+ 033021 QUALITY OF FOLLOWING VALUE                                       CODE TABLE 33021           0            0   2 CODE TABLE 33021          0          1
+ 033022 QUALITY OF BUOY SATELLITE TRANSMISSION                           CODE TABLE 33022           0            0   2 CODE TABLE 33022          0          1
+ 033023 QUALITY OF BUOY LOCATION                                         CODE TABLE 33023           0            0   2 CODE TABLE 33023          0          1
+ 033024 STATION ELEVATION QUALITY MARK (FOR MOBILE STATIONS)             CODE TABLE 33024           0            0   4 CODE TABLE 33024          0          2
+ 033025 ACARS INTERPOLATED VALUES                                        CODE TABLE 33025           0            0   3 CODE TABLE 33025          0          1
+ 033026 MOISTURE QUALITY                                                 CODE TABLE 33026           0            0   6 CODE TABLE 33026          0          2
+ 033027 LOCATION QUALITY CLASS (RANGE OF RADIUS OF 66 % CONFIDENCE)      CODE TABLE 33027           0            0   3 CODE TABLE 33027          0          1
+ 033030 SCAN LINE STATUS FLAGS FOR ATOVS                                 FLAG TABLE 33030           0            0  24 FLAG TABLE 33030          0          8
+ 033031 SCAN LINE QUALITY FLAGS FOR ATOVS                                FLAG TABLE 33031           0            0  24 FLAG TABLE 33031          0          8
+ 033032 CHANNEL QUALITY FLAGS FOR ATOVS                                  FLAG TABLE 33032           0            0  24 FLAG TABLE 33032          0          8
+ 033033 FIELD OF VIEW QUALITY FLAGS FOR ATOVS                            FLAG TABLE 33033           0            0  24 FLAG TABLE 33033          0          8
+ 033035 MANUAL/AUTOMATIC QUALITY CONTROL                                 CODE TABLE 33035           0            0   4 CODE TABLE 33035          0          2
+ 033036 NOMINAL CONFIDENCE THRESHOLD                                     %                          0            0   7 %                         0          3
+ 033037 WIND CORRELATION ERROR                                           FLAG TABLE 33037           0            0  20 FLAG TABLE 33037          0          7
+ 033038 QUALITY FLAGS FOR GROUND-BASED GNSS DATA                         FLAG TABLE 33038           0            0  10 FLAG TABLE 33038          0          4
+ 033040 CONFIDENCE INTERVAL                                              %                          0            0   7 PERCENT                   0          3
+ 033041 ATTRIBUTE OF FOLLOWING VALUE                                     CODE TABLE 33041           0            0   2 CODE TABLE 33041          0          1
+ 033050 GLOBAL GTSPP QUALITY FLAG                                        CODE TABLE 33050           0            0   4 CODE TABLE 33050          0          2
+ 033192 Climatological and consistency check                             %                          0            0   7 PERCENT                   0          3
+ 033193 Time consistency                                                 %                          0            0   7 PERCENT                   0          3
+ 033194 Space consistency                                                %                          0            0   7 PERCENT                   0          3
+ 033195 MeteoDB variable ID                                              NUMERIC                    0            0  24 NUMERIC                   0          8
+ 033196 Data has been invalidated                                        CODE TABLE 33196           0            0   2 CODE TABLE 33196          0          1
+ 033197 Manual replacement in substitution                               CODE TABLE 33197           0            0   2 CODE TABLE 33197          0          1
+ 033198 Observation increment                                            NUMERIC                    4  -1073741823  31 NUMERIC                   4         10
+ 033199 In station quality check                                         %                          0            0   7 PERCENT                   0          3
+ 033201 Kalman coefficient, state vector (s.v.) x1                       NUMERIC                    4  -1073741823  31 NUMERIC                   4         10
+ 033202 Kalman coefficient, state vector (s.v.) x2                       NUMERIC                    4  -1073741823  31 NUMERIC                   4         10
+ 033203 Kalman coefficient, s.v. error covariance matrix(1,1)            NUMERIC                    4  -1073741823  31 NUMERIC                   4         10
+ 033204 Kalman coefficient, s.v. error covariance matrix(1,2)            NUMERIC                    4  -1073741823  31 NUMERIC                   4         10
+ 033205 Kalman coefficient, s.v. error covariance matrix(2,1)            NUMERIC                    4  -1073741823  31 NUMERIC                   4         10
+ 033206 Kalman coefficient, s.v. error covariance matrix(2,2)            NUMERIC                    4  -1073741823  31 NUMERIC                   4         10
+ 033207 Kalman observation sequential counter                            NUMERIC                    0         -127   8 NUMERIC                   0          3
+ 033208 Kalman osservation missing counter                               NUMERIC                    0         -127   8 NUMERIC                   0          3
+ 033209 Normalized Density Index                                         %                          0            0   7 PERCENT                   0          3
+ 033210 Data in the interval used to compute the value                   %                          0            0   7 PERCENT                   0          3
+ 048001 Graminacee_Graminacee indistinte                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048002 Betulacee_Ontano nero                                            POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048003 Betulacee_Betulla                                                POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048004 Betulacee_Betulacee indistinte                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048005 Composite_Ambrosia                                               POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048006 Composite_Artemisia                                              POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048007 Composite_Composite indistinte                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048008 Corilacee_Nocciolo                                               POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048009 Corilacee_Carpino bianco -Carpino nero                           POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048010 Corilacee_Corilacee indistinte                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048011 Fagacee_Castagno                                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048012 Fagacee_Faggio                                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048013 Fagacee_Quercia                                                  POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048014 Fagacee_Fagacee indistinte                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048015 Oleacee_Olivo                                                    POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048016 Oleacee_Frassino                                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048017 Oleacee_Oleacee indistinte                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048018 Plantaginacee_Plantaginacee indistinte                           POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048019 Urticacee_Urticacee indistinte                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048020 Cupressacee - Taxacee indistinte_Cipresso comune                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048021 Cupressacee - Taxacee indistinte_Cupressacee - Taxacee ind       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048022 Chenopodiacee - Amarantacee Indistinte_Amaranto                  POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048023 Chenopodiacee - Amarantacee Indistinte_Chenopodiacee - Ama       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048024 Poligonacee_Poligonacee indistinte                               POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048025 Euphorbiacee_Euforbiacee indistinte                              POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048026 Mirtacee_Mirtacee indistinte                                     POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048027 Ulmacee_Bagolaro comune                                          POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048028 Ulmacee_Olmo campestre                                           POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048029 Ulmacee_Ulmacee indistinte                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048030 Platanacee_Platanacee indistinte                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048031 Aceraceae_Aceracee indistinte                                    POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048032 Pinacee_Pinacee indistinte                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048033 Salicacee_Salice comune                                          POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048034 Salicacee_Pioppo                                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048035 Salicacee_Salicacee indistinte                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048036 Ciperacee_Ciperacee indistinte                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048037 Juglandacee_Juglandacee indistinte                               POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048038 Ippocastanacee_Ippocastanacee indistinte                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048039 Spore fungine_Alternaria                                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048040 Spore fungine_Botrytis                                           POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048041 Spore fungine_Stemphylium                                        POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048042 Spore fungine_Cladosporium                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048043 Spore fungine_Epicoccum                                          POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048044 Altri Pollini / Non Identificati_Altri pollini identificat       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048045 Altri Pollini / Non Identificati_Pollini non identificati        POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048046 Altre Spore / Non identificati_Altre spore fungine               POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048047 Altre Spore / Non identificati_Spore fungine non identific       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048048 Graminacee_Graminacee indistinte 1                               POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048049 Plantaginacee_Plantaginacee indistinte 1                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048050 Urticacee_Urticacee indistinte 1                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048051 Poligonacee_Poligonacee indistinte 1                             POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048052 Euphorbiacee_Euforbiacee indistinte 1                            POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048053 Mirtacee_Mirtacee indistinte 1                                   POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048054 Platanacee_Platanacee indistinte 1                               POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048055 Aceraceae_Aceracee indistinte 1                                  POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048056 Pinacee_Pinacee indistinte 1                                     POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048057 Ciperacee_Ciperacee indistinte 1                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048058 Juglandacee_Juglandacee indistinte 1                             POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048059 Ippocastanacee_Ippocastanacee indistinte 1                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048060 Oleacee_Ligustro                                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048061 Anacardiacee                                                     POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048062 Apocinacee                                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048063 Araliacee                                                        POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048064 Boraginacee                                                      POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048065 Brassicacee                                                      POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048066 Cannabacee                                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048067 Caprifoliacee                                                    POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048068 Cariofillacee                                                    POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048069 Cornacee                                                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048070 Elaegnacee                                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048071 Lauracee                                                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048072 Moracee                                                          POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048073 Ramnacee                                                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048074 Rosacee                                                          POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048075 Rubiacee                                                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048076 Simaroubacee                                                     POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048077 Umbellifere                                                      POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048078 Vitacee                                                          POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048079 Corilacee_Carpino                                                POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048080 Corilacee_Ostria                                                 POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048081 Moracee - Broussonetia                                           POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048082 Moracee - Morus                                                  POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048083 Leguminose                                                       POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048084 Arecacee                                                         POLLEN/M**3                1            0  24 POLLEN/M**3               1          8
+ 048128 Conta Graminacee_Graminacee indistinte                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048129 Conta Betulacee_Ontano nero                                      NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048130 Conta Betulacee_Betulla                                          NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048131 Conta Betulacee_Betulacee indistinte                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048132 Conta Composite_Ambrosia                                         NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048133 Conta Composite_Artemisia                                        NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048134 Conta Composite_Composite indistinte                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048135 Conta Corilacee_Nocciolo                                         NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048136 Conta Corilacee_Carpino bianco -Carpino nero                     NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048137 Conta Corilacee_Corilacee indistinte                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048138 Conta Fagacee_Castagno                                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048139 Conta Fagacee_Faggio                                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048140 Conta Fagacee_Quercia                                            NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048141 Conta Fagacee_Fagacee indistinte                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048142 Conta Oleacee_Olivo                                              NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048143 Conta Oleacee_Frassino                                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048144 Conta Oleacee_Oleacee indistinte                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048145 Conta Plantaginacee_Plantaginacee indistinte                     NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048146 Conta Urticacee_Urticacee indistinte                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048147 Conta Cupressacee - Taxacee indistinte_Cipresso comune           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048148 Conta Cupressacee - Taxacee indistinte_Cupressacee - Taxac       NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048149 Conta Chenopodiacee - Amarantacee Indistinte_Amaranto            NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048150 Conta Chenopodiacee - Amarantacee Indistinte_Chenopodiacee       NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048151 Conta Poligonacee_Poligonacee indistinte                         NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048152 Conta Euphorbiacee_Euforbiacee indistinte                        NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048153 Conta Mirtacee_Mirtacee indistinte                               NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048154 Conta Ulmacee_Bagolaro comune                                    NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048155 Conta Ulmacee_Olmo campestre                                     NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048156 Conta Ulmacee_Ulmacee indistinte                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048157 Conta Platanacee_Platanacee indistinte                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048158 Conta Aceraceae_Aceracee indistinte                              NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048159 Conta Pinacee_Pinacee indistinte                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048160 Conta Salicacee_Salice comune                                    NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048161 Conta Salicacee_Pioppo                                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048162 Conta Salicacee_Salicacee indistinte                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048163 Conta Ciperacee_Ciperacee indistinte                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048164 Conta Juglandacee_Juglandacee indistinte                         NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048165 Conta Ippocastanacee_Ippocastanacee indistinte                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048166 Conta Spore fungine_Alternaria                                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048167 Conta Spore fungine_Botrytis                                     NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048168 Conta Spore fungine_Stemphylium                                  NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048169 Conta Spore fungine_Cladosporium                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048170 Conta Spore fungine_Epicoccum                                    NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048171 Conta Altri Pollini / Non Identificati_Altri pollini ident       NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048172 Conta Altri Pollini / Non Identificati_Pollini non identif       NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048173 Conta Altre Spore / Non identificati_Altre spore fungine         NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048174 Conta Altre Spore / Non identificati_Spore fungine non ide       NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048175 Conta Graminacee_Graminacee indistinte 1                         NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048176 Conta Plantaginacee_Plantaginacee indistinte 1                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048177 Conta Urticacee_Urticacee indistinte 1                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048178 Conta Poligonacee_Poligonacee indistinte 1                       NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048179 Conta Euphorbiacee_Euforbiacee indistinte 1                      NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048180 Conta Mirtacee_Mirtacee indistinte 1                             NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048181 Conta Platanacee_Platanacee indistinte 1                         NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048182 Conta Aceraceae_Aceracee indistinte 1                            NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048183 Conta Pinacee_Pinacee indistinte 1                               NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048184 Conta Ciperacee_Ciperacee indistinte 1                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048185 Conta Juglandacee_Juglandacee indistinte 1                       NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048186 Conta Ippocastanacee_Ippocastanacee indistinte 1                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048187 Conta Oleacee_Ligustro                                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048188 Conta Anacardiacee                                               NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048189 Conta Apocinacee                                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048190 Conta Araliacee                                                  NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048191 Conta Boraginacee                                                NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048192 Conta Brassicacee                                                NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048193 Conta Cannabacee                                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048194 Conta Caprifoliacee                                              NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048195 Conta Cariofillacee                                              NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048196 Conta Cornacee                                                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048197 Conta Elaegnacee                                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048198 Conta Lauracee                                                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048199 Conta Moracee                                                    NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048200 Conta Ramnacee                                                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048201 Conta Rosacee                                                    NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048202 Conta Rubiacee                                                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048203 Conta Simaroubacee                                               NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048204 Conta Umbellifere                                                NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048205 Conta Vitacee                                                    NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048206 Conta Corilacee_Carpino                                          NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048207 Conta Corilacee_Ostria                                           NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048208 Conta Moracee - Broussonetia                                     NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048209 Conta Moracee - Morus                                            NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048210 Conta Leguminose                                                 NUMERIC                    0            0  20 NUMERIC                   0          7
+ 048211 Conta Arecacee                                                   NUMERIC                    0            0  20 NUMERIC                   0          7
+ 049192 Number of particles with diameter <= 0.3 um                      NUMERIC                   -3            0  16 NUMERIC                  -3          5
+ 049193 Number of particles with diameter > 0.3 <= 0.5 um                NUMERIC                   -3            0  16 NUMERIC                  -3          5
+ 049194 Number of particles with diameter > 0.5 <= 1.0 um                NUMERIC                   -2            0  16 NUMERIC                  -2          5
+ 049195 Number of particles with diameter > 1.0 <= 2.5 um                NUMERIC                   -1            0  16 NUMERIC                  -1          5
+ 049196 Number of particles with diameter > 2.5 <= 5.0 um                NUMERIC                    0            0  16 NUMERIC                   0          5
+ 049197 Number of particles with diameter > 5.0 <= 10.0 um               NUMERIC                    1            0  16 NUMERIC                   1          5
+ 049198 Density of particles with diameter > 0.35 <= 0.46 um             NUMERIC/M**3              -5            0  16 NUMERIC/M**3             -5          5
+ 049199 Density of particles with diameter > 0.46 <= 0.66 um             NUMERIC/M**3              -5            0  16 NUMERIC/M**3             -5          5
+ 049200 Density of particles with diameter > 0.66 <= 1.0 um              NUMERIC/M**3              -4            0  16 NUMERIC/M**3             -4          5
+ 049201 Density of particles with diameter > 1.0 <= 1.3 um               NUMERIC/M**3              -4            0  16 NUMERIC/M**3             -4          5
+ 049202 Density of particles with diameter > 1.3 <= 1.7 um               NUMERIC/M**3              -3            0  16 NUMERIC/M**3             -3          5
+ 049203 Density of particles with diameter > 1.7 <= 2.3 um               NUMERIC/M**3              -3            0  16 NUMERIC/M**3             -3          5
+ 049204 Density of particles with diameter > 2.3 <= 3.0 um               NUMERIC/M**3              -3            0  16 NUMERIC/M**3             -3          5
+ 049205 Density of particles with diameter > 3.0 <= 4.0 um               NUMERIC/M**3              -2            0  16 NUMERIC/M**3             -2          5
+ 049206 Density of particles with diameter > 4.0 <= 5.2 um               NUMERIC/M**3              -2            0  16 NUMERIC/M**3             -2          5
+ 049207 Density of particles with diameter > 5.2 <= 6.5 um               NUMERIC/M**3              -2            0  16 NUMERIC/M**3             -2          5
+ 049208 Density of particles with diameter > 6.5 <= 8.0 um               NUMERIC/M**3              -2            0  16 NUMERIC/M**3             -2          5
+ 049209 Density of particles with diameter > 8.0 <= 10.0 um              NUMERIC/M**3              -2            0  16 NUMERIC/M**3             -2          5
+ 049210 Density of particles with diameter > 10 <= 12 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049211 Density of particles with diameter > 12 <= 14 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049212 Density of particles with diameter > 14 <= 16 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049213 Density of particles with diameter > 16 <= 18 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049214 Density of particles with diameter > 18 <= 20 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049215 Density of particles with diameter > 20 <= 22 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049216 Density of particles with diameter > 22 <= 25 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049217 Density of particles with diameter > 25 <= 28 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049218 Density of particles with diameter > 28 <= 31 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049219 Density of particles with diameter > 31 <= 34 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049220 Density of particles with diameter > 34 <= 37 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
+ 049221 Density of particles with diameter > 37 <= 40 um                 NUMERIC/M**3              -1            0  16 NUMERIC/M**3             -1          5
