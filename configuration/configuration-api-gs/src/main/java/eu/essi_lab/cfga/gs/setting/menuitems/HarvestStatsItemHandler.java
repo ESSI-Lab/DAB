@@ -48,12 +48,12 @@ import eu.essi_lab.messages.JobStatus.JobPhase;
 /**
  * @author Fabrizio
  */
-public class HarvestingStatsItemHandler extends GridMenuItemHandler {
+public class HarvestStatsItemHandler extends GridMenuItemHandler {
 
     /**
      * 
      */
-    public HarvestingStatsItemHandler() {
+    public HarvestStatsItemHandler() {
 
     }
 
@@ -61,7 +61,7 @@ public class HarvestingStatsItemHandler extends GridMenuItemHandler {
      * @param withTopDivider
      * @param withBottomDivider
      */
-    public HarvestingStatsItemHandler(boolean withTopDivider, boolean withBottomDivider) {
+    public HarvestStatsItemHandler(boolean withTopDivider, boolean withBottomDivider) {
 
 	super(withTopDivider, withBottomDivider);
     }
@@ -221,6 +221,6 @@ public class HarvestingStatsItemHandler extends GridMenuItemHandler {
     @Override
     public String getItemText() {
 
-	return "Harvesting statistics";
+	return "Harvest statistics";
     }
 }

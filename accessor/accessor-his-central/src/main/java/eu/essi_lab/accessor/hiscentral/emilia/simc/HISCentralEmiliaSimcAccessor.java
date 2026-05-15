@@ -1,4 +1,4 @@
-package eu.essi_lab.cdk;
+package eu.essi_lab.accessor.hiscentral.emilia.simc;
 
 /*-
  * #%L
@@ -21,40 +21,27 @@ package eu.essi_lab.cdk;
  * #L%
  */
 
-import eu.essi_lab.cfga.*;
-import eu.essi_lab.cfga.gs.setting.connector.*;
-import eu.essi_lab.model.*;
-import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.adk.harvest.HarvestedAccessor;
 
 /**
- * Generic Connector Interface.
- *
- * @author roncella
+ * HIS-Central accessor for ARPAE-SIMC meteorological open data ({@link ArpaeSimcMeteoOpenDataClient}).
  */
-public interface IDriverConnector<T extends ConnectorSetting> extends Configurable<T>, Pluggable {
+public class HISCentralEmiliaSimcAccessor extends HarvestedAccessor<HISCentralEmiliaSimcConnector> {
 
-    /**
-     * @param source
-     * @return
-     */
-    boolean supports(GSSource source);
+    public static final String TYPE = "SIR_EMILIA_SIMC";
 
-    /**
-     * @param url
-     */
-    void setSourceURL(String url);
-
-    /**
-     * @return
-     */
-    String getSourceURL();
-
-    /**
-     * @return
-     */
-    default boolean supportsPreview() {
-
-	return true;
+    @Override
+    protected String initSettingName() {
+	return "HIS-Central Emilia-SIMC Accessor";
     }
 
+    @Override
+    protected String initAccessorType() {
+	return TYPE;
+    }
+
+    @Override
+    protected HISCentralEmiliaSimcConnectorSetting initHarvestedConnectorSetting() {
+	return new HISCentralEmiliaSimcConnectorSetting();
+    }
 }

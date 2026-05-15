@@ -9,6 +9,7 @@ eu.essi_lab.accessor.hiscentral.lombardia.HISCentralLombardiaAccessor
 eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaAccessor
 eu.essi_lab.accessor.hiscentral.bolzano.HISCentralBolzanoAccessor
 eu.essi_lab.accessor.hiscentral.emilia.HISCentralEmiliaAccessor
+eu.essi_lab.accessor.hiscentral.emilia.simc.HISCentralEmiliaSimcAccessor
 eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaAccessor
 eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataAccessor
 eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaAccessor

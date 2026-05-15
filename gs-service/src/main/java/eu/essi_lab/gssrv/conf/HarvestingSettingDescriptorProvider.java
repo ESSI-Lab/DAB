@@ -1,5 +1,26 @@
 package eu.essi_lab.gssrv.conf;
 
+/*-
+ * #%L
+ * Discovery and Access Broker (DAB)
+ * %%
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * %%
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * #L%
+ */
+
 import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.data.provider.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
@@ -114,8 +135,8 @@ public class HarvestingSettingDescriptorProvider {
 
 	ArrayList<GridMenuItemHandler> list = new ArrayList<>();
 
-	list.add(new SettingEditItemHandler());
-	list.add(new HarvestingInfoItemHandler());
+	list.add(new SettingEditItemHandler(false, true));
+
 
 	if (ExecutionMode.get() == ExecutionMode.MIXED || //
 		ExecutionMode.get() == ExecutionMode.LOCAL_PRODUCTION) {
@@ -125,9 +146,11 @@ public class HarvestingSettingDescriptorProvider {
 
 	list.add(new HarvestPreviewStarter());
 
-	list.add(new SettingsRemoveItemHandler(true, true));
+	list.add(new HarvestingInfoItemHandler(true, false));
 
-	list.add(new HarvestingStatsItemHandler());
+	list.add(new HarvestStatsItemHandler(false, false));
+
+	list.add(new SettingsRemoveItemHandler(true, false));
 
 	return list;
     }

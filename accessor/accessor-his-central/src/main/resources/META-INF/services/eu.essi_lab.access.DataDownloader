@@ -1,5 +1,6 @@
 eu.essi_lab.downloader.hiscentral.HISCentralBolzanoDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralEmiliaDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralEmiliaSimcDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralFriuliDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralLazioDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralLiguriaDownloader

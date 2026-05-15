@@ -21,14 +21,23 @@ package eu.essi_lab.accessor.dataloggers;
  * #L%
  */
 
+import java.util.Arrays;
+
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
+import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.option.StringOptionBuilder;
 
 /**
  * @author Generated
  */
 public class DataloggersConnectorSetting extends HarvestedConnectorSetting {
+
+    public static final String TEMPORAL_EXTENT_SOURCE_KEY = "temporalExtentSource";
+
+    public static final String TEMPORAL_EXTENT_AVAILABLE = "available";
+    public static final String TEMPORAL_EXTENT_REAL_DATA = "real_data";
 
     private static final int DEFAULT_PAGE_SIZE = 50;
 
@@ -38,6 +47,17 @@ public class DataloggersConnectorSetting extends HarvestedConnectorSetting {
     public DataloggersConnectorSetting() {
 
 	setPageSize(DEFAULT_PAGE_SIZE);
+
+	Option<String> temporalExtentOption = StringOptionBuilder.get().//
+		withKey(TEMPORAL_EXTENT_SOURCE_KEY).//
+		withLabel("Temporal extent source").//
+		withSingleSelection().//
+		withValues(Arrays.asList(TEMPORAL_EXTENT_AVAILABLE, TEMPORAL_EXTENT_REAL_DATA)).//
+		withSelectedValue(TEMPORAL_EXTENT_AVAILABLE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(temporalExtentOption);
     }
 
     /**
@@ -66,6 +86,19 @@ public class DataloggersConnectorSetting extends HarvestedConnectorSetting {
     protected String initSettingName() {
 
 	return "Dataloggers Connector settings";
+    }
+
+    /**
+     * @return {@value #TEMPORAL_EXTENT_AVAILABLE} or {@value #TEMPORAL_EXTENT_REAL_DATA}
+     */
+    public String getTemporalExtentSource() {
+
+	return getOption(TEMPORAL_EXTENT_SOURCE_KEY, String.class).map(Option::getValue).orElse(TEMPORAL_EXTENT_AVAILABLE);
+    }
+
+    public boolean useRealDataTemporalExtent() {
+
+	return TEMPORAL_EXTENT_REAL_DATA.equals(getTemporalExtentSource());
     }
 }
 

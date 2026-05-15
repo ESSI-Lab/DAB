@@ -262,6 +262,18 @@ public class DataloggersClient {
 			    ISO8601DateTimeUtils.getISO8601DateTime(
 				    ISO8601DateTimeUtils.parseISO8601(json.getString("datastream_available_until")))));
 	}
+	if (json.has("datastream_real_data_start") && !json.isNull("datastream_real_data_start")) {
+	    datastream.setDatastreamRealDataStart(
+		    OffsetDateTime.parse(
+			    ISO8601DateTimeUtils.getISO8601DateTime(
+				    ISO8601DateTimeUtils.parseISO8601(json.getString("datastream_real_data_start")))));
+	}
+	if (json.has("datastream_real_data_end") && !json.isNull("datastream_real_data_end")) {
+	    datastream.setDatastreamRealDataEnd(
+		    OffsetDateTime.parse(
+			    ISO8601DateTimeUtils.getISO8601DateTime(
+				    ISO8601DateTimeUtils.parseISO8601(json.getString("datastream_real_data_end")))));
+	}
 
 	return datastream;
     }
