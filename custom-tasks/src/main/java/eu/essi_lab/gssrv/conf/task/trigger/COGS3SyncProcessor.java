@@ -179,7 +179,7 @@ public class COGS3SyncProcessor {
     }
 
     private void runGdalCog(Path in, Path out) throws Exception {
-	ProcessBuilder pb = new ProcessBuilder("gdal_translate", "-of", "COG", "-co", "COMPRESS=DEFLATE",
+	ProcessBuilder pb = new ProcessBuilder("gdal_translate", "-of", "COG", "-co", "COMPRESS=DEFLATE", "-co", "BLOCKSIZE=512",
 		in.toAbsolutePath().toString(), out.toAbsolutePath().toString());
 	if (pb.start().waitFor() != 0) throw new RuntimeException("GDAL failed");
     }
