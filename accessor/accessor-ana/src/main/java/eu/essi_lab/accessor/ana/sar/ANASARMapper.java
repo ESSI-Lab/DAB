@@ -148,8 +148,11 @@ public class ANASARMapper extends OriginalIdentifierMapper {
 	String resolutionString = "";
 	if (resolution != null) {
 	    ExtensionHandler extensionHandler = dataset.getExtensionHandler();
-	    extensionHandler.setTimeResolution("" + resolution);
-	    extensionHandler.setTimeUnits("ms");
+	    java.math.BigDecimal ms = new java.math.BigDecimal(resolution);
+	    javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(ms, "ms");
+	    if (duration != null) {
+		extensionHandler.setTimeResolutionDuration8601(duration.toString());
+	    }
 	    setIndeterminatePosition(dataset, resolution * 10);
 	    resolutionString = ":resolution:" + resolution;
 	}
@@ -231,14 +234,12 @@ public class ANASARMapper extends OriginalIdentifierMapper {
 	case "defluencia":
 	    variableTitle = "Outflow discharge (from the reservoir)";
 	    interpolation = InterpolationType.AVERAGE;
-	    dataset.getExtensionHandler().setTimeSupport("1");
-	    dataset.getExtensionHandler().setTimeUnits("day");
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 	    break;
 	case "afluencia":
 	    variableTitle = "Inflow discharge (to the reservoir)";
 	    interpolation = InterpolationType.AVERAGE;
-	    dataset.getExtensionHandler().setTimeSupport("1");
-	    dataset.getExtensionHandler().setTimeUnits("day");
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 	    
 	    break;
 	case "volume":

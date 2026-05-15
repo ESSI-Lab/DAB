@@ -230,17 +230,13 @@ public class DWSConnector extends HarvestedQueryConnector<DWSConnectorSetting> {
 
 			    break;
 			case TOTAL:
-			    dataset.getExtensionHandler().setTimeUnits("months");
-			    dataset.getExtensionHandler().setTimeUnitsAbbreviation("M");
-			    dataset.getExtensionHandler().setTimeSupport("1");
-			    dataset.getExtensionHandler().setTimeResolution("1");
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601("P1M");
+			    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1M");
 			    description = "monthly " + interpolation.getLabel();
 			    break;
 			case AVERAGE:
-			    dataset.getExtensionHandler().setTimeUnits("days");
-			    dataset.getExtensionHandler().setTimeUnitsAbbreviation("d");
-			    dataset.getExtensionHandler().setTimeSupport("1");
-			    dataset.getExtensionHandler().setTimeResolution("1");
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
+			    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 			    description = "daily " + interpolation.getLabel();
 			    break;
 			default:

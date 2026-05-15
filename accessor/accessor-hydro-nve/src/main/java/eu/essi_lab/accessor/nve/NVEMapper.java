@@ -262,9 +262,15 @@ public class NVEMapper extends OriginalIdentifierMapper {
 		}
 
 		if (restime != null && !restime.equals("")) {
-		    dataset.getExtensionHandler().setTimeSupport(restime);
-		    dataset.getExtensionHandler().setTimeUnits("minutes");
-		    dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
+		    try {
+			java.math.BigDecimal value = new java.math.BigDecimal(restime);
+			javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(value, "minutes");
+			if (duration != null) {
+			    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
+			}
+		    } catch (Exception e) {
+		    }
 		}
 
 		dataset.getExtensionHandler().setAttributeUnits(series.getUnit());

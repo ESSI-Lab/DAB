@@ -509,6 +509,11 @@ public class DatahubMapper extends FileIdentifierMapper {
         Contact contact = new Contact();
         Address addr = new Address();
 
+        Object phoneRaw = json.opt("phone");
+        if (phoneRaw != null && !JSONObject.NULL.equals(phoneRaw)) {
+            contact.addPhoneVoice(phoneRaw.toString());
+        }
+
         if (address != null) {
             String email = address.optString("email", null);
             if (email != null) {
@@ -548,7 +553,9 @@ public class DatahubMapper extends FileIdentifierMapper {
             contact.setOnlineResource(onlineResource);
         }
 
-        if (addr.getElectronicMailAddresses().hasNext() || link != null) {
+        boolean hasAddress = addr.getElectronicMailAddresses().hasNext();
+        boolean hasPhone = phoneRaw != null && !JSONObject.NULL.equals(phoneRaw);
+        if (hasAddress || link != null || hasPhone) {
             contact.setAddress(addr);
             party.setContactInfo(contact);
         }

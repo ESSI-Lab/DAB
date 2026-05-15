@@ -250,10 +250,17 @@ public class DataloggersClient {
 	    datastream.setDataloggerLocation(json.getString("datalogger_location"));
 	}
 	if (json.has("datastream_available_since") && !json.isNull("datastream_available_since")) {
-	    datastream.setDatastreamAvailableSince(OffsetDateTime.parse(json.getString("datastream_available_since")));
+	    datastream.setDatastreamAvailableSince(
+		    OffsetDateTime.parse(
+		    ISO8601DateTimeUtils.getISO8601DateTime(
+		    ISO8601DateTimeUtils.parseISO8601(json.getString("datastream_available_since")))));
 	}
 	if (json.has("datastream_available_until") && !json.isNull("datastream_available_until")) {
-	    datastream.setDatastreamAvailableUntil(OffsetDateTime.parse(json.getString("datastream_available_until")));
+
+	    datastream.setDatastreamAvailableUntil(
+		    OffsetDateTime.parse(
+			    ISO8601DateTimeUtils.getISO8601DateTime(
+				    ISO8601DateTimeUtils.parseISO8601(json.getString("datastream_available_until")))));
 	}
 
 	return datastream;

@@ -1,7 +1,7 @@
 /**
  *
  */
-package eu.essi_lab.gssrv.conf.import_export;
+package eu.essi_lab.gssrv.conf.tools;
 
 /*-
  * #%L
@@ -43,7 +43,7 @@ import java.util.*;
 /**
  * @author Fabrizio
  */
-public class ConfigExporter extends VerticalLayout {
+class ConfigExporter extends VerticalLayout {
 
     private ConfigurationSourceSetting setting;
 

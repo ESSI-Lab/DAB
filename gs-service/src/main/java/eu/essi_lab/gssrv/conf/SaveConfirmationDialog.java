@@ -28,7 +28,6 @@ import com.vaadin.flow.component.orderedlayout.*;
 import eu.essi_lab.cfga.gui.components.*;
 import eu.essi_lab.cfga.gui.components.listener.*;
 import eu.essi_lab.cfga.gui.dialog.*;
-import eu.essi_lab.gssrv.starter.*;
 import eu.essi_lab.lib.utils.*;
 
 /**
@@ -37,7 +36,7 @@ import eu.essi_lab.lib.utils.*;
 @SuppressWarnings("serial")
 class SaveConfirmationDialog extends ConfirmationDialog {
 
-    private GSConfigurationView view;
+    private final GSConfigurationView view;
 
     /**
      *

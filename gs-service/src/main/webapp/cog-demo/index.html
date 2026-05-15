@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud Optimezed GeoTIFF (COG) Demo</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.9.0/ol.css">
+    <link rel="stylesheet" href="main.css">
+    <script type="importmap">
+        {
+          "imports": {
+            "ol": "https://esm.sh/ol@10.9.0",
+            "ol/": "https://esm.sh/ol@10.9.0/"
+          }
+        }
+    </script>
+</head>
+<body>
+
+<div id="controls">
+
+    <div class="time-nav">
+        <button id="prevStep">◀</button>
+        <input type="range" id="forecastSlider">
+        <button id="nextStep">▶</button>
+    </div>
+
+    <div id="timeMain" class="time-main"></div>
+
+    <div id="timeLayers" class="time-layers"></div>
+
+</div>
+
+
+
+<!-- MAP -->
+<div id="map" class="map"></div>
+
+
+
+<div id="layerControls" class="layer-controls">
+    <label>
+        <input type="checkbox" id="chkShiwe" checked>
+        SHIWE
+    </label>
+
+    <label>
+        <input type="checkbox" id="chkTemp">
+        Temperature
+    </label>
+
+    <label>
+        <input type="checkbox" id="chkUtci">
+        UTCI
+    </label>
+
+    <label>
+        <input type="checkbox" id="chkHumidity">
+        Humidity
+    </label>
+</div>
+
+
+<div id="legend" class="legend"></div>
+
+
+
+
+<!-- script-->
+<script type="module" src="main.js"></script>
+
+</body>
+</html>

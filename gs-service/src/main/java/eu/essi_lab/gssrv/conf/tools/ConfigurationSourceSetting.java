@@ -1,7 +1,7 @@
 /**
  *
  */
-package eu.essi_lab.gssrv.conf.import_export;
+package eu.essi_lab.gssrv.conf.tools;
 
 /*-
  * #%L
@@ -24,27 +24,25 @@ package eu.essi_lab.gssrv.conf.import_export;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Optional;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.Database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.Database.DatabaseImpl;
-import eu.essi_lab.api.database.factory.DatabaseFactory;
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.S3StorageSetting;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import java.util.*;
 
 /**
  * @author Fabrizio
  */
-public class ConfigurationSourceSetting extends Setting implements EditableSetting {
+class ConfigurationSourceSetting extends Setting implements EditableSetting {
 
     private static final String OS_SETTING_ID = "osSetting";
     private static final String OS_URI_OPTION_KEY = "osUri";
@@ -168,8 +166,9 @@ public class ConfigurationSourceSetting extends Setting implements EditableSetti
 		    withKey(OS_TYPE_OPTION_KEY).//
 		    withSingleSelection().//
 		    withValues(Arrays.asList("OpenSearch", "OpenSearch managed (AWS)")).//
-		    withSelectedValue(impl == DatabaseImpl.OPENSEARCH ? dbSetting.getDatabaseType()
-		    .map(v -> v.equals("osl") ? "OpenSearch" : "OpenSearch managed (AWS)").get() : "OpenSearch").//
+		    withSelectedValue(impl == DatabaseImpl.OPENSEARCH ? dbSetting.getDatabaseType().map(v -> v.equals("osl")
+		                                                                                             ? "OpenSearch"
+		    : "OpenSearch managed (AWS)").get() : "OpenSearch").//
 		    cannotBeDisabled().//
 		    required().//
 		    build();

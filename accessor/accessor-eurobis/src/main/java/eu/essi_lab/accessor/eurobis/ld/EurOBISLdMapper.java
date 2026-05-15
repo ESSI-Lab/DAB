@@ -26,9 +26,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -61,6 +64,9 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
  * @author boldrini
  */
 public class EurOBISLdMapper extends FileIdentifierMapper {
+
+    /** Marineinfo project IRI prefix; {@code ProID} from dataset JSON appends the numeric id. */
+    public static final String MARINEINFO_PROJECT_URI_PREFIX = "https://marineinfo.org/id/project/";
 
     public static Double TOL = Math.pow(10, -8);
 
@@ -140,6 +146,8 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    List<List<String>> instrumentLabelsAndURIs = turtle.getElementsList(RDFElement.INSTRUMENTLABELSANDURIS);
 	    List<List<String>> urlsAndTypes = turtle.getElementsList(RDFElement.URLS_AND_TYPES);
 	    List<String> creatorsURIs = turtle.getElements(RDFElement.CREATORS);
+	    List<String> contributorsURIs = turtle.getElements(RDFElement.CONTRIBUTORS);
+	    List<List<String>> qualifiedAttributions = turtle.getElementsList(RDFElement.QUALIFIEDATTRIBUTIONS);
 	    List<String> parents = turtle.getElements(RDFElement.ISPARTOF);
 	    List<String> children = turtle.getElements(RDFElement.HASPART);
 
@@ -286,7 +294,7 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    }
 
 	    for (List<String> k : keywordsLabelsAndURIsAndThesaurusAndTypes) {
-		if (k.size()<4) {
+		if (k.size() < 4) {
 		    continue;
 		}
 		String label = k.get(0);
@@ -295,12 +303,9 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 		if (thesaurus == null) {
 		    thesaurus = "";
 		}
-		String type = k.get(3);
-		if (type == null) {
-		    type = "";
-		}else{
-		    type = type.replace("https://standards.iso.org/iso/19115/resources/Codelists/gml/MD_KeywordTypeCode.xml#","");
-		}
+		String rawAdditionalType = k.get(3);
+		String rawAlternativeType = k.size() >= 5 ? k.get(4) : "";
+		String type = resolveDefinedTermKeywordType(rawAdditionalType, rawAlternativeType);
 		Keywords keywords = keywordMap.get(type);
 		if (keywords == null) {
 		    keywords = new Keywords();
@@ -313,6 +318,10 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 		} else {
 		    keywords.addKeyword(label);
 		}
+	    }
+
+	    if (dasid != null && !dasid.isEmpty()) {
+		addDatasetJsonProjectKeywords(keywordMap, dasid);
 	    }
 
 	    for (Keywords keywords : keywordMap.values()) {
@@ -520,42 +529,21 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    //
 
 	    for (String creatorsURI : creatorsURIs) {
-
-		if (creatorsURI.contains("id/person")) {
+		addOrganizationParty(coreMetadata, creatorsURI, "author");
+	    }
+	    for (String contributorUri : contributorsURIs) {
+		addOrganizationParty(coreMetadata, contributorUri, "collaborator");
+	    }
+	    for (List<String> agentAndRole : qualifiedAttributions) {
+		if (agentAndRole.size() < 2) {
 		    continue;
 		}
-		ResponsibleParty creatorContact = new ResponsibleParty();
-		MarineOrganization organization = new MarineOrganization(creatorsURI + ".ttl");
-		String orgName = organization.getElement(RDFElement.ORGNAME);
-		String mail = organization.getElement(RDFElement.ORGEMAILS);
-		String telephone = organization.getElement(RDFElement.ORGTELEPHONES);
-		String url = organization.getElement(RDFElement.ORGWEBPAGES);
-		String addr = organization.getElement(RDFElement.ORGADDRESS);
-
-		Contact contactInfo = new Contact();
-		Address address = new Address();
-		if (mail != null && !mail.isEmpty()) {
-		    address.addElectronicMailAddress(mail);
+		String agentUri = agentAndRole.get(0);
+		String roleUri = agentAndRole.get(1);
+		if (agentUri == null || agentUri.isBlank()) {
+		    continue;
 		}
-		if (addr != null && !addr.isBlank()) {
-		    address.addDeliveryPoint(addr);
-		}
-		contactInfo.setAddress(address);
-		if (telephone != null && !telephone.isBlank()) {
-		    contactInfo.addPhoneVoice(telephone);
-		}
-		creatorContact.getElementType().setOrganisationName(ISOMetadata.createAnchorPropertyType(creatorsURI, orgName));
-
-		if (url != null && !url.isEmpty()) {
-		    Online online = new Online();
-		    online.setLinkage(url);
-		    contactInfo.setOnline(online);
-		}
-
-		creatorContact.setContactInfo(contactInfo);
-		creatorContact.setRoleCode("author");
-		coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
-
+		addOrganizationParty(coreMetadata, agentUri, marineinfoHadRoleToIsoRole(roleUri));
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("EurOBIS-LD Mappper ENDED");
@@ -566,6 +554,212 @@ public class EurOBISLdMapper extends FileIdentifierMapper {
 	    e.printStackTrace();
 	}
 
+    }
+
+    private void addOrganizationParty(CoreMetadata coreMetadata, String orgUri, String roleCode) {
+	if (orgUri == null || orgUri.isBlank() || orgUri.contains("id/person")) {
+	    return;
+	}
+	if (roleCode == null || roleCode.isBlank()) {
+	    roleCode = "collaborator";
+	}
+	try {
+	    ResponsibleParty party = new ResponsibleParty();
+	    MarineOrganization organization = new MarineOrganization(orgUri + ".ttl");
+	    String orgName = organization.getElement(RDFElement.ORGNAME);
+	    String mail = organization.getElement(RDFElement.ORGEMAILS);
+	    String telephone = organization.getElement(RDFElement.ORGTELEPHONES);
+	    String url = organization.getElement(RDFElement.ORGWEBPAGES);
+	    String addr = organization.getElement(RDFElement.ORGADDRESS);
+
+	    Contact contactInfo = new Contact();
+	    Address address = new Address();
+	    if (mail != null && !mail.isEmpty()) {
+		address.addElectronicMailAddress(mail);
+	    }
+	    if (addr != null && !addr.isBlank()) {
+		address.addDeliveryPoint(addr);
+	    }
+	    contactInfo.setAddress(address);
+	    if (telephone != null && !telephone.isBlank()) {
+		contactInfo.addPhoneVoice(telephone);
+	    }
+	    party.getElementType().setOrganisationName(ISOMetadata.createAnchorPropertyType(orgUri, orgName));
+
+	    if (url != null && !url.isEmpty()) {
+		Online online = new Online();
+		online.setLinkage(url);
+		contactInfo.setOnline(online);
+	    }
+
+	    party.setContactInfo(contactInfo);
+	    party.setRoleCode(roleCode);
+	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(party);
+	} catch (IOException e) {
+	    GSLoggerFactory.getLogger(getClass()).debug("Could not load institute TTL for {}: {}", orgUri, e.getMessage());
+	}
+    }
+
+    /**
+     * Maps Marineinfo {@code dcat:hadRole} IRIs (e.g. {@code .../contribroles#Data_provider}) to ISO 19115
+     * {@code CI_RoleCode} values for {@link ResponsibleParty#setRoleCode(String)}.
+     */
+    static String marineinfoHadRoleToIsoRole(String roleUri) {
+	if (roleUri == null || roleUri.isBlank()) {
+	    return "collaborator";
+	}
+	String frag = cleanKeywordLiteral(roleUri);
+	int h = frag.lastIndexOf('#');
+	if (h >= 0) {
+	    frag = frag.substring(h + 1);
+	} else {
+	    int s = frag.lastIndexOf('/');
+	    if (s >= 0) {
+		frag = frag.substring(s + 1);
+	    }
+	}
+	switch (frag) {
+	case "Data_provider":
+	case "data_provider":
+	    return "resourceProvider";
+	case "Publisher":
+	case "publisher":
+	    return "publisher";
+	case "Data_collector":
+	case "data_collector":
+	    return "originator";
+	case "Custodian":
+	case "custodian":
+	    return "custodian";
+	case "Owner":
+	case "owner":
+	    return "owner";
+	case "Funder":
+	case "funder":
+	    return "sponsor";
+	case "Metadata_provider":
+	case "metadata_provider":
+	    return "custodian";
+	case "Distributor":
+	case "distributor":
+	    return "distributor";
+	case "Rights_holder":
+	case "rights_holder":
+	    return "rightsHolder";
+	case "Processor":
+	case "processor":
+	    return "processor";
+	case "Point_of_contact":
+	case "pointOfContact":
+	    return "pointOfContact";
+	default:
+	    GSLoggerFactory.getLogger(EurOBISLdMapper.class).debug(
+		    "Unknown contribution role fragment {}, using collaborator", frag);
+	    return "collaborator";
+	}
+    }
+
+    private static final String MD_KEYWORD_TYPE_CODE_NS = "https://standards.iso.org/iso/19115/resources/Codelists/gml/MD_KeywordTypeCode.xml#";
+
+    /**
+     * Uses {@code schema:additionalType} when present (e.g. ISO keyword type code {@code place}); otherwise
+     * {@code schema:alternativeType} (e.g. {@code Geographic term}).
+     */
+    private static String resolveDefinedTermKeywordType(String rawAdditionalType, String rawAlternativeType) {
+	String fromAdditional = normalizeKeywordTypeFromAdditional(rawAdditionalType);
+	if (!fromAdditional.isEmpty()) {
+	    return fromAdditional;
+	}
+	return cleanKeywordLiteral(rawAlternativeType);
+    }
+
+    private static String normalizeKeywordTypeFromAdditional(String raw) {
+	if (raw == null) {
+	    return "";
+	}
+	String t = cleanKeywordLiteral(raw);
+	if (t.isEmpty()) {
+	    return "";
+	}
+	t = t.replace(MD_KEYWORD_TYPE_CODE_NS, "");
+	if (t.contains("#")) {
+	    t = t.substring(t.lastIndexOf('#') + 1);
+	}
+	return t.trim();
+    }
+
+    private static String cleanKeywordLiteral(String raw) {
+	if (raw == null) {
+	    return "";
+	}
+	String t = raw.trim();
+	if (t.contains("^^")) {
+	    t = t.substring(0, t.indexOf("^^"));
+	}
+	if (t.endsWith("@en")) {
+	    t = t.substring(0, t.length() - 3);
+	} else {
+	    int at = t.lastIndexOf('@');
+	    if (at > 0) {
+		String tag = t.substring(at + 1);
+		if (tag.matches("[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*")) {
+		    t = t.substring(0, at);
+		}
+	    }
+	}
+	t = t.replace("\"", "").replace("\\n", "");
+	return t.trim();
+    }
+
+    /**
+     * Adds {@code projects} from {@code https://marineinfo.org/id/dataset/{dasId}.json} when present (anchor:
+     * {@link #MARINEINFO_PROJECT_URI_PREFIX} + {@code ProID}, title: {@code StandardTitle}).
+     */
+    private void addDatasetJsonProjectKeywords(HashMap<String, Keywords> keywordMap, String dasid) {
+	try {
+	    Set<String> projectHrefsAdded = new HashSet<>();
+	    Downloader d = new Downloader();
+	    Optional<String> res = d.downloadOptionalString("https://marineinfo.org/id/dataset/" + dasid + ".json");
+	    if (res.isEmpty()) {
+		return;
+	    }
+	    JSONObject root = new JSONObject(res.get());
+	    JSONArray projects = root.optJSONArray("projects");
+	    if (projects == null || projects.length() == 0) {
+		return;
+	    }
+	    Keywords kprojects = keywordMap.computeIfAbsent("project", t -> {
+		Keywords k = new Keywords();
+		k.setTypeCode("project");
+		return k;
+	    });
+	    for (int i = 0; i < projects.length(); i++) {
+		JSONObject p = projects.optJSONObject(i);
+		if (p == null || !p.has("ProID") || p.isNull("ProID")) {
+		    continue;
+		}
+		long proId = p.getLong("ProID");
+		if (proId < 1) {
+		    continue;
+		}
+		String href = MARINEINFO_PROJECT_URI_PREFIX + proId;
+		if (!projectHrefsAdded.add(href)) {
+		    continue;
+		}
+		String stdTitle = p.optString("StandardTitle", "").trim();
+		if (stdTitle.isEmpty()) {
+		    stdTitle = p.optString("Acronym", "").trim();
+		}
+		if (stdTitle.isEmpty()) {
+		    kprojects.addKeyword(href, href);
+		} else {
+		    kprojects.addKeyword(stdTitle, href);
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).debug("Could not merge dataset JSON projects for {}: {}", dasid,
+		    e.getMessage());
+	}
     }
 
     // private void retrieveOnline(MIMetadata miMetadata, ExtensionHandler

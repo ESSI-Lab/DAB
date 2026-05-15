@@ -86,6 +86,7 @@ import java.nio.charset.*;
 import java.nio.file.*;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Optional;
 
 public class OMHandler extends StreamingRequestHandler {
@@ -748,7 +749,35 @@ public class OMHandler extends StreamingRequestHandler {
 
     @Override
     public MediaType getMediaType(WebRequest webRequest) {
-	return MediaType.APPLICATION_JSON_TYPE;
+	OMRequest request = new OMRequest(webRequest);
+	OMFormat format = OMFormat.decode(request.getParameterValue(APIParameters.FORMAT));
+	if (format == null) {
+	    return MediaType.APPLICATION_JSON_TYPE;
+	}
+	switch (format) {
+	case NETCDF:
+	    return new MediaType("application", "x-netcdf");
+	case CSV:
+	    return new MediaType("text", "csv");
+	case WATERML_1:
+	case WATERML_2:
+	    return MediaType.TEXT_XML_TYPE;
+	case JSON:
+	default:
+	    return MediaType.APPLICATION_JSON_TYPE;
+	}
+    }
+
+    @Override
+    protected List<SimpleEntry<String, String>> getResponseHeaders(WebRequest webRequest) {
+	List<SimpleEntry<String, String>> headers = new ArrayList<>();
+	OMRequest request = new OMRequest(webRequest);
+	OMFormat format = OMFormat.decode(request.getParameterValue(APIParameters.FORMAT));
+	if (format != null && format != OMFormat.JSON) {
+	    String filename = "observations" + format.getExtension();
+	    headers.add(new SimpleEntry<>("Content-Disposition", "attachment; filename=\"" + filename + "\""));
+	}
+	return headers;
     }
 
     public DiscoveryRequestTransformer getTransformer() {

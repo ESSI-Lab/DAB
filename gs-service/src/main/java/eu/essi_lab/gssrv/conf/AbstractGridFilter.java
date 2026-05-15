@@ -21,16 +21,12 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
-import com.vaadin.flow.component.grid.*;
-import com.vaadin.flow.component.textfield.*;
-import com.vaadin.flow.data.value.*;
-
 import java.util.*;
 
 /**
  * @author Fabrizio
  */
-public abstract class AbstractGridFilter<G extends GridDataModel> {
+abstract class AbstractGridFilter<G extends GridDataModel> {
 
     /**
      *

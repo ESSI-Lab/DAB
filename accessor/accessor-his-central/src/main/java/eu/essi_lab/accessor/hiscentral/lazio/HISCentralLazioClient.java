@@ -23,23 +23,14 @@ package eu.essi_lab.accessor.hiscentral.lazio;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import eu.essi_lab.model.ratings.RatingCurve;
-import eu.essi_lab.model.ratings.RatingCurvePoint;
-import eu.essi_lab.model.ratings.RatingCurves;
 import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -60,40 +51,161 @@ public class HISCentralLazioClient {
     private static final String LAZIO_REMOTE_SERVICE_ERROR = "LAZIO_REMOTE_SERVICE_ERROR";
     private static final String LAZIO_CLIENT_UNABLE_TO_GET_STATIONS_ERROR = "LAZIO_CLIENT_UNABLE_TO_GET_STATIONS_ERROR";
 
-    
-    public static String BEARER_TOKEN = null;
+    private static final int TOKEN_ACQUIRE_MAX_ATTEMPTS = 100;
 
-    public static String REFRESH_BEARER_TOKEN = null;
-    
-    public static final String BASE_URL = "http://rlazio.dynalias.org/datascape/v1/";
+    private static final long TOKEN_ACQUIRE_RETRY_WAIT_MS = 5000L;
 
-    public static final String TOKEN_URL = "http://rlazio.dynalias.org/datascape/connect/token";
-    
-    private String endpoint;
+    private final String datascapeRoot;
     private GSLogger logger;
     private static String giProxyEndpoint = null;
 
-    public static String getGiProxyEndpoint() {
-	if (giProxyEndpoint == null) {
-	    giProxyEndpoint = ConfigurationWrapper.getSystemSettings().getProxyEndpoint().orElse(null);
+    private static String lazioClientUserOverride = null;
+
+    private static String lazioClientPasswordOverride = null;
+
+    private static String lazioClientIdOverride = null;
+
+    private static String lazioClientInstanceOverride = null;
+
+    /**
+     * Normalizes the configured source URL to the Datascape <strong>root</strong> (no trailing slash), without
+     * {@code /v1}. Accepts either {@code http://host/datascape}, {@code http://host/datascape/}, or
+     * {@code http://host/datascape/v1/}.
+     */
+    public static String normalizeDatascapeRoot(String configuredUrl) {
+
+	String root = configuredUrl.trim();
+	while (root.endsWith("/")) {
+	    root = root.substring(0, root.length() - 1);
 	}
-	return giProxyEndpoint;
+	if (root.endsWith("/v1")) {
+	    root = root.substring(0, root.length() - 3);
+	    while (root.endsWith("/")) {
+		root = root.substring(0, root.length() - 1);
+	    }
+	}
+	return root;
+    }
+
+    public static String apiV1BaseFromConfiguredUrl(String configuredUrl) {
+
+	return normalizeDatascapeRoot(configuredUrl) + "/v1/";
+    }
+
+    /**
+     * {@code true} if {@code linkage} is a data download URL under this source's {@code /v1/data/} API.
+     */
+    public static boolean matchesDownloadLinkage(String linkage, String configuredSourceUrl) {
+
+	if (linkage == null || configuredSourceUrl == null) {
+	    return false;
+	}
+	String prefix = apiV1BaseFromConfiguredUrl(configuredSourceUrl) + "data/";
+	return linkage.startsWith(prefix);
+    }
+
+    public static String getGiProxyEndpoint() {
+	if (giProxyEndpoint != null) {
+	    return giProxyEndpoint;
+	}
+	return ConfigurationWrapper.getSystemSettings().getProxyEndpoint().orElse(null);
+	
     }
 
     public static void setGiProxyEndpoint(String endpoint) {
 	giProxyEndpoint = endpoint;
     }
-    
-    public HISCentralLazioClient() {
 
-	this(BASE_URL);
-	
+    /**
+     * Overrides Lazio OAuth credentials for token requests (e.g. standalone tests). Per field: a non-null argument
+     * overrides; {@code null} falls back to {@link ConfigurationWrapper} for that field only. If all four arguments
+     * are non-null, the configuration service is not queried for Lazio token login.
+     */
+    public static void setLazioClientCredentials(String username, String password, String clientId, String clientInstance) {
+
+	lazioClientUserOverride = username;
+	lazioClientPasswordOverride = password;
+	lazioClientIdOverride = clientId;
+	lazioClientInstanceOverride = clientInstance;
     }
 
-    public HISCentralLazioClient(String endpoint) {
+    /**
+     * Clears {@link #setLazioClientCredentials(String, String, String, String)} overrides; token login uses
+     * {@link ConfigurationWrapper} again.
+     */
+    public static void clearLazioClientCredentials() {
 
-	this.endpoint = endpoint;
+	lazioClientUserOverride = null;
+	lazioClientPasswordOverride = null;
+	lazioClientIdOverride = null;
+	lazioClientInstanceOverride = null;
+    }
+
+    private static String effectiveLazioClientUser() {
+
+	return lazioClientUserOverride != null ? lazioClientUserOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientUser().orElse(null);
+    }
+
+    private static String effectiveLazioClientPassword() {
+
+	return lazioClientPasswordOverride != null ? lazioClientPasswordOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientPassword().orElse(null);
+    }
+
+    private static String effectiveLazioClientId() {
+
+	return lazioClientIdOverride != null ? lazioClientIdOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientId().orElse(null);
+    }
+
+    private static String effectiveLazioClientInstance() {
+
+	return lazioClientInstanceOverride != null ? lazioClientInstanceOverride
+		: ConfigurationWrapper.getCredentialsSetting().getLazioClientInstance().orElse(null);
+    }
+
+    /**
+     * @param configuredSourceUrl connector endpoint: Datascape root ({@code .../datascape}) or API base
+     *        ({@code .../datascape/v1/}); see {@link #normalizeDatascapeRoot(String)}
+     */
+    public HISCentralLazioClient(String configuredSourceUrl) {
+
+	this.datascapeRoot = normalizeDatascapeRoot(configuredSourceUrl);
 	this.logger = GSLoggerFactory.getLogger(HISCentralLazioClient.class);
+    }
+
+    public String getDatascapeRoot() {
+
+	return datascapeRoot;
+    }
+
+    public String getTokenUrl() {
+
+	return datascapeRoot + "/connect/token";
+    }
+
+    public String getRevokeSsoTokensUrl() {
+
+	return datascapeRoot + "/connect/revoke-sso-tokens";
+    }
+
+    private String apiV1Base() {
+
+	return datascapeRoot + "/v1/";
+    }
+
+    /**
+     * Full HTTP URL for an API request: either {@code pathOrUrl} if it is already absolute, or {@code apiV1Base() +}
+     * relative path (e.g. {@code stations?...}).
+     */
+    private String fullRequestUrl(String pathOrUrl) {
+
+	String p = pathOrUrl.trim();
+	if (p.startsWith("http://") || p.startsWith("https://")) {
+	    return p;
+	}
+	return apiV1Base() + p;
     }
 
     public String getData(String path) throws GSException {
@@ -108,41 +220,43 @@ public class HISCentralLazioClient {
 
     }
     
-    public static String getBeareToken(String tokenPath) throws GSException {
+    /**
+     * Single token request (no retry). Prefer {@link #getResponse(String)} / instance methods for harvest, which
+     * acquire, use, and revoke tokens.
+     */
+    public static String getBearerToken(String tokenPath) throws GSException {
 
-	GSLoggerFactory.getLogger(HISCentralLazioConnector.class).info("Getting BEARER TOKEN from Lazio Datascape service");
+	return requestAccessTokenFromEndpoint(tokenPath);
+    }
 
-	// StringEntity input = null;
+    private static String requestAccessTokenFromEndpoint(String tokenPath) throws GSException {
+
 	String token = null;
 
 	try {
-	    // HttpPost httpPost = new HttpPost(TOKEN_URL);
-	    // HttpClient httpClient = HttpClientBuilder.create().build();
-	    //
-	    // List<NameValuePair> params = new ArrayList<NameValuePair>(2);
-	    // params.add(new BasicNameValuePair("username", CLIENT_USER));
-	    // params.add(new BasicNameValuePair("password", CLIENT_SECRET));
-	    // params.add(new BasicNameValuePair("grant_type", "password"));
-	    // params.add(new BasicNameValuePair("client_id", CLIENT_ID));
-	    // params.add(new BasicNameValuePair("client_instance", CLIENT_INSTANCE));
-	    // httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-	    //
-	    // HttpResponse response = null;
-	    //
-	    // response = httpClient.execute(httpPost);
 
 	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put("username", ConfigurationWrapper.getCredentialsSetting().getLazioClientUser().orElse(null));
-	    params.put("password", ConfigurationWrapper.getCredentialsSetting().getLazioClientPassword().orElse(null));
 	    params.put("grant_type", "password");
-	    params.put("client_id", ConfigurationWrapper.getCredentialsSetting().getLazioClientId().orElse(null));
-	    params.put("client_instance", ConfigurationWrapper.getCredentialsSetting().getLazioClientInstance().orElse(null));
+	    params.put("username", effectiveLazioClientUser());
+	    params.put("password", effectiveLazioClientPassword());
+	    params.put("client_id", effectiveLazioClientId());
+	    params.put("client_instance", effectiveLazioClientInstance());
+	    params.put("refresh_token", "");
 
+	    String postUrl = tokenPath;
+	    String proxyEndpoint = getGiProxyEndpoint();
+	    if (proxyEndpoint != null) {
+		postUrl = proxyEndpoint + "/post?url=" + URLEncoder.encode(tokenPath, "UTF-8");
+	    }
+
+	    HashMap<String, String> headers = new HashMap<>();
+	    headers.put("Content-Type", "application/x-www-form-urlencoded");
 
 	    HttpRequest request = HttpRequestUtils.build(//
 		    MethodWithBody.POST, //
-		    tokenPath, //
-		    params);
+		    postUrl, //
+		    params, //
+		    headers);
 
 	    Downloader downloader = new Downloader();
 
@@ -152,12 +266,8 @@ public class HISCentralLazioClient {
 
 	    JSONObject result = new JSONObject(IOStreamUtils.asUTF8String(response.body()));
 
-	    // result = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
 	    if (result != null) {
 		token = result.optString("access_token");
-		REFRESH_BEARER_TOKEN = result.optString("refresh_token");
-		GSLoggerFactory.getLogger(HISCentralLazioConnector.class).info("BEARER TOKEN obtained: " + BEARER_TOKEN);
-		GSLoggerFactory.getLogger(HISCentralLazioConnector.class).info("BEARER TOKEN obtained: " + REFRESH_BEARER_TOKEN);
 	    }
 
 	} catch (Exception e) {
@@ -166,6 +276,75 @@ public class HISCentralLazioClient {
 	    return null;
 	}
 	return token;
+    }
+
+    private String acquireBearerTokenOnce() throws GSException {
+
+	return requestAccessTokenFromEndpoint(getTokenUrl());
+    }
+
+    private String acquireBearerTokenWithRetries() throws GSException {
+
+	for (int attempt = 1; attempt <= TOKEN_ACQUIRE_MAX_ATTEMPTS; attempt++) {
+
+	    String token = acquireBearerTokenOnce();
+	    if (token != null && !token.isEmpty()) {
+		return token;
+	    }
+	    logger.warn("Lazio token acquisition failed (attempt {}/{}), waiting {} ms before retry", //
+		    attempt, TOKEN_ACQUIRE_MAX_ATTEMPTS, TOKEN_ACQUIRE_RETRY_WAIT_MS);
+	    if (attempt < TOKEN_ACQUIRE_MAX_ATTEMPTS) {
+		try {
+		    Thread.sleep(TOKEN_ACQUIRE_RETRY_WAIT_MS);
+		} catch (InterruptedException e) {
+		    Thread.currentThread().interrupt();
+		    throw GSException.createException(//
+			    getClass(), //
+			    "Interrupted while waiting to retry Lazio token acquisition", //
+			    null, //
+			    ErrorInfo.ERRORTYPE_SERVICE, //
+			    ErrorInfo.SEVERITY_ERROR, //
+			    LAZIO_REMOTE_SERVICE_ERROR);
+		}
+	    }
+	}
+	throw GSException.createException(//
+		getClass(), //
+		"Unable to acquire Lazio bearer token after " + TOKEN_ACQUIRE_MAX_ATTEMPTS + " attempts", //
+		null, //
+		ErrorInfo.ERRORTYPE_SERVICE, //
+		ErrorInfo.SEVERITY_ERROR, //
+		LAZIO_REMOTE_SERVICE_ERROR);
+    }
+
+    private void revokeAccessToken(String accessToken) {
+
+	if (accessToken == null || accessToken.isEmpty()) {
+	    return;
+	}
+	String revokeUrl = getRevokeSsoTokensUrl();
+	try {
+	    HashMap<String, String> params = new HashMap<String, String>();
+	    params.put("accessToken", accessToken);
+
+	    String postUrl = revokeUrl;
+	    String proxyEndpoint = getGiProxyEndpoint();
+	    if (proxyEndpoint != null) {
+		postUrl = proxyEndpoint + "/post?url=" + URLEncoder.encode(revokeUrl, "UTF-8");
+	    }
+
+	    HashMap<String, String> headers = new HashMap<>();
+	    headers.put("Content-Type", "application/x-www-form-urlencoded");
+
+	    HttpRequest request = HttpRequestUtils.build(MethodWithBody.POST, postUrl, params, headers);
+
+	    Downloader downloader = new Downloader();
+	    downloader.setConnectionTimeout(TimeUnit.SECONDS, 5);
+	    downloader.setResponseTimeout(TimeUnit.SECONDS, 5);
+	    downloader.downloadResponse(request);
+	} catch (Exception e) {
+	    logger.warn("Lazio revoke-sso-tokens failed: {}", e.getMessage());
+	}
     }
 
 
@@ -179,9 +358,11 @@ public class HISCentralLazioClient {
      */
     public String getLastData(String startTime, String endTime, boolean nearRealTimeData) throws GSException {
 	String ret = null;
+	String token = acquireBearerTokenWithRetries();
 	try {
 
-	    String parameter = nearRealTimeData ? endpoint.trim() + "&date_from=" + startTime + "&date_to=" + endTime :  endpoint.trim() + "&data_min=" + startTime + "&data_max=" + endTime + "&format=json";
+	    String parameter = nearRealTimeData ? apiV1Base().trim() + "&date_from=" + startTime + "&date_to=" + endTime
+		    : apiV1Base().trim() + "&data_min=" + startTime + "&data_max=" + endTime + "&format=json";
 	    parameter = URLEncoder.encode(parameter, "UTF-8");
 
 	    String url = parameter;
@@ -193,8 +374,12 @@ public class HISCentralLazioClient {
 
 	    logger.info("Sending request to: {}", url);
 
+	    Map<String, String> headers = new HashMap<String, String>();
+	    headers.put("accept", "application/json");
+	    headers.put("Authorization", "Bearer " + token);
+
 	    HttpResponse<InputStream> response = new Downloader()
-		    .downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, url, HttpHeaderUtils.build("accept", "application/json")));
+		    .downloadResponse(HttpRequestUtils.build(MethodNoBody.GET, url, HttpHeaderUtils.build(headers)));
 
 	    InputStream input = response.body();
 
@@ -211,14 +396,13 @@ public class HISCentralLazioClient {
 
 	    ) {
 		logger.warn("Invalid response: {}", ret);
+		ret = null;
 
-	    } else {
-		// responseCache.put(path, ret);
-		return ret;
 	    }
-
 	} catch (Exception e) {
 	    e.printStackTrace();
+	} finally {
+	    revokeAccessToken(token);
 	}
 
 	return ret;
@@ -241,30 +425,25 @@ public class HISCentralLazioClient {
 
 	int tries = 20;
 	do {
+	    String token = null;
 	    try {
+		token = acquireBearerTokenWithRetries();
+		try {
 
-		String parameter = endpoint.trim() + path;
-		parameter = URLEncoder.encode(parameter, "UTF-8");
+		    String parameter = fullRequestUrl(path);
+		    parameter = URLEncoder.encode(parameter, "UTF-8");
 
-		String url = parameter;
+		    String url = parameter;
 
-		String proxyEndpoint = getGiProxyEndpoint();
-		if (proxyEndpoint != null) {
-		    url = proxyEndpoint + "/get?url=" + url;
-		}
+		    String proxyEndpoint = getGiProxyEndpoint();
+		    if (proxyEndpoint != null) {
+			url = proxyEndpoint + "/get?url=" + url;
+		    }
 
-		logger.info("Sending request to: {}", url);
-		
-		int timeout = 120;
-		int responseTimeout = 200;
-		InputStream stream = null;
-		
+		    logger.info("Sending request to: {}", url);
 
-		    // RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-		    // .setConnectionRequestTimeout(responseTimeout * 1000).setSocketTimeout(timeout * 1000).build();
-		    // CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-		    // CloseableHttpResponse getStationResponse = client.execute(get);
-		    // stream = getStationResponse.getEntity().getContent();
+		    int timeout = 120;
+		    int responseTimeout = 200;
 
 		    Downloader downloader = new Downloader();
 		    downloader.setConnectionTimeout(TimeUnit.MILLISECONDS, timeout * 1000);
@@ -272,47 +451,35 @@ public class HISCentralLazioClient {
 
 		    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
 			    url.trim(), //
-			    HttpHeaderUtils.build("Authorization", "Bearer " + BEARER_TOKEN));
+			    HttpHeaderUtils.build("Authorization", "Bearer " + token));
 
-		    stream = getStationResponse.body();
+		    InputStream stream = getStationResponse.body();
 
-//		    GSLoggerFactory.getLogger(getClass()).info("Got " + url);
-//
-//		    if (stream != null) {
-//			JSONArray arrayResult = new JSONArray(IOStreamUtils.asUTF8String(stream));
-//			stream.close();
-//			return arrayResult;
-//		    }
-//
-//		
-//		
-//		
-//		
-//
-//		HttpResponse<InputStream> response = new Downloader().downloadResponse(
-//			HttpRequestUtils.build(MethodNoBody.GET, url, HttpHeaderUtils.build("accept", "application/json")));
-//
-//		InputStream input = response.body();
+		    ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		    IOUtils.copy(stream, output);
 
-		IOUtils.copy(stream, output);
+		    stream.close();
 
-		stream.close();
+		    ret = new String(output.toByteArray());
 
-		ret = new String(output.toByteArray());
+		    if (ret.contains("Too many requests, please try again later") //
+			    || ret.contains("504 Gateway Time-out")//
 
-		if (ret.contains("Too many requests, please try again later") //
-			|| ret.contains("504 Gateway Time-out")//
+		    ) {
+			logger.warn("Invalid response: {}", ret);
 
-		) {
-		    logger.warn("Invalid response: {}", ret);
+		    } else {
+			responseCache.put(path, ret);
+			return ret;
+		    }
 
-		} else {
-		    responseCache.put(path, ret);
-		    return ret;
+		} finally {
+		    revokeAccessToken(token);
 		}
 
+	    } catch (GSException e) {
+		throw e;
 	    } catch (Exception e) {
 		e.printStackTrace();
 	    }
@@ -320,7 +487,15 @@ public class HISCentralLazioClient {
 	    try {
 		Thread.sleep(40000);
 	    } catch (InterruptedException e) {
-		e.printStackTrace();
+		Thread.currentThread().interrupt();
+		throw GSException.createException( //
+			getClass(), //
+			"Interrupted while waiting to retry Lazio request", //
+			null, //
+			ErrorInfo.ERRORTYPE_SERVICE, //
+			ErrorInfo.SEVERITY_ERROR, //
+			LAZIO_REMOTE_SERVICE_ERROR //
+		);
 	    }
 	} while (tries-- > 0);
 

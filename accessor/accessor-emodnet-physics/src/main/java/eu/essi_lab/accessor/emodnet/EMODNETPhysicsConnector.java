@@ -24,7 +24,6 @@ package eu.essi_lab.accessor.emodnet;
 import java.util.ArrayList;
 import java.util.List;
 import java.net.URISyntaxException;
-import java.net.http.HttpTimeoutException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +47,11 @@ import eu.essi_lab.model.resource.OriginalMetadata;
  * @author boldrini
  */
 public class EMODNETPhysicsConnector extends HarvestedQueryConnector<EMODNETPhysicsConnectorSetting> {
+
+    /**
+     * ERDDAP DAS is small; probing {@code .nc} can trigger full aggregation and is slow.
+     */
+    private static final String ERDDAP_LIGHT_PROBE_SUFFIX = ".das";
 
     /**
      * 
@@ -119,15 +123,19 @@ public class EMODNETPhysicsConnector extends HarvestedQueryConnector<EMODNETPhys
 	    Boolean isDownloadLink = isDownloadLinkSet();
 	    GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<Boolean>("isDownloadLink", isDownloadLink));
 	    if (isDownloadLink) {
-		String downloadLink = getSourceURL() + "/tabledap/" + identifier + ".nc";
-		boolean isAvailable = false;
+		String base = getSourceURL();
+		String tabledapNc = base + "/tabledap/" + identifier + ".nc";
+		String griddapNc = base + "/griddap/" + identifier + ".nc";
+		String downloadLink = tabledapNc;
+		boolean tabledapOk = false;
 		try {
-		    isAvailable = HttpConnectionUtils.checkConnectivity(downloadLink, TimeUnit.MINUTES, 2);
+		    String probe = base + "/tabledap/" + identifier + ERDDAP_LIGHT_PROBE_SUFFIX;
+		    tabledapOk = HttpConnectionUtils.checkConnectivity(probe, TimeUnit.MINUTES, 2);
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error(e);
 		}
-		if (!isAvailable) {
-		    downloadLink = getSourceURL() + "/griddap/" + identifier + ".nc";
+		if (!tabledapOk) {
+		    downloadLink = griddapNc;
 		}
 		handler.add(new GSProperty<String>("downloadLink", downloadLink));
 	    }

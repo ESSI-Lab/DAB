@@ -207,8 +207,7 @@ public class PolytopeMeteoTrackerMapper extends PolytopeMapper {
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(variable.toString().toLowerCase());
 
 	    ExtensionHandler handler = dataset.getExtensionHandler();
-	    handler.setTimeUnits("h");
-	    handler.setTimeResolution("1");
+	    handler.setTimeResolutionDuration8601("PT1H");
 	    handler.setAttributeMissingValue("-9999");
 	    handler.setAttributeUnitsAbbreviation(abbreviation);
 

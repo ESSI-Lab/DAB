@@ -24,7 +24,7 @@ package eu.essi_lab.gssrv.conf;
 /**
  * @author Fabrizio
  */
-public interface GridDataModel {
+interface GridDataModel {
 
     /**
      * @return

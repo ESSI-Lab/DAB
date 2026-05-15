@@ -10,21 +10,21 @@ package eu.essi_lab.cdk;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import eu.essi_lab.cfga.Configurable;
-import eu.essi_lab.cfga.gs.setting.connector.ConnectorSetting;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.pluggable.Pluggable;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.setting.connector.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.pluggable.*;
 
 /**
  * Generic Connector Interface.
@@ -37,15 +37,24 @@ public interface IDriverConnector<T extends ConnectorSetting> extends Configurab
      * @param source
      * @return
      */
-    public boolean supports(GSSource source);
+    boolean supports(GSSource source);
 
     /**
      * @param url
      */
-    public void setSourceURL(String url);
+    void setSourceURL(String url);
 
     /**
      * @return
      */
-    public String getSourceURL();
+    String getSourceURL();
+
+    /**
+     * @return
+     */
+    default boolean supportsPreview() {
+
+	return true;
+    }
+
 }

@@ -219,9 +219,8 @@ public class INUMETMapper extends AbstractResourceMapper {
 	    parameterName = parameterDescription.replace(" acumulada 24 horas de 10 a 10 UTC", "").trim();
 	    InterpolationType interpolation = InterpolationType.TOTAL;
 	    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
-	    dataset.getExtensionHandler().setTimeUnits("day");
-	    dataset.getExtensionHandler().setTimeUnitsAbbreviation("day");
-	    dataset.getExtensionHandler().setTimeSupport("1");
+	    dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
+	    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 	}
 	coverageDescription.setAttributeTitle(parameterName);
 

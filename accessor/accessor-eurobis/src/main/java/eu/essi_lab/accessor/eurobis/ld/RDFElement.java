@@ -49,6 +49,8 @@ public enum RDFElement {
     INSTRUMENTLABELSANDURIS(true, true, getInstrumentsURIQuery()), //
     URLS_AND_TYPES(true, true, getDistributionsQuery()), //
     CREATORS(true, true, getCreatorURIQuery()), //
+    CONTRIBUTORS(true, true, getContributorURIQuery()), //
+    QUALIFIEDATTRIBUTIONS(true, true, getQualifiedAttributionAgentRoleQuery()), //
     //
     ORGNAME(false, false, getSimpleQueryTemplate("schema:Organization", "schema:name")), //
     ORGALTERNATENAME(false, false, getSimpleQueryTemplate("schema:Organization", "schema:alternateName")), //
@@ -77,6 +79,7 @@ public enum RDFElement {
     private static final String PREFIXES = "PREFIX dcat: <http://www.w3.org/ns/dcat#> \n" + //
 	    "PREFIX mi: <http://www.marineinfo.org/ns/ontology#> \n" + //
 	    "PREFIX dct: <http://purl.org/dc/terms/> \n" + //
+	    "PREFIX prov: <http://www.w3.org/ns/prov#> \n" + //
 	    "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#> \n" + //
 	    "PREFIX dc: <http://purl.org/dc/elements/1.1/> \n" + //
 	    "PREFIX schema: <https://schema.org/> \n"; //
@@ -181,18 +184,17 @@ public enum RDFElement {
 		"                OPTIONAL{ ?definedTerm schema:name ?keywordlabel . " + //
 		" ?definedTerm schema:identifier ?keyworduri . " + //
 		"}\n" + //
-		"                OPTIONAL{ ?definedTerm schema:name ?keywordlabel . " + //
-		" ?definedTerm schema:identifier ?keyworduri . " + //
-		" ?definedTerm schema:additionalType ?keywordtype . " + //
-		"}\n" + //
+		"                OPTIONAL{ ?definedTerm schema:additionalType ?keywordtype }\n" + //
 		"                OPTIONAL{ ?definedTerm schema:inDefinedTermSet ?schemak. " + //
 		" 					?schemak schema:name ?keywordthesaurus" + //
 		"		}\n" + //
+		"                OPTIONAL{ ?definedTerm schema:alternativeType ?keywordAlternativeType }\n" + //
 		"    BIND(CONCAT(" +//
 		"COALESCE(str(?keywordlabel),''), '" + RDFResource.SEPARATOR2 + "', " +//
 		"COALESCE(str(?keyworduri),''), '" + RDFResource.SEPARATOR2 + "', " +//
 		"COALESCE(str(?keywordthesaurus),''), '" + RDFResource.SEPARATOR2 + "', " +//
-		"COALESCE(str(?keywordtype),'')) AS ?" + VAR_PLACEHOLDER + "1)" + //
+		"COALESCE(str(?keywordtype),''), '" + RDFResource.SEPARATOR2 + "', " +//
+		"COALESCE(str(?keywordAlternativeType),'')) AS ?" + VAR_PLACEHOLDER + "1)" + //
 		"  }}"; //
     }
 
@@ -206,6 +208,31 @@ public enum RDFElement {
 		"               ?definedVariable schema:name       ?parameterlabel .  \n" + //
 		"               ?definedVariable schema:identifier ?parameteruri . \n" + //
 		"    BIND(CONCAT(str(?parameterlabel), '" + RDFResource.SEPARATOR2 + "', str(?parameteruri)) AS ?" + VAR_PLACEHOLDER + "1)" + //
+		"  }}";
+    }
+
+    private static String getContributorURIQuery() {
+	return getMultipleQueryHeader() + //
+
+		" WHERE { ?dataset a dcat:Dataset; \n" + //
+		"  OPTIONAL {\n" + //
+		"    { ?dataset dct:contributor ?contributor } UNION { ?dataset dc:contributor ?contributor } \n" + //
+		"    ?contributor a schema:Organization .\n" + //
+		"                OPTIONAL{?contributor schema:identifier ?" + VAR_PLACEHOLDER + "1 }\n" + //
+		"  }}";
+    }
+
+    private static String getQualifiedAttributionAgentRoleQuery() {
+	return getMultipleQueryHeader() + //
+
+		" WHERE { ?dataset a dcat:Dataset; \n" + //
+		"  OPTIONAL {\n" + //
+		"    ?dataset prov:qualifiedAttribution ?attr .\n" + //
+		"    ?attr prov:agent ?agent .\n" + //
+		"    OPTIONAL { ?attr dcat:hadRole ?role }\n" + //
+		"    FILTER ( isIRI(?agent) )\n" + //
+		"    BIND(CONCAT(str(?agent), '" + RDFResource.SEPARATOR2 + "', COALESCE(str(?role),'')) AS ?"
+		+ VAR_PLACEHOLDER + "1)\n" + //
 		"  }}";
     }
 

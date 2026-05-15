@@ -41,7 +41,7 @@ import java.util.stream.*;
 /**
  * @author Fabrizio
  */
-public abstract class AbstractGridDescriptor<G extends GridDataModel> extends TabDescriptor {
+abstract class AbstractGridDescriptor<G extends GridDataModel> extends TabDescriptor {
 
     private final VerticalLayout verticalLayout;
     private final Grid<G> grid;

@@ -1,4 +1,4 @@
-package eu.essi_lab.gssrv.conf.import_export;
+package eu.essi_lab.gssrv.conf.tools;
 
 /*-
  * #%L
