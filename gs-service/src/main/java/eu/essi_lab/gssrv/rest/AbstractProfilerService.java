@@ -220,8 +220,10 @@ public abstract class AbstractProfilerService {
 
 	    if (optProfiler.isPresent()) {
 
-		response = optProfiler.get()
-			.createUncaughtError(webRequest, Status.INTERNAL_SERVER_ERROR, ExceptionUtils.getStackTrace(ex));
+		response = optProfiler.get().createUncaughtError(
+				webRequest,
+				Status.INTERNAL_SERVER_ERROR,
+				ExceptionUtils.getStackTrace(ex));
 
 	    } else {
 

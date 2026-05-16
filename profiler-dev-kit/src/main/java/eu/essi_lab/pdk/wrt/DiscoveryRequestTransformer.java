@@ -375,10 +375,6 @@ public abstract class DiscoveryRequestTransformer extends WebRequestTransformer<
 	    }
 	});
 
-	if (!excList.isEmpty()) {
-	    throw excList.getFirst();
-	}
-
 	if (sources.isEmpty()) {
 	    if (optionalView.isPresent()) {
 

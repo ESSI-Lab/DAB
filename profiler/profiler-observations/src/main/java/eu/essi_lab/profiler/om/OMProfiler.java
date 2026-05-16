@@ -99,7 +99,7 @@ public class OMProfiler extends Profiler<OMProfilerSetting> {
 	json.put("message", validationMessage.getError());
 	json.put("error", validationMessage.getErrorCode());
 
-	return Response.status(Integer.valueOf(validationMessage.getErrorCode())).//
+	return Response.status(Status.INTERNAL_SERVER_ERROR.getStatusCode()).//
 		type(MediaType.APPLICATION_JSON).//
 		entity(json.toString()).build();
     }

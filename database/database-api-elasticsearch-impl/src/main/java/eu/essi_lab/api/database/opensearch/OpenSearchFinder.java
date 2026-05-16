@@ -105,8 +105,6 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		try {
 
-		    GSLoggerFactory.getLogger(getClass()).debug("Updating sources to data folder map STARTED");
-
 		    SOURCES_DATA_FOLDER_MAP = getSourcesDataMap(//
 			    database, //
 			    wrapper, //
@@ -116,8 +114,6 @@ public class OpenSearchFinder implements DatabaseFinder {
 				    collect(Collectors.toList()),
 
 			    false);
-
-		    GSLoggerFactory.getLogger(getClass()).debug("Updating sources to data folder map ENDED");
 
 		} catch (Exception e) {
 
