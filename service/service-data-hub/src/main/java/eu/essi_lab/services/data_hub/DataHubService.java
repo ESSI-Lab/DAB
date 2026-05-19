@@ -436,15 +436,15 @@ public class DataHubService extends AbstractManagedService {
 
 	    Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
-	    SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
+	    SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 
 	    sourceStorage.harvestingStarted(getSource(), HarvestingStrategy.SELECTIVE, false, false);
 	    sourceStorage.harvestingEnded(getSource(), HarvestingStrategy.SELECTIVE);
 
-	    SourceStorageWorker worker = database.getWorker(sourceId);
+	    SourceStorage storage = database.getStorage(sourceId);
 
-	    boolean data1Folder = worker.existsData1Folder();
-	    boolean data2Folder = worker.existsData2Folder();
+	    boolean data1Folder = storage.existsData1Folder();
+	    boolean data2Folder = storage.existsData2Folder();
 
 	    if (data1Folder && data2Folder) {
 
@@ -458,7 +458,7 @@ public class DataHubService extends AbstractManagedService {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(worker.getData1Folder());
+	    return Optional.of(storage.getData1Folder());
 
 	} catch (Exception e) {
 

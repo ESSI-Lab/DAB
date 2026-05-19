@@ -5,7 +5,7 @@ package eu.essi_lab.api.database.opensearch.index;
 
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.DatabaseFolder.*;
-import eu.essi_lab.api.database.SourceStorageWorker.*;
+import eu.essi_lab.api.database.SourceStorage.*;
 import eu.essi_lab.api.database.opensearch.*;
 import eu.essi_lab.api.database.opensearch.index.mappings.*;
 import eu.essi_lab.iso.datamodel.classes.*;
@@ -189,9 +189,9 @@ public class IndexData {
 
 	indexData.entryId = OpenSearchFolder.getEntryId(folder, privateId);
 
-	String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-		? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
-		: SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
+	String dataFolder = folder.getName().endsWith(SourceStorage.DATA_1_SHORT_POSTFIX) //
+		? SourceStorage.DATA_1_SHORT_POSTFIX //
+		: SourceStorage.DATA_2_SHORT_POSTFIX; //
 
 	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
 	indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.DATA_FOLDER), dataFolder);
@@ -389,9 +389,9 @@ public class IndexData {
 
 	case WRITING_FOLDER_TAG:
 
-	    String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-		    ? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
-		    : SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
+	    String dataFolder = folder.getName().endsWith(SourceStorage.DATA_1_SHORT_POSTFIX) //
+		    ? SourceStorage.DATA_1_SHORT_POSTFIX //
+		    : SourceStorage.DATA_2_SHORT_POSTFIX; //
 
 	    indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
 
@@ -566,10 +566,10 @@ public class IndexData {
 	    return FolderRegistryMapping.get().getIndex();
 	}
 
-	if (name.contains(SourceStorageWorker.META_POSTFIX)) {
+	if (name.contains(SourceStorage.META_POSTFIX)) {
 
 	    return MetaFolderMapping.get().getIndex();
-	} else if (name.contains(SourceStorageWorker.DATA_1_POSTFIX) || name.contains(SourceStorageWorker.DATA_2_POSTFIX)) {
+	} else if (name.contains(SourceStorage.DATA_1_POSTFIX) || name.contains(SourceStorage.DATA_2_POSTFIX)) {
 
 	    return DataFolderMapping.get().getIndex();
 	} else if (name.contains(Database.USERS_FOLDER)) {

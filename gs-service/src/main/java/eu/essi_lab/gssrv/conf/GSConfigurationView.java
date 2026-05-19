@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -446,29 +446,11 @@ public class GSConfigurationView extends ConfigurationView {
 
 	    boolean sourceStorageSettingChanged = false;
 
-	    if (sourceStorageSetting.isISOComplianceTestSet(sourceIdentifier)) {
-
-		sourceStorageSetting.removeTestISOCompliance(sourceIdentifier);
-
-		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from ISO compliance test list");
-
-		sourceStorageSettingChanged = true;
-	    }
-
 	    if (sourceStorageSetting.isMarkDeletedOption(sourceIdentifier)) {
 
 		sourceStorageSetting.removeMarkDeleted(sourceIdentifier);
 
 		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from mark deleted list");
-
-		sourceStorageSettingChanged = true;
-	    }
-
-	    if (sourceStorageSetting.isRecoverResourceTagsSet(sourceIdentifier)) {
-
-		sourceStorageSetting.removeRecoverResourceTags(sourceIdentifier);
-
-		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from recovery resource tags list");
 
 		sourceStorageSettingChanged = true;
 	    }

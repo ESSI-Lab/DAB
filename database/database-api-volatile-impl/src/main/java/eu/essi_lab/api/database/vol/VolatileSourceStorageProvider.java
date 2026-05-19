@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -41,7 +41,7 @@ import eu.essi_lab.model.exceptions.GSException;
 /**
  * @author Fabrizio
  */
-public class VolatileSourceStorage extends SourceStorage {
+public class VolatileSourceStorageProvider extends SourceStorageProvider {
 
     private VolatileDatabase database;
     private StorageInfo dbUri;
@@ -71,7 +71,7 @@ public class VolatileSourceStorage extends SourceStorage {
     @Override
     public String getType() {
 
-	return "VolatileSourceStorage";
+	return "VolatileSourceStorageProvider";
     }
 
     @Override

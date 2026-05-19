@@ -24,9 +24,7 @@ import java.util.Optional;
  * #L%
  */
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.*;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -65,7 +63,7 @@ public class HCDataBase extends Database {
     }
 
     @Override
-    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+    public SourceStorage getStorage(String sourceId) throws GSException {
 
 	return null;
     }
@@ -107,7 +105,7 @@ public class HCDataBase extends Database {
     }
 
     @Override
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+    public DatabaseFolder findWritingFolder(SourceStorage worker) throws GSException {
 
 	return null;
     }

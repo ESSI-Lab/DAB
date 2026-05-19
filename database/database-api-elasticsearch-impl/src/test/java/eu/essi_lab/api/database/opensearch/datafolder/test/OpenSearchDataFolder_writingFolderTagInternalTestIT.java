@@ -5,12 +5,12 @@ package eu.essi_lab.api.database.opensearch.datafolder.test;
 
 import java.io.InputStream;
 
+import eu.essi_lab.api.database.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.IndexData.DataType;
@@ -38,11 +38,11 @@ OpenSearchDatabase database = createDataBase();
 	//
 	//
 
-	InputStream tag = SourceStorageWorker.createWritingFolderTag();
+	InputStream tag = SourceStorage.createWritingFolderTag();
 
 	Assert.assertEquals(0, tag.available());
 
-	String key = SourceStorageWorker.WRITING_FOLDER_TAG;
+	String key = SourceStorage.WRITING_FOLDER_TAG;
 
 	//
 	//

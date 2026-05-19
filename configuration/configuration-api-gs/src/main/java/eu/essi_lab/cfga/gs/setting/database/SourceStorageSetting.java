@@ -10,35 +10,27 @@ package eu.essi_lab.cfga.gs.setting.database;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import eu.essi_lab.cfga.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import org.json.JSONObject;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.validation.*;
+import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
+import org.json.*;
 
-import eu.essi_lab.cfga.Configuration;
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.validation.ValidationContext;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse;
-import eu.essi_lab.cfga.setting.validation.ValidationResponse.ValidationResult;
-import eu.essi_lab.cfga.setting.validation.Validator;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -46,89 +38,45 @@ import eu.essi_lab.cfga.setting.validation.Validator;
 public class SourceStorageSetting extends Setting implements EditableSetting {
 
     /**
-     * 
+     *
      */
     private final static String MARK_DELETED_RECORDS_KEY = "markDeletedRecords";
 
     /**
-     * 
-     */
-    private final static String TEST_ISO_COMPLIANCE_KEY = "testIsoCompliance";
-
-    /**
-     * 
-     */
-    private final static String RECOVER_TAGS_KEY = "recoverTags";
-
-    /**
-     * 
+     *
      */
     private final static String SMART_STORAGE_KEY = "smartStorage";
 
     public SourceStorageSetting() {
 
 	setName("Source storage settings");
-	setDescription("""
-		Set of options for the final phases of the harvesting process.
-		To enable/disable a feature for a specific source, enable the related option and add its identifier.
-		To enable/disable a feature for all the sources, enable/disable the related option""");
+	setDescription("Options for the final phase of the harvesting process");
 	enableCompactMode(false);
 	setCanBeDisabled(false);
 
+	Option<String> smartStorageOption = StringOptionBuilder.get().//
+		withLabel("Disable smart storage").//
+		withDescription("Per default this feature is enabled for all the sources."
+		+ " Enable this option and add source identifiers to disable this feature for the given sources."
+		+ " Disable this option to enable the feature for all the sources (default)." + " Single source identifier per row").//
+		withKey(SMART_STORAGE_KEY).//
+		disabled().//
+		withTextArea().//
+		build();
+
+	addOption(smartStorageOption);
+
 	Option<String> markDeletedRecordsOption = StringOptionBuilder.get().//
-		withLabel("Mark deleted records").//
+		withLabel("Enable tagging of deleted records").//
 		withDescription("Per default this feature is disabled for all the sources. "
-			+ " Enable this option and add source identifiers to enable this feature for the given sources."
-			+ " Disable this option to disable the feature for all the sources (default)."
-			+ " Single source identifier per row")
-		.//
+		+ " Enable this option and add source identifiers to enable this feature for the given sources."
+		+ " Disable this option to disable the feature for all the sources (default)." + " Single source identifier per row").//
 		withKey(MARK_DELETED_RECORDS_KEY).//
 		disabled().//
 		withTextArea().//
 		build();
 
 	addOption(markDeletedRecordsOption);
-
-	Option<String> isoComplianceTestOption = StringOptionBuilder.get().//
-		withLabel("Test ISO compliance").//
-		withDescription("Per default this feature is disabled for all the sources. "
-			+ " Enable this option and add source identifiers to enable this feature for the given sources."
-			+ " Disable this option to disable the feature for all the sources (default)."
-			+ " Single source identifier per row")
-		.//
-		withKey(TEST_ISO_COMPLIANCE_KEY).//
-		disabled().//
-		withTextArea().//
-		build();
-
-	addOption(isoComplianceTestOption);
-
-	Option<String> recoverResourceTagsOption = StringOptionBuilder.get().//
-		withLabel("Recover resource tags").//
-		withDescription("Per default this feature is disabled for all the sources. "
-			+ " Enable this option and add source identifiers to enable this feature for the given sources."
-			+ " Disable this option to disable the feature for all the sources (default)."
-			+ " Single source identifier per row")
-		.//
-		withKey(RECOVER_TAGS_KEY).//
-		disabled().//
-		withTextArea().//
-		build();
-
-	addOption(recoverResourceTagsOption);
-
-	Option<String> smartStorageDisabledOption = StringOptionBuilder.get().//
-		withLabel("Disable smart storage").//
-		withDescription("Per default this feature is enabled for all the sources."
-			+ " Enable this option and add source identifiers to disable this feature for the given sources."
-			+ " Disable this option to enable the feature for all the sources (default)." + " Single source identifier per row")
-		.//
-		withKey(SMART_STORAGE_KEY).//
-		disabled().//
-		withTextArea().//
-		build();
-
-	addOption(smartStorageDisabledOption);
 
 	//
 	// set the validator
@@ -155,20 +103,6 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 		validationResponse.getErrors().add("One or more source identifier must be set for the 'Mark deleted records' feature");
 	    }
 
-	    Option<String> isoOption = srcStrSetting.getOption(TEST_ISO_COMPLIANCE_KEY, String.class).get();
-	    if (isoOption.isEnabled() && (isoOption.getOptionalValue().isEmpty() || isoOption.getValue().isEmpty())) {
-
-		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
-		validationResponse.getErrors().add("One or more source identifier must be set for the 'Test ISO compliance' feature");
-	    }
-
-	    Option<String> tagsOption = srcStrSetting.getOption(RECOVER_TAGS_KEY, String.class).get();
-	    if (tagsOption.isEnabled() && (tagsOption.getOptionalValue().isEmpty() || tagsOption.getValue().isEmpty())) {
-
-		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
-		validationResponse.getErrors().add("One or more source identifier must be set for the 'Recover resource tags' feature");
-	    }
-
 	    Option<String> smartOption = srcStrSetting.getOption(SMART_STORAGE_KEY, String.class).get();
 	    if (smartOption.isEnabled() && (smartOption.getOptionalValue().isEmpty() || smartOption.getValue().isEmpty())) {
 
@@ -188,18 +122,17 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	private final TabContentDescriptor descriptor;
 
 	/**
-	 * 
+	 *
 	 */
 	public DescriptorProvider() {
 
 	    descriptor = TabContentDescriptorBuilder.get(SourceStorageSetting.class).//
 		    withLabel("Source storage").//
-		    withEditDirective("EDIT","Edit source storage settings").//
+		    withEditDirective("EDIT", "Edit source storage settings").//
 		    build();
 	}
 
 	/**
-	 *
 	 * @return
 	 */
 	public TabContentDescriptor get() {
@@ -246,54 +179,6 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     public void removeMarkDeleted(String... sourceIdentifiers) {
 
 	removeIdentifier(MARK_DELETED_RECORDS_KEY, sourceIdentifiers);
-    }
-
-    /**
-     * @return
-     */
-    public Boolean isISOComplianceTestSet(String sourceIdentifier) {
-
-	return test(TEST_ISO_COMPLIANCE_KEY, sourceIdentifier);
-    }
-
-    /**
-     * @param set
-     */
-    public void setTestISOCompliance(String... sourceIdentifiers) {
-
-	addIdentifier(TEST_ISO_COMPLIANCE_KEY, sourceIdentifiers);
-    }
-
-    /**
-     * @param sourceIdentifiers
-     */
-    public void removeTestISOCompliance(String... sourceIdentifiers) {
-
-	removeIdentifier(TEST_ISO_COMPLIANCE_KEY, sourceIdentifiers);
-    }
-
-    /**
-     * @return
-     */
-    public Boolean isRecoverResourceTagsSet(String sourceIdentifier) {
-
-	return test(RECOVER_TAGS_KEY, sourceIdentifier);
-    }
-
-    /**
-     * @param set
-     */
-    public void setRecoverResourceTags(String... sourceIdentifiers) {
-
-	addIdentifier(RECOVER_TAGS_KEY, sourceIdentifiers);
-    }
-
-    /**
-     * @param sourceIdentifiers
-     */
-    public void removeRecoverResourceTags(String... sourceIdentifiers) {
-
-	removeIdentifier(RECOVER_TAGS_KEY, sourceIdentifiers);
     }
 
     /**
@@ -376,7 +261,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
+     *
      */
     public void disableMarkDeleted() {
 
@@ -384,23 +269,7 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * 
-     */
-    public void disableRecoverResourceTags() {
-
-	getOption(RECOVER_TAGS_KEY, String.class).get().setEnabled(false);
-    }
-
-    /**
-     * 
-     */
-    public void disableTestISOCompliance() {
-
-	getOption(TEST_ISO_COMPLIANCE_KEY, String.class).get().setEnabled(false);
-    }
-
-    /**
-     * 
+     *
      */
     public void enableSmartStorage() {
 

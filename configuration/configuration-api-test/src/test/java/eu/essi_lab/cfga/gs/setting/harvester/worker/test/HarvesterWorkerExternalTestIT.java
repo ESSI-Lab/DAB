@@ -4,16 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import eu.essi_lab.api.database.*;
 import jakarta.xml.bind.JAXBElement;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.accessor.oaipmh.OAIPMHConnectorSetting;
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.vol.VolatileDatabase;
@@ -137,7 +134,7 @@ public class HarvesterWorkerExternalTestIT {
 
 	Assert.assertEquals(0, resultsList.size());
 
-	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
+	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 
 	HarvestingProperties harvestingProperties = sourceStorage
 		.retrieveHarvestingProperties(workerSetting.getSelectedAccessorSetting().getSource());

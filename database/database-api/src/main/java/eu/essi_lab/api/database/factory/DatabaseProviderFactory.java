@@ -24,13 +24,7 @@ package eu.essi_lab.api.database.factory;
 import java.util.HashMap;
 import java.util.ServiceLoader;
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseExecutor;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseSemanticsExecutor;
-import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.*;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -260,20 +254,20 @@ public class DatabaseProviderFactory {
     }
 
     /**
-     * Loads the available {@link SourceStorage}s using the {@link ServiceLoader} API and
+     * Loads the available {@link SourceStorageProvider}s using the {@link ServiceLoader} API and
      * selects the one suitable for the given <code>info</code>
      *
      * @param info
-     * @return the suitable {@link SourceStorage} or <code>null</code> if none is found
+     * @return the suitable {@link SourceStorageProvider} or <code>null</code> if none is found
      * @throws GSException if info is <code>null</code> or info.getUri is <code>null</code>
      */
-    public static SourceStorage getSourceStorage(StorageInfo info) throws GSException {
+    public static SourceStorageProvider getSourceStorage(StorageInfo info) throws GSException {
 
 	synchronized (DatabaseFactory.PROVIDER_LOCK) {
 
 	    Database database = DatabaseFactory.get(info);
 
-	    for (SourceStorage storage : ServiceLoader.load(SourceStorage.class)) {
+	    for (SourceStorageProvider storage : ServiceLoader.load(SourceStorageProvider.class)) {
 
 		if (storage.supports(info)) {
 
