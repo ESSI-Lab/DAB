@@ -41,6 +41,7 @@ import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.messages.bond.spatial.ShapeEntryPrefix;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
@@ -91,8 +92,9 @@ public class HISCentralShapefileInitializer extends AbstractCustomTask {
 	    });
 
 	    for (String zipFile : zipFiles) {
-		InputStream stream = new FileInputStream(new File(s3Dir,zipFile));
-		boolean stored = folder.store("UOMIT20181025", FolderEntry.of(stream), EntryType.SHAPE_FILE);
+		InputStream stream = new FileInputStream(new File(s3Dir, zipFile));
+		String prefix = ShapeEntryPrefix.fromZipFileName(zipFile);
+		boolean stored = folder.store(prefix, FolderEntry.of(stream), EntryType.SHAPE_FILE);
 		stream.close();
 		GSLoggerFactory.getLogger(getClass()).info("Stored shape file {}: {}", zipFile, stored);
 

@@ -43,6 +43,9 @@ public class ShapeFileMapping extends IndexMapping {
     public static final String SHAPE = "shape";
     public static final String USER_ID = "userId";
     public static final String SHAPE_FILE = "shapeFile";
+    public static final String UPLOAD_REGISTRY = "uploadRegistry";
+    public static final String UPLOAD_REGISTRY_ENTRY_NAME = "__upload_registry__";
+    public static final String SHAPE_UPLOAD_PREFIX = "shapeUploadPrefix";
 
     private static ShapeFileMapping instance;
     
@@ -67,6 +70,10 @@ public class ShapeFileMapping extends IndexMapping {
 	addProperty(USER_ID, FieldType.Text.jsonValue());
 
 	addProperty(SHAPE_FILE, FieldType.Binary.jsonValue());
+
+	addProperty(UPLOAD_REGISTRY, FieldType.Text.jsonValue());
+
+	addProperty(SHAPE_UPLOAD_PREFIX, FieldType.Keyword.jsonValue());
     }
 
     /**

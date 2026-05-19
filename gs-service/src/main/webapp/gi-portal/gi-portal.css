@@ -1040,6 +1040,59 @@ body {
     z-index: 1000;
 }
 
+/* Predefined shapes management dialog */
+.shape-management-dialog {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.shape-management-dialog .ui-dialog-titlebar {
+    background: #2c3e50;
+    color: white;
+    border: none;
+}
+
+.predefined-shapes-table th,
+.predefined-shapes-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+    font-size: 13px;
+}
+
+.predefined-shapes-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+    position: sticky;
+    top: 0;
+}
+
+.shapes-status-icon {
+    font-size: 18px;
+}
+
+.shapes-status-full {
+    color: #27ae60;
+}
+
+.shapes-status-partial {
+    color: #f39c12;
+}
+
+.shapes-status-none {
+    color: #95a5a6;
+}
+
+.shapes-legacy-tag {
+    font-size: 11px;
+    color: #888;
+}
+
+.shapes-delete-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
 /* Bulk download dialog styles */
 .bulk-download-dialog {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;

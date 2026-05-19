@@ -77,6 +77,7 @@ import eu.essi_lab.messages.bond.LogicalBond.LogicalOperator;
 import eu.essi_lab.messages.bond.ResourcePropertyBond;
 import eu.essi_lab.messages.bond.SimpleValueBond;
 import eu.essi_lab.messages.bond.View;
+import eu.essi_lab.messages.bond.spatial.IndexedShape;
 import eu.essi_lab.messages.bond.spatial.SpatialEntity;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
@@ -1019,7 +1020,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    //		andBond.getOperands().add(BondFactory.createSpatialEntityBond(BondOperator.decode(spatialOp.get()), entity));
 	    //	    }
 	    String value = predefinedLayer.get();
-	    String id = "UOMIT20181025_" + value.substring(value.lastIndexOf(":") + 1, value.length());
+	    String id = IndexedShape.entryNameFromPredefinedLayer(value);
 
 	    SpatialEntity entity = SpatialEntity.ofIndexedShape(id);
 

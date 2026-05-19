@@ -58,6 +58,7 @@
 		<module>accessor-rasaqm</module>
 		<module>accessor-rihmi-wdc-hydro</module>
 		<module>accessor-s3-shapefile</module>
+		<module>accessor-shapefile-opensearch</module>
 		<module>accessor-sentinel</module>
 		<module>accessor-satellite-common</module>
 		<module>accessor-smhi</module>

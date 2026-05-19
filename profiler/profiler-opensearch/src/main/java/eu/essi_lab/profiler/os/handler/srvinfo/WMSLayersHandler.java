@@ -24,6 +24,8 @@ package eu.essi_lab.profiler.os.handler.srvinfo;
  * #L%
  */
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +79,7 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 	case "capabilities":
 
 	    String endpoint = parser.getValue("endpoint");
+	    endpoint = URLDecoder.decode(endpoint);
 	    String version = parser.getValue("version");
 	    
 	    if (!endpoint.startsWith("http")) {

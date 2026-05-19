@@ -173,7 +173,7 @@ public abstract class OSParameters {
 		return Optional.empty();
 	    }
 
-	    String id = "UOMIT20181025_" + value.substring(value.lastIndexOf(":") + 1, value.length());
+	    String id = IndexedShape.entryNameFromPredefinedLayer(value);
 
 	    return Optional.of(fromIndexedShape(id, relatedValues));
 	}
