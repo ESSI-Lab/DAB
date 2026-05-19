@@ -97,21 +97,24 @@ public class ShapeHarvestScheduler {
 
 	boolean replaced = configuration.replace(setting);
 
-	if (!replaced) {
+	if (replaced) {
+
+	    try {
+
+		configuration.flush();
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(ShapeHarvestScheduler.class).error(ex);
+
+		return Optional.of("Unable to save harvesting schedule: " + ex.getMessage());
+	    }
+
+	} else if (!configuration.exists(settingId)) {
 
 	    return Optional.of("Unable to update harvesting schedule for source: " + sourceId);
 	}
-
-	try {
-
-	    configuration.flush();
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(ShapeHarvestScheduler.class).error(ex);
-
-	    return Optional.of("Unable to save harvesting schedule: " + ex.getMessage());
-	}
+	// Scheduling unchanged (already "start now"): still reschedule below, same as ConfigService
 
 	SchedulerViewSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
 

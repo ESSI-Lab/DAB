@@ -634,7 +634,8 @@ public class SupportService {
 
 	try {
 
-	    JSONObject payload = new PredefinedShapeManagementService().listAreas();
+	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	    JSONObject payload = new PredefinedShapeManagementService().listAreas(owner, loginResponse.isAdmin());
 	    payload.put("success", true);
 
 	    return Response.ok(payload.toString(), MediaType.APPLICATION_JSON).build();
@@ -698,12 +699,17 @@ public class SupportService {
 	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
 	}
 
-	Optional<String> error = new PredefinedShapeManagementService().deleteByPrefix(request.getPrefix());
+	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	PredefinedShapeDeleteResult deleteResult = new PredefinedShapeManagementService().deleteByPrefix(request.getPrefix(),
+		owner, loginResponse.isAdmin());
 
-	if (error.isPresent()) {
+	if (!deleteResult.isSuccess()) {
 
 	    basicResponse.setSuccess(false);
-	    basicResponse.setMessage(error.get());
+	    basicResponse.setMessage(deleteResult.getErrorMessage().orElse("Delete failed"));
+	    if (deleteResult.isForbidden()) {
+		return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+	    }
 	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
 	}
 
@@ -747,26 +753,25 @@ public class SupportService {
 	    }
 
 	    String shapeId = multipart.getField("shapeId").orElse("");
-	    boolean autoHarvest = "true".equalsIgnoreCase(multipart.getField("autoHarvest").orElse("false"));
+	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
 
 	    PredefinedShapeUploadService uploadService = new PredefinedShapeUploadService();
 
 	    PredefinedShapeUploadService.UploadOutcome outcome = uploadService.upload(multipart.getFileName(), shapeId,
-		    multipart.getFileStream(), autoHarvest);
+		    multipart.getFileStream(), owner, loginResponse.isAdmin());
 
 	    if (!outcome.isSuccess()) {
 
 		basicResponse.setSuccess(false);
 		basicResponse.setMessage(outcome.getErrorMessage());
+		if (outcome.isForbidden()) {
+		    return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+		}
 		return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
 	    }
 
 	    basicResponse.setSuccess(true);
-	    String message = "Shapefile stored with identifier \"" + outcome.getEntryPrefix() + "\"";
-	    if (autoHarvest) {
-		message += "; harvest scheduled for source " + ConfigurationWrapper.getShapeSourceId().orElse("");
-	    }
-	    basicResponse.setMessage(message);
+	    basicResponse.setMessage("Shapefile stored with identifier \"" + outcome.getEntryPrefix() + "\"");
 
 	    return Response.ok(basicResponse).build();
 

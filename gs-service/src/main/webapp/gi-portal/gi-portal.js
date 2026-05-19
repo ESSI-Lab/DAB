@@ -4,6 +4,44 @@ var view = '';
 var token = '';
 var availableViews = []; // Store views fetched for the current source deployment
 
+/** Token for shape WMS: empty before login → {@code public} (admin layers only). */
+function getShapeWmsToken() {
+	return localStorage.getItem('authToken') || 'public';
+}
+
+window.getShapeWmsToken = getShapeWmsToken;
+
+/** Relative WMS path for predefined shape layers from {@link window.config.shapeView}. */
+function buildShapeWmsEndpoint() {
+	var shapeView = window.config && window.config.shapeView;
+	if (!shapeView) {
+		return '';
+	}
+	return '../services/essi/token/' + encodeURIComponent(getShapeWmsToken()) + '/view/'
+		+ encodeURIComponent(shapeView) + '/wms';
+}
+
+window.buildShapeWmsEndpoint = buildShapeWmsEndpoint;
+
+/** JSONP query for filtered predefined layer list (shapeView + token). */
+function buildShapeWmsLayersQuery(wmsVersion) {
+	var shapeView = window.config && window.config.shapeView;
+	if (!shapeView) {
+		return '';
+	}
+	var dabEndpoint = '../services/essi/';
+	var servicePath = '';
+	if (typeof GIAPI !== 'undefined' && GIAPI.search && GIAPI.search.dab) {
+		dabEndpoint = GIAPI.search.dab.endpoint();
+		dabEndpoint = dabEndpoint.endsWith('/') ? dabEndpoint : dabEndpoint + '/';
+		servicePath = GIAPI.search.dab.servicePath();
+	}
+	return dabEndpoint + servicePath + '/opensearch/wmslayershandler?request=capabilities&shapeView='
+		+ encodeURIComponent(shapeView) + '&token=' + encodeURIComponent(getShapeWmsToken()) + '&version=' + (wmsVersion || '1.3.0');
+}
+
+window.buildShapeWmsLayersQuery = buildShapeWmsLayersQuery;
+
 
 var getUrlParameter = function getUrlParameter(sParam) {
 		var sPageURL = window.location.search.substring(1),
@@ -1072,7 +1110,6 @@ function initializeLogin(config) {
 
 			const authToken = localStorage.getItem('authToken');
 			const userEmail = localStorage.getItem('userEmail');
-			const wmsEndpoint = (window.config && window.config.wmsEndpoint) ? window.config.wmsEndpoint : '';
 			const wmsVersion = '1.3.0';
 			const shapeOnlinePrefix = 'opensearch://shapeFiles:';
 
@@ -1088,7 +1125,8 @@ function initializeLogin(config) {
 			const listTable = $('<table class="predefined-shapes-table">').css({ 'width': '100%', 'borderCollapse': 'collapse' });
 			listTable.append('<thead><tr>'
 				+ '<th></th><th>' + t('shapes_col_identifier') + '</th><th>' + t('shapes_col_file') + '</th>'
-				+ '<th>' + t('shapes_col_features') + '</th><th>' + t('shapes_col_selection') + '</th><th>' + t('shapes_col_actions') + '</th>'
+				+ '<th>' + t('shapes_col_owner') + '</th><th>' + t('shapes_col_features') + '</th>'
+				+ '<th>' + t('shapes_col_selection') + '</th><th>' + t('shapes_col_actions') + '</th>'
 				+ '</tr></thead>');
 			const listBody = $('<tbody id="predefined-shapes-list-body">');
 			listTable.append(listBody);
@@ -1101,38 +1139,24 @@ function initializeLogin(config) {
 			const shapeIdLabel = $('<label>').attr('for', 'predefined-shapes-id-input').css({ display: 'block', fontWeight: 600 }).text(t('upload_shapes_id_label'));
 			const shapeIdInput = $('<input type="text" id="predefined-shapes-id-input">').attr('placeholder', t('upload_shapes_id_placeholder')).css({ width: '100%', boxSizing: 'border-box', marginTop: '6px' });
 			const fileInput = $('<input type="file" id="predefined-shapes-file-input">').attr('accept', '.zip,application/zip').css({ marginTop: '10px', width: '100%' });
-			const autoHarvestLabel = $('<label>').css({ display: 'block', marginTop: '10px', fontSize: '13px' });
-			const autoHarvestCheck = $('<input type="checkbox" id="predefined-shapes-auto-harvest">');
-			autoHarvestLabel.append(autoHarvestCheck).append(' ' + t('shapes_auto_harvest'));
 			const uploadBtn = $('<button type="button" class="login-button">').css({ marginTop: '10px' }).text(t('upload_shapes_submit'));
 
-			uploadSection.append(shapeIdLabel).append(shapeIdInput).append(fileInput).append(autoHarvestLabel).append(uploadBtn);
+			uploadSection.append(shapeIdLabel).append(shapeIdInput).append(fileInput).append(uploadBtn);
 
 			dialogContent.append(statusDiv).append(toolbar).append(listWrapper).append(uploadSection);
 
 			let uploadInProgress = false;
 
-			function buildWmsLayersQuery() {
-				let dabEndpoint = '../services/essi/';
-				let servicePath = '';
-				if (typeof GIAPI !== 'undefined' && GIAPI.search && GIAPI.search.dab) {
-					dabEndpoint = GIAPI.search.dab.endpoint();
-					dabEndpoint = dabEndpoint.endsWith('/') ? dabEndpoint : dabEndpoint + '/';
-					servicePath = GIAPI.search.dab.servicePath();
-				}
-				return dabEndpoint + servicePath + '/opensearch/wmslayershandler?request=capabilities&endpoint='
-					+ encodeURIComponent(wmsEndpoint) + '&version=' + wmsVersion;
-			}
-
 			function fetchWmsLayerNames() {
 				return new Promise(function(resolve) {
-					if (!wmsEndpoint) {
+					const query = buildShapeWmsLayersQuery(wmsVersion);
+					if (!query) {
 						resolve([]);
 						return;
 					}
 					jQuery.ajax({
 						type: 'GET',
-						url: buildWmsLayersQuery(),
+						url: query,
 						crossDomain: true,
 						dataType: 'jsonp',
 						success: function(data) {
@@ -1184,10 +1208,20 @@ function initializeLogin(config) {
 				return '<span class="shapes-status-icon shapes-status-none" title="' + t('shapes_in_selection_none') + '"><i class="fa fa-circle-o"></i></span>';
 			}
 
+			function formatOwnerLabel(owner, legacy) {
+				if (!owner) {
+					return legacy ? t('shapes_owner_unknown') : '—';
+				}
+				if (owner === 'admin') {
+					return t('shapes_owner_admin');
+				}
+				return owner;
+			}
+
 			function renderAreas(areas) {
 				listBody.empty();
 				if (!areas || areas.length === 0) {
-					listBody.append('<tr><td colspan="6" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
+					listBody.append('<tr><td colspan="7" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
 					return;
 				}
 				areas.forEach(function(area) {
@@ -1197,6 +1231,7 @@ function initializeLogin(config) {
 					row.append($('<td>').html(selectionCell(area)));
 					row.append($('<td>').html('<code>' + area.prefix + '</code>' + legacyTag));
 					row.append($('<td>').text(area.fileName || '—'));
+					row.append($('<td>').text(formatOwnerLabel(area.owner, area.legacy)));
 					row.append($('<td>').text(area.featureCount));
 					row.append($('<td>').text(area.selectionCount + ' / ' + area.featureCount));
 					row.append($('<td>').append(deleteBtn));
@@ -1303,7 +1338,6 @@ function initializeLogin(config) {
 				formData.append('shapeId', shapeIdInput.val().trim());
 				formData.append('email', userEmail);
 				formData.append('apiKey', authToken);
-				formData.append('autoHarvest', autoHarvestCheck.is(':checked') ? 'true' : 'false');
 				fetch('../services/support/uploadPredefinedShapes', { method: 'POST', body: formData })
 					.then(function(r) { return r.json(); })
 					.then(function(data) {
@@ -2631,7 +2665,8 @@ export function initializePortal(config) {
 			'dabNode': GIAPI.search.dab,
 
 
-			'wmsEndpoint': config.wmsEndpoint,
+			'shapeView': config.shapeView,
+			'wmsVersion': '1.3.0',
 
 
 			'clusterWMS': (config.clusterWMS !== undefined),
@@ -3632,9 +3667,17 @@ export function initializePortal(config) {
 							var lines = [];
 							if (constraints.when && constraints.when.from) lines.push({ label: 'Begin date', value: constraints.when.from });
 							if (constraints.when && constraints.when.to) lines.push({ label: 'End date', value: constraints.when.to });
+							var hasFiniteBbox = function(w) {
+								if (!w || w.predefinedLayer) {
+									return false;
+								}
+								return [w.west, w.south, w.east, w.north].every(function(v) {
+									return typeof v === 'number' && Number.isFinite(v);
+								});
+							};
 							if (where) {
 								if (where.predefinedLayer) lines.push({ label: 'Predefined layer', value: where.predefinedLayer });
-								if (where.south != null && where.west != null && where.north != null && where.east != null) {
+								if (hasFiniteBbox(where)) {
 									lines.push({ label: 'Bounding box', value: [where.west, where.south, where.east, where.north].join(', ') });
 								}
 							}
@@ -3979,9 +4022,9 @@ export function initializePortal(config) {
 											if (where) {
 												if (where.predefinedLayer) {
 													params.append('predefinedLayer', where.predefinedLayer);
-												}
-
-												if (where.south && where.west && where.north && where.east) {
+												} else if ([where.west, where.south, where.east, where.north].every(function(v) {
+													return typeof v === 'number' && Number.isFinite(v);
+												})) {
 													params.append('west', where.west);
 													params.append('south', where.south);
 													params.append('east', where.east);

@@ -98,14 +98,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	if (type == EntryType.SHAPE_FILE) {
 
-	    List<IndexData> list = IndexData.ofShapeFile(this, key, entry);
-
-	    for (IndexData indexData : list) {
-
-		result = wrapper.upsertWithOpenSearchClient(indexData);
-
-		wrapper.synch();
-	    }
+	    result = upsertShapeFile(key, entry, null) ? Result.Updated : Result.Created;
 
 	} else {
 
@@ -126,14 +119,7 @@ public class OpenSearchFolder implements DatabaseFolder {
 
 	if (type == EntryType.SHAPE_FILE) {
 
-	    List<IndexData> list = IndexData.ofShapeFile(this, key, entry);
-
-	    for (IndexData indexData : list) {
-
-		stored &= wrapper.storeWithOpenSearchClient(indexData);
-
-		wrapper.synch();
-	    }
+	    stored = storeShapeFile(key, entry, null);
 
 	} else {
 
@@ -145,6 +131,49 @@ public class OpenSearchFolder implements DatabaseFolder {
 	}
 
 	return stored;
+    }
+
+    /**
+     * @param owner uploader id stored on each polygon document; may be {@code null}
+     */
+    public boolean storeShapeFile(String key, FolderEntry entry, String owner) throws Exception {
+
+	boolean stored = true;
+
+	List<IndexData> list = IndexData.ofShapeFile(this, key, entry, owner);
+
+	for (IndexData indexData : list) {
+
+	    stored &= wrapper.storeWithOpenSearchClient(indexData);
+
+	    wrapper.synch();
+	}
+
+	return stored;
+    }
+
+    /**
+     * @param owner uploader id stored on each polygon document; may be {@code null}
+     * @return {@code true} when at least one feature was upserted as an update
+     */
+    public boolean upsertShapeFile(String key, FolderEntry entry, String owner) throws Exception {
+
+	boolean updated = false;
+
+	List<IndexData> list = IndexData.ofShapeFile(this, key, entry, owner);
+
+	for (IndexData indexData : list) {
+
+	    Result result = wrapper.upsertWithOpenSearchClient(indexData);
+
+	    wrapper.synch();
+
+	    if (result == Result.Updated) {
+		updated = true;
+	    }
+	}
+
+	return updated;
     }
 
     @Override

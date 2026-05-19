@@ -35,10 +35,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.opensearch.shape.OpenSearchShapefileClient;
-import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.bond.spatial.ShapeEntryPrefix;
@@ -49,9 +49,11 @@ import eu.essi_lab.messages.bond.spatial.ShapeEntryPrefix;
 public class PredefinedShapeManagementService {
 
     /**
+     * @param actorOwner owner id of the current user
+     * @param actorIsAdmin whether the current user is an administrator
      * @return JSON payload for the management panel (selection status is computed client-side via WMS GetCapabilities)
      */
-    public JSONObject listAreas() throws Exception {
+    public JSONObject listAreas(String actorOwner, boolean actorIsAdmin) throws Exception {
 
 	OpenSearchShapefileClient client = new OpenSearchShapefileClient();
 	List<String> entryNames = client.listEntryNames().stream()//
@@ -69,16 +71,23 @@ public class PredefinedShapeManagementService {
 
 	for (OpenSearchShapefileClient.UploadRecord upload : uploads) {
 
+	    if (!PredefinedShapeAccess.canManage(actorOwner, actorIsAdmin, upload.owner())) {
+		continue;
+	    }
+
 	    List<String> features = entryNames.stream()//
 		    .filter(name -> name.equals(upload.prefix()) || name.startsWith(upload.prefix() + "_"))//
 		    .collect(Collectors.toList());
 
-	    areas.put(toAreaJson(upload.prefix(), upload.fileName(), upload.uploadedAt(), features, false));
+	    areas.put(toAreaJson(upload.prefix(), upload.fileName(), upload.uploadedAt(), upload.owner(), features, false));
 	}
 
-	for (Map.Entry<String, List<String>> legacy : legacyGroups.entrySet()) {
+	if (actorIsAdmin) {
 
-	    areas.put(toAreaJson(legacy.getKey(), "", "", legacy.getValue(), true));
+	    for (Map.Entry<String, List<String>> legacy : legacyGroups.entrySet()) {
+
+		areas.put(toAreaJson(legacy.getKey(), "", "", "", legacy.getValue(), true));
+	    }
 	}
 
 	JSONObject out = new JSONObject();
@@ -92,11 +101,12 @@ public class PredefinedShapeManagementService {
      * @param originalFileName
      * @param explicitShapeId
      * @param zipStream
-     * @param autoHarvest
+     * @param owner uploader id ({@link PredefinedShapeAccess#ADMIN_OWNER} for administrators)
+     * @param actorIsAdmin whether the current user is an administrator
      * @return upload outcome
      */
     public PredefinedShapeUploadService.UploadOutcome upload(String originalFileName, String explicitShapeId, InputStream zipStream,
-	    boolean autoHarvest) {
+	    String owner, boolean actorIsAdmin) {
 
 	if (originalFileName == null || originalFileName.isBlank()) {
 
@@ -108,6 +118,11 @@ public class PredefinedShapeManagementService {
 	    return PredefinedShapeUploadService.UploadOutcome.failure("Only zipped shapefiles (.zip) are supported");
 	}
 
+	if (owner == null || owner.isBlank()) {
+
+	    return PredefinedShapeUploadService.UploadOutcome.failure("Missing owner");
+	}
+
 	String prefix;
 	try {
 	    prefix = ShapeEntryPrefix.resolve(explicitShapeId, originalFileName);
@@ -117,13 +132,23 @@ public class PredefinedShapeManagementService {
 
 	try {
 
-	    deleteByPrefix(prefix);
+	    PredefinedShapeDeleteResult replaceCheck = deleteByPrefix(prefix, owner, actorIsAdmin, false);
+
+	    if (!replaceCheck.isSuccess()) {
+
+		if (replaceCheck.isForbidden()) {
+		    return PredefinedShapeUploadService.UploadOutcome.forbidden(replaceCheck.getErrorMessage().orElse(
+			    PredefinedShapeAccess.FORBIDDEN_MESSAGE));
+		}
+		return PredefinedShapeUploadService.UploadOutcome.failure(
+			replaceCheck.getErrorMessage().orElse("Unable to replace existing shape area"));
+	    }
 
 	    OpenSearchDatabase database = new OpenSearchDatabase();
 	    database.initialize(ConfigurationWrapper.getStorageInfo());
 	    OpenSearchFolder folder = new OpenSearchFolder(database, OpenSearchDatabase.SHAPE_FILES_FOLDER);
 
-	    boolean stored = folder.store(prefix, FolderEntry.of(zipStream), EntryType.SHAPE_FILE);
+	    boolean stored = folder.storeShapeFile(prefix, FolderEntry.of(zipStream), owner);
 
 	    if (!stored) {
 
@@ -131,9 +156,10 @@ public class PredefinedShapeManagementService {
 	    }
 
 	    PredefinedShapeRegistry registry = new PredefinedShapeRegistry();
-	    registry.registerUpload(prefix, originalFileName);
+	    registry.registerUpload(prefix, originalFileName, owner);
 
-	    GSLoggerFactory.getLogger(getClass()).info("Stored predefined shape zip {} with prefix {}", originalFileName, prefix);
+	    GSLoggerFactory.getLogger(getClass()).info("Stored predefined shape zip {} with prefix {} for owner {}", originalFileName,
+		    prefix, owner);
 
 	} catch (Exception ex) {
 
@@ -141,30 +167,58 @@ public class PredefinedShapeManagementService {
 	    return PredefinedShapeUploadService.UploadOutcome.failure("Error storing shapefile: " + ex.getMessage());
 	}
 
-	if (autoHarvest) {
-
-	    Optional<String> harvestError = triggerHarvest();
-
-	    if (harvestError.isPresent()) {
-
-		return PredefinedShapeUploadService.UploadOutcome.failure(harvestError.get());
-	    }
-	}
-
 	return PredefinedShapeUploadService.UploadOutcome.success(prefix);
     }
 
     /**
      * @param prefix
-     * @return error message when deletion failed
+     * @param actorOwner owner id of the current user
+     * @param actorIsAdmin whether the current user is an administrator
+     * @return deletion result
      */
-    public Optional<String> deleteByPrefix(String prefix) {
+    public PredefinedShapeDeleteResult deleteByPrefix(String prefix, String actorOwner, boolean actorIsAdmin) {
+
+	return deleteByPrefix(prefix, actorOwner, actorIsAdmin, true);
+    }
+
+    private PredefinedShapeDeleteResult deleteByPrefix(String prefix, String actorOwner, boolean actorIsAdmin,
+	    boolean enforceWhenMissing) {
 
 	try {
 
 	    if (prefix == null || prefix.isBlank()) {
 
-		return Optional.of("Missing shape identifier");
+		return PredefinedShapeDeleteResult.failure("Missing shape identifier");
+	    }
+
+	    PredefinedShapeRegistry registry = new PredefinedShapeRegistry();
+	    Optional<OpenSearchShapefileClient.UploadRecord> existing = registry.findUpload(prefix);
+
+	    if (existing.isPresent()) {
+
+		if (!PredefinedShapeAccess.canManage(actorOwner, actorIsAdmin, existing.get().owner())) {
+		    return PredefinedShapeDeleteResult.forbidden(PredefinedShapeAccess.FORBIDDEN_MESSAGE);
+		}
+
+	    } else {
+
+		OpenSearchShapefileClient client = new OpenSearchShapefileClient();
+		Optional<String> featureOwner = readOwnerFromFeatures(client, prefix);
+
+		if (featureOwner.isPresent()
+			&& !PredefinedShapeAccess.canManage(actorOwner, actorIsAdmin, featureOwner.get())) {
+		    return PredefinedShapeDeleteResult.forbidden(PredefinedShapeAccess.FORBIDDEN_MESSAGE);
+		}
+
+		if (enforceWhenMissing && featureOwner.isEmpty()) {
+		    String prefixMarker = prefix + "_";
+		    boolean hasFeatures = client.listEntryNames().stream()//
+			    .anyMatch(name -> name.equals(prefix) || name.startsWith(prefixMarker));
+
+		    if (hasFeatures && !actorIsAdmin) {
+			return PredefinedShapeDeleteResult.forbidden(PredefinedShapeAccess.FORBIDDEN_MESSAGE);
+		    }
+		}
 	    }
 
 	    OpenSearchShapefileClient client = new OpenSearchShapefileClient();
@@ -180,17 +234,16 @@ public class PredefinedShapeManagementService {
 		client.getFolder().remove(toRemove);
 	    }
 
-	    PredefinedShapeRegistry registry = new PredefinedShapeRegistry();
 	    registry.unregisterUpload(prefix);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Deleted predefined shape prefix {} ({} features)", prefix, toRemove.size());
 
-	    return Optional.empty();
+	    return PredefinedShapeDeleteResult.ok();
 
 	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(ex);
-	    return Optional.of("Error deleting shapes: " + ex.getMessage());
+	    return PredefinedShapeDeleteResult.failure("Error deleting shapes: " + ex.getMessage());
 	}
     }
 
@@ -209,12 +262,14 @@ public class PredefinedShapeManagementService {
 	return ShapeHarvestScheduler.scheduleHarvestNow(sourceId.get());
     }
 
-    private JSONObject toAreaJson(String prefix, String fileName, String uploadedAt, List<String> featureNames, boolean legacy) {
+    private JSONObject toAreaJson(String prefix, String fileName, String uploadedAt, String owner, List<String> featureNames,
+	    boolean legacy) {
 
 	JSONObject area = new JSONObject();
 	area.put("prefix", prefix);
 	area.put("fileName", fileName == null ? "" : fileName);
 	area.put("uploadedAt", uploadedAt == null ? "" : uploadedAt);
+	area.put("owner", owner == null ? "" : owner);
 	area.put("featureCount", featureNames.size());
 	area.put("legacy", legacy);
 
@@ -225,6 +280,30 @@ public class PredefinedShapeManagementService {
 	area.put("entryNames", entryNames);
 
 	return area;
+    }
+
+    private Optional<String> readOwnerFromFeatures(OpenSearchShapefileClient client, String prefix) throws Exception {
+
+	String prefixMarker = prefix + "_";
+
+	for (String name : client.listEntryNames()) {
+
+	    if (!name.equals(prefix) && !name.startsWith(prefixMarker)) {
+		continue;
+	    }
+
+	    Optional<org.json.JSONObject> source = client.getShapeSource(name);
+	    if (source.isEmpty()) {
+		continue;
+	    }
+
+	    String owner = source.get().optString(ShapeFileMapping.OWNER, "");
+	    if (!owner.isBlank()) {
+		return Optional.of(owner);
+	    }
+	}
+
+	return Optional.empty();
     }
 
     private Map<String, List<String>> groupLegacyEntries(List<String> entryNames, Set<String> knownPrefixes) {

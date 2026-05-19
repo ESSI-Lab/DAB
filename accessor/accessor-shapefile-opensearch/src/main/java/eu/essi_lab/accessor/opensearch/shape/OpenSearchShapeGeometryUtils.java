@@ -59,9 +59,9 @@ public class OpenSearchShapeGeometryUtils {
 	};
     }
 
-    public static void setBoundingBox(FeatureMetadata metadata, Geometry geometry) {
+    public static void setBoundingBox(FeatureMetadata metadata, Geometry wgs84Geometry) {
 
-	org.locationtech.jts.geom.Envelope envelope = geometry.getEnvelopeInternal();
+	org.locationtech.jts.geom.Envelope envelope = wgs84Geometry.getEnvelopeInternal();
 	metadata.setWest(BigDecimal.valueOf(envelope.getMinX()));
 	metadata.setEast(BigDecimal.valueOf(envelope.getMaxX()));
 	metadata.setSouth(BigDecimal.valueOf(envelope.getMinY()));

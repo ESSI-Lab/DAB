@@ -46,6 +46,12 @@ public class ShapeFileMapping extends IndexMapping {
     public static final String UPLOAD_REGISTRY = "uploadRegistry";
     public static final String UPLOAD_REGISTRY_ENTRY_NAME = "__upload_registry__";
     public static final String SHAPE_UPLOAD_PREFIX = "shapeUploadPrefix";
+    /** Human-readable polygon label from shapefile attributes (used as WMS layer title after harvest). */
+    public static final String ENTRY_TITLE = "entryTitle";
+    /** User id of the uploader ({@code admin} for administrators). */
+    public static final String OWNER = "owner";
+    /** CRS identifier ({@code EPSG:xxxx}) of coordinates in the {@link #SHAPE} geojson. */
+    public static final String SHAPE_CRS = "shapeCrs";
 
     private static ShapeFileMapping instance;
     
@@ -74,6 +80,12 @@ public class ShapeFileMapping extends IndexMapping {
 	addProperty(UPLOAD_REGISTRY, FieldType.Text.jsonValue());
 
 	addProperty(SHAPE_UPLOAD_PREFIX, FieldType.Keyword.jsonValue());
+
+	addProperty(ENTRY_TITLE, FieldType.Text.jsonValue());
+
+	addProperty(OWNER, FieldType.Keyword.jsonValue());
+
+	addProperty(SHAPE_CRS, FieldType.Keyword.jsonValue());
     }
 
     /**

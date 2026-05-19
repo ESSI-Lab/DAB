@@ -28,6 +28,8 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.accessor.s3.FeatureMetadata;
+import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
+import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -87,13 +89,23 @@ public class OpenSearchShapefileConnector extends HarvestedQueryConnector<OpenSe
 		}
 
 		try {
-		    JSONObject shape = source.get().getJSONObject("shape");
-		    Geometry geometry = OpenSearchShapeGeometryUtils.toGeometry(shape);
+		    JSONObject osSource = source.get();
+		    JSONObject shape = osSource.getJSONObject("shape");
+		    String shapeCrs = osSource.optString(ShapeFileMapping.SHAPE_CRS, CRS.EPSG_4326().getIdentifier());
+		    Geometry geometry = ShapeBoundingBoxNormalizer.toWgs84(OpenSearchShapeGeometryUtils.toGeometry(shape), shapeCrs);
 		    FeatureMetadata feature = new FeatureMetadata();
 		    feature.setUrl(sourceUrl);
 		    feature.setId(entryName);
 		    OpenSearchShapeGeometryUtils.setBoundingBox(feature, geometry);
 		    feature.getAttributes().put("entryName", entryName);
+		    String entryTitle = osSource.optString(ShapeFileMapping.ENTRY_TITLE, "");
+		    if (!entryTitle.isBlank()) {
+			feature.getAttributes().put("entryTitle", entryTitle);
+		    }
+		    String owner = osSource.optString(ShapeFileMapping.OWNER, "");
+		    if (!owner.isBlank()) {
+			feature.getAttributes().put("owner", owner);
+		    }
 
 		    OriginalMetadata metadataRecord = new OriginalMetadata();
 		    metadataRecord.setSchemeURI(CommonNameSpaceContext.OPENSEARCH_SHAPEFILE);

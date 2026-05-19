@@ -492,6 +492,14 @@ public class IndexData {
      */
     public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry) throws Exception {
 
+	return ofShapeFile(folder, key, entry, null);
+    }
+
+    /**
+     * @param owner uploader id stored on each polygon document; may be {@code null}
+     */
+    public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry, String owner) throws Exception {
+
 	ClonableInputStream inputStream = new ClonableInputStream(entry.getStream().get());
 
 	Unzipper unzipper = new Unzipper(inputStream.clone());
@@ -546,6 +554,20 @@ public class IndexData {
 		    Base64.getEncoder().encodeToString(object.toString().getBytes(StandardCharsets.UTF_8)));
 
 	    indexData.put(ShapeFileMapping.SHAPE, shape);
+
+	    String entryTitle = object.optString(ShapeFileMapping.ENTRY_TITLE, "");
+	    if (!entryTitle.isBlank()) {
+		indexData.put(ShapeFileMapping.ENTRY_TITLE, entryTitle);
+	    }
+
+	    if (owner != null && !owner.isBlank()) {
+		indexData.put(ShapeFileMapping.OWNER, owner);
+	    }
+
+	    String shapeCrs = object.optString(ShapeFileMapping.SHAPE_CRS, "");
+	    if (!shapeCrs.isBlank()) {
+		indexData.put(ShapeFileMapping.SHAPE_CRS, shapeCrs);
+	    }
 
 	    out.add(indexData);
 	}

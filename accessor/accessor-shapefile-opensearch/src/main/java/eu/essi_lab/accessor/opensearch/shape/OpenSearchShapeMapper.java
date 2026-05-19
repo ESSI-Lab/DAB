@@ -39,6 +39,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.messages.bond.spatial.ShapeLayerOwner;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.model.resource.ResourcePropertyHandler;
 import eu.essi_lab.model.resource.data.CRS;
@@ -81,7 +82,10 @@ public class OpenSearchShapeMapper extends FileIdentifierMapper {
 	    coreMetadata.setIdentifier(metadataId);
 
 	    HashMap<String, String> attributes = feature.getAttributes();
-	    String title = attributes.get("distretti");
+	    String title = attributes.get("entryTitle");
+	    if (title == null || title.isEmpty()) {
+		title = attributes.get("distretti");
+	    }
 	    if (title == null || title.isEmpty()) {
 		title = attributes.get("euuomname");
 	    }
@@ -95,8 +99,13 @@ public class OpenSearchShapeMapper extends FileIdentifierMapper {
 	    coreMetadata.setTitle(title);
 	    coreMetadata.setAbstract("Shape feature from OpenSearch at " + feature.getUrl());
 
+	    String owner = attributes.get("owner");
+	    if (owner != null && !owner.isEmpty()) {
+		coreMetadata.getMIMetadata().getDataIdentification().addKeyword(ShapeLayerOwner.toKeyword(owner));
+	    }
+
 	    for (String name : attributes.keySet()) {
-		if (!"entryName".equals(name)) {
+		if (!"entryName".equals(name) && !"entryTitle".equals(name) && !"owner".equals(name)) {
 		    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(attributes.get(name));
 		}
 	    }

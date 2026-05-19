@@ -29,7 +29,10 @@ import org.locationtech.jts.geom.Geometry;
 
 import eu.essi_lab.accessor.opensearch.shape.OpenSearchShapeGeometryUtils;
 import eu.essi_lab.accessor.opensearch.shape.OpenSearchShapefileClient;
+import eu.essi_lab.accessor.opensearch.shape.ShapeBoundingBoxNormalizer;
 import eu.essi_lab.accessor.s3.FeatureMetadata;
+import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
+import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
@@ -70,8 +73,10 @@ public class OpenSearchFeatureManager {
 	    return null;
 	}
 
-	JSONObject shape = source.get().getJSONObject("shape");
-	Geometry geometry = OpenSearchShapeGeometryUtils.toGeometry(shape);
+	JSONObject osSource = source.get();
+	JSONObject shape = osSource.getJSONObject("shape");
+	String shapeCrs = osSource.optString(ShapeFileMapping.SHAPE_CRS, CRS.EPSG_4326().getIdentifier());
+	Geometry geometry = ShapeBoundingBoxNormalizer.toWgs84(OpenSearchShapeGeometryUtils.toGeometry(shape), shapeCrs);
 
 	FeatureMetadata metadata = new FeatureMetadata();
 	metadata.setUrl(linkage);

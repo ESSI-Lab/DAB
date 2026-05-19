@@ -33,6 +33,8 @@ import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer;
 import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.UriInfo;
@@ -68,10 +70,8 @@ import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.BondFactory;
-import eu.essi_lab.messages.bond.LogicalBond;
-import eu.essi_lab.messages.bond.ResourcePropertyBond;
+import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter;
+import eu.essi_lab.messages.bond.spatial.ShapeLayerOwner;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -155,7 +155,6 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			List<GSSource> allSources = ConfigurationWrapper.getAllSources();
 
 			// set the required properties
-			discoveryMessage.setSources(allSources);
 			discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
 			discoveryMessage.setWebRequest(webRequest);
@@ -168,11 +167,17 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			// set the view
 			Optional<String> viewId = webRequest.extractViewId();
 			if (viewId.isPresent()) {
+			    View view = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId.get()).get();
+
+			    discoveryMessage.setSources(ConfigurationWrapper.getViewSources(view));
 
 				WebRequestTransformer.setView(//
 						viewId.get(), //
 						discoveryMessage.getDataBaseURI(), //
 						discoveryMessage);
+			}else{
+			    discoveryMessage.setSources(allSources);
+
 			}
 
 			// set the user bond
@@ -271,11 +276,20 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			cap.setLayer(rootLayer);
 			rootLayer.getCRS().add(CRS.EPSG_4326().getIdentifier());
 			
+			Optional<String> tokenId = webRequest.extractTokenId();
+			String viewerOwner = ShapeWmsLayerFilter.resolveViewerOwner(tokenId.orElse(ShapeLayerOwner.PUBLIC_TOKEN))
+				.orElse("");
+
 			List<GSResource> resources = response.getResultsList().stream().
 			sorted((r1,r2) -> r1.getHarmonizedMetadata().getCoreMetadata().getTitle().compareTo(r2.getHarmonizedMetadata().getCoreMetadata().getTitle())).
 			collect(Collectors.toList());
 			
 			for (GSResource resource : resources) {
+
+			    Optional<String> shapeOwner = ShapeLayerOwner.readFromResource(resource);
+			    if (shapeOwner.isPresent() && !ShapeLayerOwner.isVisible(shapeOwner.get(), viewerOwner)) {
+				continue;
+			    }
 				ReportsMetadataHandler handler = new ReportsMetadataHandler(resource);
 				List<DataComplianceReport> reports = handler.getReports();
 				if (!reports.isEmpty()) {
@@ -293,10 +307,10 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 
 					if (boundingBox != null) {
 
-						bbox.setNorthBoundLatitude(boundingBox.getNorth());
-						bbox.setSouthBoundLatitude(boundingBox.getSouth());
-						bbox.setWestBoundLongitude(boundingBox.getWest());
-						bbox.setEastBoundLongitude(boundingBox.getEast());
+						bbox.setNorthBoundLatitude(boundingBox.getNorth().doubleValue());
+						bbox.setSouthBoundLatitude(boundingBox.getSouth().doubleValue());
+						bbox.setWestBoundLongitude(boundingBox.getWest().doubleValue());
+						bbox.setEastBoundLongitude(boundingBox.getEast().doubleValue());
 					} else {
 						bbox.setNorthBoundLatitude(90);
 						bbox.setSouthBoundLatitude(-90);

@@ -37,6 +37,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Node;
 
+import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter;
+import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter.LayerFilterContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -79,12 +81,24 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 	case "capabilities":
 
 	    String endpoint = parser.getValue("endpoint");
-	    endpoint = URLDecoder.decode(endpoint);
+	    String shapeView = parser.getValue("shapeView");
+	    String token = parser.getValue("token");
 	    String version = parser.getValue("version");
-	    
-	    if (!endpoint.startsWith("http")) {
+
+	    HttpServletRequest req = webRequest.getServletRequest();
+
+	    if (shapeView != null && !shapeView.isBlank()) {
+
+		String contextPath = req.getContextPath();
+		endpoint = ShapeWmsLayerFilter.buildWmsEndpointPath(contextPath, token, shapeView);
+
+	    } else if (endpoint != null) {
+
+		endpoint = URLDecoder.decode(endpoint);
+	    }
+
+	    if (endpoint != null && !endpoint.startsWith("http")) {
 		// relative endpoint
-		HttpServletRequest req = webRequest.getServletRequest();
 		String scheme = req.getScheme();
 	        String serverName = req.getServerName();
 	        int serverPort = req.getServerPort();
@@ -97,7 +111,17 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 	        endpoint = url.toString();
 	    }
 
+	    if (endpoint == null || endpoint.isBlank()) {
+
+		break;
+	    }
+
 	    String capRequest = endpoint + "?service=WMS&request=GetCapabilities&version=" + version;
+
+	    LayerFilterContext layerFilter = null;
+	    if (shapeView != null && !shapeView.isBlank()) {
+		layerFilter = ShapeWmsLayerFilter.createContext(token);
+	    }
 
 	    Optional<String> response = downloader.downloadOptionalString(capRequest);
 	    if (response.isPresent()) {
@@ -125,6 +149,10 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 			}
 
 			if (!layerName.isEmpty()) {
+
+			    if (layerFilter != null && !ShapeWmsLayerFilter.isLayerVisible(layerName, layerFilter)) {
+				continue;
+			    }
 
 			    JSONObject layerObject = new JSONObject();
 			    layersArray.put(layerObject);

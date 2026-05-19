@@ -46,6 +46,11 @@
 			<artifactId>accessor-datahub</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-shapefile-opensearch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		
 	</dependencies>
 

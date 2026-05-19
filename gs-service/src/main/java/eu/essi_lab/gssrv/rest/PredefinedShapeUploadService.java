@@ -35,21 +35,28 @@ public class PredefinedShapeUploadService {
 
 	private final String entryPrefix;
 	private final String errorMessage;
+	private final boolean forbidden;
 
-	private UploadOutcome(String entryPrefix, String errorMessage) {
+	private UploadOutcome(String entryPrefix, String errorMessage, boolean forbidden) {
 
 	    this.entryPrefix = entryPrefix;
 	    this.errorMessage = errorMessage;
+	    this.forbidden = forbidden;
 	}
 
 	public static UploadOutcome success(String entryPrefix) {
 
-	    return new UploadOutcome(entryPrefix, null);
+	    return new UploadOutcome(entryPrefix, null, false);
 	}
 
 	public static UploadOutcome failure(String errorMessage) {
 
-	    return new UploadOutcome(null, errorMessage);
+	    return new UploadOutcome(null, errorMessage, false);
+	}
+
+	public static UploadOutcome forbidden(String errorMessage) {
+
+	    return new UploadOutcome(null, errorMessage, true);
 	}
 
 	public boolean isSuccess() {
@@ -66,6 +73,11 @@ public class PredefinedShapeUploadService {
 
 	    return errorMessage;
 	}
+
+	public boolean isForbidden() {
+
+	    return forbidden;
+	}
     }
 
     private final PredefinedShapeManagementService managementService = new PredefinedShapeManagementService();
@@ -74,11 +86,11 @@ public class PredefinedShapeUploadService {
      * @param originalFileName
      * @param explicitShapeId optional user-provided shape identifier; if blank, derived from {@code originalFileName}
      * @param zipStream
-     * @param autoHarvest when true, schedules harvest of the configured shape source after upload
      * @return upload outcome
      */
-    public UploadOutcome upload(String originalFileName, String explicitShapeId, InputStream zipStream, boolean autoHarvest) {
+    public UploadOutcome upload(String originalFileName, String explicitShapeId, InputStream zipStream, String owner,
+	    boolean actorIsAdmin) {
 
-	return managementService.upload(originalFileName, explicitShapeId, zipStream, autoHarvest);
+	return managementService.upload(originalFileName, explicitShapeId, zipStream, owner, actorIsAdmin);
     }
 }

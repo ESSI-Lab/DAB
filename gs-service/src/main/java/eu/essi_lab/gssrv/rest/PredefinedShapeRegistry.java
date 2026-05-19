@@ -22,6 +22,7 @@ package eu.essi_lab.gssrv.rest;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import eu.essi_lab.accessor.opensearch.shape.OpenSearchShapefileClient;
 import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
@@ -55,9 +56,17 @@ public class PredefinedShapeRegistry {
      * @param prefix
      * @param fileName
      */
-    public void registerUpload(String prefix, String fileName) throws Exception {
+    public void registerUpload(String prefix, String fileName, String owner) throws Exception {
 
-	client.registerUpload(prefix, fileName);
+	client.registerUpload(prefix, fileName, owner);
+    }
+
+    /**
+     * @param prefix upload identifier
+     */
+    public Optional<OpenSearchShapefileClient.UploadRecord> findUpload(String prefix) throws Exception {
+
+	return client.findUpload(prefix);
     }
 
     /**

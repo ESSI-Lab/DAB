@@ -41,6 +41,12 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>security</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>jaxb-classes-common</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>

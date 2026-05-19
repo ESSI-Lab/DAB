@@ -23,18 +23,24 @@ package eu.essi_lab.accessor.opensearch.shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchResponse;
 
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
+import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
 import eu.essi_lab.api.database.opensearch.OpenSearchWrapper;
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
+import eu.essi_lab.api.database.opensearch.query.OpenSearchQueryBuilder;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -81,6 +87,112 @@ public class OpenSearchShapefileClient {
 	}
     }
 
+    /**
+     * @return map of shape entry name → owner id (single paginated OpenSearch query series)
+     */
+    public Map<String, String> loadEntryOwners() throws Exception {
+
+	Map<String, String> out = new HashMap<>();
+
+	String index = ShapeFileMapping.get().getIndex();
+	Query query = OpenSearchQueryBuilder.buildFolderEntriesQuery(folder);
+
+	int pageSize = 1000;
+	int from = 0;
+
+	while (true) {
+
+	    SearchResponse<Object> response = wrapper.search(//
+		    index, //
+		    query, //
+		    List.of(IndexData.ENTRY_NAME, ShapeFileMapping.OWNER), //
+		    from, //
+		    pageSize, //
+		    Optional.empty(), //
+		    Optional.empty(), //
+		    false, //
+		    true);
+
+	    List<JSONObject> batch = OpenSearchUtils.toJSONSourcesList(response);
+
+	    if (batch.isEmpty()) {
+		break;
+	    }
+
+	    for (JSONObject source : batch) {
+
+		String entryName = source.optString(IndexData.ENTRY_NAME, "");
+
+		if (entryName.isBlank() || ShapeFileMapping.UPLOAD_REGISTRY_ENTRY_NAME.equals(entryName)) {
+		    continue;
+		}
+
+		out.put(entryName, source.optString(ShapeFileMapping.OWNER, ""));
+	    }
+
+	    from += batch.size();
+
+	    if (batch.size() < pageSize) {
+		break;
+	    }
+	}
+
+	return out;
+    }
+
+    /**
+     * @return shape index sources with entry name, title and owner (excluding upload registry)
+     */
+    public List<JSONObject> loadPredefinedLayerSources() throws Exception {
+
+	List<JSONObject> out = new ArrayList<>();
+
+	String index = ShapeFileMapping.get().getIndex();
+	Query query = OpenSearchQueryBuilder.buildFolderEntriesQuery(folder);
+
+	int pageSize = 1000;
+	int from = 0;
+
+	while (true) {
+
+	    SearchResponse<Object> response = wrapper.search(//
+		    index, //
+		    query, //
+		    List.of(IndexData.ENTRY_NAME, ShapeFileMapping.ENTRY_TITLE, ShapeFileMapping.OWNER), //
+		    from, //
+		    pageSize, //
+		    Optional.empty(), //
+		    Optional.empty(), //
+		    false, //
+		    true);
+
+	    List<JSONObject> batch = OpenSearchUtils.toJSONSourcesList(response);
+
+	    if (batch.isEmpty()) {
+		break;
+	    }
+
+	    for (JSONObject source : batch) {
+
+		String entryName = source.optString(IndexData.ENTRY_NAME, "");
+
+		if (entryName.isBlank() || ShapeFileMapping.UPLOAD_REGISTRY_ENTRY_NAME.equals(entryName)) {
+		    continue;
+		}
+
+		out.add(source);
+	    }
+
+	    from += batch.size();
+
+	    if (batch.size() < pageSize) {
+		break;
+	    }
+	}
+
+	return out;
+    }
+
     public OpenSearchFolder getFolder() {
 	return folder;
     }
@@ -99,14 +211,23 @@ public class OpenSearchShapefileClient {
      * @param prefix upload identifier
      * @param fileName original zip file name
      */
-    public void registerUpload(String prefix, String fileName) throws Exception {
+    public void registerUpload(String prefix, String fileName, String owner) throws Exception {
 
 	List<UploadRecord> uploads = readUploadRegistry();
 
 	uploads.removeIf(u -> u.prefix().equals(prefix));
-	uploads.add(new UploadRecord(prefix, fileName, ISO8601DateTimeUtils.getISO8601DateTime()));
+	uploads.add(new UploadRecord(prefix, fileName, ISO8601DateTimeUtils.getISO8601DateTime(), owner));
 
 	writeUploadRegistry(uploads);
+    }
+
+    /**
+     * @param prefix upload identifier
+     * @return registry record when present
+     */
+    public Optional<UploadRecord> findUpload(String prefix) throws Exception {
+
+	return readUploadRegistry().stream().filter(u -> u.prefix().equals(prefix)).findFirst();
     }
 
     /**
@@ -148,7 +269,8 @@ public class OpenSearchShapefileClient {
 	for (int i = 0; i < array.length(); i++) {
 
 	    JSONObject object = array.getJSONObject(i);
-	    out.add(new UploadRecord(object.optString("prefix"), object.optString("fileName"), object.optString("uploadedAt")));
+	    out.add(new UploadRecord(object.optString("prefix"), object.optString("fileName"), object.optString("uploadedAt"),
+		    object.optString("owner", "")));
 	}
 
 	return out;
@@ -165,6 +287,7 @@ public class OpenSearchShapefileClient {
 	    object.put("prefix", upload.prefix());
 	    object.put("fileName", upload.fileName());
 	    object.put("uploadedAt", upload.uploadedAt());
+	    object.put("owner", upload.owner() == null ? "" : upload.owner());
 	    array.put(object);
 	}
 
@@ -175,6 +298,6 @@ public class OpenSearchShapefileClient {
     /**
      * Upload metadata.
      */
-    public record UploadRecord(String prefix, String fileName, String uploadedAt) {
+    public record UploadRecord(String prefix, String fileName, String uploadedAt, String owner) {
     }
 }
