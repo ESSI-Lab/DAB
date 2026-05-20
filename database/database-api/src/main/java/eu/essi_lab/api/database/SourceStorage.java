@@ -330,7 +330,7 @@ public class SourceStorage {
      */
     public Optional<Boolean> consolidatedFolderSurvives() throws Exception {
 
-	Boolean smartStorageDisabled = storage.getSetting().isSmartStorageDisabledSet(this.sourceId);
+	Boolean smartStorageDisabled = storage.getSetting().isSmartStorageDisabled(this.sourceId);
 
 	if (!smartStorageDisabled) {
 
@@ -655,7 +655,7 @@ public class SourceStorage {
 	switch (strategy) {
 	case FULL:
 
-	    Boolean deletedOption = storage.getSetting().isMarkDeletedOption(this.sourceId);
+	    boolean deletedOption = storage.getSetting().isMarkDeleted(this.sourceId);
 
 	    // -----------------------------------------------------
 	    //
@@ -668,7 +668,7 @@ public class SourceStorage {
 		debug("Tagging deleted records ENDED", status);
 	    }
 
-	    Boolean smartStorageDisabled = storage.getSetting().isSmartStorageDisabledSet(this.sourceId);
+	    boolean smartStorageDisabled = storage.getSetting().isSmartStorageDisabled(this.sourceId);
 
 	    if (!smartStorageDisabled) {
 

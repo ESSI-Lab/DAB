@@ -22,6 +22,7 @@ package eu.essi_lab.cfga.gs.setting.database;
  */
 
 import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.option.*;
 import eu.essi_lab.cfga.setting.*;
@@ -30,7 +31,6 @@ import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
 import org.json.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -56,24 +56,24 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	Option<String> smartStorageOption = StringOptionBuilder.get().//
 		withLabel("Disable smart storage").//
-		withDescription("Per default this feature is enabled for all the sources."
-		+ " Enable this option and add source identifiers to disable this feature for the given sources."
-		+ " Disable this option to enable the feature for all the sources (default)." + " Single source identifier per row").//
+		withDescription("Enable this option to disable 'smart storage' for the given sources."
+		+ " Disable this option to enable 'smart storage' for all the sources (default)").//
 		withKey(SMART_STORAGE_KEY).//
+		withMultiSelection().//
+		withValues(getSourcesMap().values().stream().sorted().toList()).//
 		disabled().//
-		withTextArea().//
 		build();
 
 	addOption(smartStorageOption);
 
 	Option<String> markDeletedRecordsOption = StringOptionBuilder.get().//
 		withLabel("Enable tagging of deleted records").//
-		withDescription("Per default this feature is disabled for all the sources. "
-		+ " Enable this option and add source identifiers to enable this feature for the given sources."
-		+ " Disable this option to disable the feature for all the sources (default)." + " Single source identifier per row").//
+		withDescription("Enable this option to tag deleted records of the given sources."
+		+ " Disable this option to disable the feature for all the sources (default)").//
 		withKey(MARK_DELETED_RECORDS_KEY).//
+		withMultiSelection().//
+		withValues(getSourcesMap().values().stream().sorted().toList()).//
 		disabled().//
-		withTextArea().//
 		build();
 
 	addOption(markDeletedRecordsOption);
@@ -97,17 +97,19 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 	    ValidationResponse validationResponse = new ValidationResponse();
 
 	    Option<String> markOption = srcStrSetting.getOption(MARK_DELETED_RECORDS_KEY, String.class).get();
-	    if (markOption.isEnabled() && (markOption.getOptionalValue().isEmpty() || markOption.getValue().isEmpty())) {
+
+	    if (markOption.isEnabled() && (markOption.getSelectedValues().isEmpty())) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
-		validationResponse.getErrors().add("One or more source identifier must be set for the 'Mark deleted records' feature");
+		validationResponse.getErrors().add("One or more sources must be selected to enable the 'tag deleted records' feature");
 	    }
 
 	    Option<String> smartOption = srcStrSetting.getOption(SMART_STORAGE_KEY, String.class).get();
-	    if (smartOption.isEnabled() && (smartOption.getOptionalValue().isEmpty() || smartOption.getValue().isEmpty())) {
+
+	    if (smartOption.isEnabled() && (smartOption.getSelectedValues().isEmpty())) {
 
 		validationResponse.setResult(ValidationResult.VALIDATION_FAILED);
-		validationResponse.getErrors().add("One or more source identifier must be set for the 'Disable smart storage' feature");
+		validationResponse.getErrors().add("One or more sources must be selected to disable the 'smart storage' feature");
 	    }
 
 	    return validationResponse;
@@ -158,19 +160,19 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * @return
-     */
-    public Boolean isMarkDeletedOption(String sourceIdentifier) {
-
-	return test(MARK_DELETED_RECORDS_KEY, sourceIdentifier);
-    }
-
-    /**
      * @param set
      */
     public void setMarkDeleted(String... sourceIdentifiers) {
 
 	addIdentifier(MARK_DELETED_RECORDS_KEY, sourceIdentifiers);
+    }
+
+    /**
+     * @return
+     */
+    public boolean isMarkDeleted(String sourceIdentifier) {
+
+	return test(MARK_DELETED_RECORDS_KEY, sourceIdentifier);
     }
 
     /**
@@ -182,28 +184,27 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     }
 
     /**
-     * @return
-     */
-    public Boolean isSmartStorageDisabledSet(String sourceIdentifier) {
-
-	return test(SMART_STORAGE_KEY, sourceIdentifier);
-
-    }
-
-    /**
-     * @param sourceIdentifiers
-     */
-    public void removeSmartStorageDisabledSet(String... sourceIdentifiers) {
-
-	removeIdentifier(SMART_STORAGE_KEY, sourceIdentifiers);
-    }
-
-    /**
      * @param set
      */
     public void setDisableSmartStorage(String... sourceIdentifiers) {
 
 	addIdentifier(SMART_STORAGE_KEY, sourceIdentifiers);
+    }
+
+    /**
+     * @return
+     */
+    public boolean isSmartStorageDisabled(String sourceIdentifier) {
+
+	return test(SMART_STORAGE_KEY, sourceIdentifier);
+    }
+
+    /**
+     * @param sourceIdentifiers
+     */
+    public void removeSmartStorageDisabled(String... sourceIdentifiers) {
+
+	removeIdentifier(SMART_STORAGE_KEY, sourceIdentifiers);
     }
 
     /**
@@ -216,7 +217,9 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	option.setEnabled(true);
 
-	option.setValue(option.getOptionalValue().orElse("") + String.join("\n", Arrays.asList(sourceIdentifiers)));
+	List<String> labels = Arrays.stream(sourceIdentifiers).map(this::getSourceLabel).toList();
+
+	option.select(labels::contains);
     }
 
     /**
@@ -229,19 +232,12 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
 
 	option.setEnabled(true);
 
-	Optional<String> optionalValue = option.getOptionalValue();
+	List<String> labelsToRemove = Arrays.stream(sourceIdentifiers).map(this::getSourceLabel).toList();
 
-	List<String> targetList = Arrays.asList(sourceIdentifiers);
+	List<String> selectedLabels = option.getSelectedValues();
+	selectedLabels.removeAll(labelsToRemove);
 
-	if (optionalValue.isPresent()) {
-
-	    //
-	    String newValue = Arrays.stream(optionalValue.get().split("\n")).//
-		    filter(id -> !targetList.contains(id)).//
-		    collect(Collectors.joining("\n"));
-
-	    option.setValue(newValue);
-	}
+	option.select(selectedLabels::contains);
     }
 
     /**
@@ -252,28 +248,50 @@ public class SourceStorageSetting extends Setting implements EditableSetting {
     private boolean test(String optionKey, String sourceIdentifier) {
 
 	Option<String> option = getOption(optionKey, String.class).get();
+
 	if (!option.isEnabled()) {
 
 	    return false;
 	}
 
-	return option.getOptionalValue().orElse("").contains(sourceIdentifier);
+	return option.getSelectedValues().stream().map(this::getSourceId).anyMatch(v -> v.equals(sourceIdentifier));
     }
 
     /**
-     *
+     * @return
      */
-    public void disableMarkDeleted() {
+    private Map<String, String> getSourcesMap() {
 
-	getOption(MARK_DELETED_RECORDS_KEY, String.class).get().setEnabled(false);
+	HashMap<String, String> out = new HashMap<>();
+
+	if (ConfigurationWrapper.getConfiguration().isPresent()) {
+
+	    ConfigurationWrapper.getHarvestedAndMixedSources(). //
+		    stream().//
+		    filter(s -> s.getUniqueIdentifier() != null && !s.getUniqueIdentifier().isEmpty()).//
+		    forEach(s -> out.put(s.getUniqueIdentifier(), s.getLabel()));
+
+	}
+
+	return out;
     }
 
     /**
-     *
+     * @param sourceIdentifier
+     * @return
      */
-    public void enableSmartStorage() {
+    private String getSourceLabel(String sourceIdentifier) {
 
-	getOption(SMART_STORAGE_KEY, String.class).get().setEnabled(false);
+	return getSourcesMap().get(sourceIdentifier);
+    }
+
+    /**
+     * @param sourceLabel
+     * @return
+     */
+    private String getSourceId(String sourceLabel) {
+
+	return getSourcesMap().entrySet().stream().filter(entry -> entry.getValue().equals(sourceLabel)).findFirst().get().getKey();
     }
 
 }

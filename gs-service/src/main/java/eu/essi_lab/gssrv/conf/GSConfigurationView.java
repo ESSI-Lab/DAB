@@ -446,7 +446,7 @@ public class GSConfigurationView extends ConfigurationView {
 
 	    boolean sourceStorageSettingChanged = false;
 
-	    if (sourceStorageSetting.isMarkDeletedOption(sourceIdentifier)) {
+	    if (sourceStorageSetting.isMarkDeleted(sourceIdentifier)) {
 
 		sourceStorageSetting.removeMarkDeleted(sourceIdentifier);
 
@@ -455,9 +455,9 @@ public class GSConfigurationView extends ConfigurationView {
 		sourceStorageSettingChanged = true;
 	    }
 
-	    if (sourceStorageSetting.isSmartStorageDisabledSet(sourceIdentifier)) {
+	    if (sourceStorageSetting.isSmartStorageDisabled(sourceIdentifier)) {
 
-		sourceStorageSetting.removeSmartStorageDisabledSet(sourceIdentifier);
+		sourceStorageSetting.removeSmartStorageDisabled(sourceIdentifier);
 
 		additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from smart storage list");
 
