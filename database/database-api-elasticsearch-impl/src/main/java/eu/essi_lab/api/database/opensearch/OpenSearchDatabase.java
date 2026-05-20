@@ -371,7 +371,7 @@ public class OpenSearchDatabase extends Database {
     }
 
     //
-    // NOT IMPLEMENTED AT THE MOMENT. Used in deprecated SourceStorageWorker
+    // NOT IMPLEMENTED AT THE MOMENT. Used in deprecated SourceStorage
     // testISOCompliance, recoverTags and
     // testISCompliance methods and also in markDeletedRecords (which could be used)
     //

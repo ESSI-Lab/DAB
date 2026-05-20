@@ -466,8 +466,8 @@ public class SupportService {
 
 	    try {
 		Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
-		SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
-		HarvestingProperties harvestingProperties = worker.getHarvestingProperties();
+		SourceStorage storage = database.getStorage(source.getUniqueIdentifier());
+		HarvestingProperties harvestingProperties = storage.getHarvestingProperties();
 		String lastHarvesting = harvestingProperties.getEndHarvestingTimestamp();
 		jsonSource.put("lastHarvesting", lastHarvesting);
 	    } catch (Exception e) {

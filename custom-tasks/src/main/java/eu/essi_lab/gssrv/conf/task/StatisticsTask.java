@@ -50,7 +50,7 @@ import eu.essi_lab.access.availability.DownloadInformation;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -162,7 +162,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  * <dt>{@link StatisticsMetric#LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS
  * LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS} ({@code last_successful_ingestion_harvest_unix_timestamp_ms})</dt>
  * <dd>Unix epoch <b>milliseconds</b> of the last <b>completed</b> harvest end time when {@link HarvestingProperties}
- * reports {@code resourcesCount &gt; 0} and {@link SourceStorageWorker#consolidatedFolderSurvives()} matches
+ * reports {@code resourcesCount &gt; 0} and {@link SourceStorage#consolidatedFolderSurvives()} matches
  * {@link ResourcesComparatorTask}: the consolidated snapshot does not “survive” (optional empty or {@code false}), i.e.
  * the same situation where remote-sourced records are processed for comparison. Omitted when the last run was not
  * completed, left no resources, consolidated survives, or end time is missing.</dd>
@@ -559,7 +559,7 @@ public class StatisticsTask extends AbstractCustomTask {
 			|| metrics.contains(StatisticsMetric.LAST_SOURCE_UP_UNIX_TIMESTAMP_MS);
 		HarvestingProperties harvestingProperties = null;
 		if (needHarvestingProps) {
-		    harvestingProperties = database.getWorker(source).getHarvestingProperties();
+		    harvestingProperties = database.getStorage(source).getHarvestingProperties();
 		}
 
 		if (metrics.contains(StatisticsMetric.DOWNLOAD_AVAILABILITY)) {

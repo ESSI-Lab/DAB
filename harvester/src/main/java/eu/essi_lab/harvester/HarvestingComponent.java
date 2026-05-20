@@ -22,7 +22,7 @@ package eu.essi_lab.harvester;
  */
 
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
-import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
 import eu.essi_lab.messages.HarvestingProperties;
@@ -40,7 +40,7 @@ public abstract class HarvestingComponent {
     private String resumptionToken;
     @SuppressWarnings("rawtypes")
     private IHarvestedAccessor accessor;
-    private SourceStorage sourceStorage;
+    private SourceStorageProvider sourceStorage;
     private HarvestingProperties harvestingProperties;
     private boolean isRecovering;
     private boolean isFirstHarvesting;
@@ -147,7 +147,7 @@ public abstract class HarvestingComponent {
     /**
      * @param sourceStorage
      */
-    public void setSourceStorage(SourceStorage sourceStorage) {
+    public void setSourceStorage(SourceStorageProvider sourceStorage) {
 
 	this.sourceStorage = sourceStorage;
     }
@@ -172,7 +172,7 @@ public abstract class HarvestingComponent {
     /**
      * @return
      */
-    public SourceStorage getSourceStorage() {
+    public SourceStorageProvider getSourceStorage() {
 
 	return sourceStorage;
     }

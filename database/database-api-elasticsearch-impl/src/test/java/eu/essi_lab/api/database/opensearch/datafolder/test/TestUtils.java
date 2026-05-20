@@ -7,12 +7,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.api.database.*;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.w3c.dom.Node;
 
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
@@ -58,7 +57,7 @@ public class TestUtils {
     public static String getMetaFolderName(OpenSearchDatabase database, String sourceId) {
 
 	return sourceId + // source id
-		SourceStorageWorker.META_POSTFIX;//
+		SourceStorage.META_POSTFIX;//
     }
 
     /**
@@ -68,7 +67,7 @@ public class TestUtils {
     public static String getDataFolderName(OpenSearchDatabase database) {
 
 	return SOURCE_ID + // source id
-		SourceStorageWorker.DATA_1_POSTFIX;//
+		SourceStorage.DATA_1_POSTFIX;//
     }
 
     public static boolean EXIT_ON_ERROR = false;

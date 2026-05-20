@@ -26,7 +26,7 @@ package eu.essi_lab.services.webdav;
 
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.DatabaseFolder.*;
-import eu.essi_lab.api.database.SourceStorageWorker.*;
+import eu.essi_lab.api.database.SourceStorage.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.exceptions.*;
@@ -161,16 +161,16 @@ public class DatabaseDirectoryResource
 
 		    entry = FolderEntry.of(clone.clone());
 		    type = EntryType.HARVESTING_PROPERTIES;
-		} else if (file.equals(SourceStorageWorker.ERRORS_REPORT_FILE_NAME)) {
+		} else if (file.equals(SourceStorage.ERRORS_REPORT_FILE_NAME)) {
 
 		    entry = FolderEntry.of(clone.clone());
 		    type = EntryType.HARVESTING_ERROR_REPORT;
-		} else if (file.equals(SourceStorageWorker.WARN_REPORT_FILE_NAME)) {
+		} else if (file.equals(SourceStorage.WARN_REPORT_FILE_NAME)) {
 
 		    entry = FolderEntry.of(clone.clone());
 		    type = EntryType.HARVESTING_WARN_REPORT;
 
-		} else if (file.endsWith(SourceStorageWorker.DATA_FOLDER_POSTFIX)) {
+		} else if (file.endsWith(SourceStorage.DATA_FOLDER_POSTFIX)) {
 
 		    entry = FolderEntry.of(new DataFolderIndexDocument(clone.clone()).getDocument());
 		    type = EntryType.DATA_FOLDER_INDEX_DOC;

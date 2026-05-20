@@ -10,30 +10,24 @@ package eu.essi_lab.cfga;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import eu.essi_lab.cfga.Selectable.*;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.cfga.setting.scheduling.*;
+import org.json.*;
 
-import org.json.JSONArray;
-
-import eu.essi_lab.cfga.Selectable.SelectionMode;
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.setting.AfterCleanFunction;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.cfga.setting.SettingUtils;
-import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -43,7 +37,7 @@ public class SelectionUtils {
     /**
      * @param targetSetting
      * @param newSetting a setting obtained as result of
-     *        <code>SettingUtils.create(targetSetting.getSettingClass())</code>
+     * <code>SettingUtils.create(targetSetting.getSettingClass())</code>
      */
     public static void deepSelect(Setting targetSetting, Setting newSetting) {
 
@@ -65,23 +59,25 @@ public class SelectionUtils {
 	    //
 	    //
 
-	    List<Setting> newSubSettings = newSelSetting.getSettings();
+	    if (!configSelSetting.isEmpty()) {
 
-	    List<Setting> confSubSettings = configSelSetting.getFirst().getSettings();
+		List<Setting> newSubSettings = newSelSetting.getSettings();
 
-	    newSubSettings.forEach(set -> set.setSelected(//
-		    confSubSettings.//
-			    stream().//
-			    map(Setting::getIdentifier).//
-			    anyMatch(id -> id.equals(set.getIdentifier()))));
+		List<Setting> confSubSettings = configSelSetting.getFirst().getSettings();
+
+		newSubSettings.forEach(set -> set.setSelected(//
+			confSubSettings.//
+				stream().//
+				map(Setting::getIdentifier).//
+				anyMatch(id -> id.equals(set.getIdentifier()))));
+	    }
 	}
     }
 
     /**
-     * Recursively removes all unselected settings and options values of the given <code>configuration</code>
-     * from those settings and options that have a {@link SelectionMode}
-     * different from {@link SelectionMode#UNSET}
-     * 
+     * Recursively removes all unselected settings and options values of the given <code>configuration</code> from those settings and
+     * options that have a {@link SelectionMode} different from {@link SelectionMode#UNSET}
+     *
      * @param configuration
      */
     public static void deepClean(Configuration configuration) {
@@ -97,7 +93,7 @@ public class SelectionUtils {
 
     /**
      * Performs recursively after clean operations according to the implementation of the {@link AfterCleanFunction}
-     * 
+     *
      * @param setting
      */
     public static void deepAfterClean(Configuration configuration) {
@@ -112,11 +108,10 @@ public class SelectionUtils {
     }
 
     /**
-     * Recursively removes all unselected settings (except the {@link SchedulerSetting} which cannot be removed)
-     * and options values of the given <code>setting</code>
-     * from those settings and options that have a {@link SelectionMode}
-     * different from {@link SelectionMode#UNSET}
-     * 
+     * Recursively removes all unselected settings (except the {@link SchedulerSetting} which cannot be removed) and options values of the
+     * given <code>setting</code> from those settings and options that have a {@link SelectionMode} different from
+     * {@link SelectionMode#UNSET}
+     *
      * @param setting
      */
     public static void deepClean(Setting setting) {
@@ -130,7 +125,7 @@ public class SelectionUtils {
 
     /**
      * Performs recursively after clean operations according to the implementation of the {@link AfterCleanFunction}
-     * 
+     *
      * @param setting
      */
     public static void deepAfterClean(Setting setting) {
@@ -144,7 +139,7 @@ public class SelectionUtils {
      * Creates a new setting which is a <i>reset</i> clone of
      * <code>targetSetting</code>, then recursively applies all the selections (settings and options values) of
      * <code>targetSetting</code>. The resulting setting is not {@link Selectable#clean()} <br>
-     * 
+     *
      * @param targetSetting
      * @param check
      * @return
@@ -206,9 +201,9 @@ public class SelectionUtils {
     }
 
     /**
-     * {@link Setting} properties can be set outside the default constructor, that is after its initialization, so this
-     * method copies all the <code>targetSetting</code> properties to its <code>resetSetting</code>.
-     * 
+     * {@link Setting} properties can be set outside the default constructor, that is after its initialization, so this method copies all
+     * the <code>targetSetting</code> properties to its <code>resetSetting</code>.
+     *
      * @param resetSetting
      * @param targetSetting
      */

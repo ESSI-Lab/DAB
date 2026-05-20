@@ -25,14 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.api.database.*;
 import org.w3c.dom.Node;
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.GetViewIdentifiersRequest;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.ResultSet;
@@ -206,7 +201,7 @@ public class HCDatabaseReader extends Database implements DatabaseReader, Databa
     }
 
     @Override
-    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+    public SourceStorage getStorage(String sourceId) throws GSException {
 
 	return null;
     }
@@ -242,7 +237,7 @@ public class HCDatabaseReader extends Database implements DatabaseReader, Databa
     }
 
     @Override
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+    public DatabaseFolder findWritingFolder(SourceStorage worker) throws GSException {
 
 	return null;
     }

@@ -1,12 +1,13 @@
 package eu.essi_lab.api.database;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.marklogic.xcc.exceptions.*;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
 
-import com.marklogic.xcc.exceptions.RequestException;
+import java.util.*;
+import java.util.stream.*;
 
 /*-
  * #%L
@@ -18,22 +19,16 @@ import com.marklogic.xcc.exceptions.RequestException;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import eu.essi_lab.cfga.Configurable;
-import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
@@ -208,14 +203,14 @@ public abstract class Database implements SupportChecker, Configurable<DatabaseS
     /**
      * 
      */
-    private HashMap<String, SourceStorageWorker> workersMap;
+    private HashMap<String, SourceStorage> sourceStorageMap;
 
     /**
      * 
      */
     public Database() {
 
-	workersMap = new HashMap<String, SourceStorageWorker>();
+	sourceStorageMap = new HashMap<String, SourceStorage>();
     }
 
     /**
@@ -231,15 +226,17 @@ public abstract class Database implements SupportChecker, Configurable<DatabaseS
      * @throws GSException
      * @throws Exception
      */
-    public SourceStorageWorker getWorker(String sourceId) throws GSException {
+    public SourceStorage getStorage(String sourceId) throws GSException {
 
-	SourceStorageWorker worker = workersMap.get(sourceId);
-	if (worker == null) {
-	    worker = createSourceStorageWorker(sourceId);
-	    workersMap.put(sourceId, worker);
+	SourceStorage storage = sourceStorageMap.get(sourceId);
+
+	if (storage == null) {
+
+	    storage = createSourceStorageWorker(sourceId);
+	    sourceStorageMap.put(sourceId, storage);
 	}
 
-	return worker;
+	return storage;
     }
 
     /**
@@ -290,7 +287,7 @@ public abstract class Database implements SupportChecker, Configurable<DatabaseS
      * @throws GSException
      * @throws RequestException
      */
-    public DatabaseFolder findWritingFolder(SourceStorageWorker worker) throws GSException {
+    public DatabaseFolder findWritingFolder(SourceStorage worker) throws GSException {
 
 	DatabaseFolder folder = worker.getWritingFolder(Optional.empty());
 
@@ -404,8 +401,8 @@ public abstract class Database implements SupportChecker, Configurable<DatabaseS
 
 	return Arrays.asList(getFolders()).//
 		stream().//
-		filter(f -> f.getName().endsWith(SourceStorageWorker.DATA_1_POSTFIX)
-			|| f.getName().endsWith(SourceStorageWorker.DATA_2_POSTFIX))
+		filter(f -> f.getName().endsWith(SourceStorage.DATA_1_POSTFIX)
+			|| f.getName().endsWith(SourceStorage.DATA_2_POSTFIX))
 		.//
 		collect(Collectors.toList());
     }
@@ -419,8 +416,8 @@ public abstract class Database implements SupportChecker, Configurable<DatabaseS
 
 	return Arrays.asList(getFolders()).//
 		stream().//
-		filter(f -> f.getName().endsWith("_" + sourceId + SourceStorageWorker.DATA_1_POSTFIX)
-			|| f.getName().endsWith("_" + sourceId + SourceStorageWorker.DATA_2_POSTFIX))
+		filter(f -> f.getName().endsWith("_" + sourceId + SourceStorage.DATA_1_POSTFIX)
+			|| f.getName().endsWith("_" + sourceId + SourceStorage.DATA_2_POSTFIX))
 		.//
 		collect(Collectors.toList());
     }
@@ -433,7 +430,7 @@ public abstract class Database implements SupportChecker, Configurable<DatabaseS
 
 	return Arrays.asList(getFolders()).//
 		stream().//
-		filter(f -> f.getName().endsWith(SourceStorageWorker.META_POSTFIX)).//
+		filter(f -> f.getName().endsWith(SourceStorage.META_POSTFIX)).//
 		collect(Collectors.toList());
     }
 
@@ -446,25 +443,25 @@ public abstract class Database implements SupportChecker, Configurable<DatabaseS
 
 	return Arrays.asList(getFolders()).//
 		stream().//
-		filter(f -> f.getName().endsWith("_" + sourceId + SourceStorageWorker.META_POSTFIX)).//
+		filter(f -> f.getName().endsWith("_" + sourceId + SourceStorage.META_POSTFIX)).//
 		findFirst();
     }
 
     /**
-     * @return the workersMap
+     * @return
      */
-    protected HashMap<String, SourceStorageWorker> getWorkersMap() {
+    protected HashMap<String, SourceStorage> getStorageMap() {
 
-	return workersMap;
+	return sourceStorageMap;
     }
 
     /**
      * @param sourceId
      * @throws GSException
      */
-    protected SourceStorageWorker createSourceStorageWorker(String sourceId) throws GSException {
+    protected SourceStorage createSourceStorageWorker(String sourceId) throws GSException {
 
-	return new SourceStorageWorker(sourceId, this);
+	return new SourceStorage(sourceId, this);
     }
 
     /**

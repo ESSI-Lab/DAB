@@ -5,7 +5,7 @@ package eu.essi_lab.services.ftp;
 
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.DatabaseFolder.*;
-import eu.essi_lab.api.database.SourceStorageWorker.*;
+import eu.essi_lab.api.database.SourceStorage.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.model.exceptions.*;
@@ -337,7 +337,7 @@ public class DatabaseFtpFile implements FtpFile {
 		entry = FolderEntry.of(fileInputStream);
 		type = EntryType.HARVESTING_PROPERTIES;
 
-	    } else if (_file.endsWith(SourceStorageWorker.DATA_FOLDER_POSTFIX)) {
+	    } else if (_file.endsWith(SourceStorage.DATA_FOLDER_POSTFIX)) {
 
 		entry = FolderEntry.of(new DataFolderIndexDocument(fileInputStream).getDocument());
 		type = EntryType.DATA_FOLDER_INDEX_DOC;

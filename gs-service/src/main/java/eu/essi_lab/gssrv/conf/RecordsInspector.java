@@ -328,7 +328,7 @@ class RecordsInspector extends AbstractGridDescriptor<RecordsInspector.GridData>
 	    this.sourceDeployment = String.join(",", source.getDeployment());
 	    this.dataFolder = folder.getName().contains("data-1") ? "1" : "2";
 	    try {
-		this.writingFolder = folder.getBinary(SourceStorageWorker.WRITING_FOLDER_TAG) != null;
+		this.writingFolder = folder.getBinary(SourceStorage.WRITING_FOLDER_TAG) != null;
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error(e);
 	    }

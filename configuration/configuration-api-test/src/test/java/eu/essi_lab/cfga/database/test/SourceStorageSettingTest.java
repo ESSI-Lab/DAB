@@ -1,17 +1,50 @@
 package eu.essi_lab.cfga.database.test;
 
-import static org.junit.Assert.fail;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.model.*;
+import org.junit.*;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.*;
 
-import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
-import eu.essi_lab.cfga.setting.SettingUtils;
+import static org.junit.Assert.*;
 
 /**
  * @author Fabrizio
  */
 public class SourceStorageSettingTest {
+
+    @Before
+    public void init() {
+
+	DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
+	defaultConfiguration.clean();
+
+	ConfigurationWrapper.setConfiguration(defaultConfiguration);
+    }
+
+    @Test
+    public void resetAndSelectTest() {
+
+	SourceStorageSetting setting = new SourceStorageSetting();
+
+	setting.setMarkDeleted("atlasSouth", "defaultOAISource", "defaultGBIFMixedSource");
+	setting.setDisableSmartStorage("atlasSouth", "defaultOAISource", "defaultGBIFMixedSource");
+
+	setting.clean();
+
+	//
+	//
+	//
+
+	SourceStorageSetting setting1 = SettingUtils.downCast(SelectionUtils.resetAndSelect(setting, false), SourceStorageSetting.class);
+
+	test2(setting);
+	test2(setting1);
+    }
+
 
     @Test
     public void test() {
@@ -38,10 +71,8 @@ public class SourceStorageSettingTest {
 	//
 	//
 
-	setting.setMarkDeleted("source1", "source2", "source3");
-	setting.setRecoverResourceTags("source1", "source2", "source3");
-	setting.setTestISOCompliance("source1", "source2", "source3");
-	setting.setDisableSmartStorage("source1", "source2", "source3");
+	setting.setMarkDeleted("atlasSouth", "defaultOAISource", "defaultGBIFMixedSource");
+	setting.setDisableSmartStorage("atlasSouth", "defaultOAISource", "defaultGBIFMixedSource");
 
 	test2(setting);
 	test2(new SourceStorageSetting(setting.getObject()));
@@ -52,42 +83,17 @@ public class SourceStorageSettingTest {
 	//
 	//
 
-	setting.removeMarkDeleted("source1");
-	setting.removeRecoverResourceTags("source2");
-	setting.removeTestISOCompliance("source3");
+	setting.removeMarkDeleted("atlasSouth");
 
-	setting.removeSmartStorageDisabledSet("source1");
-	setting.removeSmartStorageDisabledSet("source3");
+	setting.removeSmartStorageDisabled("atlasSouth", "defaultGBIFMixedSource");
 
-	Assert.assertFalse(setting.isMarkDeletedOption("source1"));
-	Assert.assertTrue(setting.isMarkDeletedOption("source2"));
-	Assert.assertTrue(setting.isMarkDeletedOption("source3"));
+	Assert.assertFalse(setting.isMarkDeleted("atlasSouth"));
+	Assert.assertTrue(setting.isMarkDeleted("defaultOAISource"));
+	Assert.assertTrue(setting.isMarkDeleted("defaultGBIFMixedSource"));
 
-	Assert.assertTrue(setting.isRecoverResourceTagsSet("source1"));
-	Assert.assertFalse(setting.isRecoverResourceTagsSet("source2"));
-	Assert.assertTrue(setting.isRecoverResourceTagsSet("source3"));
-
-	Assert.assertTrue(setting.isISOComplianceTestSet("source1"));
-	Assert.assertTrue(setting.isISOComplianceTestSet("source2"));
-	Assert.assertFalse(setting.isISOComplianceTestSet("source3"));
-
-	Assert.assertFalse(setting.isSmartStorageDisabledSet("source1"));
-	Assert.assertTrue(setting.isSmartStorageDisabledSet("source2"));
-	Assert.assertFalse(setting.isSmartStorageDisabledSet("source3"));
-
-	//
-	//
-	//
-
-	setting.disableMarkDeleted();
-	setting.disableRecoverResourceTags();
-	setting.disableTestISOCompliance();
-	setting.enableSmartStorage();
-
-	test1(setting);
-	test1(new SourceStorageSetting(setting.getObject()));
-	test1(new SourceStorageSetting(setting.getObject().toString()));
-	test1(SettingUtils.downCast(setting, SourceStorageSetting.class, true));
+	Assert.assertFalse(setting.isSmartStorageDisabled("atlasSouth"));
+	Assert.assertTrue(setting.isSmartStorageDisabled("defaultOAISource"));
+	Assert.assertFalse(setting.isSmartStorageDisabled("defaultGBIFMixedSource"));
     }
 
     /**
@@ -95,64 +101,32 @@ public class SourceStorageSettingTest {
      */
     private void test1(SourceStorageSetting setting) {
 
-	Boolean isoComplianceTestSet = setting.isISOComplianceTestSet("");
-	Assert.assertFalse(isoComplianceTestSet);
-
-	isoComplianceTestSet = setting.isISOComplianceTestSet("source1");
-	Assert.assertFalse(isoComplianceTestSet);
-
-	isoComplianceTestSet = setting.isISOComplianceTestSet("source2");
-	Assert.assertFalse(isoComplianceTestSet);
-
-	isoComplianceTestSet = setting.isISOComplianceTestSet("source3");
-	Assert.assertFalse(isoComplianceTestSet);
-
-	//
-	//
-	//
-
-	Boolean markDeletedOption = setting.isMarkDeletedOption("");
+	boolean markDeletedOption = setting.isMarkDeleted("");
 	Assert.assertFalse(markDeletedOption);
 
-	markDeletedOption = setting.isMarkDeletedOption("source1");
+	markDeletedOption = setting.isMarkDeleted("atlasSouth");
 	Assert.assertFalse(markDeletedOption);
 
-	markDeletedOption = setting.isMarkDeletedOption("source2");
+	markDeletedOption = setting.isMarkDeleted("defaultOAISource");
 	Assert.assertFalse(markDeletedOption);
 
-	markDeletedOption = setting.isMarkDeletedOption("source3");
+	markDeletedOption = setting.isMarkDeleted("defaultGBIFMixedSource");
 	Assert.assertFalse(markDeletedOption);
 
 	//
 	//
 	//
 
-	Boolean recoverResourceTagsSet = setting.isRecoverResourceTagsSet("");
-	Assert.assertFalse(recoverResourceTagsSet);
-
-	recoverResourceTagsSet = setting.isRecoverResourceTagsSet("source1");
-	Assert.assertFalse(recoverResourceTagsSet);
-
-	recoverResourceTagsSet = setting.isRecoverResourceTagsSet("source2");
-	Assert.assertFalse(recoverResourceTagsSet);
-
-	recoverResourceTagsSet = setting.isRecoverResourceTagsSet("source3");
-	Assert.assertFalse(recoverResourceTagsSet);
-
-	//
-	//
-	//
-
-	Boolean smartStorageDisabled = setting.isSmartStorageDisabledSet("");
+	boolean smartStorageDisabled = setting.isSmartStorageDisabled("");
 	Assert.assertFalse(smartStorageDisabled);
 
-	smartStorageDisabled = setting.isSmartStorageDisabledSet("source1");
+	smartStorageDisabled = setting.isSmartStorageDisabled("atlasSouth");
 	Assert.assertFalse(smartStorageDisabled);
 
-	smartStorageDisabled = setting.isSmartStorageDisabledSet("source2");
+	smartStorageDisabled = setting.isSmartStorageDisabled("defaultOAISource");
 	Assert.assertFalse(smartStorageDisabled);
 
-	smartStorageDisabled = setting.isSmartStorageDisabledSet("source3");
+	smartStorageDisabled = setting.isSmartStorageDisabled("defaultGBIFMixedSource");
 	Assert.assertFalse(smartStorageDisabled);
     }
 
@@ -161,64 +135,32 @@ public class SourceStorageSettingTest {
      */
     private void test2(SourceStorageSetting setting) {
 
-	Boolean isoComplianceTestSet = setting.isISOComplianceTestSet("source1");
-	Assert.assertTrue(isoComplianceTestSet);
-
-	isoComplianceTestSet = setting.isISOComplianceTestSet("source2");
-	Assert.assertTrue(isoComplianceTestSet);
-
-	isoComplianceTestSet = setting.isISOComplianceTestSet("source3");
-	Assert.assertTrue(isoComplianceTestSet);
-
-	isoComplianceTestSet = setting.isISOComplianceTestSet("source4");
-	Assert.assertFalse(isoComplianceTestSet);
-
-	//
-	//
-	//
-
-	Boolean markDeletedOption = setting.isMarkDeletedOption("source1");
+	boolean markDeletedOption = setting.isMarkDeleted("atlasSouth");
 	Assert.assertTrue(markDeletedOption);
 
-	markDeletedOption = setting.isMarkDeletedOption("source2");
+	markDeletedOption = setting.isMarkDeleted("defaultOAISource");
 	Assert.assertTrue(markDeletedOption);
 
-	markDeletedOption = setting.isMarkDeletedOption("source3");
+	markDeletedOption = setting.isMarkDeleted("defaultGBIFMixedSource");
 	Assert.assertTrue(markDeletedOption);
 
-	markDeletedOption = setting.isMarkDeletedOption("source4");
+	markDeletedOption = setting.isMarkDeleted("source4");
 	Assert.assertFalse(markDeletedOption);
 
 	//
 	//
 	//
 
-	Boolean recoverResourceTagsSet = setting.isRecoverResourceTagsSet("source1");
-	Assert.assertTrue(recoverResourceTagsSet);
-
-	recoverResourceTagsSet = setting.isRecoverResourceTagsSet("source2");
-	Assert.assertTrue(recoverResourceTagsSet);
-
-	recoverResourceTagsSet = setting.isRecoverResourceTagsSet("source3");
-	Assert.assertTrue(recoverResourceTagsSet);
-
-	recoverResourceTagsSet = setting.isRecoverResourceTagsSet("source4");
-	Assert.assertFalse(recoverResourceTagsSet);
-
-	//
-	//
-	//
-
-	Boolean smartStorageDisabled = setting.isSmartStorageDisabledSet("source1");
+	boolean smartStorageDisabled = setting.isSmartStorageDisabled("atlasSouth");
 	Assert.assertTrue(smartStorageDisabled);
 
-	smartStorageDisabled = setting.isSmartStorageDisabledSet("source2");
+	smartStorageDisabled = setting.isSmartStorageDisabled("defaultOAISource");
 	Assert.assertTrue(smartStorageDisabled);
 
-	smartStorageDisabled = setting.isSmartStorageDisabledSet("source3");
+	smartStorageDisabled = setting.isSmartStorageDisabled("defaultGBIFMixedSource");
 	Assert.assertTrue(smartStorageDisabled);
 
-	smartStorageDisabled = setting.isSmartStorageDisabledSet("source4");
+	smartStorageDisabled = setting.isSmartStorageDisabled("source4");
 	Assert.assertFalse(smartStorageDisabled);
     }
 }

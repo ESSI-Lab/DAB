@@ -663,9 +663,9 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 		    String writingFolder = agg.getString(MetaFolderMapping.DATA_FOLDER);
 		    // query folder is opposite of the writing folder
-		    String queryFolder = writingFolder.equals(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-			    ? SourceStorageWorker.DATA_2_SHORT_POSTFIX //
-			    : SourceStorageWorker.DATA_1_SHORT_POSTFIX;
+		    String queryFolder = writingFolder.equals(SourceStorage.DATA_1_SHORT_POSTFIX) //
+			    ? SourceStorage.DATA_2_SHORT_POSTFIX //
+			    : SourceStorage.DATA_1_SHORT_POSTFIX;
 
 		    out.put(agg.getString(MetaFolderMapping.SOURCE_ID), queryFolder);
 		});

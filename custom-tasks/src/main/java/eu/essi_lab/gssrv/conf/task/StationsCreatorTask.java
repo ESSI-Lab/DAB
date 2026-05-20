@@ -36,7 +36,7 @@ import eu.essi_lab.api.database.DatabaseFinder;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.api.database.opensearch.index.Shape;
@@ -89,9 +89,9 @@ public class StationsCreatorTask extends AbstractEmbeddedTask {
 
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
-	SourceStorageWorker worker = database.getWorker(sourceId);
+	SourceStorage storage = database.getStorage(sourceId);
 
-	DatabaseFolder target = worker.getData1Folder() == null ? worker.getData2Folder() : worker.getData1Folder();
+	DatabaseFolder target = storage.getData1Folder() == null ? storage.getData2Folder() : storage.getData1Folder();
 
 	int targetSize = target.size();
 

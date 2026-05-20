@@ -1,3 +1,6 @@
+/**
+ * 
+ */
 package eu.essi_lab.api.database.marklogic;
 
 /*-
@@ -21,52 +24,52 @@ package eu.essi_lab.api.database.marklogic;
  * #L%
  */
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.model.StorageInfo;
+import java.util.Optional;
+
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.indexes.marklogic.MarkLogicScalarType;
+import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * @author Fabrizio
  */
 public class MarkLogicSourceStorage extends SourceStorage {
 
-    private MarkLogicDatabase markLogicDB;
+    /**
+     * @param sourceId
+     * @param database
+     * @throws GSException
+     */
+    public MarkLogicSourceStorage(String sourceId, Database database) throws GSException {
+
+	super(sourceId, database);
+    }
 
     /**
-     * 
+     * @param indexName
+     * @param status
+     * @throws Exception
      */
-    public MarkLogicSourceStorage() {
-
-	configure(ConfigurationWrapper.getSourceStorageSettings());
-    }
-
     @Override
-    public String getType() {
+    protected void checkDataFolderIndex(String indexName, Optional<SchedulerJobStatus> status) throws Exception {
 
-	return "MarkLogicSourceStorage";
-    }
+	MarkLogicIndexesManager idxManager = new MarkLogicIndexesManager((MarkLogicDatabase) getDatabase(), false);
 
-    @Override
-    public void setDatabase(Database dataBase) {
+	if (!idxManager.rangeIndexExists(//
+		indexName, //
+		MarkLogicScalarType.STRING)) {
 
-	this.markLogicDB = (MarkLogicDatabase) dataBase;
-    }
+	    debug("Adding data folder range index STARTED", status);
 
-    @Override
-    public MarkLogicDatabase getDatabase() {
+	    idxManager.addRangeIndex(indexName, //
+		    MarkLogicScalarType.STRING.getType());
 
-	return this.markLogicDB;
-    }
+	    debug("Adding data folder range index ENDED", status);
 
-    @Override
-    public boolean supports(StorageInfo info) {
+	} else {
 
-	if (MarkLogicDatabase.isSupported(info)) {
-
-	    return true;
+	    debug("Index " + indexName + " already exists", status);
 	}
-
-	return false;
     }
 }

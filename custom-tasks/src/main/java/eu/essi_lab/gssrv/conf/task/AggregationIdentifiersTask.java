@@ -39,7 +39,7 @@ import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
@@ -129,7 +129,7 @@ public class AggregationIdentifiersTask extends AbstractEmbeddedTask  {
 	DatabaseReader dbReader = DatabaseProviderFactory.getReader(databaseURI);
 	DatabaseFinder dbFinder = DatabaseProviderFactory.getFinder(databaseURI);
 
-	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
+	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	DatabaseFolder folder = sourceStorage.getDataFolder(targetSource.getUniqueIdentifier(), true).get();
 
