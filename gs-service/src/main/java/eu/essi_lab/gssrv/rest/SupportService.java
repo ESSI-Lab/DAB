@@ -47,6 +47,7 @@ import eu.essi_lab.pdk.wrt.*;
 import eu.essi_lab.profiler.semantic.*;
 import eu.essi_lab.request.executor.*;
 import jakarta.jws.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.core.Response;
@@ -611,6 +612,182 @@ public class SupportService {
     private String getXMLErrorResponse(String error) {
 
 	return "<error>" + error + "</error>";
+    }
+
+    @SuppressWarnings("rawtypes")
+    @GET
+    @Path("/predefinedShapes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listPredefinedShapes(//
+	    @QueryParam("email") String email, //
+	    @QueryParam("apiKey") String apiKey) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginResponse loginResponse = getLoginResponse(new LoginRequest(email, apiKey));
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	try {
+
+	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	    JSONObject payload = new PredefinedShapeManagementService().listAreas(owner, loginResponse.isAdmin());
+	    payload.put("success", true);
+
+	    return Response.ok(payload.toString(), MediaType.APPLICATION_JSON).build();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Predefined shape list failed", ex);
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("Unable to list shapes: " + ex.getMessage());
+	    return Response.serverError().entity(basicResponse).build();
+	}
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/predefinedShapes/harvest")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response harvestPredefinedShapes(LoginRequest request) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginResponse loginResponse = getLoginResponse(request);
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	Optional<String> error = new PredefinedShapeManagementService().triggerHarvest();
+
+	if (error.isPresent()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(error.get());
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	}
+
+	basicResponse.setSuccess(true);
+	basicResponse.setMessage("Harvest scheduled for source " + ConfigurationWrapper.getShapeSourceId().orElse(""));
+
+	return Response.ok(basicResponse).build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/predefinedShapes/delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deletePredefinedShape(PredefinedShapeDeleteRequest request) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
+	LoginResponse loginResponse = getLoginResponse(loginRequest);
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	PredefinedShapeDeleteResult deleteResult = new PredefinedShapeManagementService().deleteByPrefix(request.getPrefix(),
+		owner, loginResponse.isAdmin());
+
+	if (!deleteResult.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(deleteResult.getErrorMessage().orElse("Delete failed"));
+	    if (deleteResult.isForbidden()) {
+		return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+	    }
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	}
+
+	basicResponse.setSuccess(true);
+	basicResponse.setMessage("Deleted shape area \"" + request.getPrefix() + "\"");
+
+	return Response.ok(basicResponse).build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/uploadPredefinedShapes")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response uploadPredefinedShapes(@Context HttpServletRequest servletRequest) {
+
+	BasicResponse basicResponse = new BasicResponse();
+
+	try {
+
+	    MultipartSupport.ParsedMultipart multipart = MultipartSupport.parse(servletRequest);
+
+	    String email = multipart.getField("email").orElse("");
+	    String apiKey = multipart.getField("apiKey").orElse("");
+
+	    LoginRequest loginRequest = new LoginRequest(email, apiKey);
+	    LoginResponse loginResponse = getLoginResponse(loginRequest);
+
+	    if (!loginResponse.isSuccess()) {
+
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage("not authenticated");
+		return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	    }
+
+	    if (multipart.getFileStream() == null) {
+
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage("Missing shapefile (.zip)");
+		return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	    }
+
+	    String shapeId = multipart.getField("shapeId").orElse("");
+	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+
+	    PredefinedShapeUploadService uploadService = new PredefinedShapeUploadService();
+
+	    PredefinedShapeUploadService.UploadOutcome outcome = uploadService.upload(multipart.getFileName(), shapeId,
+		    multipart.getFileStream(), owner, loginResponse.isAdmin());
+
+	    if (!outcome.isSuccess()) {
+
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage(outcome.getErrorMessage());
+		if (outcome.isForbidden()) {
+		    return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	    }
+
+	    basicResponse.setSuccess(true);
+	    basicResponse.setMessage("Shapefile stored with identifier \"" + outcome.getEntryPrefix() + "\"");
+
+	    return Response.ok(basicResponse).build();
+
+	} catch (IllegalArgumentException ex) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(ex.getMessage());
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Predefined shape upload failed", ex);
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("Upload failed: " + ex.getMessage());
+	    return Response.serverError().entity(basicResponse).build();
+	}
     }
 
     @SuppressWarnings("rawtypes")

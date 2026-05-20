@@ -240,21 +240,25 @@ public class S3ShapeDownloader extends DataDownloader {
 
 			// Create a style for rendering
 			MapContent map = new MapContent();
-			// Style style = SLD.createSimpleStyle(featureSource.getSchema());
-			Style style = createCustomLineStyle(java.awt.Color.BLUE, 4);
-			FeatureLayer layer = new FeatureLayer(featureCollection, style);
-			map.addLayer(layer);
+			try {
+			    // Style style = SLD.createSimpleStyle(featureSource.getSchema());
+			    Style style = createCustomLineStyle(java.awt.Color.BLUE, 4);
+			    FeatureLayer layer = new FeatureLayer(featureCollection, style);
+			    map.addLayer(layer);
 
-			// Render the map to an image
-			Long size1 = firstDimension.getContinueDimension().getSize();
-			Long size2 = secondDimension.getContinueDimension().getSize();
-			BufferedImage image = renderToImage(map, boundingBox, size1.intValue(), size2.intValue());
+			    // Render the map to an image
+			    Long size1 = firstDimension.getContinueDimension().getSize();
+			    Long size2 = secondDimension.getContinueDimension().getSize();
+			    BufferedImage image = renderToImage(map, boundingBox, size1.intValue(), size2.intValue());
 
-			// Save the image to a file
-			File output = File.createTempFile(getClass().getSimpleName(), ".png");
-			javax.imageio.ImageIO.write(image, "png", output);
-			System.out.println("Image created: " + output.getAbsolutePath());
-			return output;
+			    // Save the image to a file
+			    File output = File.createTempFile(getClass().getSimpleName(), ".png");
+			    javax.imageio.ImageIO.write(image, "png", output);
+			    System.out.println("Image created: " + output.getAbsolutePath());
+			    return output;
+			} finally {
+			    map.dispose();
+			}
 
 		    }
 		}

@@ -1067,4 +1067,25 @@ public class ConfigurationWrapper {
 	return getHarvestingSettings().stream()
 		.filter(set -> set.getSelectedAccessorSetting().getGSSourceSetting().getSourceIdentifier().equals(sourceId)).findFirst();
     }
+
+    /**
+     * @return configured shape harvest source id from system key-value options ({@code shape-source-id})
+     */
+    public static Optional<String> getShapeSourceId() {
+
+	Optional<Properties> kvo = getSystemSettings().getKeyValueOptions();
+
+	if (kvo.isPresent()) {
+
+	    String prop = kvo.get().getProperty(SystemSetting.KeyValueOptionKeys.SHAPE_SOURCE_ID.getLabel());
+
+	    if (prop != null && !prop.isBlank()) {
+
+		return Optional.of(prop.trim());
+	    }
+	}
+
+	return Optional.empty();
+    }
+
 }

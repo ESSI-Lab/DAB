@@ -492,6 +492,14 @@ public class IndexData {
      */
     public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry) throws Exception {
 
+	return ofShapeFile(folder, key, entry, null);
+    }
+
+    /**
+     * @param owner uploader id stored on each polygon document; may be {@code null}
+     */
+    public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry, String owner) throws Exception {
+
 	ClonableInputStream inputStream = new ClonableInputStream(entry.getStream().get());
 
 	Unzipper unzipper = new Unzipper(inputStream.clone());
@@ -531,6 +539,8 @@ public class IndexData {
 	    indexData.put(FOLDER_NAME, folder.getName());
 	    indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
 
+	    indexData.put(ShapeFileMapping.SHAPE_UPLOAD_PREFIX, key);
+
 	    indexData.put(DATA_TYPE, entry.getDataType());
 
 	    indexData.entryId = OpenSearchFolder.getEntryId(folder, entryName);
@@ -545,6 +555,20 @@ public class IndexData {
 
 	    indexData.put(ShapeFileMapping.SHAPE, shape);
 
+	    String entryTitle = object.optString(ShapeFileMapping.ENTRY_TITLE, "");
+	    if (!entryTitle.isBlank()) {
+		indexData.put(ShapeFileMapping.ENTRY_TITLE, entryTitle);
+	    }
+
+	    if (owner != null && !owner.isBlank()) {
+		indexData.put(ShapeFileMapping.OWNER, owner);
+	    }
+
+	    String shapeCrs = object.optString(ShapeFileMapping.SHAPE_CRS, "");
+	    if (!shapeCrs.isBlank()) {
+		indexData.put(ShapeFileMapping.SHAPE_CRS, shapeCrs);
+	    }
+
 	    out.add(indexData);
 	}
 
@@ -552,6 +576,33 @@ public class IndexData {
 	Arrays.asList(unzipper.getOutputFolder().listFiles()).forEach(File::delete);
 
 	return out;
+    }
+
+    /**
+     * @param folder
+     * @param registryJson JSON document with predefined shape upload metadata
+     * @return index data for the upload registry entry
+     */
+    public static IndexData ofUploadRegistry(OpenSearchFolder folder, String registryJson) throws Exception {
+
+	IndexData indexData = new IndexData();
+
+	indexData.mapping = ShapeFileMapping.get();
+	indexData.index = indexData.mapping.getIndex();
+	indexData.mapping.setEntryType(EntryType.SHAPE_FILE);
+
+	indexData.put(ENTRY_NAME, ShapeFileMapping.UPLOAD_REGISTRY_ENTRY_NAME);
+	indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+	indexData.put(FOLDER_NAME, folder.getName());
+	indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+	indexData.put(DATA_TYPE, DataType.BINARY.getType());
+	indexData.entryId = OpenSearchFolder.getEntryId(folder, ShapeFileMapping.UPLOAD_REGISTRY_ENTRY_NAME);
+
+	indexData.put(BINARY_PROPERTY, ShapeFileMapping.SHAPE_FILE);
+	indexData.put(ShapeFileMapping.SHAPE_FILE, Base64.getEncoder().encodeToString("{}".getBytes(StandardCharsets.UTF_8)));
+	indexData.put(ShapeFileMapping.UPLOAD_REGISTRY, registryJson);
+
+	return indexData;
     }
 
     /**

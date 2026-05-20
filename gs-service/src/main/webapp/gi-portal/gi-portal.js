@@ -4,6 +4,44 @@ var view = '';
 var token = '';
 var availableViews = []; // Store views fetched for the current source deployment
 
+/** Token for shape WMS: empty before login → {@code public} (admin layers only). */
+function getShapeWmsToken() {
+	return localStorage.getItem('authToken') || 'public';
+}
+
+window.getShapeWmsToken = getShapeWmsToken;
+
+/** Relative WMS path for predefined shape layers from {@link window.config.shapeView}. */
+function buildShapeWmsEndpoint() {
+	var shapeView = window.config && window.config.shapeView;
+	if (!shapeView) {
+		return '';
+	}
+	return '../services/essi/token/' + encodeURIComponent(getShapeWmsToken()) + '/view/'
+		+ encodeURIComponent(shapeView) + '/wms';
+}
+
+window.buildShapeWmsEndpoint = buildShapeWmsEndpoint;
+
+/** JSONP query for filtered predefined layer list (shapeView + token). */
+function buildShapeWmsLayersQuery(wmsVersion) {
+	var shapeView = window.config && window.config.shapeView;
+	if (!shapeView) {
+		return '';
+	}
+	var dabEndpoint = '../services/essi/';
+	var servicePath = '';
+	if (typeof GIAPI !== 'undefined' && GIAPI.search && GIAPI.search.dab) {
+		dabEndpoint = GIAPI.search.dab.endpoint();
+		dabEndpoint = dabEndpoint.endsWith('/') ? dabEndpoint : dabEndpoint + '/';
+		servicePath = GIAPI.search.dab.servicePath();
+	}
+	return dabEndpoint + servicePath + '/opensearch/wmslayershandler?request=capabilities&shapeView='
+		+ encodeURIComponent(shapeView) + '&token=' + encodeURIComponent(getShapeWmsToken()) + '&version=' + (wmsVersion || '1.3.0');
+}
+
+window.buildShapeWmsLayersQuery = buildShapeWmsLayersQuery;
+
 
 var getUrlParameter = function getUrlParameter(sParam) {
 		var sPageURL = window.location.search.substring(1),
@@ -518,7 +556,8 @@ function initializeLogin(config) {
 		userMenu.className = 'user-menu';
 		userMenu.style.display = 'none';
 		let menuHtml = `
-			<button id=\"statusBtn\" class=\"menu-button\">${t('menu_status')}</button>\n`;
+			<button id=\"statusBtn\" class=\"menu-button\">${t('menu_status')}</button>
+			<button id=\"uploadShapesBtn\" class=\"menu-button\">${t('menu_upload_predefined_shapes')}</button>\n`;
 		if (isAdmin) {
 			menuHtml += `<button id=\"listUsersBtn\" class=\"menu-button\">${t('menu_manage_users')}</button>\n`;
 			menuHtml += `<button id=\"dataReportBtn\" class=\"menu-button\">${t('menu_data_report')}</button>\n`;
@@ -1064,6 +1103,271 @@ function initializeLogin(config) {
 
 			// Initial fetch after dialog is shown
 			setTimeout(fetchAndUpdateStatus, 100);
+		});
+
+		document.getElementById('uploadShapesBtn').addEventListener('click', function() {
+			userMenu.style.display = 'none';
+
+			const authToken = localStorage.getItem('authToken');
+			const userEmail = localStorage.getItem('userEmail');
+			const wmsVersion = '1.3.0';
+			const shapeOnlinePrefix = 'opensearch://shapeFiles:';
+
+			const dialogContent = $('<div>').addClass('predefined-shapes-manager');
+			const statusDiv = $('<div>').attr('id', 'predefined-shapes-status').css({ 'margin': '10px 0', 'min-height': '20px' });
+
+			const toolbar = $('<div>').css({ 'marginBottom': '12px', 'textAlign': 'right' });
+			const refreshBtn = $('<button type="button" class="login-button">').html('<i class="fa fa-refresh"></i> ' + t('refresh'));
+			const harvestBtn = $('<button type="button" class="login-button">').css({ 'marginLeft': '8px' }).html('<i class="fa fa-play"></i> ' + t('shapes_harvest_now'));
+			toolbar.append(refreshBtn).append(harvestBtn);
+
+			const listWrapper = $('<div>').css({ 'maxHeight': '320px', 'overflowY': 'auto', 'border': '1px solid #ddd', 'borderRadius': '4px' });
+			const listTable = $('<table class="predefined-shapes-table">').css({ 'width': '100%', 'borderCollapse': 'collapse' });
+			listTable.append('<thead><tr>'
+				+ '<th></th><th>' + t('shapes_col_identifier') + '</th><th>' + t('shapes_col_file') + '</th>'
+				+ '<th>' + t('shapes_col_owner') + '</th><th>' + t('shapes_col_features') + '</th>'
+				+ '<th>' + t('shapes_col_selection') + '</th><th>' + t('shapes_col_actions') + '</th>'
+				+ '</tr></thead>');
+			const listBody = $('<tbody id="predefined-shapes-list-body">');
+			listTable.append(listBody);
+			listWrapper.append(listTable);
+
+			const uploadSection = $('<div>').css({ 'marginTop': '20px', 'paddingTop': '15px', 'borderTop': '1px solid #eee' });
+			uploadSection.append($('<h4>').css({ margin: '0 0 10px', color: '#2c3e50' }).text(t('shapes_upload_section')));
+			uploadSection.append($('<p>').css({ margin: '0 0 10px', fontSize: '13px', color: '#666' }).html(t('upload_shapes_note_html')));
+
+			const shapeIdLabel = $('<label>').attr('for', 'predefined-shapes-id-input').css({ display: 'block', fontWeight: 600 }).text(t('upload_shapes_id_label'));
+			const shapeIdInput = $('<input type="text" id="predefined-shapes-id-input">').attr('placeholder', t('upload_shapes_id_placeholder')).css({ width: '100%', boxSizing: 'border-box', marginTop: '6px' });
+			const fileInput = $('<input type="file" id="predefined-shapes-file-input">').attr('accept', '.zip,application/zip').css({ marginTop: '10px', width: '100%' });
+			const uploadBtn = $('<button type="button" class="login-button">').css({ marginTop: '10px' }).text(t('upload_shapes_submit'));
+
+			uploadSection.append(shapeIdLabel).append(shapeIdInput).append(fileInput).append(uploadBtn);
+
+			dialogContent.append(statusDiv).append(toolbar).append(listWrapper).append(uploadSection);
+
+			let uploadInProgress = false;
+
+			function fetchWmsLayerNames() {
+				return new Promise(function(resolve) {
+					const query = buildShapeWmsLayersQuery(wmsVersion);
+					if (!query) {
+						resolve([]);
+						return;
+					}
+					jQuery.ajax({
+						type: 'GET',
+						url: query,
+						crossDomain: true,
+						dataType: 'jsonp',
+						success: function(data) {
+							if (data && data.layers) {
+								resolve(data.layers.map(function(layer) { return layer.name; }));
+							} else {
+								resolve([]);
+							}
+						},
+						error: function() {
+							resolve([]);
+						}
+					});
+				});
+			}
+
+			function enrichAreaWithSelection(area, wmsLayerNames) {
+				const entryNames = area.entryNames || [];
+				let selectionCount = 0;
+				entryNames.forEach(function(entryName) {
+					const onlineId = shapeOnlinePrefix + entryName;
+					const found = wmsLayerNames.some(function(layerName) {
+						return layerName === onlineId || layerName.endsWith(':' + entryName);
+					});
+					if (found) {
+						selectionCount++;
+					}
+				});
+				const featureCount = entryNames.length || area.featureCount || 0;
+				let selectionStatus = 'NONE';
+				if (featureCount > 0 && selectionCount > 0) {
+					selectionStatus = selectionCount >= featureCount ? 'FULL' : 'PARTIAL';
+				}
+				return Object.assign({}, area, {
+					featureCount: featureCount,
+					selectionCount: selectionCount,
+					selectionStatus: selectionStatus
+				});
+			}
+
+			function selectionCell(area) {
+				const status = area.selectionStatus || 'NONE';
+				if (status === 'FULL') {
+					return '<span class="shapes-status-icon shapes-status-full" title="' + t('shapes_in_selection_full') + '"><i class="fa fa-check-circle"></i></span>';
+				}
+				if (status === 'PARTIAL') {
+					return '<span class="shapes-status-icon shapes-status-partial" title="' + t('shapes_in_selection_partial', { count: area.selectionCount, total: area.featureCount }) + '"><i class="fa fa-adjust"></i></span>';
+				}
+				return '<span class="shapes-status-icon shapes-status-none" title="' + t('shapes_in_selection_none') + '"><i class="fa fa-circle-o"></i></span>';
+			}
+
+			function formatOwnerLabel(owner, legacy) {
+				if (!owner) {
+					return legacy ? t('shapes_owner_unknown') : '—';
+				}
+				if (owner === 'admin') {
+					return t('shapes_owner_admin');
+				}
+				return owner;
+			}
+
+			function renderAreas(areas) {
+				listBody.empty();
+				if (!areas || areas.length === 0) {
+					listBody.append('<tr><td colspan="7" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
+					return;
+				}
+				areas.forEach(function(area) {
+					const legacyTag = area.legacy ? ' <span class="shapes-legacy-tag">(' + t('shapes_legacy') + ')</span>' : '';
+					const deleteBtn = $('<button type="button" class="menu-button shapes-delete-btn">').text(t('delete')).data('prefix', area.prefix);
+					const row = $('<tr>');
+					row.append($('<td>').html(selectionCell(area)));
+					row.append($('<td>').html('<code>' + area.prefix + '</code>' + legacyTag));
+					row.append($('<td>').text(area.fileName || '—'));
+					row.append($('<td>').text(formatOwnerLabel(area.owner, area.legacy)));
+					row.append($('<td>').text(area.featureCount));
+					row.append($('<td>').text(area.selectionCount + ' / ' + area.featureCount));
+					row.append($('<td>').append(deleteBtn));
+					listBody.append(row);
+				});
+			}
+
+			function loadAreas() {
+				statusDiv.text(t('shapes_list_loading')).css('color', '#2c3e50');
+				const params = new URLSearchParams({ email: userEmail, apiKey: authToken });
+				Promise.all([
+					fetch('../services/support/predefinedShapes?' + params.toString()).then(function(r) { return r.json(); }),
+					fetchWmsLayerNames()
+				])
+					.then(function(results) {
+						const data = results[0];
+						const wmsLayerNames = results[1];
+						if (data.success === false) {
+							statusDiv.text(data.message || t('shapes_list_error')).css('color', '#c0392b');
+							return;
+						}
+						statusDiv.text('');
+						const areas = (data.areas || []).map(function(area) {
+							return enrichAreaWithSelection(area, wmsLayerNames);
+						});
+						renderAreas(areas);
+					})
+					.catch(function(err) {
+						console.error(err);
+						statusDiv.text(t('shapes_list_error')).css('color', '#c0392b');
+					});
+			}
+
+			function triggerHarvest() {
+				statusDiv.text(t('shapes_harvest_starting')).css('color', '#2c3e50');
+				fetch('../services/support/predefinedShapes/harvest', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email: userEmail, apiKey: authToken })
+				})
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						if (data.success) {
+							statusDiv.text(data.message || t('shapes_harvest_scheduled')).css('color', '#27ae60');
+							setTimeout(loadAreas, 3000);
+						} else {
+							statusDiv.text(data.message || t('shapes_harvest_error')).css('color', '#c0392b');
+						}
+					})
+					.catch(function() {
+						statusDiv.text(t('shapes_harvest_error')).css('color', '#c0392b');
+					});
+			}
+
+			fileInput.on('change', function() {
+				const file = fileInput[0].files && fileInput[0].files[0];
+				if (!file || shapeIdInput.val().trim()) return;
+				let base = file.name.replace(/\.zip$/i, '');
+				base = base.replace(/[\s.]+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').replace(/_+/g, '_').toLowerCase();
+				if (base) shapeIdInput.val(base);
+			});
+
+			refreshBtn.on('click', loadAreas);
+			harvestBtn.on('click', triggerHarvest);
+
+			listBody.on('click', '.shapes-delete-btn', function() {
+				const prefix = $(this).data('prefix');
+				if (!prefix || !confirm(t('shapes_delete_confirm', { prefix: prefix }))) return;
+				statusDiv.text(t('shapes_deleting')).css('color', '#2c3e50');
+				fetch('../services/support/predefinedShapes/delete', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email: userEmail, apiKey: authToken, prefix: prefix })
+				})
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						if (data.success) {
+							statusDiv.text(data.message).css('color', '#27ae60');
+							loadAreas();
+						} else {
+							statusDiv.text(data.message || t('shapes_delete_error')).css('color', '#c0392b');
+						}
+					})
+					.catch(function() {
+						statusDiv.text(t('shapes_delete_error')).css('color', '#c0392b');
+					});
+			});
+
+			uploadBtn.on('click', function() {
+				if (uploadInProgress) return;
+				const file = fileInput[0].files && fileInput[0].files[0];
+				if (!file) {
+					statusDiv.text(t('upload_shapes_no_file')).css('color', '#c0392b');
+					return;
+				}
+				if (!file.name.toLowerCase().endsWith('.zip')) {
+					statusDiv.text(t('upload_shapes_zip_only')).css('color', '#c0392b');
+					return;
+				}
+				uploadInProgress = true;
+				statusDiv.text(t('upload_shapes_uploading')).css('color', '#2c3e50');
+				const formData = new FormData();
+				formData.append('file', file);
+				formData.append('shapeId', shapeIdInput.val().trim());
+				formData.append('email', userEmail);
+				formData.append('apiKey', authToken);
+				fetch('../services/support/uploadPredefinedShapes', { method: 'POST', body: formData })
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						uploadInProgress = false;
+						if (data.success) {
+							statusDiv.text(data.message || t('upload_shapes_success_html')).css('color', '#27ae60');
+							fileInput.val('');
+							shapeIdInput.val('');
+							loadAreas();
+						} else {
+							statusDiv.text(data.message || t('upload_shapes_error')).css('color', '#c0392b');
+						}
+					})
+					.catch(function(err) {
+						uploadInProgress = false;
+						console.error(err);
+						statusDiv.text(t('upload_shapes_error')).css('color', '#c0392b');
+					});
+			});
+
+			dialogContent.dialog({
+				title: t('manage_predefined_shapes_title'),
+				modal: true,
+				width: 920,
+				maxHeight: window.innerHeight - 80,
+				classes: { 'ui-dialog': 'shape-management-dialog' },
+				buttons: [{ text: t('close'), click: function() { $(this).dialog('close'); } }],
+				open: function() { loadAreas(); },
+				close: function() { $(this).dialog('destroy').remove(); }
+			});
 		});
 
 		// List Users button click handler (admin only)
@@ -2361,7 +2665,8 @@ export function initializePortal(config) {
 			'dabNode': GIAPI.search.dab,
 
 
-			'wmsEndpoint': config.wmsEndpoint,
+			'shapeView': config.shapeView,
+			'wmsVersion': '1.3.0',
 
 
 			'clusterWMS': (config.clusterWMS !== undefined),
@@ -3362,9 +3667,17 @@ export function initializePortal(config) {
 							var lines = [];
 							if (constraints.when && constraints.when.from) lines.push({ label: 'Begin date', value: constraints.when.from });
 							if (constraints.when && constraints.when.to) lines.push({ label: 'End date', value: constraints.when.to });
+							var hasFiniteBbox = function(w) {
+								if (!w || w.predefinedLayer) {
+									return false;
+								}
+								return [w.west, w.south, w.east, w.north].every(function(v) {
+									return typeof v === 'number' && Number.isFinite(v);
+								});
+							};
 							if (where) {
 								if (where.predefinedLayer) lines.push({ label: 'Predefined layer', value: where.predefinedLayer });
-								if (where.south != null && where.west != null && where.north != null && where.east != null) {
+								if (hasFiniteBbox(where)) {
 									lines.push({ label: 'Bounding box', value: [where.west, where.south, where.east, where.north].join(', ') });
 								}
 							}
@@ -3709,9 +4022,9 @@ export function initializePortal(config) {
 											if (where) {
 												if (where.predefinedLayer) {
 													params.append('predefinedLayer', where.predefinedLayer);
-												}
-
-												if (where.south && where.west && where.north && where.east) {
+												} else if ([where.west, where.south, where.east, where.north].every(function(v) {
+													return typeof v === 'number' && Number.isFinite(v);
+												})) {
 													params.append('west', where.west);
 													params.append('south', where.south);
 													params.append('east', where.east);
