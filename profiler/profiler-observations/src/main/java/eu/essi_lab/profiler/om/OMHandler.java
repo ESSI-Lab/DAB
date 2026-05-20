@@ -257,6 +257,20 @@ public class OMHandler extends StreamingRequestHandler {
 	if (userOutputFormat == null) {
 	    userOutputFormat = OMFormat.JSON;
 	}
+
+	if (OMRequestUtils.isMetadataOnly(request) && userOutputFormat == OMFormat.SHAPEFILE
+		&& !request.isAsynchDownloadRequest()) {
+	    HttpServletRequest servletRequest = webRequest.getServletRequest();
+	    StringBuilder requestURL = new StringBuilder(servletRequest.getRequestURL().toString());
+	    if (servletRequest.getQueryString() != null) {
+		requestURL.append('?').append(servletRequest.getQueryString());
+	    }
+	    String baseName = MetadataDownloaderTool.resolveBaseName(request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME),
+		    requestURL.toString());
+	    new MetadataDownloaderTool().writeMetadataZip(output, requestURL.toString(), baseName);
+	    return;
+	}
+
 	ResultWriter resultWriter = null;
 	OutputStreamWriter writer = new OutputStreamWriter(output, Charsets.UTF_8);
 
@@ -273,7 +287,11 @@ public class OMHandler extends StreamingRequestHandler {
 	case WATERML_1:
 	case WATERML_2:
 	case CSV:
-	    resultWriter = new EmptyResultWriter(writer);
+	    if (OMRequestUtils.isMetadataOnly(request)) {
+		resultWriter = new MetadataCsvResultWriter(writer);
+	    } else {
+		resultWriter = new EmptyResultWriter(writer);
+	    }
 	    break;
 	default:
 	    throw new IllegalArgumentException("Unrecognized format. Choose between: " + OMFormat.stringOptions());
@@ -383,13 +401,37 @@ public class OMHandler extends StreamingRequestHandler {
 			    requestURL.append('?').append(queryString);
 			}
 
-			SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
-			Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
 			Optional<String> view = webRequest.extractViewId();
 			String bucket = null;
 			if (view.isPresent()) {
 			    bucket = view.get();
 			}
+
+			String asynchDownloadName = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME);
+
+			if (asynchDownloadName == null || asynchDownloadName.isEmpty()) {
+			    GSLoggerFactory.getLogger(getClass()).info("Download name not given, assigning generated name");
+			    asynchDownloadName = "download-" + UUID.randomUUID().toString();
+			}
+
+			boolean metadataOnly = OMRequestUtils.isMetadataOnly(request);
+
+			if (metadataOnly) {
+			    Integer totalCount = null;
+			    CountSet countResponse = resultSet.getCountResponse();
+			    if (countResponse != null) {
+				totalCount = countResponse.getCount();
+			    }
+			    if (totalCount != null && totalCount <= OMRequestUtils.METADATA_SYNC_MAX_RECORDS) {
+				JSONObject completed = completeSyncMetadataDownload(s3wrapper, bucket, view.orElse(null),
+					requestURL.toString(), operationId, asynchDownloadName);
+				printJSON(output, completed);
+				return;
+			    }
+			}
+
+			SchedulerSetting schedulerSetting = ConfigurationWrapper.getSchedulerSetting();
+			Scheduler scheduler = SchedulerFactory.getScheduler(schedulerSetting);
 			OMSchedulerSetting setting = new OMSchedulerSetting();
 			setting.setBucket(bucket);
 			setting.setPublicURL("https://" + bucket + ".s3.us-east-1.amazonaws.com");
@@ -401,21 +443,17 @@ public class OMHandler extends StreamingRequestHandler {
 			    setting.setEmailNotifications(notifications);
 			}
 
-			String asynchDownloadName = request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME);
-
-			if (asynchDownloadName == null || asynchDownloadName.isEmpty()) {
-			    GSLoggerFactory.getLogger(getClass()).info("Download name not given, assigning its id");
-			    operationId = asynchDownloadName;
-			}
-
 			setting.setAsynchDownloadName(asynchDownloadName);
-			Integer mb = user.getMaxDownloadSizeMB();
-			if (mb != null) {
-			    setting.setMaxDownloadSizeMB(mb);
-			}
-			Integer partMb = user.getMaxDownloadPartSizeMB();
-			if (partMb != null) {
-			    setting.setMaxDownloadPartSizeMB(partMb);
+			setting.setMetadataOnly(metadataOnly);
+			if (!metadataOnly) {
+			    Integer mb = user.getMaxDownloadSizeMB();
+			    if (mb != null) {
+				setting.setMaxDownloadSizeMB(mb);
+			    }
+			    Integer partMb = user.getMaxDownloadPartSizeMB();
+			    if (partMb != null) {
+				setting.setMaxDownloadPartSizeMB(partMb);
+			    }
 			}
 			scheduler.schedule(setting);
 
@@ -423,6 +461,11 @@ public class OMHandler extends StreamingRequestHandler {
 			msg.put("id", operationId);
 			msg.put("status", "Submitted");
 			msg.put("downloadName", asynchDownloadName);
+			if (metadataOnly) {
+			    msg.put("downloadKind", "metadata");
+			} else {
+			    msg.put("downloadKind", "data");
+			}
 			msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
 
 			status(s3wrapper, bucket, operationId, msg);
@@ -759,6 +802,8 @@ public class OMHandler extends StreamingRequestHandler {
 	    return new MediaType("application", "x-netcdf");
 	case CSV:
 	    return new MediaType("text", "csv");
+	case SHAPEFILE:
+	    return new MediaType("application", "zip");
 	case WATERML_1:
 	case WATERML_2:
 	    return MediaType.TEXT_XML_TYPE;
@@ -774,7 +819,16 @@ public class OMHandler extends StreamingRequestHandler {
 	OMRequest request = new OMRequest(webRequest);
 	OMFormat format = OMFormat.decode(request.getParameterValue(APIParameters.FORMAT));
 	if (format != null && format != OMFormat.JSON) {
-	    String filename = "observations" + format.getExtension();
+	    String downloadBaseName = MetadataDownloaderTool.resolveBaseName(
+		    request.getParameterValue(APIParameters.ASYNCH_DOWNLOAD_NAME), webRequest.getQueryString());
+	    String filename;
+	    if (format == OMFormat.SHAPEFILE) {
+		filename = downloadBaseName + ".zip";
+	    } else if (OMRequestUtils.isMetadataOnly(request) && format == OMFormat.CSV) {
+		filename = downloadBaseName + format.getExtension();
+	    } else {
+		filename = "observations" + format.getExtension();
+	    }
 	    headers.add(new SimpleEntry<>("Content-Disposition", "attachment; filename=\"" + filename + "\""));
 	}
 	return headers;
@@ -1195,6 +1249,44 @@ public class OMHandler extends StreamingRequestHandler {
 
 	writer.write(json.toString());
 	writer.close();
+    }
+
+    private JSONObject completeSyncMetadataDownload(S3TransferWrapper s3wrapper, String bucket, String viewId, String requestURL,
+	    String operationId, String asynchDownloadName) throws Exception {
+
+	MetadataDownloaderTool downloader = new MetadataDownloaderTool();
+	DownloadPartResult result = downloader.download(s3wrapper, bucket, requestURL, operationId, asynchDownloadName, null);
+
+	JSONObject msg = new JSONObject();
+	msg.put("id", operationId);
+	msg.put("downloadName", asynchDownloadName);
+	msg.put("downloadKind", "metadata");
+	msg.put("sync", true);
+	msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+
+	if (result == null || result.getPartFile() == null) {
+	    msg.put("status", "Canceled");
+	    status(s3wrapper, bucket, operationId, msg);
+	    return msg;
+	}
+
+	if (s3wrapper != null && bucket != null) {
+	    String fname = asynchDownloadName + ".zip";
+	    s3wrapper.uploadFile(result.getPartFile().getAbsolutePath(), bucket, "data-downloads/" + fname, "application/zip");
+	    String publicURL = "https://" + bucket + ".s3.us-east-1.amazonaws.com";
+	    String locator = publicURL + "/data-downloads/" + fname;
+	    msg.put("status", "Completed");
+	    msg.put("locators", new JSONArray(Collections.singletonList(locator)));
+	    if (result.getSizeInMB() != null) {
+		msg.put("sizeInMB", result.getSizeInMB());
+	    }
+	    result.getPartFile().delete();
+	} else {
+	    msg.put("status", "Completed");
+	}
+
+	status(s3wrapper, bucket, operationId, msg);
+	return msg;
     }
 
 }

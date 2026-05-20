@@ -3820,100 +3820,122 @@ export function initializePortal(config) {
 
 							dialogContent.append(nameDiv);
 
-							// Define format options before using them in rows
-							const csvOption = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
+							let bulkDownloadType = 'data';
+
+							function formatSupportsDownloadKind(support, kind) {
+								if (!support) {
+									return kind === 'data';
+								}
+								return String(support).split(',').map(function(s) { return s.trim(); }).includes(kind);
+							}
+
+							function renderFormatOptions(formatOptions, downloadKind) {
+								formatOptions.empty();
+								if (!authToken || !view) {
+									formatOptions.append(
+										$('<p>').text(t('formats_unavailable')).css('color', '#c0392b')
+									);
+									return;
+								}
+								fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=format&limit=10`)
+									.then(function(response) { return response.json(); })
+									.then(function(data) {
+										formatOptions.empty();
+										const formats = (data.format || []).filter(function(fmt) {
+											return formatSupportsDownloadKind(fmt.support, downloadKind);
+										});
+										if (formats.length > 0) {
+											formats.forEach(function(fmt, index) {
+												const fmtId = 'format-' + String(fmt.value).replace(/[^a-zA-Z0-9_]/g, '_');
+												const option = $('<div>').css({
+													'display': 'flex',
+													'align-items': 'center'
+												});
+												option.append(
+													$('<input>').attr({
+														'type': 'radio',
+														'name': 'downloadFormat',
+														'id': fmtId,
+														'value': fmt.value,
+														'checked': index === 0
+													}).css('margin-right', '8px')
+												);
+												option.append(
+													$('<label>')
+														.attr('for', fmtId)
+														.text(fmt.label || fmt.value)
+														.css('color', '#2c3e50')
+												);
+												formatOptions.append(option);
+											});
+										} else {
+											formatOptions.append(
+												$('<p>').text(t('formats_unavailable')).css('color', '#c0392b')
+											);
+										}
+									})
+									.catch(function(error) {
+										console.error('Error fetching download formats:', error);
+										formatOptions.empty();
+										formatOptions.append(
+											$('<p>').text(t('formats_load_failed')).css('color', '#c0392b')
+										);
+									});
+							}
+
+							const downloadTypeDiv = $('<div>').css({
+								'margin-top': '15px',
+								'margin-bottom': '10px',
+								'padding': '10px',
+								'background-color': '#f8f9fa',
+								'border-radius': '4px'
 							});
-							csvOption.append(
+							downloadTypeDiv.append(
+								$('<label>')
+									.text(t('download_type_label'))
+									.css({
+										'display': 'block',
+										'margin-bottom': '10px',
+										'font-weight': 'bold',
+										'color': '#2c3e50'
+									})
+							);
+							const downloadTypeOptions = $('<div>').css({
+								'display': 'flex',
+								'gap': '20px',
+								'flex-wrap': 'wrap'
+							});
+							const dataTypeOption = $('<div>').css({ 'display': 'flex', 'align-items': 'center' });
+							dataTypeOption.append(
 								$('<input>').attr({
 									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatCSV',
-									'value': 'CSV',
+									'name': 'bulkDownloadType',
+									'id': 'bulkDownloadTypeData',
+									'value': 'data',
 									'checked': true
 								}).css('margin-right', '8px')
 							);
-							csvOption.append(
-								$('<label>')
-									.attr('for', 'formatCSV')
-									.text('CSV')
-									.css('color', '#2c3e50')
+							dataTypeOption.append(
+								$('<label>').attr('for', 'bulkDownloadTypeData').text(t('download_type_data')).css('color', '#2c3e50')
 							);
-							const jsonOption = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							jsonOption.append(
+							const metadataTypeOption = $('<div>').css({ 'display': 'flex', 'align-items': 'center' });
+							metadataTypeOption.append(
 								$('<input>').attr({
 									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatJSON',
-									'value': 'JSON'
+									'name': 'bulkDownloadType',
+									'id': 'bulkDownloadTypeMetadata',
+									'value': 'metadata'
 								}).css('margin-right', '8px')
 							);
-							jsonOption.append(
-								$('<label>')
-									.attr('for', 'formatJSON')
-									.text('JSON')
-									.css('color', '#2c3e50')
+							metadataTypeOption.append(
+								$('<label>').attr('for', 'bulkDownloadTypeMetadata').text(t('download_type_metadata')).css('color', '#2c3e50')
 							);
-							const waterml10Option = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							waterml10Option.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatWaterML10',
-									'value': 'WATERML_1_0'
-								}).css('margin-right', '8px')
-							);
-							waterml10Option.append(
-								$('<label>')
-									.attr('for', 'formatWaterML10')
-									.text('WaterML 1.0')
-									.css('color', '#2c3e50')
-							);
-							const waterml20Option = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							waterml20Option.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatWaterML20',
-									'value': 'WATERML_2_0'
-								}).css('margin-right', '8px')
-							);
-							waterml20Option.append(
-								$('<label>')
-									.attr('for', 'formatWaterML20')
-									.text('WaterML 2.0')
-									.css('color', '#2c3e50')
-							);
-							const netcdfOption = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							netcdfOption.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatNetCDF',
-									'value': 'NETCDF'
-								}).css('margin-right', '8px')
-							);
-							netcdfOption.append(
-								$('<label>')
-									.attr('for', 'formatNetCDF')
-									.text('NetCDF')
-									.css('color', '#2c3e50')
-							);
+							downloadTypeOptions.append(dataTypeOption);
+							downloadTypeOptions.append(metadataTypeOption);
+							downloadTypeDiv.append(downloadTypeOptions);
+							dialogContent.append(downloadTypeDiv);
 
-							// Add format selection
+							// Format selection (loaded from om-api/properties)
 							const formatDiv = $('<div>').css({
 								'margin-top': '15px',
 								'margin-bottom': '15px',
@@ -3933,33 +3955,21 @@ export function initializePortal(config) {
 									})
 							);
 
-							// Format selection
 							const formatOptions = $('<div>').css({
 								'display': 'flex',
-								'flex-direction': 'column',
-								'gap': '10px'
+								'flex-wrap': 'wrap',
+								'gap': '20px'
 							});
-							// First row: CSV, JSON, WaterML 1.0
-							const formatRow1 = $('<div>').css({
-								'display': 'flex',
-								'gap': '20px',
-								'margin-bottom': '0px'
-							});
-							formatRow1.append(csvOption);
-							formatRow1.append(jsonOption);
-							formatRow1.append(waterml10Option);
-							// Second row: WaterML 2.0, NetCDF
-							const formatRow2 = $('<div>').css({
-								'display': 'flex',
-								'gap': '20px',
-								'margin-top': '0px'
-							});
-							formatRow2.append(waterml20Option);
-							formatRow2.append(netcdfOption);
-							formatOptions.append(formatRow1);
-							formatOptions.append(formatRow2);
+							formatOptions.append($('<p>').text(t('loading')));
 							formatDiv.append(formatOptions);
 							dialogContent.append(formatDiv);
+
+							renderFormatOptions(formatOptions, bulkDownloadType);
+							downloadTypeDiv.on('change', 'input[name="bulkDownloadType"]', function() {
+								bulkDownloadType = $('input[name="bulkDownloadType"]:checked').val() || 'data';
+								formatOptions.html(`<p>${t('loading')}</p>`);
+								renderFormatOptions(formatOptions, bulkDownloadType);
+							});
 
 							// Add email notifications checkbox
 							const notificationsDiv = $('<div>').css({
@@ -4159,17 +4169,66 @@ export function initializePortal(config) {
 
 											// Add format parameter based on radio selection
 											const selectedFormat = $('input[name="downloadFormat"]:checked').val();
+											if (!selectedFormat) {
+												alert(t('formats_unavailable'));
+												return;
+											}
 											params.append('format', selectedFormat);
+
+											var downloadType = $('input[name="bulkDownloadType"]:checked').val() || 'data';
+											if (downloadType === 'metadata') {
+												params.append('includeData', 'false');
+											} else {
+												params.append('includeData', 'true');
+											}
 
 											// Add email notifications parameter if checkbox is checked
 											if ($('#emailNotifications').is(':checked')) {
 												params.append('eMailNotifications', 'true');
 											}
 
+											// Synchronous metadata download when the result set is small
+											if (downloadType === 'metadata' && resultSet.size <= 100) {
+												var syncParams = new URLSearchParams(params.toString());
+												syncParams.delete('eMailNotifications');
+												var syncUrl = `${baseUrl}/token/${token}/view/${view}/om-api/observations?${syncParams.toString()}`;
+												var syncFileExt = selectedFormat === 'SHAPEFILE' ? '.zip' : '.csv';
+												fetch(syncUrl)
+													.then(function(response) {
+														if (!response.ok) {
+															throw new Error('Network response was not ok');
+														}
+														return response.blob();
+													})
+													.then(function(blob) {
+														var fileName = (downloadName || 'metadata') + syncFileExt;
+														var link = document.createElement('a');
+														link.href = window.URL.createObjectURL(blob);
+														link.download = fileName;
+														document.body.appendChild(link);
+														link.click();
+														document.body.removeChild(link);
+														window.URL.revokeObjectURL(link.href);
+														GIAPI.UI_Utils.dialog('open', {
+															title: t('download_started_title'),
+															message: t('metadata_sync_download_message')
+														});
+													})
+													.catch(function(error) {
+														GIAPI.UI_Utils.dialog('open', {
+															title: t('error_title'),
+															message: t('error_download_message')
+														});
+														console.error('Metadata sync download error:', error);
+													});
+												$(this).dialog('close');
+												return;
+											}
+
 											// Construct the final URL using the view from config
 											var downloadUrl = `${baseUrl}/token/${token}/view/${view}/om-api/downloads?${params.toString()}`;
 
-											// Make the GET request
+											// Make the PUT request
 											fetch(downloadUrl, { method: 'PUT', body: '' })
 												.then(response => {
 													if (!response.ok) {

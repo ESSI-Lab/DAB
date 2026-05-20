@@ -288,6 +288,16 @@ public class PropertiesHandler extends StreamingRequestHandler {
 		    obj.put("label", s.getLabel());
 		}
 	    }
+	    if (dp.equals(DatasetProperty.FORMAT)) {
+		try {
+		    OMFormat format = OMFormat.valueOf(term);
+		    obj.put("label", format.getLabel());
+		    obj.put("support", format.getSupport());
+		} catch (IllegalArgumentException ex) {
+		    obj.put("label", term);
+		    obj.put("support", "data");
+		}
+	    }
 	}
 	return ret;
     }
