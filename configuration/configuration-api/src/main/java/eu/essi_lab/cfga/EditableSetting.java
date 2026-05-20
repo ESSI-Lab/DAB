@@ -216,7 +216,7 @@ public interface EditableSetting {
 
 	    if (log) {
 		GSLoggerFactory.getLogger(EditableSetting.class)
-			.error("- Reset setting misses the follwing settings ids: {}", targetSettingIds);
+			.error("- Reset setting misses the following settings ids: {}", targetSettingIds);
 	    }
 	}
 
