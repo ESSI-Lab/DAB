@@ -92,8 +92,10 @@ public class COGS3SyncProcessor {
 	    Path varFolder = base.resolve(var);
 	    Files.createDirectories(varFolder);
 
-	    Path raw = varFolder.resolve(finalBaseName + ".raw");
-	    Path reprojected = varFolder.resolve(finalBaseName + ".3857");
+
+	    Path raw = varFolder.resolve(finalBaseName + "_" + System.nanoTime() + ".tif");
+	    Path reprojected = varFolder.resolve(finalBaseName + "_" + System.nanoTime() + "_3857.tif");
+
 	    Path finalCog = varFolder.resolve(finalBaseName + ".tif");
 
 	    // Download
@@ -157,6 +159,13 @@ public class COGS3SyncProcessor {
 
 	    Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
 	    hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, CRS.decode("EPSG:4326", true));
+
+	    GSLoggerFactory.getLogger(getClass()).info("Opening GeoTIFF: " + in + " size=" + Files.size(in));
+
+
+	    if(!Files.exists(in) || Files.size(in) == 0) {
+		throw new IOException("Input file missing or empty: " + in);
+	    }
 
 	    reader = new GeoTiffReader(in.toFile(), hints);
 	    coverage = reader.read(null);
