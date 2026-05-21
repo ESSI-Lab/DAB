@@ -10,12 +10,12 @@ package eu.essi_lab.services.data_hub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -356,6 +356,8 @@ public class DataHubService extends AbstractManagedService {
 
 		    try {
 
+			GSLoggerFactory.getLogger(getClass()).trace("Submit STARTED");
+
 			byte[] raw = record.value();
 
 			Optional<DecodedRecord> optRecord;
@@ -373,11 +375,17 @@ public class DataHubService extends AbstractManagedService {
 
 			optRecord.ifPresent(this::process);
 
+			GSLoggerFactory.getLogger(getClass()).trace("Submit ENDED");
+
 		    } finally {
+
+			GSLoggerFactory.getLogger(getClass()).trace("Finalization STARTED");
 
 			tracker.markProcessed(record);
 
 			inFlight.release();
+
+			GSLoggerFactory.getLogger(getClass()).trace("Finalization ENDED");
 		    }
 		});
 	    }
