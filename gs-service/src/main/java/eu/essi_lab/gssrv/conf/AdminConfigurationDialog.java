@@ -38,7 +38,7 @@ import eu.essi_lab.lib.utils.*;
  */
 class AdminConfigurationDialog extends SettingEditDialog {
 
-    private String requestURL;
+    private final String requestURL;
 
     /**
      * @param configuration
@@ -66,7 +66,7 @@ class AdminConfigurationDialog extends SettingEditDialog {
     }
 
     /**
-     *  
+     *
      */
     public void close() {
 

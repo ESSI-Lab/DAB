@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -86,8 +87,13 @@ public class DataloggersMapper extends FileIdentifierMapper {
 	    String uomCod = getString(datastreamJson, "uom_cod");
 	    Integer datastreamStep = datastreamJson.optInt("datastream_step", 0);
 	    String tipologiaRete = getString(datastreamJson, "tipologia_rete");
-	    String datastreamAvailableSince = getString(datastreamJson, "datastream_available_since");
-	    String datastreamAvailableUntil = getString(datastreamJson, "datastream_available_until");
+	    boolean useRealDataTemporalExtent = useRealDataTemporalExtent(originalMD);
+	    String temporalExtentStart = useRealDataTemporalExtent
+		    ? getString(datastreamJson, "datastream_real_data_start")
+		    : getString(datastreamJson, "datastream_available_since");
+	    String temporalExtentEnd = useRealDataTemporalExtent
+		    ? getString(datastreamJson, "datastream_real_data_end")
+		    : getString(datastreamJson, "datastream_available_until");
 
 	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
@@ -164,10 +170,10 @@ public class DataloggersMapper extends FileIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeywords(keyword);
 
 	    // Temporal extent
-	    if (datastreamAvailableSince != null && datastreamAvailableUntil != null) {
+	    if (temporalExtentStart != null && temporalExtentEnd != null) {
 		try {
-		    OffsetDateTime start = OffsetDateTime.parse(datastreamAvailableSince);
-		    OffsetDateTime end = OffsetDateTime.parse(datastreamAvailableUntil);
+		    OffsetDateTime start = OffsetDateTime.parse(temporalExtentStart);
+		    OffsetDateTime end = OffsetDateTime.parse(temporalExtentEnd);
 		    coreMetadata.addTemporalExtent(start.toString(), end.toString());
 		} catch (Exception e) {
 		    logger.warn("Error parsing temporal extent", e);
@@ -217,7 +223,7 @@ public class DataloggersMapper extends FileIdentifierMapper {
 		extensionHandler.setAttributeUnits(uomCod);
 	    }
 	    if (datastreamStep != null && datastreamStep > 0) {
-		extensionHandler.setTimeResolution(String.valueOf(datastreamStep));
+		extensionHandler.setTimeResolutionDuration8601("PT" + datastreamStep + "M");
 	    }
 
 	    // Online resource
@@ -235,6 +241,16 @@ public class DataloggersMapper extends FileIdentifierMapper {
 
 	}
 
+    }
+
+    private boolean useRealDataTemporalExtent(OriginalMetadata originalMD) {
+
+	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
+	if (additionalInfo == null) {
+	    return false;
+	}
+	String source = additionalInfo.get(DataloggersConnectorSetting.TEMPORAL_EXTENT_SOURCE_KEY, String.class);
+	return DataloggersConnectorSetting.TEMPORAL_EXTENT_REAL_DATA.equals(source);
     }
 
     private String getString(JSONObject result, String key) {

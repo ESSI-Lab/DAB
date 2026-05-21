@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import eu.essi_lab.api.database.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.adk.AccessorFactory;
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.accessor.AccessorSetting;
@@ -222,7 +222,7 @@ public class SourceConnectivityTestTask extends AbstractCustomTask {
 	    viewSources = only;
 	}
 
-	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
+	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 
 	GSLoggerFactory.getLogger(getClass()).info("Testing connectivity of {} sources for view {} (source filter: {})", viewSources.size(),
 		viewId, sourceId != null ? sourceId : "none");

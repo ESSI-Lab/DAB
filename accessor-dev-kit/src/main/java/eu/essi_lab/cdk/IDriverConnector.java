@@ -21,10 +21,10 @@ package eu.essi_lab.cdk;
  * #L%
  */
 
-import eu.essi_lab.cfga.Configurable;
-import eu.essi_lab.cfga.gs.setting.connector.ConnectorSetting;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.pluggable.Pluggable;
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.setting.connector.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.pluggable.*;
 
 /**
  * Generic Connector Interface.
@@ -37,15 +37,24 @@ public interface IDriverConnector<T extends ConnectorSetting> extends Configurab
      * @param source
      * @return
      */
-    public boolean supports(GSSource source);
+    boolean supports(GSSource source);
 
     /**
      * @param url
      */
-    public void setSourceURL(String url);
+    void setSourceURL(String url);
 
     /**
      * @return
      */
-    public String getSourceURL();
+    String getSourceURL();
+
+    /**
+     * @return
+     */
+    default boolean supportsPreview() {
+
+	return true;
+    }
+
 }

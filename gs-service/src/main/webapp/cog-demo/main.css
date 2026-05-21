@@ -1,0 +1,108 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#map {
+  flex: 1 1 auto;
+  position: relative;
+}
+
+
+#controls {
+  padding: 6px 10px;
+  font-family: sans-serif;
+  flex: 0 0 auto;
+}
+
+.time-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#forecastSlider {
+  flex: 1;
+}
+
+.time-main {
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.time-layers {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #555;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+
+.layer-controls {
+  position: absolute;
+  top: 80px;
+  left: 10px;
+
+  background: white;
+  padding: 8px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+
+  font-family: sans-serif;
+  font-size: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  z-index: 1000;
+}
+
+.layer-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.legend {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: white;
+  padding: 10px 12px;
+  font-family: sans-serif;
+  font-size: 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  max-width: 260px;
+}
+
+.legend-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.legend-color {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  border: 1px solid #666;
+}

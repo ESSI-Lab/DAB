@@ -227,7 +227,7 @@ public class DataloggersDownloader extends WMLDataDownloader {
 		    datastreamIds.add(datastreamId);
 
 		    // Retrieve data
-		    DataResponse dataResponse = client.getData(varIds, dataloggerIds, datastreamIds, startString, endString, 0, 1000);
+		    DataResponse dataResponse = client.getData(varIds, dataloggerIds, datastreamIds, startString, endString, 0, 1000000);
 
 		    TimeSeriesResponseType jtst = getJaxbTimeSeriesTemplate();
 		    jtst.getTimeSeries().get(0).getVariable().setNoDataValue(NO_DATA_VALUE.doubleValue());

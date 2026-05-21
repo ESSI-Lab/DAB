@@ -34,6 +34,8 @@ import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -103,6 +105,9 @@ public class DataloggersConnector extends HarvestedQueryConnector<DataloggersCon
 		    OriginalMetadata metadata = new OriginalMetadata();
 		    metadata.setSchemeURI(CommonNameSpaceContext.DATALOGGERS_NS_URI);
 		    metadata.setMetadata(om);
+		    metadata.setAdditionalInfo(GSPropertyHandler.of(//
+			    new GSProperty<String>(DataloggersConnectorSetting.TEMPORAL_EXTENT_SOURCE_KEY,
+				    getSetting().getTemporalExtentSource())));
 		    ret.addRecord(metadata);
 		    partialNumbers++;
 		    count++;
@@ -262,6 +267,12 @@ public class DataloggersConnector extends HarvestedQueryConnector<DataloggersCon
 	}
 	if (datastream.getDatastreamAvailableUntil() != null) {
 	    json.put("datastream_available_until", datastream.getDatastreamAvailableUntil().toString());
+	}
+	if (datastream.getDatastreamRealDataStart() != null) {
+	    json.put("datastream_real_data_start", datastream.getDatastreamRealDataStart().toString());
+	}
+	if (datastream.getDatastreamRealDataEnd() != null) {
+	    json.put("datastream_real_data_end", datastream.getDatastreamRealDataEnd().toString());
 	}
 	return json;
     }

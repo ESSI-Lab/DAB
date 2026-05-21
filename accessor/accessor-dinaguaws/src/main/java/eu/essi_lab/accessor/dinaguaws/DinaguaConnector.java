@@ -181,10 +181,8 @@ public class DinaguaConnector extends HarvestedQueryConnector<DinaguaConnectorSe
 
 			dataset.getExtensionHandler().setTimeInterpolation(interpolation);
 			if (!interpolation.equals(InterpolationType.CONTINUOUS)) {
-			    dataset.getExtensionHandler().setTimeUnits("days");
-			    dataset.getExtensionHandler().setTimeUnitsAbbreviation("d");
-			    dataset.getExtensionHandler().setTimeSupport("1");
-			    dataset.getExtensionHandler().setTimeResolution("1");
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
+			    dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 			}
 			
 

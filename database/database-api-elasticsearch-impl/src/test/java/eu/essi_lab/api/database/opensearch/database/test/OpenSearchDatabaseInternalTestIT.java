@@ -38,7 +38,7 @@ OpenSearchDatabase database = createDataBase();
 	//
 	//
 
-	Assert.assertNotNull(database.getWorker("sourceId"));
+	Assert.assertNotNull(database.getStorage("sourceId"));
 
 	//
 	//

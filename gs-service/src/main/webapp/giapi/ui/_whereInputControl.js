@@ -21,6 +21,20 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 	var predefinedLayers = [];
 
+	var resolveShapeWmsToken = function() {
+		if (typeof window.getShapeWmsToken === 'function') {
+			return window.getShapeWmsToken();
+		}
+		return localStorage.getItem('authToken') || 'public';
+	};
+
+	var resolveShapeWmsEndpoint = function() {
+		if (options.shapeView && typeof window.buildShapeWmsEndpoint === 'function') {
+			return window.buildShapeWmsEndpoint();
+		}
+		return options.wmsEndpoint;
+	};
+
 	if (options.olMap) {
 		options.olMap.inputControl(inControl);
 	}
@@ -183,7 +197,7 @@ console.log("Hello, world!");
 		map.addControl(myControl);
 
 
-		if (options.wmsEndpoint) {
+		if (options.shapeView || options.wmsEndpoint) {
 
 			//
 			// creates the layers selector
@@ -322,7 +336,15 @@ console.log("Hello, world!");
 
 		var servicePath = options.dabNode.servicePath();
 
-		var query = endpoint + servicePath + '/opensearch/wmslayershandler?request=capabilities&endpoint=' + options.wmsEndpoint + '&version=' + options.wmsVersion;
+		var query;
+		if (options.shapeView && typeof window.buildShapeWmsLayersQuery === 'function') {
+			query = window.buildShapeWmsLayersQuery(options.wmsVersion);
+		} else if (options.wmsEndpoint) {
+			query = endpoint + servicePath + '/opensearch/wmslayershandler?request=capabilities&endpoint='
+				+ options.wmsEndpoint + '&version=' + options.wmsVersion;
+		} else {
+			return;
+		}
 
 		jQuery.ajax({
 
@@ -406,7 +428,7 @@ console.log("Hello, world!");
 							'name': layer.name,
 							'title': layer.title,
 							'protocol': protocol,
-							'url': options.wmsEndpoint
+							'url': resolveShapeWmsEndpoint()
 						};
 
 						onlineArray.push(online);
@@ -583,7 +605,7 @@ console.log("Hello, world!");
 		// WMS Layers selector
 		//
 
-		if (options.wmsEndpoint!==undefined) {
+		if (options.shapeView || options.wmsEndpoint !== undefined) {
 
 			var layersSelectorButton = GIAPI.ButtonsFactory.onOffSwitchButton(__t('layers_select'), __t('layers_hide'), {
 				'id': 'layersSelectorButton',

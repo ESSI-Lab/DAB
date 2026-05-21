@@ -38,6 +38,8 @@ public class Datastream {
     private String dataloggerLocation;
     private OffsetDateTime datastreamAvailableSince;
     private OffsetDateTime datastreamAvailableUntil;
+    private OffsetDateTime datastreamRealDataStart;
+    private OffsetDateTime datastreamRealDataEnd;
 
     public Integer getUomId() {
         return uomId;
@@ -149,6 +151,22 @@ public class Datastream {
 
     public void setDatastreamAvailableUntil(OffsetDateTime datastreamAvailableUntil) {
         this.datastreamAvailableUntil = datastreamAvailableUntil;
+    }
+
+    public OffsetDateTime getDatastreamRealDataStart() {
+        return datastreamRealDataStart;
+    }
+
+    public void setDatastreamRealDataStart(OffsetDateTime datastreamRealDataStart) {
+        this.datastreamRealDataStart = datastreamRealDataStart;
+    }
+
+    public OffsetDateTime getDatastreamRealDataEnd() {
+        return datastreamRealDataEnd;
+    }
+
+    public void setDatastreamRealDataEnd(OffsetDateTime datastreamRealDataEnd) {
+        this.datastreamRealDataEnd = datastreamRealDataEnd;
     }
 
     @Override

@@ -27,21 +27,18 @@ import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
 import eu.essi_lab.cfga.gui.dialog.*;
 import eu.essi_lab.cfga.scheduler.*;
-import eu.essi_lab.cfga.scheduler.Scheduler;
-import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.scheduling.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.profiler.om.scheduling.*;
 
 import java.util.*;
-import java.util.Date;
 import java.util.stream.*;
 
 /**
  * @author Fabrizio
  */
-public class AsynchDownloadDescriptor extends AbstractGridDescriptor<AsynchDownloadDescriptor.GridData> {
+class AsynchDownloadDescriptor extends AbstractGridDescriptor<AsynchDownloadDescriptor.GridData> {
 
     private static final String DOWNLOAD_NAME_COLUMN = "Download name";
     private static final String EMAIL_COLUMN = "E-mail";

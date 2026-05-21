@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import eu.essi_lab.api.database.*;
 import jakarta.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,9 +48,6 @@ import com.marklogic.xcc.types.ValueType;
 import com.marklogic.xcc.types.XdmItem;
 import com.marklogic.xcc.types.XdmNode;
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.DatabaseFolder;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.marklogic.search.DistinctQueryHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicDiscoveryBondHandler;
 import eu.essi_lab.api.database.marklogic.search.MarkLogicSelectorBuilder;
@@ -346,9 +344,9 @@ public class MarkLogicDatabase extends Database {
     }
 
     @Override
-    protected SourceStorageWorker createSourceStorageWorker(String sourceId) throws GSException {
+    protected SourceStorage createSourceStorageWorker(String sourceId) throws GSException {
 
-	return new MarkLogicSourceStorageWorker(sourceId, this);
+	return new MarkLogicSourceStorage(sourceId, this);
     }
 
     private void initializeStorageWorkers() throws GSException {
@@ -356,12 +354,12 @@ public class MarkLogicDatabase extends Database {
 
 	    DatabaseFolder[] folders = getFolders();
 	    for (int i = 0; i < folders.length; i++) {
-		String sourceId = SourceStorageWorker.retrieveSourceName(dbIdentifier, folders[i].getName());
+		String sourceId = SourceStorage.retrieveSourceName(dbIdentifier, folders[i].getName());
 
 		if (sourceId != null) {
 
-		    MarkLogicSourceStorageWorker worker = new MarkLogicSourceStorageWorker(sourceId, this);
-		    getWorkersMap().put(sourceId, worker);
+		    MarkLogicSourceStorage worker = new MarkLogicSourceStorage(sourceId, this);
+		    getStorageMap().put(sourceId, worker);
 		}
 	    }
 

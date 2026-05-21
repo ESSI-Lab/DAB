@@ -47,6 +47,7 @@ import eu.essi_lab.pdk.wrt.*;
 import eu.essi_lab.profiler.semantic.*;
 import eu.essi_lab.request.executor.*;
 import jakarta.jws.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.core.Response;
@@ -267,7 +268,7 @@ public class SupportService {
 	    @QueryParam("token") String token) { //
 
 	if (platformId == null || platformId.isEmpty()) {
-	    return Response.serverError().entity(getErrorResponse("platformId parameter is required").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("platformId parameter is required").toString()).build();
 	}
 
 	try {
@@ -333,12 +334,12 @@ public class SupportService {
 	    List<GSResource> resources = resultSet.getResultsList();
 
 	    if (resources.isEmpty()) {
-		return Response.serverError().entity(getErrorResponse("No rating curves found for platform: " + platformId).toString())
+		return Response.serverError().entity(getXMLErrorResponse("No rating curves found for platform: " + platformId).toString())
 			.build();
 	    }
 
 	    // Perform access request for the first rating curve found
-	    GSResource resource = resources.get(0);
+	    GSResource resource = resources.getFirst();
 
 	    Iterator<Online> onlineIterator = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution()
 		    .getDistributionOnlines();
@@ -353,7 +354,7 @@ public class SupportService {
 	    String onlineId = online.getIdentifier();
 	    
 	    if (onlineId == null || onlineId.isEmpty()) {
-		return Response.serverError().entity(getErrorResponse("Online ID not found for rating curve").toString()).build();
+		return Response.serverError().entity(getXMLErrorResponse("Online ID not found for rating curve").toString()).build();
 	    }
 
 	    // Execute access request
@@ -375,7 +376,7 @@ public class SupportService {
 	    ResultSet<DataObject> accessResult = accessExecutor.retrieve(accessMessage);
 
 	    if (accessResult.getResultsList().isEmpty()) {
-		return Response.serverError().entity(getErrorResponse("Unable to retrieve rating curve data").toString()).build();
+		return Response.serverError().entity(getXMLErrorResponse("Unable to retrieve rating curve data").toString()).build();
 	    }
 
 	    DataObject dataObject = accessResult.getResultsList().get(0);
@@ -389,7 +390,7 @@ public class SupportService {
 		dataFile.delete();
 	    } catch (IOException e) {
 		GSLoggerFactory.getLogger(getClass()).error("Error reading rating curve file", e);
-		return Response.serverError().entity(getErrorResponse("Error reading rating curve data: " + e.getMessage()).toString())
+		return Response.serverError().entity(getXMLErrorResponse("Error reading rating curve data: " + e.getMessage()).toString())
 			.build();
 	    }
 
@@ -397,7 +398,7 @@ public class SupportService {
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error retrieving rating curves", e);
-	    return Response.serverError().entity(getErrorResponse("Error retrieving rating curves: " + e.getMessage()).toString())
+	    return Response.serverError().entity(getXMLErrorResponse("Error retrieving rating curves: " + e.getMessage()).toString())
 		    .build();
 	}
     }
@@ -410,14 +411,14 @@ public class SupportService {
 
 	JSONObject output = new JSONObject();
 	if (view == null || view.isEmpty()) {
-	    return Response.serverError().entity(getErrorResponse("view parameter not specified").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("view parameter not specified").toString()).build();
 	}
 	View v;
 	try {
 	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
 	} catch (GSException e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    return Response.serverError().entity(getErrorResponse(e.getMessage()).toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
 	}
 	List<GSSource> sources = ConfigurationWrapper.getViewSources(v);
 	List<String> sourceIdentifiers = new ArrayList<String>();
@@ -430,7 +431,7 @@ public class SupportService {
 		dataCacheConnector = DataCacheConnectorFactory.newDefaultDataCacheConnector();
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error(e);
-		return Response.serverError().entity(getErrorResponse("error init data cache connector").toString()).build();
+		return Response.serverError().entity(getJSONErrorResponse("error init data cache connector").toString()).build();
 
 	    }
 	}
@@ -439,7 +440,7 @@ public class SupportService {
 	    datasetsInDatabase = getDatasetsInDatabase(sources, view);
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    return Response.serverError().entity(getErrorResponse("error counting datasets").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("error counting datasets").toString()).build();
 	}
 
 	Map<String, SourceCacheStats> stats = null;
@@ -447,7 +448,7 @@ public class SupportService {
 	    stats = dataCacheConnector.getCacheStatsPerSource(sourceIdentifiers);
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    return Response.serverError().entity(getErrorResponse("error counting cached datasets").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("error counting cached datasets").toString()).build();
 	}
 
 	JSONArray sourcesArray = new JSONArray();
@@ -465,8 +466,8 @@ public class SupportService {
 
 	    try {
 		Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
-		SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
-		HarvestingProperties harvestingProperties = worker.getHarvestingProperties();
+		SourceStorage storage = database.getStorage(source.getUniqueIdentifier());
+		HarvestingProperties harvestingProperties = storage.getHarvestingProperties();
 		String lastHarvesting = harvestingProperties.getEndHarvestingTimestamp();
 		jsonSource.put("lastHarvesting", lastHarvesting);
 	    } catch (Exception e) {
@@ -542,16 +543,16 @@ public class SupportService {
     public Response getViews(LoginRequest request, @QueryParam("sourceDeployment") String sourceDeployment) {
 
 	if (sourceDeployment == null || sourceDeployment.isEmpty()) {
-	    return Response.serverError().entity(getErrorResponse("sourceDeployment parameter is required").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("sourceDeployment parameter is required").toString()).build();
 	}
 
 	LoginResponse loginResponse = getLoginResponse(request);
 	if (!loginResponse.isSuccess()) {
-	    return Response.serverError().entity(getErrorResponse("Authentication failed").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("Authentication failed").toString()).build();
 	}
 
 	if (!loginResponse.isAdmin()) {
-	    return Response.serverError().entity(getErrorResponse("Admin access required").toString()).build();
+	    return Response.serverError().entity(getJSONErrorResponse("Admin access required").toString()).build();
 	}
 
 	try {
@@ -586,16 +587,207 @@ public class SupportService {
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error retrieving views", e);
-	    return Response.serverError().entity(getErrorResponse("Error retrieving views: " + e.getMessage()).toString())
+	    return Response.serverError().entity(getJSONErrorResponse("Error retrieving views: " + e.getMessage()).toString())
 		    .build();
 	}
     }
 
-    private JSONObject getErrorResponse(String error) {
+    /**
+     *
+     * @param error
+     * @return
+     */
+    private JSONObject getJSONErrorResponse(String error) {
 	JSONObject ret = new JSONObject();
 	ret.put("status", "error");
 	ret.put("message", error);
 	return ret;
+    }
+
+    /**
+     *
+     * @param error
+     * @return
+     */
+    private String getXMLErrorResponse(String error) {
+
+	return "<error>" + error + "</error>";
+    }
+
+    @SuppressWarnings("rawtypes")
+    @GET
+    @Path("/predefinedShapes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listPredefinedShapes(//
+	    @QueryParam("email") String email, //
+	    @QueryParam("apiKey") String apiKey) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginResponse loginResponse = getLoginResponse(new LoginRequest(email, apiKey));
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	try {
+
+	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	    JSONObject payload = new PredefinedShapeManagementService().listAreas(owner, loginResponse.isAdmin());
+	    payload.put("success", true);
+
+	    return Response.ok(payload.toString(), MediaType.APPLICATION_JSON).build();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Predefined shape list failed", ex);
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("Unable to list shapes: " + ex.getMessage());
+	    return Response.serverError().entity(basicResponse).build();
+	}
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/predefinedShapes/harvest")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response harvestPredefinedShapes(LoginRequest request) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginResponse loginResponse = getLoginResponse(request);
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	Optional<String> error = new PredefinedShapeManagementService().triggerHarvest();
+
+	if (error.isPresent()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(error.get());
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	}
+
+	basicResponse.setSuccess(true);
+	basicResponse.setMessage("Harvest scheduled for source " + ConfigurationWrapper.getShapeSourceId().orElse(""));
+
+	return Response.ok(basicResponse).build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/predefinedShapes/delete")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deletePredefinedShape(PredefinedShapeDeleteRequest request) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
+	LoginResponse loginResponse = getLoginResponse(loginRequest);
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	PredefinedShapeDeleteResult deleteResult = new PredefinedShapeManagementService().deleteByPrefix(request.getPrefix(),
+		owner, loginResponse.isAdmin());
+
+	if (!deleteResult.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(deleteResult.getErrorMessage().orElse("Delete failed"));
+	    if (deleteResult.isForbidden()) {
+		return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+	    }
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	}
+
+	basicResponse.setSuccess(true);
+	basicResponse.setMessage("Deleted shape area \"" + request.getPrefix() + "\"");
+
+	return Response.ok(basicResponse).build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/uploadPredefinedShapes")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response uploadPredefinedShapes(@Context HttpServletRequest servletRequest) {
+
+	BasicResponse basicResponse = new BasicResponse();
+
+	try {
+
+	    MultipartSupport.ParsedMultipart multipart = MultipartSupport.parse(servletRequest);
+
+	    String email = multipart.getField("email").orElse("");
+	    String apiKey = multipart.getField("apiKey").orElse("");
+
+	    LoginRequest loginRequest = new LoginRequest(email, apiKey);
+	    LoginResponse loginResponse = getLoginResponse(loginRequest);
+
+	    if (!loginResponse.isSuccess()) {
+
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage("not authenticated");
+		return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	    }
+
+	    if (multipart.getFileStream() == null) {
+
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage("Missing shapefile (.zip)");
+		return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	    }
+
+	    String shapeId = multipart.getField("shapeId").orElse("");
+	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+
+	    PredefinedShapeUploadService uploadService = new PredefinedShapeUploadService();
+
+	    PredefinedShapeUploadService.UploadOutcome outcome = uploadService.upload(multipart.getFileName(), shapeId,
+		    multipart.getFileStream(), owner, loginResponse.isAdmin());
+
+	    if (!outcome.isSuccess()) {
+
+		basicResponse.setSuccess(false);
+		basicResponse.setMessage(outcome.getErrorMessage());
+		if (outcome.isForbidden()) {
+		    return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	    }
+
+	    basicResponse.setSuccess(true);
+	    basicResponse.setMessage("Shapefile stored with identifier \"" + outcome.getEntryPrefix() + "\"");
+
+	    return Response.ok(basicResponse).build();
+
+	} catch (IllegalArgumentException ex) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(ex.getMessage());
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Predefined shape upload failed", ex);
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("Upload failed: " + ex.getMessage());
+	    return Response.serverError().entity(basicResponse).build();
+	}
     }
 
     @SuppressWarnings("rawtypes")

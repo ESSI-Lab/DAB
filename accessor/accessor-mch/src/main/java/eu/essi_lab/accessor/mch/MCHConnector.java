@@ -247,11 +247,8 @@ public class MCHConnector extends HarvestedQueryConnector<MCHConnectorSetting> {
 		    }
 
 		    if (resolution.equals(Resolution.DAILY)) {
-
-			dataset.getExtensionHandler().setTimeSupport("1");
-			dataset.getExtensionHandler().setTimeUnits("day");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("day");
-
+			dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
+			dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 		    }
 
 		    GridSpatialRepresentation grid = new GridSpatialRepresentation();

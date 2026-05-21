@@ -33,7 +33,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.*;
 import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
 import eu.essi_lab.identifierdecorator.ConflictingResourceException;
 import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
@@ -53,14 +53,14 @@ public class HarvestingReportsHandler {
 
     private static boolean enabled;
 
-    private SourceStorage sourceStorage;
+    private SourceStorageProvider sourceStorage;
     private GSSource gsSource;
 
     /**
      * @param gsSource
      * @param sourceStorage
      */
-    public HarvestingReportsHandler(GSSource gsSource, SourceStorage sourceStorage) {
+    public HarvestingReportsHandler(GSSource gsSource, SourceStorageProvider sourceStorage) {
 
 	this.gsSource = gsSource;
 	this.sourceStorage = sourceStorage;

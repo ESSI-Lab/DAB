@@ -369,6 +369,22 @@
             <artifactId>json</artifactId>
         </dependency>
 
+        <!-- MCP (Model Context Protocol) — draft servlet; BOM from parent dependencyManagement -->
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-json-jackson2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>gs-lib-skos</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
         <!-- core -->
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
@@ -601,6 +617,11 @@
         <dependency>
             <groupId>${project.parent.groupId}</groupId>
             <artifactId>accessor-s3-shapefile</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.parent.groupId}</groupId>
+            <artifactId>accessor-shapefile-opensearch</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

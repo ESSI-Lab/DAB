@@ -231,8 +231,11 @@ public class NetCDFConnector extends HarvestedQueryConnector<NetCDFConnectorSett
 				Dimension timeDimension = new Dimension();
 				timeDimension.setResolution(time.getUom().getIdentifier(), time.getResolution().doubleValue());
 				grid.addAxisDimension(timeDimension);
-				dataset.getExtensionHandler().setTimeUnits("milliseconds");
-				dataset.getExtensionHandler().setTimeResolution("" + time.getResolution().longValue());
+			java.math.BigDecimal ms = new java.math.BigDecimal(time.getResolution().longValue());
+			javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(ms, "ms");
+			if (duration != null) {
+			    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
+			}
 				Dimension latDimension = new Dimension();
 				latDimension.setResolution(spatialNorth.getUom().getIdentifier(),
 					spatialNorth.getResolution().doubleValue());

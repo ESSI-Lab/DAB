@@ -1,13 +1,16 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.gssrv.conf;
 
-import java.io.InputStream;
-import java.util.Properties;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.orderedlayout.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
+import eu.essi_lab.lib.utils.*;
 
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import java.io.*;
+import java.util.*;
 
 /*-
  * #%L
@@ -30,20 +33,14 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  * #L%
  */
 
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-
-import eu.essi_lab.cfga.gs.GSTabIndex;
-import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-
 /**
- * 
+ *
  * @author Fabrizio
  */
-public class AboutTabDescriptor extends TabDescriptor {
+class AboutTabDescriptor extends TabDescriptor {
 
     /**
-     * 
+     *
      */
     public AboutTabDescriptor() {
 

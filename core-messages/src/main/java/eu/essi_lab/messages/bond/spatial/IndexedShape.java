@@ -40,6 +40,28 @@ public class IndexedShape implements SpatialEntity {
     }
 
     /**
+     * Resolves the shape-files folder entry name from a {@code predefinedLayer} parameter value
+     * (e.g. {@code opensearch://shapeFiles:my_dataset_feature.1}).
+     *
+     * @param predefinedLayerValue full predefined layer online identifier
+     * @return entry name as stored in the shape-files folder
+     */
+    public static String entryNameFromPredefinedLayer(String predefinedLayerValue) {
+
+	if (predefinedLayerValue == null || predefinedLayerValue.isEmpty()) {
+	    return predefinedLayerValue;
+	}
+
+	int colon = predefinedLayerValue.lastIndexOf(':');
+
+	if (colon < 0) {
+	    return predefinedLayerValue;
+	}
+
+	return predefinedLayerValue.substring(colon + 1);
+    }
+
+    /**
      * @return the id
      */
     public String getId() {

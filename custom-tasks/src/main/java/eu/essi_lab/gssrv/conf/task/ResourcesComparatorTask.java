@@ -171,26 +171,26 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	GSSource gsSource = getSource().get();
 
-	SourceStorageWorker worker = database.getWorker(gsSource.getUniqueIdentifier());
+	SourceStorage storage = database.getStorage(gsSource.getUniqueIdentifier());
 
-	Optional<Boolean> consFolderSurvives = worker.consolidatedFolderSurvives();
+	Optional<Boolean> consFolderSurvives = storage.consolidatedFolderSurvives();
 
 	if (consFolderSurvives.isEmpty() || !consFolderSurvives.get()) {
 
-	    HarvestingStrategy strategy = worker.getStrategy();
+	    HarvestingStrategy strategy = storage.getStrategy();
 
 	    //
 	    //
 	    //
 
-	    if (worker.existsData1Folder()) {
+	    if (storage.existsData1Folder()) {
 
-		data1Folder = worker.getData1Folder();
+		data1Folder = storage.getData1Folder();
 	    }
 
-	    if (worker.existsData2Folder()) {
+	    if (storage.existsData2Folder()) {
 
-		data2Folder = worker.getData2Folder();
+		data2Folder = storage.getData2Folder();
 	    }
 
 	    if (data1Folder == null && data2Folder == null) {
@@ -219,7 +219,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		    //
 
 		    handleFullHarvesting( //
-			    worker,//
+			    storage,//
 			    comparisonFields,//
 			    maxAggFields,//
 			    finder,//
@@ -238,7 +238,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 		//
 
 		handleSelectiveHarvesting( //
-			worker,//
+			storage,//
 			gsSource,//
 			discoveryPageSize,//
 			finder,//
@@ -317,7 +317,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      * @throws Exception
      */
     private void handleFullHarvesting( //
-	    SourceStorageWorker worker, //
+	    SourceStorage worker, //
 	    List<String> comparisonFields, //
 	    int maxAggFields, //
 	    DatabaseFinder finder,//
@@ -397,7 +397,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      * @param modifiedRecords
      * @throws Exception
      */
-    private void handleSelectiveHarvesting(SourceStorageWorker worker, //
+    private void handleSelectiveHarvesting(SourceStorage worker, //
 	    GSSource gsSource,  //
 	    int discoveryPageSize, //
 	    DatabaseFinder finder, //
@@ -820,7 +820,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 			String folder = folderBucket.key();
 
-			Set<String> targetSet = SourceStorageWorker.DATA_1_SHORT_POSTFIX.equals(folder) ? values1 : values2;
+			Set<String> targetSet = SourceStorage.DATA_1_SHORT_POSTFIX.equals(folder) ? values1 : values2;
 
 			Aggregate aggregate = folderBucket.aggregations().get("values");
 

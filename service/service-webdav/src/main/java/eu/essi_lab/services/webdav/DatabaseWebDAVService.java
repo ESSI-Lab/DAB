@@ -67,6 +67,15 @@ public class DatabaseWebDAVService extends AbstractManagedService {
     @Override
     public void start() {
 
+	if(ConfigurationWrapper.getDatabaseSetting().isVolatile()){
+
+	    GSLoggerFactory.getLogger(getClass()).error("Database volatile not supported, unable to start service");
+
+	    publish(MessageChannel.MessageLevel.ERROR, "Database volatile not supported, unable to start service");
+
+	    return;
+	}
+
 	int port = getSetting(). //
 		readKeyValue(PORT_KEY).//
 		map(Integer::parseInt).//
@@ -119,7 +128,10 @@ public class DatabaseWebDAVService extends AbstractManagedService {
     @Override
     public void stop() {
 
-	server.stop();
+	if (server != null) {
+
+	    server.stop();
+	}
 
 	publish(MessageChannel.MessageLevel.INFO, "WebDAV Service " + getId() + " stopped");
     }

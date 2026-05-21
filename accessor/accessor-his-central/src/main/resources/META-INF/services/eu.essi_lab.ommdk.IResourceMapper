@@ -8,6 +8,7 @@ eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteMapper
 eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaMapper
 eu.essi_lab.accessor.hiscentral.bolzano.HISCentralBolzanoMapper
 eu.essi_lab.accessor.hiscentral.emilia.HISCentralEmiliaMapper
+eu.essi_lab.accessor.hiscentral.emilia.simc.HISCentralEmiliaSimcMapper
 eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaMapper
 eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataMapper
 eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaMapper

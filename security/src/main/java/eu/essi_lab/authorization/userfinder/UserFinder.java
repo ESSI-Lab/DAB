@@ -24,41 +24,21 @@ package eu.essi_lab.authorization.userfinder;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.authentication.token.*;
+import eu.essi_lab.authorization.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.bond.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.auth.*;
+import eu.essi_lab.model.exceptions.*;
+import jakarta.servlet.http.*;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.UsersManager;
-import eu.essi_lab.api.database.UsersReader;
-import eu.essi_lab.api.database.UsersWriter;
-import eu.essi_lab.api.database.ViewsReader;
-import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
-import eu.essi_lab.api.database.factory.UsersManagerFactory;
-import eu.essi_lab.authentication.token.TokenProvider;
-import eu.essi_lab.authorization.BasicRole;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.utils.ExpiringCache;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.messages.bond.Bond;
-import eu.essi_lab.messages.bond.DynamicView;
-import eu.essi_lab.messages.bond.DynamicViewAnd;
-import eu.essi_lab.messages.bond.View;
-import eu.essi_lab.messages.bond.ViewBond;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.GSProperty;
-import eu.essi_lab.model.StorageInfo;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.auth.UserIdentifierType;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -111,11 +91,7 @@ public class UserFinder {
 
 		try {
 
-		    GSLoggerFactory.getLogger(getClass()).debug("Updating users cache STARTED");
-
 		    finder.updateUsersCache();
-
-		    GSLoggerFactory.getLogger(getClass()).debug("Updating users cache ENDED");
 
 		} catch (Exception e) {
 
@@ -125,8 +101,6 @@ public class UserFinder {
 		}
 	    }
 	}
-
-	;
     }
 
     private Optional<String> email;
@@ -484,7 +458,7 @@ public class UserFinder {
 	    // if the request is executed by a user logged with OAuth 2.0, then the token provider returns the
 	    // email used as identifier and compares it with the configured admin email
 	    //
-	    if (email.isPresent() && isAdmin(email.get())){
+	    if (email.isPresent() && isAdmin(email.get())) {
 
 		user.get().setIdentifier(email.get());
 		user.get().setRole(BasicRole.ADMIN.getRole());

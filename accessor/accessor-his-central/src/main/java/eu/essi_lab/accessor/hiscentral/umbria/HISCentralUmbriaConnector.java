@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import eu.essi_lab.jaxb.wml._2_0.om__2.Result;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -244,9 +245,9 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 			if (stationsMap.containsKey(stationId)) {
 			    JSONObject stationDescription = stationsMap.get(stationId);
 
-			    Map<UMBRIA_Variable, List<String>> resMap = postData(sensorObj, SORT_ORDER.ASC, null);
+			    Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> resMap = postData(sensorObj, SORT_ORDER.ASC, null);
 
-			    for (Map.Entry<UMBRIA_Variable, List<String>> entry : resMap.entrySet()) {
+			    for (Map.Entry<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> entry : resMap.entrySet()) {
 
 				if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
 				    stoppedByMax = true;
@@ -254,9 +255,9 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 				}
 
 				String variableName = entry.getKey().name();
-				String startDate = entry.getValue().get(1);
-				String time = entry.getValue().get(0);
-				String resourceId = entry.getValue().get(2);
+				String startDate = entry.getValue().getDate();
+				String time = entry.getValue().getType();
+				String resourceId = entry.getValue().getResourceId();
 				ret.addRecord(HISCentralUmbriaMapper.create(stationDescription, sensorObj, variableName, resourceId, time,
 					startDate));
 				partialNumbers++;
@@ -295,128 +296,183 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 	return ret;
     }
 
-    public static Map<UMBRIA_Variable, List<String>> postData(JSONObject sensorObj, SORT_ORDER sort_order, String resourceIdentifier) {
+    public static Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> postData(JSONObject sensorObj, SORT_ORDER sort_order, String resourceIdentifier) {
 
-	Map<UMBRIA_Variable, List<String>> ret = new HashMap<UMBRIA_Variable, List<String>>();
+	Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> ret = new HashMap<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo>();
 
 	try {
+
 	    String sensorType = sensorObj.optString("TIPO_STRUMENTO");
 	    String sensorId = sensorObj.optString("ID_SENSORE");
+	    String stationId = sensorObj.optString("ID_STAZIONE");
 
-	    List<String> resourceId = new ArrayList<String>();
-	    List<UMBRIA_Variable> varList = new ArrayList<UMBRIA_Variable>();
+	    if(sensorType == null || sensorType.isEmpty()) {
+		return ret;
+	    }
 
-	    if (sensorType != null && !sensorType.isEmpty()) {
-		if (sensorType.toLowerCase().contains("termometro")) {
-		    resourceId.add(HYSTORICAL_TEMPERATURE_ID);
-		    resourceId.add(CURRENT_TEMPERATURE_ID);
-		    varList.add(UMBRIA_Variable.TMEDIA);
-		    varList.add(UMBRIA_Variable.TMIN);
-		    varList.add(UMBRIA_Variable.TMAX);
-		} else if (sensorType.toLowerCase().contains("pluviometro")) {
-		    resourceId.add(HYSTORICAL_RAIN_ID);
-		    resourceId.add(CURRENT_RAIN_ID);
-		    varList.add(UMBRIA_Variable.PTOT);
-		} else if (sensorType.toLowerCase().contains("idrometro")) {
-		    resourceId.add(HYSTORICAL_LEVEL_ID);
-		    resourceId.add(CURRENT_LEVEL_ID);
-		    varList.add(UMBRIA_Variable.LIVELLOMEDIO);
-		    varList.add(UMBRIA_Variable.LIVELLOMIN);
-		    varList.add(UMBRIA_Variable.LIVELLOMAX);
-		} else if (sensorType.toLowerCase().contains("portata")) {
-		    resourceId.add(HYSTORICAL_FLOW_RATE_ID);
-		    resourceId.add(CURRENT_FLOW_RATE_ID);
-		    varList.add(UMBRIA_Variable.PORTATAMEDIA);
-		    varList.add(UMBRIA_Variable.PORTATAMIN);
-		    varList.add(UMBRIA_Variable.PORTATAMAX);
-		}
-		
-		if(resourceIdentifier != null) {
-		    resourceId.clear();
-		    resourceId.add(resourceIdentifier);
-		}
+	    SensorConfig config = resolveSensorConfig(sensorType);
 
-		int limit = 10;
-		String sort = null;
-		if (SORT_ORDER.ASC.equals(sort_order)) {
-		    sort = "ANNO asc, MESE asc, GIORNO asc";
-		} else if (SORT_ORDER.DESC.equals(sort_order)) {
-		    sort = "ANNO desc, MESE desc, GIORNO desc";
-		}
+	    if (config == null) {
+		return ret;
+	    }
 
-		for (String resource : resourceId) {
-		    boolean breakLoop = false;
-		    for (String type : timeList) {
 
-			String postRequest = "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
-				+ "\", \"TIPOLOGIA_RILEVAZIONE\":\"" + type + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort
-				+ "\"}";
+	    List<String> resources = (resourceIdentifier != null)
+		    ? List.of(resourceIdentifier)
+		    : config.resourceIds;
 
-			HashMap<String, String> map = new HashMap<String, String>();
-			map.put("accept", "text/plain");
-			map.put("Content-Type", "application/json");
 
-			GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).debug("POST REQUEST: " + postRequest);
+	    String sort = buildSort(sort_order);
 
-			HttpRequest request = HttpRequestUtils.build(MethodWithBody.POST, BASE_URL, postRequest,
-				HttpHeaderUtils.build(map));
+	    for (String resource : resources) {
+		for (String time : timeList) {
 
-			HttpResponse<InputStream> response = new Downloader().downloadResponse(request);
-			int statusCode = response.statusCode();
-			if (statusCode > 400) {
-			    breakLoop = true;
-			    postRequest = "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
-				    + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort + "\"}";
-			    GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).debug("POST REQUEST: " + postRequest);
-			    HttpRequest newRequest = HttpRequestUtils.build(MethodWithBody.POST, BASE_URL, postRequest,
-				    HttpHeaderUtils.build(map));
-			    response = new Downloader().downloadResponse(newRequest);
+		    JSONObject payload = buildPayload(resource, config.useStationId ? stationId : sensorId, time, sort, config.useStationId);
+
+		    JSONObject fallback = buildPayload(resource, stationId, null, sort, true);
+
+		    //Optional<JSONObject> response = executePost(payload);
+
+		    Optional<JSONObject> response =
+			    executePostWithRetry(payload, fallback);
+
+		    if (response.isEmpty()) {
+			continue;
+		    }
+
+		    Optional<String> date = extractDate(response.get());
+
+		    if (date.isPresent()) {
+			HISCentralUmbriaMeasurementInfo info = new HISCentralUmbriaMeasurementInfo(time, date.get(), resource);
+
+			for (UMBRIA_Variable var : config.variables) {
+			    ret.put(var, info);
 			}
-
-			InputStream input = response.body();
-
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-
-			IOUtils.copy(input, output);
-
-			String result = new String(output.toByteArray());
-
-			JSONObject resultObj = new JSONObject(result);
-
-			if (resultObj != null) {
-			    JSONObject res = resultObj.optJSONObject("result");
-
-			    if (res != null) {
-				JSONArray arrayResults = res.optJSONArray("records");
-
-				if (arrayResults != null && arrayResults.length() > 0) {
-				    JSONObject firstData = arrayResults.getJSONObject(0);
-				    int year = firstData.optInt("ANNO");
-				    int month = firstData.optInt("MESE");
-				    int day = firstData.optInt("GIORNO");
-				    String date = ISO8601DateTimeUtils.getISO8601DateTime(year, month, day);
-				    // Optional<Date> optDate = ISO8601DateTimeUtils.parseISO8601ToDate(date);
-				    if (date != null && !date.isEmpty()) {
-					List<String> toAdd = new ArrayList<String>();
-					toAdd.add(type);
-					toAdd.add(date);
-					toAdd.add(resource);
-					for (UMBRIA_Variable var : varList) {
-					    ret.put(var, toAdd);
-					}
-				    }
-				}
-			    }
-			}
-			if (input != null)
-			    input.close();
-			if(breakLoop)
-			    break;
+			break;
 		    }
 		}
-
 	    }
+
 	    return ret;
+
+
+
+//	    boolean useStationId = false;
+//	    List<String> resourceId = new ArrayList<String>();
+//	    List<UMBRIA_Variable> varList = new ArrayList<UMBRIA_Variable>();
+//
+//	    if (sensorType != null && !sensorType.isEmpty()) {
+//		if (sensorType.toLowerCase().contains("termometro")) {
+//		    resourceId.add(HYSTORICAL_TEMPERATURE_ID);
+//		    resourceId.add(CURRENT_TEMPERATURE_ID);
+//		    varList.add(UMBRIA_Variable.TMEDIA);
+//		    varList.add(UMBRIA_Variable.TMIN);
+//		    varList.add(UMBRIA_Variable.TMAX);
+//		} else if (sensorType.toLowerCase().contains("pluviometro")) {
+//		    resourceId.add(HYSTORICAL_RAIN_ID);
+//		    resourceId.add(CURRENT_RAIN_ID);
+//		    varList.add(UMBRIA_Variable.PTOT);
+//		} else if (sensorType.toLowerCase().contains("idrometro")) {
+//		    resourceId.add(HYSTORICAL_LEVEL_ID);
+//		    resourceId.add(CURRENT_LEVEL_ID);
+//		    varList.add(UMBRIA_Variable.LIVELLOMEDIO);
+//		    varList.add(UMBRIA_Variable.LIVELLOMIN);
+//		    varList.add(UMBRIA_Variable.LIVELLOMAX);
+//		} else if (sensorType.toLowerCase().contains("portata")) {
+//		    useStationId = true;
+//		    resourceId.add(HYSTORICAL_FLOW_RATE_ID);
+//		    resourceId.add(CURRENT_FLOW_RATE_ID);
+//		    varList.add(UMBRIA_Variable.PORTATAMEDIA);
+//		    varList.add(UMBRIA_Variable.PORTATAMIN);
+//		    varList.add(UMBRIA_Variable.PORTATAMAX);
+//		}
+//
+//		if(resourceIdentifier != null) {
+//		    resourceId.clear();
+//		    resourceId.add(resourceIdentifier);
+//		}
+//
+//		int limit = 10;
+//
+//
+//		for (String resource : resourceId) {
+//		    boolean breakLoop = false;
+//		    for (String type : timeList) {
+//
+//			String postRequest = useStationId ? "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_STAZIONE\":\"" + stationId
+//				+ "\", \"TIPOLOGIA_RILEVAZIONE\":\"" + type + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort
+//				+ "\"}": "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
+//				+ "\", \"TIPOLOGIA_RILEVAZIONE\":\"" + type + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort
+//				+ "\"}";
+//
+//			HashMap<String, String> map = new HashMap<String, String>();
+//			map.put("accept", "text/plain");
+//			map.put("Content-Type", "application/json");
+//
+//			GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).debug("POST REQUEST: " + postRequest);
+//
+//			HttpRequest request = HttpRequestUtils.build(MethodWithBody.POST, BASE_URL, postRequest,
+//				HttpHeaderUtils.build(map));
+//
+//			HttpResponse<InputStream> response = new Downloader().downloadResponse(request);
+//			int statusCode = response.statusCode();
+//			if (statusCode > 400) {
+//			    breakLoop = true;
+//			    postRequest = useStationId ? "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_STAZIONE\":\"" + stationId
+//				    + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort + "\"}" : "{\"resource_id\": \"" + resource + "\",\"filters\":{\"ID_SENSORE_DETTAGLIO\":\"" + sensorId
+//				    + "\"},\"limit\": \"" + limit + "\", \"sort\": \"" + sort + "\"}";
+//			    GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).debug("POST REQUEST: " + postRequest);
+//			    HttpRequest newRequest = HttpRequestUtils.build(MethodWithBody.POST, BASE_URL, postRequest,
+//				    HttpHeaderUtils.build(map));
+//			    response = new Downloader().downloadResponse(newRequest);
+//			    statusCode = response.statusCode();
+//			    breakLoop = statusCode > 400 ? true : false;
+//			}
+//
+//			InputStream input = response.body();
+//
+//			ByteArrayOutputStream output = new ByteArrayOutputStream();
+//
+//			IOUtils.copy(input, output);
+//
+//			String result = new String(output.toByteArray());
+//
+//			JSONObject resultObj = new JSONObject(result);
+//
+//			if (resultObj != null) {
+//			    JSONObject res = resultObj.optJSONObject("result");
+//
+//			    if (res != null) {
+//				JSONArray arrayResults = res.optJSONArray("records");
+//
+//				if (arrayResults != null && arrayResults.length() > 0) {
+//				    JSONObject firstData = arrayResults.getJSONObject(0);
+//				    int year = firstData.optInt("ANNO");
+//				    int month = firstData.optInt("MESE");
+//				    int day = firstData.optInt("GIORNO");
+//				    String date = ISO8601DateTimeUtils.getISO8601DateTime(year, month, day);
+//				    // Optional<Date> optDate = ISO8601DateTimeUtils.parseISO8601ToDate(date);
+//				    if (date != null && !date.isEmpty()) {
+//					List<String> toAdd = new ArrayList<String>();
+//					toAdd.add(type);
+//					toAdd.add(date);
+//					toAdd.add(resource);
+//					for (UMBRIA_Variable var : varList) {
+//					    ret.put(var, toAdd);
+//					}
+//				    }
+//				}
+//			    }
+//			}
+//			if (input != null)
+//			    input.close();
+//			if(breakLoop)
+//			    break;
+//		    }
+//		}
+//
+//	    }
+//	    return ret;
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).error(e.getMessage());
@@ -424,6 +480,145 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 	}
 
     }
+
+    private static Optional<JSONObject> executePostWithRetry(JSONObject payload, JSONObject fallbackPayload) {
+
+	Optional<JSONObject> response = executePost(payload);
+
+	if (response.isPresent()) {
+	    return response;
+	}
+
+	GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).debug("Retrying without time filter...");
+
+	return executePost(fallbackPayload);
+    }
+
+    private static Optional<String> extractDate(JSONObject jsonObject) {
+
+	JSONObject result = jsonObject.optJSONObject("result");
+	if (result == null) return Optional.empty();
+
+	JSONArray records = result.optJSONArray("records");
+	if (records == null || records.isEmpty()) return Optional.empty();
+
+	JSONObject first = records.getJSONObject(0);
+
+	int year = first.optInt("ANNO");
+	int month = first.optInt("MESE");
+	int day = first.optInt("GIORNO");
+
+	String date = ISO8601DateTimeUtils.getISO8601DateTime(year, month, day);
+
+	return Optional.ofNullable(date);
+    }
+
+    private static Optional<JSONObject> executePost(JSONObject payload) {
+	try {
+	    HttpRequest request = HttpRequestUtils.build(
+		    MethodWithBody.POST,
+		    BASE_URL,
+		    payload.toString(),
+		    HttpHeaderUtils.build(Map.of("Content-Type", "application/json"))
+	    );
+
+	    HttpResponse<InputStream> response = new Downloader().downloadResponse(request);
+
+	    if (response.statusCode() > 400) {
+		GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).error("HTTP error {} for payload {}", response.statusCode(), payload);
+		return Optional.empty();
+	    }
+
+	    try (InputStream input = response.body()) {
+		String body = new String(input.readAllBytes());
+		return Optional.of(new JSONObject(body));
+	    }
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).error("POST error", e);
+	    return Optional.empty();
+	}
+    }
+
+    private static JSONObject buildPayload(String resource, String id, String time, String sort, boolean useStationId) {
+
+	JSONObject payload = new JSONObject();
+	payload.put("resource_id", resource);
+	payload.put("limit", 10);
+	payload.put("sort", sort);
+
+	JSONObject filters = new JSONObject();
+
+	if (useStationId) {
+	    filters.put("ID_STAZIONE", id);
+	} else {
+	    filters.put("ID_SENSORE_DETTAGLIO", id);
+	}
+
+	if(time != null && !time.isEmpty()) {
+
+	    filters.put("TIPOLOGIA_RILEVAZIONE", time);
+	}
+
+
+
+	payload.put("filters", filters);
+
+	return payload;
+
+    }
+
+    public static String buildSort(SORT_ORDER sort_order){
+
+	String sort = null;
+	if (SORT_ORDER.ASC.equals(sort_order)) {
+	    sort = "ANNO asc, MESE asc, GIORNO asc";
+	} else if (SORT_ORDER.DESC.equals(sort_order)) {
+	    sort = "ANNO desc, MESE desc, GIORNO desc";
+	}
+
+	return sort;
+
+    }
+
+    private static SensorConfig resolveSensorConfig(String sensorType) {
+	String type = sensorType.toLowerCase();
+
+	if (type.contains("termometro")) {
+	    return new SensorConfig(
+		    List.of(HYSTORICAL_TEMPERATURE_ID, CURRENT_TEMPERATURE_ID),
+		    List.of(UMBRIA_Variable.TMEDIA, UMBRIA_Variable.TMIN, UMBRIA_Variable.TMAX),
+		    false
+	    );
+	}
+
+	if (type.contains("pluviometro")) {
+	    return new SensorConfig(
+		    List.of(HYSTORICAL_RAIN_ID, CURRENT_RAIN_ID),
+		    List.of(UMBRIA_Variable.PTOT),
+		    false
+	    );
+	}
+
+	if (type.contains("idrometro")) {
+	    return new SensorConfig(
+		    List.of(HYSTORICAL_LEVEL_ID, CURRENT_LEVEL_ID),
+		    List.of(UMBRIA_Variable.LIVELLOMEDIO, UMBRIA_Variable.LIVELLOMIN, UMBRIA_Variable.LIVELLOMAX),
+		    false
+	    );
+	}
+
+	if (type.contains("portata")) {
+	    return new SensorConfig(
+		    List.of(HYSTORICAL_FLOW_RATE_ID, CURRENT_FLOW_RATE_ID),
+		    List.of(UMBRIA_Variable.PORTATAMEDIA, UMBRIA_Variable.PORTATAMIN, UMBRIA_Variable.PORTATAMAX),
+		    true
+	    );
+	}
+
+	return null;
+    }
+
 
     private List<JSONObject> getSensorList(int start, int pageSize) throws GSException {
 	logger.trace("SIR UMBRIA List Sensor finding STARTED");

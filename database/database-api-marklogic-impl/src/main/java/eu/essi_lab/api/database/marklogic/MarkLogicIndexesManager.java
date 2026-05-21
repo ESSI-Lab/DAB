@@ -37,7 +37,7 @@ import com.marklogic.xcc.ResultSequence;
 import com.marklogic.xcc.exceptions.RequestException;
 
 import eu.essi_lab.api.database.Database.DatabaseImpl;
-import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.indexes.CustomIndexedElements;
 import eu.essi_lab.indexes.IndexedElements;
 import eu.essi_lab.indexes.IndexedMetadataElements;
@@ -617,7 +617,7 @@ public class MarkLogicIndexesManager {
 	    //
 	    if (!supportedIndexes.contains(indexInfo) &&
 
-		    !localname.contains(SourceStorageWorker.DATA_FOLDER_POSTFIX)) {
+		    !localname.contains(SourceStorage.DATA_FOLDER_POSTFIX)) {
 
 		GSLoggerFactory.getLogger(getClass()).warn("Removing usupported range element index: {}", indexInfo);
 

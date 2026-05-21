@@ -16,8 +16,8 @@ import org.xml.sax.SAXException;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
+import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorage.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.test.OpenSearchFolderInternalTestIT;
@@ -596,7 +596,7 @@ public class MultipleFoldersRemoveAndClearInternalTestIT extends OpenSearchTest 
 	    String sourceId, //
 	    int entriesCount) throws Exception {
 
-	String folderName = sourceId + SourceStorageWorker.META_POSTFIX;//
+	String folderName = sourceId + SourceStorage.META_POSTFIX;//
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 
@@ -604,13 +604,13 @@ public class MultipleFoldersRemoveAndClearInternalTestIT extends OpenSearchTest 
 	//
 	//
 
-	String indexName = SourceStorageWorker.createDataFolderIndexName(sourceId);
+	String indexName = SourceStorage.createDataFolderIndexName(sourceId);
 
 	DataFolderIndexDocument indexDoc = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_1_POSTFIX);
+		SourceStorage.DATA_1_POSTFIX);
 
-	String indexDocKey = sourceId + SourceStorageWorker.DATA_1_POSTFIX;
+	String indexDocKey = sourceId + SourceStorage.DATA_1_POSTFIX;
 
 	folder.store(//
 		indexDocKey, //
@@ -704,7 +704,7 @@ public class MultipleFoldersRemoveAndClearInternalTestIT extends OpenSearchTest 
 	    String sourceId, //
 	    int entriesCount) throws Exception {
 
-	String folderName = sourceId + SourceStorageWorker.DATA_1_POSTFIX;//
+	String folderName = sourceId + SourceStorage.DATA_1_POSTFIX;//
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

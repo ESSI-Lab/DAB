@@ -201,9 +201,9 @@ public interface DatabaseFolder {
 
 	String name = folderName;
 	name = name.replace(databaseId + "_", "");
-	name = name.replace(SourceStorageWorker.META_POSTFIX, "");
-	name = name.replace(SourceStorageWorker.DATA_1_POSTFIX, "");
-	name = name.replace(SourceStorageWorker.DATA_2_POSTFIX, "");
+	name = name.replace(SourceStorage.META_POSTFIX, "");
+	name = name.replace(SourceStorage.DATA_1_POSTFIX, "");
+	name = name.replace(SourceStorage.DATA_2_POSTFIX, "");
 
 	return name;
     }

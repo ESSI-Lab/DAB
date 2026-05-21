@@ -356,6 +356,8 @@ public class DataHubService extends AbstractManagedService {
 
 		    try {
 
+			GSLoggerFactory.getLogger(getClass()).trace("Submit STARTED");
+
 			byte[] raw = record.value();
 
 			Optional<DecodedRecord> optRecord;
@@ -373,11 +375,17 @@ public class DataHubService extends AbstractManagedService {
 
 			optRecord.ifPresent(this::process);
 
+			GSLoggerFactory.getLogger(getClass()).trace("Submit ENDED");
+
 		    } finally {
+
+			GSLoggerFactory.getLogger(getClass()).trace("Finalization STARTED");
 
 			tracker.markProcessed(record);
 
 			inFlight.release();
+
+			GSLoggerFactory.getLogger(getClass()).trace("Finalization ENDED");
 		    }
 		});
 	    }
@@ -436,15 +444,15 @@ public class DataHubService extends AbstractManagedService {
 
 	    Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
-	    SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
+	    SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 
 	    sourceStorage.harvestingStarted(getSource(), HarvestingStrategy.SELECTIVE, false, false);
 	    sourceStorage.harvestingEnded(getSource(), HarvestingStrategy.SELECTIVE);
 
-	    SourceStorageWorker worker = database.getWorker(sourceId);
+	    SourceStorage storage = database.getStorage(sourceId);
 
-	    boolean data1Folder = worker.existsData1Folder();
-	    boolean data2Folder = worker.existsData2Folder();
+	    boolean data1Folder = storage.existsData1Folder();
+	    boolean data2Folder = storage.existsData2Folder();
 
 	    if (data1Folder && data2Folder) {
 
@@ -458,7 +466,7 @@ public class DataHubService extends AbstractManagedService {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(worker.getData1Folder());
+	    return Optional.of(storage.getData1Folder());
 
 	} catch (Exception e) {
 
@@ -551,11 +559,17 @@ public class DataHubService extends AbstractManagedService {
 
 		GSResource resource = mapper.map(original, getSource());
 
-		if (resource.getOriginalId().isPresent()) {
+		if (resource.getOriginalId().isEmpty()) {
 
 		    error("Current record [" + entityURN + "] seems to have no identifier, skipping record", true);
 		    return;
 		}
+
+		//
+		// private identifier
+		//
+
+		resource.setPrivateId(createPrivateId(entityURN));
 
 		//
 		// original identifier
@@ -565,7 +579,6 @@ public class DataHubService extends AbstractManagedService {
 			resource.getOriginalId().get(), //
 			getSource().getUniqueIdentifier());//
 
-		resource.setPrivateId(StringUtils.URLEncodeUTF8(originalId));
 		resource.setOriginalId(originalId);
 		resource.setPublicId(originalId);
 
@@ -584,12 +597,16 @@ public class DataHubService extends AbstractManagedService {
 		    resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentId);
 		}
 
+		//
+		//
+		//
+
 		IndexedElementsWriter.write(resource);
 
 		Document doc = resource.asDocument(true);
 
 		DatabaseFolder.UpsertType upsertResult = targetFolder.upsert( //
-			entityURN,  //
+			createPrivateId(entityURN),  //
 			DatabaseFolder.FolderEntry.of(doc),   //
 			DatabaseFolder.EntryType.GS_RESOURCE);//
 
@@ -601,9 +618,7 @@ public class DataHubService extends AbstractManagedService {
 
 		GSLoggerFactory.getLogger(getClass()).info("Processing DELETE record STARTED: {}", entityURN);
 
-		String encodedURN = StringUtils.URLEncodeUTF8(entityURN);
-
-		boolean removed = targetFolder.remove(encodedURN);
+		boolean removed = targetFolder.remove(createPrivateId(entityURN));
 
 		if (removed) {
 
@@ -622,6 +637,19 @@ public class DataHubService extends AbstractManagedService {
 
 	    error("Unable to process record: " + e.getMessage(), e, true);
 	}
+    }
+
+    /**
+     * @param entityURN
+     * @return
+     */
+    private String createPrivateId(String entityURN) {
+
+	String identifier = IdentifierDecorator.generatePersistentIdentifier( //
+		entityURN, //
+		getSource().getUniqueIdentifier());//
+
+	return StringUtils.URLEncodeUTF8(identifier);
     }
 
     /**

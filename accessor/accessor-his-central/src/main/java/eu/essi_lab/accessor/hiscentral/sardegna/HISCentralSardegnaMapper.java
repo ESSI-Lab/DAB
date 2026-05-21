@@ -520,9 +520,6 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    // 1 -> timeResolution
 	    // H -> timeUnits
 	    //
-	    String timeUnits = aggregationPeriodUnits.substring(aggregationPeriodUnits.length() - 1);
-
-	    dataset.getExtensionHandler().setTimeUnits(timeUnits);
 	    dataset.getExtensionHandler().setTimeResolutionDuration8601(aggregationPeriodUnits);
 	    dataset.getExtensionHandler().setTimeAggregationDuration8601(aggregationPeriodUnits);
 

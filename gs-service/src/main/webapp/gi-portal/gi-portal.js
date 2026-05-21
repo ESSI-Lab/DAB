@@ -4,6 +4,44 @@ var view = '';
 var token = '';
 var availableViews = []; // Store views fetched for the current source deployment
 
+/** Token for shape WMS: empty before login → {@code public} (admin layers only). */
+function getShapeWmsToken() {
+	return localStorage.getItem('authToken') || 'public';
+}
+
+window.getShapeWmsToken = getShapeWmsToken;
+
+/** Relative WMS path for predefined shape layers from {@link window.config.shapeView}. */
+function buildShapeWmsEndpoint() {
+	var shapeView = window.config && window.config.shapeView;
+	if (!shapeView) {
+		return '';
+	}
+	return '../services/essi/token/' + encodeURIComponent(getShapeWmsToken()) + '/view/'
+		+ encodeURIComponent(shapeView) + '/wms';
+}
+
+window.buildShapeWmsEndpoint = buildShapeWmsEndpoint;
+
+/** JSONP query for filtered predefined layer list (shapeView + token). */
+function buildShapeWmsLayersQuery(wmsVersion) {
+	var shapeView = window.config && window.config.shapeView;
+	if (!shapeView) {
+		return '';
+	}
+	var dabEndpoint = '../services/essi/';
+	var servicePath = '';
+	if (typeof GIAPI !== 'undefined' && GIAPI.search && GIAPI.search.dab) {
+		dabEndpoint = GIAPI.search.dab.endpoint();
+		dabEndpoint = dabEndpoint.endsWith('/') ? dabEndpoint : dabEndpoint + '/';
+		servicePath = GIAPI.search.dab.servicePath();
+	}
+	return dabEndpoint + servicePath + '/opensearch/wmslayershandler?request=capabilities&shapeView='
+		+ encodeURIComponent(shapeView) + '&token=' + encodeURIComponent(getShapeWmsToken()) + '&version=' + (wmsVersion || '1.3.0');
+}
+
+window.buildShapeWmsLayersQuery = buildShapeWmsLayersQuery;
+
 
 var getUrlParameter = function getUrlParameter(sParam) {
 		var sPageURL = window.location.search.substring(1),
@@ -518,7 +556,8 @@ function initializeLogin(config) {
 		userMenu.className = 'user-menu';
 		userMenu.style.display = 'none';
 		let menuHtml = `
-			<button id=\"statusBtn\" class=\"menu-button\">${t('menu_status')}</button>\n`;
+			<button id=\"statusBtn\" class=\"menu-button\">${t('menu_status')}</button>
+			<button id=\"uploadShapesBtn\" class=\"menu-button\">${t('menu_upload_predefined_shapes')}</button>\n`;
 		if (isAdmin) {
 			menuHtml += `<button id=\"listUsersBtn\" class=\"menu-button\">${t('menu_manage_users')}</button>\n`;
 			menuHtml += `<button id=\"dataReportBtn\" class=\"menu-button\">${t('menu_data_report')}</button>\n`;
@@ -1064,6 +1103,271 @@ function initializeLogin(config) {
 
 			// Initial fetch after dialog is shown
 			setTimeout(fetchAndUpdateStatus, 100);
+		});
+
+		document.getElementById('uploadShapesBtn').addEventListener('click', function() {
+			userMenu.style.display = 'none';
+
+			const authToken = localStorage.getItem('authToken');
+			const userEmail = localStorage.getItem('userEmail');
+			const wmsVersion = '1.3.0';
+			const shapeOnlinePrefix = 'opensearch://shapeFiles:';
+
+			const dialogContent = $('<div>').addClass('predefined-shapes-manager');
+			const statusDiv = $('<div>').attr('id', 'predefined-shapes-status').css({ 'margin': '10px 0', 'min-height': '20px' });
+
+			const toolbar = $('<div>').css({ 'marginBottom': '12px', 'textAlign': 'right' });
+			const refreshBtn = $('<button type="button" class="login-button">').html('<i class="fa fa-refresh"></i> ' + t('refresh'));
+			const harvestBtn = $('<button type="button" class="login-button">').css({ 'marginLeft': '8px' }).html('<i class="fa fa-play"></i> ' + t('shapes_harvest_now'));
+			toolbar.append(refreshBtn).append(harvestBtn);
+
+			const listWrapper = $('<div>').css({ 'maxHeight': '320px', 'overflowY': 'auto', 'border': '1px solid #ddd', 'borderRadius': '4px' });
+			const listTable = $('<table class="predefined-shapes-table">').css({ 'width': '100%', 'borderCollapse': 'collapse' });
+			listTable.append('<thead><tr>'
+				+ '<th></th><th>' + t('shapes_col_identifier') + '</th><th>' + t('shapes_col_file') + '</th>'
+				+ '<th>' + t('shapes_col_owner') + '</th><th>' + t('shapes_col_features') + '</th>'
+				+ '<th>' + t('shapes_col_selection') + '</th><th>' + t('shapes_col_actions') + '</th>'
+				+ '</tr></thead>');
+			const listBody = $('<tbody id="predefined-shapes-list-body">');
+			listTable.append(listBody);
+			listWrapper.append(listTable);
+
+			const uploadSection = $('<div>').css({ 'marginTop': '20px', 'paddingTop': '15px', 'borderTop': '1px solid #eee' });
+			uploadSection.append($('<h4>').css({ margin: '0 0 10px', color: '#2c3e50' }).text(t('shapes_upload_section')));
+			uploadSection.append($('<p>').css({ margin: '0 0 10px', fontSize: '13px', color: '#666' }).html(t('upload_shapes_note_html')));
+
+			const shapeIdLabel = $('<label>').attr('for', 'predefined-shapes-id-input').css({ display: 'block', fontWeight: 600 }).text(t('upload_shapes_id_label'));
+			const shapeIdInput = $('<input type="text" id="predefined-shapes-id-input">').attr('placeholder', t('upload_shapes_id_placeholder')).css({ width: '100%', boxSizing: 'border-box', marginTop: '6px' });
+			const fileInput = $('<input type="file" id="predefined-shapes-file-input">').attr('accept', '.zip,application/zip').css({ marginTop: '10px', width: '100%' });
+			const uploadBtn = $('<button type="button" class="login-button">').css({ marginTop: '10px' }).text(t('upload_shapes_submit'));
+
+			uploadSection.append(shapeIdLabel).append(shapeIdInput).append(fileInput).append(uploadBtn);
+
+			dialogContent.append(statusDiv).append(toolbar).append(listWrapper).append(uploadSection);
+
+			let uploadInProgress = false;
+
+			function fetchWmsLayerNames() {
+				return new Promise(function(resolve) {
+					const query = buildShapeWmsLayersQuery(wmsVersion);
+					if (!query) {
+						resolve([]);
+						return;
+					}
+					jQuery.ajax({
+						type: 'GET',
+						url: query,
+						crossDomain: true,
+						dataType: 'jsonp',
+						success: function(data) {
+							if (data && data.layers) {
+								resolve(data.layers.map(function(layer) { return layer.name; }));
+							} else {
+								resolve([]);
+							}
+						},
+						error: function() {
+							resolve([]);
+						}
+					});
+				});
+			}
+
+			function enrichAreaWithSelection(area, wmsLayerNames) {
+				const entryNames = area.entryNames || [];
+				let selectionCount = 0;
+				entryNames.forEach(function(entryName) {
+					const onlineId = shapeOnlinePrefix + entryName;
+					const found = wmsLayerNames.some(function(layerName) {
+						return layerName === onlineId || layerName.endsWith(':' + entryName);
+					});
+					if (found) {
+						selectionCount++;
+					}
+				});
+				const featureCount = entryNames.length || area.featureCount || 0;
+				let selectionStatus = 'NONE';
+				if (featureCount > 0 && selectionCount > 0) {
+					selectionStatus = selectionCount >= featureCount ? 'FULL' : 'PARTIAL';
+				}
+				return Object.assign({}, area, {
+					featureCount: featureCount,
+					selectionCount: selectionCount,
+					selectionStatus: selectionStatus
+				});
+			}
+
+			function selectionCell(area) {
+				const status = area.selectionStatus || 'NONE';
+				if (status === 'FULL') {
+					return '<span class="shapes-status-icon shapes-status-full" title="' + t('shapes_in_selection_full') + '"><i class="fa fa-check-circle"></i></span>';
+				}
+				if (status === 'PARTIAL') {
+					return '<span class="shapes-status-icon shapes-status-partial" title="' + t('shapes_in_selection_partial', { count: area.selectionCount, total: area.featureCount }) + '"><i class="fa fa-adjust"></i></span>';
+				}
+				return '<span class="shapes-status-icon shapes-status-none" title="' + t('shapes_in_selection_none') + '"><i class="fa fa-circle-o"></i></span>';
+			}
+
+			function formatOwnerLabel(owner, legacy) {
+				if (!owner) {
+					return legacy ? t('shapes_owner_unknown') : '—';
+				}
+				if (owner === 'admin') {
+					return t('shapes_owner_admin');
+				}
+				return owner;
+			}
+
+			function renderAreas(areas) {
+				listBody.empty();
+				if (!areas || areas.length === 0) {
+					listBody.append('<tr><td colspan="7" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
+					return;
+				}
+				areas.forEach(function(area) {
+					const legacyTag = area.legacy ? ' <span class="shapes-legacy-tag">(' + t('shapes_legacy') + ')</span>' : '';
+					const deleteBtn = $('<button type="button" class="menu-button shapes-delete-btn">').text(t('delete')).data('prefix', area.prefix);
+					const row = $('<tr>');
+					row.append($('<td>').html(selectionCell(area)));
+					row.append($('<td>').html('<code>' + area.prefix + '</code>' + legacyTag));
+					row.append($('<td>').text(area.fileName || '—'));
+					row.append($('<td>').text(formatOwnerLabel(area.owner, area.legacy)));
+					row.append($('<td>').text(area.featureCount));
+					row.append($('<td>').text(area.selectionCount + ' / ' + area.featureCount));
+					row.append($('<td>').append(deleteBtn));
+					listBody.append(row);
+				});
+			}
+
+			function loadAreas() {
+				statusDiv.text(t('shapes_list_loading')).css('color', '#2c3e50');
+				const params = new URLSearchParams({ email: userEmail, apiKey: authToken });
+				Promise.all([
+					fetch('../services/support/predefinedShapes?' + params.toString()).then(function(r) { return r.json(); }),
+					fetchWmsLayerNames()
+				])
+					.then(function(results) {
+						const data = results[0];
+						const wmsLayerNames = results[1];
+						if (data.success === false) {
+							statusDiv.text(data.message || t('shapes_list_error')).css('color', '#c0392b');
+							return;
+						}
+						statusDiv.text('');
+						const areas = (data.areas || []).map(function(area) {
+							return enrichAreaWithSelection(area, wmsLayerNames);
+						});
+						renderAreas(areas);
+					})
+					.catch(function(err) {
+						console.error(err);
+						statusDiv.text(t('shapes_list_error')).css('color', '#c0392b');
+					});
+			}
+
+			function triggerHarvest() {
+				statusDiv.text(t('shapes_harvest_starting')).css('color', '#2c3e50');
+				fetch('../services/support/predefinedShapes/harvest', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email: userEmail, apiKey: authToken })
+				})
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						if (data.success) {
+							statusDiv.text(data.message || t('shapes_harvest_scheduled')).css('color', '#27ae60');
+							setTimeout(loadAreas, 3000);
+						} else {
+							statusDiv.text(data.message || t('shapes_harvest_error')).css('color', '#c0392b');
+						}
+					})
+					.catch(function() {
+						statusDiv.text(t('shapes_harvest_error')).css('color', '#c0392b');
+					});
+			}
+
+			fileInput.on('change', function() {
+				const file = fileInput[0].files && fileInput[0].files[0];
+				if (!file || shapeIdInput.val().trim()) return;
+				let base = file.name.replace(/\.zip$/i, '');
+				base = base.replace(/[\s.]+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').replace(/_+/g, '_').toLowerCase();
+				if (base) shapeIdInput.val(base);
+			});
+
+			refreshBtn.on('click', loadAreas);
+			harvestBtn.on('click', triggerHarvest);
+
+			listBody.on('click', '.shapes-delete-btn', function() {
+				const prefix = $(this).data('prefix');
+				if (!prefix || !confirm(t('shapes_delete_confirm', { prefix: prefix }))) return;
+				statusDiv.text(t('shapes_deleting')).css('color', '#2c3e50');
+				fetch('../services/support/predefinedShapes/delete', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ email: userEmail, apiKey: authToken, prefix: prefix })
+				})
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						if (data.success) {
+							statusDiv.text(data.message).css('color', '#27ae60');
+							loadAreas();
+						} else {
+							statusDiv.text(data.message || t('shapes_delete_error')).css('color', '#c0392b');
+						}
+					})
+					.catch(function() {
+						statusDiv.text(t('shapes_delete_error')).css('color', '#c0392b');
+					});
+			});
+
+			uploadBtn.on('click', function() {
+				if (uploadInProgress) return;
+				const file = fileInput[0].files && fileInput[0].files[0];
+				if (!file) {
+					statusDiv.text(t('upload_shapes_no_file')).css('color', '#c0392b');
+					return;
+				}
+				if (!file.name.toLowerCase().endsWith('.zip')) {
+					statusDiv.text(t('upload_shapes_zip_only')).css('color', '#c0392b');
+					return;
+				}
+				uploadInProgress = true;
+				statusDiv.text(t('upload_shapes_uploading')).css('color', '#2c3e50');
+				const formData = new FormData();
+				formData.append('file', file);
+				formData.append('shapeId', shapeIdInput.val().trim());
+				formData.append('email', userEmail);
+				formData.append('apiKey', authToken);
+				fetch('../services/support/uploadPredefinedShapes', { method: 'POST', body: formData })
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						uploadInProgress = false;
+						if (data.success) {
+							statusDiv.text(data.message || t('upload_shapes_success_html')).css('color', '#27ae60');
+							fileInput.val('');
+							shapeIdInput.val('');
+							loadAreas();
+						} else {
+							statusDiv.text(data.message || t('upload_shapes_error')).css('color', '#c0392b');
+						}
+					})
+					.catch(function(err) {
+						uploadInProgress = false;
+						console.error(err);
+						statusDiv.text(t('upload_shapes_error')).css('color', '#c0392b');
+					});
+			});
+
+			dialogContent.dialog({
+				title: t('manage_predefined_shapes_title'),
+				modal: true,
+				width: 920,
+				maxHeight: window.innerHeight - 80,
+				classes: { 'ui-dialog': 'shape-management-dialog' },
+				buttons: [{ text: t('close'), click: function() { $(this).dialog('close'); } }],
+				open: function() { loadAreas(); },
+				close: function() { $(this).dialog('destroy').remove(); }
+			});
 		});
 
 		// List Users button click handler (admin only)
@@ -2361,7 +2665,8 @@ export function initializePortal(config) {
 			'dabNode': GIAPI.search.dab,
 
 
-			'wmsEndpoint': config.wmsEndpoint,
+			'shapeView': config.shapeView,
+			'wmsVersion': '1.3.0',
 
 
 			'clusterWMS': (config.clusterWMS !== undefined),
@@ -3362,9 +3667,17 @@ export function initializePortal(config) {
 							var lines = [];
 							if (constraints.when && constraints.when.from) lines.push({ label: 'Begin date', value: constraints.when.from });
 							if (constraints.when && constraints.when.to) lines.push({ label: 'End date', value: constraints.when.to });
+							var hasFiniteBbox = function(w) {
+								if (!w || w.predefinedLayer) {
+									return false;
+								}
+								return [w.west, w.south, w.east, w.north].every(function(v) {
+									return typeof v === 'number' && Number.isFinite(v);
+								});
+							};
 							if (where) {
 								if (where.predefinedLayer) lines.push({ label: 'Predefined layer', value: where.predefinedLayer });
-								if (where.south != null && where.west != null && where.north != null && where.east != null) {
+								if (hasFiniteBbox(where)) {
 									lines.push({ label: 'Bounding box', value: [where.west, where.south, where.east, where.north].join(', ') });
 								}
 							}
@@ -3507,100 +3820,122 @@ export function initializePortal(config) {
 
 							dialogContent.append(nameDiv);
 
-							// Define format options before using them in rows
-							const csvOption = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
+							let bulkDownloadType = 'data';
+
+							function formatSupportsDownloadKind(support, kind) {
+								if (!support) {
+									return kind === 'data';
+								}
+								return String(support).split(',').map(function(s) { return s.trim(); }).includes(kind);
+							}
+
+							function renderFormatOptions(formatOptions, downloadKind) {
+								formatOptions.empty();
+								if (!authToken || !view) {
+									formatOptions.append(
+										$('<p>').text(t('formats_unavailable')).css('color', '#c0392b')
+									);
+									return;
+								}
+								fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=format&limit=10`)
+									.then(function(response) { return response.json(); })
+									.then(function(data) {
+										formatOptions.empty();
+										const formats = (data.format || []).filter(function(fmt) {
+											return formatSupportsDownloadKind(fmt.support, downloadKind);
+										});
+										if (formats.length > 0) {
+											formats.forEach(function(fmt, index) {
+												const fmtId = 'format-' + String(fmt.value).replace(/[^a-zA-Z0-9_]/g, '_');
+												const option = $('<div>').css({
+													'display': 'flex',
+													'align-items': 'center'
+												});
+												option.append(
+													$('<input>').attr({
+														'type': 'radio',
+														'name': 'downloadFormat',
+														'id': fmtId,
+														'value': fmt.value,
+														'checked': index === 0
+													}).css('margin-right', '8px')
+												);
+												option.append(
+													$('<label>')
+														.attr('for', fmtId)
+														.text(fmt.label || fmt.value)
+														.css('color', '#2c3e50')
+												);
+												formatOptions.append(option);
+											});
+										} else {
+											formatOptions.append(
+												$('<p>').text(t('formats_unavailable')).css('color', '#c0392b')
+											);
+										}
+									})
+									.catch(function(error) {
+										console.error('Error fetching download formats:', error);
+										formatOptions.empty();
+										formatOptions.append(
+											$('<p>').text(t('formats_load_failed')).css('color', '#c0392b')
+										);
+									});
+							}
+
+							const downloadTypeDiv = $('<div>').css({
+								'margin-top': '15px',
+								'margin-bottom': '10px',
+								'padding': '10px',
+								'background-color': '#f8f9fa',
+								'border-radius': '4px'
 							});
-							csvOption.append(
+							downloadTypeDiv.append(
+								$('<label>')
+									.text(t('download_type_label'))
+									.css({
+										'display': 'block',
+										'margin-bottom': '10px',
+										'font-weight': 'bold',
+										'color': '#2c3e50'
+									})
+							);
+							const downloadTypeOptions = $('<div>').css({
+								'display': 'flex',
+								'gap': '20px',
+								'flex-wrap': 'wrap'
+							});
+							const dataTypeOption = $('<div>').css({ 'display': 'flex', 'align-items': 'center' });
+							dataTypeOption.append(
 								$('<input>').attr({
 									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatCSV',
-									'value': 'CSV',
+									'name': 'bulkDownloadType',
+									'id': 'bulkDownloadTypeData',
+									'value': 'data',
 									'checked': true
 								}).css('margin-right', '8px')
 							);
-							csvOption.append(
-								$('<label>')
-									.attr('for', 'formatCSV')
-									.text('CSV')
-									.css('color', '#2c3e50')
+							dataTypeOption.append(
+								$('<label>').attr('for', 'bulkDownloadTypeData').text(t('download_type_data')).css('color', '#2c3e50')
 							);
-							const jsonOption = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							jsonOption.append(
+							const metadataTypeOption = $('<div>').css({ 'display': 'flex', 'align-items': 'center' });
+							metadataTypeOption.append(
 								$('<input>').attr({
 									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatJSON',
-									'value': 'JSON'
+									'name': 'bulkDownloadType',
+									'id': 'bulkDownloadTypeMetadata',
+									'value': 'metadata'
 								}).css('margin-right', '8px')
 							);
-							jsonOption.append(
-								$('<label>')
-									.attr('for', 'formatJSON')
-									.text('JSON')
-									.css('color', '#2c3e50')
+							metadataTypeOption.append(
+								$('<label>').attr('for', 'bulkDownloadTypeMetadata').text(t('download_type_metadata')).css('color', '#2c3e50')
 							);
-							const waterml10Option = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							waterml10Option.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatWaterML10',
-									'value': 'WATERML_1_0'
-								}).css('margin-right', '8px')
-							);
-							waterml10Option.append(
-								$('<label>')
-									.attr('for', 'formatWaterML10')
-									.text('WaterML 1.0')
-									.css('color', '#2c3e50')
-							);
-							const waterml20Option = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							waterml20Option.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatWaterML20',
-									'value': 'WATERML_2_0'
-								}).css('margin-right', '8px')
-							);
-							waterml20Option.append(
-								$('<label>')
-									.attr('for', 'formatWaterML20')
-									.text('WaterML 2.0')
-									.css('color', '#2c3e50')
-							);
-							const netcdfOption = $('<div>').css({
-								'display': 'flex',
-								'align-items': 'center'
-							});
-							netcdfOption.append(
-								$('<input>').attr({
-									'type': 'radio',
-									'name': 'downloadFormat',
-									'id': 'formatNetCDF',
-									'value': 'NETCDF'
-								}).css('margin-right', '8px')
-							);
-							netcdfOption.append(
-								$('<label>')
-									.attr('for', 'formatNetCDF')
-									.text('NetCDF')
-									.css('color', '#2c3e50')
-							);
+							downloadTypeOptions.append(dataTypeOption);
+							downloadTypeOptions.append(metadataTypeOption);
+							downloadTypeDiv.append(downloadTypeOptions);
+							dialogContent.append(downloadTypeDiv);
 
-							// Add format selection
+							// Format selection (loaded from om-api/properties)
 							const formatDiv = $('<div>').css({
 								'margin-top': '15px',
 								'margin-bottom': '15px',
@@ -3620,33 +3955,21 @@ export function initializePortal(config) {
 									})
 							);
 
-							// Format selection
 							const formatOptions = $('<div>').css({
 								'display': 'flex',
-								'flex-direction': 'column',
-								'gap': '10px'
+								'flex-wrap': 'wrap',
+								'gap': '20px'
 							});
-							// First row: CSV, JSON, WaterML 1.0
-							const formatRow1 = $('<div>').css({
-								'display': 'flex',
-								'gap': '20px',
-								'margin-bottom': '0px'
-							});
-							formatRow1.append(csvOption);
-							formatRow1.append(jsonOption);
-							formatRow1.append(waterml10Option);
-							// Second row: WaterML 2.0, NetCDF
-							const formatRow2 = $('<div>').css({
-								'display': 'flex',
-								'gap': '20px',
-								'margin-top': '0px'
-							});
-							formatRow2.append(waterml20Option);
-							formatRow2.append(netcdfOption);
-							formatOptions.append(formatRow1);
-							formatOptions.append(formatRow2);
+							formatOptions.append($('<p>').text(t('loading')));
 							formatDiv.append(formatOptions);
 							dialogContent.append(formatDiv);
+
+							renderFormatOptions(formatOptions, bulkDownloadType);
+							downloadTypeDiv.on('change', 'input[name="bulkDownloadType"]', function() {
+								bulkDownloadType = $('input[name="bulkDownloadType"]:checked').val() || 'data';
+								formatOptions.html(`<p>${t('loading')}</p>`);
+								renderFormatOptions(formatOptions, bulkDownloadType);
+							});
 
 							// Add email notifications checkbox
 							const notificationsDiv = $('<div>').css({
@@ -3709,9 +4032,9 @@ export function initializePortal(config) {
 											if (where) {
 												if (where.predefinedLayer) {
 													params.append('predefinedLayer', where.predefinedLayer);
-												}
-
-												if (where.south && where.west && where.north && where.east) {
+												} else if ([where.west, where.south, where.east, where.north].every(function(v) {
+													return typeof v === 'number' && Number.isFinite(v);
+												})) {
 													params.append('west', where.west);
 													params.append('south', where.south);
 													params.append('east', where.east);
@@ -3846,17 +4169,66 @@ export function initializePortal(config) {
 
 											// Add format parameter based on radio selection
 											const selectedFormat = $('input[name="downloadFormat"]:checked').val();
+											if (!selectedFormat) {
+												alert(t('formats_unavailable'));
+												return;
+											}
 											params.append('format', selectedFormat);
+
+											var downloadType = $('input[name="bulkDownloadType"]:checked').val() || 'data';
+											if (downloadType === 'metadata') {
+												params.append('includeData', 'false');
+											} else {
+												params.append('includeData', 'true');
+											}
 
 											// Add email notifications parameter if checkbox is checked
 											if ($('#emailNotifications').is(':checked')) {
 												params.append('eMailNotifications', 'true');
 											}
 
+											// Synchronous metadata download when the result set is small
+											if (downloadType === 'metadata' && resultSet.size <= 100) {
+												var syncParams = new URLSearchParams(params.toString());
+												syncParams.delete('eMailNotifications');
+												var syncUrl = `${baseUrl}/token/${token}/view/${view}/om-api/observations?${syncParams.toString()}`;
+												var syncFileExt = selectedFormat === 'SHAPEFILE' ? '.zip' : '.csv';
+												fetch(syncUrl)
+													.then(function(response) {
+														if (!response.ok) {
+															throw new Error('Network response was not ok');
+														}
+														return response.blob();
+													})
+													.then(function(blob) {
+														var fileName = (downloadName || 'metadata') + syncFileExt;
+														var link = document.createElement('a');
+														link.href = window.URL.createObjectURL(blob);
+														link.download = fileName;
+														document.body.appendChild(link);
+														link.click();
+														document.body.removeChild(link);
+														window.URL.revokeObjectURL(link.href);
+														GIAPI.UI_Utils.dialog('open', {
+															title: t('download_started_title'),
+															message: t('metadata_sync_download_message')
+														});
+													})
+													.catch(function(error) {
+														GIAPI.UI_Utils.dialog('open', {
+															title: t('error_title'),
+															message: t('error_download_message')
+														});
+														console.error('Metadata sync download error:', error);
+													});
+												$(this).dialog('close');
+												return;
+											}
+
 											// Construct the final URL using the view from config
 											var downloadUrl = `${baseUrl}/token/${token}/view/${view}/om-api/downloads?${params.toString()}`;
 
-											// Make the GET request
+											// Make the PUT request
 											fetch(downloadUrl, { method: 'PUT', body: '' })
 												.then(response => {
 													if (!response.ok) {

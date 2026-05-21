@@ -58,8 +58,10 @@ public class ISPRASourceFinder extends SourceFinder {
 		"SIR_LOMBARDIA"), //
 	BOLZANO("Italy, Sistema Informativo della Provincia Autonoma di Bolzano", "ita-sir-bolzano",
 		"http://daten.buergernetz.bz.it/services/meteo/v1/", "SIR_BOLZANO"), //
-	HIS_CENTRAL_SHAPE_FILES("HIS Central shape files", "his-central-shapes", "https://his-central.s3.amazonaws.com/polygons/",
-		"S3-SHAPEFILE");//
+	//HIS_CENTRAL_SHAPE_FILES("HIS Central shape files", "his-central-shapes", "https://his-central.s3.amazonaws.com/polygons/",
+	//	"S3-SHAPEFILE"), //
+	HIS_CENTRAL_OPENSEARCH_SHAPE_FILES("HIS Central OpenSearch shape files", "his-central-shapes-opensearch",
+		"opensearch://shapeFiles", "OPENSEARCH-SHAPEFILE");//
 
 	private String name;
 
@@ -101,7 +103,7 @@ public class ISPRASourceFinder extends SourceFinder {
 
 	for (ItalianSIR sir : ItalianSIR.values()) {
 	    List<String> augs = new ArrayList<String>(augmenterTypes);
-	    if (sir.equals(ItalianSIR.HIS_CENTRAL_SHAPE_FILES)) {
+	    if (sir.equals(sir.equals(ItalianSIR.HIS_CENTRAL_OPENSEARCH_SHAPE_FILES))) {
 		augs.clear();
 	    }
 	    HarvestingSetting harvestingSetting = createSetting(//

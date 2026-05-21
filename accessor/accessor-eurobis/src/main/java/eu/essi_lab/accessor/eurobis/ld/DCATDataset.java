@@ -53,7 +53,9 @@ public class DCATDataset extends RDFResource {
 		RDFElement.INSTRUMENTS, //
 		RDFElement.INSTRUMENTLABELSANDURIS, //
 		RDFElement.URLS_AND_TYPES, //
-		RDFElement.CREATORS
+		RDFElement.CREATORS, //
+		RDFElement.CONTRIBUTORS, //
+		RDFElement.QUALIFIEDATTRIBUTIONS
 	};
     }
 

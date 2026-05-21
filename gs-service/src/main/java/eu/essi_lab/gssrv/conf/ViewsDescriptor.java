@@ -48,7 +48,7 @@ import eu.essi_lab.model.exceptions.*;
 import java.io.*;
 import java.util.*;
 
-public class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.GridData> {
+class ViewsDescriptor extends AbstractGridDescriptor<ViewsDescriptor.GridData> {
 
     private static final String ID_COLUMN = "Id";
     private static final String LABEL_COLUMN = "Label";

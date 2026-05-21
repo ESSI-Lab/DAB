@@ -21,15 +21,12 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
-import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.component.page.Viewport;
-import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.shared.communication.PushMode;
+import com.vaadin.flow.component.page.*;
+import com.vaadin.flow.server.*;
+import com.vaadin.flow.shared.communication.*;
 
 /**
- * Use the @PWA annotation make the application installable on phones, tablets
- * and some desktop browsers.
+ * Use the @PWA annotation make the application installable on phones, tablets and some desktop browsers.
  */
 @PWA(name = "DAB configuration GUI", shortName = "DAB Configurator")
 @Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")

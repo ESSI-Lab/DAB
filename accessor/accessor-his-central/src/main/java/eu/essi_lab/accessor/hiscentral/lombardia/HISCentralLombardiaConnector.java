@@ -296,57 +296,38 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
 		    periodoId = "" + periodo.getId();
 		    switch (periodo) {
 		    case ID_5_T1M:
-			dataset.getExtensionHandler().setTimeUnits("minutes");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1M");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT1M");
-
 			break;
 		    case ID_10_T5M:
-			dataset.getExtensionHandler().setTimeUnits("minutes");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT5M");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT5M");
 			break;
 		    case ID_1_T10M:
-			dataset.getExtensionHandler().setTimeUnits("minutes");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT10M");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT10M");
 			break;
 		    case ID_2_T30M:
-			dataset.getExtensionHandler().setTimeUnits("minutes");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("min");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT30M");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT30M");
 			break;
 		    case ID_3_T60M:
-			dataset.getExtensionHandler().setTimeUnits("hour");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT1H");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT1H");
 			break;
 		    case ID_8_T2H:
-			dataset.getExtensionHandler().setTimeUnits("hour");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT2H");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT2H");
 			break;
 		    case ID_6_T3H:
-			dataset.getExtensionHandler().setTimeUnits("hour");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT3H");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT3H");
 			break;
 		    case ID_9_T4H:
-			dataset.getExtensionHandler().setTimeUnits("hour");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("h");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("PT4H");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("PT4H");
 			break;
 		    case ID_4_T1D:
-			dataset.getExtensionHandler().setTimeUnits("day");
-			dataset.getExtensionHandler().setTimeUnitsAbbreviation("d");
 			dataset.getExtensionHandler().setTimeResolutionDuration8601("P1D");
 			dataset.getExtensionHandler().setTimeAggregationDuration8601("P1D");
 			break;

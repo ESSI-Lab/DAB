@@ -33,7 +33,6 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileManager;
@@ -89,13 +88,11 @@ public class EurOBISLdClient {
 			StmtIterator iter = model.listStatements();
 			while (iter.hasNext()) {
 				Statement statement = iter.nextStatement();
-				Resource subject = statement.getSubject();
 				Property predicate = statement.getPredicate();
 				RDFNode object = statement.getObject();
-				if (isDataset(predicate)) {
+				if (isDataset(predicate) && object.isResource()) {
 					datasetURIs.add(object.asResource().getURI());
 				}
-				// System.out.println(subject + " " + predicate + " " + object);
 			}
 			model.close();
 			tempFile.delete();

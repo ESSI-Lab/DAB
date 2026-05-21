@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.api.database.*;
 import org.quartz.Calendar;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -35,9 +36,6 @@ import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
-import eu.essi_lab.api.database.DatabaseReader;
-import eu.essi_lab.api.database.DatabaseWriter;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.Augmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -238,7 +236,7 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 
 	DatabaseReader dataBaseReader = DatabaseProviderFactory.getReader(databaseURI);
 	DatabaseWriter dataBaseWriter = DatabaseProviderFactory.getWriter(databaseURI);
-	SourceStorage storage = DatabaseProviderFactory.getSourceStorage(databaseURI);
+	SourceStorageProvider storage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	// ----------------------------------------------------
 	// inserts the mandatory components in the PROPER order
@@ -296,7 +294,7 @@ public class HarvesterWorker extends SchedulerWorker<HarvestingSetting> {
 
 	// ---------------------------------------
 	//
-	// Adds the SourceStorage to the harvester
+	// Adds the SourceStorageProvider to the harvester
 	//
 	harvester.setSourceStorage(storage);
 

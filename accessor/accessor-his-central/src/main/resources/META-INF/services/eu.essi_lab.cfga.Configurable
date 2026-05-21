@@ -20,6 +20,8 @@ eu.essi_lab.accessor.hiscentral.bolzano.HISCentralBolzanoConnector
 eu.essi_lab.accessor.hiscentral.bolzano.HISCentralBolzanoAccessor
 eu.essi_lab.accessor.hiscentral.emilia.HISCentralEmiliaAccessor
 eu.essi_lab.accessor.hiscentral.emilia.HISCentralEmiliaConnector
+eu.essi_lab.accessor.hiscentral.emilia.simc.HISCentralEmiliaSimcAccessor
+eu.essi_lab.accessor.hiscentral.emilia.simc.HISCentralEmiliaSimcConnector
 eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaAccessor
 eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaConnector
 eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataAccessor

@@ -57,7 +57,7 @@ public class DataFolderMapping extends IndexMapping {
      */
     public static final String GS_RESOURCE = "gsResource";
     // the source storage worker key must be preserved
-    public static final String WRITING_FOLDER_TAG = SourceStorageWorker.WRITING_FOLDER_TAG;
+    public static final String WRITING_FOLDER_TAG = SourceStorage.WRITING_FOLDER_TAG;
 
     public static final String CENTROID = "centroid";
 

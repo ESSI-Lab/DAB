@@ -21,16 +21,14 @@ package eu.essi_lab.gssrv.conf;
  * #L%
  */
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.button.Button;
-
-import eu.essi_lab.cfga.gui.ConfigurationView;
-import eu.essi_lab.cfga.gui.LogOutButtonListener;
+import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.button.*;
+import eu.essi_lab.cfga.gui.*;
 
 /**
  * @author Fabrizio
  */
-public class GSLogoutButtonListener extends LogOutButtonListener {
+class GSLogoutButtonListener extends LogOutButtonListener {
 
     /**
      * @param view
@@ -48,7 +46,7 @@ public class GSLogoutButtonListener extends LogOutButtonListener {
 	String url = "../../../gs-service/auth/user/logout?url=" + requestURL;
 
 	view.getUI().get().getPage().open(url, "_self");
-	
+
 	view.getUI().get().push();
     }
 }

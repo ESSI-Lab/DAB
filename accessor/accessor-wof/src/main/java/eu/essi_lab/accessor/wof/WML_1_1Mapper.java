@@ -60,6 +60,7 @@ import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
@@ -398,15 +399,18 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 	}
 
 	Number timeSupport = getTimeScaleTimeSupport(series);
-	if (timeSupport != null && !timeSupport.toString().equals("0")) {
-	    dataset.getExtensionHandler().setTimeSupport(timeSupport.toString());
-	}
-
 	String timeUnits = getTimeScaleUnitName(series);
-	dataset.getExtensionHandler().setTimeUnits(timeUnits);
-
-	String timeUnitsAbbreviation = getTimeScaleUnitAbbreviation(series);
-	dataset.getExtensionHandler().setTimeUnitsAbbreviation(timeUnitsAbbreviation);
+	if (timeSupport != null && !timeSupport.toString().equals("0") && timeUnits != null && !timeUnits.isEmpty()) {
+	    try {
+		BigDecimal value = new BigDecimal(timeSupport.toString());
+		javax.xml.datatype.Duration duration = ISO8601DateTimeUtils.getDuration(value, timeUnits);
+		if (duration != null) {
+		    dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
+		    dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
+		}
+	    } catch (Exception e) {
+	    }
+	}
 
 	String missingValue = series.getNoDataValue();
 	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);

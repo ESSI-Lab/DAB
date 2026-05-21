@@ -22,7 +22,7 @@ package eu.essi_lab.profiler.om;
  */
 
 public enum OMFormat {
-    CSV(".csv"), JSON(".json"), NETCDF(".nc"), WATERML_1(".xml"), WATERML_2(".xml");
+    CSV(".csv"), JSON(".json"), SHAPEFILE(".zip"), NETCDF(".nc"), WATERML_1(".xml"), WATERML_2(".xml");
 
     private String extension;
 
@@ -61,6 +61,9 @@ public enum OMFormat {
 	if (format.contains("json")) {
 	    return JSON;
 	}
+	if (format.contains("shp") || format.contains("shape")) {
+	    return SHAPEFILE;
+	}
 	if (format.contains("wml") || format.contains("water")) {
 	    if (format.contains("2")) {
 		return WATERML_2;
@@ -76,5 +79,43 @@ public enum OMFormat {
 
     public String getExtension() {
 	return extension;
+    }
+
+    public String getLabel() {
+	switch (this) {
+	case CSV:
+	    return "CSV";
+	case JSON:
+	    return "JSON";
+	case SHAPEFILE:
+	    return "Shapefile";
+	case NETCDF:
+	    return "NetCDF";
+	case WATERML_1:
+	    return "WaterML 1.0";
+	case WATERML_2:
+	    return "WaterML 2.0";
+	default:
+	    return name();
+	}
+    }
+
+    /**
+     * Comma-separated capabilities for bulk download: {@code data}, {@code metadata}, or both.
+     */
+    public String getSupport() {
+	switch (this) {
+	case CSV:
+	case JSON:
+	    return "data,metadata";
+	case SHAPEFILE:
+	    return "metadata";
+	case NETCDF:
+	case WATERML_1:
+	case WATERML_2:
+	    return "data";
+	default:
+	    return "data";
+	}
     }
 }

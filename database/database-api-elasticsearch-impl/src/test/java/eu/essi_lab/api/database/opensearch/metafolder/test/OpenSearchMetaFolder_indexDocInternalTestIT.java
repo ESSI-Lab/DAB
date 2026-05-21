@@ -5,6 +5,7 @@ package eu.essi_lab.api.database.opensearch.metafolder.test;
 
 import java.io.InputStream;
 
+import eu.essi_lab.api.database.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -12,8 +13,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
-import eu.essi_lab.api.database.SourceStorageWorker.DataFolderIndexDocument;
+import eu.essi_lab.api.database.SourceStorage.DataFolderIndexDocument;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
@@ -40,13 +40,13 @@ OpenSearchDatabase database = createDataBase();
 	//
 	//
 
-	String indexName = SourceStorageWorker.createDataFolderIndexName(TestUtils.SOURCE_ID);
+	String indexName = SourceStorage.createDataFolderIndexName(TestUtils.SOURCE_ID);
 
 	DataFolderIndexDocument doc = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_1_POSTFIX);
+		SourceStorage.DATA_1_POSTFIX);
 
-	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_POSTFIX;
+	String key = TestUtils.SOURCE_ID + SourceStorage.DATA_1_POSTFIX;
 
 	Assert.assertTrue(folder.store(//
 		key, //
@@ -83,7 +83,7 @@ OpenSearchDatabase database = createDataBase();
 
 	Assert.assertEquals(TestUtils.SOURCE_ID, wrapper.getSourceId().get());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), wrapper.getDataFolder().get());
+	Assert.assertEquals(SourceStorage.DATA_1_POSTFIX.substring(1), wrapper.getDataFolder().get());
 
 	Assert.assertEquals(//
 		OpenSearchUtils.encode(FolderEntry.of(doc.getDocument())), wrapper.getIndexDoc().get());
@@ -106,17 +106,17 @@ OpenSearchDatabase database = createDataBase();
 	//
 	//
 
-	String indexName = SourceStorageWorker.createDataFolderIndexName(TestUtils.SOURCE_ID);
+	String indexName = SourceStorage.createDataFolderIndexName(TestUtils.SOURCE_ID);
 
 	DataFolderIndexDocument doc = new DataFolderIndexDocument(//
 		indexName, //
-		SourceStorageWorker.DATA_1_POSTFIX);
+		SourceStorage.DATA_1_POSTFIX);
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), doc.getShortDataFolderPostfix());
+	Assert.assertEquals(SourceStorage.DATA_1_POSTFIX.substring(1), doc.getShortDataFolderPostfix());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX, doc.getDataFolderPrefix());
+	Assert.assertEquals(SourceStorage.DATA_1_POSTFIX, doc.getDataFolderPrefix());
 
-	String key = TestUtils.SOURCE_ID + SourceStorageWorker.DATA_1_POSTFIX;
+	String key = TestUtils.SOURCE_ID + SourceStorage.DATA_1_POSTFIX;
 
 	//
 	//
@@ -132,9 +132,9 @@ OpenSearchDatabase database = createDataBase();
 
 	DataFolderIndexDocument doc2 = new DataFolderIndexDocument((Document) node);
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), doc2.getShortDataFolderPostfix());
+	Assert.assertEquals(SourceStorage.DATA_1_POSTFIX.substring(1), doc2.getShortDataFolderPostfix());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX, doc2.getDataFolderPrefix());
+	Assert.assertEquals(SourceStorage.DATA_1_POSTFIX, doc2.getDataFolderPrefix());
 
 	//
 	// trying to get a doc as a binary always works
@@ -144,8 +144,8 @@ OpenSearchDatabase database = createDataBase();
 
 	DataFolderIndexDocument doc3 = new DataFolderIndexDocument(binary);
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX.substring(1), doc3.getShortDataFolderPostfix());
+	Assert.assertEquals(SourceStorage.DATA_1_POSTFIX.substring(1), doc3.getShortDataFolderPostfix());
 
-	Assert.assertEquals(SourceStorageWorker.DATA_1_POSTFIX, doc3.getDataFolderPrefix());
+	Assert.assertEquals(SourceStorage.DATA_1_POSTFIX, doc3.getDataFolderPrefix());
     }
 }

@@ -25,11 +25,10 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.UUID;
 
+import eu.essi_lab.api.database.*;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.adk.harvest.IHarvestedAccessor;
-import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.ExecutionStage;
@@ -57,7 +56,7 @@ import eu.essi_lab.model.resource.GSResource;
 public class Harvester {
 
     private HarvesterPlan harvesterPlan;
-    private SourceStorage sourceStorage;
+    private SourceStorageProvider sourceStorage;
     private HarvestingReportsHandler reportsHandler;
     private HarvestingEmbeddedTask customTask;
     @SuppressWarnings("rawtypes")
@@ -150,11 +149,13 @@ public class Harvester {
 	ListRecordsRequest request = new ListRecordsRequest(status);
 
 	//
-	// set the source storage worker to the request
+	// set the source storage to the request
 	//
-	SourceStorageWorker worker = getSourceStorage().getDatabase().getWorker(getAccessor().getSource().getUniqueIdentifier());
+
+	SourceStorage storage = getSourceStorage().getDatabase().getStorage(getAccessor().getSource().getUniqueIdentifier());
+
 	request.setAdditionalInfo(
-		GSPropertyHandler.of(new GSProperty<SourceStorageWorker>(ListRecordsRequest.SOURCE_STORAGE_WORKER_PROPERTY, worker)));
+		GSPropertyHandler.of(new GSProperty<SourceStorage>(ListRecordsRequest.SOURCE_STORAGE_WORKER_PROPERTY, storage)));
 
 	try {
 
@@ -322,7 +323,7 @@ public class Harvester {
     /**
      * @param sourceStorage
      */
-    public void setSourceStorage(SourceStorage sourceStorage) {
+    public void setSourceStorage(SourceStorageProvider sourceStorage) {
 
 	this.sourceStorage = sourceStorage;
     }
@@ -568,7 +569,7 @@ public class Harvester {
     /**
      * @return
      */
-    private SourceStorage getSourceStorage() {
+    private SourceStorageProvider getSourceStorage() {
 
 	return sourceStorage;
     }

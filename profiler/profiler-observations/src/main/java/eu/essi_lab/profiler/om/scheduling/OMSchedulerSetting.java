@@ -45,6 +45,7 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
     private static final String PUBLIC_URL_OPTION_KEY = "publicURL";
     private static final String MAX_DOWNLOAD_SIZE_MB_OPTION_KEY = "maxDownloadSizeMB";
     private static final String MAX_DOWNLOAD_PART_SIZE_MB_OPTION_KEY = "maxDownloadPartSizeMB";
+    private static final String METADATA_ONLY_OPTION_KEY = "metadataOnly";
 
     /**
      * 
@@ -102,6 +103,11 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 		withKey(PUBLIC_URL_OPTION_KEY).//
 		build();
 	addOption(publicURLOption);
+
+	Option<String> metadataOnlyOption = StringOptionBuilder.get().//
+		withKey(METADATA_ONLY_OPTION_KEY).//
+		build();
+	addOption(metadataOnlyOption);
     }
 
     /**
@@ -204,6 +210,17 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
     public void setMaxDownloadPartSizeMB(Integer mb) {
 
 	getOption(MAX_DOWNLOAD_PART_SIZE_MB_OPTION_KEY, Integer.class).get().setValue(mb);
+    }
+
+    public boolean getMetadataOnly() {
+
+	String value = getOption(METADATA_ONLY_OPTION_KEY, String.class).get().getValue();
+	return value != null && value.equalsIgnoreCase("true");
+    }
+
+    public void setMetadataOnly(boolean metadataOnly) {
+
+	getOption(METADATA_ONLY_OPTION_KEY, String.class).get().setValue(metadataOnly ? "true" : "false");
     }
 
 }

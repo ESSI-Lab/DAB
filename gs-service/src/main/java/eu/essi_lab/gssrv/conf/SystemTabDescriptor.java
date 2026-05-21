@@ -24,18 +24,15 @@ package eu.essi_lab.gssrv.conf;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
-import eu.essi_lab.cfga.gs.setting.driver.*;
-import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
+import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import eu.essi_lab.gssrv.conf.import_export.*;
+import eu.essi_lab.gssrv.conf.tools.*;
 
 /**
- *
  * @author Fabrizio
- *
  */
-public class SystemTabDescriptor extends TabDescriptor {
+class SystemTabDescriptor extends TabDescriptor {
 
     /**
      *
@@ -46,14 +43,12 @@ public class SystemTabDescriptor extends TabDescriptor {
 
 	setIndex(GSTabIndex.SYSTEM.getIndex());
 
-	addContentDescriptors(
-		new SystemSetting.DescriptorProvider().get(), //
+	addContentDescriptors(new SystemSetting.DescriptorProvider().get(), //
 		new DatabaseSetting.DescriptorProvider().get(),//
 		new SchedulerViewSetting.DescriptorProvider().get(),//
 		new DownloadSetting.DescriptorProvider().get(),//
 		new RateLimiterSetting.DescriptorProvider().get(),//
 		new SessionCoordinatorSetting.DescriptorProvider().get(),//
-		new ConfigToolsDescriptor()
-	);
+		new ConfigToolsDescriptor());
     }
 }

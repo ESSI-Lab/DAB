@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 import org.quartz.JobExecutionContext;
 
-import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.ConfigurationSource;
@@ -302,7 +302,7 @@ public class ViewHarvestSchedulerTask extends AbstractCustomTask {
 		.filter(s -> harvestableIds.contains(s.getUniqueIdentifier()))
 		.collect(Collectors.toList());
 
-	SourceStorage sourceStorage = null;
+	SourceStorageProvider sourceStorage = null;
 	if (maximumResources.isPresent()) {
 	    sourceStorage = DatabaseProviderFactory.getSourceStorage(ConfigurationWrapper.getStorageInfo());
 	}
