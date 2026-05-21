@@ -401,7 +401,7 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	}
 
 	try {
-	    List<JSONObject> obs = fetchObservationsForDatastream(
+		    List<JSONObject> obs = fetchObservationsForDatastream(
 		    webRequest, message, datastreamId, platformId, windowBeginDate, windowEndDate, baseUrl);
 
 	    boolean orderDesc = orderBy != null && orderBy.toLowerCase().contains("phenomenontime")
