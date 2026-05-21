@@ -21,60 +21,34 @@ package eu.essi_lab.profiler.os;
  * #L%
  */
 
-import java.util.Optional;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.DiscoveryMessage.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.web.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.pluggable.*;
+import eu.essi_lab.pdk.*;
+import eu.essi_lab.pdk.handler.*;
+import eu.essi_lab.pdk.handler.selector.*;
+import eu.essi_lab.pdk.rsf.*;
+import eu.essi_lab.pdk.rsf.impl.atom.*;
+import eu.essi_lab.pdk.rsf.impl.json.jsapi._1_0.*;
+import eu.essi_lab.pdk.rsf.impl.json.jsapi._2_0.*;
+import eu.essi_lab.pdk.rsm.*;
+import eu.essi_lab.pdk.rsm.impl.atom.*;
+import eu.essi_lab.pdk.rsm.impl.json.jsapi.*;
+import eu.essi_lab.pdk.validation.*;
+import eu.essi_lab.profiler.os.handler.discover.*;
+import eu.essi_lab.profiler.os.handler.discover.covering.*;
+import eu.essi_lab.profiler.os.handler.discover.datahub.*;
+import eu.essi_lab.profiler.os.handler.discover.eiffel.*;
+import eu.essi_lab.profiler.os.handler.srvinfo.*;
+import jakarta.ws.rs.core.*;
+import jakarta.ws.rs.core.Response.*;
+import org.json.*;
 
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.LabeledEnum;
-import eu.essi_lab.lib.xml.NameSpace;
-import eu.essi_lab.messages.DiscoveryMessage.EiffelAPIDiscoveryOption;
-import eu.essi_lab.messages.ValidationMessage;
-import eu.essi_lab.messages.web.WebRequest;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.pluggable.ESSILabProvider;
-import eu.essi_lab.model.pluggable.Provider;
-import eu.essi_lab.pdk.Profiler;
-import eu.essi_lab.pdk.handler.DiscoveryHandler;
-import eu.essi_lab.pdk.handler.selector.GETRequestFilter;
-import eu.essi_lab.pdk.handler.selector.HandlerSelector;
-import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatter;
-import eu.essi_lab.pdk.rsf.DiscoveryResultSetFormatterFactory;
-import eu.essi_lab.pdk.rsf.FormattingEncoding;
-import eu.essi_lab.pdk.rsf.MessageResponseFormatter;
-import eu.essi_lab.pdk.rsf.impl.atom.AtomGPResultSetFormatter;
-import eu.essi_lab.pdk.rsf.impl.json.jsapi._1_0.JS_API_ResultSetFormatter_1_0;
-import eu.essi_lab.pdk.rsf.impl.json.jsapi._2_0.JS_API_ResultSetFormatter_2_0;
-import eu.essi_lab.pdk.rsf.impl.json.jsapi._2_0.JS_API_ResultSet_2_0;
-import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapper;
-import eu.essi_lab.pdk.rsm.DiscoveryResultSetMapperFactory;
-import eu.essi_lab.pdk.rsm.MappingSchema;
-import eu.essi_lab.pdk.rsm.impl.atom.AtomGPResultSetMapper;
-import eu.essi_lab.pdk.rsm.impl.json.jsapi.JS_API_ResultSetMapper;
-import eu.essi_lab.pdk.validation.WebRequestValidator;
-import eu.essi_lab.profiler.os.handler.discover.OSDiscoveryRequestFilter;
-import eu.essi_lab.profiler.os.handler.discover.OSRequestTransformer;
-import eu.essi_lab.profiler.os.handler.discover.OS_XML_ResultSetFormatter;
-import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeDiscoveryHandler;
-import eu.essi_lab.profiler.os.handler.discover.covering.CoveringModeOptionsReader;
-import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelAtomMapper;
-import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHandler;
-import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelDiscoveryHelper;
-import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelJsonMapper;
-import eu.essi_lab.profiler.os.handler.discover.eiffel.EiffelRequestTransformer;
-import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonFormatter;
-import eu.essi_lab.profiler.os.handler.discover.datahub.DatahubJsonMapper;
-import eu.essi_lab.profiler.os.handler.srvinfo.NominatimQueryHandler;
-import eu.essi_lab.profiler.os.handler.srvinfo.OSDescriptionDocumentHandler;
-import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesFilter;
-import eu.essi_lab.profiler.os.handler.srvinfo.OSGetSourcesHandler;
-import eu.essi_lab.profiler.os.handler.srvinfo.WMSLayersHandler;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -179,7 +153,11 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 	    JSONObject jsonError = new JSONObject();
 	    jsonError.put("Error occurred", message);
 
-	    return Response.status(status).type(outputFormat).entity(jsonError.toString()).build();
+	    String entity = jsonError.toString(3).replace("\\r\\n\\t", "");
+	    entity = entity.replace("\\r\\n", "");
+	    entity = entity.replace("at", " at");
+
+	    return Response.status(status).type(outputFormat).entity(entity).build();
 
 	case DatahubJsonMapper.DATAHUB_JSON_MEDIA_TYPE:
 
@@ -198,8 +176,8 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
     }
 
     /**
-     * Here (in case the request is not a GetDescriptionDocument) the right {@link DiscoveryResultSetMapper} and {@link
-     * MessageResponseFormatter} are set, according to the requested output format
+     * Here (in case the request is not a GetDescriptionDocument) the right {@link DiscoveryResultSetMapper} and
+     * {@link MessageResponseFormatter} are set, according to the requested output format
      */
     @Override
     protected void onRequestValidated(WebRequest request, WebRequestValidator validator, RequestType type) throws GSException {
@@ -234,7 +212,8 @@ public class OSProfiler extends Profiler<OSProfilerSetting> {
 		mapper = new EiffelJsonMapper();
 	    }
 
-	    FormattingEncoding encoding = version.equals("1.0") ? JS_API_ResultSetFormatter_1_0.JS_API_FORMATTING_ENCODING
+	    FormattingEncoding encoding = version.equals("1.0")
+		    ? JS_API_ResultSetFormatter_1_0.JS_API_FORMATTING_ENCODING
 		    : JS_API_ResultSetFormatter_2_0.JS_API_FORMATTING_ENCODING;
 
 	    formatter = DiscoveryResultSetFormatterFactory.loadFormatters(//

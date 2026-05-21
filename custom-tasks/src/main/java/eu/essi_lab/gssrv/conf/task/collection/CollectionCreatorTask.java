@@ -37,7 +37,7 @@ import eu.essi_lab.access.augmenter.DataCacheAugmenter;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorage;
+import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
@@ -183,7 +183,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
      */
     public void run(String hostname, String sourceId, StorageInfo databaseURI, View view) throws Exception {
 
-	SourceStorage sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
+	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	DatabaseFolder folder = sourceStorage.getDataFolder(sourceId, true).get();
 

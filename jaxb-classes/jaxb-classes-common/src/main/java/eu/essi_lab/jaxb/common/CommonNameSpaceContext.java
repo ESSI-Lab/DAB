@@ -128,6 +128,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String RIHMI_URI = "http://ws.meteo.ru";
     public static final String ARAL_MOLDOVA_URI = "http://ws.meteo.ru/aral";
     public static final String HIS_CENTRAL_SHAPEFILE = "http://shapefile.his-central.it";
+    public static final String OPENSEARCH_SHAPEFILE = "http://shapefile.opensearch.essi-lab.eu";
     public static final String RIHMI_HISTORICAL_URI = "http://ws.meteo.ru/hydro/rest/GetHydroAveMonDischargesRF/xml/";
     public static final String BNHS_URI = "http://wmo.int/bnhs";
     public static final String RASAQM_URI = "http://www.feerc.ru/geoss/rasaqm";

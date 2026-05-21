@@ -46,7 +46,6 @@ class BrokeringTabDescriptor extends TabDescriptor {
 		new HarvestingSettingDescriptorProvider().get(), //
 		new SourcePrioritySetting.DescriptorProvider().get(), //
 		new SourceStorageSetting.DescriptorProvider().get(),//
-		new GDCSourcesSetting.DescriptorProvider().get(),//
 		new RecordsInspector().get(),//
 		new DistributionSetting.DescriptorProvider().get(),//
 		new ProfilerSetting.DescriptorProvider().get()//

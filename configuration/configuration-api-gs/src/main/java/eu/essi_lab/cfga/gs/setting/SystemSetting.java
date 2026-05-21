@@ -135,7 +135,12 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	/**
 	 *
 	 */
-	REST_API_PROTOCOL("restApiProtocol");
+	REST_API_PROTOCOL("restApiProtocol"),
+
+	/**
+	 * Source id of the OpenSearch shapefile accessor to harvest after portal shape upload
+	 */
+	SHAPE_SOURCE_ID("shape-source-id");
 
 	/**
 	 * MirrorSiteTokenGeneratorHandler option prefix

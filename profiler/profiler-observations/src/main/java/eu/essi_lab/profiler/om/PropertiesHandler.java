@@ -37,6 +37,8 @@ import org.json.JSONObject;
 
 import com.google.common.base.Charsets;
 
+import eu.essi_lab.accessor.opensearch.shape.PredefinedShapeLayerLister;
+import eu.essi_lab.accessor.opensearch.shape.PredefinedShapeLayerLister.LayerItem;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -76,7 +78,8 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	TIME_INTERPOLATION(new String[] { "timeInterpolation" }, MetadataElement.TIME_INTERPOLATION), //
 	PROVIDER(new String[] { "provider" }, ResourceProperty.SOURCE_ID), //
 	FORMAT(new String[] { "format" }, null), //
-	ONTOLOGY(new String[] { "ontology" }, null),//
+	ONTOLOGY(new String[] { "ontology" }, null), //
+	PREDEFINED_LAYER(new String[] { "predefinedLayer" }, null), //
 	;
 
 	String[] names;
@@ -179,6 +182,16 @@ public class PropertiesHandler extends StreamingRequestHandler {
 		    break;
 
 		}
+		case PREDEFINED_LAYER: {
+		    String token = PredefinedShapeLayerLister.tokenFromRequest(webRequest.extractTokenId());
+		    List<LayerItem> layers = PredefinedShapeLayerLister.list(token, max);
+		    JSONObject predefined = encodePredefinedLayers(layers);
+		    writer.write(predefined.toString());
+		    writer.flush();
+		    writer.close();
+		    output.close();
+		    return;
+		}
 		default:
 
 		    try {
@@ -214,6 +227,24 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	    }
 
 	};
+    }
+
+    private JSONObject encodePredefinedLayers(List<LayerItem> layers) {
+
+	JSONObject ret = new JSONObject();
+	ret.put("completed", true);
+	JSONArray array = new JSONArray();
+	ret.put("predefinedLayer", array);
+
+	for (LayerItem layer : layers) {
+	    JSONObject obj = new JSONObject();
+	    obj.put("value", layer.value());
+	    obj.put("label", layer.label());
+	    obj.put("observationCount", 1);
+	    array.put(obj);
+	}
+
+	return ret;
     }
 
     private JSONObject getJSONEncoding(ResultSet<TermFrequencyItem> results, DatasetProperty dp) {
@@ -255,6 +286,16 @@ public class PropertiesHandler extends StreamingRequestHandler {
 		GSSource s = ConfigurationWrapper.getSource(term);
 		if (s != null) {
 		    obj.put("label", s.getLabel());
+		}
+	    }
+	    if (dp.equals(DatasetProperty.FORMAT)) {
+		try {
+		    OMFormat format = OMFormat.valueOf(term);
+		    obj.put("label", format.getLabel());
+		    obj.put("support", format.getSupport());
+		} catch (IllegalArgumentException ex) {
+		    obj.put("label", term);
+		    obj.put("support", "data");
 		}
 	    }
 	}

@@ -136,7 +136,7 @@ public class JSONFeature {
 	    String type = coordObj.optString("type");
 	    if (type != null && type.equals("Point")) {
 		JSONArray coords = coordObj.optJSONArray("coordinates");
-		if (coords != null && coords.length() == 2) {
+		if (coords != null && coords.length() >= 2) {
 		    BigDecimal lat = coords.optBigDecimal(1, null);
 		    BigDecimal lon = coords.optBigDecimal(0, null);
 		    return new SimpleEntry<BigDecimal, BigDecimal>(lat, lon);

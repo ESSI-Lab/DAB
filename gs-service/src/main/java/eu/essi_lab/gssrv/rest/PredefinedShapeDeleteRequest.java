@@ -1,7 +1,4 @@
-/**
- * 
- */
-package eu.essi_lab.api.database.opensearch;
+package eu.essi_lab.gssrv.rest;
 
 /*-
  * #%L
@@ -24,47 +21,39 @@ package eu.essi_lab.api.database.opensearch;
  * #L%
  */
 
-import eu.essi_lab.api.database.Database;
-import eu.essi_lab.api.database.SourceStorage;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.model.StorageInfo;
-
 /**
- * @author Fabrizio
+ * Request body for deleting a predefined shape upload group.
  */
-public class OpenSearchSourceStorage extends SourceStorage {
+public class PredefinedShapeDeleteRequest {
 
-    private Database dataBase;
+    private String email;
+    private String apiKey;
+    private String prefix;
 
-    /**
-     * 
-     */
-    public OpenSearchSourceStorage() {
-
-	configure(ConfigurationWrapper.getSourceStorageSettings());
+    public PredefinedShapeDeleteRequest() {
     }
 
-    @Override
-    public void setDatabase(Database dataBase) {
-
-	this.dataBase = dataBase;
+    public String getEmail() {
+	return email;
     }
 
-    @Override
-    public OpenSearchDatabase getDatabase() {
-
-	return (OpenSearchDatabase) dataBase;
+    public void setEmail(String email) {
+	this.email = email;
     }
 
-    @Override
-    public boolean supports(StorageInfo info) {
-
-	return OpenSearchDatabase.isSupported(info);
+    public String getApiKey() {
+	return apiKey;
     }
 
-    @Override
-    public String getType() {
+    public void setApiKey(String apiKey) {
+	this.apiKey = apiKey;
+    }
 
-	return "OpenSearchSourceStorage";
+    public String getPrefix() {
+	return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+	this.prefix = prefix;
     }
 }

@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import eu.essi_lab.api.database.*;
 import jakarta.xml.bind.JAXBException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,7 +25,6 @@ import org.xml.sax.SAXException;
 import eu.essi_lab.api.database.Database.IdentifierType;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.OpenSearchUtils;
@@ -55,7 +55,7 @@ public class OpenSearchDataFolder_GSResourceInternalTestIT extends OpenSearchTes
 	    OpenSearchDatabase database, //
 	    String sourceId) throws Exception {
 
-	String folderName = sourceId + SourceStorageWorker.DATA_1_POSTFIX;//
+	String folderName = sourceId + SourceStorage.DATA_1_POSTFIX;//
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

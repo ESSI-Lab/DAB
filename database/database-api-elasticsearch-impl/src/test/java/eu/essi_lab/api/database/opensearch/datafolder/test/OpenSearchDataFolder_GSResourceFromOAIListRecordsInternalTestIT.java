@@ -15,7 +15,7 @@ import org.w3c.dom.Node;
 
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
-import eu.essi_lab.api.database.SourceStorageWorker;
+import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.opensearch.OpenSearchDatabase;
 import eu.essi_lab.api.database.opensearch.OpenSearchFolder;
 import eu.essi_lab.api.database.opensearch.index.SourceWrapper;
@@ -40,7 +40,7 @@ public class OpenSearchDataFolder_GSResourceFromOAIListRecordsInternalTestIT ext
 
 OpenSearchDatabase database = createDataBase();
 
-	String folderName = "test" + SourceStorageWorker.DATA_1_POSTFIX;
+	String folderName = "test" + SourceStorage.DATA_1_POSTFIX;
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, folderName);
 

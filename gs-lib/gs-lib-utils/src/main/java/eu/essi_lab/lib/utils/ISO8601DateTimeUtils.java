@@ -319,26 +319,35 @@ public class ISO8601DateTimeUtils {
 	return parsed.toDate();
     }
 
+    /**
+     * Parses a date-time string to {@link Date}. Tries ISO8601 first (e.g.
+     * {@code 2015-02-02T01:05:05Z}, {@code 2015-02-02}); if that fails, tries HTTP RFC 1123
+     * (e.g. {@code Thu, 02 Jan 2003 00:00:00 GMT}).
+     *
+     * @param dateTimeString input string
+     * @return parsed instant in UTC, or empty if null/blank/unparseable
+     */
     public static Optional<Date> parseISO8601ToDate(String dateTimeString) {
 
-	if (dateTimeString == null) {
+	if (dateTimeString == null || dateTimeString.isBlank() || "null".equalsIgnoreCase(dateTimeString.trim())) {
 	    return Optional.empty();
 	}
+	String trimmed = dateTimeString.trim();
 	try {
 	    DateTimeFormatter parser = ISODateTimeFormat.dateTimeParser().withChronology(ISOChronology.getInstance(DateTimeZone.UTC));
-	    DateTime parsed = parser.parseDateTime(dateTimeString);
+	    DateTime parsed = parser.parseDateTime(trimmed);
 	    parsed = parsed.toDateTime(DateTimeZone.UTC);
-	    /**
-	     * before JodaTime we used JAXB parser.. but it proved insufficient
-	     * e.g. for treating time zones such as +0700 (it can parse only +07:00)
-	     * Calendar parsed = DatatypeConverter.parseDateTime(timeString.trim());
-	     */
 	    return Optional.of(parsed.toDate());
-	} catch (RuntimeException e) {
-	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable Date: {}", dateTimeString);
+	} catch (RuntimeException ignored) {
+	    // fall through: try RFC 1123
 	}
-
-	return Optional.empty();
+	try {
+	    ZonedDateTime zdt = ZonedDateTime.parse(trimmed, java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME);
+	    return Optional.of(Date.from(zdt.toInstant()));
+	} catch (java.time.format.DateTimeParseException e) {
+	    GSLoggerFactory.getLogger(ISO8601DateTimeUtils.class).warn("Unparsable date (not ISO8601 or RFC1123): {}", dateTimeString, e);
+	    return Optional.empty();
+	}
     }
 
     public static Duration getDuration(BigDecimal value, String timeUnits) {

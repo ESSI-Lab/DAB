@@ -33,7 +33,7 @@ OpenSearchDatabase database = createDataBase();
 
 	OpenSearchFolder folder = new OpenSearchFolder(database, OpenSearchDatabase.SHAPE_FILES_FOLDER);
 
-	boolean stored = folder.store("UOMIT20181025", FolderEntry.of(stream), EntryType.SHAPE_FILE);
+	boolean stored = folder.store("test_shapes", FolderEntry.of(stream), EntryType.SHAPE_FILE);
 
 	//
 	//

@@ -60,9 +60,9 @@ public abstract class DatabaseWriter implements DatabaseProvider, UsersWriter {
 
 	try {
 
-	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
+	    SourceStorage storage = database.getStorage(source.getUniqueIdentifier());
 
-	    DatabaseFolder folder = database.findWritingFolder(worker);
+	    DatabaseFolder folder = database.findWritingFolder(storage);
 
 	    Document asDocument = resource.asDocument(true);
 
@@ -117,13 +117,13 @@ public abstract class DatabaseWriter implements DatabaseProvider, UsersWriter {
 
 	try {
 
-	    SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
+	    SourceStorage storage = database.getStorage(source.getUniqueIdentifier());
 
 	    Document asDocument = resource.asDocument(true);
 
 	    String key = resource.getPrivateId();
 
-	    DatabaseFolder folder = database.findWritingFolder(worker);
+	    DatabaseFolder folder = database.findWritingFolder(storage);
 
 	    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 

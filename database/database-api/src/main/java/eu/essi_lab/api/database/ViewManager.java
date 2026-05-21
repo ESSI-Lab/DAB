@@ -110,8 +110,6 @@ public class ViewManager {
 
 	    view.ifPresent(v ->  resolvedViewCache.put(viewId, v));
 
-	    GSLoggerFactory.getLogger(getClass()).trace("Resolving view {} bonds ENDED", view.get().getId());
-
 	    return view;
 	}
     }

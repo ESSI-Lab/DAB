@@ -16,6 +16,11 @@
 			<artifactId>jaxb-classes-wms-1.3.0</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-shapefile-opensearch</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 	</dependencies>
 
 </project>

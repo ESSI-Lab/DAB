@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -53,6 +54,7 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.profiler.om.DataDownloaderTool;
 import eu.essi_lab.profiler.om.DownloadPartResult;
+import eu.essi_lab.profiler.om.MetadataDownloaderTool;
 import eu.essi_lab.profiler.om.OMHandler;
 
 /**
@@ -79,7 +81,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 
 	String fname = asynchDownloadName + ".zip";
 
-	DataDownloaderTool downloader = new DataDownloaderTool();
+	boolean metadataOnly = getSetting().getMetadataOnly();
 
 	S3TransferWrapper s3wrapper = null;
 
@@ -100,6 +102,17 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 		maxDownloadPartSizeMB = 1;
 	    }
 	}
+
+	String emailNotifications = getSetting().getEmailNotifications();
+
+	if (metadataOnly) {
+	    runMetadataDownload(s3wrapper, bucket, requestURL, operationId, asynchDownloadName, fname, publicURL, emailNotifications,
+		    status);
+	    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker ENDED (metadata), operation id {}", operationId);
+	    return;
+	}
+
+	DataDownloaderTool downloader = new DataDownloaderTool();
 
 	String resumptionToken = null;
 	BigDecimal totalDownloadedSoFarMB = BigDecimal.ZERO;
@@ -150,7 +163,6 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    }
 	}
 
-	String emailNotifications = getSetting().getEmailNotifications();
 	String email = null;
 	if (!resuming) {
 	    GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker STARTED, operation id {}", operationId);
@@ -278,6 +290,68 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker ENDED, operation id {}", operationId);
+    }
+
+    private void runMetadataDownload(S3TransferWrapper s3wrapper, String bucket, String requestURL, String operationId,
+	    String asynchDownloadName, String fname, String publicURL, String emailNotifications, SchedulerJobStatus status)
+	    throws Exception {
+
+	MetadataDownloaderTool downloader = new MetadataDownloaderTool();
+	String email = null;
+
+	GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker STARTED (metadata), operation id {}", operationId);
+	if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
+	    email = getSetting().getEmail();
+	    OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(),
+		    Optional.of(email));
+	}
+	OMDownloadReportsHandler.sendEmail(DownloadStatus.STARTED, setting, Optional.empty(), Optional.empty(), Optional.empty(),
+		Optional.empty());
+
+	DownloadPartResult result = downloader.download(s3wrapper, bucket, requestURL, operationId, asynchDownloadName, status);
+
+	if (result == null || result.getPartFile() == null) {
+	    if (ConfigurationWrapper.getDownloadSetting().getDownloadStorage() != DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+		JSONObject msg = new JSONObject();
+		msg.put("id", operationId);
+		msg.put("status", "Canceled");
+		msg.put("downloadName", asynchDownloadName);
+		msg.put("downloadKind", "metadata");
+		msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+		OMHandler.status(s3wrapper, bucket, operationId, msg);
+	    }
+	    return;
+	}
+
+	if (ConfigurationWrapper.getDownloadSetting().getDownloadStorage() != DownloadStorage.LOCAL_DOWNLOAD_STORAGE) {
+
+	    s3wrapper.uploadFile(result.getPartFile().getAbsolutePath(), bucket, "data-downloads/" + fname, "application/zip");
+
+	    String locator = publicURL + "/data-downloads/" + fname;
+	    JSONObject msg = new JSONObject();
+	    msg.put("id", operationId);
+	    msg.put("status", "Completed");
+	    msg.put("downloadName", asynchDownloadName);
+	    msg.put("downloadKind", "metadata");
+	    msg.put("locators", new JSONArray(Collections.singletonList(locator)));
+	    if (result.getSizeInMB() != null) {
+		msg.put("sizeInMB", result.getSizeInMB());
+	    }
+	    msg.put("timestamp", ISO8601DateTimeUtils.getISO8601DateTime());
+
+	    OMHandler.status(s3wrapper, bucket, operationId, msg);
+
+	    Optional<String> partDetails = Optional.of("Metadata catalog file in zip archive.\n");
+	    if (emailNotifications != null && emailNotifications.toLowerCase().equals("true")) {
+		email = getSetting().getEmail();
+		OMDownloadReportsHandler.sendEmail(DownloadStatus.ENDED, setting, Optional.of(locator), Optional.empty(), partDetails,
+			Optional.of(email));
+	    }
+	    OMDownloadReportsHandler.sendEmail(DownloadStatus.ENDED, setting, Optional.of(locator), Optional.empty(), partDetails,
+		    Optional.empty());
+	}
+
+	result.getPartFile().delete();
     }
 
     @Override

@@ -27,12 +27,20 @@ package eu.essi_lab.api.database.opensearch.index;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.geotools.api.data.FileDataStore;
+import org.geotools.api.feature.type.AttributeDescriptor;
 import org.geotools.api.data.FileDataStoreFinder;
 import org.geotools.api.data.SimpleFeatureSource;
 import org.geotools.api.feature.GeometryAttribute;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.api.feature.type.Name;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -78,6 +86,7 @@ class ShapeFileMapper {
 
 		Geometry geometry = (Geometry) feature.getDefaultGeometry();
 		geometry = GeometryFixer.fix(geometry);
+		geometry = toWgs84(geometry, featureSource);
 
 		ObjectMapper mapper = new ObjectMapper();
 
@@ -99,7 +108,7 @@ class ShapeFileMapper {
 		    coordinatesNode.add(polygonNode);
 		    geoJson.set("coordinates", coordinatesNode);
 
-		    JSONObject object = build(geoJson, feature);
+		    JSONObject object = build(geoJson, feature, featureSource);
 
 		    out.add(object);
 
@@ -127,7 +136,7 @@ class ShapeFileMapper {
 
 		    geoJson.set("coordinates", coordinatesNode);
 
-		    JSONObject object = build(geoJson, feature);
+		    JSONObject object = build(geoJson, feature, featureSource);
 
 		    out.add(object);
 		}
@@ -138,11 +147,28 @@ class ShapeFileMapper {
     }
 
     /**
+     * @param geometry
+     * @param featureSource
+     * @return geometry in WGS84
+     */
+    private static Geometry toWgs84(Geometry geometry, SimpleFeatureSource featureSource) throws Exception {
+
+	CoordinateReferenceSystem source = featureSource.getSchema().getCoordinateReferenceSystem();
+
+	if (source == null || org.geotools.referencing.CRS.equalsIgnoreMetadata(source, DefaultGeographicCRS.WGS84)) {
+	    return geometry;
+	}
+
+	MathTransform transform = org.geotools.referencing.CRS.findMathTransform(source, DefaultGeographicCRS.WGS84, true);
+	return JTS.transform(geometry, transform);
+    }
+
+    /**
      * @param geoJson
      * @param feature
      * @return
      */
-    private static JSONObject build(ObjectNode geoJson, SimpleFeature feature) {
+    private static JSONObject build(ObjectNode geoJson, SimpleFeature feature, SimpleFeatureSource featureSource) throws Exception {
 
 	String prettyString = geoJson.toPrettyString();
 
@@ -152,9 +178,63 @@ class ShapeFileMapper {
 
 	object.put(ShapeFileMapping.SHAPE, shape);
 	object.put(IndexData.ENTRY_NAME, feature.getID());
+	object.put(ShapeFileMapping.ENTRY_TITLE, extractPolygonTitle(feature));
+	object.put(ShapeFileMapping.SHAPE_CRS, "EPSG:4326");
 	// object.put(ShapeFileMapping.USER_ID, "???");
 
 	return object;
+    }
+
+    /**
+     * @param feature shape feature from GeoTools
+     * @return display name from non-geometry attributes, or the feature id
+     */
+    static String extractPolygonTitle(SimpleFeature feature) {
+
+	GeometryAttribute geomAttr = feature.getDefaultGeometryProperty();
+	Map<String, String> attributes = new LinkedHashMap<>();
+
+	for (AttributeDescriptor attr : feature.getFeatureType().getAttributeDescriptors()) {
+
+	    if (attr.getName().equals(geomAttr.getName())) {
+		continue;
+	    }
+
+	    Object value = feature.getAttribute(attr.getName());
+	    if (value != null) {
+		attributes.put(attr.getName().getLocalPart(), value.toString());
+	    }
+	}
+
+	for (String preferred : new String[] { "distretti", "euuomname", "name", "NAME", "Name", "label", "LABEL", "title",
+		"TITLE" }) {
+
+	    String candidate = attributes.get(preferred);
+	    if (candidate != null && !candidate.isBlank()) {
+		return candidate.trim();
+	    }
+	}
+
+	for (Map.Entry<String, String> entry : attributes.entrySet()) {
+
+	    String key = entry.getKey().toLowerCase(Locale.ROOT);
+	    if (key.contains("name") || key.contains("nome") || key.equals("label") || key.equals("title")) {
+
+		String candidate = entry.getValue();
+		if (candidate != null && !candidate.isBlank()) {
+		    return candidate.trim();
+		}
+	    }
+	}
+
+	for (String candidate : attributes.values()) {
+
+	    if (candidate != null && !candidate.isBlank()) {
+		return candidate.trim();
+	    }
+	}
+
+	return feature.getID();
     }
 
     /**

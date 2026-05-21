@@ -10,28 +10,26 @@ package eu.essi_lab.cfga.gs.setting;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import eu.essi_lab.cfga.*;
+import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.*;
-import org.json.JSONObject;
+import eu.essi_lab.cfga.setting.*;
+import eu.essi_lab.model.*;
+import org.json.*;
 
-import eu.essi_lab.cfga.EditableSetting;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.setting.Setting;
-import eu.essi_lab.model.GSSource;
+import java.util.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -114,7 +112,7 @@ public class GDCSourcesSetting extends Setting implements EditableSetting {
 
 	    descriptor = TabContentDescriptorBuilder.get(GDCSourcesSetting.class).//
 		    withLabel("GDC Sources").//
-		    withEditDirective("EDIT","Edit GEOSS Data Core settings").//
+		    withEditDirective("EDIT", "Edit GEOSS Data Core settings").//
 		    build();
 	}
 

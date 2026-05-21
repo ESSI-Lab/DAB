@@ -474,7 +474,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	// the message.getSources (see DiscoveryRequestTransformer)
 	//
 
-	// adds the bonds created from the the available OS params
+	// adds the bonds created from the available OS params
 	List<OSParameter> parameters = WebRequestParameter.findParameters(OSParameters.class);
 
 	String rosetta = parser.parse(OSParameters.ROSETTA);
@@ -556,10 +556,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 			OS_PARAM_PARSING_ERROR, ex);
 	    }
 
-	    if (bond.isPresent()) {
-
-		bondList.add(bond.get());
-	    }
+	    bond.ifPresent(bondList::add);
 	}
 
 	return BondFactory.aggregate(bondList, LogicalOperator.AND).orElse(null);

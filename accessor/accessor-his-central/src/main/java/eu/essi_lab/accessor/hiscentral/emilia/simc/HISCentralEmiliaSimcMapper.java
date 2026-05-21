@@ -21,6 +21,8 @@ package eu.essi_lab.accessor.hiscentral.emilia.simc;
  * #L%
  */
 
+import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -35,6 +37,7 @@ import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -194,11 +197,15 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
 	    dataset.getExtensionHandler().setCountry("ITA");
 
 	    TemporalExtent temporalExtent = new TemporalExtent();
-	    if (reftimeStart != null && !reftimeStart.isEmpty()) {
-		temporalExtent.setBeginPosition(reftimeStart);
-	    }
+	    ISO8601DateTimeUtils.parseISO8601ToDate(reftimeStart).ifPresent(
+		    d -> temporalExtent.setBeginPosition(ISO8601DateTimeUtils.getISO8601DateTime(d)));
 	    if (reftimeEnd != null && !reftimeEnd.isEmpty() && !"null".equalsIgnoreCase(reftimeEnd)) {
-		temporalExtent.setEndPosition(reftimeEnd);
+		Optional<Date> end = ISO8601DateTimeUtils.parseISO8601ToDate(reftimeEnd);
+		if (end.isPresent()) {
+		    temporalExtent.setEndPosition(ISO8601DateTimeUtils.getISO8601DateTime(end.get()));
+		} else {
+		    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+		}
 	    } else {
 		temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
 	    }

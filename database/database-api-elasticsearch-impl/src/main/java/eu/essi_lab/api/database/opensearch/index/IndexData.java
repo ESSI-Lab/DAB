@@ -5,7 +5,7 @@ package eu.essi_lab.api.database.opensearch.index;
 
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.DatabaseFolder.*;
-import eu.essi_lab.api.database.SourceStorageWorker.*;
+import eu.essi_lab.api.database.SourceStorage.*;
 import eu.essi_lab.api.database.opensearch.*;
 import eu.essi_lab.api.database.opensearch.index.mappings.*;
 import eu.essi_lab.iso.datamodel.classes.*;
@@ -189,9 +189,9 @@ public class IndexData {
 
 	indexData.entryId = OpenSearchFolder.getEntryId(folder, privateId);
 
-	String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-		? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
-		: SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
+	String dataFolder = folder.getName().endsWith(SourceStorage.DATA_1_SHORT_POSTFIX) //
+		? SourceStorage.DATA_1_SHORT_POSTFIX //
+		: SourceStorage.DATA_2_SHORT_POSTFIX; //
 
 	indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
 	indexData.put(IndexMapping.toKeywordField(MetaFolderMapping.DATA_FOLDER), dataFolder);
@@ -389,9 +389,9 @@ public class IndexData {
 
 	case WRITING_FOLDER_TAG:
 
-	    String dataFolder = folder.getName().endsWith(SourceStorageWorker.DATA_1_SHORT_POSTFIX) //
-		    ? SourceStorageWorker.DATA_1_SHORT_POSTFIX //
-		    : SourceStorageWorker.DATA_2_SHORT_POSTFIX; //
+	    String dataFolder = folder.getName().endsWith(SourceStorage.DATA_1_SHORT_POSTFIX) //
+		    ? SourceStorage.DATA_1_SHORT_POSTFIX //
+		    : SourceStorage.DATA_2_SHORT_POSTFIX; //
 
 	    indexData.put(MetaFolderMapping.DATA_FOLDER, dataFolder);
 
@@ -492,6 +492,14 @@ public class IndexData {
      */
     public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry) throws Exception {
 
+	return ofShapeFile(folder, key, entry, null);
+    }
+
+    /**
+     * @param owner uploader id stored on each polygon document; may be {@code null}
+     */
+    public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry, String owner) throws Exception {
+
 	ClonableInputStream inputStream = new ClonableInputStream(entry.getStream().get());
 
 	Unzipper unzipper = new Unzipper(inputStream.clone());
@@ -531,6 +539,8 @@ public class IndexData {
 	    indexData.put(FOLDER_NAME, folder.getName());
 	    indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
 
+	    indexData.put(ShapeFileMapping.SHAPE_UPLOAD_PREFIX, key);
+
 	    indexData.put(DATA_TYPE, entry.getDataType());
 
 	    indexData.entryId = OpenSearchFolder.getEntryId(folder, entryName);
@@ -545,6 +555,20 @@ public class IndexData {
 
 	    indexData.put(ShapeFileMapping.SHAPE, shape);
 
+	    String entryTitle = object.optString(ShapeFileMapping.ENTRY_TITLE, "");
+	    if (!entryTitle.isBlank()) {
+		indexData.put(ShapeFileMapping.ENTRY_TITLE, entryTitle);
+	    }
+
+	    if (owner != null && !owner.isBlank()) {
+		indexData.put(ShapeFileMapping.OWNER, owner);
+	    }
+
+	    String shapeCrs = object.optString(ShapeFileMapping.SHAPE_CRS, "");
+	    if (!shapeCrs.isBlank()) {
+		indexData.put(ShapeFileMapping.SHAPE_CRS, shapeCrs);
+	    }
+
 	    out.add(indexData);
 	}
 
@@ -552,6 +576,33 @@ public class IndexData {
 	Arrays.asList(unzipper.getOutputFolder().listFiles()).forEach(File::delete);
 
 	return out;
+    }
+
+    /**
+     * @param folder
+     * @param registryJson JSON document with predefined shape upload metadata
+     * @return index data for the upload registry entry
+     */
+    public static IndexData ofUploadRegistry(OpenSearchFolder folder, String registryJson) throws Exception {
+
+	IndexData indexData = new IndexData();
+
+	indexData.mapping = ShapeFileMapping.get();
+	indexData.index = indexData.mapping.getIndex();
+	indexData.mapping.setEntryType(EntryType.SHAPE_FILE);
+
+	indexData.put(ENTRY_NAME, ShapeFileMapping.UPLOAD_REGISTRY_ENTRY_NAME);
+	indexData.put(DATABASE_ID, folder.getDatabase().getIdentifier());
+	indexData.put(FOLDER_NAME, folder.getName());
+	indexData.put(FOLDER_ID, OpenSearchFolder.getFolderId(folder));
+	indexData.put(DATA_TYPE, DataType.BINARY.getType());
+	indexData.entryId = OpenSearchFolder.getEntryId(folder, ShapeFileMapping.UPLOAD_REGISTRY_ENTRY_NAME);
+
+	indexData.put(BINARY_PROPERTY, ShapeFileMapping.SHAPE_FILE);
+	indexData.put(ShapeFileMapping.SHAPE_FILE, Base64.getEncoder().encodeToString("{}".getBytes(StandardCharsets.UTF_8)));
+	indexData.put(ShapeFileMapping.UPLOAD_REGISTRY, registryJson);
+
+	return indexData;
     }
 
     /**
@@ -566,10 +617,10 @@ public class IndexData {
 	    return FolderRegistryMapping.get().getIndex();
 	}
 
-	if (name.contains(SourceStorageWorker.META_POSTFIX)) {
+	if (name.contains(SourceStorage.META_POSTFIX)) {
 
 	    return MetaFolderMapping.get().getIndex();
-	} else if (name.contains(SourceStorageWorker.DATA_1_POSTFIX) || name.contains(SourceStorageWorker.DATA_2_POSTFIX)) {
+	} else if (name.contains(SourceStorage.DATA_1_POSTFIX) || name.contains(SourceStorage.DATA_2_POSTFIX)) {
 
 	    return DataFolderMapping.get().getIndex();
 	} else if (name.contains(Database.USERS_FOLDER)) {
