@@ -333,7 +333,7 @@ public class DataHubService extends AbstractManagedService {
 	    }
 	});
 
-	Semaphore inFlight = new Semaphore(maxPendingProcesses); // backpressure
+//	Semaphore inFlight = new Semaphore(maxPendingProcesses); // backpressure
 
 	while (running) {
 
@@ -341,16 +341,16 @@ public class DataHubService extends AbstractManagedService {
 
 	    for (ConsumerRecord<byte[], byte[]> record : records) {
 
-		try {
-
-		    inFlight.acquire();
-
-		} catch (InterruptedException e) {
-		    Thread.currentThread().interrupt();
-		    error("Loop thread interrupted: " + e.getMessage(), e);
-
-		    return;
-		}
+//		try {
+//
+//		    inFlight.acquire();
+//
+//		} catch (InterruptedException e) {
+//		    Thread.currentThread().interrupt();
+//		    error("Loop thread interrupted: " + e.getMessage(), e);
+//
+//		    return;
+//		}
 
 		executor.submit(() -> {
 
@@ -383,9 +383,9 @@ public class DataHubService extends AbstractManagedService {
 
 			tracker.markProcessed(record);
 
-			inFlight.release();
-
 			GSLoggerFactory.getLogger(getClass()).trace("Finalization ENDED");
+
+//			inFlight.release();
 		    }
 		});
 	    }
