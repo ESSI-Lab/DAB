@@ -182,10 +182,18 @@ public class COGS3SyncProcessor {
 
     private void runGdalWarpToCOG(Path input, Path output) throws Exception {
 
-	ProcessBuilder pb = new ProcessBuilder("gdalwarp", "-t_srs", "EPSG:3857", "-r", "bilinear", "-of", "COG", "-co", "COMPRESS=DEFLATE",
-		"-co", "BLOCKSIZE=512", "-co", "OVERVIEWS=IGNORE_EXISTING", input.toAbsolutePath().toString(),
-		output.toAbsolutePath().toString());
-
+	ProcessBuilder pb = new ProcessBuilder(
+		"gdalwarp",
+		"-s_srs", "EPSG:4326",
+		"-t_srs", "EPSG:3857",
+		"-r", "bilinear",
+		"-of", "COG",
+		"-co", "COMPRESS=DEFLATE",
+		"-co", "BLOCKSIZE=512",
+		"-co", "OVERVIEWS=IGNORE_EXISTING",
+		input.toAbsolutePath().toString(),
+		output.toAbsolutePath().toString()
+	);
 
 	GSLoggerFactory.getLogger(getClass())
 		.info("Running GDAL: " + String.join(" ", pb.command()));
@@ -194,10 +202,12 @@ public class COGS3SyncProcessor {
 	Process p = pb.start();
 
 	try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-
 	    String line;
 	    while ((line = reader.readLine()) != null) {
-		GSLoggerFactory.getLogger(getClass()).info("[GDAL] " + line);
+
+		if (line.toLowerCase().contains("error") || line.toLowerCase().contains("warning")) {
+		    GSLoggerFactory.getLogger(getClass()).warn("[GDAL] " + line);
+		}
 	    }
 	}
 
@@ -206,6 +216,7 @@ public class COGS3SyncProcessor {
 	if (exit != 0) {
 	    throw new RuntimeException("GDAL warp failed with code " + exit);
 	}
+
 
 	if (!Files.exists(output) || Files.size(output) == 0) {
 	    throw new IOException("COG not created: " + output);
