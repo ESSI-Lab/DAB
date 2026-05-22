@@ -5,34 +5,6 @@ import OSM from 'ol/source/OSM.js';
 import WebGLTileLayer from 'ol/layer/WebGLTile.js';
 import GeoTIFF from 'ol/source/GeoTIFF.js';
 
-/* =========================================================
-   1) GLOBAL TIMELINE
-   ---------------------------------------------------------
-   Here define the tempral extent of the slide.
-   In this case start from 2026-05-13T18:00:00Z
-   ========================================================= */
-
-function generateTimeline(startIso, endIso, stepHours = 1) {
-  const out = [];
-  const start = new Date(startIso);
-  const end = new Date(endIso);
-
-  for (
-    let d = new Date(start.getTime());
-    d <= end;
-    d = new Date(d.getTime() + stepHours * 3600 * 1000)
-  ) {
-    out.push(d.toISOString());
-  }
-
-  return out;
-}
-
-const timeline = generateTimeline(
-  '2026-05-13T06:00:00Z',
-  '2026-05-23T00:00:00Z',
-  1
-);
 
 /* =========================================================
    2) VARIABLE/LAYER and Legends configuration
@@ -198,16 +170,6 @@ const variables = {
   shiwe: {
     folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/shiwe/',
     filePrefix: 'shiwe',
-    availableHours: [0, 6, 12, 18],
-    minDate: '2026-05-13T06:00:00Z',
-    maxDate: '2026-05-16T18:00:00Z',
-    availability: [
-        {
-          untilDays: 4,
-          stepHours: 6
-        }
-      ],
-
     visible: true,
     style: shiweStyle
   },
@@ -215,23 +177,6 @@ const variables = {
   '2t': {
     folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2t/',
     filePrefix: '2t', //
-    minDate: '2026-05-13T01:00:00Z',
-    maxDate: '2026-05-23T00:00:00Z',
-    availability: [
-        {
-          untilDays: 4,
-          stepHours: 1
-        },
-        {
-          untilDays: 6,
-          stepHours: 3
-        },
-        {
-          untilDays: 10,
-          stepHours: 6
-        }
-      ],
-
     visible: false,
     style: temperatureStyle
   },
@@ -239,23 +184,6 @@ const variables = {
     utci: {
       folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/utci/',
       filePrefix: 'utci', //
-      minDate: '2026-05-13T01:00:00Z',
-      maxDate: '2026-05-23T00:00:00Z',
-      availability: [
-          {
-            untilDays: 4,
-            stepHours: 1
-          },
-          {
-            untilDays: 6,
-            stepHours: 3
-          },
-          {
-            untilDays: 10,
-            stepHours: 6
-          }
-        ],
-
       visible: false,
       style: utciStyle
     },
@@ -263,23 +191,6 @@ const variables = {
     '2r': {
           folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2r/',
           filePrefix: '2r', //
-          minDate: '2026-05-13T01:00:00Z',
-          maxDate: '2026-05-23T00:00:00Z',
-          availability: [
-              {
-                untilDays: 4,
-                stepHours: 1
-              },
-              {
-                untilDays: 6,
-                stepHours: 3
-              },
-              {
-                untilDays: 10,
-                stepHours: 6
-              }
-            ],
-
           visible: false,
           style: humidityStyle
         }
@@ -309,14 +220,29 @@ function updateLegend(layerName) {
   `;
 }
 
-
-
-const timelineMaster = buildMasterTimeline(variables);
 let currentIndex = 0;
 
-const modelStart = new Date(
-  Math.min(...Object.values(variables).map(v => new Date(v.minDate)))
-);
+const loadedData = {}; // Store info from index.json
+let timelineMaster = [];
+
+async function initData() {
+  const promises = Object.entries(variables).map(async ([name, cfg]) => {
+    try {
+      const response = await fetch(`${cfg.folderUrl}index.json`);
+      const data = await response.json();
+      loadedData[name] = data;
+    } catch (e) {
+      console.error(`error loading index.json for ${name}:`, e);
+      loadedData[name] = { files: [] };
+    }
+  });
+
+  await Promise.all(promises);
+  buildMasterTimeline();
+  initSlider();
+  updateFromIndex(0);
+}
+
 
 
 /* =========================================================
@@ -328,7 +254,9 @@ function hoursBetween(a, b) {
   return Math.round((b - a) / 36e5);
 }
 
-function formatUtcLabel(date) {
+function formatUtcLabel(dateInput) {
+
+const date = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
   const yyyy = date.getUTCFullYear();
   const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
   const dd = String(date.getUTCDate()).padStart(2, '0');
@@ -337,41 +265,14 @@ function formatUtcLabel(date) {
 }
 
 
-function buildVariableTimeline(cfg) {
-  const out = [];
-  const start = new Date(cfg.minDate);
-  const end = new Date(cfg.maxDate);
-
-  let current = new Date(start);
-
-  for (const rule of cfg.availability) {
-    const ruleEnd = new Date(
-      start.getTime() + rule.untilDays * 24 * 3600e3
-    );
-    const effectiveEnd = ruleEnd < end ? ruleEnd : end;
-
-    while (current <= effectiveEnd) {
-      out.push(new Date(current));
-      current = new Date(
-        current.getTime() + rule.stepHours * 3600e3
-      );
-    }
-  }
-
-  return out;
-}
 
 
-function buildMasterTimeline(variables) {
-  const map = new Map();
-
-  for (const cfg of Object.values(variables)) {
-    for (const d of buildVariableTimeline(cfg)) {
-      map.set(d.toISOString(), d);
-    }
-  }
-
-  return Array.from(map.values()).sort((a, b) => a - b);
+function buildMasterTimeline() {
+  const timeSet = new Set();
+  Object.values(loadedData).forEach(varData => {
+    varData.files.forEach(f => timeSet.add(f.time));
+  });
+  timelineMaster = Array.from(timeSet).sort();
 }
 
 
@@ -389,14 +290,7 @@ function pad2(n) {
   return String(n).padStart(2, '0');
 }
 
-function buildFilename(filePrefix, date) {
-  const yyyy = date.getUTCFullYear();
-  const mm = pad2(date.getUTCMonth() + 1);
-  const dd = pad2(date.getUTCDate());
-  const hh = pad2(date.getUTCHours());
 
-  return `${filePrefix}_${yyyy}${mm}${dd}${hh}.tif`;
-}
 
 /* =========================================================
    4) SAFE TEMPORAL CANDIDATE GENERATION
@@ -407,55 +301,6 @@ function buildFilename(filePrefix, date) {
    - then, if necessary, the previous / next day
    - always respecting minDate and maxDate
    ========================================================= */
-
-
-function getStepHours(cfg, requestedDate) {
-  const t0 = new Date(cfg.minDate).getTime();
-  const dtHours = (requestedDate.getTime() - t0) / 36e5;
-
-  for (const rule of cfg.availability) {
-    if (dtHours <= rule.untilDays * 24) {
-      return rule.stepHours;
-    }
-  }
-
-  return null; // outside range
-}
-
-
-
-function buildCandidateDates(targetDate, cfg, searchDays = 2) {
-  const minDate = new Date(cfg.minDate);
-  const maxDate = new Date(cfg.maxDate);
-
-  const stepHours = getStepHours(cfg, targetDate);
-  if (!stepHours) return [];
-
-  const candidates = [];
-
-  for (let dayOffset = -searchDays; dayOffset <= searchDays; dayOffset++) {
-    const base = new Date(Date.UTC(
-      targetDate.getUTCFullYear(),
-      targetDate.getUTCMonth(),
-      targetDate.getUTCDate() + dayOffset,
-      0, 0, 0
-    ));
-
-    for (let h = 0; h < 24; h += stepHours) {
-      const d = new Date(base.getTime() + h * 3600e3);
-      if (d < minDate || d > maxDate) continue;
-      candidates.push(d);
-    }
-  }
-
-  candidates.sort(
-    (a, b) =>
-      Math.abs(a - targetDate) - Math.abs(b - targetDate)
-  );
-
-  return candidates;
-}
-
 
 
 
@@ -490,34 +335,7 @@ const urlExists = (() => {
 })();
 
 
-/* =========================================================
-   6) BEST URL RESOLUTION
-   ---------------------------------------------------------
-   Given a layer and a requested date:
-   - generates nearby candidates
-   - tries them in order
-   - returns the first URL that actually exists
-   ========================================================= */
 
-async function resolveBestUrl(cfg, requestedDate) {
-  const candidates = buildCandidateDates(requestedDate, cfg, 2);
-
-  for (const d of candidates) {
-    const file = buildFilename(cfg.filePrefix, d);
-    const url = cfg.folderUrl + file;
-
-    const exists = await urlExists(url);
-    if (exists) {
-      return {
-        url,
-        resolvedDate: d,
-        file
-      };
-    }
-  }
-
-  return null;
-}
 
 /* =========================================================
    7) LAYER
@@ -546,7 +364,7 @@ const map = new OLMap({
   layers: [baseMap, ...Object.values(layers)],
   view: new View({
     projection: 'EPSG:3857',
-    center: [1113194, 7628367], // Europa circa, puoi modificare
+    center: [1113194, 7628367],
     zoom: 4
   })
 });
@@ -575,53 +393,43 @@ const timeLayers = document.getElementById('timeLayers');
 
 let updateRequestId = 0;
 
-async function updateTimeFromDate(requestedDate) {
-  const requestId = ++updateRequestId;
+async function updateTimeFromDate(isoDateString) {
+  timeMain.textContent = isoDateString.replace('T', ' · ').replace('.000Z', ' UTC');
 
-
-  const lead = hoursBetween(modelStart, requestedDate);
-  const yyyy = requestedDate.getUTCFullYear();
-  const mm = String(requestedDate.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(requestedDate.getUTCDate()).padStart(2, '0');
-  const hh = String(requestedDate.getUTCHours()).padStart(2, '0');
-
-  timeMain.textContent =
-    `${yyyy}-${mm}-${dd} · ${hh}:00 UTC   (T+${lead}h)`;
-
+  // Update global
+  currentIndex = timelineMaster.indexOf(isoDateString);
 
   const promises = Object.entries(layers).map(async ([name, layer]) => {
-    const cfg = variables[name];
-    const result = await resolveBestUrl(cfg, requestedDate);
-    return { name, layer, result };
+    const data = loadedData[name];
+    if (!data || !data.files.length) return { name, layer, url: null };
+
+    const target = new Date(isoDateString).getTime();
+    // Find best file
+    const bestFile = data.files.reduce((prev, curr) => {
+      return Math.abs(new Date(curr.time) - target) < Math.abs(new Date(prev.time) - target)
+             ? curr : prev;
+    });
+
+    return { name, layer, url: bestFile.url };
   });
 
   const results = await Promise.all(promises);
-  if (requestId !== updateRequestId) return;
 
-  const parts = [];
-
-  for (const { name, layer, result } of results) {
-    if (!result) {
+  results.forEach(({ name, layer, url }) => {
+    if (url) {
+      layer.setSource(createSource(url));
+      // user layer visibility
+      layer.setVisible(variables[name].visible);
+    } else {
       layer.setVisible(false);
-      parts.push(`${name.toUpperCase()} ✕`);
-      continue;
     }
+  });
+}
 
-    layer.setSource(createSource(result.url));
-
-    const layerLead = hoursBetween(modelStart, result.resolvedDate);
-    const snap = Math.abs(
-      hoursBetween(requestedDate, result.resolvedDate)
-    );
-
-    parts.push(
-      snap > 0
-        ? `${name.toUpperCase()} ✓ T+${layerLead}h (±${snap}h)`
-        : `${name.toUpperCase()} ✓ T+${layerLead}h`
-    );
-  }
-
-  timeLayers.textContent = parts.join('   ');
+function initSlider() {
+  slider.min = 0;
+  slider.max = timelineMaster.length - 1;
+  slider.value = 0;
 }
 
 
@@ -649,8 +457,10 @@ document.getElementById('nextStep')
    11) INIT + LISTENERS
    ========================================================= */
 
-updateFromIndex(0);
-updateLegend('shiwe');
+
+initData();
+
+
 
 // show legend for the first visible layer
 for (const [name, layer] of Object.entries(layers)) {
@@ -664,29 +474,32 @@ for (const [name, layer] of Object.entries(layers)) {
 window.layers = layers;
 
 
-document.getElementById('chkShiwe')
-  .addEventListener('change', e => {
-    layers.shiwe.setVisible(e.target.checked);
-    if (e.target.checked) updateLegend('shiwe');
-  });
 
-document.getElementById('chkTemp')
-  .addEventListener('change', e => {
-    layers['2t'].setVisible(e.target.checked);
-     if (e.target.checked) updateLegend('2t');
-  });
 
-document.getElementById('chkUtci')
-  .addEventListener('change', e => {
-    layers['utci'].setVisible(e.target.checked);
-     if (e.target.checked) updateLegend('utci');
-  });
+document.getElementById('chkShiwe').addEventListener('change', e => {
+   variables.shiwe.visible = e.target.checked;
+   layers.shiwe.setVisible(e.target.checked);
+   if (e.target.checked) updateLegend('shiwe');
+});
 
-document.getElementById('chkHumidity')
-  .addEventListener('change', e => {
-    layers['2r'].setVisible(e.target.checked);
-     if (e.target.checked) updateLegend('2r');
-  });
+document.getElementById('chkTemp').addEventListener('change', e => {
+   variables['2t'].visible = e.target.checked;
+   layers['2t'].setVisible(e.target.checked);
+   if (e.target.checked) updateLegend('2t');
+});
+
+document.getElementById('chkUtci').addEventListener('change', e => {
+   variables['utci'].visible = e.target.checked;
+   layers['utci'].setVisible(e.target.checked);
+   if (e.target.checked) updateLegend('utci');
+});
+
+document.getElementById('chkHumidity').addEventListener('change', e => {
+   variables['2r'].visible = e.target.checked;
+   layers['2r'].setVisible(e.target.checked);
+   if (e.target.checked) updateLegend('2r');
+});
+
 
 slider.style.accentColor = '#666';
 
