@@ -83,11 +83,7 @@ public class WMSCacheFilter implements Filter {
 	//
 	//
 
-	if ( // requestPath.endsWith("/wms") || //
-	    // requestPath.endsWith("/wms-extent") || //
-		requestPath.endsWith("/wms-cluster") && query != null && query.toLowerCase().contains("getmap") //
-
-	) {
+	if (isCacheableWmsGetMap(requestPath, query)) {
 
 	    URL url = new URL(requestURL.toString());
 	    String hostname = url.getHost();
@@ -185,6 +181,20 @@ public class WMSCacheFilter implements Filter {
     private String getRequestLogPrefix(WebRequest request) {
 
 	return "[WMS cache] REQ# " + request.getRequestId();
+    }
+
+    /**
+     * @param requestPath servlet path (e.g. {@code .../view/his-central-shapes/wms})
+     * @param query query string
+     * @return whether this GetMap request can use the tile cache
+     */
+    static boolean isCacheableWmsGetMap(String requestPath, String query) {
+
+	if (query == null || !query.toLowerCase().contains("getmap")) {
+	    return false;
+	}
+
+	return requestPath.endsWith("/wms-cluster") || requestPath.endsWith("/wms");
     }
 
     /**
