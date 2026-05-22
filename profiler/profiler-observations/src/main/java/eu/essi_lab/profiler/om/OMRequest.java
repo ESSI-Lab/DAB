@@ -64,7 +64,7 @@ public class OMRequest {
 		TIME_INTERPOLATION("timeInterpolation"), //
 		VARIABLE("variable", "varCode", "variableCode"), //
 		SPATIAL_RELATION("spatialRelation"), //
-		PREDEFINED_LAYER("predefinedLayer"), //
+		PREDEFINED_LAYER("predefinedSearchArea", "predefinedLayer"), //
 		OBSERVATION("observationIdentifier", "observationId", "observation"), //
 		OUTPUT_PROPERTIES("outputProperties"), //
 		E_MAIL_NOTIFICATIONS("eMailNotifications"), //

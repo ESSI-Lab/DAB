@@ -79,7 +79,7 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	PROVIDER(new String[] { "provider" }, ResourceProperty.SOURCE_ID), //
 	FORMAT(new String[] { "format" }, null), //
 	ONTOLOGY(new String[] { "ontology" }, null), //
-	PREDEFINED_LAYER(new String[] { "predefinedLayer" }, null), //
+	PREDEFINED_LAYER(new String[] { "predefinedSearchArea", "predefinedLayer" }, null), //
 	;
 
 	String[] names;
@@ -184,8 +184,8 @@ public class PropertiesHandler extends StreamingRequestHandler {
 		}
 		case PREDEFINED_LAYER: {
 		    String token = PredefinedShapeLayerLister.tokenFromRequest(webRequest.extractTokenId());
-		    List<LayerItem> layers = PredefinedShapeLayerLister.list(token, max);
-		    JSONObject predefined = encodePredefinedLayers(layers);
+		    PredefinedShapeLayerLister.PagedLayerItems layers = PredefinedShapeLayerLister.listPaged(token, max, resumption);
+		    JSONObject predefined = encodePredefinedLayers(layers, dp);
 		    writer.write(predefined.toString());
 		    writer.flush();
 		    writer.close();
@@ -229,14 +229,17 @@ public class PropertiesHandler extends StreamingRequestHandler {
 	};
     }
 
-    private JSONObject encodePredefinedLayers(List<LayerItem> layers) {
+    private JSONObject encodePredefinedLayers(PredefinedShapeLayerLister.PagedLayerItems layers, DatasetProperty dp) {
 
 	JSONObject ret = new JSONObject();
-	ret.put("completed", true);
+	ret.put("completed", layers.completed());
+	if (!layers.completed() && layers.resumptionToken() != null) {
+	    ret.put("resumptionToken", layers.resumptionToken());
+	}
 	JSONArray array = new JSONArray();
-	ret.put("predefinedLayer", array);
+	ret.put(dp.getNames()[0], array);
 
-	for (LayerItem layer : layers) {
+	for (LayerItem layer : layers.items()) {
 	    JSONObject obj = new JSONObject();
 	    obj.put("value", layer.value());
 	    obj.put("label", layer.label());

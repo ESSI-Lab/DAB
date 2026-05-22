@@ -39,7 +39,7 @@
 					{
 						"name": "property",
 						"in": "query",
-						"description": "Property string. To view the available properties, do not include'",
+						"description": "Property to list (e.g. country, feature, format, predefinedSearchArea). Omit to receive available property names. predefinedLayer is a deprecated alias for predefinedSearchArea.",
 						"schema": {
 							"type": "string"
 						}
@@ -136,8 +136,18 @@
 						}
 					},
 					{
+						"name": "predefinedSearchArea",
+						"in": "query",
+						"description": "Identifier of a predefined spatial extent layer (alternative to west/south/east/north bounding box)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "predefinedLayer",
 						"in": "query",
+						"deprecated": true,
+						"description": "Deprecated alias for predefinedSearchArea",
 						"schema": {
 							"type": "string"
 						}
@@ -330,8 +340,18 @@
 						}
 					},
 					{
+						"name": "predefinedSearchArea",
+						"in": "query",
+						"description": "Identifier of a predefined spatial extent layer (alternative to west/south/east/north bounding box)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
 						"name": "predefinedLayer",
 						"in": "query",
+						"deprecated": true,
+						"description": "Deprecated alias for predefinedSearchArea",
 						"schema": {
 							"type": "string"
 						}
@@ -522,6 +542,30 @@
 						"in": "query",
 						"schema": {
 							"type": "number"
+						}
+					},
+					{
+						"name": "spatialRelation",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "predefinedSearchArea",
+						"in": "query",
+						"description": "Identifier of a predefined spatial extent layer (alternative to west/south/east/north bounding box)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "predefinedLayer",
+						"in": "query",
+						"deprecated": true,
+						"description": "Deprecated alias for predefinedSearchArea",
+						"schema": {
+							"type": "string"
 						}
 					},
 					{
@@ -734,6 +778,30 @@
 						"in": "query",
 						"schema": {
 							"type": "number"
+						}
+					},
+					{
+						"name": "spatialRelation",
+						"in": "query",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "predefinedSearchArea",
+						"in": "query",
+						"description": "Identifier of a predefined spatial extent layer (alternative to west/south/east/north bounding box)",
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "predefinedLayer",
+						"in": "query",
+						"deprecated": true,
+						"description": "Deprecated alias for predefinedSearchArea",
+						"schema": {
+							"type": "string"
 						}
 					},
 					{
