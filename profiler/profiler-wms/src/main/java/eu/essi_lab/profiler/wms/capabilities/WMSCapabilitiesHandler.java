@@ -277,8 +277,9 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			rootLayer.getCRS().add(CRS.EPSG_4326().getIdentifier());
 			
 			Optional<String> tokenId = webRequest.extractTokenId();
-			String viewerOwner = ShapeWmsLayerFilter.resolveViewerOwner(tokenId.orElse(ShapeLayerOwner.PUBLIC_TOKEN))
-				.orElse("");
+			String token = tokenId.orElse(ShapeLayerOwner.PUBLIC_TOKEN);
+			String viewerOwner = ShapeWmsLayerFilter.resolveViewerOwner(token).orElse("");
+			boolean viewerIsAdmin = ShapeWmsLayerFilter.isViewerAdmin(token);
 
 			List<GSResource> resources = response.getResultsList().stream().
 			sorted((r1,r2) -> r1.getHarmonizedMetadata().getCoreMetadata().getTitle().compareTo(r2.getHarmonizedMetadata().getCoreMetadata().getTitle())).
@@ -287,7 +288,7 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			for (GSResource resource : resources) {
 
 			    Optional<String> shapeOwner = ShapeLayerOwner.readFromResource(resource);
-			    if (shapeOwner.isPresent() && !ShapeLayerOwner.isVisible(shapeOwner.get(), viewerOwner)) {
+			    if (shapeOwner.isPresent() && !ShapeLayerOwner.isVisible(shapeOwner.get(), viewerOwner, viewerIsAdmin)) {
 				continue;
 			    }
 				ReportsMetadataHandler handler = new ReportsMetadataHandler(resource);

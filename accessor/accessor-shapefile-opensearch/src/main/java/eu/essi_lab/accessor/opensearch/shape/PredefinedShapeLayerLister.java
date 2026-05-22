@@ -41,10 +41,20 @@ public final class PredefinedShapeLayerLister {
     /**
      * One selectable predefined area.
      *
-     * @param value {@code predefinedLayer} parameter value (harvested online id)
+     * @param value {@code predefinedSearchArea} (or {@code predefinedLayer}) parameter value (harvested online id)
      * @param label human-readable title
      */
     public record LayerItem(String value, String label) {
+    }
+
+    /**
+     * One page of predefined layers for the properties API.
+     *
+     * @param items layers in this page
+     * @param completed {@code true} when there is no next page
+     * @param resumptionToken offset for the next request, or {@code null} when {@code completed}
+     */
+    public record PagedLayerItems(List<LayerItem> items, boolean completed, String resumptionToken) {
     }
 
     private PredefinedShapeLayerLister() {
@@ -56,6 +66,46 @@ public final class PredefinedShapeLayerLister {
      * @return visible predefined layers sorted by label
      */
     public static List<LayerItem> list(String tokenSegment, int limit) {
+
+	return listPaged(tokenSegment, limit, null).items();
+    }
+
+    /**
+     * @param tokenSegment token from {@code /token/{token}/view/...}
+     * @param limit maximum number of items per page (ignored when {@code <= 0}, returns remainder)
+     * @param resumptionToken zero-based offset from a previous response, or {@code null} for the first page
+     * @return one page of visible predefined layers sorted by label
+     */
+    public static PagedLayerItems listPaged(String tokenSegment, int limit, String resumptionToken) {
+
+	List<LayerItem> all = loadAll(tokenSegment);
+	int offset = parseOffset(resumptionToken);
+	if (offset > all.size()) {
+	    offset = all.size();
+	}
+
+	int end = limit > 0 ? Math.min(offset + limit, all.size()) : all.size();
+	List<LayerItem> page = all.subList(offset, end);
+	boolean completed = end >= all.size();
+	String nextToken = completed ? null : String.valueOf(end);
+
+	return new PagedLayerItems(page, completed, nextToken);
+    }
+
+    private static int parseOffset(String resumptionToken) {
+
+	if (resumptionToken == null || resumptionToken.isBlank()) {
+	    return 0;
+	}
+	try {
+	    int offset = Integer.parseInt(resumptionToken.trim());
+	    return Math.max(0, offset);
+	} catch (NumberFormatException ex) {
+	    return 0;
+	}
+    }
+
+    private static List<LayerItem> loadAll(String tokenSegment) {
 
 	LayerFilterContext context = ShapeWmsLayerFilter.createContext(tokenSegment);
 	List<LayerItem> items = new ArrayList<>();
@@ -87,11 +137,6 @@ public final class PredefinedShapeLayerLister {
 	}
 
 	items.sort(Comparator.comparing(LayerItem::label, String.CASE_INSENSITIVE_ORDER));
-
-	if (limit > 0 && items.size() > limit) {
-	    return items.subList(0, limit);
-	}
-
 	return items;
     }
 

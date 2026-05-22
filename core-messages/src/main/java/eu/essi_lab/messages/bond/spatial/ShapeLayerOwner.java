@@ -85,6 +85,21 @@ public final class ShapeLayerOwner {
      */
     public static boolean isVisible(String resourceOwner, String viewerOwner) {
 
+	return isVisible(resourceOwner, viewerOwner, false);
+    }
+
+    /**
+     * @param resourceOwner owner stored on the layer; empty for legacy layers without owner
+     * @param viewerOwner owner id of the requesting user; empty when anonymous
+     * @param viewerIsAdmin when {@code true}, every layer is visible
+     * @return whether the layer is listed in GetCapabilities / predefined selection
+     */
+    public static boolean isVisible(String resourceOwner, String viewerOwner, boolean viewerIsAdmin) {
+
+	if (viewerIsAdmin) {
+	    return true;
+	}
+
 	if (ADMIN_OWNER.equals(resourceOwner)) {
 	    return true;
 	}
