@@ -118,7 +118,7 @@
 	"location_found" : "Location found",
 	"location_not_found" : "Location not found",
 	"predefined" : "Predefined",
-	"predefined_selection" : "Predefined selection",
+	"predefined_selection" : "Predefined search area",
 	"predefined_selection_search" : "Enter search text",
 	"contains" : "CONTAINS",
 	"overlaps" : "OVERLAPS",

@@ -25,8 +25,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -226,44 +224,51 @@ public class DataloggersDownloader extends WMLDataDownloader {
 		    List<Integer> datastreamIds = new ArrayList<>();
 		    datastreamIds.add(datastreamId);
 
-		    // Retrieve data
-		    DataResponse dataResponse = client.getData(varIds, dataloggerIds, datastreamIds, startString, endString, 0, 1000000);
-
 		    TimeSeriesResponseType jtst = getJaxbTimeSeriesTemplate();
 		    jtst.getTimeSeries().get(0).getVariable().setNoDataValue(NO_DATA_VALUE.doubleValue());
 		    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(jtst, getClass().getSimpleName(), ".wml");
 
 		    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
-		    DateFormat iso8601OutputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-		    iso8601OutputFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 
-		    if (dataResponse.getContent() != null && dataResponse.getContent().getFeatures() != null) {
-			for (Feature feature : dataResponse.getContent().getFeatures()) {
-			    if (feature.getProperties() != null && feature.getProperties().getAdditionalAttributes() != null
-				    && feature.getProperties().getAdditionalAttributes().getMeasurement() != null) {
+		    int page = 0;
+		    int size = 100;
+		    boolean hasMore = true;
+		    while (hasMore) {
+				GSLoggerFactory.getLogger(getClass()).info("At page {}",page);
+			DataResponse dataResponse = client.getData(varIds, dataloggerIds, datastreamIds, startString, endString,
+				page, size);
 
-				Measurement measurement = feature.getProperties().getAdditionalAttributes().getMeasurement();
-				OffsetDateTime timestamp = measurement.getTimestamp();
-				if (timestamp != null) {
-				    Date parsed = Date.from(timestamp.toInstant());
-				    ValueSingleVariable v = new ValueSingleVariable();
+			if (dataResponse.getContent() != null && dataResponse.getContent().getFeatures() != null) {
+			    for (Feature feature : dataResponse.getContent().getFeatures()) {
+				if (feature.getProperties() != null && feature.getProperties().getAdditionalAttributes() != null
+					&& feature.getProperties().getAdditionalAttributes().getMeasurement() != null) {
 
-				    if (measurement.getValue() != null) {
-					BigDecimal dataValue = BigDecimal.valueOf(measurement.getValue());
-					v.setValue(dataValue);
-				    } else {
-					v.setValue(NO_DATA_VALUE);
+				    Measurement measurement = feature.getProperties().getAdditionalAttributes().getMeasurement();
+				    OffsetDateTime timestamp = measurement.getTimestamp();
+				    if (timestamp != null) {
+					Date parsed = Date.from(timestamp.toInstant());
+					ValueSingleVariable v = new ValueSingleVariable();
+
+					if (measurement.getValue() != null) {
+					    BigDecimal dataValue = BigDecimal.valueOf(measurement.getValue());
+					    v.setValue(dataValue);
+					} else {
+					    v.setValue(NO_DATA_VALUE);
+					}
+
+					GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
+					c.setTime(parsed);
+					XMLGregorianCalendar date2 = xmlFactory.newXMLGregorianCalendar(c);
+					v.setDateTimeUTC(date2);
+
+					addValue(tsrt, v);
 				    }
-
-				    GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-				    c.setTime(parsed);
-				    XMLGregorianCalendar date2 = xmlFactory.newXMLGregorianCalendar(c);
-				    v.setDateTimeUTC(date2);
-
-				    addValue(tsrt, v);
 				}
 			    }
 			}
+
+			hasMore = dataResponse.getLast() != null && !dataResponse.getLast();
+			page++;
 		    }
 
 		    return tsrt.getDataFile();
