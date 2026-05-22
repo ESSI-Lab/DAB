@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf.task.trigger;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -41,6 +41,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -64,9 +65,23 @@ public class COGS3SyncProcessor {
 
     public void execute() throws Exception {
 
-	Path tempWorkDir = Files.createTempDirectory("geotiff_processing_");
+	Path tempWorkDir = Paths.get(System.getProperty("java.io.tmpdir"), "geotiff_processing");
+
+	if (Files.exists(tempWorkDir)) {
+	    GSLoggerFactory.getLogger(getClass()).info("Cleaning existing working directory: " + tempWorkDir);
+	    cleanup(tempWorkDir);
+	}
+	Files.createDirectories(tempWorkDir);
+
+
+	GSLoggerFactory.getLogger(getClass()).info("=== COG S3 Sync START ===");
+	GSLoggerFactory.getLogger(getClass()).info("Source URL: " + sourceURL);
+	GSLoggerFactory.getLogger(getClass()).info("Bucket: " + bucketName);
+	GSLoggerFactory.getLogger(getClass()).info("Variables: " + Arrays.toString(variables));
+	GSLoggerFactory.getLogger(getClass()).info("Working dir: " + tempWorkDir);
+
+
 	try {
-	    //setupTrustStore();
 
 	    URL listURL = URI.create(sourceURL).toURL();
 	    String user = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
@@ -74,11 +89,17 @@ public class COGS3SyncProcessor {
 
 	    // 1. Discovery
 	    List<URL> allFiles = WAFClient.listFiles(new WAF_URL(listURL), true, user, pass);
+	    GSLoggerFactory.getLogger(getClass())
+		    .info("Total files discovered: " + allFiles.size());
+
 	    List<URL> tiffUrls = allFiles.stream().filter(url -> url.toString().toLowerCase().contains(".tif"))
 		    .collect(Collectors.toList());
 
+
+	    GSLoggerFactory.getLogger(getClass())
+		    .info("GeoTIFF files found: " + tiffUrls.size());
+
 	    List<URL> filteredURLs = filterURLs(tiffUrls);
-	    //filteredURLs.forEach(System.out::println);
 
 	    GSLoggerFactory.getLogger(getClass()).info("File to analyze: " + filteredURLs.size());
 
@@ -88,11 +109,16 @@ public class COGS3SyncProcessor {
 		processSingleFile(url, tempWorkDir, downloader, user, pass);
 	    }
 
-	    // 2. Generazione Indici
+	    // 2. Index Generation
 	    generateIndexFiles(tempWorkDir);
 
-	    // 3. Sincronizzazione S3
-	    //syncToS3(tempWorkDir);
+	    // 3. S3 sync
+	    syncToS3(tempWorkDir);
+
+
+	    GSLoggerFactory.getLogger(getClass())
+		    .info("=== COG S3 Sync COMPLETED ===");
+
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error during the task: " + e.getMessage());
@@ -109,10 +135,13 @@ public class COGS3SyncProcessor {
 	String var = extractVariable(originalName);
 	String finalBaseName = buildRenamedFileName(originalName);
 
+	GSLoggerFactory.getLogger(getClass())
+		.info("Processing file: " + originalName + " -> variable=" + var);
+
+
 	try {
 	    Path varFolder = base.resolve(var);
 	    Files.createDirectories(varFolder);
-
 
 	    Path raw = varFolder.resolve(finalBaseName + "_" + System.nanoTime() + ".tif");
 	    Path reprojected = varFolder.resolve(finalBaseName + "_" + System.nanoTime() + "_3857.tif");
@@ -124,11 +153,21 @@ public class COGS3SyncProcessor {
 		Files.copy(in, raw, StandardCopyOption.REPLACE_EXISTING);
 	    }
 
-	    // GeoTools Reproject
-	    reprojectTo3857(raw, reprojected);
+	    //	    // GeoTools Reproject
+	    //	    reprojectTo3857(raw, reprojected);
+	    //
+	    //	    // GDAL COG
+	    //	    runGdalCog(reprojected, finalCog);
 
-	    // GDAL COG
-	    runGdalCog(reprojected, finalCog);
+	    long start = System.currentTimeMillis();
+
+	    runGdalWarpToCOG(raw, finalCog);
+
+	    long end = System.currentTimeMillis();
+
+	    GSLoggerFactory.getLogger(getClass())
+		    .info("GDAL completed: " + finalCog.getFileName() +
+			    " (" + (end - start) + " ms)");
 
 	    variableFilesMap.computeIfAbsent(var, k -> new ArrayList<>()).add(finalCog.getFileName().toString());
 
@@ -138,6 +177,38 @@ public class COGS3SyncProcessor {
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error on " + originalName + ": " + e.getMessage());
+	}
+    }
+
+    private void runGdalWarpToCOG(Path input, Path output) throws Exception {
+
+	ProcessBuilder pb = new ProcessBuilder("gdalwarp", "-t_srs", "EPSG:3857", "-r", "bilinear", "-of", "COG", "-co", "COMPRESS=DEFLATE",
+		"-co", "BLOCKSIZE=512", "-co", "OVERVIEWS=IGNORE_EXISTING", input.toAbsolutePath().toString(),
+		output.toAbsolutePath().toString());
+
+
+	GSLoggerFactory.getLogger(getClass())
+		.info("Running GDAL: " + String.join(" ", pb.command()));
+
+	pb.redirectErrorStream(true);
+	Process p = pb.start();
+
+	try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+
+	    String line;
+	    while ((line = reader.readLine()) != null) {
+		GSLoggerFactory.getLogger(getClass()).info("[GDAL] " + line);
+	    }
+	}
+
+	int exit = p.waitFor();
+
+	if (exit != 0) {
+	    throw new RuntimeException("GDAL warp failed with code " + exit);
+	}
+
+	if (!Files.exists(output) || Files.size(output) == 0) {
+	    throw new IOException("COG not created: " + output);
 	}
     }
 
@@ -170,75 +241,93 @@ public class COGS3SyncProcessor {
 	return fileName.split("_")[0];
     }
 
-    private void reprojectTo3857(Path in, Path out) throws Exception {
-	GeoTiffReader reader = null;
-	GeoTiffWriter writer = null;
-	GridCoverage2D coverage = null;
-	GridCoverage2D resampled = null;
-
-	try {
-
-	    Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-	    hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, CRS.decode("EPSG:4326", true));
-
-	    GSLoggerFactory.getLogger(getClass()).info("Opening GeoTIFF: " + in + " size=" + Files.size(in));
-
-
-	    if(!Files.exists(in) || Files.size(in) == 0) {
-		throw new IOException("Input file missing or empty: " + in);
-	    }
-
-	    reader = new GeoTiffReader(in.toFile(), hints);
-	    coverage = reader.read(null);
-
-	    // EPSG:4326
-	    if (coverage.getCoordinateReferenceSystem() == null) {
-		System.out.println("CRS missing, set predefined EPSG:4326...");
-		// NB: In una pipeline reale qui andrebbe ricostruita la copertura con il CRS corretto
-	    }
-
-	    CoordinateReferenceSystem targetCRS = CRS.decode(TARGET_EPSG, true);
-	    resampled = (GridCoverage2D) Operations.DEFAULT.resample(coverage, targetCRS);
-
-	    writer = new GeoTiffWriter(out.toFile());
-	    writer.write(resampled, null);
-
-	    //
-	    writer.dispose();
-	    writer = null;
-
-	    resampled.dispose(true);
-	    resampled = null;
-
-	    coverage.dispose(true);
-	    coverage = null;
-
-	    reader.dispose();
-	    reader = null;
-
-	} finally {
-	    // clean
-	    if (writer != null)
-		try {
-		    writer.dispose();
-		} catch (Exception e) {
-		}
-	    if (resampled != null)
-		resampled.dispose(true);
-	    if (coverage != null)
-		coverage.dispose(true);
-	    if (reader != null)
-		try {
-		    reader.dispose();
-		} catch (Exception e) {
-		}
-
-
-	    // Windows workaround
-	    System.gc();
-	    Thread.sleep(500);
-	}
-    }
+    //    private void reprojectTo3857(Path in, Path out) throws Exception {
+    //	GeoTiffReader reader = null;
+    //	GeoTiffWriter writer = null;
+    //	GridCoverage2D coverage = null;
+    //	GridCoverage2D resampled = null;
+    //
+    //	try {
+    //
+    //	    Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+    //	    hints.put(Hints.DEFAULT_COORDINATE_REFERENCE_SYSTEM, CRS.decode("EPSG:4326", true));
+    //
+    //	    GSLoggerFactory.getLogger(getClass()).info("Opening GeoTIFF: " + in + " size=" + Files.size(in));
+    //
+    //
+    //	    if(!Files.exists(in) || Files.size(in) == 0) {
+    //		throw new IOException("Input file missing or empty: " + in);
+    //	    }
+    //
+    //
+    //	    System.out.println("GDAL present: " +
+    //		    ClassLoader.getSystemResource(
+    //			    "it/geosolutions/imageioimpl/plugins/tiff/gdal/GDALMetadataParser.class"
+    //		    ));
+    //
+    //
+    //	    try {
+    //		reader = new GeoTiffReader(in.toFile(), hints);
+    //	    } catch (Throwable t) {
+    //		GSLoggerFactory.getLogger(getClass()).warn("GDAL reader failed, retry without GDAL");
+    //
+    //		System.setProperty("org.geotools.coverage.io.enableGDAL", "false");
+    //
+    //		reader = new GeoTiffReader(in.toFile(), hints);
+    //	    }
+    //
+    //
+    //	    reader = new GeoTiffReader(in.toFile(), hints);
+    //	    coverage = reader.read(null);
+    //
+    //	    // EPSG:4326
+    //	    if (coverage.getCoordinateReferenceSystem() == null) {
+    //		System.out.println("CRS missing, set predefined EPSG:4326...");
+    //		// NB: In una pipeline reale qui andrebbe ricostruita la copertura con il CRS corretto
+    //	    }
+    //
+    //	    CoordinateReferenceSystem targetCRS = CRS.decode(TARGET_EPSG, true);
+    //	    resampled = (GridCoverage2D) Operations.DEFAULT.resample(coverage, targetCRS);
+    //
+    //	    writer = new GeoTiffWriter(out.toFile());
+    //	    writer.write(resampled, null);
+    //
+    //	    //
+    //	    writer.dispose();
+    //	    writer = null;
+    //
+    //	    resampled.dispose(true);
+    //	    resampled = null;
+    //
+    //	    coverage.dispose(true);
+    //	    coverage = null;
+    //
+    //	    reader.dispose();
+    //	    reader = null;
+    //
+    //	} finally {
+    //	    // clean
+    //	    if (writer != null)
+    //		try {
+    //		    writer.dispose();
+    //		} catch (Exception e) {
+    //		}
+    //	    if (resampled != null)
+    //		resampled.dispose(true);
+    //	    if (coverage != null)
+    //		coverage.dispose(true);
+    //	    if (reader != null)
+    //		try {
+    //		    reader.dispose();
+    //		} catch (Exception e) {
+    //		}
+    //
+    //
+    //	    // Windows workaround
+    //	    System.gc();
+    //	    Thread.sleep(500);
+    //	}
+    //    }
 
     private String buildRenamedFileName(String o) {
 	String base = o.substring(0, o.lastIndexOf('.'));
@@ -246,22 +335,28 @@ public class COGS3SyncProcessor {
 	return (p.length < 3) ? base : p[0] + "_" + p[2];
     }
 
-    private void runGdalCog(Path in, Path out) throws Exception {
-	ProcessBuilder pb = new ProcessBuilder("gdal_translate", "-of", "COG", "-co", "COMPRESS=DEFLATE", "-co", "BLOCKSIZE=512",
-		in.toAbsolutePath().toString(), out.toAbsolutePath().toString());
-	if (pb.start().waitFor() != 0)
-	    throw new RuntimeException("GDAL failed");
-    }
+    //    private void runGdalCog(Path in, Path out) throws Exception {
+    //	ProcessBuilder pb = new ProcessBuilder("gdal_translate", "-of", "COG", "-co", "COMPRESS=DEFLATE", "-co", "BLOCKSIZE=512",
+    //		in.toAbsolutePath().toString(), out.toAbsolutePath().toString());
+    //	if (pb.start().waitFor() != 0)
+    //	    throw new RuntimeException("GDAL failed");
+    //    }
 
     private void cleanup(Path path) {
 	try {
 	    if (Files.exists(path)) {
-		Files.walk(path).sorted(Comparator.reverseOrder()) // Cancella prima i file, poi le cartelle
-			.map(Path::toFile).forEach(File::delete);
-		GSLoggerFactory.getLogger(getClass()).info("Disk Cleanup Completed: " + path.getFileName());
+		Files.walk(path).sorted(Comparator.reverseOrder()).forEach(p -> {
+		    try {
+			Files.delete(p);
+		    } catch (IOException e) {
+			GSLoggerFactory.getLogger(getClass()).warn("Unable to delete: " + p);
+		    }
+		});
+
+		GSLoggerFactory.getLogger(getClass()).info("Disk cleanup completed: " + path);
 	    }
 	} catch (IOException e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Impossible to clenaup tmp folder: " + e.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).error("Cleanup failed: " + e.getMessage());
 	}
     }
 
@@ -270,14 +365,23 @@ public class COGS3SyncProcessor {
 	    return;
 
 	for (Map.Entry<String, List<String>> entry : variableFilesMap.entrySet()) {
+
 	    String var = entry.getKey();
 	    List<String> files = entry.getValue();
+
+	    GSLoggerFactory.getLogger(getClass())
+		    .info("Generating index for variable: " + var +
+			    " (" + files.size() + " files)");
+
 	    if (files.isEmpty())
 		continue;
 
 	    Collections.sort(files);
 	    Path varDir = workingDir.resolve(var);
 	    Files.createDirectories(varDir);
+
+	    generateLegend(varDir, var);
+
 	    Path indexPath = varDir.resolve("index.json");
 
 	    Files.deleteIfExists(indexPath);
@@ -302,6 +406,8 @@ public class COGS3SyncProcessor {
 	json.append("    \"begin\": \"").append(minDate).append("\",\n");
 	json.append("    \"end\": \"").append(maxDate).append("\"\n");
 	json.append("  },\n");
+
+	json.append("  \"legend\": \"").append(baseUrl).append("legend.svg\",\n");
 
 	json.append("  \"files\": [\n");
 
@@ -328,7 +434,10 @@ public class COGS3SyncProcessor {
     }
 
     private void syncToS3(Path workingDir) {
+	s3.setACLPublicRead(true);
 	for (String var : variables) {
+	    GSLoggerFactory.getLogger(getClass())
+		    .info("Uploading variable: " + var);
 	    String prefix = var + "/";
 	    Path varDir = workingDir.resolve(var);
 	    // Clean S3
@@ -339,16 +448,24 @@ public class COGS3SyncProcessor {
 		s3.deleteObjects(bucketName, keys);
 	    }
 	    // Upload files in the var directories
-	    //TODO:upload
 	    try (DirectoryStream<Path> stream = Files.newDirectoryStream(varDir)) {
 		for (Path localFile : stream) {
 		    if (Files.isRegularFile(localFile)) {
 			String fileName = localFile.getFileName().toString();
-			String s3Key = prefix + fileName; // Risultato: "shiwe/shiwe_2026.tif"
+			String s3Key = prefix + fileName;
 
-			String contentType = fileName.endsWith(".json") ? "application/json" : "image/tiff";
+			String contentType;
+
+			if (fileName.endsWith(".json")) {
+			    contentType = "application/json";
+			} else if (fileName.endsWith(".svg")) {
+			    contentType = "image/svg+xml";
+			} else {
+			    contentType = "image/tiff";
+			}
 
 			GSLoggerFactory.getLogger(getClass()).info("  - Loading: " + s3Key);
+
 			s3.uploadFile(localFile.toAbsolutePath().toString(), bucketName, s3Key, contentType);
 		    }
 		}
@@ -356,7 +473,71 @@ public class COGS3SyncProcessor {
 		GSLoggerFactory.getLogger(getClass()).info("Error S3 for variable " + var);
 		throw new RuntimeException(e);
 	    }
+
+	    GSLoggerFactory.getLogger(getClass())
+		    .info("Completed upload for: " + var);
+
 	}
+    }
+
+    private void generateLegend(Path varDir, String var) throws IOException {
+
+	Legend legend = LegendFactory.getLegend(var);
+
+	if (legend == null)
+	    return; // unknown variable
+
+	String svg = generateLegendSvg(legend);
+
+	Path svgPath = varDir.resolve("legend.svg");
+
+	Files.write(svgPath, svg.getBytes(StandardCharsets.UTF_8));
+
+	GSLoggerFactory.getLogger(getClass()).info("Legend created for " + var);
+    }
+
+    public String generateLegendSvg(Legend legend) {
+
+	int width = 320;
+	int itemHeight = 22;
+	int spacing = 6;
+	int margin = 10;
+
+	int height = margin + 30 + legend.items.size() * (itemHeight + spacing);
+
+	StringBuilder svg = new StringBuilder();
+	svg.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+	svg.append("<svg xmlns='http://www.w3.org/2000/svg' ").append("width='").append(width).append("' ").append("height='")
+		.append(height).append("'>");
+
+	//Background
+	svg.append("<rect width='100%' height='100%' fill='#f5f5f5'/>");
+
+	//Title
+	svg.append("<text x='10' y='20' font-size='14' font-weight='bold'>").append(escapeXml(legend.title)).append("</text>");
+
+	int y = 40;
+
+	for (LegendItem item : legend.items) {
+
+	    // color box
+	    svg.append("<rect x='10' y='").append(y).append("' width='18' height='18' fill='").append(item.color)
+		    .append("' stroke='black' stroke-width='0.5'/>");
+
+	    // text
+	    svg.append("<text x='35' y='").append(y + 13).append("' font-size='12'>").append(escapeXml(item.range)).append(" (")
+		    .append(escapeXml(item.label)).append(")").append("</text>");
+
+	    y += itemHeight + spacing;
+	}
+
+	svg.append("</svg>");
+
+	return svg.toString();
+    }
+
+    private String escapeXml(String text) {
+	return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     private String formatIsoTime(String filename) {
@@ -370,7 +551,4 @@ public class COGS3SyncProcessor {
 	}
     }
 
-    private static void setupTrustStore() throws IOException {
-
-    }
 }
