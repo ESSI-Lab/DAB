@@ -190,7 +190,7 @@ public class COGS3SyncProcessor {
 		"-of", "COG",
 		"-co", "COMPRESS=DEFLATE",
 		"-co", "BLOCKSIZE=512",
-		"-co", "OVERVIEWS=IGNORE_EXISTING",
+		"-co", "OVERVIEWS=FORCE",
 		input.toAbsolutePath().toString(),
 		output.toAbsolutePath().toString()
 	);
@@ -220,6 +220,38 @@ public class COGS3SyncProcessor {
 
 	if (!Files.exists(output) || Files.size(output) == 0) {
 	    throw new IOException("COG not created: " + output);
+	}
+
+	verifyCogFile(output);
+    }
+
+    private void verifyCogFile(Path output) throws Exception {
+	ProcessBuilder pb = new ProcessBuilder("gdalinfo", output.toAbsolutePath().toString());
+	Process p = pb.start();
+
+	boolean isCog = false;
+	boolean hasOverviews = false;
+
+	try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+	    String line;
+	    while ((line = reader.readLine()) != null) {
+		// Check for COG driver/layout metadata
+		if (line.contains("LAYOUT=COG") || line.contains("Driver: COG")) {
+		    isCog = true;
+		}
+		// Check for overviews (pyramids)
+		if (line.contains("Overviews:")) {
+		    hasOverviews = true;
+		}
+	    }
+	}
+
+	p.waitFor();
+
+	if (isCog && hasOverviews) {
+	    GSLoggerFactory.getLogger(getClass()).info("[GDAL Verify] Success: File is a valid optimized COG with overviews.");
+	} else {
+	    GSLoggerFactory.getLogger(getClass()).warn("[GDAL Verify] Warning: File might not be fully optimized. COG: " + isCog + ", Overviews: " + hasOverviews);
 	}
     }
 
