@@ -395,35 +395,41 @@ let updateRequestId = 0;
 
 async function updateTimeFromDate(isoDateString) {
   timeMain.textContent = isoDateString.replace('T', ' · ').replace('.000Z', ' UTC');
-
-  // Update global
   currentIndex = timelineMaster.indexOf(isoDateString);
 
-  const promises = Object.entries(layers).map(async ([name, layer]) => {
-    const data = loadedData[name];
-    if (!data || !data.files.length) return { name, layer, url: null };
+  const target = new Date(isoDateString).getTime();
 
-    const target = new Date(isoDateString).getTime();
-    // Find best file
+  // Eseguiamo l'aggiornamento per ogni layer definito
+  for (const [name, layer] of Object.entries(layers)) {
+
+    // 1. if layer is not visible -> skip
+    if (!variables[name].visible) {
+      layer.setVisible(false);
+      continue; // next layer
+    }
+
+    layer.setVisible(true);
+
+    // 2. find correct file tiff
+    const data = loadedData[name];
+    if (!data || !data.files.length) continue;
+
     const bestFile = data.files.reduce((prev, curr) => {
       return Math.abs(new Date(curr.time) - target) < Math.abs(new Date(prev.time) - target)
              ? curr : prev;
     });
 
-    return { name, layer, url: bestFile.url };
-  });
-
-  const results = await Promise.all(promises);
-
-  results.forEach(({ name, layer, url }) => {
-    if (url) {
-      layer.setSource(createSource(url));
-      // user layer visibility
-      layer.setVisible(variables[name].visible);
-    } else {
-      layer.setVisible(false);
+    // 3. update the source if URL is different
+    const currentSource = layer.getSource();
+    // retrieve URL in a safe way
+    let currentUrl = null;
+    if (currentSource && currentSource.options_ && currentSource.options_.sources) {
+       currentUrl = currentSource.options_.sources[0].url;
     }
-  });
+
+    if (bestFile.url !== currentUrl) {
+      layer.setSource(createSource(bestFile.url));
+    }  }
 }
 
 function initSlider() {
@@ -477,29 +483,40 @@ window.layers = layers;
 
 
 document.getElementById('chkShiwe').addEventListener('change', e => {
-   variables.shiwe.visible = e.target.checked;
-   layers.shiwe.setVisible(e.target.checked);
-   if (e.target.checked) updateLegend('shiwe');
+   variables['shiwe'].visible = e.target.checked;
+   layers['shiwe'].setVisible(e.target.checked);
+   if (e.target.checked) {
+       updateTimeFromDate(timelineMaster[currentIndex]);
+       updateLegend('shiwe');
+   }
 });
 
 document.getElementById('chkTemp').addEventListener('change', e => {
    variables['2t'].visible = e.target.checked;
    layers['2t'].setVisible(e.target.checked);
-   if (e.target.checked) updateLegend('2t');
+   if (e.target.checked) {
+       updateTimeFromDate(timelineMaster[currentIndex]);
+       updateLegend('2t');
+   }
 });
 
 document.getElementById('chkUtci').addEventListener('change', e => {
    variables['utci'].visible = e.target.checked;
    layers['utci'].setVisible(e.target.checked);
-   if (e.target.checked) updateLegend('utci');
+   if (e.target.checked) {
+       updateTimeFromDate(timelineMaster[currentIndex]);
+       updateLegend('utci');
+   }
 });
 
 document.getElementById('chkHumidity').addEventListener('change', e => {
    variables['2r'].visible = e.target.checked;
    layers['2r'].setVisible(e.target.checked);
-   if (e.target.checked) updateLegend('2r');
+   if (e.target.checked) {
+       updateTimeFromDate(timelineMaster[currentIndex]);
+       updateLegend('2r');
+   }
 });
-
 
 slider.style.accentColor = '#666';
 
