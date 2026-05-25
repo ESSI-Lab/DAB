@@ -190,7 +190,7 @@ public class COGS3SyncProcessor {
 		"-of", "COG",
 		"-co", "COMPRESS=DEFLATE",
 		"-co", "BLOCKSIZE=512",
-		"-co", "OVERVIEWS=FORCE",
+		"-co", "OVERVIEWS=AUTO",
 		input.toAbsolutePath().toString(),
 		output.toAbsolutePath().toString()
 	);
