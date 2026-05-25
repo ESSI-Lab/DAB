@@ -1,7 +1,7 @@
 
 <%@page import="java.util.Comparator"%>
 <%@page import="eu.essi_lab.messages.HarvestingProperties"%>
-<%@page import="eu.essi_lab.api.database.SourceStorageWorker"%>
+<%@page import="eu.essi_lab.api.database.SourceStorage"%>
 <%@page import="eu.essi_lab.api.database.Database"%>
 <%@page import="eu.essi_lab.api.database.factory.DatabaseFactory"%>
 <%@page import="eu.essi_lab.model.GSSource"%>
@@ -78,8 +78,8 @@ GSSource source = ConfigurationWrapper.getViewSources(v.get()).get(0);
 
 Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
 
-SourceStorageWorker worker = database.getWorker(source.getUniqueIdentifier());
-HarvestingProperties harvestingProperties = worker.getHarvestingProperties();
+SourceStorage storage = database.getStorage(source.getUniqueIdentifier());
+HarvestingProperties harvestingProperties = storage.getHarvestingProperties();
 String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
 
 DatabaseExecutor executor = DatabaseProviderFactory.getExecutor(ConfigurationWrapper.getStorageInfo());
