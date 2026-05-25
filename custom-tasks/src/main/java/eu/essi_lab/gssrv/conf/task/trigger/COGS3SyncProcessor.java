@@ -28,6 +28,7 @@ import eu.essi_lab.lib.net.dirlisting.WAF_URL;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+
 import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.processing.Operations;
@@ -73,13 +74,11 @@ public class COGS3SyncProcessor {
 	}
 	Files.createDirectories(tempWorkDir);
 
-
 	GSLoggerFactory.getLogger(getClass()).info("=== COG S3 Sync START ===");
 	GSLoggerFactory.getLogger(getClass()).info("Source URL: " + sourceURL);
 	GSLoggerFactory.getLogger(getClass()).info("Bucket: " + bucketName);
 	GSLoggerFactory.getLogger(getClass()).info("Variables: " + Arrays.toString(variables));
 	GSLoggerFactory.getLogger(getClass()).info("Working dir: " + tempWorkDir);
-
 
 	try {
 
@@ -89,15 +88,12 @@ public class COGS3SyncProcessor {
 
 	    // 1. Discovery
 	    List<URL> allFiles = WAFClient.listFiles(new WAF_URL(listURL), true, user, pass);
-	    GSLoggerFactory.getLogger(getClass())
-		    .info("Total files discovered: " + allFiles.size());
+	    GSLoggerFactory.getLogger(getClass()).info("Total files discovered: " + allFiles.size());
 
 	    List<URL> tiffUrls = allFiles.stream().filter(url -> url.toString().toLowerCase().contains(".tif"))
 		    .collect(Collectors.toList());
 
-
-	    GSLoggerFactory.getLogger(getClass())
-		    .info("GeoTIFF files found: " + tiffUrls.size());
+	    GSLoggerFactory.getLogger(getClass()).info("GeoTIFF files found: " + tiffUrls.size());
 
 	    List<URL> filteredURLs = filterURLs(tiffUrls);
 
@@ -115,10 +111,7 @@ public class COGS3SyncProcessor {
 	    // 3. S3 sync
 	    syncToS3(tempWorkDir);
 
-
-	    GSLoggerFactory.getLogger(getClass())
-		    .info("=== COG S3 Sync COMPLETED ===");
-
+	    GSLoggerFactory.getLogger(getClass()).info("=== COG S3 Sync COMPLETED ===");
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error during the task: " + e.getMessage());
@@ -135,9 +128,7 @@ public class COGS3SyncProcessor {
 	String var = extractVariable(originalName);
 	String finalBaseName = buildRenamedFileName(originalName);
 
-	GSLoggerFactory.getLogger(getClass())
-		.info("Processing file: " + originalName + " -> variable=" + var);
-
+	GSLoggerFactory.getLogger(getClass()).info("Processing file: " + originalName + " -> variable=" + var);
 
 	try {
 	    Path varFolder = base.resolve(var);
@@ -145,6 +136,8 @@ public class COGS3SyncProcessor {
 
 	    Path raw = varFolder.resolve(finalBaseName + "_" + System.nanoTime() + ".tif");
 	    Path reprojected = varFolder.resolve(finalBaseName + "_" + System.nanoTime() + "_3857.tif");
+
+	    Path tmpPath = varFolder.resolve(finalBaseName + "_" + System.nanoTime() + "_tmp.tif");
 
 	    Path finalCog = varFolder.resolve(finalBaseName + ".tif");
 
@@ -161,17 +154,16 @@ public class COGS3SyncProcessor {
 
 	    long start = System.currentTimeMillis();
 
-	    runGdalWarpToCOG(raw, finalCog);
+	    runGdalWarpToCOG(raw, finalCog, tmpPath);
 
 	    long end = System.currentTimeMillis();
 
-	    GSLoggerFactory.getLogger(getClass())
-		    .info("GDAL completed: " + finalCog.getFileName() +
-			    " (" + (end - start) + " ms)");
+	    GSLoggerFactory.getLogger(getClass()).info("GDAL completed: " + finalCog.getFileName() + " (" + (end - start) + " ms)");
 
 	    variableFilesMap.computeIfAbsent(var, k -> new ArrayList<>()).add(finalCog.getFileName().toString());
 
 	    // Clean tmp files
+	    Files.deleteIfExists(tmpPath);
 	    Files.deleteIfExists(raw);
 	    Files.deleteIfExists(reprojected);
 
@@ -180,49 +172,97 @@ public class COGS3SyncProcessor {
 	}
     }
 
-    private void runGdalWarpToCOG(Path input, Path output) throws Exception {
+    private void runGdalWarpToCOG(Path input, Path output, Path temp) throws Exception {
 
-	ProcessBuilder pb = new ProcessBuilder(
-		"gdalwarp",
-		"-s_srs", "EPSG:4326",
-		"-t_srs", "EPSG:3857",
-		"-r", "bilinear",
-		"-of", "COG",
-		"-co", "COMPRESS=DEFLATE",
-		"-co", "BLOCKSIZE=512",
-		"-co", "OVERVIEWS=AUTO",
-		input.toAbsolutePath().toString(),
-		output.toAbsolutePath().toString()
-	);
 
-	GSLoggerFactory.getLogger(getClass())
-		.info("Running GDAL: " + String.join(" ", pb.command()));
 
-	pb.redirectErrorStream(true);
-	Process p = pb.start();
+	try {
 
-	try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-	    String line;
-	    while ((line = reader.readLine()) != null) {
+	    ProcessBuilder pb = new ProcessBuilder(
+		    "gdalwarp",
+		    "-s_srs", "EPSG:4326",
+		    "-t_srs", "EPSG:3857",
+		    "-r", "cubic",
+		    "-ot", "Float32",
+		    "-tr", "10000", "10000",
+		    "-tap",
+		    "-of", "COG",
+		    "-co", "COMPRESS=DEFLATE",
+		    "-co", "PREDICTOR=2",
+		    "-co", "BLOCKSIZE=512",
+		    "-co", "OVERVIEWS=IGNORE_EXISTING",
+		    "-co", "RESAMPLING=CUBIC",
+		    input.toAbsolutePath().toString(),
+		    temp.toAbsolutePath().toString());
 
-		if (line.toLowerCase().contains("error") || line.toLowerCase().contains("warning")) {
-		    GSLoggerFactory.getLogger(getClass()).warn("[GDAL] " + line);
+	    GSLoggerFactory.getLogger(getClass()).info("Running GDALWARP: " + String.join(" ", pb.command()));
+
+	    pb.redirectErrorStream(true);
+	    Process p = pb.start();
+
+	    try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+		String line;
+		while ((line = reader.readLine()) != null) {
+
+		    if (line.toLowerCase().contains("error") || line.toLowerCase().contains("warning")) {
+			GSLoggerFactory.getLogger(getClass()).warn("[GDAL] " + line);
+		    }
 		}
 	    }
+
+	    int exit = p.waitFor();
+
+	    if (exit != 0) {
+		throw new RuntimeException("GDAL warp failed with code " + exit);
+	    }
+
+	    if (!Files.exists(temp) || Files.size(temp) == 0) {
+		throw new IOException("COG not created: " + temp);
+	    }
+
+	    ProcessBuilder addoPb = new ProcessBuilder("gdaladdo", "-r", "cubic", temp.toString(), "2", "4", "8", "16");
+
+	    GSLoggerFactory.getLogger(getClass()).info("Running gdaladdo: " + String.join(" ", addoPb.command()));
+
+	    Process addo = addoPb.start();
+	    addo.waitFor();
+
+	    exit = addo.waitFor();
+
+	    if (exit != 0) {
+		throw new RuntimeException("GDALADDO warp failed with code " + exit);
+	    }
+
+	    if (!Files.exists(temp) || Files.size(temp) == 0) {
+		throw new IOException("COG not created: " + temp);
+	    }
+
+	    // STEP 3: final COG
+	    ProcessBuilder translatePb = new ProcessBuilder("gdal_translate", temp.toString(), output.toString(), "-of", "COG", "-co",
+		    "COMPRESS=DEFLATE", "-co", "PREDICTOR=2", "-co", "BLOCKSIZE=512", "-co", "RESAMPLING=CUBIC");
+
+	    GSLoggerFactory.getLogger(getClass()).info("Running gdal_translate: " + String.join(" ", translatePb.command()));
+
+	    Process translate = translatePb.start();
+	    translate.waitFor();
+
+	    exit =  translate.waitFor();
+
+	    if (exit != 0) {
+		throw new RuntimeException("GDAL translate failed with code " + exit);
+	    }
+
+	    if (!Files.exists(output) || Files.size(output) == 0) {
+		throw new IOException("COG not created: " + output);
+	    }
+
+	    verifyCogFile(output);
+
+	} finally {
+
+	    Files.deleteIfExists(temp);
 	}
 
-	int exit = p.waitFor();
-
-	if (exit != 0) {
-	    throw new RuntimeException("GDAL warp failed with code " + exit);
-	}
-
-
-	if (!Files.exists(output) || Files.size(output) == 0) {
-	    throw new IOException("COG not created: " + output);
-	}
-
-	verifyCogFile(output);
     }
 
     private void verifyCogFile(Path output) throws Exception {
@@ -251,7 +291,8 @@ public class COGS3SyncProcessor {
 	if (isCog && hasOverviews) {
 	    GSLoggerFactory.getLogger(getClass()).info("[GDAL Verify] Success: File is a valid optimized COG with overviews.");
 	} else {
-	    GSLoggerFactory.getLogger(getClass()).warn("[GDAL Verify] Warning: File might not be fully optimized. COG: " + isCog + ", Overviews: " + hasOverviews);
+	    GSLoggerFactory.getLogger(getClass())
+		    .warn("[GDAL Verify] Warning: File might not be fully optimized. COG: " + isCog + ", Overviews: " + hasOverviews);
 	}
     }
 
@@ -412,9 +453,7 @@ public class COGS3SyncProcessor {
 	    String var = entry.getKey();
 	    List<String> files = entry.getValue();
 
-	    GSLoggerFactory.getLogger(getClass())
-		    .info("Generating index for variable: " + var +
-			    " (" + files.size() + " files)");
+	    GSLoggerFactory.getLogger(getClass()).info("Generating index for variable: " + var + " (" + files.size() + " files)");
 
 	    if (files.isEmpty())
 		continue;
@@ -479,8 +518,7 @@ public class COGS3SyncProcessor {
     private void syncToS3(Path workingDir) {
 	s3.setACLPublicRead(true);
 	for (String var : variables) {
-	    GSLoggerFactory.getLogger(getClass())
-		    .info("Uploading variable: " + var);
+	    GSLoggerFactory.getLogger(getClass()).info("Uploading variable: " + var);
 	    String prefix = var + "/";
 	    Path varDir = workingDir.resolve(var);
 	    // Clean S3
@@ -517,8 +555,7 @@ public class COGS3SyncProcessor {
 		throw new RuntimeException(e);
 	    }
 
-	    GSLoggerFactory.getLogger(getClass())
-		    .info("Completed upload for: " + var);
+	    GSLoggerFactory.getLogger(getClass()).info("Completed upload for: " + var);
 
 	}
     }
