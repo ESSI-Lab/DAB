@@ -10,18 +10,19 @@ package eu.essi_lab.services.data_hub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import com.fasterxml.jackson.databind.*;
+import dev.failsafe.*;
 import eu.essi_lab.accessor.datahub.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
@@ -55,8 +56,13 @@ public class DataHubService extends AbstractManagedService {
 
     private static final String SCHEMA_REGISTRY_URL_KEY = "shemaRegistryURL";
     private static final String SERVICE_URL_KEY = "serviceURL";
+
     private static final String TOKEN_USER_KEY = "token.user";
     private static final String TOKEN_PWD_KEY = "token.pwd";
+    private static final String TOKEN_GET_TIMEOUT_MILLIS_KEY = "token.get.timeoutMillis";
+    private static final String TOKEN_GET_MAX_RETRIES_KEY = "token.get.maxRetries";
+    private static final String TOKEN_GET_RETRIES_DELAY_SECONDS_KEY = "token.get.retriesDelaySeconds";
+
     private static final String KAFKA_BOOTSTRAP_SERVERS_KEY = "kafka.bootstrapServers";
     private static final String KAFKA_TOPIC_KEY = "kafka.topic";
     private static final String KAFKA_GROUP_ID_KEY = "kafka.groupId";
@@ -99,7 +105,24 @@ public class DataHubService extends AbstractManagedService {
      */
     private static final int DEFAULT_POLL_TIMEOUT_SECONDS = 1;
 
+    /**
+     * Get access token -> timeout millis (must be < retries delay)
+     */
+    private static final int DEFAULT_GET_TOKEN_TIMEOUT_MILLIS = 500;
+
+    /**
+     * Get access token -> max. number of retries
+     */
+    private static final int DEFAULT_GET_TOKEN_MAX_RETRIES = 10;
+
+    /**
+     * Get access token -> delay in seconds between retries (must be < timeout millis)
+     */
+    private static final int DEFAULT_GET_TOKEN_RETRIES_DELAY_SECONDS = 1;
+    
+
     private volatile boolean running;
+
     /**
      *
      */
@@ -114,6 +137,9 @@ public class DataHubService extends AbstractManagedService {
     private int maxStopWaitSeconds;
     private String tokenUser;
     private String tokenPwd;
+    private int tokenTimeoutMillis;
+    private int tokenMaxRetries;
+    private int tokenRetriesDelaySeconds;
 
     /**
      *
@@ -259,10 +285,26 @@ public class DataHubService extends AbstractManagedService {
 		map(Integer::parseInt).//
 		orElse(DEFAULT_POLL_TIMEOUT_SECONDS);//
 
+	tokenTimeoutMillis = getSetting(). //
+		readKeyValue(TOKEN_GET_TIMEOUT_MILLIS_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_GET_TOKEN_TIMEOUT_MILLIS);
+
+	tokenMaxRetries = getSetting(). //
+		readKeyValue(TOKEN_GET_MAX_RETRIES_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_GET_TOKEN_MAX_RETRIES);
+
+	tokenRetriesDelaySeconds = getSetting(). //
+		readKeyValue(TOKEN_GET_RETRIES_DELAY_SECONDS_KEY).//
+		map(Integer::parseInt).//
+		orElse(DEFAULT_GET_TOKEN_RETRIES_DELAY_SECONDS);
+
 	maxStopWaitSeconds = getSetting(). //
 		readKeyValue(MAX_STOP_WAIT_SECONDS_KEY).//
 		map(Integer::parseInt).//
 		orElse(DEFAULT_MAX_STOP_WAIT_SECONDS);
+
 
 	//
 	// init executor
@@ -333,7 +375,7 @@ public class DataHubService extends AbstractManagedService {
 	    }
 	});
 
-//	Semaphore inFlight = new Semaphore(maxPendingProcesses); // backpressure
+	//	Semaphore inFlight = new Semaphore(maxPendingProcesses); // backpressure
 
 	while (running) {
 
@@ -341,22 +383,20 @@ public class DataHubService extends AbstractManagedService {
 
 	    for (ConsumerRecord<byte[], byte[]> record : records) {
 
-//		try {
-//
-//		    inFlight.acquire();
-//
-//		} catch (InterruptedException e) {
-//		    Thread.currentThread().interrupt();
-//		    error("Loop thread interrupted: " + e.getMessage(), e);
-//
-//		    return;
-//		}
+		//		try {
+		//
+		//		    inFlight.acquire();
+		//
+		//		} catch (InterruptedException e) {
+		//		    Thread.currentThread().interrupt();
+		//		    error("Loop thread interrupted: " + e.getMessage(), e);
+		//
+		//		    return;
+		//		}
 
 		executor.submit(() -> {
 
 		    try {
-
-			GSLoggerFactory.getLogger(getClass()).trace("Submit STARTED");
 
 			byte[] raw = record.value();
 
@@ -375,17 +415,11 @@ public class DataHubService extends AbstractManagedService {
 
 			optRecord.ifPresent(this::process);
 
-			GSLoggerFactory.getLogger(getClass()).trace("Submit ENDED");
-
 		    } finally {
-
-			GSLoggerFactory.getLogger(getClass()).trace("Finalization STARTED");
 
 			tracker.markProcessed(record);
 
-			GSLoggerFactory.getLogger(getClass()).trace("Finalization ENDED");
-
-//			inFlight.release();
+			//			inFlight.release();
 		    }
 		});
 	    }
@@ -683,18 +717,28 @@ public class DataHubService extends AbstractManagedService {
      */
     String getAccessToken() throws IOException, InterruptedException {
 
-	return getAccessToken(tokenUser, tokenPwd, serviceUrl);
+	return getAccessToken(tokenUser, tokenPwd, serviceUrl, tokenTimeoutMillis, tokenMaxRetries, tokenRetriesDelaySeconds);
     }
 
     /**
+     * 
      * @param user
      * @param pwd
      * @param url
+     * @param timeoutMillis
+     * @param maxRetries
+     * @param retriesDelaySeconds
      * @return
      * @throws IOException
      * @throws InterruptedException
      */
-    public static String getAccessToken(String user, String pwd, String url) throws IOException, InterruptedException {
+    public static String getAccessToken(
+	    String user, //
+	    String pwd, //
+	    String url, //
+	    int timeoutMillis, //
+	    int maxRetries, //
+	    int retriesDelaySeconds) throws IOException{
 
 	HttpResponse<String> response;
 	ObjectMapper mapper = new ObjectMapper();
@@ -710,10 +754,23 @@ public class DataHubService extends AbstractManagedService {
 
 	    String tokenUrl = url + "/ext-login";
 
-	    HttpRequest request = HttpRequest.newBuilder().uri(URI.create(tokenUrl)).header("Content-Type", "application/json")
-		    .POST(HttpRequest.BodyPublishers.ofString(body)).build();
+	    HttpRequest request = HttpRequest.newBuilder(). //
+		    timeout(Duration.ofMillis(timeoutMillis)).//
+		    uri(URI.create(tokenUrl)).//
+		    header("Content-Type", "application/json").//
+		    POST(HttpRequest.BodyPublishers.ofString(body)). //
+		    build();
 
-	    response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	    RetryPolicy<HttpResponse<String>> retryPolicy = RetryPolicy.<HttpResponse<String>> //
+		    builder().//
+		    handleResultIf(r -> r.statusCode() != 200).//
+		    withDelay(Duration.ofSeconds(retriesDelaySeconds)).//
+		    withMaxRetries(maxRetries).//
+		    onRetry(e -> GSLoggerFactory.getLogger(DataHubService.class).warn("Failure #{}. Retrying...", e.getAttemptCount())).//
+		    onRetriesExceeded(e -> GSLoggerFactory.getLogger(DataHubService.class).warn("Unable to get access token. Max retries exceeded")).//
+		    build();
+
+	    response = Failsafe.with(retryPolicy).get(() -> client.send(request, HttpResponse.BodyHandlers.ofString()));
 	}
 
 	JsonNode json = mapper.readTree(response.body());
