@@ -44,6 +44,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -491,6 +493,38 @@ public class COGS3SyncProcessor {
 
 	json.append("  \"legend\": \"").append(baseUrl).append("legend.svg\",\n");
 
+	// Dynamic Availability Calculation Block
+	json.append("  \"availability\": [\n");
+	if (files.size() >= 2) {
+	    Instant intervalStart = Instant.parse(formatIsoTime(files.get(0)));
+	    Instant currentTrackedTime = intervalStart;
+	    long currentStepHours = -1;
+	    List<String> availabilityBlocks = new ArrayList<>();
+
+	    for (int i = 1; i < files.size(); i++) {
+		Instant nextTime = Instant.parse(formatIsoTime(files.get(i)));
+		long calculatedDelta = Duration.between(currentTrackedTime, nextTime).toHours();
+
+		if (currentStepHours == -1) {
+		    currentStepHours = calculatedDelta;
+		} else if (calculatedDelta != currentStepHours) {
+		    // Flush completed range block
+		    availabilityBlocks.add(formatAvailabilityBlock(intervalStart, currentTrackedTime, currentStepHours));
+		    intervalStart = currentTrackedTime;
+		    currentStepHours = calculatedDelta;
+		}
+		currentTrackedTime = nextTime;
+	    }
+
+	    // Flush trailing range block
+	    if (currentStepHours != -1) {
+		availabilityBlocks.add(formatAvailabilityBlock(intervalStart, currentTrackedTime, currentStepHours));
+	    }
+
+	    json.append(String.join(",\n", availabilityBlocks)).append("\n");
+	}
+	json.append("  ],\n");
+
 	json.append("  \"files\": [\n");
 
 	for (int i = 0; i < files.size(); i++) {
@@ -513,6 +547,14 @@ public class COGS3SyncProcessor {
 	json.append("  ]\n");
 	json.append("}");
 	return json.toString();
+    }
+
+    private String formatAvailabilityBlock(Instant from, Instant to, long stepHours) {
+	return "    {\n" +
+		"      \"from\": \"" + from.toString() + "\",\n" +
+		"      \"to\": \"" + to.toString() + "\",\n" +
+		"      \"stepHours\": " + stepHours + "\n" +
+		"    }";
     }
 
     private void syncToS3(Path workingDir) {
