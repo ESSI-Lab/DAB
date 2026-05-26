@@ -20,13 +20,16 @@ public class MapperTest {
      */
     public static void main(String[] args) throws Exception {
 
-	String user = "";
-	String pwd = "";
-	String url = "";
+	String user = "dxc-client-dev";
+	String pwd = "dxc-client-dev";
+	String url = "https://x2030-single-spa.platform.sim-dev.mase.gov.it";
 
 	String token = DataHubService.getAccessToken(user, //
 		pwd,//
-		url);//
+		url,//
+		500, //
+		2, //
+		1);//
 
 	DatahubConnector connector = new DatahubConnector();
 
