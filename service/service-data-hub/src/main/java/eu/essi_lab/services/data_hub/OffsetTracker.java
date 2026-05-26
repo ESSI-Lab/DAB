@@ -10,12 +10,12 @@ package eu.essi_lab.services.data_hub;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -47,6 +47,34 @@ class OffsetTracker {
     }
 
     /**
+     * @param partitions
+     */
+    void onPartitionAssigned(Collection<TopicPartition> partitions) {
+
+	for (TopicPartition tp : partitions) {
+
+	    state.putIfAbsent(tp, new PartitionState());
+	}
+    }
+
+    /**
+     * @param record
+     */
+    void markProcessed(ConsumerRecord<byte[], byte[]> record) {
+
+	TopicPartition tp = new TopicPartition(//
+		record.topic(),//
+		record.partition());
+
+	PartitionState ps = state.get(tp);
+
+	synchronized (ps) {
+
+	    ps.completed.add(record.offset());
+	}
+    }
+
+    /**
      * @return
      */
     Map<TopicPartition, OffsetAndMetadata> buildOffsets() {
@@ -64,45 +92,9 @@ class OffsetTracker {
     }
 
     /**
-     * @param partitions
-     */
-    void onPartitionAssigned(Collection<TopicPartition> partitions) {
-
-	for (TopicPartition tp : partitions) {
-
-	    state.putIfAbsent(tp, new PartitionState());
-	}
-    }
-
-    /**
-     * @param record
-     */
-    void markProcessed(ConsumerRecord<byte[], byte[]> record) {
-
-	markProcessed(new TopicPartition(//
-			record.topic(),//
-			record.partition()),//
-		record.offset());
-    }
-
-    /**
-     * @param tp
-     * @param offset
-     */
-    void markProcessed(TopicPartition tp, long offset) {
-
-	PartitionState ps = state.get(tp);
-
-	synchronized (ps) {
-
-	    ps.completed.add(offset);
-	}
-    }
-
-    /**
      * @return
      */
-    Map<TopicPartition, Long> computeCommitOffsets() {
+    private Map<TopicPartition, Long> computeCommitOffsets() {
 
 	Map<TopicPartition, Long> result = new HashMap<>();
 
