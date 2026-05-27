@@ -21,14 +21,11 @@ package eu.essi_lab.cfga.setting;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.Optional;
-import java.util.Properties;
+import eu.essi_lab.cfga.option.*;
+import eu.essi_lab.lib.utils.*;
 
-import eu.essi_lab.cfga.option.Option;
-import eu.essi_lab.cfga.option.StringOptionBuilder;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -156,7 +153,7 @@ public interface KeyValueOptionDecorator {
      * @param property
      * @return
      */
-    public default Optional<String> readKeyValue(String property) {
+    default Optional<String> readKeyValue(String property) {
 
 	return getKeyValueOptions().flatMap(opt -> Optional.ofNullable(opt.getProperty(property)));
     }
