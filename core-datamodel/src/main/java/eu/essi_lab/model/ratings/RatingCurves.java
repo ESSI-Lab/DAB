@@ -21,6 +21,7 @@ package eu.essi_lab.model.ratings;
  * #L%
  */
 
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +34,8 @@ public class RatingCurves {
     }
 
     private final Collection<RatingCurve> curves;
+    private String stationIdentifier;
+    private String name;
 
     public RatingCurves() {
 	this(new ArrayList<>());
@@ -40,6 +43,59 @@ public class RatingCurves {
 
     public RatingCurves(Collection<RatingCurve> curves) {
 	this.curves = curves;
+    }
+
+    public RatingCurves(String stationIdentifier, String name) {
+	this(new ArrayList<>());
+	this.stationIdentifier = stationIdentifier;
+	this.name = name;
+    }
+
+    public String getStationIdentifier() {
+	return stationIdentifier;
+    }
+
+    public void setStationIdentifier(String stationIdentifier) {
+	this.stationIdentifier = stationIdentifier;
+    }
+
+    public String getName() {
+	return name;
+    }
+
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    /**
+     * Prints this station's rating curves (formula ranges and generated points) to {@code System.out}.
+     */
+    public void print() {
+	print(System.out);
+    }
+
+    /**
+     * Prints this station's rating curves (formula ranges and generated points) to the given stream.
+     */
+    public void print(PrintStream out) {
+
+	out.println("Station: " + stationIdentifier + " - " + name);
+	for (RatingCurve curve : curves) {
+	    Formula formula = curve.getFormula();
+	    if (formula != null && !formula.isEmpty()) {
+		out.println("  Formula:");
+		for (FormulaRange range : formula.getRanges()) {
+		    out.println("    " + range);
+		}
+		out.println("  Points (" + curve.getPoints().size() + "):");
+		for (RatingCurvePoint point : curve.getPoints()) {
+		    out.println(String.format("    h=%.4f -> Q=%.4f", point.getLevel().doubleValue(),
+			    point.getDischarge().doubleValue()));
+		}
+	    } else {
+		out.println("  (no formula)");
+	    }
+	}
     }
 
     /**
