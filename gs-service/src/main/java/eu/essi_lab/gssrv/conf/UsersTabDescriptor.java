@@ -43,12 +43,12 @@ import java.util.*;
 class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridData> {
 
     private static final String ID_COLUMN = "Id";
+    private static final String ROLE_COLUMN = "Role";
     private static final String EMAIL_COLUMN = "E-mail";
     private static final String FIRST_NAME_COLUMN = "First Name";
     private static final String SECOND_NAME_COLUMN = "Last Name";
     private static final String REG_DATE_COLUMN = "Registration Date";
     private static final String INSTITUTION_COLUMN = "Institution";
-    private static final String ROLE_COLUMN = "Role";
     private static final String ID_TYPE_COLUMN = "Id.Type";
     private static final String ENABLED_COLUMN = "Enabled";
 
@@ -69,6 +69,10 @@ class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridD
 
 	Grid.Column<UsersTabDescriptor.GridData> mailCol = addSortableResizableColumn(EMAIL_COLUMN, UsersTabDescriptor.GridData::getEmail,
 		300);
+
+	Grid.Column<UsersTabDescriptor.GridData> depCol = addSortableResizableColumn(ROLE_COLUMN, UsersTabDescriptor.GridData::getRole,
+		300);
+
 	Grid.Column<UsersTabDescriptor.GridData> fNameCol = addSortableResizableColumn(FIRST_NAME_COLUMN,
 		UsersTabDescriptor.GridData::getFirstName, 300);
 
@@ -81,8 +85,6 @@ class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridD
 	Grid.Column<UsersTabDescriptor.GridData> instCol = addSortableResizableColumn(INSTITUTION_COLUMN,
 		UsersTabDescriptor.GridData::getInstitution, 300);
 
-	Grid.Column<UsersTabDescriptor.GridData> depCol = addSortableResizableColumn(ROLE_COLUMN, UsersTabDescriptor.GridData::getRole,
-		300);
 
 	Grid.Column<UsersTabDescriptor.GridData> userIdCol = addSortableResizableColumn(ID_TYPE_COLUMN,
 		UsersTabDescriptor.GridData::getUserIdentifierType, 200);

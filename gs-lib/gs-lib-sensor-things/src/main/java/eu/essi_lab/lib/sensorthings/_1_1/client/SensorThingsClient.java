@@ -21,47 +21,23 @@ package eu.essi_lab.lib.sensorthings._1_1.client;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import dev.failsafe.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.sensorthings._1_1.client.request.*;
+import eu.essi_lab.lib.sensorthings._1_1.client.response.*;
+import eu.essi_lab.lib.sensorthings._1_1.client.response.capabilities.*;
+import eu.essi_lab.lib.sensorthings._1_1.model.entities.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.exceptions.*;
+import org.json.*;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import dev.failsafe.Failsafe;
-import dev.failsafe.RetryPolicy;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.sensorthings._1_1.client.request.AddressableEntity;
-import eu.essi_lab.lib.sensorthings._1_1.client.request.EntityRef;
-import eu.essi_lab.lib.sensorthings._1_1.client.request.SensorThingsRequest;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.AddressableEntityResult;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.AssociationLinkResult;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.DataArrayFormatResult;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.PropertyResult;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.PropertyValueResult;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.SensorThingsResponse;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.SensorThingsResponseImpl;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.capabilities.ServiceRootResult;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.Entity;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.FeatureOfInterest;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.HistoricalLocation;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.Location;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.Observation;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.ObservedProperty;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.Sensor;
-import eu.essi_lab.lib.sensorthings._1_1.model.entities.Thing;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import java.io.*;
+import java.net.*;
+import java.net.http.*;
+import java.time.*;
+import java.util.AbstractMap.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * https://docs.ogc.org/is/18-088/18-088.html#sensorthings-serviceinterface
@@ -95,9 +71,9 @@ public class SensorThingsClient {
      * @param serviceRootUrl
      * @throws MalformedURLException
      */
-    public SensorThingsClient(String serviceRootUrl) throws MalformedURLException {
+    public SensorThingsClient(String serviceRootUrl) throws MalformedURLException, URISyntaxException {
 
-	this(new URL(serviceRootUrl));
+	this(new URI(serviceRootUrl).toURL());
     }
 
     /**
@@ -129,7 +105,7 @@ public class SensorThingsClient {
      */
     public SensorThingsClient withRetryPolicy(int attempts, int delay) {
 
-	this.retry = new SimpleEntry<Integer, Integer>(attempts, delay);
+	this.retry = new SimpleEntry<>(attempts, delay);
 	return this;
     }
 
@@ -203,40 +179,37 @@ public class SensorThingsClient {
 
 	    List<AddressableEntity> addEntitiesList = request.getAddressableEntityList();
 
-	    EntityRef targetEntity = addEntitiesList.get(addEntitiesList.size() - 1).getEntityRef();
+	    EntityRef targetEntity = addEntitiesList.getLast().getEntityRef();
 
 	    try {
 		if (targetEntity == EntityRef.DATASTREAMS) {
 		    sensorThingsResponse
-			    .setAddressableEntityResult(new AddressableEntityResult<Datastream>(responseString, Datastream.class));
+			    .setAddressableEntityResult(new AddressableEntityResult<>(responseString, Datastream.class));
 		} else if (targetEntity == EntityRef.FEATURES_OF_INTEREST) {
-		    sensorThingsResponse.setAddressableEntityResult(
-			    new AddressableEntityResult<FeatureOfInterest>(responseString, FeatureOfInterest.class));
+		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<>(responseString, FeatureOfInterest.class));
 
 		} else if (targetEntity == EntityRef.LOCATIONS) {
-		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<Location>(responseString, Location.class));
+		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<>(responseString, Location.class));
 
 		} else if (targetEntity == EntityRef.OBSERVATIONS) {
 		    sensorThingsResponse
-			    .setAddressableEntityResult(new AddressableEntityResult<Observation>(responseString, Observation.class));
+			    .setAddressableEntityResult(new AddressableEntityResult<>(responseString, Observation.class));
 
 		} else if (targetEntity == EntityRef.OBSERVED_PROPERTIES) {
-		    sensorThingsResponse.setAddressableEntityResult(
-			    new AddressableEntityResult<ObservedProperty>(responseString, ObservedProperty.class));
+		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<>(responseString, ObservedProperty.class));
 
 		} else if (targetEntity == EntityRef.SENSORS) {
-		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<Sensor>(responseString, Sensor.class));
+		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<>(responseString, Sensor.class));
 
 		} else if (targetEntity == EntityRef.THINGS) {
-		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<Thing>(responseString, Thing.class));
+		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<>(responseString, Thing.class));
 
 		} else if (targetEntity == EntityRef.HISTORICAL_LOCATIONS) {
-		    sensorThingsResponse.setAddressableEntityResult(
-			    new AddressableEntityResult<HistoricalLocation>(responseString, HistoricalLocation.class));
+		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<>(responseString, HistoricalLocation.class));
 
 		} else {
 
-		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<Entity>(responseString, Entity.class));
+		    sensorThingsResponse.setAddressableEntityResult(new AddressableEntityResult<>(responseString, Entity.class));
 		}
 
 	    } catch (JSONException ex) {

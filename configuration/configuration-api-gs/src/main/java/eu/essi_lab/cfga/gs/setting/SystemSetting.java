@@ -22,12 +22,12 @@ import java.util.*;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -106,6 +106,11 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	TRUST_STORE("trustStore"), //
 	TRUST_STORE_PWD("trustStorePassword"), //
 	TRUST_STORE_NAME("trustStoreName"),//
+
+	/**
+	 * Authorization option; if set to 'true' the OAUTH-2 admin user found by UserFinder is discarded
+	 */
+	DISCARD_ESSI_OAUTH_ADMIN_USER("discardEssiOauthAdminUser"),//
 
 	/**
 	 * Configurator option
@@ -595,5 +600,14 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	}
 
 	return Optional.empty();
+    }
+
+    /**
+     * @param key
+     * @return
+     */
+    public Optional<String> readKeyValue(KeyValueOptionKeys key) {
+
+	return KeyValueOptionDecorator.super.readKeyValue(key.getLabel());
     }
 }
