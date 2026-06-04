@@ -109,18 +109,105 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 
     @Override
     public StreamingOutput getStreamingResponse(WebRequest webRequest) throws GSException {
+	String path = webRequest.getRequestPath();
+	boolean observationsPath = path != null && DATASTREAMS_OBSERVATIONS_PATTERN.matcher(path).matches();
+	final JSONObject navigationEntity;
+	if (observationsPath) {
+	    preflightDatastreamsObservations(webRequest);
+	    navigationEntity = null;
+	} else {
+	    navigationEntity = preflightDatastreamsById(webRequest);
+	}
 	return output -> {
 	    try {
-		String path = webRequest.getRequestPath();
-		if (path != null && DATASTREAMS_OBSERVATIONS_PATTERN.matcher(path).matches()) {
+		if (observationsPath) {
 		    writeDatastreamsObservationsResponse(output, webRequest);
+		} else if (navigationEntity != null) {
+		    output.write(navigationEntity.toString().getBytes(StandardCharsets.UTF_8));
 		} else {
 		    writeDatastreamsResponse(output, webRequest);
 		}
+	    } catch (WebApplicationException e) {
+		throw e;
 	    } catch (Exception e) {
 		throw new WebApplicationException("Error handling Datastreams request", e);
 	    }
 	};
+    }
+
+    /**
+     * Resolves Datastreams(id) and navigation (ObservedProperty, Sensor, Thing) before streaming starts,
+     * so that 404 responses are not lost when thrown from {@link StreamingOutput#write(OutputStream)}.
+     *
+     * @return navigation entity JSON, or {@code null} when the request is not a single-entity navigation call
+     */
+    private JSONObject preflightDatastreamsById(WebRequest webRequest) throws GSException {
+	STARequest staRequest = new STARequest(webRequest);
+	if (staRequest.getEntitySet().orElse(null) != STARequest.EntitySet.Datastreams
+		|| !staRequest.getEntityId().isPresent()) {
+	    return null;
+	}
+	String nav = staRequest.getNavigationProperty().orElse(null);
+	boolean navigation = "ObservedProperty".equals(nav) || "Sensor".equals(nav) || "Thing".equals(nav);
+
+	DiscoveryRequestTransformer transformer = getTransformer();
+	DiscoveryMessage message = transformer.transform(webRequest);
+	ResultSet<String> resultSet = exec(message);
+	if (resultSet == null || resultSet.getResultsList().isEmpty()) {
+	    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+	}
+	if (!navigation) {
+	    try {
+		String metadataXml = resultSet.getResultsList().get(0);
+		GIResourceParser parser = new GIResourceParser(metadataXml);
+		String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
+		if (STAResourceMapper.datastreamFromParser(parser, baseUrl) == null) {
+		    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+		}
+	    } catch (XMLStreamException | IOException e) {
+		throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
+	    }
+	    return null;
+	}
+	try {
+	    String metadataXml = resultSet.getResultsList().get(0);
+	    GIResourceParser parser = new GIResourceParser(metadataXml);
+	    String baseUrl = STAJsonWriter.buildBaseUrl(webRequest.getServletRequest().getRequestURL().toString());
+	    JSONObject entity;
+	    switch (nav) {
+	    case "ObservedProperty":
+		entity = STAResourceMapper.observedPropertyFromParser(parser, baseUrl);
+		break;
+	    case "Sensor":
+		entity = STAResourceMapper.sensorFromParser(parser, baseUrl);
+		break;
+	    case "Thing":
+		entity = STAResourceMapper.thingFromParser(parser, baseUrl);
+		break;
+	    default:
+		entity = null;
+	    }
+	    if (entity == null) {
+		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+	    }
+	    return entity;
+	} catch (XMLStreamException | IOException e) {
+	    throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
+	}
+    }
+
+    private void preflightDatastreamsObservations(WebRequest webRequest) throws GSException {
+	STARequest staRequest = new STARequest(webRequest);
+	String datastreamId = staRequest.getEntityIdNormalized().orElse(null);
+	if (datastreamId == null || datastreamId.isEmpty()) {
+	    throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).entity("Missing Datastream id").build());
+	}
+	DiscoveryRequestTransformer transformer = getObservationsTransformer();
+	DiscoveryMessage discoveryMessage = transformer.transform(webRequest);
+	ResultSet<String> discoveryResult = exec(discoveryMessage);
+	if (discoveryResult == null || discoveryResult.getResultsList().isEmpty()) {
+	    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
+	}
     }
 
     @Override
@@ -182,54 +269,10 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	}
 
 	if (staRequest.getEntitySet().orElse(null) == STARequest.EntitySet.Datastreams
-		&& staRequest.getEntityId().isPresent()) {
+		&& staRequest.getEntityId().isPresent()
+		&& staRequest.getNavigationProperty().isEmpty()) {
 	    if (datastreams.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
-	    }
-	    if ("ObservedProperty".equals(staRequest.getNavigationProperty().orElse(null))) {
-		try {
-		    String metadataXml = resultSet.getResultsList().get(0);
-		    GIResourceParser parser = new GIResourceParser(metadataXml);
-		    JSONObject op = STAResourceMapper.observedPropertyFromParser(parser, baseUrl);
-		    if (op != null) {
-			output.write(op.toString().getBytes(StandardCharsets.UTF_8));
-		    } else {
-			throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
-		    }
-		} catch (XMLStreamException | IOException e) {
-		    throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
-		}
-		return;
-	    }
-	    if ("Sensor".equals(staRequest.getNavigationProperty().orElse(null))) {
-		try {
-		    String metadataXml = resultSet.getResultsList().get(0);
-		    GIResourceParser parser = new GIResourceParser(metadataXml);
-		    JSONObject sensor = STAResourceMapper.sensorFromParser(parser, baseUrl);
-		    if (sensor != null) {
-			output.write(sensor.toString().getBytes(StandardCharsets.UTF_8));
-		    } else {
-			throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
-		    }
-		} catch (XMLStreamException | IOException e) {
-		    throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
-		}
-		return;
-	    }
-	    if ("Thing".equals(staRequest.getNavigationProperty().orElse(null))) {
-		try {
-		    String metadataXml = resultSet.getResultsList().get(0);
-		    GIResourceParser parser = new GIResourceParser(metadataXml);
-		    JSONObject thing = STAResourceMapper.thingFromParser(parser, baseUrl);
-		    if (thing != null) {
-			output.write(thing.toString().getBytes(StandardCharsets.UTF_8));
-		    } else {
-			throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
-		    }
-		} catch (XMLStreamException | IOException e) {
-		    throw new WebApplicationException(Response.status(Response.Status.INTERNAL_SERVER_ERROR).build());
-		}
-		return;
 	    }
 	    JSONObject singleDs = datastreams.get(0);
 	    String dsId = singleDs.getString("@iot.id");
@@ -433,10 +476,6 @@ public class DatastreamsHandler extends StreamingRequestHandler {
 	DiscoveryRequestTransformer transformer = getObservationsTransformer();
 	DiscoveryMessage discoveryMessage = transformer.transform(webRequest);
 	ResultSet<String> discoveryResult = exec(discoveryMessage);
-
-	if (discoveryResult == null || discoveryResult.getResultsList().isEmpty()) {
-	    throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
-	}
 
 	String metadataXml = discoveryResult.getResultsList().get(0);
 	GIResourceParser parser = new GIResourceParser(metadataXml);
