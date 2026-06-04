@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -197,6 +198,11 @@ public abstract class AbstractProfilerService {
 		    //
 
 		    response = profiler.handle(webRequest);
+
+		} catch (WebApplicationException wae) {
+
+		    Response waeResponse = wae.getResponse();
+		    response = waeResponse != null ? waeResponse : Response.status(Status.INTERNAL_SERVER_ERROR).build();
 
 		} catch (GSException gsEx) {
 

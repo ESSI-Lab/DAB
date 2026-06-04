@@ -10,38 +10,28 @@ package eu.essi_lab.iso.datamodel;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.xml.*;
+import jakarta.xml.bind.*;
+import net.opengis.iso19139.gco.v_20060504.*;
+import net.opengis.iso19139.gmx.v_20060504.*;
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.UnmarshalException;
-import jakarta.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
-import eu.essi_lab.jaxb.common.CommonContext;
-import eu.essi_lab.jaxb.common.ObjectFactories;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
-import net.opengis.iso19139.gco.v_20060504.CodeListValueType;
-import net.opengis.iso19139.gmx.v_20060504.AnchorType;
-import net.opengis.iso19139.gmx.v_20060504.MimeFileTypeType;
+import javax.xml.parsers.*;
+import javax.xml.xpath.*;
+import java.io.*;
 
 /**
  * @author Fabrizio
@@ -123,8 +113,24 @@ public class ISOMetadata<T> extends DOMSerializer {
     @SuppressWarnings("unchecked")
     public T fromStream(InputStream stream) throws JAXBException {
 
-	Unmarshaller unmarshaller = CommonContext.createUnmarshaller();
-	return ((JAXBElement<T>) unmarshaller.unmarshal(stream)).getValue();
+	try {
+
+	    Unmarshaller unmarshaller = CommonContext.createUnmarshaller();
+	    return ((JAXBElement<T>) unmarshaller.unmarshal(stream)).getValue();
+
+	} catch (JAXBException e) {
+
+	    String message = e.getMessage();
+
+	    if (message != null && message.contains("unexpected element")) {
+
+		message = message.substring(0, message.indexOf(")") + 1);
+
+		throw new JAXBException(message, e.getCause());
+	    }
+
+	    throw e;
+	}
     }
 
     @Override
@@ -141,7 +147,7 @@ public class ISOMetadata<T> extends DOMSerializer {
 	    if (ex instanceof UnmarshalException) {
 
 		StackTraceElement[] stackTrace = ex.getStackTrace();
-		
+
 		String message = ex.getMessage();
 
 		if (message != null && message.contains("unexpected element")) {
@@ -259,7 +265,7 @@ public class ISOMetadata<T> extends DOMSerializer {
 	}
 	return null;
     }
-    
+
     public static String getHREFStringFromCharacterString(CharacterStringPropertyType characterStringPropertyType) {
 	if (characterStringPropertyType != null && //
 		characterStringPropertyType.isSetCharacterString() && //

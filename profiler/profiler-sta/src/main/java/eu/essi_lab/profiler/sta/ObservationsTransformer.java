@@ -24,8 +24,10 @@ package eu.essi_lab.profiler.sta;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 import eu.essi_lab.messages.ResourceSelector;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.SortedFields;
@@ -40,6 +42,12 @@ import eu.essi_lab.model.resource.ResourceProperty;
  * Uses retrieveStrings (full resources) rather than distinct.
  */
 public class ObservationsTransformer extends STATransformer {
+
+    @Override
+    protected void applyEntitySpecificFilterBonds(String filter, Set<Bond> operands) {
+	addEntityIdFilter(filter, "Datastream", MetadataElement.ONLINE_ID, operands);
+	addIdFilter(filter, MetadataElement.ONLINE_ID, operands);
+    }
 
     @Override
     protected Optional<eu.essi_lab.model.Queryable> getDistinctElement(WebRequest request) {
