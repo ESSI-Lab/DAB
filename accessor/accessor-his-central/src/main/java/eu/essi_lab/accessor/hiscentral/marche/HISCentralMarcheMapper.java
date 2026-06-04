@@ -1,7 +1,9 @@
 package eu.essi_lab.accessor.hiscentral.marche;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.NoSuchAlgorithmException;
 
 /*-
  * #%L
@@ -46,6 +48,8 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -260,11 +264,14 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	legalConstraints.addUseLimitation(resourceConstraints);
 	coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
 
-	//
-	// id
-	//
-	coreMetadata.setIdentifier(timeSeriesId);
-	coreMetadata.getMIMetadata().setFileIdentifier(timeSeriesId);
+	String id = null;
+	try {
+	    id = StringUtils.hashSHA1messageDigest(stationName + " - " + basePhenomenon + " - " + timeSeriesId);
+	    coreMetadata.setIdentifier(id);
+	    coreMetadata.getMIMetadata().setFileIdentifier(id);
+	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to create permanent identifier", e);
+	}
 
 	//
 	// responsible party
@@ -375,13 +382,26 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	    protocol = CommonNameSpaceContext.HISCENTRAL_MARCHE_NS_URI;
 	}
 
-	online = new Online();
-	online.setLinkage(linkage);
-	online.setFunctionCode("download");
-	online.setName(stationName + "_" + timeSeriesId);
-	online.setProtocol(protocol);
+	HISCentralMarcheIdentifierMangler mangler = new HISCentralMarcheIdentifierMangler();
 
-	distribution.addDistributionOnline(online);
+	mangler.setPlatformIdentifier(stationName + ":" + timeSeriesId);
+	mangler.setParameterIdentifier(basePhenomenon);
+	mangler.setSourceIdentifier(id);
+
+	String identifier = mangler.getMangling();
+
+	String resourceIdentifier = generateCode(dataset, timeSeriesId + "-" + basePhenomenon);
+
+	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
+
+	Online downloadOnline = new Online();
+	downloadOnline.setLinkage(linkage);
+	downloadOnline.setFunctionCode("download");
+	downloadOnline.setName(identifier);
+	downloadOnline.setProtocol(protocol);
+	downloadOnline.setIdentifier(resourceIdentifier);
+
+	distribution.addDistributionOnline(downloadOnline);
 
 	//
 	// coverage description

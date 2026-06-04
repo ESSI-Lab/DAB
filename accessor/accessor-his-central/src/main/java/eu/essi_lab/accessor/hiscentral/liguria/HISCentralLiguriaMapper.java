@@ -1,7 +1,9 @@
 package eu.essi_lab.accessor.hiscentral.liguria;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.NoSuchAlgorithmException;
 
 /*-
  * #%L
@@ -37,16 +39,15 @@ import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -354,12 +355,14 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	// legalConstraints.addUseLimitation(resourceConstraints);
 	// coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
 
-	//
-	// id
-	//
-	String resourceIdentifier = generateCode(dataset, stationCode + "-" + varName);
-
-	coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
+	String id = null;
+	try {
+	    id = StringUtils.hashSHA1messageDigest(stationName + " - " + varId + " - " + stationCode);
+	    coreMetadata.setIdentifier(id);
+	    coreMetadata.getMIMetadata().setFileIdentifier(id);
+	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to create permanent identifier", e);
+	}
 
 	//
 	// responsible party
@@ -476,37 +479,23 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	setIndeterminatePosition(dataset);
 
-	Distribution distribution = coreMetadata.getMIMetadata().getDistribution();
+	HISCentralLiguriaIdentifierMangler mangler = new HISCentralLiguriaIdentifierMangler();
 
-	//
-	// distribution info, information
-	//
+	mangler.setPlatformIdentifier(stationName + ":" + stationCode);
+	mangler.setParameterIdentifier(varId);
+	mangler.setSourceIdentifier(id);
 
-	Online online = new Online();
-	// online.setLinkage(link);
-	// online.setFunctionCode("information");
-	// online.setName("Rete Meteo-Idro-Pluviometrica");
-	//
-	// distribution.addDistributionOnline(online);
+	String identifier = mangler.getMangling();
 
-	//
-	// distribution info, download
-	//
-
-	// if (tempExtenBegin.contains("+")) {
-	//
-	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
-	// }
-	// Date d = new Date();
 	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL;
 
-	online = new Online();
-	online.setLinkage(linkage);
-	online.setFunctionCode("download");
-	online.setName(stationName + "_" + stationCode + "_" + varId);
-	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_LIGURIA_NS_URI);
+	coreMetadata.addDistributionOnlineResource(identifier, linkage, CommonNameSpaceContext.HISCENTRAL_LIGURIA_NS_URI, "download");
 
-	distribution.addDistributionOnline(online);
+	String resourceIdentifier = generateCode(dataset, stationCode + "-" + varId);
+
+	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
+
+	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
 	//
 	// coverage description
