@@ -678,6 +678,18 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+	/**
+     *
+     */
+    public static final IndexedMetadataElement RESOURCE_PROVIDER_ORGANISATION_NAME = new IndexedMetadataElement(//
+	    MetadataElement.RESOURCE_PROVIDER_ORGANISATION_NAME) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    getPartyNamesByRoleCode(resource, "resourceProvider").forEach(this::addValue);
+	}
+    };
+
     /**
      * @param resource
      * @param code

@@ -520,6 +520,18 @@ public abstract class OSParameters {
 	}
     };
 
+	/**
+     *
+     */
+    public static final OSParameter RESOURCE_PROVIDER_ORGANISATION_NAME = new OSParameter("resProviderOrgName", "string", null, "{gs:resProviderOrgName}", false) {
+
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    return readMultiValues(value, MetadataElement.RESOURCE_PROVIDER_ORGANISATION_NAME, BondOperator.TEXT_SEARCH);
+	}
+    };
+
     /**
      *
      */
