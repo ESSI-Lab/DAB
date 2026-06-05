@@ -234,16 +234,15 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    // IDENTIFIER
 	    String id = null;
 	    try {
-		id = StringUtils.hashSHA1messageDigest(stationName + " - " + varName);
+		String hashInput = stationName + " - " + var.name() + " - " + stationType;
+		if (interp.isPresent()) {
+		    hashInput = hashInput + " - " + interp.get();
+		}
+		id = StringUtils.hashSHA1messageDigest(hashInput);
 		coreMetadata.setIdentifier(id);
 		coreMetadata.getMIMetadata().setFileIdentifier(id);
-		// coreMetadata.getDataIdentification().setResourceIdentifier(stationCode);
-	    } catch (NoSuchAlgorithmException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    } catch (UnsupportedEncodingException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	    } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+		logger.error("Unable to create permanent identifier", e);
 	    }
 
 	    ResponsibleParty publisherContact = new ResponsibleParty();
@@ -393,7 +392,7 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 
 	    CoverageDescription coverageDescription = new CoverageDescription();
 
-	    coverageDescription.setAttributeIdentifier(PLATFORM_PREFIX + ":" + varName);
+	    coverageDescription.setAttributeIdentifier(PLATFORM_PREFIX + ":" + var.name());
 	    // variable = (variable.contains(" ")) ? variable.split(" ")[0] : varName;
 	    coverageDescription.setAttributeTitle(varName);
 
@@ -488,9 +487,11 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 
 	    coreMetadata.addDistributionOnlineResource(identifier, dataUrl, CommonNameSpaceContext.HISCENTRAL_EMILIA_NS_URI, "download");
 
-	    coreMetadata.getDataIdentification().setResourceIdentifier(identifier);
-
-	    String resourceIdentifier = generateCode(dataset, stationName + "-" + varName);
+	    String resourceKey = stationType + "-" + var.name();
+	    if (interp.isPresent()) {
+		resourceKey = resourceKey + "-" + interp.get();
+	    }
+	    String resourceIdentifier = generateCode(dataset, resourceKey);
 
 	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 

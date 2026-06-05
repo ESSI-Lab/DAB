@@ -54,6 +54,7 @@ import org.json.JSONObject;
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaConnector;
+import eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaIdentifierMangler;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -195,8 +196,28 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 	    String linkage = online.getLinkage() + "&dtrf_beg=" + startString + "&dtrf_end=" + endString;
 	    // linkage = linkage.replaceAll("Z", "");
 
-	    String var = online.getName().split("_")[2];
-	    String code = online.getName().split("_")[1];
+	    String var = null;
+	    String code = null;
+	    String onlineName = online.getName();
+	    if (onlineName != null && onlineName.contains("platform=")) {
+		HISCentralLiguriaIdentifierMangler mangler = new HISCentralLiguriaIdentifierMangler();
+		mangler.setMangling(onlineName);
+		var = mangler.getParameterIdentifier();
+		String site = mangler.getPlatformIdentifier();
+		if (site != null && site.contains(":")) {
+		    code = site.split(":")[1];
+		}
+	    } else if (onlineName != null) {
+		String[] parts = onlineName.split("_");
+		if (parts.length > 2) {
+		    code = parts[1];
+		    var = parts[2];
+		}
+	    }
+	    if (var == null || code == null) {
+		throw GSException.createException(getClass(), "Unable to parse online resource name: " + onlineName, null,
+			ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_ERROR, HISCENTRAL_LIGURIA_DOWNLOAD_ERROR);
+	    }
 
 	    TimeSeriesTemplate template = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
@@ -230,6 +251,9 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 
 		JSONArrayStreamParser parser = new JSONArrayStreamParser();
 
+		String finalVar = var;
+	    	String finalCode = code;
+
 		parser.parse(cachedStream, new JSONArrayStreamParserListener() {
 		    @Override
 		    public void notifyJSONObject(JSONObject object) {
@@ -237,7 +261,8 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			ValueSingleVariable variable = new ValueSingleVariable();
 
 			// TODO: get variable of interest -- see HISCentralLiguriaConnector class
-			String valueString = object.optString(var);
+
+			String valueString = object.optString(finalVar);
 
 			if (valueString != null && !valueString.isEmpty()) {
 
@@ -245,12 +270,12 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			    // value
 			    //
 			    // temperature and wind values need to be divided by 10
-			    if (var.toLowerCase().contains("temp") || var.toLowerCase().contains("wspd")) {
+			    if (finalVar.toLowerCase().contains("temp") || finalVar.toLowerCase().contains("wspd")) {
 				double d = Double.valueOf(valueString) / 10;
 				valueString = String.valueOf(d);
 			    }
 			    // creek level values need to be divided by 100
-			    if (var.toLowerCase().contains("crlvm")) {
+			    if (finalVar.toLowerCase().contains("crlvm")) {
 				double d = Double.valueOf(valueString) / 100;
 				valueString = String.valueOf(d);
 			    }
@@ -289,7 +314,7 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 
 		    @Override
 		    public void finished() {
-			GSLoggerFactory.getLogger(getClass()).info("Completed download for station code: " + code + ".");
+			GSLoggerFactory.getLogger(getClass()).info("Completed download for station code: " + finalCode + ".");
 
 			// finished = true;
 		    }
