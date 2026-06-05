@@ -251,6 +251,9 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 
 		JSONArrayStreamParser parser = new JSONArrayStreamParser();
 
+		String finalVar = var;
+	    	String finalCode = code;
+
 		parser.parse(cachedStream, new JSONArrayStreamParserListener() {
 		    @Override
 		    public void notifyJSONObject(JSONObject object) {
@@ -258,7 +261,8 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			ValueSingleVariable variable = new ValueSingleVariable();
 
 			// TODO: get variable of interest -- see HISCentralLiguriaConnector class
-			String valueString = object.optString(var);
+
+			String valueString = object.optString(finalVar);
 
 			if (valueString != null && !valueString.isEmpty()) {
 
@@ -266,12 +270,12 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			    // value
 			    //
 			    // temperature and wind values need to be divided by 10
-			    if (var.toLowerCase().contains("temp") || var.toLowerCase().contains("wspd")) {
+			    if (finalVar.toLowerCase().contains("temp") || finalVar.toLowerCase().contains("wspd")) {
 				double d = Double.valueOf(valueString) / 10;
 				valueString = String.valueOf(d);
 			    }
 			    // creek level values need to be divided by 100
-			    if (var.toLowerCase().contains("crlvm")) {
+			    if (finalVar.toLowerCase().contains("crlvm")) {
 				double d = Double.valueOf(valueString) / 100;
 				valueString = String.valueOf(d);
 			    }
@@ -310,7 +314,7 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 
 		    @Override
 		    public void finished() {
-			GSLoggerFactory.getLogger(getClass()).info("Completed download for station code: " + code + ".");
+			GSLoggerFactory.getLogger(getClass()).info("Completed download for station code: " + finalCode + ".");
 
 			// finished = true;
 		    }
