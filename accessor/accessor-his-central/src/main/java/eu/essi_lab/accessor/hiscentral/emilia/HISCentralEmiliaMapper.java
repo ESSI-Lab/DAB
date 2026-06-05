@@ -388,7 +388,7 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 	    //
 	    // mangler.setQualityIdentifier(qualityCode);
 
-	    mangler.setSourceIdentifier(id);
+	    mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
 
 	    CoverageDescription coverageDescription = new CoverageDescription();
 

@@ -252,7 +252,7 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
 		    + "-" + interpolationLabel + (aggregationPeriod != null ? "-" + aggregationPeriod : ""));
 	    coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
 	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
-	    mangler.setSourceIdentifier(resourceIdentifier);
+	    mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
 
 	    String identifier = mangler.getMangling();
 	    String downloadUrl = datasetResource != null ? baseUrl + "/" + datasetResource : baseUrl;

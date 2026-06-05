@@ -398,7 +398,7 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 
 	mangler.setResourceIdentifier(resourceIdentifier);
 
-	mangler.setSourceIdentifier(id);
+	mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
 
 	CoverageDescription coverageDescription = new CoverageDescription();
 

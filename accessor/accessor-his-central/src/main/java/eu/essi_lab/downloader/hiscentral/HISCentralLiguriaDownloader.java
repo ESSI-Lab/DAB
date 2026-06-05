@@ -199,7 +199,7 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 	    String var = null;
 	    String code = null;
 	    String onlineName = online.getName();
-	    if (onlineName != null && onlineName.contains("platform=")) {
+	    if (onlineName != null && onlineName.contains("platform;")) {
 		HISCentralLiguriaIdentifierMangler mangler = new HISCentralLiguriaIdentifierMangler();
 		mangler.setMangling(onlineName);
 		var = mangler.getParameterIdentifier();

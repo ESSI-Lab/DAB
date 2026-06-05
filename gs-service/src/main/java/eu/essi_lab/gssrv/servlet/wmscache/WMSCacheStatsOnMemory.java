@@ -132,4 +132,14 @@ public class WMSCacheStatsOnMemory implements WMSCacheStats {
 	reqMeta.clear();
 	leaderboards.clear();
     }
+
+    @Override
+    public void deleteLayer(String view, String layer) {
+
+	leaderboards.remove(makeLeaderboardKey(view, layer));
+
+	String prefix = view + ":" + layer + ":";
+	reqCount.keySet().removeIf(key -> key.startsWith(prefix));
+	reqMeta.keySet().removeIf(key -> key.startsWith(prefix));
+    }
 }

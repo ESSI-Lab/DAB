@@ -204,14 +204,9 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().getDataIdentification()
 		.setAbstract(resourceTitle + " (" + resourceGermanTitle + ")" + " - " + measureName);
 
-	String id = null;
-	try {
-	    id = StringUtils.hashSHA1messageDigest(resourceTitle + " - " + parameterType + " - " + stationId);
+	String id = generateCode(dataset, stationId + "-" + parameterType+"-"+resourceTitle);
 	    coreMetadata.setIdentifier(id);
 	    coreMetadata.getMIMetadata().setFileIdentifier(id);
-	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Unable to create permanent identifier", e);
-	}
 
 	//
 	// responsible party
@@ -312,7 +307,7 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 
 	mangler.setPlatformIdentifier(resourceTitle + ":" + stationId);
 	mangler.setParameterIdentifier(parameterType);
-	mangler.setSourceIdentifier(id);
+	mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
 
 	String identifier = mangler.getMangling();
 

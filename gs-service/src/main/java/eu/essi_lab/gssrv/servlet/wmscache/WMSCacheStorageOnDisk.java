@@ -140,6 +140,40 @@ public class WMSCacheStorageOnDisk implements WMSCacheStorage {
     }
 
     @Override
+    public void deleteCachedLayer(String view, String layer) {
+
+	File layerFolder = new File(new File(rootDir.toFile(), view), layer);
+	deleteDirectory(layerFolder);
+    }
+
+    @Override
+    public void deleteCachedLayerAllViews(String layer) {
+
+	for (String view : getViews()) {
+	    deleteCachedLayer(view, layer);
+	}
+    }
+
+    private void deleteDirectory(File directory) {
+
+	if (directory == null || !directory.exists()) {
+	    return;
+	}
+
+	File[] children = directory.listFiles();
+	if (children != null) {
+	    for (File child : children) {
+		if (child.isDirectory()) {
+		    deleteDirectory(child);
+		} else {
+		    child.delete();
+		}
+	    }
+	}
+	directory.delete();
+    }
+
+    @Override
     public Integer getSize() {
 	Integer ret = 0;
 	List<String> views = getViews();

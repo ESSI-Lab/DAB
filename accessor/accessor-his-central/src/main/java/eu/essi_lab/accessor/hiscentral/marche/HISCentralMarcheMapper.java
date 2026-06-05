@@ -264,14 +264,9 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	legalConstraints.addUseLimitation(resourceConstraints);
 	coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
 
-	String id = null;
-	try {
-	    id = StringUtils.hashSHA1messageDigest(stationName + " - " + basePhenomenon + " - " + timeSeriesId);
+	String id = generateCode(dataset, stationName + "-" + basePhenomenon+"-"+timeSeriesId);
 	    coreMetadata.setIdentifier(id);
 	    coreMetadata.getMIMetadata().setFileIdentifier(id);
-	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Unable to create permanent identifier", e);
-	}
 
 	//
 	// responsible party
@@ -386,7 +381,7 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 
 	mangler.setPlatformIdentifier(stationName + ":" + timeSeriesId);
 	mangler.setParameterIdentifier(basePhenomenon);
-	mangler.setSourceIdentifier(id);
+	mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
 
 	String identifier = mangler.getMangling();
 

@@ -167,4 +167,27 @@ public class WMSCacheStatsOnRedis implements WMSCacheStats {
 
 	return new ArrayList<>(result);
     }
+
+    @Override
+    public void deleteLayer(String view, String layer) {
+
+	try (Jedis jedis = pool.getResource()) {
+
+	    jedis.del("wms:reqleaderboard:view" + view + ":layer:" + layer);
+
+	    String countPrefix = "wms:reqcount:view" + view + ":layer:" + layer + ":";
+	    String metaPrefix = "wms:reqmeta:view:" + view + ":layer:" + layer + ":";
+
+	    String cursor = "0";
+	    do {
+		ScanResult<String> scan = jedis.scan(cursor);
+		for (String key : scan.getResult()) {
+		    if (key.startsWith(countPrefix) || key.startsWith(metaPrefix)) {
+			jedis.del(key);
+		    }
+		}
+		cursor = scan.getCursor();
+	    } while (!cursor.equals("0"));
+	}
+    }
 }
