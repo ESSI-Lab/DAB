@@ -563,7 +563,7 @@ public class ConfigurationWrapper {
 			map(GSSource::getUniqueIdentifier).//
 			toList();
 
-		out.addAll(ids);
+ 		out.addAll(ids);
 	    }
 	}
     }
