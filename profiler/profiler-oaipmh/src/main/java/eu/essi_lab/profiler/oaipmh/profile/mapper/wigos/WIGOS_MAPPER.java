@@ -690,6 +690,8 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	     */
 	    record.setDeploymentValidPeriod(beginPosition, endPosition);
 
+	    record.setVerticalDistanceOfSensor("m", 0.0,"unknown");
+
 	    /*
 	     * SET setStationOrPlatformDateEstablished
 	     */

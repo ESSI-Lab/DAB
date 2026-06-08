@@ -289,6 +289,7 @@ public class OSCARTask extends AbstractCustomTask {
 			continue;
 		    }
 		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+		    params.put("UseOnlyGmlIds", "FALSE");
 		    HttpRequest postRequest = HttpRequestUtils.build(//
 			    MethodWithBody.POST, //
 			    finalEndpoint, doc, params);
