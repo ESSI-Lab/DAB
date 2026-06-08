@@ -49,6 +49,9 @@ async function initData() {
 
 function updateLegend() {
   const legendDiv = document.getElementById('legend');
+
+  const legendTitle = "Wet Bulb Globe Temperature (°C)";
+
   const items = [
     { range: '≤ -5.0', label: 'Freezing / Cold Stress', color: '#313695' },
     { range: '-5.0 – 0.0', label: 'Very Cold', color: '#4575b4' },
@@ -59,12 +62,15 @@ function updateLegend() {
     { range: '> 20.0', label: 'Heat Stress Threshold', color: '#d73027' }
   ];
 
-  legendDiv.innerHTML = items.map(item => `
-    <div class="legend-item">
-      <div class="legend-color" style="background:${item.color}"></div>
-      <div>${item.range} - ${item.label}</div>
-    </div>
-  `).join('');
+  legendDiv.innerHTML = `
+      <div class="legend-subtitle">${legendTitle}</div>
+      ${items.map(item => `
+        <div class="legend-item">
+          <div class="legend-color" style="background:${item.color}"></div>
+          <div>${item.range} - ${item.label}</div>
+        </div>
+      `).join('')}
+    `;
 }
 
 // 5. Update UI

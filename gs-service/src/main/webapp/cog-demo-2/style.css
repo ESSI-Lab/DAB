@@ -18,6 +18,16 @@ body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family:
 #forecastSlider { width: 100%; cursor: pointer; }
 
 /* Legend Styling */
+
+.legend-subtitle {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
 #legend { margin-top: 15px; }
 .legend-item { display: flex; align-items: center; margin: 4px 0; font-size: 12px; }
 .legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
