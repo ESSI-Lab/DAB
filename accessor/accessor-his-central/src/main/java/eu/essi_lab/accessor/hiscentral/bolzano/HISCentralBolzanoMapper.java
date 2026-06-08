@@ -1,6 +1,8 @@
 package eu.essi_lab.accessor.hiscentral.bolzano;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 
 /*-
  * #%L
@@ -32,14 +34,14 @@ import org.json.JSONObject;
 import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -202,12 +204,9 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 	coreMetadata.getMIMetadata().getDataIdentification()
 		.setAbstract(resourceTitle + " (" + resourceGermanTitle + ")" + " - " + measureName);
 
-	//
-	// id
-	//
-	String resourceIdentifier = stationId + "-" + parameterType;
-	coreMetadata.setIdentifier(resourceIdentifier);
-	coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
+	String id = generateCode(dataset, stationId + "-" + parameterType+"-"+resourceTitle);
+	    coreMetadata.setIdentifier(id);
+	    coreMetadata.getMIMetadata().setFileIdentifier(id);
 
 	//
 	// responsible party
@@ -304,37 +303,23 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 
 	setIndeterminatePosition(dataset);
 
-	Distribution distribution = coreMetadata.getMIMetadata().getDistribution();
+	HISCentralBolzanoIdentifierMangler mangler = new HISCentralBolzanoIdentifierMangler();
 
-	//
-	// distribution info, information
-	//
+	mangler.setPlatformIdentifier(resourceTitle + ":" + stationId);
+	mangler.setParameterIdentifier(parameterType);
+	mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
 
-	// Online online = new Online();
-	// online.setLinkage(resourceLocator);
-	// online.setFunctionCode("information");
-	// online.setName("Rete Meteo-Idro-Pluviometrica");
-	//
-	// distribution.addDistributionOnline(online);
-
-	//
-	// distribution info, download
-	//
-
-	// if (tempExtenBegin.contains("+")) {
-	//
-	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
-	// }
+	String identifier = mangler.getMangling();
 
 	String linkage = HISCentralBolzanoConnector.BASE_URL + "timeseries?station_code=" + stationId + "&sensor_code=" + parameterType;
 
-	Online online = new Online();
-	online.setLinkage(linkage);
-	online.setFunctionCode("download");
-	online.setName(resourceTitle + "_" + parameterType);
-	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_BOLZANO_NS_URI);
+	coreMetadata.addDistributionOnlineResource(identifier, linkage, CommonNameSpaceContext.HISCENTRAL_BOLZANO_NS_URI, "download");
 
-	distribution.addDistributionOnline(online);
+	String resourceIdentifier = generateCode(dataset, stationId + "-" + parameterType);
+
+	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
+
+	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
 	//
 	// coverage description

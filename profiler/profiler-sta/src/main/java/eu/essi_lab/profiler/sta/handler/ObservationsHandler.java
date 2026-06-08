@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,6 +90,11 @@ public class ObservationsHandler extends StreamingRequestHandler {
     }
 
     private void writeObservationsResponse(OutputStream output, WebRequest webRequest) throws Exception {
+	STARequest staRequest = new STARequest(webRequest);
+	int top = staRequest.getTop() != null ? staRequest.getTop() : 100;
+	String orderBy = staRequest.getOrderBy();
+	String filter = staRequest.getFilter();
+
 	DiscoveryRequestTransformer transformer = getTransformer();
 	DiscoveryMessage message = transformer.transform(webRequest);
 
@@ -105,33 +111,14 @@ public class ObservationsHandler extends StreamingRequestHandler {
 			continue;
 		    }
 		    String platformId = parser.getUniquePlatformCode();
-		    String beginStr = parser.getTmpExtentBegin();
-		    String endStr = parser.getTmpExtentEnd();
-		    String endNow = parser.getTmpExtentEndNow();
-		    if (endNow != null && "true".equals(endNow)) {
-			endStr = ISO8601DateTimeUtils.getISO8601DateTime();
-		    }
-		    if (beginStr == null || endStr == null) {
+		    java.util.Date[] window = resolveObservationTimeWindow(parser, filter);
+		    if (window == null) {
 			continue;
 		    }
-		    Optional<java.util.Date> beginOpt = ISO8601DateTimeUtils.parseISO8601ToDate(beginStr);
-		    Optional<java.util.Date> endOpt = ISO8601DateTimeUtils.parseISO8601ToDate(endStr);
-		    if (!beginOpt.isPresent() || !endOpt.isPresent()) {
-			continue;
-		    }
-		    ZonedDateTime phenomenonEnd = ZonedDateTime.ofInstant(endOpt.get().toInstant(), ZoneOffset.UTC);
-		    ZonedDateTime phenomenonStart = ZonedDateTime.ofInstant(beginOpt.get().toInstant(), ZoneOffset.UTC);
-		    ZonedDateTime windowEnd = phenomenonEnd;
-		    ZonedDateTime windowBegin = phenomenonEnd.minusMonths(PAGINATION_MONTHS);
-		    if (windowBegin.isBefore(phenomenonStart)) {
-			windowBegin = phenomenonStart;
-		    }
-		    java.util.Date windowBeginDate = java.util.Date.from(windowBegin.toInstant());
-		    java.util.Date windowEndDate = java.util.Date.from(windowEnd.toInstant());
 
 		    DatastreamsHandler dsHandler = new DatastreamsHandler();
 		    List<JSONObject> obs = dsHandler.fetchObservationsForDatastream(
-			    webRequest, message, datastreamId, platformId, windowBeginDate, windowEndDate, baseUrl);
+			    webRequest, message, datastreamId, platformId, window[0], window[1], baseUrl);
 		    observations.addAll(obs);
 		} catch (XMLStreamException | IOException e) {
 		    // skip malformed
@@ -139,7 +126,17 @@ public class ObservationsHandler extends StreamingRequestHandler {
 	    }
 	}
 
-	STARequest staRequest = new STARequest(webRequest);
+	boolean orderDesc = orderBy != null && orderBy.toLowerCase().contains("phenomenontime")
+		&& orderBy.toLowerCase().contains("desc");
+	if (orderDesc) {
+	    observations.sort(Comparator.comparing((JSONObject o) -> o.optString("phenomenonTime", "")).reversed());
+	} else if (orderBy != null && orderBy.toLowerCase().contains("phenomenontime")) {
+	    observations.sort(Comparator.comparing((JSONObject o) -> o.optString("phenomenonTime", "")));
+	}
+	if (observations.size() > top) {
+	    observations = observations.subList(0, top);
+	}
+
 	if (staRequest.getEntityId().isPresent()) {
 	    if (observations.isEmpty()) {
 		throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND).build());
@@ -165,5 +162,48 @@ public class ObservationsHandler extends StreamingRequestHandler {
 
 	String json = STAJsonWriter.collectionResponse(observations, nextLink, count);
 	output.write(json.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Resolves the access time window for observations: explicit phenomenonTime ge/le from $filter when present,
+     * otherwise the last {@link #PAGINATION_MONTHS} months of the datastream extent (same as $expand=Observations).
+     *
+     * @return [begin, end] or null if the extent cannot be resolved
+     */
+    private static java.util.Date[] resolveObservationTimeWindow(GIResourceParser parser, String filter) {
+	String[] range = STARequest.ExpandOption.parsePhenomenonTimeRange(filter);
+	if (range != null && range.length == 2) {
+	    Optional<java.util.Date> geOpt = ISO8601DateTimeUtils.parseISO8601ToDate(range[0]);
+	    Optional<java.util.Date> leOpt = ISO8601DateTimeUtils.parseISO8601ToDate(range[1]);
+	    if (geOpt.isPresent() && leOpt.isPresent()) {
+		return new java.util.Date[] { geOpt.get(), leOpt.get() };
+	    }
+	    return null;
+	}
+	String beginStr = parser.getTmpExtentBegin();
+	String endStr = parser.getTmpExtentEnd();
+	String endNow = parser.getTmpExtentEndNow();
+	if (endNow != null && "true".equals(endNow)) {
+	    endStr = ISO8601DateTimeUtils.getISO8601DateTime();
+	}
+	if (beginStr == null || endStr == null) {
+	    return null;
+	}
+	Optional<java.util.Date> beginOpt = ISO8601DateTimeUtils.parseISO8601ToDate(beginStr);
+	Optional<java.util.Date> endOpt = ISO8601DateTimeUtils.parseISO8601ToDate(endStr);
+	if (!beginOpt.isPresent() || !endOpt.isPresent()) {
+	    return null;
+	}
+	ZonedDateTime phenomenonStart = ZonedDateTime.ofInstant(beginOpt.get().toInstant(), ZoneOffset.UTC);
+	ZonedDateTime phenomenonEnd = ZonedDateTime.ofInstant(endOpt.get().toInstant(), ZoneOffset.UTC);
+	ZonedDateTime windowEnd = phenomenonEnd;
+	ZonedDateTime windowBegin = phenomenonEnd.minusMonths(PAGINATION_MONTHS);
+	if (windowBegin.isBefore(phenomenonStart)) {
+	    windowBegin = phenomenonStart;
+	}
+	return new java.util.Date[] {
+		java.util.Date.from(windowBegin.toInstant()),
+		java.util.Date.from(windowEnd.toInstant())
+	};
     }
 }

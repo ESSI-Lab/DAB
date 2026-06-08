@@ -21,6 +21,8 @@ package eu.essi_lab.model.ratings;
  * #L%
  */
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +33,11 @@ public class RatingCurve {
     private final LocalDate beginDate;
     private final LocalDate endDate;
     private final List<RatingCurvePoint> points = new ArrayList<>();
+    private Formula formula;
+
+    public RatingCurve() {
+	this(null, null);
+    }
 
     public RatingCurve(LocalDate beginDate, LocalDate endDate) {
 	this.beginDate = beginDate;
@@ -51,5 +58,42 @@ public class RatingCurve {
 
     public List<RatingCurvePoint> getPoints() {
 	return Collections.unmodifiableList(points);
+    }
+
+    public Formula getFormula() {
+	return formula;
+    }
+
+    public void setFormula(Formula formula) {
+	this.formula = formula;
+    }
+
+    /**
+     * Replaces the current points with a list generated from the {@link Formula}, sampling {@code count} water
+     * levels evenly from {@code 0} up to twice the formula's top range value, and evaluating the discharge at each.
+     * Levels for which the formula cannot be evaluated are skipped.
+     *
+     * @param count the number of sample points (e.g. 100)
+     */
+    public void generatePoints(int count) {
+
+	points.clear();
+	if (formula == null || formula.isEmpty() || count < 2) {
+	    return;
+	}
+	double top = formula.getTopRangeValue();
+	if (Double.isNaN(top) || top <= 0) {
+	    return;
+	}
+	double max = top * 2;
+	for (int i = 0; i < count; i++) {
+	    double level = max * i / (count - 1);
+	    double discharge = formula.evaluate(level);
+	    if (Double.isFinite(discharge)) {
+		points.add(new RatingCurvePoint(//
+			new BigDecimal(level, MathContext.DECIMAL64), //
+			new BigDecimal(discharge, MathContext.DECIMAL64)));
+	    }
+	}
     }
 }

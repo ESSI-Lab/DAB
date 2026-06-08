@@ -293,6 +293,14 @@ public class OMHandler extends StreamingRequestHandler {
 		resultWriter = new EmptyResultWriter(writer);
 	    }
 	    break;
+	case SHAPEFILE:
+	    if (OMRequestUtils.isMetadataOnly(request)) {
+		// Sync zip is handled above; async bulk uses MetadataDownloaderTool via the scheduler.
+		resultWriter = new EmptyResultWriter(writer);
+	    } else {
+		throw new IllegalArgumentException("Shapefile format is only supported for metadata-only downloads");
+	    }
+	    break;
 	default:
 	    throw new IllegalArgumentException("Unrecognized format. Choose between: " + OMFormat.stringOptions());
 	}

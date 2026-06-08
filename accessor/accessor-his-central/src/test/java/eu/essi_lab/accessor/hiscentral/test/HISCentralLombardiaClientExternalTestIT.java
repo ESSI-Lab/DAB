@@ -34,6 +34,7 @@ public class HISCentralLombardiaClientExternalTestIT {
 	// client.elencoTipologieSensore();
 
 	Stazione stazione = client.getStazione("100");
+//	Stazione stazione = client.getStazione("100002");
 
 	System.out.println("Dati stazione");
 	System.out.println("nome: " + stazione.getNome());

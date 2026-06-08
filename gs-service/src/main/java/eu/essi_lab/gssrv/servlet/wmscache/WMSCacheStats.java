@@ -54,4 +54,9 @@ public interface WMSCacheStats {
      * Retrieves top N most-used reqids from the leaderboard.
      */
     public List<Entry<String, Double>> getTopRequests(String view, String layer, int limit);
+
+    /**
+     * Drops usage counters, metadata and leaderboard for a cached layer.
+     */
+    public void deleteLayer(String view, String layer);
 }

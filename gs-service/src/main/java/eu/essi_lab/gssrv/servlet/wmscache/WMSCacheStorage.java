@@ -41,6 +41,16 @@ public interface WMSCacheStorage {
 
     public void deleteCachedResponse(String view, String layer, String hash);
 
+    /**
+     * Removes all cached tiles for a layer under a view (storage folder {@code view/layer/}).
+     */
+    public void deleteCachedLayer(String view, String layer);
+
+    /**
+     * Removes all cached tiles for a layer across every view.
+     */
+    public void deleteCachedLayerAllViews(String layer);
+
     public Integer getSize();
     
     public Integer getMaxSize();

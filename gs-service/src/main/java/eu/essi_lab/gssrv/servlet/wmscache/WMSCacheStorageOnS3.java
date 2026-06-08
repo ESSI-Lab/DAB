@@ -127,6 +127,59 @@ public class WMSCacheStorageOnS3 implements WMSCacheStorage {
     }
 
     @Override
+    public void deleteCachedLayer(String view, String layer) {
+
+	deleteObjectsWithPrefix(DEFAULT_FOLDER + "/" + view + "/" + layer + "/");
+    }
+
+    @Override
+    public void deleteCachedLayerAllViews(String layer) {
+
+	String layerSegment = "/" + layer + "/";
+	String prefix = DEFAULT_FOLDER + "/";
+	String token = null;
+
+	do {
+
+	    ListObjectsV2Response response = manager.listObjects(bucketname, prefix, token);
+	    List<String> keys = new ArrayList<>();
+
+	    for (S3Object object : response.contents()) {
+
+		String key = object.key();
+		if (key.contains(layerSegment)) {
+		    keys.add(key);
+		}
+	    }
+
+	    if (!keys.isEmpty()) {
+		manager.deleteObjects(bucketname, keys);
+	    }
+
+	    token = response.nextContinuationToken();
+
+	} while (token != null);
+    }
+
+    private void deleteObjectsWithPrefix(String prefix) {
+
+	String token = null;
+
+	do {
+
+	    ListObjectsV2Response response = manager.listObjects(bucketname, prefix, token);
+	    List<String> keys = response.contents().stream().map(S3Object::key).toList();
+
+	    if (!keys.isEmpty()) {
+		manager.deleteObjects(bucketname, keys);
+	    }
+
+	    token = response.nextContinuationToken();
+
+	} while (token != null);
+    }
+
+    @Override
     public Integer getSize() {
 	Integer ret = 0;
 	List<String> views = getViews();

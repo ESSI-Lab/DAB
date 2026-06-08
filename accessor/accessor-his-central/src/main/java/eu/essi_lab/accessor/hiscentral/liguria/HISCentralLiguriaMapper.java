@@ -1,7 +1,9 @@
 package eu.essi_lab.accessor.hiscentral.liguria;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.NoSuchAlgorithmException;
 
 /*-
  * #%L
@@ -13,12 +15,12 @@ import java.math.RoundingMode;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -37,16 +39,15 @@ import eu.essi_lab.accessor.hiscentral.utils.HISCentralUtils;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.Distribution;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -354,12 +355,9 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 	// legalConstraints.addUseLimitation(resourceConstraints);
 	// coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
 
-	//
-	// id
-	//
-	String resourceIdentifier = generateCode(dataset, stationCode + "-" + varName);
-
-	coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
+	String id = generateCode(dataset, stationName + "-" + varId);
+	coreMetadata.setIdentifier(id);
+	coreMetadata.getMIMetadata().setFileIdentifier(id);
 
 	//
 	// responsible party
@@ -476,37 +474,23 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	setIndeterminatePosition(dataset);
 
-	Distribution distribution = coreMetadata.getMIMetadata().getDistribution();
+	HISCentralLiguriaIdentifierMangler mangler = new HISCentralLiguriaIdentifierMangler();
 
-	//
-	// distribution info, information
-	//
+	mangler.setPlatformIdentifier(stationName + ":" + stationCode);
+	mangler.setParameterIdentifier(varId);
+	mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
 
-	Online online = new Online();
-	// online.setLinkage(link);
-	// online.setFunctionCode("information");
-	// online.setName("Rete Meteo-Idro-Pluviometrica");
-	//
-	// distribution.addDistributionOnline(online);
+	String identifier = mangler.getMangling();
 
-	//
-	// distribution info, download
-	//
-
-	// if (tempExtenBegin.contains("+")) {
-	//
-	// tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
-	// }
-	// Date d = new Date();
 	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL;
 
-	online = new Online();
-	online.setLinkage(linkage);
-	online.setFunctionCode("download");
-	online.setName(stationName + "_" + stationCode + "_" + varId);
-	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_LIGURIA_NS_URI);
+	coreMetadata.addDistributionOnlineResource(identifier, linkage, CommonNameSpaceContext.HISCENTRAL_LIGURIA_NS_URI, "download");
 
-	distribution.addDistributionOnline(online);
+	String resourceIdentifier = generateCode(dataset, stationCode + "-" + varId);
+
+	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
+
+	coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 
 	//
 	// coverage description

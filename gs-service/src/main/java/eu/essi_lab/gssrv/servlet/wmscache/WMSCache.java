@@ -34,6 +34,10 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.Map.*;
+import java.util.stream.Collectors;
+
+import eu.essi_lab.gssrv.servlet.WMSCacheFilter;
+import eu.essi_lab.messages.bond.spatial.ShapeLayerOwner;
 
 public class WMSCache {
 
@@ -89,6 +93,62 @@ public class WMSCache {
 
 	return storage.getCachedResponse(view, layer, hash);
 
+    }
+
+    /**
+     * @param profile WMS profile folder name ({@code wms}, {@code wms-cluster}, ...)
+     * @param layersQueryValue raw {@code layers=} query value
+     * @return cache layer key ({@code profile:layers})
+     */
+    public static String toCacheLayerKey(String profile, String layersQueryValue) {
+
+	return profile + ":" + layersQueryValue.toLowerCase();
+    }
+
+    /**
+     * Removes cached GetMap tiles and stats for predefined shape entry names (after OpenSearch delete).
+     *
+     * @param entryNames shape-files folder entry names that were removed
+     */
+    public static void invalidatePredefinedShapeEntries(Collection<String> entryNames) {
+
+	if (!WMSCacheFilter.enabled || entryNames == null || entryNames.isEmpty()) {
+	    return;
+	}
+
+	List<String> cacheLayerKeys = entryNames.stream()//
+		.filter(name -> name != null && !name.isBlank())//
+		.map(name -> toCacheLayerKey("wms", ShapeLayerOwner.OPENSEARCH_ONLINE_PREFIX + name))//
+		.collect(Collectors.toList());
+
+	getInstance().invalidateCachedWmsLayers(cacheLayerKeys);
+    }
+
+    /**
+     * @param cacheLayerKeys layer keys as stored in cache ({@code profile:layerName})
+     */
+    public void invalidateCachedWmsLayers(Collection<String> cacheLayerKeys) {
+
+	if (cacheLayerKeys == null || cacheLayerKeys.isEmpty() || storage == null) {
+	    return;
+	}
+
+	for (String cacheLayerKey : cacheLayerKeys) {
+
+	    if (cacheLayerKey == null || cacheLayerKey.isBlank()) {
+		continue;
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Invalidating WMS cache layer {}", cacheLayerKey);
+
+	    storage.deleteCachedLayerAllViews(cacheLayerKey);
+
+	    if (stats != null) {
+		for (String view : stats.getViews()) {
+		    stats.deleteLayer(view, cacheLayerKey);
+		}
+	    }
+	}
     }
 
     public void cacheResponse(String profile, WebRequest request, byte[] body) {
