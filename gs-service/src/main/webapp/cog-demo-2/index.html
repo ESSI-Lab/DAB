@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.9.0/ol.css">
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+        {
+          "imports": {
+            "ol": "https://esm.sh/ol@10.9.0",
+            "ol/": "https://esm.sh/ol@10.9.0/"
+          }
+        }
+    </script>
+</head>
+<body>
+<div id="map"></div>
+
+<div id="ui-panel">
+    <h3>WBGT Monitor</h3><div id="timeMain">Loading...</div>
+    <input type="range" id="forecastSlider" min="0" step="1" value="0">
+
+    <div id="legend">
+    </div>
+</div>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>

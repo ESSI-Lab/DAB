@@ -189,15 +189,16 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	resource.getExtensionHandler().getRasterMosaic().ifPresent(mosaic -> report.put("rasterMosaic", mosaic));
 
 	// --------------------------------------------
-	// distributor and owner org.name from contacts
+	// distributor, resourceProvider and owner org.name from contacts
 	// --------------------------------------------
 
 	JSONArray ownerOrgNameArray = new JSONArray();
 	JSONArray distOrgNameArray = new JSONArray();
+	JSONArray resProviderOrgNameArray = new JSONArray();
 
 	ArrayList<ResponsibleParty> contacts = Lists.newArrayList(mi_Metadata.getContacts());//
 
-	contacts.forEach(contact -> handleOrgName(contact, ownerOrgNameArray, distOrgNameArray));
+	contacts.forEach(contact -> handleOrgName(contact, ownerOrgNameArray, distOrgNameArray, resProviderOrgNameArray));
 
 	// -----------
 	// native EPSG
@@ -270,15 +271,20 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    // distributor parties org.name
 	    // ----------------------------
 
-	    distribution.getDistributorParties().forEach(party -> {
-
-		String name = party.getOrganisationName();
-
-		if (name != null && !name.isEmpty()) {
-
-		    report.put("distributorOrgName", name);
-		}
-	    });
+		distribution.getDistributorParties().forEach(party -> {
+		
+		    String name = party.getOrganisationName();
+		    String roleCode = party.getRoleCode();
+		
+		    if (name != null && !name.isEmpty() && roleCode != null) {
+			
+		        if (roleCode.equals("resourceProvider")) {
+		            resProviderOrgNameArray.put(name);
+		        } else {
+		            distOrgNameArray.put(name);
+		        }
+		    }
+		});
 
 	    // -------
 	    // format
@@ -490,10 +496,10 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		if (party != null) {
 
 		    // ------------------------------
-		    // distributor and owner org.name
+		    // distributor, resourceProvider and owner org.name
 		    // ------------------------------
 
-		    handleOrgName(party, ownerOrgNameArray, distOrgNameArray);
+		    handleOrgName(party, ownerOrgNameArray, distOrgNameArray, resProviderOrgNameArray);
 
 		    //
 		    //
@@ -732,6 +738,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	if (!distOrgNameArray.isEmpty()) {
 
 	    report.put("distributorOrgName", distOrgNameArray);
+	}
+
+	// --------------------------------------
+	// inserts resource provider organisation names
+	if (!resProviderOrgNameArray.isEmpty()) {
+
+	    report.put("resProviderOrgName", resProviderOrgNameArray);
 	}
 
 	// ---------------
@@ -976,7 +989,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
      */
     private void handleOrgName(ResponsibleParty responsibleParty, //
 	    JSONArray ownerOrgNameArray, //
-	    JSONArray distributionOrgNameArray) { //
+	    JSONArray distributionOrgNameArray, //
+		JSONArray resProviderOrgNameArray) { //
 
 	String roleCode = responsibleParty.getRoleCode();
 
@@ -991,6 +1005,10 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    } else if (roleCode.equals("distributor")) {
 
 		distributionOrgNameArray.put(orgName);
+
+	    } else if (roleCode.equals("resourceProvider")) {
+
+		resProviderOrgNameArray.put(orgName);
 	    }
 	}
     }

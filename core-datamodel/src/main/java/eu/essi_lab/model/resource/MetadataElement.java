@@ -428,6 +428,11 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
+    RESOURCE_PROVIDER_ORGANISATION_NAME("resProviderOrgName"),
+
+    /**
+     *
+     */
     ORGANISATION_ROLE(MetadataElement.ORGANISATION_ROLE_EL_NAME),
 
     /**
