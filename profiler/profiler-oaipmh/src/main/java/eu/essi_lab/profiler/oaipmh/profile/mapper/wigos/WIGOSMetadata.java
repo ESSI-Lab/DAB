@@ -1538,7 +1538,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	DeploymentType deployment;
 	if (procedure.getAny() == null) {
 	    deployment = new DeploymentType();
-	    deployment.setId("_" + UUID.randomUUID().toString());
+	    //deployment.setId("_" + UUID.randomUUID().toString());
 	    ProcessType processType = new ProcessType();
 	    JAXBElement<ProcessType> jaxb = factory.createProcess(processType);
 	    DeploymentPropertyType dpt = new DeploymentPropertyType();
