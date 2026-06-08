@@ -31,6 +31,7 @@ public class LegendFactory {
 	case "2t": return buildTemperature();
 	case "utci": return buildUtci();
 	case "2r": return buildHumidity();
+	case "wbgt": return buildWbgt();
 	default: return null;
 	}
     }
@@ -108,4 +109,20 @@ public class LegendFactory {
 		)
 	);
     }
+
+    private static Legend buildWbgt() {
+	return new Legend(
+		"WBGT (Wet Bulb Globe Temperature) (°C)",
+		List.of(
+			new LegendItem("≤ -5.0", "Freezing / Cold Stress", "#313695"),
+			new LegendItem("-5.0 – 0.0", "Very Cold", "#4575b4"),
+			new LegendItem("0.0 – 5.0", "Cold", "#74add1"),
+			new LegendItem("5.0 – 10.0", "Cool", "#abd9e9"),
+			new LegendItem("10.0 – 15.0", "Mild", "#fdae61"),
+			new LegendItem("15.0 – 20.0", "Warm", "#f46d43"),
+			new LegendItem("> 20.0", "Heat Stress Threshold", "#d73027")
+		)
+	);
+    }
+
 }
