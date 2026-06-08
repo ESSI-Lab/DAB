@@ -168,28 +168,28 @@ const legends = {
 
 const variables = {
   shiwe: {
-    folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/shiwe/',
+    folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/shiwe/',
     filePrefix: 'shiwe',
     visible: true,
     style: shiweStyle
   },
 
   '2t': {
-    folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2t/',
+    folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/2t/',
     filePrefix: '2t', //
     visible: false,
     style: temperatureStyle
   },
 
     utci: {
-      folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/utci/',
+      folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/utci/',
       filePrefix: 'utci', //
       visible: false,
       style: utciStyle
     },
 
     '2r': {
-          folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2r/',
+          folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/2r/',
           filePrefix: '2r', //
           visible: false,
           style: humidityStyle
