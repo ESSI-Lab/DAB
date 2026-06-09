@@ -1,4 +1,5 @@
 {
+  "filters_panel_empty": "Run a search to load filters.",
   "platformTitle_label": "Station name",
   "platformTitle_help": "Name of the station",
   "beta-title": "Beta version - release 1",

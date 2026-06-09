@@ -13,12 +13,12 @@ package eu.essi_lab.profiler.wms.cluster.map;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -43,13 +43,16 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
+
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.StreamingOutput;
@@ -321,15 +324,28 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 		    String outputCRS = crs;
 
-		    int minimumClusterSize = 10; // minimum number of stations per cluster
-		    int maximumClusterSize = 1000; // minimum number of stations for the biggest pie
-
-		    int stationDiameterInPixels = 8;
+		    int minimumClusterSize = 10000; // minimum number of stations per cluster
+		    int maximumClusterSize = 10000; // minimum number of stations for the biggest pie
+		    int stationDiameterInPixels = 10;
 		    int minimumClusterDiameterInPixels = 10;
 		    int fontSizeInPixels = 10;
 		    double maxDiameterRatio = 0.6; // pie diameter with respect to sub image
-
 		    boolean eachPieinEachSubTile = false;
+
+		    boolean clusterStyle = true;
+
+		    if (layers!=null && layers.toLowerCase().contains("his-central")){
+			clusterStyle = false;
+		    }
+		    if (clusterStyle) {
+			minimumClusterSize = 10; // minimum number of stations per cluster
+			maximumClusterSize = 1000; // minimum number of stations for the biggest pie
+			stationDiameterInPixels = 8;
+			minimumClusterDiameterInPixels = 10;
+			fontSizeInPixels = 10;
+			maxDiameterRatio = 0.6; // pie diameter with respect to sub image
+			eachPieinEachSubTile = false;
+		    }
 
 		    try {
 
@@ -407,6 +423,10 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 			double widthGeo = maxx.doubleValue() - minx.doubleValue();
 			double heightGeo = maxy.doubleValue() - miny.doubleValue();
 
+			// geographic margin to include stations whose circle extends beyond the tile edge
+			double stationMarginX = (stationDiameterInPixels / 2.0) * widthGeo / width;
+			double stationMarginY = (stationDiameterInPixels / 2.0) * heightGeo / height;
+
 			double tol = 0.0000000001;
 
 			StorageInfo uri = ConfigurationWrapper.getStorageInfo();
@@ -433,6 +453,18 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 				tmpBboxMinX = minx.doubleValue() + j * bboxWidth;
 				double tmpBboxMaxX = tmpBboxMinX + bboxWidth;
 				double tmpBboxMaxY = tmpBboxMinY + bboxHeight;
+				if (j == 0) {
+				    tmpBboxMinX -= stationMarginX;
+				}
+				if (j == divisions - 1) {
+				    tmpBboxMaxX += stationMarginX;
+				}
+				if (i == 0) {
+				    tmpBboxMinY -= stationMarginY;
+				}
+				if (i == divisions - 1) {
+				    tmpBboxMaxY += stationMarginY;
+				}
 				// System.out.println("Original bbox: minx " + tmpBboxMinX + " miny " + tmpBboxMinY + "
 				// maxx " + tmpBboxMaxX
 				// + " maxy " + tmpBboxMaxY);
@@ -476,6 +508,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 			List<WMSClusterResponse> responseList = executor.execute(request);
 
+			Set<String> drawnStationIds = new HashSet<>();
 			int bbboxIndex = 0;
 			for (WMSClusterResponse response : responseList) {
 
@@ -703,28 +736,19 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
 			    } else if (!response.getDatasets().isEmpty()) {
 
-				SpatialExtent extent = new SpatialExtent(miny.doubleValue() + tol, minx.doubleValue() + tol,
-					maxy.doubleValue() - tol, maxx.doubleValue() - tol);
-				double be = extent.getEast();
-				double bw = extent.getWest();
-				double bn = extent.getNorth();
-				double bs = extent.getSouth();
-				double bx = be - bw;
-				double by = bn - bs;
-				extent.setEast(be - bx / 10.);
-				extent.setWest(bw + bx / 10.);
-				extent.setNorth(bn - by / 10.);
-				extent.setSouth(bs + by / 10.);
-
 				List<Dataset> resultSet = response.getDatasets();
 				List<StationRecord> stations = new ArrayList<>();
 
 				for (Dataset res : resultSet) {
 
-				    StationRecord station = new StationRecord();
-
 				    String id = res.getIndexesMetadata().read(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get(0);// (res,
 				    // "gs:uniquePlatformId");
+				    if (!drawnStationIds.add(id)) {
+					continue;
+				    }
+
+				    StationRecord station = new StationRecord();
+
 				    String sourceId = res.getIndexesMetadata().read(ResourceProperty.SOURCE_ID).get();
 				    // String sourceLabel = ConfigurationWrapper.getSource(sourceId).getLabel();
 
@@ -781,37 +805,12 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 				    int stationMinY = stationCenterY - (stationDiameterInPixels) / 2;
 				    int stationMaxX = stationCenterX + (stationDiameterInPixels) / 2;
 				    int stationMaxY = stationCenterY + (stationDiameterInPixels) / 2;
-				    int offsetX = 0;
-				    int offsetY = 0;
-				    if (stationMinX < 0) {
-					offsetX = -stationMinX + 1;
+				    if (stationMaxX < 0 || stationMinX >= width || stationMaxY < 0 || stationMinY >= height) {
+					continue;
 				    }
-				    if (stationMaxX > width) {
-					offsetX = width - stationMaxX - 1;
-				    }
-				    if (stationMinY < 0) {
-					offsetY = -stationMinY + 1;
-				    }
-				    if (stationMaxY > height) {
-					offsetY = height - stationMaxY - 1;
-				    }
-				    stationMinX += offsetX;
-				    stationMaxX += offsetX;
-				    stationMinY += offsetY;
-				    stationMaxY += offsetY;
 
 				    ig2.fillOval(stationMinX, stationMinY, stationDiameterInPixels, stationDiameterInPixels);
-				    Color g = Color.black;
-				    if (offsetX != 0 || offsetY != 0) {
-					g = Color.gray;
-				    }
-				    ig2.setColor(g);
-				    if (debug) {
-					if (offsetX != 0 || offsetY != 0) {
-					    ig2.drawLine(stationCenterX, stationCenterY, stationCenterX + offsetX,
-						    stationCenterY + offsetY);
-					}
-				    }
+				    ig2.setColor(Color.black);
 				    ig2.drawOval(stationMinX, stationMinY, stationDiameterInPixels, stationDiameterInPixels);
 
 				}

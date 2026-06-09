@@ -1,4 +1,5 @@
 {
+	"filters_panel_empty": "Esegui una ricerca per caricare i filtri.",
 	"platformTitle_label" : "Nome stazione",
 	"platformTitle_help" : "Nome della stazione",
 	"beta-title": "Versione beta - release 1",

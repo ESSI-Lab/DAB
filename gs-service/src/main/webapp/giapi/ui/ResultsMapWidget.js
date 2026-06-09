@@ -214,7 +214,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		options.noResultsMsg = "No geolocalized results to show";
 	}
 
-	if (options.showSpatialRelationControl === undefined || showSpatialRelationControl === true) {
+	if (options.showSpatialRelationControl === undefined || options.showSpatialRelationControl === null) {
 		options.showSpatialRelationControl = true;
 	}
 
@@ -619,6 +619,15 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 
 	/**
+	 * Shows or hides only the "Markers" vector layer.
+	 */
+	widget.setMarkersLayerVisible = function(visible) {
+		if (olMap.setMarkersLayerVisible) {
+			olMap.setMarkersLayerVisible(visible);
+		}
+	};
+
+	/**
 	 * 
 	 */
 	widget.updateWMSClusterLayers = function(constraints) {
@@ -639,7 +648,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	
 			olMap.removeLayers(layerArray);
 			olMap.addLayers(layerArray);
-	
+
 			layerSwitcher.renderPanel();
 		}
 
@@ -702,6 +711,10 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		// resets the page in order to make it reusable
 		page.reset();
+
+		if (typeof GIAPI.search !== 'undefined' && typeof GIAPI.search.syncMarkersLayerVisibility === 'function') {
+			GIAPI.search.syncMarkersLayerVisibility();
+		}
 	};
 
 	/**

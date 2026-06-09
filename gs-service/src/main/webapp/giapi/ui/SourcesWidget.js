@@ -91,6 +91,8 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
     	options.height = 'height: 210px;';      
     }else if(options.height === 'auto'){
 		options.height = 'height: '+(jQuery(window).height()-200)+'px;'
+    }else if(options.height === 'compact'){
+		options.height = 'max-height: 220px;';
     }else{
     	options.height = 'height: '+options.height+'px;';
     }
@@ -155,20 +157,47 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 			 }			 
 		}		
    }
+
+	var bindZoomToAreaLink = function(linkId, providerId, view) {
+		jQuery(document).on('click', '#' + linkId, function(e) {
+			e.preventDefault();
+			var bboxUrl = '/gs-service/stats/bbox.jsp?view=' + encodeURIComponent(view) + '&source=' + encodeURIComponent(providerId);
+			fetch(bboxUrl)
+				.then(function(response) { return response.json(); })
+				.then(function(bbox) {
+					window.GIAPI.zoomToBoundingBox(bbox);
+				})
+				.catch(function() {
+					alert('Could not retrieve bounding box for this provider.');
+				});
+		});
+	};
+
+	var buildInlineSourceLinks = function(source, viewId) {
+		var report = source.report();
+		var providerId = report.id ? report.id : source.uiId;
+		var view = viewId || ((typeof config !== 'undefined' && config.view) ? config.view : '');
+		var token = (typeof config !== 'undefined' && config.token) ? config.token : '';
+		var providerPageUrl = '/gs-service/stats/stats.jsp?language=' + __lang() + '&view=' + view + '&source=' + encodeURIComponent(providerId) + '&token=' + token;
+		var zoomLinkId = 'zoom-to-area-' + source.uiId;
+		var html = '<span class="sources-widget-inline-links">';
+		html += '<a target="_blank" class="sources-widget-inline-link" href="' + providerPageUrl + '">' + __t('provider_page') + '</a>';
+		html += '<span class="sources-widget-inline-sep">|</span>';
+		html += '<a href="#" class="sources-widget-inline-link" id="' + zoomLinkId + '">' + __t('zoom_to_area') + '</a>';
+		html += '</span>';
+		bindZoomToAreaLink(zoomLinkId, providerId, view);
+		return html;
+	};
 	
    var createTable = function(sources){
 
 		var tableContent = '';
+		var sourceRowColspan = options.inlineSourceLinks ? 1 : 3;
 
 		if (!options.groups) {
 
-	          // control for all the sources
-	          var checkAllTable = '<table>';
-
-	          checkAllTable += '<tr>';
 	          var checkId = 'check_all';
-	          checkAllTable += '<td>';
-	          checkAllTable += '<div style="margin-left: -10px; margin-top:5px; margin-bottom:-5px">' + GIAPI.ButtonsFactory.onOffSwitchButton('IN', 'OUT', {
+	          var checkAllSwitch = GIAPI.ButtonsFactory.onOffSwitchButton('IN', 'OUT', {
 	              'id' : checkId,
 	              'size' : 'small',
 	              'offBckColor': 'white',
@@ -179,12 +208,23 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 	              'switchBorderColor': '#2c3e50',
 	              'borderColor': 'rgba(44, 62, 80, 0.07)'
 	          });
-			  
-	          checkAllTable += '</div></td>';
-	          checkAllTable += '<td style="vertical-align: bottom;"><label class="sources-widget-all-label" id="check_all_label"></label></td>';
-	          checkAllTable += '</tr></table>';
-	          
-	          jQuery('#sourcesWidgetTable').append('<tr><td colspan=3>'+checkAllTable+'</td></tr>');
+
+	          if (options.inlineSourceLinks) {
+	          	var checkAllHtml = '<div class="sources-widget-row sources-widget-check-all-row">';
+	          	checkAllHtml += '<div class="sources-widget-switch">' + checkAllSwitch + '</div>';
+	          	checkAllHtml += '<label class="sources-widget-all-label" id="check_all_label"></label>';
+	          	checkAllHtml += '</div>';
+	          	jQuery('#sourcesWidgetTable').append('<tr><td class="sources-widget-row-cell">' + checkAllHtml + '</td></tr>');
+	          } else {
+		          var checkAllTable = '<table>';
+		          checkAllTable += '<tr>';
+		          checkAllTable += '<td>';
+		          checkAllTable += '<div style="margin-left: -10px; margin-top:5px; margin-bottom:-5px">' + checkAllSwitch;
+		          checkAllTable += '</div></td>';
+		          checkAllTable += '<td style="vertical-align: bottom;"><label class="sources-widget-all-label" id="check_all_label"></label></td>';
+		          checkAllTable += '</tr></table>';
+		          jQuery('#sourcesWidgetTable').append('<tr><td colspan=' + sourceRowColspan + '>' + checkAllTable + '</td></tr>');
+	          }
 
 	          // table += '<tr>';
 	          // var checkId = 'check_all';
@@ -231,80 +271,88 @@ GIAPI.SourcesWidget = function(id, dabNode, options) {
 				  tableContent += '<tr id="'+source.report().id+'">';
 	             			
 	              var checkId = 'check_' + i;
-	              tableContent += '<td style="width: 40px;">';
-	
 	              var checked = options.include(source);
 	              source.include(checked);
 	              
 				  if (checked) {
 	                  sourcesCount++;
 	              }
-	
-	              tableContent += '<div style="margin-bottom:-5px">' + GIAPI.ButtonsFactory.onOffSwitchButton('IN', 'OUT', {
+
+	              var switchHtml = GIAPI.ButtonsFactory.onOffSwitchButton('IN', 'OUT', {
 	                  'id' : checkId,
 	                  'checked' : checked,
 	                  'size' : 'small',
 	              });
 	
 	              jQuery(document).on('click', '#' + checkId, function(event) {
-					
 	                  includeSources(sources, this);
 	              });
-			               
+
+	              if (options.inlineSourceLinks) {
+	              	tableContent += '<td class="sources-widget-row-cell" title="' + (source.report().title) + '">';
+	              	tableContent += '<div class="sources-widget-row">';
+	              	tableContent += '<div class="sources-widget-switch">' + switchHtml + '</div>';
+	              	tableContent += '<div class="sources-widget-row-content">';
+	              	tableContent += '<span class="sources-widget-src-label">' + title + '</span>';
+	              	tableContent += buildInlineSourceLinks(source, options.viewId);
+	              	tableContent += '</div></div></td>';
+	              } else {
+	              tableContent += '<td style="width: 40px;">';
+	              tableContent += '<div style="margin-bottom:-5px">' + switchHtml;
 	              tableContent += '</div></td>';
-	              
-	              var targetDivId = GIAPI.random();
-	              var infoButtonId = 'source-info-'+source.uiId;       
-	              var toggleButton = GIAPI.ToggleButton({
-	       			'id': infoButtonId,
-	       			'width': 18,
-	       			'targetId': targetDivId,
-	       			'offLabel':'',
-	       			'onLabel':'',
-	       			'attr':[{ name:'title', value:__t("source_info")  }, 
-	       			        { name:'init', value:'false' },
-	       			        { name:'target', value:targetDivId }
-			        ],
-			        'source': source, 
-	       			'beforeStart': function(){
-	       			    
-	                      var init = this.attr[1].value;
-	                      if(init === 'false'){
-	                      	
-	                        var targetId = this.attr[2].value;	                                                
-	                        this.sourceInfo = GIAPI.Source_UINode(this.source,targetId);	     
-	                        
-	                  	    jQuery('#'+targetId+' > table').css('margin-left','-78px');
-	                  	    jQuery('#'+targetId+' > table').css('margin-top','10px');
-	                      }  				
-	       			},
-	       			'onComplete': function(){
-	       				
-	       				 var init = this.attr[1].value;
-	                       if(init === 'false'){
-	                       	 this.attr[1].value = 'true';
-	                      	 this.sourceInfo.updateMap();
-	                      }
-	       			}
-	              });
-	                             
-	              toggleButton.stateIcon('on','fa-info-circle');
-	              toggleButton.stateIcon('off','fa-info-circle');
-	              toggleButton.css('div','padding','0px');
-	              toggleButton.css('div','background','transparent');            
-	              toggleButton.css('icon','color','#1A237E');
-	              toggleButton.css('icon','margin-left','2px');
-	              toggleButton.css('icon','font-size','15px');
-	              toggleButton.css('icon','vertical-align','middle');
-	 
-	              tableContent += '<td style="width: 18px;" title="'+__t("source_info")+'">'+toggleButton.div()+'</td>';
-	
-	              tableContent += '<td title="' + (source.report().title) + '" style="vertical-align: bottom;"><label class="sources-widget-src-label">' + title + '</label></br>';
-	
-	              // padding-left gives room for table margin-left:-78px so the gray frame and links stay visible
-	              var infoDiv = '<div id="'+targetDivId+'" style="display:none; padding-left: 78px"></div>';
-	              
-	              tableContent += infoDiv + '</td>';
+		              var targetDivId = GIAPI.random();
+		              var infoButtonId = 'source-info-'+source.uiId;       
+		              var toggleButton = GIAPI.ToggleButton({
+		       			'id': infoButtonId,
+		       			'width': 18,
+		       			'targetId': targetDivId,
+		       			'offLabel':'',
+		       			'onLabel':'',
+		       			'attr':[{ name:'title', value:__t("source_info")  }, 
+		       			        { name:'init', value:'false' },
+		       			        { name:'target', value:targetDivId }
+				        ],
+				        'source': source, 
+		       			'beforeStart': function(){
+		       			    
+		                      var init = this.attr[1].value;
+		                      if(init === 'false'){
+		                      	
+		                        var targetId = this.attr[2].value;	                                                
+		                        this.sourceInfo = GIAPI.Source_UINode(this.source,targetId);	     
+		                        
+		                  	    jQuery('#'+targetId+' > table').css('margin-left','-78px');
+		                  	    jQuery('#'+targetId+' > table').css('margin-top','10px');
+		                      }  				
+		       			},
+		       			'onComplete': function(){
+		       				
+		       				 var init = this.attr[1].value;
+		                       if(init === 'false'){
+		                       	 this.attr[1].value = 'true';
+		                      	 this.sourceInfo.updateMap();
+		                      }
+		       			}
+		              });
+		                             
+		              toggleButton.stateIcon('on','fa-info-circle');
+		              toggleButton.stateIcon('off','fa-info-circle');
+		              toggleButton.css('div','padding','0px');
+		              toggleButton.css('div','background','transparent');            
+		              toggleButton.css('icon','color','#1A237E');
+		              toggleButton.css('icon','margin-left','2px');
+		              toggleButton.css('icon','font-size','15px');
+		              toggleButton.css('icon','vertical-align','middle');
+		 
+		              tableContent += '<td style="width: 18px;" title="'+__t("source_info")+'">'+toggleButton.div()+'</td>';
+		
+		              tableContent += '<td title="' + (source.report().title) + '" style="vertical-align: bottom;"><label class="sources-widget-src-label">' + title + '</label></br>';
+		
+		              // padding-left gives room for table margin-left:-78px so the gray frame and links stay visible
+		              var infoDiv = '<div id="'+targetDivId+'" style="display:none; padding-left: 78px"></div>';
+		              
+		              tableContent += infoDiv + '</td>';
+	              }
 	
 	              tableContent += '</tr>';
 	          }			  
