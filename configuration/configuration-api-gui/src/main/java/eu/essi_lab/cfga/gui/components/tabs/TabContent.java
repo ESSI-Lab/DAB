@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.tabs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -170,15 +170,15 @@ public class TabContent extends VerticalLayout implements Renderable, Configurat
 
 	    int maxDescLength = 300; // no add, no reload
 
-	    if (addDirective.isPresent() && tabContentDesc.isReloadable()) { // add & reload
+	    if (addDirective.isPresent() && tabContentDesc.isReloadable() && !tabContentDesc.hideReloadButton()) { // add & reload
 
 		maxDescLength = 180;
 
-	    } else if (addDirective.isPresent() && !tabContentDesc.isReloadable()) { // only add
+	    } else if (addDirective.isPresent() && (!tabContentDesc.isReloadable() || tabContentDesc.hideReloadButton())) { // only add
 
 		maxDescLength = 200;
 
-	    } else if (addDirective.isEmpty() && tabContentDesc.isReloadable()) { // only reload
+	    } else if (addDirective.isEmpty() && tabContentDesc.isReloadable() && !tabContentDesc.hideReloadButton()) { // only reload
 
 		maxDescLength = 190;
 	    }
@@ -249,7 +249,7 @@ public class TabContent extends VerticalLayout implements Renderable, Configurat
 
 	if (tabContentDesc.isReloadable()) {
 
-	    if (addReloadButton(headerLayout)) {
+	    if (!tabContentDesc.hideReloadButton() && addReloadButton(headerLayout)) {
 
 		CustomButton reloadButton = createReloadButton();
 
