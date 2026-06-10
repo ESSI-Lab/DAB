@@ -355,6 +355,8 @@ try { window.__t = t; } catch (e) { }
 
 try { window.__lang = lang; } catch (e) { }
 
+try { window.formatISO8601Duration = formatISO8601Duration; } catch (e) { }
+
 function openLanguageChooser() {
 	try {
 		const dialogDiv = $('<div>');
@@ -2064,23 +2066,24 @@ export function initializePortal(config) {
 
 	// Configure jQuery UI datepicker locale based on current language
 	if (window.jQuery && window.jQuery.datepicker && typeof window.jQuery.datepicker.setDefaults === 'function') {
+		var temporalMinYear = (config.temporalMinYear != null) ? config.temporalMinYear : 1900;
+		var datepickerDefaults = {
+			dateFormat: 'yy-mm-dd',
+			firstDay: 1,
+			// Dropdown convenience only; does not restrict manually typed dates
+			yearRange: temporalMinYear + ':c'
+		};
 		if (lang() === 'it') {
-			window.jQuery.datepicker.setDefaults({
-				dateFormat: 'yy-mm-dd',
+			window.jQuery.datepicker.setDefaults(Object.assign({}, datepickerDefaults, {
 				monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 				             'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
 				monthNamesShort: ['Gen','Feb','Mar','Apr','Mag','Giu',
 				                  'Lug','Ago','Set','Ott','Nov','Dic'],
 				dayNames: ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
-				dayNamesMin: ['Do','Lu','Ma','Me','Gi','Ve','Sa'],
-				firstDay: 1
-			});
+				dayNamesMin: ['Do','Lu','Ma','Me','Gi','Ve','Sa']
+			}));
 		} else {
-			// Ensure a consistent default for other languages (English)
-			window.jQuery.datepicker.setDefaults({
-				dateFormat: 'yy-mm-dd',
-				firstDay: 1
-			});
+			window.jQuery.datepicker.setDefaults(datepickerDefaults);
 		}
 	}
 
@@ -2236,22 +2239,9 @@ export function initializePortal(config) {
 				}
 			}
 			
-			// Clear spatial constraints (map selection)
-			if (GIAPI.search.resultsMapWidget) {
-				var olMap = GIAPI.search.resultsMapWidget.olMap;
-				if (olMap && olMap.selectionVisible) {
-					olMap.selectionVisible(false);
-				}
-				// Clear input control fields (south, west, north, east, and location)
-				var mapElement = GIAPI.search.resultsMapWidget.map ? 
-					GIAPI.search.resultsMapWidget.map.getTargetElement() : null;
-				if (mapElement) {
-					var inputControl = jQuery(mapElement).find('.cnst-widget-where-input-control');
-					if (inputControl.length) {
-						// Clear all input fields in the input control (text, number, and any other types)
-						inputControl.find('input').val('');
-					}
-				}
+			// Clear spatial constraints (bbox fields, map selection, predefined area)
+			if (GIAPI.search.resultsMapWidget && typeof GIAPI.search.resultsMapWidget.clearSpatialConstraints === 'function') {
+				GIAPI.search.resultsMapWidget.clearSpatialConstraints();
 			}
 			
 			// Clear sources selection (select all sources)
@@ -2303,11 +2293,6 @@ export function initializePortal(config) {
 					});
 				}
 			}
-			
-			// Trigger a new search with cleared constraints
-			setTimeout(function() {
-				GIAPI.search.discover();
-			}, 100);
 		}
 
 		//------------------------------------------------------------------
@@ -3752,28 +3737,25 @@ export function initializePortal(config) {
 				// Call the original update first
 				originalUpdate.call(this, resultSet);
 
-				// Check if user is logged in and has 'downloads' permission
 				var authToken = localStorage.getItem('authToken');
 				var userPermissions = (localStorage.getItem('userPermissions') || '').split(',').map(p => p.trim()).filter(Boolean);
-				if (authToken && userPermissions.includes('downloads')) {
-					// Remove any existing download button
-					$('#paginator-widget-top-label .login-button').remove();
+				var canBulkDownload = !!(authToken && userPermissions.includes('downloads'));
 
-					// Add bulk download button next to results count
-					var downloadButton = $('<button>')
-						.addClass('login-button')
-						.text(t('bulk_data_download'))
-						.css({
-							'margin-left': '10px',
-							'padding': '5px 10px',
-							'font-size': '0.9em',
-							'background-color': '#2c3e50',
-							'color': 'white',
-							'border': 'none',
-							'border-radius': '4px',
-							'cursor': 'pointer'
-						})
-						.on('click', function() {
+				$('#paginator-widget-top-label .login-button').remove();
+
+				var downloadButton = $('<button>')
+					.addClass('login-button')
+					.text(t('bulk_data_download'))
+					.css({
+						'margin-left': '10px',
+						'padding': '5px 10px',
+						'font-size': '0.9em'
+					});
+
+				if (!canBulkDownload) {
+					downloadButton.prop('disabled', true).attr('title', t('login_info'));
+				} else {
+					downloadButton.on('click', function() {
 							// Create dialog content
 							const dialogContent = $('<div>');
 
@@ -3803,7 +3785,7 @@ export function initializePortal(config) {
 							if (constraints.when && constraints.when.from) lines.push({ label: 'Begin date', value: constraints.when.from });
 							if (constraints.when && constraints.when.to) lines.push({ label: 'End date', value: constraints.when.to });
 							var hasFiniteBbox = function(w) {
-								if (!w || w.predefinedLayer) {
+								if (!w) {
 									return false;
 								}
 								return [w.west, w.south, w.east, w.north].every(function(v) {
@@ -4167,7 +4149,8 @@ export function initializePortal(config) {
 											if (where) {
 												if (where.predefinedLayer) {
 													params.append('predefinedLayer', where.predefinedLayer);
-												} else if ([where.west, where.south, where.east, where.north].every(function(v) {
+												}
+												if ([where.west, where.south, where.east, where.north].every(function(v) {
 													return typeof v === 'number' && Number.isFinite(v);
 												})) {
 													params.append('west', where.west);
@@ -4411,10 +4394,9 @@ export function initializePortal(config) {
 								]
 							});
 						});
-
-					// Append the button after the results label
-					$('#paginator-widget-top-label').append(downloadButton);
 				}
+
+				$('#paginator-widget-top-label').append(downloadButton);
 			};
 
 			return widget;
@@ -4819,6 +4801,9 @@ export function initializePortal(config) {
 			// registers the ui nodes
 			'uiNodes': [Common_UINode_No_Aside],
 
+			'showResultOverview': config.showResultOverview !== false,
+			'resultTitleFromObservedProperty': config.resultTitleFromObservedProperty === true,
+
 			// set the widgets to update
 			'mapWidget': GIAPI.search.resultsMapWidget,
 			'pagWidget': GIAPI.search.paginatorWidget,
@@ -4896,6 +4881,16 @@ export function initializePortal(config) {
 		if (config.zoomOnResults === true) {
 			constraints.kvp.push(
 				{ 'key': 'bboxUnion', 'value': 'true' }
+			);
+		}
+
+		if (config.sortBy) {
+			var sortByValue = config.sortBy;
+			if (sortByValue.indexOf(':') === -1) {
+				sortByValue = sortByValue + ':asc';
+			}
+			constraints.kvp.push(
+				{ 'key': 'sortBy', 'value': sortByValue }
 			);
 		}
 

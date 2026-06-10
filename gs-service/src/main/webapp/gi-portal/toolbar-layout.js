@@ -37,14 +37,15 @@ export function prepareToolbarHeader(t) {
 
 	var toolbarLeft = jQuery('<div id="header-toolbar-left" class="header-toolbar-left"></div>');
 	[
-		{ id: 'toolbar-query-btn', key: 'query_toolbar', fallback: 'Query' },
-		{ id: 'toolbar-filter-btn', key: 'filter_toolbar', fallback: 'Filter' },
-		{ id: 'toolbar-results-btn', key: 'results_toolbar', fallback: 'Results' }
+		{ id: 'toolbar-query-btn', key: 'query_toolbar', fallback: 'Query', icon: 'fa-book' },
+		{ id: 'toolbar-filter-btn', key: 'filter_toolbar', fallback: 'Filter', icon: 'fa-filter' },
+		{ id: 'toolbar-results-btn', key: 'results_toolbar', fallback: 'Results', icon: 'fa-list-ul' }
 	].forEach(function(spec) {
+		var label = toolbarLabel(t, spec.key, spec.fallback);
 		toolbarLeft.append(
 			jQuery('<button type="button" class="portal-toolbar-btn"></button>')
 				.attr('id', spec.id)
-				.text(toolbarLabel(t, spec.key, spec.fallback))
+				.html('<i class="fa ' + spec.icon + ' portal-toolbar-btn-icon" aria-hidden="true"></i>' + label)
 		);
 	});
 
@@ -251,7 +252,10 @@ export function relocateSpatialControlToQueryPanel() {
 			display: 'block',
 			position: 'relative',
 			width: '100%',
-			marginTop: '0'
+			maxWidth: 'none',
+			height: 'auto',
+			marginTop: '0',
+			marginLeft: '0'
 		});
 		jQuery('#layerNameSearchInput').css({ width: '100%', boxSizing: 'border-box' });
 		jQuery('#layerSelectorDiv div[style*="overflow-y"]').css({ maxHeight: '180px' });
@@ -261,6 +265,67 @@ export function relocateSpatialControlToQueryPanel() {
 	mapControl.find('.map-control-div').css('display', 'none');
 	mapControl.hide();
 	jQuery('#whereTableCaption, #onoffswitch-div-hideMapInputControl').hide();
+}
+
+function formatIsoDate(date) {
+	var month = date.getMonth() + 1;
+	var day = date.getDate();
+	return date.getFullYear() + '-' +
+		(month < 10 ? '0' : '') + month + '-' +
+		(day < 10 ? '0' : '') + day;
+}
+
+function setTemporalInputDate(fieldId, date) {
+	var field = jQuery('#' + fieldId);
+	field.val(formatIsoDate(date));
+	if (field.hasClass('hasDatepicker')) {
+		field.datepicker('setDate', date);
+	}
+}
+
+function applyTemporalPreset(monthsBack, yearsBack) {
+	if (!GIAPI.search.constWidget) {
+		return;
+	}
+
+	var end = new Date();
+	var start = new Date();
+	if (monthsBack) {
+		start.setMonth(start.getMonth() - monthsBack);
+	}
+	if (yearsBack) {
+		start.setFullYear(start.getFullYear() - yearsBack);
+	}
+
+	setTemporalInputDate(GIAPI.search.constWidget.getId('from'), start);
+	setTemporalInputDate(GIAPI.search.constWidget.getId('to'), end);
+}
+
+function setupTemporalPresetButtons() {
+	var container = jQuery('#query-temporal-presets');
+	if (!container.length) {
+		container = jQuery('<div id="query-temporal-presets" class="query-temporal-presets"></div>');
+		jQuery('#query-temporal-fields').append(container);
+	}
+	if (container.data('initialized')) {
+		return;
+	}
+	container.data('initialized', true);
+
+	var t = window.__t || function(s) { return s; };
+	[
+		{ id: 'temporal-preset-2months', key: 'last_2_months', fallback: 'Last 2 months', months: 2 },
+		{ id: 'temporal-preset-year', key: 'last_year', fallback: 'Last year', years: 1 }
+	].forEach(function(spec) {
+		container.append(
+			jQuery('<button type="button" class="query-temporal-preset-btn"></button>')
+				.attr('id', spec.id)
+				.text(toolbarLabel(t, spec.key, spec.fallback))
+				.on('click', function() {
+					applyTemporalPreset(spec.months || 0, spec.years || 0);
+				})
+		);
+	});
 }
 
 function setupTemporalFieldsInQueryPanel() {
@@ -282,6 +347,7 @@ function setupTemporalFieldsInQueryPanel() {
 	});
 	jQuery('#' + fromId + ', #' + toId).parent('div').parent('td').css('width', '100%');
 	jQuery('#query-temporal-fields .cnst-widget-div, #query-temporal-fields .cnst-widget-table').css('width', '100%');
+	setupTemporalPresetButtons();
 }
 
 export function moveQueryPanelContent(config) {
@@ -339,6 +405,50 @@ function setupAdvancedFieldsInQueryPanel() {
 		boxSizing: 'border-box'
 	});
 	container.find('td').css({ paddingLeft: '0' });
+
+	var innerTables = container.find('table > tbody > tr > td > table');
+	innerTables.css({ display: 'block', width: '100%' });
+	innerTables.children('tbody').css({ display: 'block' });
+	var innerRows = innerTables.children('tbody').children('tr');
+	innerRows.css({
+		display: 'flex',
+		alignItems: 'center',
+		width: '100%'
+	});
+	innerRows.children('td').css({ display: 'block' });
+	innerRows.children('td:first-child').css({
+		flex: '1 1 auto',
+		minWidth: '0',
+		width: 'auto'
+	});
+	innerRows.children('td:first-child').children('div').css({
+		height: 'auto',
+		display: 'flex',
+		alignItems: 'center',
+		width: '100%'
+	});
+	innerRows.children('td:nth-child(2)').css({
+		flex: '0 0 auto',
+		width: 'auto'
+	});
+	innerRows.children('td:last-child').css({
+		flex: '0 0 24px',
+		width: '24px',
+		height: 'auto',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		padding: '0',
+		textAlign: 'center'
+	});
+	container.find('.cnst-widget-clear-button').css({
+		marginTop: '0',
+		marginLeft: '0'
+	});
+	container.find('i.odip-help').css({
+		marginLeft: '0',
+		lineHeight: '1'
+	});
 }
 
 export function appendInlineAdvancedConstraints(advancedConstraints) {
@@ -572,6 +682,7 @@ export function showToolbarQueryPanel() {
 	setButtonActive('toolbar-filter-btn', false);
 	setButtonActive('toolbar-results-btn', false);
 	updateMapSize();
+	GIAPI.search.syncMarkersLayerVisibility();
 }
 
 export function showToolbarFiltersPanel() {
@@ -611,6 +722,7 @@ export function installToolbarPanelHandlers() {
 		if (isToolbarQueryPanelActive()) {
 			hideAllToolbarPanels();
 			updateMapSize();
+			GIAPI.search.syncMarkersLayerVisibility();
 			return;
 		}
 		showToolbarQueryPanel();

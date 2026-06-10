@@ -319,6 +319,137 @@ GIAPI.Common_UINode = function(options) {
 	// private methods -------------------------------------------
 	// -----------------------------------------------------------
 
+	var getResultPortalLang = function() {
+		try {
+			if (typeof window.__lang === 'function') {
+				return window.__lang();
+			}
+			if (window.i18n && window.i18n.current) {
+				return window.i18n.current;
+			}
+		} catch (e) { }
+		return 'en';
+	};
+
+	var firstReportArrayValue = function(report, key) {
+		var values = report[key];
+		if (!values) {
+			return '';
+		}
+		if (typeof values === 'string') {
+			return values.trim();
+		}
+		if (values.length > 0 && values[0] != null) {
+			return ('' + values[0]).trim();
+		}
+		return '';
+	};
+
+	var formatResultInterpolationLabel = function(value) {
+		if (!value) {
+			return '';
+		}
+		var lang = getResultPortalLang();
+		var labelsEn = {
+			'AVERAGE': 'mean',
+			'CONTINUOUS': 'instantaneous',
+			'MAXIMUM': 'maximum',
+			'MINIMUM': 'minimum',
+			'http://www.opengis.net/def/waterml/2.0/interpolationtype/maxprec': 'maximum in the preceding interval',
+			'http://www.opengis.net/def/waterml/2.0/interpolationtype/minprec': 'minimum in the preceding interval',
+			'http://www.opengis.net/def/waterml/2.0/interpolationtype/totalprec': 'total in the preceding interval'
+		};
+		var labelsIt = {
+			'AVERAGE': 'media',
+			'CONTINUOUS': 'istantaneo',
+			'MAXIMUM': 'massimo',
+			'MINIMUM': 'minimo',
+			'http://www.opengis.net/def/waterml/2.0/interpolationtype/maxprec': 'massimo nell\'intervallo precedente',
+			'http://www.opengis.net/def/waterml/2.0/interpolationtype/minprec': 'minimo nell\'intervallo precedente',
+			'http://www.opengis.net/def/waterml/2.0/interpolationtype/totalprec': 'totale nell\'intervallo precedente'
+		};
+		var map = lang === 'it' ? labelsIt : labelsEn;
+		return map[value] || value;
+	};
+
+	var getResultMeasurementUnitDisplay = function(report) {
+		var units = firstReportArrayValue(report, 'attributeUnits');
+		var abbr = firstReportArrayValue(report, 'attributeUnitsAbbreviation');
+		if (units && abbr) {
+			return units + ' (' + abbr + ')';
+		}
+		if (units) {
+			return units;
+		}
+		if (abbr) {
+			return abbr;
+		}
+		return '';
+	};
+
+	var formatResultAggregationDuration = function(value) {
+		if (!value) {
+			return '';
+		}
+		if (typeof window.formatISO8601Duration === 'function') {
+			return window.formatISO8601Duration(value) || value;
+		}
+		return value;
+	};
+
+	var getResultSourceTitle = function(report) {
+		if (report.source && report.source.title) {
+			return ('' + report.source.title).trim();
+		}
+		return '';
+	};
+
+	var getResultPlatformTitle = function(report) {
+		var platformTitle = firstReportArrayValue(report, 'platformTitle');
+		if (platformTitle) {
+			return platformTitle;
+		}
+		return firstReportArrayValue(report, 'platformDescription');
+	};
+
+	var buildObservedPropertyResultTitle = function(report) {
+		var observedTitle = '';
+		var lang = getResultPortalLang();
+		if (lang === 'it') {
+			observedTitle = firstReportArrayValue(report, 'observedPropertyTitle_it');
+		}
+		if (!observedTitle) {
+			observedTitle = firstReportArrayValue(report, 'observedPropertyTitle');
+		}
+		if (!observedTitle) {
+			return null;
+		}
+
+		var parts = [];
+		var sourceTitle = getResultSourceTitle(report);
+		var platformTitle = getResultPlatformTitle(report);
+		if (sourceTitle) {
+			parts.push(sourceTitle);
+		}
+		if (platformTitle) {
+			parts.push(platformTitle);
+		}
+		parts.push(observedTitle);
+		var interpolation = formatResultInterpolationLabel(firstReportArrayValue(report, 'timeInterpolation'));
+		var aggregation = formatResultAggregationDuration(firstReportArrayValue(report, 'aggregationDuration'));
+		var units = getResultMeasurementUnitDisplay(report);
+		if (interpolation) {
+			parts.push(interpolation);
+		}
+		if (aggregation) {
+			parts.push(aggregation);
+		}
+		if (units) {
+			parts.push(units);
+		}
+		return parts.join(' - ');
+	};
+
 	// overview, title and description
 	var subSection1 = function(node) {
 
@@ -327,15 +458,22 @@ GIAPI.Common_UINode = function(options) {
 			desc = 'No description available';
 		}
 		var title = node.report().title;
+		if (options.resultTitleFromObservedProperty) {
+			var composedTitle = buildObservedPropertyResultTitle(node.report());
+			if (composedTitle) {
+				title = composedTitle;
+			}
+		}
 
 		// this anchor is used to localize this ui node when clicking on a marker of the result map
 		var out = '<a name="node-' + node.uiId + '"/>';
 
-		var divId = 'overview_div_' + node.uiId;
 		out += '<table><tr>';
-		out += '<td><div class="no-overview-div" style="width:96px;height:96px" id="' + divId + '"></div></td>';
-
-		GIAPI.UI_Utils.loadOverview(node, divId, { 'force': true, 'selector': true, 'maintainSize': true });
+		if (options.showResultOverview !== false) {
+			var divId = 'overview_div_' + node.uiId;
+			out += '<td><div class="no-overview-div" style="width:96px;height:96px" id="' + divId + '"></div></td>';
+			GIAPI.UI_Utils.loadOverview(node, divId, { 'force': true, 'selector': true, 'maintainSize': true });
+		}
 
 		out += '<td style="width:100%">';
 		if (!options.noTitle) {

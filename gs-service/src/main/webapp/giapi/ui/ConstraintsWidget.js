@@ -1375,13 +1375,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 
 		var width = (id === _getId('what') && whatResizable) ? '100%' : initOptions.fieldsWidth + 'px';
 		
-		var ro = '';
-
-		if (time) {
-			ro = 'readonly';
-		}
-
-		textInput += '<input autocomplete="one-time-code" '+ ro + ' value="' + initValue + '" style="width: ' + width + '; cursor: ' + cursor + ';' + taxonFieldWidth + '" placeholder="' + label + '" value="' + sel + '" class="cnst-widget-input" id="' + id + '" autocomplete="new-password" type="text" ' + readOnly + '/>' + taxonDiv;
+		textInput += '<input autocomplete="one-time-code" value="' + initValue + '" style="width: ' + width + '; cursor: ' + cursor + ';' + taxonFieldWidth + '" placeholder="' + label + '" value="' + sel + '" class="cnst-widget-input" id="' + id + '" autocomplete="new-password" type="text" ' + readOnly + '/>' + taxonDiv;
 
 		if (id != _getId('what')) {
 			textInput += '</div>';
@@ -1557,20 +1551,32 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		return div;
 	};
 
+	var getDatepickerYearRange = function(minDate, maxDate) {
+		var minYear = (minDate instanceof Date) ? minDate.getFullYear() : 1900;
+		var maxYear = (maxDate instanceof Date) ? maxDate.getFullYear() : new Date().getFullYear();
+		return minYear + ':' + maxYear;
+	};
+
 	var createDatePicker = function(obj) {
 
 		var id = obj.id;
+		var pickerOpts = {
+			dateFormat: "yy-mm-dd",
+			changeMonth: true,
+			changeYear: true
+		};
 
-		jQuery('#' + id).datepicker(
+		if (obj.minDate != null) {
+			pickerOpts.minDate = obj.minDate;
+		}
+		if (obj.maxDate != null) {
+			pickerOpts.maxDate = obj.maxDate;
+		}
+		if (obj.minDate != null && obj.maxDate != null) {
+			pickerOpts.yearRange = getDatepickerYearRange(obj.minDate, obj.maxDate);
+		}
 
-			{
-				dateFormat: "yy-mm-dd",
-				changeMonth: true,
-				changeYear: true,
-
-				minDate: obj.minDate,
-				maxDate: obj.maxDate
-			});
+		jQuery('#' + id).datepicker(pickerOpts);
 	};
 
 	var createWhatOptDialog = function() {

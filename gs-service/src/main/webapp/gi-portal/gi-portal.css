@@ -444,6 +444,13 @@ body {
     background-color: #34495e;
 }
 
+.paginator-widget-results-label .login-button:disabled,
+.paginator-widget-results-label .login-button:disabled:hover {
+    background-color: #95a5a6;
+    color: #ecf0f1;
+    cursor: not-allowed;
+}
+
 .paginator-widget-button {
 	padding: 3px;
 	border-radius: 0px;
@@ -1336,6 +1343,10 @@ body.toolbar-layout .portal-toolbar-btn {
 	transition: background-color 0.2s;
 }
 
+body.toolbar-layout .portal-toolbar-btn-icon {
+	margin-right: 6px;
+}
+
 body.toolbar-layout .portal-toolbar-btn:hover,
 body.toolbar-layout .portal-toolbar-btn.active {
 	background-color: #34495e;
@@ -1414,6 +1425,29 @@ body.toolbar-layout #query-temporal-fields #to-div {
 body.toolbar-layout #query-temporal-fields .cnst-widget-input {
 	width: 100% !important;
 	box-sizing: border-box;
+}
+
+body.toolbar-layout .query-temporal-presets {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 4px;
+}
+
+body.toolbar-layout .query-temporal-preset-btn {
+	background: #fff;
+	border: 1px solid #b0b0b0;
+	border-radius: 4px;
+	padding: 6px 12px;
+	font-size: 12px;
+	cursor: pointer;
+	color: #333;
+}
+
+body.toolbar-layout .query-temporal-preset-btn:hover {
+	background: #f0f4f8;
+	border-color: #25418F;
+	color: #25418F;
 }
 
 body.toolbar-layout #query-sources-fields {
@@ -1643,6 +1677,63 @@ body.toolbar-layout #query-advanced-fields #advConstDiv label {
 	font-weight: normal;
 }
 
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table {
+	display: block;
+	width: 100%;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table > tbody {
+	display: block;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table > tbody > tr {
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table > tbody > tr > td {
+	display: block;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table > tbody > tr > td:first-child {
+	flex: 1 1 auto;
+	min-width: 0;
+	width: auto !important;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table > tbody > tr > td:first-child > div {
+	height: auto !important;
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) {
+	flex: 0 0 auto;
+	width: auto !important;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv > table > tbody > tr > td > table > tbody > tr > td:last-child {
+	flex: 0 0 24px;
+	width: 24px !important;
+	height: auto !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 !important;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv .cnst-widget-clear-button {
+	margin-top: 0 !important;
+	margin-left: 0 !important;
+}
+
+body.toolbar-layout #query-advanced-fields #advConstDiv i.odip-help.fa {
+	margin-left: 0 !important;
+	line-height: 1;
+}
+
 body.toolbar-layout #query-panel-footer {
 	display: flex;
 	align-items: center;
@@ -1756,6 +1847,12 @@ body.toolbar-layout #query-predefined-fields.query-spatial-inline {
 	width: 100%;
 }
 
+body.toolbar-layout #query-predefined-fields {
+	flex-direction: column;
+	align-items: stretch;
+	width: 100%;
+}
+
 body.toolbar-layout #query-bbox-fields .cnst-widget-where-input-control {
 	width: 100%;
 	font-size: 13px !important;
@@ -1779,10 +1876,24 @@ body.toolbar-layout #query-predefined-fields #layerSelectorDiv {
 	position: relative !important;
 	display: block !important;
 	width: 100% !important;
+	max-width: none !important;
+	height: auto !important;
+	margin-left: 0 !important;
+	margin-top: 0 !important;
 	background: #fff;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	padding: 6px;
+	box-sizing: border-box;
+}
+
+body.toolbar-layout #query-predefined-fields #wrapLayerSelectorTable,
+body.toolbar-layout #query-predefined-fields #layerSelectorTable {
+	width: 100%;
+}
+
+body.toolbar-layout #query-predefined-fields #layerSelectorDiv div[style*="overflow-y"] {
+	width: 100%;
 	box-sizing: border-box;
 }
 

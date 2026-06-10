@@ -141,7 +141,7 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 	    sensorType = "20005";
 	    break;
 	case 3:
-	    sensorType = "10001";
+	    sensorType = "10001"; // portata
 	    break;
 	case 4:
 	    sensorType = "19";

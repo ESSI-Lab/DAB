@@ -47,6 +47,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.FileIdentifierMapper;
 
@@ -212,7 +213,24 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 
 	String endTime = sensorInfo.optString("dataora");
 
-	String interpolation = retrieveValueType(originalMD);
+	String interpolationLabel = retrieveValueType(originalMD);
+
+	InterpolationType interpolation = null;
+	if (interpolationLabel != null) {
+	    String lower = interpolationLabel.toLowerCase();
+	    if (lower.contains("minimo") || lower.contains("minima")) {
+		interpolation = InterpolationType.MIN;
+	    } else if (lower.contains("cumulata")) {
+		interpolation = InterpolationType.TOTAL;
+	    } else if (lower.contains("medio")) {
+		interpolation = InterpolationType.AVERAGE;
+	    } else if (lower.contains("massimo") || lower.contains("massima")) {
+		interpolation = InterpolationType.MAX;
+	    }
+	}
+	if (interpolation != null) {
+	    dataset.getExtensionHandler().setTimeInterpolation(interpolation);
+	}
 
 	//
 	// String stationName = sensorInfo.getString("name");
@@ -264,13 +282,13 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	coreMetadata.addDistributionFormat("WaterML 1.1");
 
 	coreMetadata.getMIMetadata().getDataIdentification()
-		.setCitationTitle(stationName + " - " + measureName + " (" + interpolation + ")");
-	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(stationName + " - " + measureName + " (" + interpolation + ")");
+		.setCitationTitle(stationName + " - " + measureName + " (" + interpolationLabel + ")");
+	coreMetadata.getMIMetadata().getDataIdentification().setAbstract(stationName + " - " + measureName + " (" + interpolationLabel + ")");
 
 	//
 	// id
 	//
-	String resourceIdentifier = generateCode(dataset, timeSeriesId);
+	String resourceIdentifier = generateCode(dataset, timeSeriesId + "-" + interpolationLabel);
 	coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
 
 	//
@@ -384,7 +402,7 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	Online online = new Online();
 	online.setLinkage(linkage);
 	online.setFunctionCode("download");
-	online.setName(stationName + " - " + measureName + " (" + interpolation + ")");
+	online.setName(stationName + " - " + measureName + " (" + interpolationLabel + ")");
 	online.setIdentifier(resourceIdentifier);
 	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_VENETO_NS_URI);
 
