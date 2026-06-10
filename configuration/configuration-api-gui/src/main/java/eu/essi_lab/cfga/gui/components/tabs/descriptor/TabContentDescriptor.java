@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.tabs.descriptor;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -41,6 +41,7 @@ public class TabContentDescriptor {
     private Component content;
     private Class<? extends Setting> settingClass;
     private boolean reloadOnFlush;
+    private boolean hideReloadButton;
 
     /**
      *
@@ -101,6 +102,14 @@ public class TabContentDescriptor {
     /**
      * @return
      */
+    public boolean hideReloadButton() {
+
+	return hideReloadButton;
+    }
+
+    /**
+     * @return
+     */
     public boolean isReloadableOnFlush() {
 
 	return reloadOnFlush;
@@ -138,9 +147,20 @@ public class TabContentDescriptor {
      */
     public void setReloadable(Runnable reloader, boolean reloadOnFlush) {
 
+	setReloadable(reloader, reloadOnFlush, false);
+    }
+
+    /**
+     * @param reloader
+     * @param reloadOnFlush
+     * @param hideReloadButton
+     */
+    public void setReloadable(Runnable reloader, boolean reloadOnFlush, boolean hideReloadButton) {
+
 	this.reloadable = true;
 	this.tabReloadHandler = reloader;
 	this.reloadOnFlush = reloadOnFlush;
+	this.hideReloadButton = hideReloadButton;
     }
 
     /**
