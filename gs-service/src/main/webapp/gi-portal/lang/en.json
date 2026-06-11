@@ -243,7 +243,7 @@
 	"platformTitle_label" : "Platform name",
 	"attributeId_help" : "Id of the parameter described by the measurement value",
 	"attributeId_label" : "Parameter id",
-	"attributeTitle_help" : "Name of the parameter described by the measurement value<br/><br/><button id=\"pButton\">Browse and select parameters from the ontology GUI</button><br/><br/><button id=\"bButton\">Browse and select parameters from the ontology tree</button>",
+	"attributeTitle_help" : "Name of the parameter described by the measurement value<br/><br/><button id=\"bButton\">Browse and select parameters from the ontology tree</button>",
 	"attributeTitle_label" : "Parameter name",
 	"riverName_help" : "Name of the river object of measurement",
 	"riverName_label" : "River name",

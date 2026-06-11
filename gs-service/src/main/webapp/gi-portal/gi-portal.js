@@ -2848,11 +2848,11 @@ export function initializePortal(config) {
 		leftSidebar.css({
 			'display': isToolbarLayout(config) ? 'none' : 'flex',
 			'flex-direction': 'column',
-			'flex': '1',
+			'flex': isToolbarLayout(config) ? '0 0 40%' : '1',
 			'min-height': '0',
 			'width': '40%',
 			'min-width': '0',
-			'max-width': 'none',
+			'max-width': isToolbarLayout(config) ? '40%' : 'none',
 			'overflow': 'hidden'
 		});
 		
