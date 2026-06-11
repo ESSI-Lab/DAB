@@ -41,6 +41,7 @@
   "time": "Time",
   "please_select_data_format": "Please select data format",
   "disclaimer_to_accept": "Disclaimer to accept",
+  "disclaimer" : "Data from Regional Hydro-Meteorological Services and Autonomous Provinces. The data may be subject to revision.",
   "accept": "Accept",
   "cancel": "Cancel",
   "full_extent_note": "* Please note that data plotting for the full extent might take a large amount of time",

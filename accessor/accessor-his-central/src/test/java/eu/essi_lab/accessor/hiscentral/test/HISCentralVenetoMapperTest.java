@@ -1,7 +1,9 @@
 package eu.essi_lab.accessor.hiscentral.test;
 
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.json.JSONObject;
@@ -23,6 +25,7 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
+import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import junit.framework.TestCase;
 
@@ -146,7 +149,7 @@ public class HISCentralVenetoMapperTest {
 	TestCase.assertEquals(-1.0, verticalExtent.getMaximumValue());
 	
 	// id
-	TestCase.assertEquals("553512433DB9C6E766DC0F73413837B14D871C39", resource.getOriginalId().get());
+	TestCase.assertEquals("6CF2A38A16606235E2759FD0FF69033AB08D776E", resource.getOriginalId().get());
 
 	// responsible party
 	ResponsibleParty originator = dataIdentification.getPointOfContact("publisher");
@@ -184,5 +187,28 @@ public class HISCentralVenetoMapperTest {
 	//unitName
 	TestCase.assertEquals("mm", resource.getExtensionHandler().getAttributeUnits().get());
 
+	TestCase.assertEquals(InterpolationType.MAX, resource.getExtensionHandler().getTimeInterpolation().get());
+
+    }
+
+    @Test
+    public void testDistinctIdentifiersPerInterpolationType() throws Exception {
+	InputStream stream = HISCentralVenetoMapperTest.class.getClassLoader().getResourceAsStream("venetoStation.json");
+	String metadataTemplate = IOUtils.toString(stream);
+	GSSource gsSource = new GSSource();
+
+	Set<String> ids = new HashSet<>();
+	for (String interpolation : new String[] { "MINIMO", "MEDIO", "MASSIMO" }) {
+	    JSONObject record = new JSONObject(metadataTemplate);
+	    record.put("value", interpolation);
+	    OriginalMetadata originalMD = new OriginalMetadata();
+	    originalMD.setMetadata(record.toString());
+	    originalMD.setSchemeURI(CommonNameSpaceContext.HISCENTRAL_VENETO_NS_URI);
+
+	    GSResource resource = mapper.map(originalMD, gsSource);
+	    ids.add(resource.getOriginalId().get());
+	}
+
+	TestCase.assertEquals(3, ids.size());
     }
 }

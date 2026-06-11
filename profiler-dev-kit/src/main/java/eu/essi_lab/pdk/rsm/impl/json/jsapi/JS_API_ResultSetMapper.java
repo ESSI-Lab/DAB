@@ -26,9 +26,14 @@ import eu.essi_lab.access.compliance.*;
 import eu.essi_lab.access.compliance.DataComplianceTester.*;
 import eu.essi_lab.access.compliance.wrapper.*;
 import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.net.utils.whos.HISCentralOntology;
+import eu.essi_lab.lib.net.utils.whos.HydroOntology;
+import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
+import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.xml.*;
 import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.bond.View;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.pluggable.*;
 import eu.essi_lab.model.resource.*;
@@ -330,38 +335,38 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 
 		List<DataComplianceReport> reports = handler.getReports();
 
-		reports.stream().//
-			filter(r -> r.getFullDataDescriptor().getDataType().equals(DataType.TIME_SERIES)).//
-			filter(r -> r.getLastSucceededTest().equals(DataComplianceTest.EXECUTION)).//
-			forEach(r -> {
-		    try {
-
-			String onlineId = r.getOnlineId();
-
-			JSONObject jsonOnline = new JSONObject();
-			jsonOnline.put("protocol", "GWIS");
-			jsonOnline.put("function", "info");
-
-			URL base = new URI(message.getRequestAbsolutePath()).toURL();
-
-			Optional<String> token = message.getWebRequest().extractTokenId();
-			String tokenString = "";
-
-			if (token.isPresent()) {
-			    tokenString = "&token=" + token.get();
-			}
-
-			URL url = new URL(base, "../gwis?request=plot&onlineId=" + onlineId + tokenString);
-			jsonOnline.put("url", url.toExternalForm());
-
-			online.put(jsonOnline);
-
-		    } catch (Exception e) {
-
-			GSLoggerFactory.getLogger(getClass()).error(e);
-		    }
-
-		});
+//		reports.stream().//
+//			filter(r -> r.getFullDataDescriptor().getDataType().equals(DataType.TIME_SERIES)).//
+//			filter(r -> r.getLastSucceededTest().equals(DataComplianceTest.EXECUTION)).//
+//			forEach(r -> {
+//		    try {
+//
+//			String onlineId = r.getOnlineId();
+//
+//			JSONObject jsonOnline = new JSONObject();
+//			jsonOnline.put("protocol", "GWIS");
+//			jsonOnline.put("function", "info");
+//
+//			URL base = new URI(message.getRequestAbsolutePath()).toURL();
+//
+//			Optional<String> token = message.getWebRequest().extractTokenId();
+//			String tokenString = "";
+//
+//			if (token.isPresent()) {
+//			    tokenString = "&token=" + token.get();
+//			}
+//
+//			URL url = new URL(base, "../gwis?request=plot&onlineId=" + onlineId + tokenString);
+//			jsonOnline.put("url", url.toExternalForm());
+//
+//			online.put(jsonOnline);
+//
+//		    } catch (Exception e) {
+//
+//			GSLoggerFactory.getLogger(getClass()).error(e);
+//		    }
+//
+//		});
 
 		if (!online.isEmpty()) {
 
@@ -848,6 +853,13 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    report.put("attributeTitle", attributeTitle);
 	}
 
+	putMetadataStringArray(report, "observedPropertyURI", MetadataElement.OBSERVED_PROPERTY_URI, resource);
+	putObservedPropertyTitles(report, message, resource);
+	putMetadataStringArray(report, "timeInterpolation", MetadataElement.TIME_INTERPOLATION, resource);
+	putMetadataStringArray(report, "aggregationDuration", MetadataElement.TIME_AGGREGATION_DURATION_8601, resource);
+	putMetadataStringArray(report, "attributeUnits", MetadataElement.ATTRIBUTE_UNITS, resource);
+	putMetadataStringArray(report, "attributeUnitsAbbreviation", MetadataElement.ATTRIBUTE_UNITS_ABBREVIATION, resource);
+
 	// ----------------------------------------
 	// platformDescription & platformIdentifier
 	// ----------------------------------------
@@ -1035,6 +1047,99 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 		dateArray.put(revDateTime.toString());
 	    }
 	}
+    }
+
+    private void putObservedPropertyTitles(JSONObject report, DiscoveryMessage message, GSResource resource) {
+
+	List<String> uris = resource.getIndexesMetadata().read(MetadataElement.OBSERVED_PROPERTY_URI);
+	if (uris == null || uris.isEmpty()) {
+	    Optional<String> extensionUri = resource.getExtensionHandler().getObservedPropertyURI();
+	    if (extensionUri.isEmpty() || extensionUri.get() == null || extensionUri.get().trim().isEmpty()) {
+		return;
+	    }
+	    uris = List.of(extensionUri.get().trim());
+	}
+
+	TreeSet<String> titlesEn = new TreeSet<>();
+	TreeSet<String> titlesIt = new TreeSet<>();
+
+	for (String uri : uris) {
+	    normalizeText(uri).ifPresent(normalizedUri -> {
+		HydroOntology ontology = resolveObservedPropertyOntology(normalizedUri, message);
+		SKOSConcept concept = ontology.getConcept(normalizedUri);
+		if (concept == null) {
+		    return;
+		}
+		String en = concept.getPreferredLabel("en");
+		String it = concept.getPreferredLabel("it");
+		if (en != null && !en.isEmpty()) {
+		    titlesEn.add(en);
+		}
+		if (it != null && !it.isEmpty()) {
+		    titlesIt.add(it);
+		} else if (en != null && !en.isEmpty()) {
+		    titlesIt.add(en);
+		}
+	    });
+	}
+
+	putStringSetAsJsonArray(report, "observedPropertyTitle", titlesEn);
+	putStringSetAsJsonArray(report, "observedPropertyTitle_it", titlesIt);
+    }
+
+    private HydroOntology resolveObservedPropertyOntology(String uri, DiscoveryMessage message) {
+
+	if (uri.contains(HISCentralOntology.HIS_CENTRAL_BASE_URI)) {
+	    return new HISCentralOntology();
+	}
+
+	Optional<View> view = message.getView();
+	if (view.isPresent()) {
+	    String creator = view.get().getCreator();
+	    if (creator != null && creator.toLowerCase().contains("his")) {
+		return new HISCentralOntology();
+	    }
+	}
+
+	return new WHOSOntology();
+    }
+
+    private void putStringSetAsJsonArray(JSONObject report, String jsonKey, TreeSet<String> sorted) {
+
+	if (sorted.isEmpty()) {
+	    return;
+	}
+
+	JSONArray array = new JSONArray();
+	for (String item : sorted) {
+	    array.put(item);
+	}
+
+	report.put(jsonKey, array);
+    }
+
+    private void putMetadataStringArray(JSONObject report, String jsonKey, MetadataElement element, GSResource resource) {
+
+	List<String> values = resource.getIndexesMetadata().read(element);
+	if (values == null || values.isEmpty()) {
+	    return;
+	}
+
+	TreeSet<String> sorted = new TreeSet<>();
+	for (String value : values) {
+	    normalizeText(value).ifPresent(sorted::add);
+	}
+
+	if (sorted.isEmpty()) {
+	    return;
+	}
+
+	JSONArray array = new JSONArray();
+	for (String item : sorted) {
+	    array.put(item);
+	}
+
+	report.put(jsonKey, array);
     }
 
     /**

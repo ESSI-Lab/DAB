@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.request.executor.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -121,8 +122,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 	    List<GSResource> resources = resultSet.getResultsList();
 	    List<SimpleEntry<RowInfo, String>> rows = new ArrayList();
-	    for (int i = 0; i < resources.size(); i++) {
 
+	    for (int i = 0; i < resources.size(); i++) {
+		GSLoggerFactory.getLogger(getClass()).info("At " +i+"/"+ resources.size() + " resources");
 		GSResource resource = resources.get(i);
 		String source = s.getLabel();
 		String protocol = null;

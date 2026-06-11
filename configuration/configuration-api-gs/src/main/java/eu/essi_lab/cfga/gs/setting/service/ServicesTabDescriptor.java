@@ -10,17 +10,19 @@ package eu.essi_lab.cfga.gs.setting.service;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
+import com.vaadin.flow.component.button.*;
+import com.vaadin.flow.component.dialog.*;
 import com.vaadin.flow.component.grid.contextmenu.*;
 import com.vaadin.flow.data.provider.*;
 import eu.essi_lab.cfga.*;
@@ -74,11 +76,10 @@ public class ServicesTabDescriptor extends TabDescriptor {
 
 		ColumnDescriptor.create("Host", true, true, s -> ManagedServiceSupport.getInstance().getServiceHost(s)),
 
-		ColumnDescriptor.create("Messages", 70, s -> ManagedServiceSupport.getInstance().getServiceMessages(s), //
-			ViewerColumnRenderer.create("Messages", "Messages", "View service messages"))
+		ColumnDescriptor.create("Messages", 70, s -> "", new ServiceMessagesRenderer())
 
 	), getItemsList()).//
-		reloadable(() -> ManagedServiceSupport.getInstance().update(), true).//
+		reloadable(() -> ManagedServiceSupport.getInstance().update(), true, true).//
 
 		build();
 
@@ -86,6 +87,43 @@ public class ServicesTabDescriptor extends TabDescriptor {
 	addContentDescriptor(descriptor);
 
 	ManagedServiceSupport.getInstance().update();
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    private static class ServiceMessagesRenderer extends ViewerColumnRenderer {
+
+	/**
+	 *
+	 */
+	private ServiceMessagesRenderer() {
+
+	    super("Messages", "Messages", "View service messages");
+	}
+
+	@Override
+	public Button createComponent(HashMap<String, String> item) {
+
+	    Button button = createButton(tooltip);
+
+	    button.setId(item.get("identifier"));
+
+	    button.addClickListener(evt -> {
+
+		String serviceMessages = ManagedServiceSupport.getInstance() //
+			.getServiceMessages(ConfigurationWrapper.getManagedServiceSettings().//
+				stream().//
+				filter(s -> s.getIdentifier().equals(button.getId().get())).//
+				findFirst().get());//
+
+		Dialog dialog = createDialog(windowTitle, serviceMessages);
+
+		dialog.open();
+	    });
+
+	    return button;
+	}
     }
 
     /**

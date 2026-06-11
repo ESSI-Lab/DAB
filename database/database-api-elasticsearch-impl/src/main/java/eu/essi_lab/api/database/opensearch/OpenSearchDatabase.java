@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import eu.essi_lab.cfga.Configuration;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.configuration.ExecutionMode;
@@ -93,6 +94,11 @@ public class OpenSearchDatabase extends Database {
      * @return
      */
     public static boolean debugQueries() {
+
+	Optional<Configuration> optionalConfiguration = ConfigurationWrapper.getConfiguration();
+	if (!optionalConfiguration.isPresent()) {
+	    return false;
+	}
 
 	return ConfigurationWrapper.getSystemSettings(). //
 		readKeyValue(SystemSetting.KeyValueOptionKeys.DEBUG_OPENSEARCH_QUERIES.getLabel()). //

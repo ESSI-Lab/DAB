@@ -21,6 +21,8 @@ package eu.essi_lab.accessor.hiscentral.emilia.simc;
  * #L%
  */
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -38,6 +40,7 @@ import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -239,6 +242,24 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
 		baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
 	    }
 
+	    String parameterCode = bcode != null ? bcode : datasetResource;
+
+	    String id = null;
+	    try {
+		String hashInput = stationName + " - " + parameterCode + " - " + stationId;
+		if (interpolationLabel != null && !interpolationLabel.isEmpty()) {
+		    hashInput += " - " + interpolationLabel;
+		}
+		if (aggregationPeriod != null && !aggregationPeriod.isEmpty()) {
+		    hashInput += " - " + aggregationPeriod;
+		}
+		id = StringUtils.hashSHA1messageDigest(hashInput);
+		coreMetadata.setIdentifier(id);
+		coreMetadata.getMIMetadata().setFileIdentifier(id);
+	    } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+		GSLoggerFactory.getLogger(getClass()).error("Unable to create permanent identifier", e);
+	    }
+
 	    HISCentralEmiliaSimcMangler mangler = new HISCentralEmiliaSimcMangler();
 	    mangler.setPlatformIdentifier(stationId);
 	    if (datasetResource != null) {
@@ -247,18 +268,25 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
 	    if (bcode != null) {
 		mangler.setBcode(bcode);
 	    }
-
-	    String resourceIdentifier = generateCode(dataset, stationId + "-" + (bcode != null ? bcode : datasetResource)
-		    + "-" + interpolationLabel + (aggregationPeriod != null ? "-" + aggregationPeriod : ""));
-	    coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
-	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
-	    mangler.setSourceIdentifier(dataset.getSource().getUniqueIdentifier());
+	    mangler.setSourceIdentifier(id);
 
 	    String identifier = mangler.getMangling();
 	    String downloadUrl = datasetResource != null ? baseUrl + "/" + datasetResource : baseUrl;
 
+	    String resourceKey = stationId + "-" + parameterCode;
+	    if (interpolationLabel != null && !interpolationLabel.isEmpty()) {
+		resourceKey += "-" + interpolationLabel;
+	    }
+	    if (aggregationPeriod != null && !aggregationPeriod.isEmpty()) {
+		resourceKey += "-" + aggregationPeriod;
+	    }
+	    String resourceIdentifier = generateCode(dataset, resourceKey);
+
 	    coreMetadata.addDistributionOnlineResource(identifier, downloadUrl, CommonNameSpaceContext.HISCENTRAL_EMILIA_SIMC_NS_URI,
 		    "download");
+
+	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
+
 	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 	    dataset.getPropertyHandler().setIsTimeseries(true);
 

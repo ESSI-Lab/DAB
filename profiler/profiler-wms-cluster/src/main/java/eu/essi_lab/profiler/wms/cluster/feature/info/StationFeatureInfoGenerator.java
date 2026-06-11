@@ -37,13 +37,17 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
 
 public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
+    private static final String LANG_PARAM = "lang";
+
     @Override
     public InputStream getInfoPage(String hostname, String token, String viewId, List<StationRecord> stations, int total, String contentType,
 	    WMSGetFeatureInfoRequest request) {
 
+	StationFeatureInfoLabels labels = StationFeatureInfoLabels.of(request.getServletParameter(LANG_PARAM));
+
 	StringBuilder htmlBuilder = new StringBuilder();
 
-	htmlBuilder = build(htmlBuilder, stations.size(), total, false);
+	htmlBuilder = build(htmlBuilder, stations.size(), total, false, labels);
 
 	JSONArray json = new JSONArray();
 
@@ -139,7 +143,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 
 	if (stations.isEmpty()) {
 
-	    htmlBuilder = build(new StringBuilder(), stations.size(), 0, true);
+	    htmlBuilder = build(new StringBuilder(), stations.size(), 0, true, labels);
 
 	} else {
 
@@ -218,11 +222,11 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
      * @param empty
      * @return
      */
-    private StringBuilder build(StringBuilder builder, int returned, int total, boolean empty) {
+    private StringBuilder build(StringBuilder builder, int returned, int total, boolean empty, StationFeatureInfoLabels labels) {
 
 	builder.append("<html>\n");
 	builder.append("  <head>\n");
-	builder.append("    <title>DAB GetFeatureInfo output</title>\n");
+	builder.append("    <title>" + labels.getPageTitle() + "</title>\n");
 	builder.append(
 		"    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css\">\n");
 	builder.append("  </head>\n");
@@ -263,15 +267,16 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	if (!empty) {
 	    String info = "";
 	    if (returned != total) {
-		info = " (" + returned + " of " + total + ")";
+		info = labels.countPartial(returned, total);
 	    }
 	    builder.append("<div style='max-height: 400px; overflow-y: auto'>\n<table class='featureInfo'>\n");
 	    builder.append("<tr>\n");
-	    builder.append(" <th >Station" + info + "</th>\n");
-	    builder.append(" <th >Source</th>\n");
-	    builder.append(" <th >Station info</th>\n");
+	    builder.append(" <th >" + labels.getStation() + info + "</th>\n");
+	    builder.append(" <th >" + labels.getSource() + "</th>\n");
+	    builder.append(" <th >" + labels.getStationInfo() + "</th>\n");
 	    builder.append(
-		    " <th title='Close' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
+		    " <th title='" + labels.getClose()
+			    + "' id='closePopup' style='background: white; cursor: pointer; background:'><i class=\"font-awesome-button-icon fa fa-times\" style=\"font-size:15px;\" aria-hidden=\"true\"></i></th>\n");
 	    builder.append("</tr>\n");
 
 	} else {

@@ -645,5 +645,12 @@ GIAPI.OL_Map = function(options) {
 		return map;
 	};
 
+	/**
+	 * Shows or hides only the "Markers" vector layer.
+	 */
+	obj.setMarkersLayerVisible = function(visible) {
+		markersLayer.setVisible(visible);
+	};
+
 	return obj;
 };

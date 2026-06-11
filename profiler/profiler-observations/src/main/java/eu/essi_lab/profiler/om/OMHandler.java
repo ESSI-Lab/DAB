@@ -143,15 +143,16 @@ public class OMHandler extends StreamingRequestHandler {
 
 	// check permissions
 	Optional<String> optView = webRequest.extractViewId();
+	View resolvedView = null;
 	if (optView.isPresent()) {
 
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
 	    ViewManager manager = new ViewManager();
 	    manager.setDatabaseReader(reader);
-	    View view = manager.getView(optView.get()).get();
+	    resolvedView = manager.getView(optView.get()).get();
 
 	    // only in this case permissions are checked
-	    if (view.getSourceDeployment() != null && view.getSourceDeployment().equals("his-central")) {
+	    if (resolvedView.getSourceDeployment() != null && resolvedView.getSourceDeployment().equals("his-central")) {
 
 		if (!user.hasPermission("api")) {
 		    printErrorMessage(output, "The user has not correct permissions");
@@ -165,12 +166,12 @@ public class OMHandler extends StreamingRequestHandler {
 		} else {
 		    boolean found = false;
 		    for (String viewId : allowedViews) {
-			if (view.getId().equals(viewId)) {
+			if (resolvedView.getId().equals(viewId)) {
 			    found = true;
 			}
 		    }
 		    if (!found) {
-			printErrorMessage(output, "The user has not permissions to access this view: " + view.getId());
+			printErrorMessage(output, "The user has not permissions to access this view: " + resolvedView.getId());
 			return;
 		    }
 		}
@@ -320,6 +321,9 @@ public class OMHandler extends StreamingRequestHandler {
 
 	    }
 	    return;
+	}
+	if (resolvedView!=null){
+	    discoveryMessage.setSources(ConfigurationWrapper.getViewSources(resolvedView));
 	}
 	if (useCache) {
 	    ResourceSelector selector = new ResourceSelector();

@@ -45,6 +45,12 @@
    font-weight: bold;
  }
 
+ .platform_title {
+   margin-left: 50px;
+   margin-top: 6px;
+   font-size: 90%;
+ }
+
  .sub_title {
    margin-left: 50px;
    margin-top: 10px;

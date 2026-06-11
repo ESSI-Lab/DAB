@@ -1,4 +1,23 @@
 import { GIAPI } from '../giapi/core/GIAPI.js';
+import {
+	isToolbarLayout,
+	prepareToolbarHeader,
+	prepareQueryPanelShell,
+	mountQueryPanel,
+	restructureToolbarSidebar,
+	moveQueryPanelContent,
+	appendInlineAdvancedConstraints,
+	installToolbarDiscoverButton,
+	installToolbarPanelHandlers,
+	installToolbarResultsPanelApi,
+	moveSourcesToQueryPanel,
+	ensureSourcesMountInQueryPanel,
+	refreshFiltersPanelLayout,
+	collapseFiltersAccordionSections,
+	restoreFiltersAccordionOpenState,
+	setFiltersAccordionSectionOpen,
+	finalizeToolbarLayout
+} from './toolbar-layout.js';
 
 var view = '';
 var token = '';
@@ -10,6 +29,25 @@ function getShapeWmsToken() {
 }
 
 window.getShapeWmsToken = getShapeWmsToken;
+
+/**
+ * Results panel visibility modes (config.resultsVisibility):
+ * - "hidden" or false: initially hidden, stays hidden after search
+ * - "onSearch" or "afterSearch": initially hidden, shown after user search
+ * - "visible" or true: initially visible
+ */
+function getResultsVisibilityMode(resultsVisibility) {
+	if (resultsVisibility === true || resultsVisibility === 'visible') {
+		return 'visible';
+	}
+	if (resultsVisibility === 'onSearch' || resultsVisibility === 'afterSearch') {
+		return 'onSearch';
+	}
+	if (resultsVisibility === false || resultsVisibility === 'hidden') {
+		return 'hidden';
+	}
+	return 'visible';
+}
 
 /** Relative WMS path for predefined shape layers from {@link window.config.shapeView}. */
 function buildShapeWmsEndpoint() {
@@ -316,6 +354,8 @@ function formatISO8601Duration(iso8601Value) {
 try { window.__t = t; } catch (e) { }
 
 try { window.__lang = lang; } catch (e) { }
+
+try { window.formatISO8601Duration = formatISO8601Duration; } catch (e) { }
 
 function openLanguageChooser() {
 	try {
@@ -2026,23 +2066,24 @@ export function initializePortal(config) {
 
 	// Configure jQuery UI datepicker locale based on current language
 	if (window.jQuery && window.jQuery.datepicker && typeof window.jQuery.datepicker.setDefaults === 'function') {
+		var temporalMinYear = (config.temporalMinYear != null) ? config.temporalMinYear : 1900;
+		var datepickerDefaults = {
+			dateFormat: 'yy-mm-dd',
+			firstDay: 1,
+			// Dropdown convenience only; does not restrict manually typed dates
+			yearRange: temporalMinYear + ':c'
+		};
 		if (lang() === 'it') {
-			window.jQuery.datepicker.setDefaults({
-				dateFormat: 'yy-mm-dd',
+			window.jQuery.datepicker.setDefaults(Object.assign({}, datepickerDefaults, {
 				monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 				             'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
 				monthNamesShort: ['Gen','Feb','Mar','Apr','Mag','Giu',
 				                  'Lug','Ago','Set','Ott','Nov','Dic'],
 				dayNames: ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
-				dayNamesMin: ['Do','Lu','Ma','Me','Gi','Ve','Sa'],
-				firstDay: 1
-			});
+				dayNamesMin: ['Do','Lu','Ma','Me','Gi','Ve','Sa']
+			}));
 		} else {
-			// Ensure a consistent default for other languages (English)
-			window.jQuery.datepicker.setDefaults({
-				dateFormat: 'yy-mm-dd',
-				firstDay: 1
-			});
+			window.jQuery.datepicker.setDefaults(datepickerDefaults);
 		}
 	}
 
@@ -2073,6 +2114,37 @@ export function initializePortal(config) {
 
 		var standardLogos = '<a style="display:inline-block" target=_blank href="http://api.geodab.eu/"><img style="margin-top:-3px;" src="http://api.geodab.eu/docs/assets/img/api-logo-small-2.png"></img></a><a style="display:inline-block" target=_blank href="http://www.eurogeoss.eu/"><img src="http://api.geodab.eu/docs/assets/img/eurogeoss-small.png"></img></a><a style="display:inline-block" target=_blank href="http://www.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/iia.png"></img></a><a style="display:inline-block" targ et=_blank href="http://www.uos-firenze.iia.cnr.it/"><img style="vertical-align: super" src="http://api.geodab.eu/docs/assets/img/essilab.png"></img></a>';
 
+		GIAPI.search.isResultsTabActive = function() {
+			var tabsDiv = jQuery('#tabs-div');
+			if (tabsDiv.length && tabsDiv.hasClass('ui-tabs')) {
+				return tabsDiv.tabs('option', 'active') === 0;
+			}
+			var resultsTab = jQuery('#results-tab');
+			return resultsTab.length > 0 && resultsTab.attr('aria-hidden') !== 'true' && resultsTab.is(':visible');
+		};
+
+		GIAPI.search.syncMarkersLayerVisibility = function(resultsTabActive) {
+			if (!GIAPI.search.resultsMapWidget || !GIAPI.search.resultsMapWidget.setMarkersLayerVisible) {
+				return;
+			}
+			if (isToolbarLayout(config)) {
+				var resultsVisible = typeof resultsTabActive === 'boolean'
+					? resultsTabActive
+					: jQuery('#results-panel').is(':visible');
+				GIAPI.search.resultsMapWidget.setMarkersLayerVisible(resultsVisible);
+				return;
+			}
+			var leftSidebar = jQuery('#left-sidebar');
+			if (leftSidebar.length && leftSidebar.css('display') === 'none') {
+				GIAPI.search.resultsMapWidget.setMarkersLayerVisible(false);
+				return;
+			}
+			if (typeof resultsTabActive !== 'boolean') {
+				resultsTabActive = GIAPI.search.isResultsTabActive();
+			}
+			GIAPI.search.resultsMapWidget.setMarkersLayerVisible(resultsTabActive);
+		};
+
 		// Results tab now flows naturally in flexbox layout, no positioning needed
 		function positionResultsTab() {
 			// Remove any margins that might create white space
@@ -2081,7 +2153,13 @@ export function initializePortal(config) {
 			jQuery('#results-tab').css('padding', '0px');
 		}
 
+		if (isToolbarLayout(config)) {
+			prepareToolbarHeader(t);
+			prepareQueryPanelShell(t);
+		}
+
 		// init the tabs	        	
+		if (!isToolbarLayout(config)) {
 		jQuery('#tabs-div').tabs({
 			activate: function(event, ui) {
 
@@ -2101,6 +2179,9 @@ export function initializePortal(config) {
 					jQuery('#paginator-widget').css('display', 'none');
 				}
 
+				var isResultsTab = ui.newPanel.attr('id') === 'results-tab';
+				GIAPI.search.syncMarkersLayerVisibility(isResultsTab);
+
 				// refreshes the filters accordion (only if it's initialized)
 				if (ui.newPanel.selector === '#filters-tab') {
 					var $filtersTab = jQuery('#filters-tab');
@@ -2111,6 +2192,7 @@ export function initializePortal(config) {
 				}
 			}
 		});
+		}
 
 		//------------------------------------------------------------------
 		// header settings
@@ -2157,22 +2239,9 @@ export function initializePortal(config) {
 				}
 			}
 			
-			// Clear spatial constraints (map selection)
-			if (GIAPI.search.resultsMapWidget) {
-				var olMap = GIAPI.search.resultsMapWidget.olMap;
-				if (olMap && olMap.selectionVisible) {
-					olMap.selectionVisible(false);
-				}
-				// Clear input control fields (south, west, north, east, and location)
-				var mapElement = GIAPI.search.resultsMapWidget.map ? 
-					GIAPI.search.resultsMapWidget.map.getTargetElement() : null;
-				if (mapElement) {
-					var inputControl = jQuery(mapElement).find('.cnst-widget-where-input-control');
-					if (inputControl.length) {
-						// Clear all input fields in the input control (text, number, and any other types)
-						inputControl.find('input').val('');
-					}
-				}
+			// Clear spatial constraints (bbox fields, map selection, predefined area)
+			if (GIAPI.search.resultsMapWidget && typeof GIAPI.search.resultsMapWidget.clearSpatialConstraints === 'function') {
+				GIAPI.search.resultsMapWidget.clearSpatialConstraints();
 			}
 			
 			// Clear sources selection (select all sources)
@@ -2224,11 +2293,6 @@ export function initializePortal(config) {
 					});
 				}
 			}
-			
-			// Trigger a new search with cleared constraints
-			setTimeout(function() {
-				GIAPI.search.discover();
-			}, 100);
 		}
 
 		//------------------------------------------------------------------
@@ -2535,11 +2599,13 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// tabs
 		//
+		if (!isToolbarLayout(config)) {
 		// Let tabs-ul size dynamically based on content
 		jQuery('#tabs-ul').css('width', 'auto');
 		jQuery('#tabs-ul').css('height', '40px');
 		jQuery('#tabs-ul').css('margin-left', '0px');
 		jQuery('#tabs-ul').css('white-space', 'nowrap');
+		}
 
 		// Tabs and paginator now flow naturally in the document, no positioning needed
 		jQuery('#tabs-div').css('padding', '0px');
@@ -2658,6 +2724,8 @@ export function initializePortal(config) {
 			'mapType': 'ol',
 
 			'showSelectionControl': true,
+			'showLocationControl': !isToolbarLayout(config),
+			'showSpatialRelationControl': !isToolbarLayout(config),
 
 			//                	'onMarkerClick': function(node) {
 			//             		},
@@ -2707,6 +2775,10 @@ export function initializePortal(config) {
 			'defaultLayer': config.defaultLayer
 		});
 
+		if (isToolbarLayout(config)) {
+			jQuery('#mapControlDiv').hide();
+		}
+
 		// Create a wrapper div for the main content area (left sidebar + map)
 		var contentWrapper = jQuery('<div id="main-content-wrapper"></div>');
 		contentWrapper.css({
@@ -2720,7 +2792,7 @@ export function initializePortal(config) {
 		// Create left sidebar container (flex: 1 min-height: 0 so it gets bounded height and results panel can scroll)
 		var leftSidebar = jQuery('<div id="left-sidebar"></div>');
 		leftSidebar.css({
-			'display': 'flex',
+			'display': isToolbarLayout(config) ? 'none' : 'flex',
 			'flex-direction': 'column',
 			'flex': '1',
 			'min-height': '0',
@@ -2741,7 +2813,7 @@ export function initializePortal(config) {
 		var stationInfo = jQuery('#stationInfo');
 		
 		// Insert paginator inside tabs-div, right after the tab strip (so it appears above the tab panels)
-		if (paginator.length && jQuery('#tabs-ul').length) {
+		if (paginator.length && !isToolbarLayout(config) && jQuery('#tabs-ul').length) {
 			paginator.css({
 				'flex-shrink': '0',
 				'width': '100%'
@@ -2760,9 +2832,17 @@ export function initializePortal(config) {
 				'flex-direction': 'column',
 				'overflow': 'hidden'
 			});
-			leftSidebar.append(tabs);
+			if (isToolbarLayout(config)) {
+				restructureToolbarSidebar(leftSidebar, tabs);
+			} else {
+				leftSidebar.append(tabs);
+			}
 		}
 		
+		if (isToolbarLayout(config)) {
+			mountQueryPanel(contentWrapper);
+		}
+
 		// Add left sidebar to wrapper
 		contentWrapper.append(leftSidebar);
 		
@@ -2894,26 +2974,34 @@ export function initializePortal(config) {
 			}
 		}, 400);
 
+		function runDiscover() {
+			if (GIAPI.search.sourcesWidget.sourcesCount() === 0) {
+				GIAPI.UI_Utils.dialog('open', {
+					title: 'No sources selected',
+					message: 'Please select at least one data source before starting the search'
+				});
+			} else {
+				GIAPI.search.discover();
+			}
+		}
+
 		//------------------------------------
 		// search button
 		//
-		var searchButton = GIAPI.FontAwesomeButton({
+		if (isToolbarLayout(config)) {
+			installToolbarDiscoverButton(t, runDiscover);
+		}
+
+		var searchButton = isToolbarLayout(config) ? null : GIAPI.FontAwesomeButton({
 			'width': 120, // Increased width to prevent wrapping
 			'label': t('search'),
 			'icon': 'fa-search',
-			'handler': function() {
-				if (GIAPI.search.sourcesWidget.sourcesCount() === 0) {
-
-					GIAPI.UI_Utils.dialog('open', {
-						title: 'No sources selected',
-						message: 'Please select at least one data source before starting the search'
-					});
-
-				} else {
-					GIAPI.search.discover();
-				}
-			}
+			'handler': runDiscover
 		});
+
+		if (!searchButton) {
+			// toolbar layout: search button lives in the query panel
+		} else {
 
 		searchButton.css('div', 'padding', '6.5px');
 		searchButton.css('div', 'text-align', 'center');
@@ -2989,12 +3077,17 @@ export function initializePortal(config) {
 				}
 			}
 		}, 200);
+		}
 
 		//------------------------------------------------------------------
 		// hide results button
 		//           	
+		if (isToolbarLayout(config)) {
+			installToolbarResultsPanelApi();
+		} else {
 		// Check config for initial visibility state
-		var initialResultsVisible = config.resultsVisibility !== undefined ? config.resultsVisibility : true;
+		var resultsVisibilityMode = getResultsVisibilityMode(config.resultsVisibility);
+		var initialResultsVisible = resultsVisibilityMode === 'visible';
 		var hideResultsButton = GIAPI.ButtonsFactory.onOffSwitchButton(t('show_results'), t('hide_results'), {
 			'id': 'hideResultsButton',
 			'checked': !initialResultsVisible,
@@ -3010,6 +3103,17 @@ export function initializePortal(config) {
 
 		jQuery('#hide-results-button').append(hideResultsButton);
 
+		GIAPI.search.showResultsPanel = function() {
+			jQuery('#hideResultsButton').prop('checked', false);
+			jQuery('#left-sidebar').css('display', 'flex');
+			if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
+				setTimeout(function() {
+					GIAPI.search.resultsMapWidget.map.updateSize();
+				}, 50);
+			}
+			GIAPI.search.syncMarkersLayerVisibility();
+		};
+
 		function updateResultsVisibility() {
 			if (jQuery('#hideResultsButton').is(":checked")) {
 				// Hide the entire left sidebar (tabs + paginator + results)
@@ -3021,15 +3125,9 @@ export function initializePortal(config) {
 					}, 50);
 				}
 			} else {
-				// Show the entire left sidebar
-				jQuery('#left-sidebar').css('display', 'flex');
-				// Ensure map resizes after layout change
-				if (GIAPI.search.resultsMapWidget && GIAPI.search.resultsMapWidget.map) {
-					setTimeout(function() {
-						GIAPI.search.resultsMapWidget.map.updateSize();
-					}, 50);
-				}
+				GIAPI.search.showResultsPanel();
 			}
+			GIAPI.search.syncMarkersLayerVisibility();
 		}
 		
 		jQuery(document).on('change', '#hideResultsButton', updateResultsVisibility);
@@ -3037,6 +3135,7 @@ export function initializePortal(config) {
 		jQuery(document).on('click', '#hideResultsButton', function() {
 			setTimeout(updateResultsVisibility, 10);
 		});
+		}
 
 
 
@@ -3070,19 +3169,27 @@ export function initializePortal(config) {
 			jQuery('#' + GIAPI.search.constWidget.getId('what')).css('padding', '6px');
 		}
 
-		GIAPI.search.constWidget.whenConstraint('add', 'from', { showHelpIcon: false });
+		var fromWhenOpts = { showHelpIcon: false };
+		var toWhenOpts = { showHelpIcon: false };
+		if (isToolbarLayout(config)) {
+			fromWhenOpts.label = t('begin_date');
+			toWhenOpts.label = t('end_time');
+		}
+
+		GIAPI.search.constWidget.whenConstraint('add', 'from', fromWhenOpts);
 		GIAPI.search.constWidget.append('from-div');
 
+		var fromFieldWidth = isToolbarLayout(config) ? '100%' : '80px';
 		jQuery('#' + GIAPI.search.constWidget.getId('from')).css('padding', '6px');
-		jQuery('#' + GIAPI.search.constWidget.getId('from')).css('width', '80px');
-		jQuery('#' + GIAPI.search.constWidget.getId('from')).parent('div').parent('td').css('width', '80px');
+		jQuery('#' + GIAPI.search.constWidget.getId('from')).css('width', fromFieldWidth);
+		jQuery('#' + GIAPI.search.constWidget.getId('from')).parent('div').parent('td').css('width', fromFieldWidth);
 
-		GIAPI.search.constWidget.whenConstraint('add', 'to', { showHelpIcon: false });
+		GIAPI.search.constWidget.whenConstraint('add', 'to', toWhenOpts);
 		GIAPI.search.constWidget.append('to-div');
 
 		jQuery('#' + GIAPI.search.constWidget.getId('to')).css('padding', '6px');
-		jQuery('#' + GIAPI.search.constWidget.getId('to')).css('width', '80px');
-		jQuery('#' + GIAPI.search.constWidget.getId('to')).parent('div').parent('td').css('width', '80px');
+		jQuery('#' + GIAPI.search.constWidget.getId('to')).css('width', fromFieldWidth);
+		jQuery('#' + GIAPI.search.constWidget.getId('to')).parent('div').parent('td').css('width', fromFieldWidth);
 
 		GIAPI.search.constWidget.append('constraints-div');
 
@@ -3090,12 +3197,14 @@ export function initializePortal(config) {
 		// mapControlDiv
 		//
 
-		jQuery('#mapControlDiv').css('position', 'relative');
-		jQuery('#mapControlDiv').css('top', '5px');
-		jQuery('#mapControlDiv').css('z-index', '1');
-		jQuery('#mapControlDiv').css('background-color', '#c0c0c0'); // Match headerDiv background
+		if (!isToolbarLayout(config)) {
+			jQuery('#mapControlDiv').css('position', 'relative');
+			jQuery('#mapControlDiv').css('top', '5px');
+			jQuery('#mapControlDiv').css('z-index', '1');
+			jQuery('#mapControlDiv').css('background-color', '#c0c0c0'); // Match headerDiv background
 
-		jQuery('#where-div').append(document.getElementById("mapControlDiv"));
+			jQuery('#where-div').append(document.getElementById("mapControlDiv"));
+		}
 
 
 		jQuery('#disclaimer-div').append(config.disclaimer);
@@ -3171,11 +3280,13 @@ export function initializePortal(config) {
 
 
 
-		jQuery('#where-div').append(hideMapInputControlButton);
+		if (!isToolbarLayout(config)) {
+			jQuery('#where-div').append(hideMapInputControlButton);
 
-		jQuery('#onoffswitch-div-hideMapInputControl').css('z-index', '1');
-		jQuery('#onoffswitch-div-hideMapInputControl').css('margin-top', '-22px');
-		jQuery('#onoffswitch-div-hideMapInputControl').css('margin-left', '100px');
+			jQuery('#onoffswitch-div-hideMapInputControl').css('z-index', '1');
+			jQuery('#onoffswitch-div-hideMapInputControl').css('margin-top', '-22px');
+			jQuery('#onoffswitch-div-hideMapInputControl').css('margin-left', '100px');
+		}
 
 		//
 		// advanced search div        
@@ -3400,11 +3511,20 @@ export function initializePortal(config) {
 			
 			searchModeButton.css('div','margin-top','5px');
 			
-			jQuery("#adv-search-div").append(searchModeButton.div());	
+			if (isToolbarLayout(config)) {
+				jQuery('#query-advanced-fields').append(searchModeButton.div());
+			} else {
+				jQuery("#adv-search-div").append(searchModeButton.div());
+			}
 		}
 	  
+		if (isToolbarLayout(config)) {
+			moveQueryPanelContent(config);
+			appendInlineAdvancedConstraints(advancedConstraints);
+		}
+
 		// Only show advanced search if we have constraints to show
-		if (advancedConstraints.length > 0) {
+		if (!isToolbarLayout(config) && advancedConstraints.length > 0) {
 			GIAPI.search.constWidget.advancedSearch(
 				'advConstDiv',
 				'adv-search-div',
@@ -3617,28 +3737,25 @@ export function initializePortal(config) {
 				// Call the original update first
 				originalUpdate.call(this, resultSet);
 
-				// Check if user is logged in and has 'downloads' permission
 				var authToken = localStorage.getItem('authToken');
 				var userPermissions = (localStorage.getItem('userPermissions') || '').split(',').map(p => p.trim()).filter(Boolean);
-				if (authToken && userPermissions.includes('downloads')) {
-					// Remove any existing download button
-					$('#paginator-widget-top-label .login-button').remove();
+				var canBulkDownload = !!(authToken && userPermissions.includes('downloads'));
 
-					// Add bulk download button next to results count
-					var downloadButton = $('<button>')
-						.addClass('login-button')
-						.text(t('bulk_data_download'))
-						.css({
-							'margin-left': '10px',
-							'padding': '5px 10px',
-							'font-size': '0.9em',
-							'background-color': '#2c3e50',
-							'color': 'white',
-							'border': 'none',
-							'border-radius': '4px',
-							'cursor': 'pointer'
-						})
-						.on('click', function() {
+				$('#paginator-widget-top-label .login-button').remove();
+
+				var downloadButton = $('<button>')
+					.addClass('login-button')
+					.text(t('bulk_data_download'))
+					.css({
+						'margin-left': '10px',
+						'padding': '5px 10px',
+						'font-size': '0.9em'
+					});
+
+				if (!canBulkDownload) {
+					downloadButton.prop('disabled', true).attr('title', t('login_info'));
+				} else {
+					downloadButton.on('click', function() {
 							// Create dialog content
 							const dialogContent = $('<div>');
 
@@ -3668,7 +3785,7 @@ export function initializePortal(config) {
 							if (constraints.when && constraints.when.from) lines.push({ label: 'Begin date', value: constraints.when.from });
 							if (constraints.when && constraints.when.to) lines.push({ label: 'End date', value: constraints.when.to });
 							var hasFiniteBbox = function(w) {
-								if (!w || w.predefinedLayer) {
+								if (!w) {
 									return false;
 								}
 								return [w.west, w.south, w.east, w.north].every(function(v) {
@@ -4032,7 +4149,8 @@ export function initializePortal(config) {
 											if (where) {
 												if (where.predefinedLayer) {
 													params.append('predefinedLayer', where.predefinedLayer);
-												} else if ([where.west, where.south, where.east, where.north].every(function(v) {
+												}
+												if ([where.west, where.south, where.east, where.north].every(function(v) {
 													return typeof v === 'number' && Number.isFinite(v);
 												})) {
 													params.append('west', where.west);
@@ -4276,10 +4394,9 @@ export function initializePortal(config) {
 								]
 							});
 						});
-
-					// Append the button after the results label
-					$('#paginator-widget-top-label').append(downloadButton);
 				}
+
+				$('#paginator-widget-top-label').append(downloadButton);
 			};
 
 			return widget;
@@ -4311,9 +4428,14 @@ export function initializePortal(config) {
 		//------------------------------------
 		// SourcesWidget
 		//
+		if (isToolbarLayout(config)) {
+			ensureSourcesMountInQueryPanel();
+		}
+
 		GIAPI.search.sourcesWidget = GIAPI.SourcesWidget('sources-tab', GIAPI.search.dab, {
 			'width': 'auto',
-			'height': 'auto',
+			'height': isToolbarLayout(config) ? 'compact' : 'auto',
+			'inlineSourceLinks': isToolbarLayout(config),
 			'viewId': view,
 			'include': function(source) {
 				// includes only harvested sources to speedup the initialization
@@ -4329,14 +4451,20 @@ export function initializePortal(config) {
 						if (r && r.id) GIAPI.search._sourcesIdToTitle[r.id] = r.title || r.id;
 					});
 				}
-				// Constrain height and enable vertical scrollbar: SourcesWidget creates a div with inline overflow-y: scroll and fixed height
-				jQuery('#sources-tab div[style*="overflow-y"]').css({
-					'overflow-y': 'auto',
-					'height': '100%',
-					'max-height': '100%'
-				});
-				// starts the init discover
-				GIAPI.search.discover();
+				if (isToolbarLayout(config)) {
+					moveSourcesToQueryPanel();
+				} else {
+					// Constrain height and enable vertical scrollbar: SourcesWidget creates a div with inline overflow-y: scroll and fixed height
+					jQuery('#sources-tab div[style*="overflow-y"]').css({
+						'overflow-y': 'auto',
+						'height': '100%',
+						'max-height': '100%'
+					});
+				}
+				// starts the init discover (keep results hidden when not initially visible)
+				if (config.performStartupQuery !== false) {
+					GIAPI.search.discover(true);
+				}
 			}
 		});
 
@@ -4349,7 +4477,9 @@ export function initializePortal(config) {
 			(function() { GIAPI.UI_Utils.discoverDialog('open') }), null,
 			{
 				'itemLabelFontSize': '80%',
-				'divCSS': 'max-height:550px; overflow:auto',
+				'divCSS': isToolbarLayout(config)
+					? 'width:100%;max-width:100%;display:block;box-sizing:border-box;max-height:550px;overflow:auto'
+					: 'max-height:550px; overflow:auto',
 				'accordionMode': true
 			}
 		);
@@ -4358,7 +4488,7 @@ export function initializePortal(config) {
 		// The accordion is initialized by TermFrequencyWidget with beforeActivate returning false
 		// So we handle all state management ourselves
 		var originalUpdate = GIAPI.search.tfWidget.update;
-		var openPanelIndices = []; // Simple array tracking which panels are open
+		GIAPI.search.filtersOpenPanelIndices = [];
 		var isFirstInit = true;
 		var mutationObserver = null; // Observer to watch for table content changes
 		
@@ -4400,12 +4530,20 @@ export function initializePortal(config) {
 		
 		// Simple function to toggle a panel
 		var togglePanel = function($header, open) {
+			if (isToolbarLayout(config)) {
+				setFiltersAccordionSectionOpen($header, open);
+				if (open) {
+					setTimeout(function() {
+						adjustJtableHeights(jQuery('#filters-tab'));
+					}, 50);
+				}
+				return;
+			}
 			var $content = $header.next();
 			if (open) {
 				$content.slideDown(300);
 				$header.addClass('ui-accordion-header-active ui-state-active').removeClass('ui-state-default');
 				$header.find('.ui-accordion-header-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-				// Adjust heights after opening
 				setTimeout(function() {
 					adjustJtableHeights(jQuery('#filters-tab'));
 				}, 350);
@@ -4424,23 +4562,24 @@ export function initializePortal(config) {
 				event.preventDefault();
 				
 				var $header = jQuery(this);
-				var headerIndex = $header.index();
-				var isActive = $header.hasClass('ui-accordion-header-active');
+				var headerIndex = $filtersTab.find('h3').index($header);
+				var isActive = $header.hasClass('ui-accordion-header-active')
+					|| $header.next('.ui-accordion-content, div[widget="tf"]').hasClass('filters-section-open');
 				
 				if (isActive) {
 					// Close this panel
 					togglePanel($header, false);
 					// Remove from open list
-					var idx = openPanelIndices.indexOf(headerIndex);
+					var idx = GIAPI.search.filtersOpenPanelIndices.indexOf(headerIndex);
 					if (idx > -1) {
-						openPanelIndices.splice(idx, 1);
+						GIAPI.search.filtersOpenPanelIndices.splice(idx, 1);
 					}
 				} else {
 					// Open this panel
 					togglePanel($header, true);
 					// Add to open list if not already there
-					if (openPanelIndices.indexOf(headerIndex) === -1) {
-						openPanelIndices.push(headerIndex);
+					if (GIAPI.search.filtersOpenPanelIndices.indexOf(headerIndex) === -1) {
+						GIAPI.search.filtersOpenPanelIndices.push(headerIndex);
 					}
 				}
 			});
@@ -4455,8 +4594,11 @@ export function initializePortal(config) {
 			if ($filtersTab.hasClass('ui-accordion')) {
 				$filtersTab.find('h3').each(function(index) {
 					var $header = jQuery(this);
-					// Check if panel is open in DOM or in our state
-					if ($header.hasClass('ui-accordion-header-active') || openPanelIndices.indexOf(index) !== -1) {
+					var $content = $header.next('.ui-accordion-content, div[widget="tf"]');
+					var isOpen = $header.hasClass('ui-accordion-header-active')
+						|| $content.hasClass('filters-section-open')
+						|| GIAPI.search.filtersOpenPanelIndices.indexOf(index) !== -1;
+					if (isOpen) {
 						panelsToRestore.push(index);
 					}
 				});
@@ -4476,13 +4618,17 @@ export function initializePortal(config) {
 					
 					// On first init, close all panels
 					if (isFirstInit) {
-						$filtersTab.find('h3').each(function() {
-							var $header = jQuery(this);
-							var $content = $header.next();
-							$content.hide();
-							togglePanel($header, false);
-						});
-						openPanelIndices = [];
+						if (isToolbarLayout(config)) {
+							collapseFiltersAccordionSections($filtersTab);
+						} else {
+							$filtersTab.find('h3').each(function() {
+								var $header = jQuery(this);
+								var $content = $header.next();
+								$content.hide();
+								togglePanel($header, false);
+							});
+						}
+						GIAPI.search.filtersOpenPanelIndices = [];
 						isFirstInit = false;
 					} else {
 						// Restore panels that were open
@@ -4490,8 +4636,8 @@ export function initializePortal(config) {
 							var $header = $filtersTab.find('h3').eq(panelIndex);
 							if ($header.length) {
 								togglePanel($header, true);
-								if (openPanelIndices.indexOf(panelIndex) === -1) {
-									openPanelIndices.push(panelIndex);
+								if (GIAPI.search.filtersOpenPanelIndices.indexOf(panelIndex) === -1) {
+									GIAPI.search.filtersOpenPanelIndices.push(panelIndex);
 								}
 							}
 						});
@@ -4523,6 +4669,10 @@ export function initializePortal(config) {
 						});
 					});
 				}
+				if (isToolbarLayout(config)) {
+					refreshFiltersPanelLayout();
+					restoreFiltersAccordionOpenState($filtersTab);
+				}
 			}, 100);
 			
 			return result;
@@ -4539,13 +4689,17 @@ export function initializePortal(config) {
 				});
 				
 				// Close all panels initially
-				$filtersTab.find('h3').each(function() {
-					var $header = jQuery(this);
-					var $content = $header.next();
-					$content.hide();
-					togglePanel($header, false);
-				});
-				openPanelIndices = [];
+				if (isToolbarLayout(config)) {
+					collapseFiltersAccordionSections($filtersTab);
+				} else {
+					$filtersTab.find('h3').each(function() {
+						var $header = jQuery(this);
+						var $content = $header.next();
+						$content.hide();
+						togglePanel($header, false);
+					});
+				}
+				GIAPI.search.filtersOpenPanelIndices = [];
 				
 				// Setup click handlers
 				setupPanelHandlers($filtersTab);
@@ -4587,6 +4741,7 @@ export function initializePortal(config) {
 		});
 		
 		// Set initial height after a short delay to ensure layout is ready
+		if (!isToolbarLayout(config)) {
 		setTimeout(function() {
 			var filtersTabHeight = calculateFiltersTabHeight();
 			jQuery('#filters-tab').css({
@@ -4604,10 +4759,15 @@ export function initializePortal(config) {
 				'max-height': newHeight + 'px'
 			});
 		});
+		}
 		
 		// Also update when tabs are activated (in case paginator visibility changes)
-		jQuery('#tabs-div').on('tabsactivate', function() {
+		if (!isToolbarLayout(config)) {
+		jQuery('#tabs-div').on('tabsactivate', function(event, ui) {
+			var isResultsTab = ui.newPanel && ui.newPanel.attr('id') === 'results-tab';
+			GIAPI.search.syncMarkersLayerVisibility(isResultsTab);
 			setTimeout(function() {
+				GIAPI.search.syncMarkersLayerVisibility(isResultsTab);
 				var newHeight = calculateFiltersTabHeight();
 				jQuery('#filters-tab').css({
 					'height': newHeight + 'px',
@@ -4615,6 +4775,7 @@ export function initializePortal(config) {
 				});
 			}, 50);
 		});
+		}
 
 
 		//------------------------------------
@@ -4640,6 +4801,9 @@ export function initializePortal(config) {
 			// registers the ui nodes
 			'uiNodes': [Common_UINode_No_Aside],
 
+			'showResultOverview': config.showResultOverview !== false,
+			'resultTitleFromObservedProperty': config.resultTitleFromObservedProperty === true,
+
 			// set the widgets to update
 			'mapWidget': GIAPI.search.resultsMapWidget,
 			'pagWidget': GIAPI.search.paginatorWidget,
@@ -4663,6 +4827,8 @@ export function initializePortal(config) {
 	});
 
 	GIAPI.search.discover = function(init) {
+
+		GIAPI.search._discoverInit = !!init;
 
 		var constraints = GIAPI.search.constWidget.constraints();
 		constraints.where = GIAPI.search.resultsMapWidget.where();
@@ -4718,6 +4884,16 @@ export function initializePortal(config) {
 			);
 		}
 
+		if (config.sortBy) {
+			var sortByValue = config.sortBy;
+			if (sortByValue.indexOf(':') === -1) {
+				sortByValue = sortByValue + ':asc';
+			}
+			constraints.kvp.push(
+				{ 'key': 'sortBy', 'value': sortByValue }
+			);
+		}
+
 		// Ensure advanced constraint values (e.g. aggregationDuration) are in constraints so the WMS layer
 		// and station info link include them. Constraint widget may store them in form fields; add to kvp if missing.
 		var advKeys = ['attributeTitle', 'aggregationDuration', 'timeInterpolation', 'intendedObservationSpacing', 'observedPropertyURI', 'instrumentTitle'];
@@ -4763,8 +4939,14 @@ export function initializePortal(config) {
 
 		var resultSet = response[0];
 
+		if (!isToolbarLayout(config) && getResultsVisibilityMode(config.resultsVisibility) === 'onSearch' && !GIAPI.search._discoverInit && GIAPI.search.showResultsPanel) {
+			GIAPI.search.showResultsPanel();
+		}
+		GIAPI.search._discoverInit = false;
+
 		// updates the result set layout
 		GIAPI.search.resultSetLayout.update(response);
+		GIAPI.search.syncMarkersLayerVisibility();
 
 		if (resultSet.extension) {
 			jQuery('.resultset-layout-table-div').css('max-height', jQuery(window).height() - 280 + 'px');
@@ -4774,6 +4956,9 @@ export function initializePortal(config) {
 
 		if (!response[0].termFrequency) {
 			jQuery('#filters-tab').empty();
+			if (isToolbarLayout(config)) {
+				refreshFiltersPanelLayout();
+			}
 		}
 
 		if (GIAPI.UI_Utils.discoverDialog('isOpen')) {
@@ -4807,7 +4992,15 @@ export function initializePortal(config) {
 		}
 	};
 
-	if (config.resultsVisibility !== undefined && !config.resultsVisibility) {
+	if (isToolbarLayout(config)) {
+		setTimeout(function() {
+			installToolbarPanelHandlers();
+			finalizeToolbarLayout();
+			jQuery('#left-sidebar').hide();
+			jQuery('#filters-panel, #results-panel, #query-panel').hide();
+			GIAPI.search.syncMarkersLayerVisibility();
+		}, 200);
+	} else if (getResultsVisibilityMode(config.resultsVisibility) !== 'visible') {
 		// Set button to checked state and hide the entire left sidebar initially
 		// Use setTimeout to ensure button and left sidebar are fully initialized
 		setTimeout(function() {
@@ -4819,6 +5012,7 @@ export function initializePortal(config) {
 					GIAPI.search.resultsMapWidget.map.updateSize();
 				}, 50);
 			}
+			GIAPI.search.syncMarkersLayerVisibility();
 		}, 200);
 	}
 

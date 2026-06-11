@@ -10,12 +10,12 @@ package eu.essi_lab.cfga.gui.components.grid.renderer;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -28,16 +28,15 @@ import com.vaadin.flow.component.textfield.*;
 import eu.essi_lab.cfga.gui.dialog.*;
 
 import java.util.*;
-import java.util.stream.*;
 
 /**
  * @author Fabrizio
  */
 public class ViewerColumnRenderer extends GridColumnRenderer<Button> {
 
-    private String tooltip;
-    private String columnName;
-    private String windowTitle;
+    protected String tooltip;
+    protected String columnName;
+    protected String windowTitle;
 
     /**
      * @param columnName
@@ -47,12 +46,7 @@ public class ViewerColumnRenderer extends GridColumnRenderer<Button> {
      */
     public static ViewerColumnRenderer create(String columnName, String windowTitle, String tooltip) {
 
-	ViewerColumnRenderer renderer = new ViewerColumnRenderer();
-	renderer.columnName = columnName;
-	renderer.windowTitle = windowTitle;
-	renderer.tooltip = tooltip;
-
-	return renderer;
+	return new ViewerColumnRenderer(columnName, windowTitle, tooltip);
     }
 
     /**
@@ -70,6 +64,18 @@ public class ViewerColumnRenderer extends GridColumnRenderer<Button> {
      */
     public ViewerColumnRenderer() {
 
+    }
+
+    /**
+     * @param columnName
+     * @param windowTitle
+     * @param tooltip
+     */
+    public ViewerColumnRenderer(String columnName, String windowTitle, String tooltip) {
+
+	this.columnName = columnName;
+	this.windowTitle = windowTitle;
+	this.tooltip = tooltip;
     }
 
     /**
@@ -97,12 +103,12 @@ public class ViewerColumnRenderer extends GridColumnRenderer<Button> {
 
 	int areaWidth = 700;
 	int areaHeight = 600;
-	
+
 	TextArea textArea = new TextArea();
 	textArea.getStyle().set("font-size", "14px");
 	textArea.getStyle().set("padding", "0px");
 	textArea.setWidthFull();
-	textArea.setHeight(areaHeight+"px");
+	textArea.setHeight(areaHeight + "px");
 	textArea.setReadOnly(true);
 	textArea.setValue(text);
 	textArea.addClassName("no-wrap");

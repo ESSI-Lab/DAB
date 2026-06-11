@@ -309,6 +309,35 @@ console.log("Hello, world!");
 		jQuery('#' + locInfoLabelId).text('');
 	};
 
+	inControl.clearSpatialConstraints = function() {
+
+		if (options.value) {
+			options.value.predefinedLayer = null;
+			options.value.south = '';
+			options.value.west = '';
+			options.value.north = '';
+			options.value.east = '';
+		}
+
+		if (options.olMap) {
+			options.olMap.selectionVisible(false);
+		}
+
+		jQuery('#' + southFieldId).val('');
+		jQuery('#' + westFieldId).val('');
+		jQuery('#' + northFieldId).val('');
+		jQuery('#' + eastFieldId).val('');
+		jQuery('#' + topSearchFieldId).val('');
+		inControl.clearLocationLabel();
+
+		jQuery('#layerSelectorTable td').removeClass('highlighted');
+
+		if (shapeLayer != null) {
+			resultsMapWidget.removeLayers(shapeLayer);
+			shapeLayer = null;
+		}
+	};
+
 	/**
 	 * 
 	 */
@@ -324,6 +353,16 @@ console.log("Hello, world!");
 
 	var fitMapToBounds = function() {
 		options.olMap.fitBounds(inControl.where());
+	};
+
+	var hasExistingBbox = function() {
+		if (options.olMap && options.olMap.selectionVisible && options.olMap.selectionVisible()) {
+			return true;
+		}
+		var where = inControl.where(true);
+		return [where.south, where.west, where.north, where.east].every(function(v) {
+			return typeof v === 'number' && Number.isFinite(v);
+		});
 	};
 
 	/**
@@ -442,29 +481,26 @@ console.log("Hello, world!");
 						resultsMapWidget.addLayers(mapLayers);
 						shapeLayer = mapLayers;
 
-						//
-						// add the layer bbox
-						//
+						if (!hasExistingBbox()) {
+							var bbox = layer.bbox.split(',');
 
-						var bbox = layer.bbox.split(',');
+							updateWhereFields(
+								parseFloat(bbox[0]),
+								parseFloat(bbox[1]),
+								parseFloat(bbox[2]),
+								parseFloat(bbox[3]),
+								true
+							);
 
-						updateWhereFields(
-							parseFloat(bbox[0]),
-							parseFloat(bbox[1]),
-							parseFloat(bbox[2]),
-							parseFloat(bbox[3]),
-							true
-						);
+							var whereLatLon = inControl.where(true);
+							options.value.south = whereLatLon.south;
+							options.value.west = whereLatLon.west;
+							options.value.north = whereLatLon.north;
+							options.value.east = whereLatLon.east;
 
-						updateSelection();
-						fitMapToBounds();
-						jQuery('#' + westFieldId).val('');
-						jQuery('#' + southFieldId).val('');
-						jQuery('#' + eastFieldId).val('');
-						jQuery('#' + northFieldId).val('');
-
-
-						updateSelection();
+							updateSelection();
+							fitMapToBounds();
+						}
 					}
 				});
 			});

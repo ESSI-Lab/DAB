@@ -9,12 +9,103 @@
 }());
 
 var agreed = false;
+var pendingDisclaimerTexts = null;
+var disclaimerDialogReady = false;
+
+function captureDefaultDisclaimerFromDom() {
+	var dialogNode = document.getElementById('dialog');
+	if (!dialogNode) {
+		return;
+	}
+	var fromData = dialogNode.getAttribute('data-default-disclaimer');
+	if (fromData && fromData.trim()) {
+		dialogNode.setAttribute('data-initial-html', fromData.trim());
+		return;
+	}
+	var initial = dialogNode.innerHTML.trim();
+	if (initial) {
+		dialogNode.setAttribute('data-initial-html', initial);
+	}
+}
+
+function hasTranslation(key) {
+	var cur = i18n[i18n.current] || {};
+	return !!(cur[key] || i18n.en[key]);
+}
+
+function readDefaultDisclaimersFromDom() {
+	if (hasTranslation('disclaimer')) {
+		var translated = t('disclaimer');
+		if (translated && translated.trim()) {
+			return [translated.trim()];
+		}
+	}
+	var dialogNode = document.getElementById('dialog');
+	if (!dialogNode) {
+		return [];
+	}
+	var fromData = dialogNode.getAttribute('data-default-disclaimer');
+	if (fromData && fromData.trim()) {
+		return [fromData.trim()];
+	}
+	var html = dialogNode.getAttribute('data-initial-html');
+	if (html && html.trim()) {
+		return [html.trim()];
+	}
+	return [];
+}
+
+function collectDisclaimerTexts(data) {
+	const set = new Set();
+	for (let i = 0; i < data.length; i++) {
+		const disclaimerValue = findValue(data, i, 'data_disclaimer');
+		if (disclaimerValue && typeof disclaimerValue === 'string' && disclaimerValue.trim().length > 0) {
+			set.add(disclaimerValue.trim());
+		}
+	}
+	if (set.size === 0) {
+		readDefaultDisclaimersFromDom().forEach(function(text) {
+			set.add(text);
+		});
+	}
+	return set;
+}
+
+function showDisclaimerDialogIfNeeded() {
+	if (!disclaimerDialogReady || pendingDisclaimerTexts === null) {
+		return;
+	}
+	const dialogEl = $('#dialog');
+	if (pendingDisclaimerTexts.size === 0) {
+		agreed = true;
+		if (dialogEl.data('ui-dialog')) {
+			dialogEl.dialog('close');
+		}
+		return;
+	}
+	dialogEl.empty();
+	const list = $('<ul>');
+	Array.from(pendingDisclaimerTexts).forEach(function(text) {
+		if (text.indexOf('<') >= 0) {
+			list.append($('<li>').html(text));
+		} else {
+			list.append($('<li>').text(text));
+		}
+	});
+	dialogEl.append(list);
+	dialogEl.dialog('option', 'title', t('disclaimer_to_accept'));
+	dialogEl.dialog('open');
+}
+
 $(document).ready(function() {
+	captureDefaultDisclaimerFromDom();
 	$("#dialog").dialog({
 		resizable: false,
 		height: "auto",
 		width: 800,
 		modal: true,
+		autoOpen: false,
+		title: t('disclaimer_to_accept'),
 		buttons: [
 			{
 				text: t('accept'),
@@ -38,11 +129,68 @@ $(document).ready(function() {
 			return agreed;
 		}
 	});
+	disclaimerDialogReady = true;
+	showDisclaimerDialogIfNeeded();
 });
 
 const url = new URL(window.location.href);
 const segments = url.pathname.split('/').filter(Boolean);
 const stationCode = segments[segments.length - 1];
+
+var portalConfigCache = null;
+
+function getViewIdFromUrl() {
+	var pathSegments = window.location.pathname.split('/');
+	var viewIndex = pathSegments.indexOf('view');
+	if (viewIndex !== -1 && viewIndex + 1 < pathSegments.length) {
+		return pathSegments[viewIndex + 1];
+	}
+	return 'his-central';
+}
+
+function loadPortalConfigSync() {
+	if (portalConfigCache !== null) {
+		return portalConfigCache;
+	}
+	var viewId = getViewIdFromUrl();
+	var candidatePaths = [
+		'/gs-service/hisc/config.json',
+		'/gs-service/hisc-test/config.json',
+		'/gs-service/whos/config.json',
+		'/gs-service/whos-test/config.json',
+		'/gs-service/savahis/config.json',
+		'/gs-service/annali/config.json',
+		'/gs-service/wdo/config.json',
+		'/gs-service/brgm/config.json',
+		'/gs-service/whos-usa-lro/config.json',
+		'/gs-service/whos-plata/config.json',
+		'/gs-service/test/config.json'
+	];
+	portalConfigCache = {};
+	for (var j = 0; j < candidatePaths.length; j++) {
+		try {
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', candidatePaths[j], false);
+			xhr.send(null);
+			if (xhr.status >= 200 && xhr.status < 300 && (xhr.responseText || '').trim().length > 0) {
+				var cfg = JSON.parse(xhr.responseText);
+				if (cfg.view === viewId) {
+					portalConfigCache = cfg;
+					break;
+				}
+			}
+		} catch (e) { }
+	}
+	return portalConfigCache;
+}
+
+function getStationPageMapZoom() {
+	var zoom = loadPortalConfigSync().stationPageMapZoom;
+	if (typeof zoom === 'number' && !isNaN(zoom)) {
+		return zoom;
+	}
+	return 3;
+}
 
 // i18n support
 var i18n = { current: 'en', en: {}, it: {} };
@@ -331,6 +479,66 @@ var getAttributeLabel = function(data, i) {
 	return findValue(data, i, 'attribute_label');
 }
 
+var getMeasurementUnitDisplay = function(data, i) {
+	var attributeUnits = findValue(data, i, 'attribute_units');
+	var unitAbbr = findValue(data, i, 'attribute_units_abbreviation');
+
+	if (attributeUnits !== undefined && attributeUnits !== null && attributeUnits !== "") {
+		if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
+			return attributeUnits + " (" + unitAbbr + ")";
+		}
+		return attributeUnits;
+	}
+	if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
+		return unitAbbr;
+	}
+	return "";
+};
+
+var getInterpolationTypeLabel = function(data, i) {
+	var interpolationType = getInterpolationType(data, i);
+	if (typeof interpolationType === 'undefined' || interpolationType === "") {
+		return "";
+	}
+	switch (interpolationType) {
+		case "http://www.opengis.net/def/waterml/2.0/interpolationtype/maxprec":
+			return t('maximum_preceding');
+		case "http://www.opengis.net/def/waterml/2.0/interpolationtype/minprec":
+			return t('minimum_preceding');
+		case "http://www.opengis.net/def/waterml/2.0/interpolationtype/totalprec":
+			return t('total_preceding');
+		default:
+			return interpolationType;
+	}
+};
+
+var getTimeseriesSectionTitle = function(data, i, k) {
+	var observedVariable = getAttributeLabel(data, i);
+	var seriesTitle = findValue(data, i, 'title');
+	if (typeof seriesTitle === 'undefined' || seriesTitle === null) {
+		seriesTitle = '';
+	} else {
+		seriesTitle = ('' + seriesTitle).trim();
+	}
+
+	var indexPrefix = (k + 1) + ": ";
+	var hasObservedVariable = observedVariable !== undefined && observedVariable !== null && ('' + observedVariable).trim() !== '';
+
+	if (hasObservedVariable) {
+		var parts = [
+			observedVariable,
+			getInterpolationTypeLabel(data, i),
+			getAggregationDuration(data, i),
+			getMeasurementUnitDisplay(data, i)
+		].filter(function(part) {
+			return part !== undefined && part !== null && ('' + part).trim() !== '';
+		});
+		return indexPrefix + parts.join(' - ');
+	}
+
+	return indexPrefix + seriesTitle;
+};
+
 var convertDate = function(isoDate) {
 
 	var year = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(new Date(isoDate));
@@ -349,8 +557,6 @@ var createDataTable = function(data, i) {
 
 	var aggregationDuration = getAggregationDuration(data, i);
 
-	var interpolationType = getInterpolationType(data, i);
-
 	//
 	// Observed variable
 	//
@@ -359,26 +565,8 @@ var createDataTable = function(data, i) {
 
 	items.push("<tr><td class='data_table_label_td'>" + t('observed_variable') + "</td><td>" + getAttributeLabel(data, i) + "</td></tr>");
 
-	var attributeUnits = findValue(data, i, 'attribute_units');
-	var unitAbbr = findValue(data, i, 'attribute_units_abbreviation');
-	
-	var unitDisplay = "";
-	if (attributeUnits !== undefined && attributeUnits !== null && attributeUnits !== "") {
-		// If attribute_units exists, show it with abbreviation in parentheses if available
-		if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
-			unitDisplay = attributeUnits + " (" + unitAbbr + ")";
-		} else {
-			unitDisplay = attributeUnits;
-		}
-	} else {
-		// If attribute_units is undefined, just show the abbreviation
-		if (unitAbbr !== undefined && unitAbbr !== null && unitAbbr !== "") {
-			unitDisplay = unitAbbr;
-		} else {
-			unitDisplay = "";
-		}
-	}
-					
+	var unitDisplay = getMeasurementUnitDisplay(data, i);
+
 	items.push("<tr><td>" + t('measurement_unit') + "</td><td>" + unitDisplay + "</td></tr>");	
 
 	items.push("<tr><td>" + t('temporal_extent') + "</td><td>" + tempExtent + "</td></tr>");
@@ -387,19 +575,8 @@ var createDataTable = function(data, i) {
 		items.push("<tr><td>" + t('aggregation_duration') + "</td><td>" + aggregationDuration + "</td></tr>");
 	}
 
+	interpolationType = getInterpolationTypeLabel(data, i);
 	if (!(typeof interpolationType === 'undefined' || interpolationType === "")) {
-		switch (interpolationType) {
-			case "http://www.opengis.net/def/waterml/2.0/interpolationtype/maxprec":
-				interpolationType = t('maximum_preceding');
-				break;
-			case "http://www.opengis.net/def/waterml/2.0/interpolationtype/minprec":
-				interpolationType = t('minimum_preceding');
-				break;
-			case "http://www.opengis.net/def/waterml/2.0/interpolationtype/totalprec":
-				interpolationType = t('total_preceding');
-				break;
-
-		}
 		items.push("<tr><td>" + t('interpolation_type') + "</td><td>" + interpolationType + "</td></tr>");
 	}
 
@@ -1276,10 +1453,20 @@ var createPlot = function(data, i) {
 		});
 };
 
+var getDatepickerYearRange = function(minDate, maxDate) {
+	var minYear = minDate ? parseInt(minDate.substring(0, 4), 10) : NaN;
+	var maxYear = maxDate ? parseInt(maxDate.substring(0, 4), 10) : NaN;
+	if (!isNaN(minYear) && !isNaN(maxYear)) {
+		return minYear + ':' + maxYear;
+	}
+	return null;
+};
+
 var initDatePickers = function(data, i) {
 
 	var maxEndDate = dateOnly(data[i].time_end.value);
 	var minStartDate = dateOnly(data[i].time_start.value);
+	var yearRange = getDatepickerYearRange(minStartDate, maxEndDate);
 
 	var dstartId = "datepicker-start_" + i;
 	var dendId = "datepicker-end_" + i;
@@ -1291,6 +1478,7 @@ var initDatePickers = function(data, i) {
 		maxDate: maxEndDate,
 		changeMonth: true,
 		changeYear: true,
+		yearRange: yearRange,
 
 		onSelect: function(dateText) {
 
@@ -1310,6 +1498,7 @@ var initDatePickers = function(data, i) {
 		maxDate: maxEndDate,
 		changeMonth: true,
 		changeYear: true,
+		yearRange: yearRange,
 
 		onSelect: function(dateText) {
 
@@ -1837,16 +2026,9 @@ var createLayoutTable = function(data, i, k) {
 
 	var layoutTable = "<table class='layout_table' id='layoutTable_" + i + "'>";
 
-	// Prefer the time series title from the response (when available), otherwise fallback to observed property label
-	var seriesTitle = findValue(data, i, 'title');
-	if (typeof seriesTitle === 'undefined' || seriesTitle === null || ('' + seriesTitle).trim() === '') {
-		seriesTitle = getAttributeLabel(data, i);
-	}
-	var label = seriesTitle; // +" from "+convertDate(data[i].time_start.value)+" to "+convertDate(data[i].time_end.value);
-
 	layoutTable += "<thead><tr><th colspan='2' class='timeseries-header' id='timeseries-header_" + i + "' style='cursor: pointer;'>";
 	layoutTable += "<span class='expand-icon' style='display: inline-block; margin-right: 8px;'>▶</span>";
-	layoutTable += t('time_series') + " " + (k + 1) + ": " + label;
+	layoutTable += getTimeseriesSectionTitle(data, i, k);
 	layoutTable += "</th></tr></thead>";
 
 	layoutTable += "<tbody id='timeseries-content_" + i + "' style='display: none;'>";
@@ -1952,24 +2134,8 @@ var download = function(button, event, data) {
 const queryString = window.location.search; // includes the leading "?" if present
 
 $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
-	const disclaimersSet = new Set();
-	for (let i = 0; i < data.length; i++) {
-		const disclaimerValue = findValue(data, i, 'data_disclaimer');
-		if (disclaimerValue && typeof disclaimerValue === 'string' && disclaimerValue.trim().length > 0) {
-			disclaimersSet.add(disclaimerValue.trim());
-		}
-	}
-	if (disclaimersSet.size > 0) {
-		const dialogEl = $('#dialog');
-		dialogEl.empty();
-		dialogEl.append($('<b>').text(t('disclaimer_to_accept')));
-		dialogEl.append('<br><br>');
-		const list = $('<ul>');
-		Array.from(disclaimersSet).forEach(function(text) {
-			list.append($('<li>').text(text));
-		});
-		dialogEl.append(list);
-	}
+	pendingDisclaimerTexts = collectDisclaimerTexts(data);
+	showDisclaimerDialogIfNeeded();
 
 	$("#timeseries").removeAttr("class");
 
@@ -2044,14 +2210,35 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 		],
 		view: new ol.View({
 			center: pointerCoordinates,
-			zoom: 3,
+			zoom: getStationPageMapZoom(),
 		}),
 	});
 
 
-	document.getElementById('station-name-td').innerHTML = findValue(data, 0, 'platform_label');
+	var platformLabel = findValue(data, 0, 'platform_label');
+	var sourceLabel = findValue(data, 0, 'source_label');
+	document.getElementById('station-name-td').innerHTML = platformLabel;
 
-	document.getElementById('source-label-td').innerHTML = findValue(data, 0, 'source_label');
+	var platformTitleEl = document.getElementById('platform_title');
+	if (platformTitleEl) {
+		var platformTitleText = '';
+		if (platformLabel && sourceLabel) {
+			platformTitleText = platformLabel + ' - ' + sourceLabel;
+		} else if (platformLabel) {
+			platformTitleText = platformLabel;
+		} else if (sourceLabel) {
+			platformTitleText = sourceLabel;
+		}
+		if (platformTitleText) {
+			platformTitleEl.textContent = platformTitleText;
+			platformTitleEl.style.display = '';
+		} else {
+			platformTitleEl.textContent = '';
+			platformTitleEl.style.display = 'none';
+		}
+	}
+
+	document.getElementById('source-label-td').innerHTML = sourceLabel;
 	
 	pil = findValue(data, 0, 'platform_id_local');
 	if (pil!=null){
@@ -2076,14 +2263,8 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 	// Fetch rating curves for this platform
 	var platformId = findValue(data, 0, 'platform_id');
 	if (platformId) {
-		// Extract view from URL if available, or use default
-		var viewId = 'his-central'; // default
-		var pathSegments = window.location.pathname.split('/');
-		var viewIndex = pathSegments.indexOf('view');
-		if (viewIndex !== -1 && viewIndex + 1 < pathSegments.length) {
-			viewId = pathSegments[viewIndex + 1];
-		}
-		
+		var viewId = getViewIdFromUrl();
+
 		// Construct the rating curves endpoint URL
 		var ratingCurvesUrl = '/gs-service/services/support/rating-curves?platformId=' + encodeURIComponent(platformId) + '&view=' + encodeURIComponent(viewId);
 		

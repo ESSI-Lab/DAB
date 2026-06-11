@@ -214,7 +214,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		options.noResultsMsg = "No geolocalized results to show";
 	}
 
-	if (options.showSpatialRelationControl === undefined || showSpatialRelationControl === true) {
+	if (options.showSpatialRelationControl === undefined || options.showSpatialRelationControl === null) {
 		options.showSpatialRelationControl = true;
 	}
 
@@ -542,6 +542,17 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 			});
 		}
 
+		var lang = 'en';
+		try {
+			lang = (typeof localStorage !== 'undefined' && localStorage.getItem('lang')) ||
+				(typeof config !== 'undefined' && config.language) || 'en';
+		} catch (e) { }
+		lang = String(lang).toLowerCase().split(/[-_]/)[0];
+		if (lang !== 'it') {
+			lang = 'en';
+		}
+		query += 'lang=' + lang + '&';
+
 		var layerName = options.clusterWMSLayerName;
 		var layerTitle = options.clusterWMSLayerTitle;
 
@@ -619,6 +630,15 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 
 	/**
+	 * Shows or hides only the "Markers" vector layer.
+	 */
+	widget.setMarkersLayerVisible = function(visible) {
+		if (olMap.setMarkersLayerVisible) {
+			olMap.setMarkersLayerVisible(visible);
+		}
+	};
+
+	/**
 	 * 
 	 */
 	widget.updateWMSClusterLayers = function(constraints) {
@@ -639,7 +659,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	
 			olMap.removeLayers(layerArray);
 			olMap.addLayers(layerArray);
-	
+
 			layerSwitcher.renderPanel();
 		}
 
@@ -702,6 +722,10 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		// resets the page in order to make it reusable
 		page.reset();
+
+		if (typeof GIAPI.search !== 'undefined' && typeof GIAPI.search.syncMarkersLayerVisibility === 'function') {
+			GIAPI.search.syncMarkersLayerVisibility();
+		}
 	};
 
 	/**
@@ -800,6 +824,15 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		if (options.showSelectionControl) {
 			_inputControl.updateWhereFields();
+		}
+	};
+
+	widget.clearSpatialConstraints = function() {
+
+		if (_inputControl && typeof _inputControl.clearSpatialConstraints === 'function') {
+			_inputControl.clearSpatialConstraints();
+		} else if (olMap) {
+			olMap.selectionVisible(false);
 		}
 	};
 
