@@ -24,14 +24,11 @@ package eu.essi_lab.accessor.trigger;
  * #L%
  */
 
-import com.google.common.collect.Lists;
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.IOStreamUtils;
@@ -42,16 +39,12 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
-import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.opensearch.search.rescore.QueryRescorer;
 
 import java.io.InputStream;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
-import java.time.YearMonth;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -108,7 +101,7 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
     private String[] SEARCH_TERMS = { SMARTWATCHHIGH_URL, SMARTWATCHLOW_URL };
     private static int searchIndex = 0;
 
-    public enum TRIGGER_VARIABLES {
+    public enum AGGREGATED_TRIGGER_VARIABLES {
 	// MYAIR
 	TEMPERATURE("2m temperature", "myair", "°C"), HUMIDITY("2m rel. humidity", "myair", "%"), PRESSURE("Pressure", "myair",
 		"mbar"), // HDX("Humidex",
@@ -172,14 +165,14 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 	    return units;
 	}
 
-	private TRIGGER_VARIABLES(String label, String category, String units) {
+	private AGGREGATED_TRIGGER_VARIABLES(String label, String category, String units) {
 	    this.label = label;
 	    this.category = category;
 	    this.units = units;
 	}
 
-	public static TRIGGER_VARIABLES decode(String parameterCode) {
-	    for (TRIGGER_VARIABLES var : values()) {
+	public static AGGREGATED_TRIGGER_VARIABLES decode(String parameterCode) {
+	    for (AGGREGATED_TRIGGER_VARIABLES var : values()) {
 		if (parameterCode.equals(var.name())) {
 		    return var;
 		}
@@ -302,7 +295,7 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 			    continue;
 			}
 
-			for (TRIGGER_VARIABLES var : TRIGGER_VARIABLES.values()) {
+			for (AGGREGATED_TRIGGER_VARIABLES var : AGGREGATED_TRIGGER_VARIABLES.values()) {
 			    String field = var.getCategory();
 
 
@@ -467,11 +460,11 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 
     }
 
-    private List<TRIGGER_VARIABLES> getVariablesList(JSONObject result, String pathCategory) {
+    private List<AGGREGATED_TRIGGER_VARIABLES> getVariablesList(JSONObject result, String pathCategory) {
 
-	List<TRIGGER_VARIABLES> variables = new ArrayList<AggregatedTRIGGERConnector.TRIGGER_VARIABLES>();
+	List<AGGREGATED_TRIGGER_VARIABLES> variables = new ArrayList<AGGREGATED_TRIGGER_VARIABLES>();
 
-	for (TRIGGER_VARIABLES var : TRIGGER_VARIABLES.values()) {
+	for (AGGREGATED_TRIGGER_VARIABLES var : AGGREGATED_TRIGGER_VARIABLES.values()) {
 	    String cat = var.getCategory();
 	    if (pathCategory.contains(cat)) {
 		String obj = result.optString(var.name().toLowerCase());

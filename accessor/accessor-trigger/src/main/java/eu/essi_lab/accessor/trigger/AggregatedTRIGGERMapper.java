@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import eu.essi_lab.accessor.trigger.AggregatedTRIGGERConnector.AGGREGATED_TRIGGER_VARIABLES;
 
 /**
  * @author Roberto
@@ -289,7 +290,7 @@ public class AggregatedTRIGGERMapper extends OriginalIdentifierMapper {
 
 		String userId = object.optString("userId");
 
-		TRIGGER_VARIABLES var = TRIGGER_VARIABLES.decode(variable);
+		AGGREGATED_TRIGGER_VARIABLES var = AGGREGATED_TRIGGER_VARIABLES.decode(variable);
 		if (var != null) {
 
 		    units = var.getUnits();
