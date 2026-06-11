@@ -178,6 +178,8 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String METEOTRACKER = "https://app.meteotracker.com";
 
     public static final String TRIGGER = "https://trigger-io.difa.unibo.it";
+
+    public static final String AGGREGATED_TRIGGER = "https://trigger-io.difa.unibo.it/aggregates";
     
     public static final String SMARTCITIZENKIT = "https://api.smartcitizen.me";
     
@@ -269,6 +271,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("meteotracker", METEOTRACKER);
 	map.put("ionbeamtracker", IONBEAM_TRACKER);
 	map.put("trigger", TRIGGER);
+	map.put("aggregatedtrigger", AGGREGATED_TRIGGER);
 	map.put("smartcitizenkit", SMARTCITIZENKIT);
 	map.put("acronet", ACRONET);
 	map.put("geomountain", GEOMOUNTAIN);
