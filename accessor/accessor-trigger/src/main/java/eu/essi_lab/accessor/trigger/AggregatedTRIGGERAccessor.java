@@ -26,7 +26,7 @@ import eu.essi_lab.adk.harvest.HarvestedAccessor;
 /**
  * @author Roberto
  */
-public class AggregatedTRIGGERAccessor extends HarvestedAccessor<TRIGGERConnector> {
+public class AggregatedTRIGGERAccessor extends HarvestedAccessor<AggregatedTRIGGERConnector> {
 
     /**
      * 
@@ -46,8 +46,8 @@ public class AggregatedTRIGGERAccessor extends HarvestedAccessor<TRIGGERConnecto
     }
 
     @Override
-    protected TRIGGERConnectorSetting initHarvestedConnectorSetting() {
+    protected AggregatedTRIGGERConnectorSetting initHarvestedConnectorSetting() {
 
-	return new TRIGGERConnectorSetting();
+	return new AggregatedTRIGGERConnectorSetting();
     }
 }
