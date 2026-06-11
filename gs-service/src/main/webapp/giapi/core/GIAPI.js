@@ -447,7 +447,9 @@ export const GIAPI = {
 		if (queryID && typeof queryID === 'string' && queryID.indexOf('expand_') === 0) {
 			tok = '';
 		}
-		if (viewId) {
+		if (openSearchPath && openSearchPath.indexOf('/') !== -1) {
+			path = openSearchPath.endsWith('?') ? openSearchPath : openSearchPath + '?';
+		} else if (viewId) {
 			if (tok) {
 				path = 'token/' + tok + '/view/' + viewId +  '/opensearch/query?';
 			} else {

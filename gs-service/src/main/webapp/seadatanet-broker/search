@@ -20,8 +20,10 @@
         <link rel="stylesheet" type="text/css" href="https://api.geodab.eu/download/giapi/jtable/highlight.css"/>
         <link rel="stylesheet" type="text/css" href="https://api.geodab.eu/download/giapi/jtable/jtable_jqueryui.css"/>
 
-<!-- API minified js -->
+<script type="text/javascript" src="../giapi/jquery/jquery-1.12.1.js"></script>
+<script type="text/javascript" src="../giapi/jquery/jquery-ui-1.11.14.min.js"></script>
 <script type="text/javascript" src="https://api.geodab.eu/download/giapi/lib/min/giapi.min.js"></script>
+<script type="text/javascript" src="./seadatanet-query-patch.js"></script>
 <!-- API css -->
 <link rel="stylesheet" type="text/css" href="https://api.geodab.eu/docs/assets/css/giapi.css" />
 <!-- Portal css -->
@@ -534,7 +536,7 @@
 	    	GIAPI.ui.mapTypeId = google.maps.MapTypeId.HYBRID;	        	
 	        GIAPI.search = {};
 		        	        
-            GIAPI.search.dab = GIAPI.DAB('https://gs-service-production.geodab.eu/gs-service', 'seadatanet-broker', 'services/essi','csw');
+            GIAPI.search.dab = GIAPI.DAB('../', 'seadatanet-broker', 'services/essi', 'csw');
 	        	       	    					        	              	                
 	        jQuery(function() {
 	        
@@ -957,26 +959,32 @@
                 }
             };
                                   	               
-            GIAPI.search.onDiscoverResponse = function(response) {     
-            	           	            	                  
-        	    if(response.error){
-                   
-          		    GIAPI.UI_Utils.discoverDialog('close');           
-          		    GIAPI.UI_Utils.dialog('open',{title:'Error',message:response.error});        		 
-                    return;
-                }
-        	    
-        	    var resultSet = response[0];
-        	    
-             	// updates the result set layout
-        	    GIAPI.search.resultSetLayout.update(response);
-        	    
-        	    if(!response[0].termFrequency){
-        	    	jQuery('#filters-tab').empty();             	    	
-        	    }
-        	           	     
-                if (GIAPI.UI_Utils.discoverDialog('isOpen')) {            
-                    GIAPI.UI_Utils.discoverDialog('close');
+            GIAPI.search.onDiscoverResponse = function(response) {
+                try {
+                    if (response && response.error) {
+                        GIAPI.UI_Utils.dialog('open', { title: 'Error', message: response.error });
+                        return;
+                    }
+
+                    if (!response || !response[0]) {
+                        GIAPI.UI_Utils.dialog('open', { title: 'Error', message: 'Invalid search response' });
+                        return;
+                    }
+
+                    GIAPI.search.resultSetLayout.update(response);
+
+                    if (!response[0].termFrequency) {
+                        jQuery('#filters-tab').empty();
+                    }
+                } catch (err) {
+                    GIAPI.UI_Utils.dialog('open', {
+                        title: 'Error',
+                        message: err && err.message ? err.message : String(err)
+                    });
+                } finally {
+                    if (GIAPI.UI_Utils.discoverDialog('isOpen')) {
+                        GIAPI.UI_Utils.discoverDialog('close');
+                    }
                 }
             };
            </script>

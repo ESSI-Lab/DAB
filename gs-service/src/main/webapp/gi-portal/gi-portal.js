@@ -2795,6 +2795,7 @@ export function initializePortal(config) {
 			'clusterWMSView': view,
 			'clusterWMSLayerName': view,
 			'clusterWMSLayerTitle': view,
+			'wmsLayerExtent': config.wmsLayerExtent,
 
 			'stationInfoId': 'stationInfo',
 			'stationNameAddId': 'platformNameConstraint',

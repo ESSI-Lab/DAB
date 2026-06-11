@@ -48,6 +48,12 @@
 	"ontologyLabel" : "HIS-Central ontology",
 	"shapeView" : "his-central-shapes",
 	"clusterWMS" : true,
+	"wmsLayerExtent" : {
+		"south" : 38,
+		"west" : 6,
+		"north" : 48,
+		"east" : 19
+	},
 	"login" : true,
 	"showSourceEndpoint" : false,
 	"permissions" : "downloads,api",
