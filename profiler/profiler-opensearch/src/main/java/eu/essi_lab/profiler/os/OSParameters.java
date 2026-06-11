@@ -831,7 +831,7 @@ public abstract class OSParameters {
     /**
      *
      */
-    public static final OSParameter SPATIAL_RELATION = new OSParameter("rel", "string", "OVERLAPS", "{gs:rel}");
+    public static final OSParameter SPATIAL_RELATION = new OSParameter("rel", "string", "CONTAINS", "{gs:rel}");
 
     /**
      *

@@ -267,9 +267,12 @@ console.log("Hello, world!");
 	 */
 	inControl.spatialRelation = function() {
 
-		// spatial relation
-		var contains = jQuery('#containsButton').attr('check') === 'true';
-		return contains || contains === undefined ? "CONTAINS" : "OVERLAPS";
+		var containsButton = jQuery('#containsButton');
+		if (!containsButton.length) {
+			return 'CONTAINS';
+		}
+
+		return containsButton.attr('check') === 'true' ? 'CONTAINS' : 'OVERLAPS';
 	};
 
 	/**
@@ -355,20 +358,25 @@ console.log("Hello, world!");
 		options.olMap.fitBounds(inControl.where());
 	};
 
-	var hasExistingBbox = function() {
-		if (options.olMap && options.olMap.selectionVisible && options.olMap.selectionVisible()) {
-			return true;
-		}
-		var where = inControl.where(true);
-		return [where.south, where.west, where.north, where.east].every(function(v) {
-			return typeof v === 'number' && Number.isFinite(v);
-		});
+	var setPredefinedLayersListMessage = function(message, className) {
+		jQuery('#layerSelectorTable > tbody').remove();
+		var rowClass = className || 'predefined-layers-message';
+		jQuery('#layerSelectorTable').append(
+			'<tr class="' + rowClass + '"><td>' + message + '</td></tr>'
+		);
 	};
 
 	/**
 	  * 
 	  */
 	var downloadWmsLayers = function() {
+
+		var __t = window.__t || function(s) { return s; };
+		var loadingLabel = __t('loading');
+		if (loadingLabel === 'loading') {
+			loadingLabel = 'Loading...';
+		}
+		setPredefinedLayersListMessage(loadingLabel);
 
 		var endpoint = options.dabNode.endpoint();
 		endpoint = endpoint.endsWith('/') ? endpoint : endpoint + '/';
@@ -399,7 +407,21 @@ console.log("Hello, world!");
 					predefinedLayers = data.layers;
 
 					updateWmsLayersTable();
+				} else {
+					var emptyLabel = __t('predefined_selection_empty');
+					if (emptyLabel === 'predefined_selection_empty') {
+						emptyLabel = 'No predefined search areas available.';
+					}
+					setPredefinedLayersListMessage(emptyLabel);
 				}
+			},
+
+			error: function() {
+				var errorLabel = __t('predefined_selection_load_error');
+				if (errorLabel === 'predefined_selection_load_error') {
+					errorLabel = 'Failed to load predefined search areas.';
+				}
+				setPredefinedLayersListMessage(errorLabel, 'predefined-layers-message predefined-layers-error');
 			}
 		});
 	};
@@ -411,6 +433,16 @@ console.log("Hello, world!");
 
 		// clears the table rows by removing the table body
 		jQuery('#layerSelectorTable > tbody').remove();
+
+		if (!predefinedLayers.length) {
+			var __t = window.__t || function(s) { return s; };
+			var emptyLabel = __t('predefined_selection_empty');
+			if (emptyLabel === 'predefined_selection_empty') {
+				emptyLabel = 'No predefined search areas available.';
+			}
+			setPredefinedLayersListMessage(emptyLabel);
+			return;
+		}
 
 		predefinedLayers.forEach((layer) => {
 
@@ -480,27 +512,6 @@ console.log("Hello, world!");
 
 						resultsMapWidget.addLayers(mapLayers);
 						shapeLayer = mapLayers;
-
-						if (!hasExistingBbox()) {
-							var bbox = layer.bbox.split(',');
-
-							updateWhereFields(
-								parseFloat(bbox[0]),
-								parseFloat(bbox[1]),
-								parseFloat(bbox[2]),
-								parseFloat(bbox[3]),
-								true
-							);
-
-							var whereLatLon = inControl.where(true);
-							options.value.south = whereLatLon.south;
-							options.value.west = whereLatLon.west;
-							options.value.north = whereLatLon.north;
-							options.value.east = whereLatLon.east;
-
-							updateSelection();
-							fitMapToBounds();
-						}
 					}
 				});
 			});

@@ -2,6 +2,7 @@ import { GIAPI } from '../giapi/core/GIAPI.js';
 import {
 	isToolbarLayout,
 	prepareToolbarHeader,
+	prepareHeaderLayersControl,
 	prepareQueryPanelShell,
 	mountQueryPanel,
 	restructureToolbarSidebar,
@@ -2705,6 +2706,11 @@ export function initializePortal(config) {
 			showLayersControl = false;
 		}
 
+		var layersPanelEl = null;
+		if (showLayersControl) {
+			layersPanelEl = prepareHeaderLayersControl(t);
+		}
+
 		var startActive = true;
 
 		if (config.layersSelectorVisibility !== undefined && !config.layersSelectorVisibility) {
@@ -2768,6 +2774,7 @@ export function initializePortal(config) {
 			'addLayers': false,
 			'startActive': startActive,
 			'showLayersControl': showLayersControl,
+			'layersPanel': layersPanelEl,
 			'layersControlWidth': 180,
 			'layersControlHeight': 200,
 			'layersControlOpacity': 0.9,
@@ -4924,16 +4931,47 @@ export function initializePortal(config) {
 			GIAPI.UI_Utils.discoverDialog('open');
 
 		} catch (err) {
-			GIAPI.UI_Utils.dialog('open', { title: 'Error', message: err });
+			showDiscoverError(err && err.message ? err.message : String(err));
 		}
 	};
 
-	GIAPI.search.onDiscoverResponse = function(response) {
-
+	function getDiscoverErrorMessage(response) {
+		if (!response) {
+			return null;
+		}
 		if (response.error) {
+			return response.error;
+		}
+		var resultSet = response[0];
+		if (!resultSet) {
+			return null;
+		}
+		if (resultSet.error) {
+			return resultSet.error;
+		}
+		if (resultSet._resultSet && resultSet._resultSet.error) {
+			return resultSet._resultSet.error;
+		}
+		return null;
+	}
 
-			GIAPI.UI_Utils.discoverDialog('close');
-			GIAPI.UI_Utils.dialog('open', { title: 'Error', message: response.error });
+	function showDiscoverError(message) {
+		GIAPI.UI_Utils.discoverDialog('close');
+		var errorMessage = message || t('search_error_message');
+		if (errorMessage === 'search_error_message') {
+			errorMessage = 'The search request failed. Please try again later.';
+		}
+		var errorTitle = t('error_title');
+		if (errorTitle === 'error_title') {
+			errorTitle = 'Error';
+		}
+		GIAPI.UI_Utils.dialog('open', { title: errorTitle, message: errorMessage });
+	}
+
+	GIAPI.search.onDiscoverResponse = function(response) {
+		var discoverError = getDiscoverErrorMessage(response);
+		if (discoverError) {
+			showDiscoverError(discoverError);
 			return;
 		}
 

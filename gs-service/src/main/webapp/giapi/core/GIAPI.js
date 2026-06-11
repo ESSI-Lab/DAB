@@ -418,6 +418,9 @@ export const GIAPI = {
 		if (options && options.spatialRelation) {
 
 			spatialRel = options.spatialRelation;
+		} else if (bbox || predefinedLayer) {
+
+			spatialRel = 'CONTAINS';
 		}
 
 		// term frequency

@@ -27,9 +27,10 @@ package eu.essi_lab.profiler.wms.cluster.legend;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -63,6 +64,8 @@ import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler2;
  * @author boldrini
  */
 public class WMSGetLegendHandler extends StreamingRequestHandler {
+
+    private static final int LEGEND_TEXT_RIGHT_PADDING = 4;
 
     private int fontSize;
     private int lineSize;
@@ -251,8 +254,9 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    Font font = new Font("SansSerif", fontStyle, fontSize);
 		    BufferedImage testBI = new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB);
 		    Graphics2D igTest = testBI.createGraphics();
+		    igTest.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		    igTest.setFont(font);
-		    FontMetrics metrics = igTest.getFontMetrics();
+		    FontRenderContext fontRenderContext = igTest.getFontRenderContext();
 		    for (GSSource source : sources) {
 			String label = source.getLabel();
 			String sourceId = source.getUniqueIdentifier();
@@ -278,7 +282,8 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 
 		    int maxLengthInPixels = 0;
 		    for (InfoLegend info : infos) {
-			int l = metrics.stringWidth(info.getLabel());
+			TextLayout layout = new TextLayout(info.getLabel(), font, fontRenderContext);
+			int l = (int) Math.ceil(layout.getAdvance());
 			if (l > maxLengthInPixels) {
 			    maxLengthInPixels = l;
 			}
@@ -296,7 +301,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    // maxLength = size;
 		    // }
 		    // }
-		    widthString = "" + (maxLengthInPixels + initialGap);
+		    widthString = "" + (maxLengthInPixels + initialGap + LEGEND_TEXT_RIGHT_PADDING);
 		    // }
 		    if (heightString == null || heightString.isEmpty()) {
 			heightString = "" + lineSize * infos.size();
@@ -308,7 +313,8 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		    Graphics2D ig2 = bi.createGraphics();
 		    ig2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		    ig2.setFont(new Font("SansSerif", fontStyle, fontSize));
+		    ig2.setFont(font);
+		    igTest.dispose();
 
 		    ig2.setStroke(new BasicStroke(2));
 
@@ -329,6 +335,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    }
 
 		    ImageIO.write(bi, format, output);
+		    ig2.dispose();
 
 		} catch (Exception e) {
 

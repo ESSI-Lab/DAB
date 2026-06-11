@@ -52,6 +52,50 @@ export function prepareToolbarHeader(t) {
 	jQuery('#headerDiv').prepend(toolbarLeft);
 }
 
+export function prepareHeaderLayersControl(t) {
+	if (jQuery('#header-layers-panel-body').length) {
+		return document.getElementById('header-layers-panel-body');
+	}
+
+	var headerRight = jQuery('#header-toolbar-right');
+	if (!headerRight.length) {
+		headerRight = jQuery('<div id="header-toolbar-right" class="header-toolbar-right"></div>');
+		jQuery('#headerDiv').append(headerRight);
+		var loginContainer = jQuery('.login-container');
+		if (loginContainer.length) {
+			headerRight.append(loginContainer);
+		}
+	}
+
+	var label = toolbarLabel(t, 'layers_toolbar', 'Layers');
+	var layersBtn = jQuery('<button type="button" id="header-layers-btn" class="login-button header-layers-btn"></button>')
+		.html('<i class="fa fa-map-o header-layers-btn-icon" aria-hidden="true"></i>' + label);
+	headerRight.prepend(layersBtn);
+
+	var panel = jQuery(
+		'<div id="header-layers-panel" class="header-layers-panel" style="display:none;">' +
+			'<div id="header-layers-panel-body" class="header-layers-panel-body"></div>' +
+		'</div>'
+	);
+	headerRight.append(panel);
+
+	layersBtn.on('click', function(e) {
+		e.stopPropagation();
+		var open = !panel.is(':visible');
+		panel.toggle(open);
+		layersBtn.toggleClass('active', open);
+	});
+
+	jQuery(document).off('click.headerLayersPanel').on('click.headerLayersPanel', function(e) {
+		if (!jQuery(e.target).closest('#header-layers-panel, #header-layers-btn').length) {
+			panel.hide();
+			layersBtn.removeClass('active');
+		}
+	});
+
+	return document.getElementById('header-layers-panel-body');
+}
+
 export function prepareQueryPanelShell(t) {
 	var queryPanel = jQuery(
 		'<div id="query-panel" class="portal-panel query-panel" style="display:none;">' +

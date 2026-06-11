@@ -734,13 +734,20 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 	 * @return {BBox}
 	 */
 	widget.where = function() {
-		if (!olMap.selectionVisible()) {
+		var predefinedLayer = (options.value && options.value.predefinedLayer) ? options.value.predefinedLayer : null;
+		var hasBboxSelection = olMap.selectionVisible();
+
+		if (!hasBboxSelection && !predefinedLayer) {
 			return null;
 		}
 
+		if (!hasBboxSelection) {
+			return { 'predefinedLayer': predefinedLayer };
+		}
+
 		var where = _inputControl.where(true);
-		if (options.value && options.value.predefinedLayer) {
-			where.predefinedLayer = options.value.predefinedLayer;
+		if (predefinedLayer) {
+			where.predefinedLayer = predefinedLayer;
 		}
 		return where;
 	};
@@ -881,14 +888,17 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 	var createLayersControl = function() {
 
+		var __t = window.__t || function(s) { return s; };
+		var splitLayersPanel = !!options.layersPanel;
 
 		layerSwitcher = new ol.control.LayerSwitcher({
-			tipLabel: 'Show layers control', //
-			collapseTipLabel: 'Hide layers control',//
-			activationMode: 'click', //
+			tipLabel: splitLayersPanel ? (__t('map_legend') || 'Legend') : 'Show layers control',
+			collapseTipLabel: splitLayersPanel ? (__t('hide_legend') || 'Hide legend') : 'Hide layers control',
+			activationMode: 'click',
 
-			startActive: options.startActive, //
-			groupSelectStyle: 'children', // Can be 'children' [default], 'group' or 'none',
+			startActive: options.startActive,
+			groupSelectStyle: 'children',
+			layersPanel: options.layersPanel || null,
 
 			clusterWMS: options.clusterWMS,
 			clusterWMSToken: options.clusterWMSToken,
@@ -902,6 +912,7 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 		});
 
 		widget.map.addControl(layerSwitcher);
+		widget.layerSwitcher = layerSwitcher;
 
 	};
 
