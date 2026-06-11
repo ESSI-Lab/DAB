@@ -1,2 +1,4 @@
 eu.essi_lab.accessor.trigger.TRIGGERAccessor
 eu.essi_lab.accessor.trigger.TRIGGERConnector
+eu.essi_lab.accessor.trigger.AggregatedTRIGGERAccessor
+eu.essi_lab.accessor.trigger.AggregatedTRIGGERConnector

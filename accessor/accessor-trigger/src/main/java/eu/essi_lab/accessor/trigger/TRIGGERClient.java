@@ -57,9 +57,7 @@ public class TRIGGERClient {
     public static String TRIGGER_BEARER_TOKEN = null;
     public static String TRIGGER_REFRESH_TOKEN = null;
 
-    /**
-     * @param endpoint
-     */
+
     public TRIGGERClient() {
 
     }
@@ -164,44 +162,6 @@ public class TRIGGERClient {
 
     }
 
-    public String refreshBearerToken() {
-	// https://app.meteotracker.com/auth/refreshtoken
-	GSLoggerFactory.getLogger(TRIGGERClient.class).info("Refreshing BEARER TOKEN from MeteoTracker service");
-	String token = null;
-
-	HashMap<String, String> params = new HashMap<String, String>();
-	params.put("refreshToken", TRIGGER_REFRESH_TOKEN);
-
-	String result = null;
-	try {
-
-	    HttpRequest request = HttpRequestUtils.build(//
-		    MethodWithBody.POST, //
-		    getEndpoint() + "/auth/refreshtoken", //
-		    params);
-
-	    HttpResponse<InputStream> response = new Downloader().downloadResponse(request);
-
-	    int statusCode = response.statusCode();
-	    if (statusCode > 400) {
-		// token expired - refresh token
-		getToken();
-	    }
-	    result = IOUtils.toString(response.body(), "UTF-8");
-	    GSLoggerFactory.getLogger(TRIGGERClient.class).info("RESPONSE FROM MeteoTracker " + result);
-	    if (result != null && !result.isEmpty()) {
-		JSONObject obj = new JSONObject(result);
-		token = obj.optString("accessToken");
-		TRIGGER_REFRESH_TOKEN = obj.optString("refreshToken");
-		GSLoggerFactory.getLogger(TRIGGERClient.class).info("BEARER TOKEN obtained: " + TRIGGER_BEARER_TOKEN);
-	    }
-
-	} catch (Exception e) {
-	    e.printStackTrace();
-	    GSLoggerFactory.getLogger(TRIGGERClient.class).info("ERROR getting BEARER TOKEN: " + e.getMessage());
-	}
-	return token;
-    }
 
     public JSONArray getData(String stationId, String seriesCode, Date begin, Date end, InterpolationType interpolation) throws Exception {
 
@@ -263,7 +223,6 @@ public class TRIGGERClient {
      * @param stationId
      * @param beginDate
      * @param endDate
-     * @param variable
      * @return
      * @throws IOException
      * @throws GSException
