@@ -729,6 +729,11 @@ body {
 	z-index: 21;
 }
 
+.beta-badge-tooltip-version {
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+
 .beta-badge-tooltip::after {
 	content: "";
 	position: absolute;
