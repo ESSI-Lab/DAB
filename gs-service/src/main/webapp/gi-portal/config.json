@@ -3,9 +3,15 @@
 	"zoom" : 4,
 	"centerLat" : 0,
 	"centerLon" : 0,
+	"temporalMinYear" : 1900,
+	"stationPageMapZoom" : 10,
 	"minZoom" : 6,
 	"maxZoom" : 10,
-	"resultsVisibility" : true,
+	"toolbarLayout": true,
+	"showResultOverview": false,
+	"resultTitleFromObservedProperty": true,
+	"resultsVisibility" : "hidden",
+	"performStartupQuery": false,
 	"bboxSelectorVisibility" : false,
 	"layersSelectorVisibility" : true,
 	"layersSelectorButtonVisibility" : true,
@@ -22,5 +28,7 @@
 	"intendedObservationSpacing" : true,
 	"aggregationDuration" : true,
 	"semanticSearch" : false,
-	"language" : "en"
+	"language" : "en",
+	"zoomOnResults" : true,
+	"sortBy" : "platformTitle"
 }

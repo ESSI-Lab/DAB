@@ -207,6 +207,35 @@ body {
 	flex-shrink: 0;
 }
 
+/* Classic header: flex row with actions (language/login) on the right */
+#headerDiv:not(.portal-toolbar-header) {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 44px;
+	height: auto !important;
+	padding: 6px 12px;
+	box-sizing: border-box;
+}
+
+.header-classic-main {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px 8px;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+#headerDiv:not(.portal-toolbar-header) .login-container {
+	position: static;
+	top: auto;
+	right: auto;
+	transform: none;
+	margin-left: auto;
+	flex-shrink: 0;
+}
+
 #logoDiv {
 	vertical-align: top;
 	display: inline-block;
@@ -272,7 +301,7 @@ body {
 
 #hide-results-button {
 	display: inline-block;
-	margin-top: 7px;
+	margin-top: 0;
 }
 
 /* -------------------------------- */

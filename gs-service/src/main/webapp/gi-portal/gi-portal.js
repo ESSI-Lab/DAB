@@ -394,37 +394,84 @@ function openLanguageChooser() {
 	}
 }
 
+function ensureHeaderActionContainer() {
+	const headerDiv = document.getElementById('headerDiv');
+	if (!headerDiv) {
+		return null;
+	}
+
+	let loginContainer = headerDiv.querySelector('.login-container');
+	if (!loginContainer) {
+		loginContainer = document.createElement('div');
+		loginContainer.className = 'login-container';
+		headerDiv.appendChild(loginContainer);
+	}
+
+	return loginContainer;
+}
+
+function initializeLanguageChooser() {
+	const loginContainer = ensureHeaderActionContainer();
+	if (!loginContainer) {
+		return;
+	}
+
+	let langBtn = document.getElementById('langBtn');
+	if (!langBtn) {
+		langBtn = document.createElement('button');
+		langBtn.id = 'langBtn';
+		langBtn.className = 'login-button lang-button';
+		loginContainer.appendChild(langBtn);
+	}
+
+	const curLang = (i18n.current || 'en').toUpperCase();
+	langBtn.textContent = curLang;
+	langBtn.title = t('menu_change_language');
+
+	if (!langBtn.dataset.langChooserBound) {
+		langBtn.dataset.langChooserBound = 'true';
+		langBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			openLanguageChooser();
+		});
+	}
+}
 
 function initializeLogin(config) {
 	if (!config.login) {
 		return;
 	}
 
-	// Create and append login elements
-	const loginContainer = document.createElement('div');
-	loginContainer.className = 'login-container';
-	const curLang = (i18n.current || 'en').toUpperCase();
-	loginContainer.innerHTML = `
-		<button id=\"loginBtn\" class=\"login-button\">${t('login')}</button>
-		<button id=\"logoutBtn\" class=\"login-button\" style=\"display: none;\">${t('logout')}</button>
-		<button id=\"langBtn\" class=\"login-button lang-button\" title=\"${t('menu_change_language')}\">${curLang}</button>
-	`;
-	
-	// Adjust login container top position to better align with other buttons
-	// This will be set after headerDiv is ready
-	setTimeout(function() {
-		var loginContainerEl = document.querySelector('.login-container');
-		if (loginContainerEl) {
-			loginContainerEl.style.top = '2px'; // Adjust to match button positions
-		}
-	}, 100);
+	const loginContainer = ensureHeaderActionContainer();
+	if (!loginContainer) {
+		return;
+	}
 
-	// Append login container to headerDiv instead of body
-	const headerDiv = document.getElementById('headerDiv');
-	if (headerDiv) {
-		headerDiv.appendChild(loginContainer);
-	} else {
-		document.body.insertBefore(loginContainer, document.body.firstChild);
+	if (!document.getElementById('loginBtn')) {
+		const loginBtn = document.createElement('button');
+		loginBtn.id = 'loginBtn';
+		loginBtn.className = 'login-button';
+		loginBtn.textContent = t('login');
+		const langBtn = document.getElementById('langBtn');
+		if (langBtn) {
+			loginContainer.insertBefore(loginBtn, langBtn);
+		} else {
+			loginContainer.appendChild(loginBtn);
+		}
+	}
+
+	if (!document.getElementById('logoutBtn')) {
+		const logoutBtn = document.createElement('button');
+		logoutBtn.id = 'logoutBtn';
+		logoutBtn.className = 'login-button';
+		logoutBtn.style.display = 'none';
+		logoutBtn.textContent = t('logout');
+		const langBtn = document.getElementById('langBtn');
+		if (langBtn) {
+			loginContainer.insertBefore(logoutBtn, langBtn);
+		} else {
+			loginContainer.appendChild(logoutBtn);
+		}
 	}
 
 	// IMPORTANT: Append modal + overlay to <body> so they are fixed to the viewport.
@@ -456,21 +503,12 @@ function initializeLogin(config) {
 	// Setup event listeners
 	const loginBtn = document.getElementById('loginBtn');
 	let logoutBtn = document.getElementById('logoutBtn');
-	const langBtn = document.getElementById('langBtn');
 	const loginModal = document.getElementById('loginModal');
 	const modalOverlay = document.getElementById('modalOverlay');
 	const submitLogin = document.getElementById('submitLogin');
 	const emailInput = document.getElementById('email');
 	const apiKeyInput = document.getElementById('apiKey');
 	const closeBtn = loginModal ? loginModal.querySelector('.login-modal-close') : null;
-
-	// Always-visible language chooser button (also for non-logged users)
-	if (langBtn) {
-		langBtn.addEventListener('click', function(e) {
-			e.preventDefault();
-			openLanguageChooser();
-		});
-	}
 
 	// Show modal
 	loginBtn.addEventListener('click', function() {
@@ -2088,7 +2126,8 @@ export function initializePortal(config) {
 		}
 	}
 
-	// Initialize login if enabled
+	// Language chooser is always available; login is optional
+	initializeLanguageChooser();
 	initializeLogin(config);
 
 	var centerLat = config.centerLat;
@@ -2198,12 +2237,20 @@ export function initializePortal(config) {
 		//------------------------------------------------------------------
 		// header settings
 		//
-		jQuery('#headerDiv').css('padding', '10px');
-		jQuery('#headerDiv').css('padding-top', '2px'); // Reduced padding-top to align buttons better
-		jQuery('#headerDiv').css('padding-left', '10px');
 		jQuery('#headerDiv').css('margin-left', '0px');
-		jQuery('#headerDiv').css('height', '30px');
-		jQuery('#headerDiv').css('position', 'relative'); // Ensure relative positioning for absolute children
+		jQuery('#headerDiv').css('position', 'relative');
+		if (!isToolbarLayout(config)) {
+			jQuery('#headerDiv').css({
+				'height': 'auto',
+				'min-height': '44px',
+				'padding': '6px 12px',
+				'box-sizing': 'border-box'
+			});
+		} else {
+			jQuery('#headerDiv').css('padding', '10px');
+			jQuery('#headerDiv').css('padding-top', '2px');
+			jQuery('#headerDiv').css('padding-left', '10px');
+		}
 
 		//------------------------------------------------------------------
 		// Clear All Constraints function
@@ -3061,29 +3108,13 @@ export function initializePortal(config) {
 			}
 		);
 		
-		// Align search button container properly
-		// Use a small negative margin to move up and align with login buttons
 		jQuery('#search-button').css({
-			'margin-left': '-3px',
-			'margin-top': '0px', // Start with 0, will be adjusted
-			'vertical-align': 'top',
+			'margin-left': '0',
+			'margin-top': '0',
+			'vertical-align': 'middle',
 			'display': 'inline-block',
 			'line-height': 'normal'
 		});
-		
-		// Fine-tune alignment after a short delay to ensure DOM is ready
-		setTimeout(function() {
-			var searchBtn = jQuery('#search-button');
-			var loginBtn = jQuery('.login-container');
-			if (searchBtn.length && loginBtn.length) {
-				var searchTop = searchBtn.position().top;
-				var loginTop = loginBtn.position().top;
-				var offset = loginTop - searchTop;
-				if (Math.abs(offset) > 1) {
-					searchBtn.css('margin-top', offset + 'px');
-				}
-			}
-		}, 200);
 		}
 
 		//------------------------------------------------------------------
@@ -3749,6 +3780,10 @@ export function initializePortal(config) {
 				var canBulkDownload = !!(authToken && userPermissions.includes('downloads'));
 
 				$('#paginator-widget-top-label .login-button').remove();
+
+				if (config.bulkDownloadVisibility === false) {
+					return;
+				}
 
 				var downloadButton = $('<button>')
 					.addClass('login-button')
