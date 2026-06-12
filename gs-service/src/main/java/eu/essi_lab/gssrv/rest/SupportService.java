@@ -710,8 +710,22 @@ public class SupportService {
 	}
 
 	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
-	PredefinedShapeDeleteResult deleteResult = new PredefinedShapeManagementService().deleteByPrefix(request.getPrefix(),
-		owner, loginResponse.isAdmin());
+	PredefinedShapeManagementService managementService = new PredefinedShapeManagementService();
+	PredefinedShapeDeleteResult deleteResult;
+	String successMessage;
+
+	if (request.getIdentifiers() != null && !request.getIdentifiers().isEmpty()) {
+
+	    deleteResult = managementService.deleteByIdentifiers(request.getIdentifiers(), owner, loginResponse.isAdmin(),
+		    request.getShapeView());
+	    successMessage = "Deleted " + request.getIdentifiers().size() + " search area(s)";
+
+	} else {
+
+	    deleteResult = managementService.deleteByPrefix(request.getPrefix(), owner, loginResponse.isAdmin(),
+		    request.getShapeView());
+	    successMessage = "Deleted shape area \"" + request.getPrefix() + "\"";
+	}
 
 	if (!deleteResult.isSuccess()) {
 
@@ -724,7 +738,46 @@ public class SupportService {
 	}
 
 	basicResponse.setSuccess(true);
-	basicResponse.setMessage("Deleted shape area \"" + request.getPrefix() + "\"");
+	basicResponse.setMessage(successMessage);
+
+	return Response.ok(basicResponse).build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/predefinedShapes/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updatePredefinedShape(PredefinedShapeUpdateRequest request) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
+	LoginResponse loginResponse = getLoginResponse(loginRequest);
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	PredefinedShapeDeleteResult updateResult = new PredefinedShapeManagementService().updateEntry(request.getIdentifier(),
+		request.getNewIdentifier(), request.getName(), request.getGroup(), request.getOwner(), owner,
+		loginResponse.isAdmin(), request.getShapeView());
+
+	if (!updateResult.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(updateResult.getErrorMessage().orElse("Update failed"));
+	    if (updateResult.isForbidden()) {
+		return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+	    }
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	}
+
+	basicResponse.setSuccess(true);
+	basicResponse.setMessage("Search area updated in OpenSearch. Run harvest to refresh the selection panel.");
 
 	return Response.ok(basicResponse).build();
     }
@@ -763,12 +816,13 @@ public class SupportService {
 	    }
 
 	    String shapeId = multipart.getField("shapeId").orElse("");
+	    String group = multipart.getField("group").orElse("");
 	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
 
 	    PredefinedShapeUploadService uploadService = new PredefinedShapeUploadService();
 
 	    PredefinedShapeUploadService.UploadOutcome outcome = uploadService.upload(multipart.getFileName(), shapeId,
-		    multipart.getFileStream(), owner, loginResponse.isAdmin());
+		    multipart.getFileStream(), group, owner, loginResponse.isAdmin());
 
 	    if (!outcome.isSuccess()) {
 

@@ -51,6 +51,14 @@ import eu.essi_lab.model.StorageInfo;
  */
 public class OpenSearchShapefileClient {
 
+    private static final List<String> METADATA_FIELDS = List.of(//
+	    IndexData.ENTRY_NAME, //
+	    ShapeFileMapping.ENTRY_TITLE, //
+	    ShapeFileMapping.SHAPE_GROUP, //
+	    ShapeFileMapping.OWNER);
+
+    private static final List<String> RENAME_SOURCE_EXCLUDES = List.of(ShapeFileMapping.SHAPE_FILE);
+
     private final OpenSearchFolder folder;
     private final OpenSearchWrapper wrapper;
 
@@ -83,6 +91,56 @@ public class OpenSearchShapefileClient {
 	    return wrapper.getSource(ShapeFileMapping.get().getIndex(), entryId);
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error reading shape {}: {}", entryName, e.getMessage());
+	    return Optional.empty();
+	}
+    }
+
+    /**
+     * @param entryName shape entry name
+     * @return metadata fields only (no geometry or embedded binary payload)
+     */
+    public Optional<JSONObject> getShapeMetadata(String entryName) {
+
+	try {
+	    String entryId = OpenSearchFolder.getEntryId(folder, entryName);
+	    return wrapper.getSourceFields(ShapeFileMapping.get().getIndex(), entryId, METADATA_FIELDS, null);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error reading shape metadata {}: {}", entryName, e.getMessage());
+	    return Optional.empty();
+	}
+    }
+
+    /**
+     * @param entryName shape entry name
+     * @param fields document fields to merge
+     * @return {@code true} when the update was applied
+     */
+    public boolean patchShapeFields(String entryName, Map<String, Object> fields) {
+
+	if (fields == null || fields.isEmpty()) {
+	    return true;
+	}
+
+	try {
+	    String entryId = OpenSearchFolder.getEntryId(folder, entryName);
+	    return wrapper.updateSourceFields(ShapeFileMapping.get().getIndex(), entryId, fields);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error updating shape {}: {}", entryName, e.getMessage());
+	    return false;
+	}
+    }
+
+    /**
+     * @param entryName shape entry name
+     * @return full document without the redundant {@link ShapeFileMapping#SHAPE_FILE} binary field
+     */
+    public Optional<JSONObject> getShapeSourceForRename(String entryName) {
+
+	try {
+	    String entryId = OpenSearchFolder.getEntryId(folder, entryName);
+	    return wrapper.getSourceFields(ShapeFileMapping.get().getIndex(), entryId, null, RENAME_SOURCE_EXCLUDES);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Error reading shape {} for rename: {}", entryName, e.getMessage());
 	    return Optional.empty();
 	}
     }
@@ -158,7 +216,8 @@ public class OpenSearchShapefileClient {
 	    SearchResponse<Object> response = wrapper.search(//
 		    index, //
 		    query, //
-		    List.of(IndexData.ENTRY_NAME, ShapeFileMapping.ENTRY_TITLE, ShapeFileMapping.OWNER), //
+		    List.of(IndexData.ENTRY_NAME, ShapeFileMapping.ENTRY_TITLE, ShapeFileMapping.SHAPE_GROUP,
+			    ShapeFileMapping.OWNER), //
 		    from, //
 		    pageSize, //
 		    Optional.empty(), //

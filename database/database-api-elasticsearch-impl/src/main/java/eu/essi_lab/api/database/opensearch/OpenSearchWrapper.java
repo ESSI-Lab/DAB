@@ -127,6 +127,64 @@ public class OpenSearchWrapper {
     }
 
     /**
+     * @param includes field names to return; {@code null} or empty for all fields
+     * @param excludes field names to omit from the response
+     */
+    public Optional<JSONObject> getSourceFields(String index, String entryId, List<String> includes, List<String> excludes)
+	    throws OpenSearchException, IOException {
+
+	GetRequest.Builder builder = new GetRequest.Builder().index(index).id(entryId);
+
+	if (includes != null && !includes.isEmpty()) {
+	    builder.sourceIncludes(includes);
+	}
+
+	if (excludes != null && !excludes.isEmpty()) {
+	    builder.sourceExcludes(excludes);
+	}
+
+	GetResponse<Object> response = client.get(builder.build(), Object.class);
+
+	if (response.found()) {
+
+	    JSONObject source = OpenSearchUtils.toJSONObject(response.source());
+
+	    OpenSearchUtils.decorateSource(source, index, entryId);
+
+	    return Optional.of(source);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param partialDoc document fields to merge into the existing source
+     * @return {@code true} when the update was applied
+     */
+    public boolean updateSourceFields(String index, String entryId, Map<String, Object> partialDoc)
+	    throws OpenSearchException, IOException {
+
+	if (partialDoc == null || partialDoc.isEmpty()) {
+	    return true;
+	}
+
+	UpdateRequest<Map<String, Object>, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Map<String, Object>, Map<String, Object>>()//
+		.index(index)//
+		.id(entryId)//
+		.doc(partialDoc)//
+		.build();
+
+	@SuppressWarnings("unchecked")
+	UpdateResponse<Map<String, Object>> response = client.update(updateRequest, (Class<Map<String, Object>>) (Class<?>) Map.class);
+
+	synch();
+
+	Result result = response.result();
+
+	return result == Result.Updated || result == Result.NoOp;
+    }
+
+    /**
      * @param searchQuery
      * @param start
      * @param size

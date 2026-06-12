@@ -106,6 +106,14 @@ function buildShapeWmsLayersQuery(wmsVersion) {
 
 window.buildShapeWmsLayersQuery = buildShapeWmsLayersQuery;
 
+/** WMS view id for predefined shape layers ({@link window.config.shapeView}). */
+function getPortalShapeView() {
+	var shapeView = window.config && window.config.shapeView;
+	return shapeView && String(shapeView).trim() ? String(shapeView).trim() : undefined;
+}
+
+window.getPortalShapeView = getPortalShapeView;
+
 
 var getUrlParameter = function getUrlParameter(sParam) {
 		var sPageURL = window.location.search.substring(1),
@@ -1221,15 +1229,26 @@ function initializeLogin(config) {
 			const toolbar = $('<div>').css({ 'marginBottom': '12px', 'textAlign': 'right' });
 			const refreshBtn = $('<button type="button" class="login-button">').html('<i class="fa fa-refresh"></i> ' + t('refresh'));
 			const harvestBtn = $('<button type="button" class="login-button">').css({ 'marginLeft': '8px' }).html('<i class="fa fa-play"></i> ' + t('shapes_harvest_now'));
-			toolbar.append(refreshBtn).append(harvestBtn);
+			const deleteSelectedBtn = $('<button type="button" class="login-button shapes-delete-selected-btn">').css({ 'marginLeft': '8px' })
+				.html('<i class="fa fa-trash"></i> ' + t('shapes_delete_selected'))
+				.prop('disabled', true);
+			toolbar.append(refreshBtn).append(harvestBtn).append(deleteSelectedBtn);
 
 			const listWrapper = $('<div>').css({ 'maxHeight': '320px', 'overflowY': 'auto', 'border': '1px solid #ddd', 'borderRadius': '4px' });
 			const listTable = $('<table class="predefined-shapes-table">').css({ 'width': '100%', 'borderCollapse': 'collapse' });
-			listTable.append('<thead><tr>'
-				+ '<th></th><th>' + t('shapes_col_identifier') + '</th><th>' + t('shapes_col_file') + '</th>'
-				+ '<th>' + t('shapes_col_owner') + '</th><th>' + t('shapes_col_features') + '</th>'
-				+ '<th>' + t('shapes_col_selection') + '</th><th>' + t('shapes_col_actions') + '</th>'
-				+ '</tr></thead>');
+			const listHead = $('<thead><tr></tr></thead>');
+			const selectAllHeader = $('<th>').css({ width: '32px', textAlign: 'center' });
+			const selectAllCb = $('<input type="checkbox" class="shapes-select-all-cb">').attr('title', t('shapes_select_all'));
+			selectAllHeader.append(selectAllCb);
+			listHead.find('tr')
+				.append(selectAllHeader)
+				.append('<th style="width:36px;"></th>')
+				.append('<th>' + t('shapes_col_group') + '</th>')
+				.append('<th>' + t('shapes_col_name') + '</th>')
+				.append('<th>' + t('shapes_col_identifier') + '</th>')
+				.append('<th>' + t('shapes_col_owner') + '</th>')
+				.append('<th style="width:48px;"></th>');
+			listTable.append(listHead);
 			const listBody = $('<tbody id="predefined-shapes-list-body">');
 			listTable.append(listBody);
 			listWrapper.append(listTable);
@@ -1240,16 +1259,18 @@ function initializeLogin(config) {
 
 			const shapeIdLabel = $('<label>').attr('for', 'predefined-shapes-id-input').css({ display: 'block', fontWeight: 600 }).text(t('upload_shapes_id_label'));
 			const shapeIdInput = $('<input type="text" id="predefined-shapes-id-input">').attr('placeholder', t('upload_shapes_id_placeholder')).css({ width: '100%', boxSizing: 'border-box', marginTop: '6px' });
+			const groupLabel = $('<label>').attr('for', 'predefined-shapes-group-input').css({ display: 'block', fontWeight: 600, marginTop: '10px' }).text(t('upload_shapes_group_label'));
+			const groupInput = $('<input type="text" id="predefined-shapes-group-input">').attr('placeholder', t('upload_shapes_group_placeholder')).css({ width: '100%', boxSizing: 'border-box', marginTop: '6px' });
 			const fileInput = $('<input type="file" id="predefined-shapes-file-input">').attr('accept', '.zip,application/zip').css({ marginTop: '10px', width: '100%' });
 			const uploadBtn = $('<button type="button" class="login-button">').css({ marginTop: '10px' }).text(t('upload_shapes_submit'));
 
-			uploadSection.append(shapeIdLabel).append(shapeIdInput).append(fileInput).append(uploadBtn);
+			uploadSection.append(shapeIdLabel).append(shapeIdInput).append(groupLabel).append(groupInput).append(fileInput).append(uploadBtn);
 
 			dialogContent.append(statusDiv).append(toolbar).append(listWrapper).append(uploadSection);
 
 			let uploadInProgress = false;
 
-			function fetchWmsLayerNames() {
+			function fetchWmsLayers() {
 				return new Promise(function(resolve) {
 					const query = buildShapeWmsLayersQuery(wmsVersion);
 					if (!query) {
@@ -1263,7 +1284,7 @@ function initializeLogin(config) {
 						dataType: 'jsonp',
 						success: function(data) {
 							if (data && data.layers) {
-								resolve(data.layers.map(function(layer) { return layer.name; }));
+								resolve(data.layers);
 							} else {
 								resolve([]);
 							}
@@ -1275,37 +1296,32 @@ function initializeLogin(config) {
 				});
 			}
 
-			function enrichAreaWithSelection(area, wmsLayerNames) {
-				const entryNames = area.entryNames || [];
-				let selectionCount = 0;
-				entryNames.forEach(function(entryName) {
-					const onlineId = shapeOnlinePrefix + entryName;
-					const found = wmsLayerNames.some(function(layerName) {
-						return layerName === onlineId || layerName.endsWith(':' + entryName);
-					});
-					if (found) {
-						selectionCount++;
-					}
+			function wmsLayerMatchesEntry(layerName, entryName) {
+				return layerName === shapeOnlinePrefix + entryName || layerName.endsWith(':' + entryName);
+			}
+
+			function enrichEntryWithSelection(entry, wmsLayers) {
+				const inSelection = wmsLayers.some(function(layer) {
+					return wmsLayerMatchesEntry(layer.name, entry.identifier);
 				});
-				const featureCount = entryNames.length || area.featureCount || 0;
-				let selectionStatus = 'NONE';
-				if (featureCount > 0 && selectionCount > 0) {
-					selectionStatus = selectionCount >= featureCount ? 'FULL' : 'PARTIAL';
+				let name = entry.name || entry.identifier;
+				if (inSelection) {
+					const wmsLayer = wmsLayers.find(function(layer) {
+						return wmsLayerMatchesEntry(layer.name, entry.identifier);
+					});
+					if (wmsLayer && wmsLayer.title) {
+						name = wmsLayer.title;
+					}
 				}
-				return Object.assign({}, area, {
-					featureCount: featureCount,
-					selectionCount: selectionCount,
-					selectionStatus: selectionStatus
+				return Object.assign({}, entry, {
+					name: name,
+					inSelection: inSelection
 				});
 			}
 
-			function selectionCell(area) {
-				const status = area.selectionStatus || 'NONE';
-				if (status === 'FULL') {
-					return '<span class="shapes-status-icon shapes-status-full" title="' + t('shapes_in_selection_full') + '"><i class="fa fa-check-circle"></i></span>';
-				}
-				if (status === 'PARTIAL') {
-					return '<span class="shapes-status-icon shapes-status-partial" title="' + t('shapes_in_selection_partial', { count: area.selectionCount, total: area.featureCount }) + '"><i class="fa fa-adjust"></i></span>';
+			function selectionCell(entry) {
+				if (entry.inSelection) {
+					return '<span class="shapes-status-icon shapes-status-full" title="' + t('shapes_in_selection') + '"><i class="fa fa-check-circle"></i></span>';
 				}
 				return '<span class="shapes-status-icon shapes-status-none" title="' + t('shapes_in_selection_none') + '"><i class="fa fa-circle-o"></i></span>';
 			}
@@ -1320,25 +1336,173 @@ function initializeLogin(config) {
 				return owner;
 			}
 
-			function renderAreas(areas) {
-				listBody.empty();
-				if (!areas || areas.length === 0) {
-					listBody.append('<tr><td colspan="7" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
+			function defaultZipBaseName(fileName) {
+				let base = fileName.replace(/\.zip$/i, '');
+				const slash = Math.max(base.lastIndexOf('/'), base.lastIndexOf('\\'));
+				if (slash >= 0) {
+					base = base.substring(slash + 1);
+				}
+				return base;
+			}
+
+			function defaultShapeIdFromFileName(fileName) {
+				let base = defaultZipBaseName(fileName);
+				base = base.replace(/[\s.]+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').replace(/_+/g, '_').toLowerCase();
+				return base;
+			}
+
+			function flattenAreasToEntries(areas) {
+				const entries = [];
+				(areas || []).forEach(function(area) {
+					(area.entryNames || []).forEach(function(entryName) {
+						entries.push({
+							identifier: entryName,
+							name: entryName,
+							group: area.group || '',
+							owner: area.owner,
+							legacy: area.legacy
+						});
+					});
+				});
+				return entries;
+			}
+
+			function updateDeleteSelectedState() {
+				const rowCheckboxes = listBody.find('.shapes-select-cb');
+				const checkedCount = rowCheckboxes.filter(':checked').length;
+				deleteSelectedBtn.prop('disabled', checkedCount === 0);
+				if (rowCheckboxes.length === 0) {
+					selectAllCb.prop({ checked: false, indeterminate: false });
 					return;
 				}
-				areas.forEach(function(area) {
-					const legacyTag = area.legacy ? ' <span class="shapes-legacy-tag">(' + t('shapes_legacy') + ')</span>' : '';
-					const deleteBtn = $('<button type="button" class="menu-button shapes-delete-btn">').text(t('delete')).data('prefix', area.prefix);
-					const row = $('<tr>');
-					row.append($('<td>').html(selectionCell(area)));
-					row.append($('<td>').html('<code>' + area.prefix + '</code>' + legacyTag));
-					row.append($('<td>').text(area.fileName || '—'));
-					row.append($('<td>').text(formatOwnerLabel(area.owner, area.legacy)));
-					row.append($('<td>').text(area.featureCount));
-					row.append($('<td>').text(area.selectionCount + ' / ' + area.featureCount));
-					row.append($('<td>').append(deleteBtn));
+				selectAllCb.prop('checked', checkedCount === rowCheckboxes.length);
+				selectAllCb.prop('indeterminate', checkedCount > 0 && checkedCount < rowCheckboxes.length);
+			}
+
+			function updateSaveButtonState(row) {
+				const idInput = row.find('.shapes-id-input');
+				const nameInput = row.find('.shapes-name-input');
+				const groupInput = row.find('.shapes-group-input');
+				const ownerInput = row.find('.shapes-owner-input');
+				let dirty = idInput.val().trim() !== idInput.data('original')
+					|| nameInput.val().trim() !== nameInput.data('original')
+					|| groupInput.val().trim() !== groupInput.data('original');
+				if (isAdmin) {
+					dirty = dirty || ownerInput.val().trim() !== ownerInput.data('original');
+				}
+				row.find('.shapes-save-btn').prop('disabled', !dirty);
+			}
+
+			function saveEntry(row) {
+				const idInput = row.find('.shapes-id-input');
+				const nameInput = row.find('.shapes-name-input');
+				const groupInput = row.find('.shapes-group-input');
+				const ownerInput = row.find('.shapes-owner-input');
+				const currentIdentifier = idInput.data('original');
+				const newIdentifier = idInput.val().trim();
+				const newName = nameInput.val().trim();
+				const newGroup = groupInput.val().trim();
+				const newOwner = ownerInput.val().trim();
+				if (!currentIdentifier) {
+					return;
+				}
+				if (!newIdentifier) {
+					statusDiv.text(t('shapes_update_invalid_identifier')).css('color', '#c0392b');
+					return;
+				}
+				if (!newName) {
+					statusDiv.text(t('shapes_update_invalid_name')).css('color', '#c0392b');
+					return;
+				}
+				statusDiv.text(t('shapes_saving')).css('color', '#2c3e50');
+				row.find('.shapes-save-btn').prop('disabled', true);
+				const payload = {
+					email: userEmail,
+					apiKey: authToken,
+					identifier: currentIdentifier,
+					newIdentifier: newIdentifier,
+					name: newName,
+					group: newGroup
+				};
+				const portalShapeView = getPortalShapeView();
+				if (portalShapeView) {
+					payload.shapeView = portalShapeView;
+				}
+				if (isAdmin) {
+					payload.owner = newOwner;
+				}
+				fetch('../services/support/predefinedShapes/update', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify(payload)
+				})
+					.then(function(r) { return r.json(); })
+					.then(function(data) {
+						if (data.success) {
+							statusDiv.text(data.message).css('color', '#27ae60');
+							loadAreas();
+						} else {
+							statusDiv.text(data.message || t('shapes_update_error')).css('color', '#c0392b');
+							updateSaveButtonState(row);
+						}
+					})
+					.catch(function() {
+						statusDiv.text(t('shapes_update_error')).css('color', '#c0392b');
+						updateSaveButtonState(row);
+					});
+			}
+
+			function renderEntries(entries) {
+				listBody.empty();
+				if (!entries || entries.length === 0) {
+					listBody.append('<tr><td colspan="7" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
+					updateDeleteSelectedState();
+					return;
+				}
+				entries.forEach(function(entry) {
+					const row = $('<tr>').data('identifier', entry.identifier);
+					const selectCb = $('<input type="checkbox" class="shapes-select-cb">').data('identifier', entry.identifier);
+					const idInput = $('<input type="text" class="shapes-field-input shapes-id-input">')
+						.val(entry.identifier)
+						.data('original', entry.identifier)
+						.attr('title', entry.legacy ? t('shapes_legacy') : '');
+					const nameInput = $('<input type="text" class="shapes-field-input shapes-name-input">')
+						.val(entry.name || entry.identifier)
+						.data('original', entry.name || entry.identifier);
+					const groupInput = $('<input type="text" class="shapes-field-input shapes-group-input">')
+						.val(entry.group || '')
+						.data('original', entry.group || '');
+					const ownerInput = $('<input type="text" class="shapes-field-input shapes-owner-input">')
+						.val(entry.owner || '')
+						.data('original', entry.owner || '')
+						.prop('disabled', !isAdmin)
+						.attr('title', isAdmin ? '' : formatOwnerLabel(entry.owner, entry.legacy));
+					const saveBtn = $('<button type="button" class="menu-button shapes-save-btn" disabled>')
+						.attr('title', t('shapes_save'))
+						.html('<i class="fa fa-check"></i>');
+					idInput.on('input', function() { updateSaveButtonState(row); });
+					nameInput.on('input', function() { updateSaveButtonState(row); });
+					groupInput.on('input', function() { updateSaveButtonState(row); });
+					if (isAdmin) {
+						ownerInput.on('input', function() { updateSaveButtonState(row); });
+					}
+					idInput.add(nameInput).add(groupInput).add(isAdmin ? ownerInput : $()).on('keydown', function(e) {
+						if (e.key === 'Enter' && !saveBtn.prop('disabled')) {
+							e.preventDefault();
+							saveEntry(row);
+						}
+					});
+					saveBtn.on('click', function() { saveEntry(row); });
+					row.append($('<td>').css('textAlign', 'center').append(selectCb));
+					row.append($('<td>').html(selectionCell(entry)));
+					row.append($('<td>').append(groupInput));
+					row.append($('<td>').append(nameInput));
+					row.append($('<td>').append(idInput));
+					row.append($('<td>').append(ownerInput));
+					row.append($('<td>').css('textAlign', 'center').append(saveBtn));
 					listBody.append(row);
 				});
+				updateDeleteSelectedState();
 			}
 
 			function loadAreas() {
@@ -1346,20 +1510,25 @@ function initializeLogin(config) {
 				const params = new URLSearchParams({ email: userEmail, apiKey: authToken });
 				Promise.all([
 					fetch('../services/support/predefinedShapes?' + params.toString()).then(function(r) { return r.json(); }),
-					fetchWmsLayerNames()
+					fetchWmsLayers()
 				])
 					.then(function(results) {
 						const data = results[0];
-						const wmsLayerNames = results[1];
+						const wmsLayers = results[1];
 						if (data.success === false) {
 							statusDiv.text(data.message || t('shapes_list_error')).css('color', '#c0392b');
 							return;
 						}
 						statusDiv.text('');
-						const areas = (data.areas || []).map(function(area) {
-							return enrichAreaWithSelection(area, wmsLayerNames);
+						const rawEntries = data.entries && data.entries.length > 0
+							? data.entries
+							: flattenAreasToEntries(data.areas || []);
+						const entries = rawEntries.map(function(entry) {
+							return enrichEntryWithSelection(entry, wmsLayers);
+						}).sort(function(a, b) {
+							return (a.identifier || '').localeCompare(b.identifier || '');
 						});
-						renderAreas(areas);
+						renderEntries(entries);
 					})
 					.catch(function(err) {
 						console.error(err);
@@ -1390,23 +1559,49 @@ function initializeLogin(config) {
 
 			fileInput.on('change', function() {
 				const file = fileInput[0].files && fileInput[0].files[0];
-				if (!file || shapeIdInput.val().trim()) return;
-				let base = file.name.replace(/\.zip$/i, '');
-				base = base.replace(/[\s.]+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '').replace(/_+/g, '_').toLowerCase();
-				if (base) shapeIdInput.val(base);
+				if (!file) return;
+				if (!shapeIdInput.val().trim()) {
+					const shapeId = defaultShapeIdFromFileName(file.name);
+					if (shapeId) shapeIdInput.val(shapeId);
+				}
+				if (!groupInput.val().trim()) {
+					const group = defaultZipBaseName(file.name);
+					if (group) groupInput.val(group);
+				}
 			});
 
 			refreshBtn.on('click', loadAreas);
 			harvestBtn.on('click', triggerHarvest);
 
-			listBody.on('click', '.shapes-delete-btn', function() {
-				const prefix = $(this).data('prefix');
-				if (!prefix || !confirm(t('shapes_delete_confirm', { prefix: prefix }))) return;
+			selectAllCb.on('change', function() {
+				const checked = selectAllCb.is(':checked');
+				listBody.find('.shapes-select-cb').prop('checked', checked);
+				updateDeleteSelectedState();
+			});
+
+			listBody.on('change', '.shapes-select-cb', updateDeleteSelectedState);
+
+			deleteSelectedBtn.on('click', function() {
+				const identifiers = listBody.find('.shapes-select-cb:checked').map(function() {
+					return $(this).data('identifier');
+				}).get();
+				if (identifiers.length === 0) {
+					statusDiv.text(t('shapes_delete_none_selected')).css('color', '#c0392b');
+					return;
+				}
+				if (!confirm(t('shapes_delete_selected_confirm', { count: identifiers.length }))) {
+					return;
+				}
 				statusDiv.text(t('shapes_deleting')).css('color', '#2c3e50');
+				const deletePayload = { email: userEmail, apiKey: authToken, identifiers: identifiers };
+				const portalShapeView = getPortalShapeView();
+				if (portalShapeView) {
+					deletePayload.shapeView = portalShapeView;
+				}
 				fetch('../services/support/predefinedShapes/delete', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ email: userEmail, apiKey: authToken, prefix: prefix })
+					body: JSON.stringify(deletePayload)
 				})
 					.then(function(r) { return r.json(); })
 					.then(function(data) {
@@ -1438,6 +1633,7 @@ function initializeLogin(config) {
 				const formData = new FormData();
 				formData.append('file', file);
 				formData.append('shapeId', shapeIdInput.val().trim());
+				formData.append('group', groupInput.val().trim());
 				formData.append('email', userEmail);
 				formData.append('apiKey', authToken);
 				fetch('../services/support/uploadPredefinedShapes', { method: 'POST', body: formData })
@@ -1448,6 +1644,7 @@ function initializeLogin(config) {
 							statusDiv.text(data.message || t('upload_shapes_success_html')).css('color', '#27ae60');
 							fileInput.val('');
 							shapeIdInput.val('');
+							groupInput.val('');
 							loadAreas();
 						} else {
 							statusDiv.text(data.message || t('upload_shapes_error')).css('color', '#c0392b');

@@ -88,9 +88,9 @@ public class PredefinedShapeUploadService {
      * @param zipStream
      * @return upload outcome
      */
-    public UploadOutcome upload(String originalFileName, String explicitShapeId, InputStream zipStream, String owner,
+    public UploadOutcome upload(String originalFileName, String explicitShapeId, InputStream zipStream, String group, String owner,
 	    boolean actorIsAdmin) {
 
-	return managementService.upload(originalFileName, explicitShapeId, zipStream, owner, actorIsAdmin);
+	return managementService.upload(originalFileName, explicitShapeId, zipStream, group, owner, actorIsAdmin);
     }
 }

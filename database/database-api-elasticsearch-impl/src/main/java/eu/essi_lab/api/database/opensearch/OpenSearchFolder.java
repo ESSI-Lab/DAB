@@ -138,9 +138,17 @@ public class OpenSearchFolder implements DatabaseFolder {
      */
     public boolean storeShapeFile(String key, FolderEntry entry, String owner) throws Exception {
 
+	return storeShapeFile(key, entry, owner, null);
+    }
+
+    /**
+     * @param group optional user-defined group label stored on each polygon document
+     */
+    public boolean storeShapeFile(String key, FolderEntry entry, String owner, String group) throws Exception {
+
 	boolean stored = true;
 
-	List<IndexData> list = IndexData.ofShapeFile(this, key, entry, owner);
+	List<IndexData> list = IndexData.ofShapeFile(this, key, entry, owner, group);
 
 	for (IndexData indexData : list) {
 

@@ -47,6 +47,7 @@ public class WMSCacheSetting extends Setting {
     private static final String WMS_CACHE_S3_BUCKETNAME = "wmsCacheS3BucketName";
     private static final String WMS_CACHE_FOLDERNAME = "wmsCacheFolderName";
     private static final String WMS_CACHE_SIZE = "wmsCacheSize";
+    private static final String WMS_CACHE_SHAPE_VIEW = "wmsCacheShapeView";
 
     public enum WMSCacheMode implements LabeledEnum {
 
@@ -161,6 +162,12 @@ public class WMSCacheSetting extends Setting {
 	addOption(IntegerOptionBuilder.get().//
 		withKey(WMS_CACHE_SIZE).//
 		withLabel("Cache size").//
+		cannotBeDisabled().//
+		build());
+
+	addOption(StringOptionBuilder.get().//
+		withKey(WMS_CACHE_SHAPE_VIEW).//
+		withLabel("Predefined shapes view").//
 		cannotBeDisabled().//
 		build());
     }
@@ -339,6 +346,22 @@ public class WMSCacheSetting extends Setting {
     public Optional<Integer> getCachesize() {
 
 	return getOption(WMS_CACHE_SIZE, Integer.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param shapeView WMS view id for predefined shape tiles (e.g. {@code his-central-shapes})
+     */
+    public void setShapeView(String shapeView) {
+
+	getOption(WMS_CACHE_SHAPE_VIEW, String.class).get().setValue(shapeView);
+    }
+
+    /**
+     * @return WMS view id for predefined shape tile cache invalidation
+     */
+    public Optional<String> getShapeView() {
+
+	return getOption(WMS_CACHE_SHAPE_VIEW, String.class).get().getOptionalValue();
     }
 
 }

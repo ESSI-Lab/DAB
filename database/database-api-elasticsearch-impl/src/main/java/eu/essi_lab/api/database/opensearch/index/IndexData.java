@@ -500,6 +500,12 @@ public class IndexData {
      */
     public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry, String owner) throws Exception {
 
+	return ofShapeFile(folder, key, entry, owner, null);
+    }
+
+    public static List<IndexData> ofShapeFile(OpenSearchFolder folder, String key, FolderEntry entry, String owner, String group)
+	    throws Exception {
+
 	ClonableInputStream inputStream = new ClonableInputStream(entry.getStream().get());
 
 	Unzipper unzipper = new Unzipper(inputStream.clone());
@@ -545,9 +551,10 @@ public class IndexData {
 
 	    indexData.entryId = OpenSearchFolder.getEntryId(folder, entryName);
 
-	    //
-	    //
-	    //
+	    if (group != null && !group.isBlank()) {
+		object.put(ShapeFileMapping.SHAPE_GROUP, group);
+		indexData.put(ShapeFileMapping.SHAPE_GROUP, group);
+	    }
 
 	    indexData.put(BINARY_PROPERTY, ShapeFileMapping.SHAPE_FILE);
 	    indexData.put(ShapeFileMapping.SHAPE_FILE,
@@ -576,6 +583,37 @@ public class IndexData {
 	Arrays.asList(unzipper.getOutputFolder().listFiles()).forEach(File::delete);
 
 	return out;
+    }
+
+    /**
+     * Re-indexes an existing shape entry document (optionally under a new {@link #ENTRY_NAME}).
+     *
+     * @param folder shape-files folder
+     * @param source stored OpenSearch document
+     * @param entryName entry name used for {@code entryName} and document id
+     */
+    public static IndexData fromShapeEntrySource(OpenSearchFolder folder, JSONObject source, String entryName) {
+
+	IndexData indexData = new IndexData();
+
+	indexData.mapping = ShapeFileMapping.get();
+	indexData.index = indexData.mapping.getIndex();
+	indexData.mapping.setEntryType(EntryType.SHAPE_FILE);
+
+	indexData.entryId = OpenSearchFolder.getEntryId(folder, entryName);
+
+	JSONObject payload = new JSONObject(source.toString());
+	payload.put(ENTRY_NAME, entryName);
+	payload.remove(INDEX);
+	payload.remove(ENTRY_ID);
+	payload.remove(_INDEX);
+
+	for (String key : payload.keySet()) {
+
+	    indexData.put(key, payload.get(key));
+	}
+
+	return indexData;
     }
 
     /**

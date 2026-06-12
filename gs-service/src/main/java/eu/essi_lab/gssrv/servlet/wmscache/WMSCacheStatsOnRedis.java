@@ -25,9 +25,12 @@ import java.util.*;
 
 import java.util.Map.Entry;
 
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.resps.ScanResult;
 import redis.clients.jedis.resps.Tuple;
 
@@ -171,23 +174,113 @@ public class WMSCacheStatsOnRedis implements WMSCacheStats {
     @Override
     public void deleteLayer(String view, String layer) {
 
+	GSLoggerFactory.getLogger(getClass()).info("Deleting WMS cache stats for view={}, layer={}", view, layer);
+
 	try (Jedis jedis = pool.getResource()) {
 
-	    jedis.del("wms:reqleaderboard:view" + view + ":layer:" + layer);
+	    String primaryLeaderboard = leaderboardKey(view, layer);
+	    String alternateLeaderboard = alternateLeaderboardKey(view, layer);
 
-	    String countPrefix = "wms:reqcount:view" + view + ":layer:" + layer + ":";
-	    String metaPrefix = "wms:reqmeta:view:" + view + ":layer:" + layer + ":";
+	    List<String> reqIds = jedis.zrange(primaryLeaderboard, 0, -1);
+	    if (reqIds.isEmpty()) {
+		reqIds = jedis.zrange(alternateLeaderboard, 0, -1);
+	    }
 
-	    String cursor = "0";
-	    do {
-		ScanResult<String> scan = jedis.scan(cursor);
-		for (String key : scan.getResult()) {
-		    if (key.startsWith(countPrefix) || key.startsWith(metaPrefix)) {
-			jedis.del(key);
-		    }
+	    GSLoggerFactory.getLogger(getClass()).info("WMS cache stats delete: {} request id(s) listed in leaderboard",
+		    reqIds.size());
+
+	    long leaderboardRemoved = jedis.del(primaryLeaderboard, alternateLeaderboard);
+
+	    int removedByReqId = 0;
+	    if (!reqIds.isEmpty()) {
+		Pipeline pipeline = jedis.pipelined();
+		for (String reqId : reqIds) {
+		    pipeline.del(countKey(view, layer, reqId));
+		    pipeline.del(metaKey(view, layer, reqId));
 		}
-		cursor = scan.getCursor();
-	    } while (!cursor.equals("0"));
+		pipeline.sync();
+		removedByReqId = reqIds.size() * 2;
+		GSLoggerFactory.getLogger(getClass()).info(
+			"WMS cache stats delete: removed {} count/meta key(s) from leaderboard members", removedByReqId);
+	    }
+
+	    int orphanCountKeys = 0;
+	    int orphanMetaKeys = 0;
+	    if (reqIds.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).info(
+			"WMS cache stats delete: no leaderboard members; removing keys by prefix scan");
+		orphanCountKeys = deleteKeysWithPrefix(jedis, countKeyPrefix(view, layer), "count");
+		orphanMetaKeys = deleteKeysWithPrefix(jedis, metaKeyPrefix(view, layer), "meta");
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info(
+		    "WMS cache stats delete completed for view={}, layer={} (leaderboardKeys={}, byReqId={}, orphanCount={}, orphanMeta={})",
+		    view, layer, leaderboardRemoved, removedByReqId, orphanCountKeys, orphanMetaKeys);
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("Failed to delete WMS cache stats for view={}, layer={}", view, layer,
+		    e);
 	}
+    }
+
+    private static String countKeyPrefix(String view, String layer) {
+
+	return "wms:reqcount:view" + view + ":layer:" + layer + ":";
+    }
+
+    private static String metaKeyPrefix(String view, String layer) {
+
+	return "wms:reqmeta:view:" + view + ":layer:" + layer + ":";
+    }
+
+    private static String countKey(String view, String layer, String reqId) {
+
+	return countKeyPrefix(view, layer) + reqId;
+    }
+
+    private static String metaKey(String view, String layer, String reqId) {
+
+	return metaKeyPrefix(view, layer) + reqId;
+    }
+
+    private static String leaderboardKey(String view, String layer) {
+
+	return "wms:reqleaderboard:view" + view + ":layer:" + layer;
+    }
+
+    /** Legacy/alternate key shape used by {@link #getTopRequests}. */
+    private static String alternateLeaderboardKey(String view, String layer) {
+
+	return "wms:reqleaderboard:view:" + view + ":layer:" + layer;
+    }
+
+    /**
+     * Deletes keys matching {@code prefix*} via SCAN (scoped to the prefix, not the whole database).
+     */
+    private int deleteKeysWithPrefix(Jedis jedis, String prefix, String kind) {
+
+	ScanParams scanParams = new ScanParams().match(prefix + "*").count(500);
+	String cursor = ScanParams.SCAN_POINTER_START;
+	int deleted = 0;
+	int page = 0;
+
+	do {
+
+	    page++;
+	    ScanResult<String> scan = jedis.scan(cursor, scanParams);
+	    List<String> keys = scan.getResult();
+
+	    if (!keys.isEmpty()) {
+		deleted += keys.size();
+		jedis.del(keys.toArray(String[]::new));
+		GSLoggerFactory.getLogger(getClass()).info(
+			"WMS cache stats delete ({}): page={}, keys={}", kind, page, keys.size());
+	    }
+
+	    cursor = scan.getCursor();
+
+	} while (!cursor.equals(ScanParams.SCAN_POINTER_START));
+
+	return deleted;
     }
 }

@@ -21,20 +21,21 @@ package eu.essi_lab.gssrv.rest;
  * #L%
  */
 
-import java.util.List;
-
 /**
- * Request body for deleting predefined shape entries.
+ * Request body for updating a predefined shape entry.
  */
-public class PredefinedShapeDeleteRequest {
+public class PredefinedShapeUpdateRequest {
 
     private String email;
     private String apiKey;
-    private String prefix;
-    private List<String> identifiers;
+    private String identifier;
+    private String newIdentifier;
+    private String name;
+    private String group;
+    private String owner;
     private String shapeView;
 
-    public PredefinedShapeDeleteRequest() {
+    public PredefinedShapeUpdateRequest() {
     }
 
     public String getEmail() {
@@ -53,20 +54,44 @@ public class PredefinedShapeDeleteRequest {
 	this.apiKey = apiKey;
     }
 
-    public String getPrefix() {
-	return prefix;
+    public String getIdentifier() {
+	return identifier;
     }
 
-    public void setPrefix(String prefix) {
-	this.prefix = prefix;
+    public void setIdentifier(String identifier) {
+	this.identifier = identifier;
     }
 
-    public List<String> getIdentifiers() {
-	return identifiers;
+    public String getNewIdentifier() {
+	return newIdentifier;
     }
 
-    public void setIdentifiers(List<String> identifiers) {
-	this.identifiers = identifiers;
+    public void setNewIdentifier(String newIdentifier) {
+	this.newIdentifier = newIdentifier;
+    }
+
+    public String getName() {
+	return name;
+    }
+
+    public void setName(String name) {
+	this.name = name;
+    }
+
+    public String getGroup() {
+	return group;
+    }
+
+    public void setGroup(String group) {
+	this.group = group;
+    }
+
+    public String getOwner() {
+	return owner;
+    }
+
+    public void setOwner(String owner) {
+	this.owner = owner;
     }
 
     public String getShapeView() {
