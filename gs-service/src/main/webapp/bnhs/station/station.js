@@ -467,6 +467,17 @@ var findValue = function(data, i, targetKey) {
 	return value;
 }
 
+var formatGeoCoordinate = function(value) {
+	if (value == null || value === '') {
+		return value;
+	}
+	var num = Number(value);
+	if (isNaN(num)) {
+		return value;
+	}
+	return parseFloat(num.toFixed(4));
+}
+
 // Get attribute label with language support (uses attribute_label_it for Italian, attribute_label otherwise)
 var getAttributeLabel = function(data, i) {
 	var currentLang = lang();
@@ -2171,10 +2182,10 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 	var alt = findValue(data, 0, 'vertical_extent');
 
 	
-	var geoLocation = t('latitude') + ": " + lat + "°<br/> " + t('longitude') + ": " + lon + "°";
+	var geoLocation = t('latitude') + ": " + formatGeoCoordinate(lat) + "°<br/> " + t('longitude') + ": " + formatGeoCoordinate(lon) + "°";
 	
 	if (alt!=null && alt!= undefined){
-		geoLocation +="<br/> " + t('elevation') + ": "+alt+" " + t('elevation_unit');
+		geoLocation +="<br/> " + t('elevation') + ": "+formatGeoCoordinate(alt)+" " + t('elevation_unit');
 	}
 
 	const pointerCoordinates = ol.proj.fromLonLat([lon, lat]);
