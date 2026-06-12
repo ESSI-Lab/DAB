@@ -4,10 +4,16 @@
 	"centerLat" : 42,
 	"centerLon" : 15,
 	"zoom" : 6,
+	"temporalMinYear" : 1900,
+	"stationPageMapZoom" : 10,
 	"minZoom" : 6,
 	"maxZoom" : 10,
 	"token" : "his_central_test-b83fcd12-c1a7-4de2-9ab5-74c3f93167b1",
-	"resultsVisibility" : true,
+	"toolbarLayout": true,
+	"showResultOverview": false,
+	"resultTitleFromObservedProperty": true,
+	"resultsVisibility" : "hidden",
+	"performStartupQuery": false,
 	"bboxSelectorVisibility" : false,
 	"layersSelectorVisibility" : true,
 	"layersSelectorButtonVisibility" : true,
@@ -47,5 +53,6 @@
 	"language" : "en",
 	"beta-title" : true,
 	"beta-message" : true,
-	"zoomOnResults" : true
+	"zoomOnResults" : true,
+	"sortBy" : "platformTitle"
 }

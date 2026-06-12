@@ -1612,7 +1612,7 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 				'label': 'Browse GEMET',
 				'icon': 'fa-magic',
 				'handler': function() {
-					// Same logic as #pButton click, but set search term input instead of parameter name
+					// Opens the ontology browser dialog and sets the search term input instead of parameter name
 					if (!dialogPCreated) {
 						$('<div  id="pDialog" style="padding: 0; overflow: hidden;"></div>')
 							.html('<iframe src="' + ontologyBrowserUrl + '" id="parameterFrame" width="830" height="580" style="display: block; border: none; margin: 0;"></iframe><div style="margin: 10px; text-align: center; padding-bottom: 0;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
@@ -2124,59 +2124,6 @@ GIAPI.ConstraintsWidget = function(dabNode, options) {
 		} else {
 
 			$('#bDialog').dialog('isOpen') ? $('#bDialog').dialog('close') : $('#bDialog').dialog('open');
-
-		}
-	}));
-
-	jQuery(document).on('click', '#pButton', (function() {
-
-		if (!dialogPCreated) {
-			// Create the dialog
-			$('<div  id="pDialog" style="padding: 0; overflow: hidden;"></div>')
-				.html('<iframe src="' + ontologyBrowserUrl + '" id="parameterFrame" width="830" height="580" style="display: block; border: none; margin: 0;"></iframe><div style="margin: 10px; text-align: center; padding-bottom: 0;"><label for="selectedParameter"><b>Selected parameter: </b></label><span id="selectedParameter"><b>None</b></span></div>')
-				.dialog({
-					title: __t("select-from-ontology"),
-					width: 850,      // Width of the dialog
-					height: 650,     // Height adjusted to fit content without scrollbars
-					autoOpen: true,
-					modal: true,
-					resizable: false
-				});
-
-			// Listen for messages from the iframe
-			window.addEventListener('message', (event) => {
-
-				try {
-					const data = event.data;
-					console.log(data);
-					// Verify that data is an object and has the "name" property
-					if (typeof data === "object" && data !== null && "selectedConcept" in data&& "selectedConceptId" in data) {
-						var conceptURI = conceptBaseUrl+data.selectedConceptId;
-						$("#selectedParameter").text(data.selectedConcept +" ("+conceptURI+")"); // Update the display
-						jQuery('#attributeNameConstraint').val(conceptURI);
-
-					} else {
-						console.warn("Invalid message: 'selectedConcept' property is missing or not an object");
-					}
-				} catch (error) {
-					console.error("Failed to process message:", error);
-				}
-
-			});
-
-			// Attach 'load' event listener to the iframe
-			$("#parameterFrame").on('load', function() {
-				try {
-					// Send a message to the iframe to trigger event listening
-					this.contentWindow.postMessage('startListening', '*');
-				} catch (error) {
-					console.error("Error sending message to iframe:", error);
-				}
-			});
-			dialogPCreated = true;
-		} else {
-
-			$('#pDialog').dialog('isOpen') ? $('#pDialog').dialog('close') : $('#pDialog').dialog('open');
 
 		}
 	}));

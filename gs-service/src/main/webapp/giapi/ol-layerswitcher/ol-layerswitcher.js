@@ -85,7 +85,12 @@
 				: 'Collapse legend';
 			this.groupSelectStyle = LayerSwitcher.getGroupSelectStyle(options.groupSelectStyle);
 			this.reverse = options.reverse !== false;
+			this.layersPanel = options.layersPanel || null;
 			this.options = options;
+
+			if (this.layersPanel) {
+				element.classList.add('legend-only');
+			}
 
 			LayerSwitcher.clusterWMS = this.options.clusterWMS;
 			LayerSwitcher.dabEndpoint = this.options.dabEndpoint;
@@ -235,7 +240,9 @@
 			this.dispatchEvent('render');
 			LayerSwitcher.renderPanel(this.getMap(), this.panel, {
 				groupSelectStyle: this.groupSelectStyle,
-				reverse: this.reverse
+				reverse: this.reverse,
+				layersPanel: this.layersPanel || this.panel,
+				legendPanel: this.panel
 			});
 			this.dispatchEvent('rendercomplete');
 		}
@@ -253,8 +260,21 @@
 			options = options || {};
 			options.groupSelectStyle = LayerSwitcher.getGroupSelectStyle(options.groupSelectStyle);
 			LayerSwitcher.ensureTopVisibleBaseLayerShown(map, options.groupSelectStyle);
-			while (panel.firstChild) {
-				panel.removeChild(panel.firstChild);
+			const layersPanel = options.layersPanel || panel;
+			const legendPanel = options.legendPanel || panel;
+			const splitPanels = layersPanel !== legendPanel;
+
+			if (splitPanels) {
+				while (layersPanel.firstChild) {
+					layersPanel.removeChild(layersPanel.firstChild);
+				}
+				while (legendPanel.firstChild) {
+					legendPanel.removeChild(legendPanel.firstChild);
+				}
+			} else {
+				while (panel.firstChild) {
+					panel.removeChild(panel.firstChild);
+				}
 			}
 			// Reset indeterminate state for all layers and groups before
 			// applying based on groupSelectStyle
@@ -272,7 +292,7 @@
 				LayerSwitcher.setChildVisibility(map);
 			}
 			const ul = document.createElement('ul');
-			panel.appendChild(ul);
+			layersPanel.appendChild(ul);
 			// passing two map arguments instead of lyr as we're passing the map as the root of the layers tree
 			LayerSwitcher.renderLayers_(map, map, ul, options, function render(_changedLyr) {
 				LayerSwitcher.renderPanel(map, panel, options);
@@ -307,12 +327,24 @@
 					var url = endpoint + LayerSwitcher.servicePath + '/token/' + LayerSwitcher.clusterWMSToken + '/view/' + LayerSwitcher.clusterWMSView + '/wms-cluster?service=WMS&request=GetLegendGraphic&layers=' + LayerSwitcher.clusterWMSLayerName;
 
 					LayerSwitcher.legendImage = document.createElement('img');
-					LayerSwitcher.legendImage.style = 'margin-left: 13px; margin-right: 7px; margin-top: -15px;'
+					var splitLegend = options.layersPanel && options.legendPanel &&
+						options.layersPanel !== options.legendPanel;
+					if (splitLegend) {
+						LayerSwitcher.legendImage.style = 'display: block; margin: 0; padding: 0;';
+					} else {
+						LayerSwitcher.legendImage.style = 'margin-left: 13px; margin-right: 7px; margin-top: -15px;';
+					}
 					LayerSwitcher.legendImage.id = 'wmsClusterLegendImg';
 					LayerSwitcher.legendImage.src = url;
 				}
 
-				panel.appendChild(LayerSwitcher.legendImage);				
+				if (options.layersPanel && options.legendPanel &&
+					options.layersPanel !== options.legendPanel &&
+					LayerSwitcher.legendImage) {
+					LayerSwitcher.legendImage.style = 'display: block; margin: 0; padding: 0;';
+				}
+
+				legendPanel.appendChild(LayerSwitcher.legendImage);				
 			}
 			
 

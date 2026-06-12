@@ -1,0 +1,7 @@
+{
+  "filters_panel_empty": "Run a search to load filters.",
+  "platformTitle_label": "Station name",
+  "platformTitle_help": "Name of the station",
+  "organisationName_label": "Data provider",
+  "organisationName_help": "Organisation that provides the data"
+}

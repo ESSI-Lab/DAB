@@ -141,6 +141,51 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
     GIAPI.tfHelper.checkedItems = null;
     
     var pubSubManager = GIAPI.PubSubManager(dabNode);
+
+    var isSameOriginUrl = function(url) {
+        if (!url) {
+            return false;
+        }
+        if (url.indexOf('http://') !== 0 && url.indexOf('https://') !== 0 && url.indexOf('//') !== 0) {
+            return true;
+        }
+        var resolvedUrl = url;
+        if (url.indexOf('//') === 0) {
+            resolvedUrl = window.location.protocol + url;
+        }
+        try {
+            return new URL(resolvedUrl, window.location.href).origin === window.location.origin;
+        } catch (e) {
+            return false;
+        }
+    };
+
+    var createAjaxTransportOptions = function(url) {
+        var sameOrigin = isSameOriginUrl(url);
+        return {
+            crossDomain: !sameOrigin,
+            dataType: sameOrigin ? 'json' : 'jsonp'
+        };
+    };
+
+    var formatAjaxError = function(jqXHR, msg) {
+        if (jqXHR && jqXHR.status) {
+            var statusText = jqXHR.statusText ? ' ' + jqXHR.statusText : '';
+            return 'HTTP ' + jqXHR.status + statusText + (msg ? ' (' + msg + ')' : '');
+        }
+        return msg;
+    };
+
+    var buildDiscoverErrorResponse = function(msg) {
+        var resultSet = GIAPI.emptyResultSet(msg);
+        var paginator = GIAPI.Paginator();
+        paginator._resultSet = resultSet;
+        paginator._page = GIAPI.Page([]);
+        resultSet.paginator = paginator;
+        var response = [resultSet];
+        response.error = msg;
+        return response;
+    };
      
     dabNode._paginator = function(onResponse, constraints, options, onStatus) {
 
@@ -167,14 +212,40 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
             timer = createTimer(onStatus, extended, queryID);
         }
 
+        var transport = createAjaxTransportOptions(query);
+        var paginatorHandled = false;
+        var finishPaginator = function(response) {
+            if (paginatorHandled) {
+                return;
+            }
+            paginatorHandled = true;
+            if (timer) {
+                timer.stop();
+            }
+            onResponse.apply(dabNode, [response]);
+        };
+        var failPaginator = function(msg, exception) {
+            if (paginatorHandled) {
+                return;
+            }
+            msg = msg + (exception && exception.message ? ', exception -> ' + exception.message : '');
+            GIAPI.logger.log('error occurred: ' + msg, 'error');
+            finishPaginator(buildDiscoverErrorResponse(msg));
+        };
+
         jQuery.ajax({
 
             type : 'GET',
             url : query,
-            crossDomain : true,
-            dataType : 'jsonp',
+            crossDomain : transport.crossDomain,
+            dataType : transport.dataType,
 
             success : function(data, status, jqXHR) {
+
+                if (!data || !data.resultSet || !data.reports) {
+                    failPaginator('Invalid search response', null);
+                    return;
+                }
 
                 var nodes = [];
                 for (var i = 0; i < data.reports.length; i++) {
@@ -213,25 +284,21 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
                 var response = [data.resultSet];
                 response._origin = 'paginator';
                 
-                onResponse.apply(dabNode, [response]);
-
-                if (timer) {
-                    timer.stop();
-                }
+                finishPaginator(response);
             },
 
             complete : function(jqXHR, status) {
 
                 GIAPI.logger.log('_paginator complete status: ' + status);
 
-                if (timer) {
-                    timer.stop();
+                if (!paginatorHandled) {
+                    failPaginator(formatAjaxError(jqXHR, status) || status, null);
                 }
             },
 
             error : function(jqXHR, msg, exception) {
 
-                error(msg, exception, onResponse);
+                failPaginator(formatAjaxError(jqXHR, msg), exception);
             }
         });
     };
@@ -426,18 +493,43 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
         discoverArgs[4] = dabNode;      
 
         var timeo = (opt && opt.timeout) ? opt.timeout : 0;
+        var transport = createAjaxTransportOptions(query);
+        var discoverHandled = false;
+        var finishDiscover = function(response) {
+            if (discoverHandled) {
+                return;
+            }
+            discoverHandled = true;
+            if (timer) {
+                timer.stop();
+            }
+            onResponse.apply(dabNode, [response]);
+        };
+        var failDiscover = function(msg, exception) {
+            if (discoverHandled) {
+                return;
+            }
+            msg = msg + (exception && exception.message ? ', exception -> ' + exception.message : '');
+            GIAPI.logger.log('error occurred: ' + msg, 'error');
+            finishDiscover(buildDiscoverErrorResponse(msg));
+        };
         
         jQuery.ajax({
 
             type : 'GET',
             url : query,
-            crossDomain : true,
-            dataType : 'jsonp',
+            crossDomain : transport.crossDomain,
+            dataType : transport.dataType,
             timeout : timeo,
 
             success : function(data, status, jqXHR) {
 
-                if (data.resultSet && data.resultSet.error) {
+                if (!data || !data.resultSet) {
+                    failDiscover('Invalid search response', null);
+                    return;
+                }
+
+                if (data.resultSet.error) {
                     GIAPI.logger.log('discover error: ' + data.resultSet.error, 'error');
                     
                     var response = [data.resultSet];
@@ -446,9 +538,13 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
                     
                     delete data.resultSet.error;
                     
-                    onResponse.apply(dabNode, [response]);
+                    finishDiscover(response);
 
                     return;
+                }
+
+                if (!data.reports) {
+                    data.reports = [];
                 }
 
                 var response = [];
@@ -593,25 +689,21 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
 //                    console.log(JSON.stringify(data.reports));
                 }
                                                
-                onResponse.apply(dabNode, [response]);
-
-                if (timer) {
-                    timer.stop();
-                }
+                finishDiscover(response);
             },
 
             complete : function(jqXHR, status) {
 
                 GIAPI.logger.log('discover complete status: ' + status);
 
-                if (timer) {
-                    timer.stop();
+                if (!discoverHandled) {
+                    failDiscover(formatAjaxError(jqXHR, status) || status, null);
                 }
             },
 
             error : function(jqXHR, msg, exception) {
 
-                error(msg, exception, onResponse);
+                failDiscover(formatAjaxError(jqXHR, msg), exception);
             }
         });
     };
@@ -964,18 +1056,14 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
 
     var error = function(msg, exception, onResponse) {
 
-        msg = msg + (exception.message ? ', exception -> ' + exception.message : '');
+        msg = msg + (exception && exception.message ? ', exception -> ' + exception.message : '');
 
         GIAPI.logger.log('error occurred: ' + msg, 'error');
         if (timer) {
             timer.stop();
         }
 
-        var paginator = GIAPI.Paginator();
-        paginator._resultSet = GIAPI.emptyResultSet(msg);
-        paginator._page = GIAPI.Page([]);
-
-        onResponse.apply(dabNode, [[paginator]]);
+        onResponse.apply(dabNode, [buildDiscoverErrorResponse(msg)]);
     };
 
     var isOptions = function(object) {

@@ -3,21 +3,14 @@
      
     <head>
     	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    	<meta http-equiv="Pragma" content="no-cache" />
+    	<meta http-equiv="Expires" content="0" />
 
         <title>Search portal</title>
         <link rel="shortcut icon" type="image/png" href="../giapi/ui/images/favicon.png">
      		
-		<script type="module" src="../gi-portal/libraries.js"></script>		
- 	
- 		<link rel="stylesheet" type="text/css" href="../gi-portal/gi-portal.css" />       
-       
-		<script type="module">
-			import {initializePortal} from '../gi-portal/gi-portal.js'
-			fetch('./config.json')
-		    .then(response => response.json())
-		    .then(config => initializePortal(config))
-		    .catch(err => console.error("Configuration load error:", err));
-		</script>
+		<script type="module" src="../gi-portal/portal-bootstrap.js"></script>
 		
     </head>
     
