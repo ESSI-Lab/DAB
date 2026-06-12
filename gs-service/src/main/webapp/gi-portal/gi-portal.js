@@ -2,6 +2,7 @@ import { GIAPI } from '../giapi/core/GIAPI.js';
 import { PORTAL_ASSET_VERSION } from './portal-version.js';
 import {
 	isToolbarLayout,
+	isPredefinedSearchAreaVisible,
 	prepareToolbarHeader,
 	prepareHeaderLayersControl,
 	prepareQueryPanelShell,
@@ -49,6 +50,29 @@ function getResultsVisibilityMode(resultsVisibility) {
 		return 'hidden';
 	}
 	return 'visible';
+}
+
+/**
+ * Resolves discover sortBy constraint from portal config.
+ * - sortBy: explicit field (optional ":asc" / ":desc", default asc)
+ * - sortByPlatformTitle: true → platformTitle:asc (station/platform name)
+ * When neither is set, returns null and the backend default ranking applies.
+ */
+function resolveSortByConstraint(config) {
+	if (!config) {
+		return null;
+	}
+	if (config.sortBy) {
+		var sortByValue = config.sortBy;
+		if (sortByValue.indexOf(':') === -1) {
+			sortByValue = sortByValue + ':asc';
+		}
+		return sortByValue;
+	}
+	if (config.sortByPlatformTitle === true) {
+		return 'platformTitle:asc';
+	}
+	return null;
 }
 
 /** Relative WMS path for predefined shape layers from {@link window.config.shapeView}. */
@@ -2194,7 +2218,7 @@ export function initializePortal(config) {
 
 		if (isToolbarLayout(config)) {
 			prepareToolbarHeader(t);
-			prepareQueryPanelShell(t);
+			prepareQueryPanelShell(t, config);
 		}
 
 		// init the tabs	        	
@@ -2785,7 +2809,7 @@ export function initializePortal(config) {
 			'dabNode': GIAPI.search.dab,
 
 
-			'shapeView': config.shapeView,
+			'shapeView': isPredefinedSearchAreaVisible(config) ? config.shapeView : undefined,
 			'wmsVersion': '1.3.0',
 
 
@@ -4933,11 +4957,8 @@ export function initializePortal(config) {
 			);
 		}
 
-		if (config.sortBy) {
-			var sortByValue = config.sortBy;
-			if (sortByValue.indexOf(':') === -1) {
-				sortByValue = sortByValue + ':asc';
-			}
+		var sortByValue = resolveSortByConstraint(config);
+		if (sortByValue) {
 			constraints.kvp.push(
 				{ 'key': 'sortBy', 'value': sortByValue }
 			);

@@ -1554,6 +1554,52 @@ body.toolbar-layout #query-temporal-fields #to-div {
 	width: 100%;
 }
 
+body.toolbar-layout #query-what-fields #what-div {
+	display: block !important;
+	margin-left: 0;
+	width: 100%;
+}
+
+body.toolbar-layout #query-what-fields .cnst-widget-table {
+	width: 100%;
+}
+
+body.toolbar-layout #query-what-fields .cnst-widget-table > tbody > tr > td > table {
+	display: block;
+	width: 100%;
+}
+
+body.toolbar-layout #query-what-fields .cnst-widget-table > tbody > tr > td > table > tbody {
+	display: block;
+}
+
+body.toolbar-layout #query-what-fields .cnst-widget-table > tbody > tr > td > table > tbody > tr {
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+
+body.toolbar-layout #query-what-fields .cnst-widget-table > tbody > tr > td > table > tbody > tr > td:first-child {
+	flex: 1 1 auto;
+	min-width: 0 !important;
+	width: auto !important;
+	display: block !important;
+	resize: none !important;
+	overflow: visible !important;
+	padding-right: 0 !important;
+}
+
+body.toolbar-layout #query-what-fields .cnst-widget-table > tbody > tr > td > table > tbody > tr > td:nth-child(2) {
+	flex: 0 0 auto;
+	width: auto !important;
+}
+
+body.toolbar-layout #query-what-fields .cnst-widget-input {
+	width: 100% !important;
+	box-sizing: border-box;
+	min-width: 0;
+}
+
 body.toolbar-layout #query-temporal-fields .cnst-widget-input {
 	width: 100% !important;
 	box-sizing: border-box;

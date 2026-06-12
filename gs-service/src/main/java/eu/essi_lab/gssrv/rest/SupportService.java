@@ -114,33 +114,43 @@ public class SupportService {
 	output.put("stats", statsArray);
 	PortalTranslator translator = new PortalTranslator(language);
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
-	View view = null;
-	try {
-	    view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
-	} catch (GSException e) {
-	    e.printStackTrace();
-	}
-
-	List<GSSource> sources = ConfigurationWrapper.getViewSources(view);
-
-	// set the required properties
-	statisticsMessage.setSources(sources);
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
-	// set the view
+	boolean hasView = viewId != null && !viewId.isBlank();
+	boolean hasSource = sourceId != null && !sourceId.isBlank();
 
-	try {
-	    WebRequestTransformer.setView(//
-		    viewId, //
-		    statisticsMessage.getDataBaseURI(), //
-		    statisticsMessage);
-	} catch (GSException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	List<GSSource> sources;
+	if (hasView) {
+	    try {
+		Optional<View> optionalView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+		if (optionalView.isEmpty()) {
+		    JSONObject error = new JSONObject();
+		    error.put("error", "View not found: " + viewId);
+		    return Response.status(Response.Status.BAD_REQUEST).entity(error.toString()).build();
+		}
+		sources = ConfigurationWrapper.getViewSources(optionalView.get());
+		WebRequestTransformer.setView(viewId, statisticsMessage.getDataBaseURI(), statisticsMessage);
+	    } catch (GSException e) {
+		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+		JSONObject error = new JSONObject();
+		error.put("error", e.getMessage());
+		return Response.status(Response.Status.BAD_REQUEST).entity(error.toString()).build();
+	    }
+	} else if (hasSource) {
+	    GSSource source = ConfigurationWrapper.getSource(sourceId);
+	    if (source == null) {
+		JSONObject error = new JSONObject();
+		error.put("error", "Source not found: " + sourceId);
+		return Response.status(Response.Status.BAD_REQUEST).entity(error.toString()).build();
+	    }
+	    sources = List.of(source);
+	} else {
+	    sources = ConfigurationWrapper.getHarvestedSources();
 	}
 
-	// set the user bond
-	if (sourceId != null && !sourceId.isEmpty()) {
+	statisticsMessage.setSources(sources);
+
+	if (hasSource) {
 	    statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
 	}
 

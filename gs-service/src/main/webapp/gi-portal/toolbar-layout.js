@@ -7,6 +7,16 @@ export function isToolbarLayout(config) {
 	return config && config.toolbarLayout === true;
 }
 
+export function isPredefinedSearchAreaVisible(config) {
+	if (!config) {
+		return false;
+	}
+	if (config.predefinedSearchAreaVisibility !== undefined) {
+		return !!config.predefinedSearchAreaVisibility;
+	}
+	return !!config.shapeView;
+}
+
 function toolbarLabel(t, key, fallback) {
 	var label = t(key);
 	return label === key ? fallback : label;
@@ -96,7 +106,14 @@ export function prepareHeaderLayersControl(t) {
 	return document.getElementById('header-layers-panel-body');
 }
 
-export function prepareQueryPanelShell(t) {
+export function prepareQueryPanelShell(t, config) {
+	var predefinedSection = isPredefinedSearchAreaVisible(config) ?
+		'<section id="query-section-predefined" class="query-panel-section">' +
+			'<h4 class="query-panel-section-title">' + toolbarLabel(t, 'predefined_selection', 'Predefined search area') + '</h4>' +
+			'<div id="query-predefined-fields" class="query-panel-fields query-spatial-inline"></div>' +
+		'</section>' :
+		'';
+
 	var queryPanel = jQuery(
 		'<div id="query-panel" class="portal-panel query-panel" style="display:none;">' +
 			'<div id="query-panel-body" class="portal-panel-body">' +
@@ -108,10 +125,7 @@ export function prepareQueryPanelShell(t) {
 					'<h4 class="query-panel-section-title">' + toolbarLabel(t, 'spatial_extent', 'Spatial extent') + '</h4>' +
 					'<div id="query-bbox-fields" class="query-panel-fields query-spatial-inline"></div>' +
 				'</section>' +
-				'<section id="query-section-predefined" class="query-panel-section">' +
-					'<h4 class="query-panel-section-title">' + toolbarLabel(t, 'predefined_selection', 'Predefined search area') + '</h4>' +
-					'<div id="query-predefined-fields" class="query-panel-fields query-spatial-inline"></div>' +
-				'</section>' +
+				predefinedSection +
 				'<section id="query-section-sources" class="query-panel-section">' +
 					'<h4 class="query-panel-section-title">' + toolbarLabel(t, 'sources_tab', 'Sources') + '</h4>' +
 					'<div id="query-sources-fields" class="query-panel-fields"></div>' +
@@ -245,17 +259,21 @@ function renameSpatialClearButton(bboxHost) {
 	clearBtn.find('.font-awesome-button-label').text('CLEAR BBOX').css('white-space', 'nowrap');
 }
 
-export function relocateSpatialControlToQueryPanel() {
+export function relocateSpatialControlToQueryPanel(config) {
 	var bboxHost = jQuery('#query-bbox-fields');
-	var predefinedHost = jQuery('#query-predefined-fields');
-	if (!bboxHost.length || !predefinedHost.length) {
+	if (!bboxHost.length) {
 		return;
 	}
+
+	var showPredefined = isPredefinedSearchAreaVisible(config);
+	var predefinedHost = showPredefined ? jQuery('#query-predefined-fields') : jQuery();
 
 	if (bboxHost.find('table.cnst-widget-where-input-control').length) {
 		var existingTable = bboxHost.find('table.cnst-widget-where-input-control').first();
 		attachSpatialExtentHelpToSectionTitle(existingTable);
-		attachPredefinedHelpToSectionTitle();
+		if (showPredefined) {
+			attachPredefinedHelpToSectionTitle();
+		}
 		renameSpatialClearButton(bboxHost);
 		jQuery('#mapControlDiv').hide();
 		jQuery('#whereTableCaption, #onoffswitch-div-hideMapInputControl').hide();
@@ -268,17 +286,21 @@ export function relocateSpatialControlToQueryPanel() {
 	}
 
 	bboxHost.empty();
-	predefinedHost.empty();
+	if (predefinedHost.length) {
+		predefinedHost.empty();
+	}
 
 	var controlTable = mapControl.find('table.cnst-widget-where-input-control').first();
-	var layerSelectorDiv = mapControl.find('#layerSelectorDiv');
+	var layerSelectorDiv = showPredefined ? mapControl.find('#layerSelectorDiv') : jQuery();
 
 	if (controlTable.length) {
 		controlTable.detach().appendTo(bboxHost);
 		controlTable.css({ width: '100%', display: 'table' });
 		controlTable.find('input[type="number"]').css({ width: '100%', boxSizing: 'border-box' });
 		attachSpatialExtentHelpToSectionTitle(controlTable);
-		attachPredefinedHelpToSectionTitle();
+		if (showPredefined) {
+			attachPredefinedHelpToSectionTitle();
+		}
 		controlTable.find('tr').has('.cnst-widget-location-field').hide();
 		controlTable.find('#layersSelectorButton').closest('tr').hide();
 		controlTable.find('#containsButton, #overlapsButton').closest('tr').hide();
@@ -289,7 +311,7 @@ export function relocateSpatialControlToQueryPanel() {
 		renameSpatialClearButton(bboxHost);
 	}
 
-	if (layerSelectorDiv.length) {
+	if (showPredefined && layerSelectorDiv.length && predefinedHost.length) {
 		layerSelectorDiv.detach().appendTo(predefinedHost);
 		jQuery('#layersSelectorButton').prop('checked', false).closest('div').hide();
 		layerSelectorDiv.css({
@@ -394,10 +416,65 @@ function setupTemporalFieldsInQueryPanel() {
 	setupTemporalPresetButtons();
 }
 
+function setupWhatFieldsInQueryPanel() {
+	jQuery('#what-div').show().css({
+		display: 'block',
+		marginLeft: '0',
+		width: '100%'
+	});
+
+	var container = jQuery('#query-what-fields');
+	if (!container.length) {
+		return;
+	}
+
+	container.find('.cnst-widget-div, .cnst-widget-table').css({ width: '100%' });
+
+	var innerTables = container.find('.cnst-widget-table > tbody > tr > td > table');
+	innerTables.css({ display: 'block', width: '100%' });
+	innerTables.children('tbody').css({ display: 'block' });
+
+	var innerRows = innerTables.children('tbody').children('tr');
+	innerRows.css({
+		display: 'flex',
+		alignItems: 'center',
+		width: '100%'
+	});
+	innerRows.children('td:first-child').css({
+		flex: '1 1 auto',
+		minWidth: '0',
+		width: 'auto',
+		display: 'block',
+		resize: 'none',
+		overflow: 'visible',
+		paddingRight: '0'
+	});
+	innerRows.children('td:nth-child(2)').css({
+		flex: '0 0 auto',
+		width: 'auto'
+	});
+
+	container.find('.cnst-widget-input').css({
+		width: '100%',
+		boxSizing: 'border-box',
+		minWidth: '0'
+	});
+
+	if (!GIAPI.search.constWidget) {
+		return;
+	}
+
+	jQuery('#' + GIAPI.search.constWidget.getId('what')).css({
+		width: '100%',
+		boxSizing: 'border-box',
+		minWidth: '0'
+	});
+}
+
 export function moveQueryPanelContent(config) {
 	jQuery('#query-temporal-fields').append(jQuery('#from-div'), jQuery('#to-div'));
 	setupTemporalFieldsInQueryPanel();
-	relocateSpatialControlToQueryPanel();
+	relocateSpatialControlToQueryPanel(config);
 
 	if (config.generalTermSearch === undefined || config.generalTermSearch) {
 		jQuery('#query-panel-body').prepend(
@@ -407,6 +484,7 @@ export function moveQueryPanelContent(config) {
 			'</section>')
 		);
 		jQuery('#query-what-fields').append(jQuery('#what-div'));
+		setupWhatFieldsInQueryPanel();
 	}
 
 	var clearAllBtn = window._clearAllButton || document.getElementById('clearAllButton');
