@@ -82,7 +82,7 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
     private static final String SLEEP_URL = "call/sleep_tidy?";
     private static final String SMARTWATCHHIGH_URL = "call/smartwatchhigh_daily?";
     private static final String SMARTWATCHLOW_URL = "call/smartwatchlow_daily?";
-    private static final String MIN_VALID_PARAM = "min_valid_n=1";
+    public static final String MIN_VALID_PARAM = "min_valid_n=1";
 
     private static final String DEVICE_ID = "deviceId";
     private static final String EMAIL = "email";
@@ -299,7 +299,7 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 			    String field = var.getCategory();
 
 
-			    if (!obj.has(field) || obj.isNull(field)) {
+			    if (!obj.has(field)) {
 				continue;
 			    }
 
