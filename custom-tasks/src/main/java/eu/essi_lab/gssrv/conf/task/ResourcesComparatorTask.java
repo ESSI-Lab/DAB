@@ -13,12 +13,12 @@ package eu.essi_lab.gssrv.conf.task;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -73,7 +73,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
     /**
      * default maximum number of fields to aggregate in the comparison aggregation method
      */
-    private static final int DEFAULT_MAX_AGGREGATION_FIELDS = 3;
+    private static final int DEFAULT_MAX_AGGREGATION_FIELDS = 4;
 
     /**
      * default page size of aggregation requests in the comparison aggregation method
@@ -142,7 +142,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    if (comparisonProp != null) {
 
-		comparisonFields = Arrays.asList(comparisonProp.split(","));
+		comparisonFields = Arrays.stream(comparisonProp.split(",")).//
+			map(n -> MetadataElement.valueOf(n).getName()).//
+			collect(Collectors.toList());//
 	    }
 
 	    discoveryPageSize = Integer.parseInt(properties.getProperty("discoveryPageSize", String.valueOf(DEFAULT_DISCOVERY_PAGE_SIZE)));
