@@ -1,4 +1,5 @@
 import { GIAPI } from '../giapi/core/GIAPI.js';
+import { PORTAL_ASSET_VERSION } from './portal-version.js';
 import {
 	isToolbarLayout,
 	prepareToolbarHeader,
@@ -108,12 +109,10 @@ function loadI18nSync(lang) {
 			try {
 				var xhr = new XMLHttpRequest();
 				var url = paths[j];
-				// Add cache-busting to ensure latest translations are loaded
-				// Use a version that changes when translations are updated
 				var separator = url.indexOf('?') === -1 ? '?' : '&';
-				url += separator + '_v=2.0'; // Increment this when adding new translation keys
+				var assetVersion = (typeof window !== 'undefined' && window.__PORTAL_ASSET_VERSION__) || 'dev';
+				url += separator + 'v=' + encodeURIComponent(assetVersion);
 				xhr.open('GET', url, false);
-				xhr.setRequestHeader('Cache-Control', 'no-cache');
 				xhr.send(null);
 				if (xhr.status >= 200 && xhr.status < 300 && (xhr.responseText || '').trim().length > 0) {
 					return JSON.parse(xhr.responseText);
@@ -2849,11 +2848,11 @@ export function initializePortal(config) {
 		leftSidebar.css({
 			'display': isToolbarLayout(config) ? 'none' : 'flex',
 			'flex-direction': 'column',
-			'flex': '1',
+			'flex': isToolbarLayout(config) ? '0 0 40%' : '1',
 			'min-height': '0',
 			'width': '40%',
 			'min-width': '0',
-			'max-width': 'none',
+			'max-width': isToolbarLayout(config) ? '40%' : 'none',
 			'overflow': 'hidden'
 		});
 		
@@ -2936,7 +2935,14 @@ export function initializePortal(config) {
 						}
 						tooltipVisible = false;
 					} else {
-						tooltip = jQuery('<div class="beta-badge-tooltip"></div>').text(betaMessage);
+						var portalVersion = window.__PORTAL_ASSET_VERSION__ || PORTAL_ASSET_VERSION;
+						tooltip = jQuery('<div class="beta-badge-tooltip"></div>');
+						if (portalVersion) {
+							tooltip.append(
+								jQuery('<div class="beta-badge-tooltip-version"></div>').text(portalVersion)
+							);
+						}
+						tooltip.append(jQuery('<div class="beta-badge-tooltip-message"></div>').text(betaMessage));
 						betaBadge.append(tooltip);
 						tooltipVisible = true;
 					}

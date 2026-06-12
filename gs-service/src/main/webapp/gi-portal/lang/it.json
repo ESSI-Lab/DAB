@@ -263,7 +263,7 @@
   "attributeId_help": "ID del parametro descritto dal valore della misura",
   "attributeId_label": "ID parametro",
 
-  "attributeTitle_help": "Nome del parametro descritto dal valore della misura<br/><br/><button id=\"pButton\">Sfoglia e seleziona parametri dall’ontologia (GUI)</button><br/><br/><button id=\"bButton\">Sfoglia e seleziona parametri dall’albero ontologico</button>",
+  "attributeTitle_help": "Nome del parametro descritto dal valore della misura<br/><br/><button id=\"bButton\">Sfoglia e seleziona parametri dall’albero ontologico</button>",
   "attributeTitle_label": "Nome parametro",
 
   "riverName_help": "Nome del fiume oggetto della misura",

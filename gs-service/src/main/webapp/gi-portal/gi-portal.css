@@ -729,6 +729,11 @@ body {
 	z-index: 21;
 }
 
+.beta-badge-tooltip-version {
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+
 .beta-badge-tooltip::after {
 	content: "";
 	position: absolute;
@@ -1471,11 +1476,19 @@ body.toolbar-layout .portal-toolbar-btn.active {
 	background-color: #34495e;
 }
 
-body.toolbar-layout #query-panel {
-	flex: 0 0 40%;
-	width: 40%;
-	max-width: 40%;
+body.toolbar-layout {
+	--toolbar-panel-width: 40%;
+}
+
+body.toolbar-layout #query-panel,
+body.toolbar-layout #left-sidebar.toolbar-sidebar-visible {
+	flex: 0 0 var(--toolbar-panel-width);
+	width: var(--toolbar-panel-width);
+	max-width: var(--toolbar-panel-width);
 	min-width: 0;
+}
+
+body.toolbar-layout #query-panel {
 	min-height: 0;
 	background: #ececec;
 	border-right: 1px solid #b8b8b8;
@@ -1885,6 +1898,7 @@ body.toolbar-layout #left-sidebar > #tabs-div {
 
 body.toolbar-layout #left-sidebar.toolbar-sidebar-visible {
 	display: flex;
+	flex-direction: column;
 }
 
 body.toolbar-layout .portal-side-panel {
