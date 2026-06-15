@@ -21,6 +21,13 @@ package eu.essi_lab.profiler.om;
  * #L%
  */
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import eu.essi_lab.messages.SearchAfter;
 import eu.essi_lab.profiler.om.OMRequest.APIParameters;
 
 /**
@@ -32,7 +39,41 @@ public final class OMRequestUtils {
 
     public static final int METADATA_PAGE_SIZE = 500;
 
+    private static final String RESUMPTION_TOKEN_SEPARATOR = ",";
+
     private OMRequestUtils() {
+    }
+
+    /**
+     * Serializes a {@link SearchAfter} cursor into the OM API resumption token format.
+     */
+    public static String toResumptionToken(SearchAfter searchAfter) {
+
+	if (searchAfter == null || searchAfter.getValues().isEmpty() || searchAfter.getValues().get().isEmpty()) {
+	    return "";
+	}
+
+	return searchAfter.getValues().get().stream().//
+		map(Object::toString).//
+		collect(Collectors.joining(RESUMPTION_TOKEN_SEPARATOR));
+    }
+
+    /**
+     * Parses an OM API resumption token into a {@link SearchAfter} cursor. Values are URL-decoded first so tokens
+     * produced by {@link MetadataDownloaderTool} (where commas are encoded as {@code %2C}) are handled correctly.
+     */
+    public static SearchAfter toSearchAfter(String resumptionToken) {
+
+	if (resumptionToken == null || resumptionToken.isEmpty()) {
+	    return null;
+	}
+
+	String decoded = URLDecoder.decode(resumptionToken, StandardCharsets.UTF_8);
+	List<Object> values = new ArrayList<>();
+	for (String part : decoded.split(RESUMPTION_TOKEN_SEPARATOR, -1)) {
+	    values.add(part);
+	}
+	return new SearchAfter(values);
     }
 
     public static boolean isIncludeData(OMRequest request) {

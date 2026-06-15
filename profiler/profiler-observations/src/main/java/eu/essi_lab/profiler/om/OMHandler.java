@@ -355,12 +355,7 @@ public class OMHandler extends StreamingRequestHandler {
 	Optional<Bond> initial = discoveryMessage.getUserBond();
 	String resumption = request.getParameterValue(eu.essi_lab.profiler.om.OMRequest.APIParameters.RESUMPTION_TOKEN);
 	if (resumption != null) {
-	    List<Object> values = new ArrayList<Object>();
-	    String[] split = resumption.split(",");
-	    for (String rs : split) {
-		values.add(rs);
-	    }
-	    searchAfter = new SearchAfter(values);
+	    searchAfter = OMRequestUtils.toSearchAfter(resumption);
 	    discoveryMessage.setSearchAfter(searchAfter);
 	}
 	boolean asynchDownloadRequest = request.isAsynchDownloadRequest();
@@ -699,22 +694,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 	} while (tempSize < userSize && searchAfter != null);
 
-	String resumptionToken = "";
-
-	if (searchAfter != null && searchAfter.getValues().
-
-		isPresent() && !searchAfter.getValues().
-
-		get().
-
-		isEmpty()) {
-	    for (Object v : searchAfter.getValues().get()) {
-		resumptionToken += v.toString() + ",";
-	    }
-	    if (resumptionToken.endsWith(",")) {
-		resumptionToken = resumptionToken.substring(0, resumptionToken.length() - 1);
-	    }
-	}
+	String resumptionToken = OMRequestUtils.toResumptionToken(searchAfter);
 	Integer count = null;
 	CountSet countResponse = resultSet.getCountResponse();
 	if (countResponse != null) {

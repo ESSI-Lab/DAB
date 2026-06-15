@@ -48,6 +48,7 @@ import org.json.JSONObject;
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.friuli.HISCentralFriuliConnector;
+import eu.essi_lab.accessor.hiscentral.friuli.HISCentralFriuliVariableUnits;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
@@ -294,6 +295,7 @@ public class HISCentralFriuliDownloader extends WMLDataDownloader {
 		HISCENTRAL_FRIULI_DOWNLOAD_ERROR);
 
     }
+
 
     private JSONObject getData(String linkage) throws GSException {
 	GSLoggerFactory.getLogger(getClass()).info("Getting BEARER TOKEN from FVG Omnia service");

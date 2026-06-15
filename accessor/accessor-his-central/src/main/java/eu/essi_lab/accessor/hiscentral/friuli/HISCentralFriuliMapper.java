@@ -375,14 +375,9 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	String missingValue = "-9999";
 	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
 
-	// if (uom != null) {
-	// dataset.getExtensionHandler().setAttributeUnits(uom);
-	// }
-	//
-	// String units = uom != null ? " Units: " + uom : "";
+	HISCentralFriuliVariableUnits.getUnits(measureCode).ifPresent(unit -> dataset.getExtensionHandler().setAttributeUnits(unit));
 
-	// // as no description is given this field is calculated
-	// HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
+	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 
 	coverageDescription.setAttributeDescription(description);
 
