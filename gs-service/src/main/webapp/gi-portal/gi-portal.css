@@ -1138,20 +1138,15 @@ body {
     border-radius: 3px;
 }
 
-.predefined-shapes-table .shapes-save-btn {
-    min-width: 32px;
-    padding: 4px 8px;
-}
-
-.predefined-shapes-table .shapes-save-btn:disabled {
-    opacity: 0.4;
-    cursor: default;
-}
-
 .predefined-shapes-table .shapes-field-input:disabled {
     background: #f4f4f4;
     color: #666;
     cursor: not-allowed;
+}
+
+.shapes-save-changes-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
 .shapes-delete-btn {
@@ -2084,32 +2079,45 @@ body.toolbar-layout #query-predefined-fields #layerSelectorDiv {
 	height: auto !important;
 	margin-left: 0 !important;
 	margin-top: 0 !important;
-	background: #fff;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	padding: 6px;
+	background: transparent;
+	border: none;
+	padding: 0;
 	box-sizing: border-box;
 }
 
-body.toolbar-layout #query-predefined-fields #wrapLayerSelectorTable,
-body.toolbar-layout #query-predefined-fields #layerSelectorTable {
-	width: 100%;
+body.toolbar-layout #query-predefined-fields .predefined-shape-dropdown-row,
+.predefined-shape-dropdowns .predefined-shape-dropdown-row {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-bottom: 10px;
 }
 
-body.toolbar-layout #query-predefined-fields #layerSelectorDiv div[style*="overflow-y"] {
+body.toolbar-layout #query-predefined-fields .predefined-shape-dropdown-row label,
+.predefined-shape-dropdowns .predefined-shape-dropdown-row label {
+	font-weight: 600;
+	font-size: 13px;
+	color: #2c3e50;
+}
+
+body.toolbar-layout #query-predefined-fields .predefined-shape-select,
+.predefined-shape-dropdowns .predefined-shape-select {
 	width: 100%;
 	box-sizing: border-box;
+	padding: 6px 8px;
+	font-size: 13px;
 }
 
-body.toolbar-layout #layerSelectorTable tr.predefined-layers-message td,
-#layerSelectorTable tr.predefined-layers-message td {
+#predefinedLayersMessage.predefined-layers-message {
 	color: #666;
 	font-style: italic;
-	padding: 8px 4px;
+	padding: 4px 0;
+	font-size: 13px;
 }
 
-#layerSelectorTable tr.predefined-layers-error td {
+#predefinedLayersMessage.predefined-layers-error {
 	color: #a94442;
+	font-style: normal;
 }
 
 body.toolbar-layout #query-bbox-fields #mapControlDiv,

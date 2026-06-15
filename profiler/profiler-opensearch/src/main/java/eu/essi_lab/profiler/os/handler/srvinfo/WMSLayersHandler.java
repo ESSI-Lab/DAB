@@ -25,10 +25,18 @@ package eu.essi_lab.profiler.os.handler.srvinfo;
  */
 
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.json.JSONObject;
+
+import eu.essi_lab.accessor.opensearch.shape.OpenSearchShapefileClient;
+import eu.essi_lab.api.database.opensearch.index.IndexData;
+import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
+import eu.essi_lab.messages.bond.spatial.ShapeLayerOwner;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.MediaType;
@@ -119,8 +127,10 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 	    String capRequest = endpoint + "?service=WMS&request=GetCapabilities&version=" + version;
 
 	    LayerFilterContext layerFilter = null;
+	    Map<String, String> groupByOnlineId = null;
 	    if (shapeView != null && !shapeView.isBlank()) {
 		layerFilter = ShapeWmsLayerFilter.createContext(token);
+		groupByOnlineId = loadShapeGroupsByOnlineId();
 	    }
 
 	    Optional<String> response = downloader.downloadOptionalString(capRequest);
@@ -159,6 +169,10 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 
 			    layerObject.put("title", layerTitle);
 			    layerObject.put("name", layerName);
+
+			    if (groupByOnlineId != null) {
+				layerObject.put("group", groupByOnlineId.getOrDefault(layerName, ""));
+			    }
 
 			    //
 			    // layer bbox
@@ -214,5 +228,30 @@ public class WMSLayersHandler extends DefaultRequestHandler {
     public MediaType getMediaType(WebRequest webRequest) {
 
 	return MediaType.APPLICATION_JSON_TYPE;
+    }
+
+    private Map<String, String> loadShapeGroupsByOnlineId() {
+
+	Map<String, String> out = new HashMap<>();
+
+	try {
+
+	    for (JSONObject source : new OpenSearchShapefileClient().loadPredefinedLayerSources()) {
+
+		String entryName = source.optString(IndexData.ENTRY_NAME, "");
+		if (entryName.isBlank()) {
+		    continue;
+		}
+
+		String onlineId = ShapeLayerOwner.OPENSEARCH_ONLINE_PREFIX + entryName;
+		out.put(onlineId, source.optString(ShapeFileMapping.SHAPE_GROUP, ""));
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Failed to load shape groups for WMS layers handler", ex);
+	}
+
+	return out;
     }
 }

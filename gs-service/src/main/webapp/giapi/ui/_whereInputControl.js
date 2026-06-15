@@ -21,6 +21,51 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 	var predefinedLayers = [];
 
+	var PREDEFINED_NO_GROUP_KEY = '__NO_GROUP__';
+
+	var layerGroupKey = function(layer) {
+		var group = (layer.group || '').trim();
+		return group ? group : PREDEFINED_NO_GROUP_KEY;
+	};
+
+	var groupDisplayLabel = function(groupKey) {
+		var __t = window.__t || function(s) { return s; };
+		if (groupKey === PREDEFINED_NO_GROUP_KEY) {
+			var noGroup = __t('predefined_no_group');
+			return noGroup === 'predefined_no_group' ? '(no group)' : noGroup;
+		}
+		return groupKey;
+	};
+
+	var buildGroupIndex = function(layers) {
+		var groups = {};
+		layers.forEach(function(layer) {
+			var key = layerGroupKey(layer);
+			if (!groups[key]) {
+				groups[key] = [];
+			}
+			groups[key].push(layer);
+		});
+		Object.keys(groups).forEach(function(key) {
+			groups[key].sort(function(a, b) {
+				return (a.title || a.name || '').localeCompare(b.title || b.name || '', undefined, { sensitivity: 'base' });
+			});
+		});
+		return groups;
+	};
+
+	var sortedGroupKeys = function(groupsByKey) {
+		return Object.keys(groupsByKey).sort(function(a, b) {
+			if (a === PREDEFINED_NO_GROUP_KEY) {
+				return -1;
+			}
+			if (b === PREDEFINED_NO_GROUP_KEY) {
+				return 1;
+			}
+			return groupDisplayLabel(a).localeCompare(groupDisplayLabel(b), undefined, { sensitivity: 'base' });
+		});
+	};
+
 	var resolveShapeWmsToken = function() {
 		if (typeof window.getShapeWmsToken === 'function') {
 			return window.getShapeWmsToken();
@@ -117,8 +162,6 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 
 						break;
 					case 'closed':
-console.log("Hello, world!");
-
 						jQuery(openCloseDiv).removeClass('fa fa-caret-right');
 						jQuery(openCloseDiv).addClass('fa fa-caret-left');
 
@@ -203,25 +246,46 @@ console.log("Hello, world!");
 			// creates the layers selector
 			//
 
-			var layerSelectorDiv = '<div id="layerSelectorDiv" style="display:none" class="cnst-widget-where-wms-selector-div">';
+			var groupLabelText = __t('predefined_group_label');
+			if (groupLabelText === 'predefined_group_label') {
+				groupLabelText = 'Group';
+			}
+			var areaLabelText = __t('predefined_area_label');
+			if (areaLabelText === 'predefined_area_label') {
+				areaLabelText = 'Area';
+			}
 
-			layerSelectorDiv += '<table style="width:100%" id="wrapLayerSelectorTable">';
-
-			layerSelectorDiv += '<tr><th style="background: lightgray;">'+ __t('predefined_selection') +'</th></tr>';
-
-			layerSelectorDiv += '<tr><td><input id="layerNameSearchInput" style="width: 376px;" placeholder="'+ __t('predefined_selection_search') +'"></input></td></tr>';
-
-			layerSelectorDiv += '<tr><td><div style="overflow-y: scroll;height: 210px"><table style="width:100%" id="layerSelectorTable"></table></div></td></tr>';
-
-			layerSelectorDiv += '</table>';
-
+			var layerSelectorDiv = '<div id="layerSelectorDiv" style="display:none" class="cnst-widget-where-wms-selector-div predefined-shape-dropdowns">';
+			layerSelectorDiv += '<div class="predefined-shape-dropdown-row">';
+			layerSelectorDiv += '<label for="predefinedGroupSelect">' + groupLabelText + '</label>';
+			layerSelectorDiv += '<select id="predefinedGroupSelect" class="cnst-widget-input predefined-shape-select"></select>';
+			layerSelectorDiv += '</div>';
+			layerSelectorDiv += '<div class="predefined-shape-dropdown-row">';
+			layerSelectorDiv += '<label for="predefinedAreaSelect">' + areaLabelText + '</label>';
+			layerSelectorDiv += '<select id="predefinedAreaSelect" class="cnst-widget-input predefined-shape-select"></select>';
+			layerSelectorDiv += '</div>';
+			layerSelectorDiv += '<div id="predefinedLayersMessage" class="predefined-layers-message" style="display:none;"></div>';
 			layerSelectorDiv += '</div>';
 
 			jQuery(controlDiv).append(layerSelectorDiv);
 
-			jQuery("#layerNameSearchInput").on("keyup", function() {
+			jQuery(document).on('change', '#predefinedGroupSelect', function() {
+				clearPredefinedLayerSelection();
+				populateAreaSelect(jQuery('#predefinedGroupSelect').val(), '');
+			});
 
-				updateWmsLayersTable(jQuery("#layerNameSearchInput").val());
+			jQuery(document).on('change', '#predefinedAreaSelect', function() {
+				var selectedName = jQuery('#predefinedAreaSelect').val();
+				if (!selectedName) {
+					clearPredefinedLayerSelection();
+					return;
+				}
+				var layer = predefinedLayers.find(function(item) {
+					return item.name === selectedName;
+				});
+				if (layer) {
+					applyPredefinedLayerSelection(layer);
+				}
 			});
 
 			downloadWmsLayers();
@@ -333,11 +397,12 @@ console.log("Hello, world!");
 		jQuery('#' + topSearchFieldId).val('');
 		inControl.clearLocationLabel();
 
-		jQuery('#layerSelectorTable td').removeClass('highlighted');
-
-		if (shapeLayer != null) {
-			resultsMapWidget.removeLayers(shapeLayer);
-			shapeLayer = null;
+		resetPredefinedLayerDropdowns();
+		clearPredefinedLayerSelection();
+		if (predefinedLayers.length) {
+			resetPredefinedLayerDropdownsWithoutSelection();
+		} else {
+			resetPredefinedLayerDropdowns();
 		}
 	};
 
@@ -359,11 +424,188 @@ console.log("Hello, world!");
 	};
 
 	var setPredefinedLayersListMessage = function(message, className) {
-		jQuery('#layerSelectorTable > tbody').remove();
-		var rowClass = className || 'predefined-layers-message';
-		jQuery('#layerSelectorTable').append(
-			'<tr class="' + rowClass + '"><td>' + message + '</td></tr>'
-		);
+		var messageDiv = jQuery('#predefinedLayersMessage');
+		if (!messageDiv.length) {
+			return;
+		}
+		messageDiv.attr('class', className || 'predefined-layers-message');
+		messageDiv.text(message).show();
+		jQuery('#predefinedGroupSelect, #predefinedAreaSelect').prop('disabled', true);
+	};
+
+	var hidePredefinedLayersListMessage = function() {
+		jQuery('#predefinedLayersMessage').hide().text('');
+		jQuery('#predefinedGroupSelect, #predefinedAreaSelect').prop('disabled', false);
+	};
+
+	var resetPredefinedLayerDropdowns = function() {
+		jQuery('#predefinedGroupSelect').empty();
+		jQuery('#predefinedAreaSelect').empty();
+	};
+
+	var hasUngroupedLayers = function(layers) {
+		return (layers || predefinedLayers).some(function(layer) {
+			return !(layer.group || '').trim();
+		});
+	};
+
+	var populateGroupSelect = function(selectedGroupKey) {
+		var groupSelect = jQuery('#predefinedGroupSelect');
+		groupSelect.empty();
+
+		if (!predefinedLayers.length) {
+			return;
+		}
+
+		var groupsByKey = buildGroupIndex(predefinedLayers);
+		var groupKeys = sortedGroupKeys(groupsByKey);
+		var hasUngrouped = hasUngroupedLayers(predefinedLayers);
+
+		if (hasUngrouped) {
+			groupSelect.append(jQuery('<option>', { value: '', text: '' }));
+		}
+
+		groupKeys.forEach(function(groupKey) {
+			groupSelect.append(jQuery('<option>', {
+				value: groupKey,
+				text: groupDisplayLabel(groupKey)
+			}));
+		});
+
+		if (selectedGroupKey && groupsByKey[selectedGroupKey]) {
+			groupSelect.val(selectedGroupKey);
+		} else if (!hasUngrouped && groupKeys.length > 0) {
+			groupSelect.val(groupKeys[0]);
+		} else {
+			groupSelect.val('');
+		}
+	};
+
+	var resetPredefinedLayerDropdownsWithoutSelection = function() {
+		if (!predefinedLayers.length) {
+			resetPredefinedLayerDropdowns();
+			return;
+		}
+
+		var groupsByKey = buildGroupIndex(predefinedLayers);
+		var groupKeys = sortedGroupKeys(groupsByKey);
+		var hasUngrouped = hasUngroupedLayers(predefinedLayers);
+
+		populateGroupSelect('');
+		if (!hasUngrouped && groupKeys.length > 0) {
+			populateAreaSelect(groupKeys[0], '');
+		} else {
+			populateAreaSelect('', '');
+		}
+	};
+
+	var populateAreaSelect = function(groupKey, selectedLayerName) {
+		var areaSelect = jQuery('#predefinedAreaSelect');
+		areaSelect.empty();
+
+		var __t = window.__t || function(s) { return s; };
+		var noSelection = __t('predefined_no_selection');
+		if (noSelection === 'predefined_no_selection') {
+			noSelection = '(no selection)';
+		}
+		areaSelect.append(jQuery('<option>', { value: '', text: noSelection }));
+
+		if (!groupKey) {
+			return;
+		}
+
+		var groupsByKey = buildGroupIndex(predefinedLayers);
+		var layers = groupsByKey[groupKey] || [];
+
+		layers.forEach(function(layer) {
+			areaSelect.append(jQuery('<option>', {
+				value: layer.name,
+				text: layer.title || layer.name
+			}));
+		});
+
+		if (selectedLayerName) {
+			areaSelect.val(selectedLayerName);
+		}
+	};
+
+	var clearPredefinedLayerSelection = function() {
+		if (options.value) {
+			options.value.predefinedLayer = null;
+		}
+		if (shapeLayer != null) {
+			resultsMapWidget.removeLayers(shapeLayer);
+			shapeLayer = null;
+		}
+	};
+
+	var applyPredefinedLayerSelection = function(layer) {
+		if (!layer) {
+			clearPredefinedLayerSelection();
+			return;
+		}
+
+		if (options.value) {
+			options.value.predefinedLayer = layer.name;
+		}
+
+		var onlineArray = [];
+		var protocol = 'urn:ogc:serviceType:WebMapService:' + options.wmsVersion + ':HTTP';
+		onlineArray.push({
+			'function': 'download',
+			'name': layer.name,
+			'title': layer.title,
+			'protocol': protocol,
+			'url': resolveShapeWmsEndpoint()
+		});
+
+		var mapLayers = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:');
+
+		if (shapeLayer != null) {
+			resultsMapWidget.removeLayers(shapeLayer);
+		}
+
+		resultsMapWidget.addLayers(mapLayers);
+		shapeLayer = mapLayers;
+	};
+
+	var restorePredefinedLayerSelection = function() {
+		var selectedName = options.value && options.value.predefinedLayer;
+		if (!selectedName || !predefinedLayers.length) {
+			resetPredefinedLayerDropdownsWithoutSelection();
+			return;
+		}
+
+		var layer = predefinedLayers.find(function(item) {
+			return item.name === selectedName;
+		});
+
+		if (!layer) {
+			resetPredefinedLayerDropdownsWithoutSelection();
+			return;
+		}
+
+		var groupKey = layerGroupKey(layer);
+		populateGroupSelect(groupKey);
+		populateAreaSelect(groupKey, layer.name);
+		applyPredefinedLayerSelection(layer);
+	};
+
+	var refreshPredefinedLayerDropdowns = function() {
+		hidePredefinedLayersListMessage();
+		resetPredefinedLayerDropdowns();
+
+		if (!predefinedLayers.length) {
+			var __t = window.__t || function(s) { return s; };
+			var emptyLabel = __t('predefined_selection_empty');
+			if (emptyLabel === 'predefined_selection_empty') {
+				emptyLabel = 'No predefined search areas available.';
+			}
+			setPredefinedLayersListMessage(emptyLabel);
+			return;
+		}
+
+		restorePredefinedLayerSelection();
 	};
 
 	/**
@@ -405,8 +647,7 @@ console.log("Hello, world!");
 				if (data && data.layers) {
 
 					predefinedLayers = data.layers;
-
-					updateWmsLayersTable();
+					refreshPredefinedLayerDropdowns();
 				} else {
 					var emptyLabel = __t('predefined_selection_empty');
 					if (emptyLabel === 'predefined_selection_empty') {
@@ -425,99 +666,6 @@ console.log("Hello, world!");
 			}
 		});
 	};
-
-	/**
-	  * 
-	  */
-	var updateWmsLayersTable = function(searchText) {
-
-		// clears the table rows by removing the table body
-		jQuery('#layerSelectorTable > tbody').remove();
-
-		if (!predefinedLayers.length) {
-			var __t = window.__t || function(s) { return s; };
-			var emptyLabel = __t('predefined_selection_empty');
-			if (emptyLabel === 'predefined_selection_empty') {
-				emptyLabel = 'No predefined search areas available.';
-			}
-			setPredefinedLayersListMessage(emptyLabel);
-			return;
-		}
-
-		predefinedLayers.forEach((layer) => {
-
-			//
-			// creates the table rows using the layer names witch match the search text
-			//		
-
-			if (layer.title.toLowerCase().indexOf(searchText) >= 0 || !searchText) {
-
-				var rowId = "layerSelectorTableRow_" + GIAPI.random();
-
-				jQuery('#layerSelectorTable').append('<tr id="' + rowId + '"><td>' + layer.title + '</td></tr>');
-			}
-
-			//
-			// set the click listener which shows add the layer and its bbox
-			//
-
-			jQuery(document).on('click', '#' + rowId, function() {
-
-				if ($('#' + rowId + ' > td').hasClass('highlighted')) {
-
-					$('#layerSelectorTable td').removeClass('highlighted');
-					if (shapeLayer!=null){
-							resultsMapWidget.removeLayers(shapeLayer);
-						}
-						options.value.predefinedLayer = null;
-						shapeLayer = null;
-						
-					return;
-				}
-				options.value.predefinedLayer = layer.name;
-				$('#layerSelectorTable td').removeClass('highlighted');
-        
-				$('#' + rowId + ' > td').addClass('highlighted');
-        
-				var title = jQuery('#' + rowId + ' > td').text();
-
-				predefinedLayers.forEach((layer) => {
-
-					if (layer.title === title) {
-
-						//
-						// add the layers
-						//
-
-						var onlineArray = [];
-
-						var protocol = 'urn:ogc:serviceType:WebMapService:' + options.wmsVersion + ':HTTP';
-
-						var online = {
-
-							'function': 'download',
-							'name': layer.name,
-							'title': layer.title,
-							'protocol': protocol,
-							'url': resolveShapeWmsEndpoint()
-						};
-
-						onlineArray.push(online);
-
-						var mapLayers = GIAPI.LayersFactory.layers(onlineArray, 'urn:ogc:serviceType:WebMapService:');
-
-						if (shapeLayer!=null){
-							resultsMapWidget.removeLayers(shapeLayer);
-						}
-
-						resultsMapWidget.addLayers(mapLayers);
-						shapeLayer = mapLayers;
-					}
-				});
-			});
-		});
-	};
-
 
 	var create = function() {
 

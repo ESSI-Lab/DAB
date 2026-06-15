@@ -228,7 +228,7 @@ function attachPredefinedHelpToSectionTitle() {
 	var help = toolbarLabel(
 		t,
 		'predefined_selection_help',
-		'These polygons are used for search. Click a row to select it; click again to unselect it.'
+		'Choose a group, then a search area. The polygon is shown on the map and used in queries. Select "(no selection)" to clear the area.'
 	);
 
 	sectionTitle.append(GIAPI.UI_Utils.helpImage(
@@ -321,11 +321,12 @@ export function relocateSpatialControlToQueryPanel(config) {
 			maxWidth: 'none',
 			height: 'auto',
 			marginTop: '0',
-			marginLeft: '0'
+			marginLeft: '0',
+			background: 'transparent',
+			border: 'none',
+			padding: '0'
 		});
-		jQuery('#layerNameSearchInput').css({ width: '100%', boxSizing: 'border-box' });
-		jQuery('#layerSelectorDiv div[style*="overflow-y"]').css({ maxHeight: '180px' });
-		jQuery('#layerSelectorDiv #wrapLayerSelectorTable th').hide();
+		jQuery('#predefinedGroupSelect, #predefinedAreaSelect').css({ width: '100%', boxSizing: 'border-box' });
 	}
 
 	mapControl.find('.map-control-div').css('display', 'none');

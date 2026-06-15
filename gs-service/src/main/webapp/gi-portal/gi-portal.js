@@ -1232,7 +1232,10 @@ function initializeLogin(config) {
 			const deleteSelectedBtn = $('<button type="button" class="login-button shapes-delete-selected-btn">').css({ 'marginLeft': '8px' })
 				.html('<i class="fa fa-trash"></i> ' + t('shapes_delete_selected'))
 				.prop('disabled', true);
-			toolbar.append(refreshBtn).append(harvestBtn).append(deleteSelectedBtn);
+			const saveChangesBtn = $('<button type="button" class="login-button shapes-save-changes-btn">').css({ 'marginLeft': '8px' })
+				.html('<i class="fa fa-check"></i> ' + t('shapes_save'))
+				.prop('disabled', true);
+			toolbar.append(refreshBtn).append(harvestBtn).append(saveChangesBtn).append(deleteSelectedBtn);
 
 			const listWrapper = $('<div>').css({ 'maxHeight': '320px', 'overflowY': 'auto', 'border': '1px solid #ddd', 'borderRadius': '4px' });
 			const listTable = $('<table class="predefined-shapes-table">').css({ 'width': '100%', 'borderCollapse': 'collapse' });
@@ -1246,8 +1249,7 @@ function initializeLogin(config) {
 				.append('<th>' + t('shapes_col_group') + '</th>')
 				.append('<th>' + t('shapes_col_name') + '</th>')
 				.append('<th>' + t('shapes_col_identifier') + '</th>')
-				.append('<th>' + t('shapes_col_owner') + '</th>')
-				.append('<th style="width:48px;"></th>');
+				.append('<th>' + t('shapes_col_owner') + '</th>');
 			listTable.append(listHead);
 			const listBody = $('<tbody id="predefined-shapes-list-body">');
 			listTable.append(listBody);
@@ -1379,7 +1381,7 @@ function initializeLogin(config) {
 				selectAllCb.prop('indeterminate', checkedCount > 0 && checkedCount < rowCheckboxes.length);
 			}
 
-			function updateSaveButtonState(row) {
+			function isRowDirty(row) {
 				const idInput = row.find('.shapes-id-input');
 				const nameInput = row.find('.shapes-name-input');
 				const groupInput = row.find('.shapes-group-input');
@@ -1390,73 +1392,146 @@ function initializeLogin(config) {
 				if (isAdmin) {
 					dirty = dirty || ownerInput.val().trim() !== ownerInput.data('original');
 				}
-				row.find('.shapes-save-btn').prop('disabled', !dirty);
+				return dirty;
 			}
 
-			function saveEntry(row) {
+			function updateSaveChangesState() {
+				const dirtyCount = listBody.find('tr').filter(function() {
+					return isRowDirty($(this));
+				}).length;
+				saveChangesBtn.prop('disabled', dirtyCount === 0);
+			}
+
+			function buildUpdatePayload(row) {
 				const idInput = row.find('.shapes-id-input');
 				const nameInput = row.find('.shapes-name-input');
 				const groupInput = row.find('.shapes-group-input');
 				const ownerInput = row.find('.shapes-owner-input');
-				const currentIdentifier = idInput.data('original');
-				const newIdentifier = idInput.val().trim();
-				const newName = nameInput.val().trim();
-				const newGroup = groupInput.val().trim();
-				const newOwner = ownerInput.val().trim();
-				if (!currentIdentifier) {
-					return;
-				}
-				if (!newIdentifier) {
-					statusDiv.text(t('shapes_update_invalid_identifier')).css('color', '#c0392b');
-					return;
-				}
-				if (!newName) {
-					statusDiv.text(t('shapes_update_invalid_name')).css('color', '#c0392b');
-					return;
-				}
-				statusDiv.text(t('shapes_saving')).css('color', '#2c3e50');
-				row.find('.shapes-save-btn').prop('disabled', true);
 				const payload = {
 					email: userEmail,
 					apiKey: authToken,
-					identifier: currentIdentifier,
-					newIdentifier: newIdentifier,
-					name: newName,
-					group: newGroup
+					identifier: idInput.data('original'),
+					newIdentifier: idInput.val().trim(),
+					name: nameInput.val().trim(),
+					group: groupInput.val().trim()
 				};
 				const portalShapeView = getPortalShapeView();
 				if (portalShapeView) {
 					payload.shapeView = portalShapeView;
 				}
 				if (isAdmin) {
-					payload.owner = newOwner;
+					payload.owner = ownerInput.val().trim();
 				}
-				fetch('../services/support/predefinedShapes/update', {
+				return payload;
+			}
+
+			function validateUpdatePayload(payload) {
+				if (!payload.identifier) {
+					return t('shapes_update_error');
+				}
+				if (!payload.newIdentifier) {
+					return t('shapes_update_invalid_identifier');
+				}
+				if (!payload.name) {
+					return t('shapes_update_invalid_name');
+				}
+				return null;
+			}
+
+			function saveEntry(row) {
+				const payload = buildUpdatePayload(row);
+				const validationError = validateUpdatePayload(payload);
+				if (validationError) {
+					return Promise.resolve({ success: false, message: validationError });
+				}
+				return fetch('../services/support/predefinedShapes/update', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(payload)
 				})
 					.then(function(r) { return r.json(); })
 					.then(function(data) {
-						if (data.success) {
-							statusDiv.text(data.message).css('color', '#27ae60');
-							loadAreas();
-						} else {
-							statusDiv.text(data.message || t('shapes_update_error')).css('color', '#c0392b');
-							updateSaveButtonState(row);
-						}
+						return {
+							success: !!data.success,
+							message: data.message || (data.success ? '' : t('shapes_update_error'))
+						};
 					})
 					.catch(function() {
-						statusDiv.text(t('shapes_update_error')).css('color', '#c0392b');
-						updateSaveButtonState(row);
+						return { success: false, message: t('shapes_update_error') };
 					});
+			}
+
+			function saveAllDirtyEntries() {
+				const dirtyRows = listBody.find('tr').filter(function() {
+					return isRowDirty($(this));
+				});
+				if (dirtyRows.length === 0) {
+					statusDiv.text(t('shapes_save_none')).css('color', '#c0392b');
+					return;
+				}
+
+				const payloads = [];
+				const seenIdentifiers = new Set();
+				for (let i = 0; i < dirtyRows.length; i++) {
+					const row = $(dirtyRows[i]);
+					const payload = buildUpdatePayload(row);
+					const validationError = validateUpdatePayload(payload);
+					if (validationError) {
+						statusDiv.text(validationError).css('color', '#c0392b');
+						return;
+					}
+					if (seenIdentifiers.has(payload.newIdentifier)) {
+						statusDiv.text(t('shapes_update_invalid_identifier')).css('color', '#c0392b');
+						return;
+					}
+					seenIdentifiers.add(payload.newIdentifier);
+					payloads.push({ row: row, payload: payload });
+				}
+
+				saveChangesBtn.prop('disabled', true);
+				let index = 0;
+				let saved = 0;
+				let lastError = null;
+
+				function saveNext() {
+					if (index >= payloads.length) {
+						if (lastError) {
+							return;
+						}
+						statusDiv.text(t('shapes_save_success', { count: saved })).css('color', '#27ae60');
+						loadAreas();
+						return;
+					}
+
+					const item = payloads[index];
+					index++;
+					statusDiv.text(t('shapes_saving_progress', { current: index, total: payloads.length })).css('color', '#2c3e50');
+
+					saveEntry(item.row).then(function(result) {
+						if (result.success) {
+							saved++;
+							saveNext();
+							return;
+						}
+						lastError = result.message || t('shapes_update_error');
+						statusDiv.text(lastError).css('color', '#c0392b');
+						if (saved > 0) {
+							loadAreas();
+						} else {
+							updateSaveChangesState();
+						}
+					});
+				}
+
+				saveNext();
 			}
 
 			function renderEntries(entries) {
 				listBody.empty();
 				if (!entries || entries.length === 0) {
-					listBody.append('<tr><td colspan="7" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
+					listBody.append('<tr><td colspan="6" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
 					updateDeleteSelectedState();
+					updateSaveChangesState();
 					return;
 				}
 				entries.forEach(function(entry) {
@@ -1477,32 +1552,31 @@ function initializeLogin(config) {
 						.data('original', entry.owner || '')
 						.prop('disabled', !isAdmin)
 						.attr('title', isAdmin ? '' : formatOwnerLabel(entry.owner, entry.legacy));
-					const saveBtn = $('<button type="button" class="menu-button shapes-save-btn" disabled>')
-						.attr('title', t('shapes_save'))
-						.html('<i class="fa fa-check"></i>');
-					idInput.on('input', function() { updateSaveButtonState(row); });
-					nameInput.on('input', function() { updateSaveButtonState(row); });
-					groupInput.on('input', function() { updateSaveButtonState(row); });
+					function onFieldInput() {
+						updateSaveChangesState();
+					}
+					idInput.on('input', onFieldInput);
+					nameInput.on('input', onFieldInput);
+					groupInput.on('input', onFieldInput);
 					if (isAdmin) {
-						ownerInput.on('input', function() { updateSaveButtonState(row); });
+						ownerInput.on('input', onFieldInput);
 					}
 					idInput.add(nameInput).add(groupInput).add(isAdmin ? ownerInput : $()).on('keydown', function(e) {
-						if (e.key === 'Enter' && !saveBtn.prop('disabled')) {
+						if (e.key === 'Enter' && !saveChangesBtn.prop('disabled')) {
 							e.preventDefault();
-							saveEntry(row);
+							saveAllDirtyEntries();
 						}
 					});
-					saveBtn.on('click', function() { saveEntry(row); });
 					row.append($('<td>').css('textAlign', 'center').append(selectCb));
 					row.append($('<td>').html(selectionCell(entry)));
 					row.append($('<td>').append(groupInput));
 					row.append($('<td>').append(nameInput));
 					row.append($('<td>').append(idInput));
 					row.append($('<td>').append(ownerInput));
-					row.append($('<td>').css('textAlign', 'center').append(saveBtn));
 					listBody.append(row);
 				});
 				updateDeleteSelectedState();
+				updateSaveChangesState();
 			}
 
 			function loadAreas() {
@@ -1572,6 +1646,7 @@ function initializeLogin(config) {
 
 			refreshBtn.on('click', loadAreas);
 			harvestBtn.on('click', triggerHarvest);
+			saveChangesBtn.on('click', saveAllDirtyEntries);
 
 			selectAllCb.on('change', function() {
 				const checked = selectAllCb.is(':checked');
