@@ -8,7 +8,7 @@
 	"stationPageMapZoom" : 10,
 	"minZoom" : 6,
 	"maxZoom" : 10,
-	"token" : "his_central_test-b83fcd12-c1a7-4de2-9ab5-74c3f93167b1",
+	"token" : "his_central-568a4888-d6bd-4be3-b7a6-d9887997bb0f",
 	"toolbarLayout": true,
 	"showResultOverview": false,
 	"resultTitleFromObservedProperty": true,
