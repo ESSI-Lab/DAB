@@ -13,12 +13,12 @@ package eu.essi_lab.authorization.userfinder;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -26,7 +26,6 @@ package eu.essi_lab.authorization.userfinder;
 
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
-import eu.essi_lab.authentication.*;
 import eu.essi_lab.authentication.token.*;
 import eu.essi_lab.authorization.*;
 import eu.essi_lab.cfga.gs.*;
@@ -61,11 +60,8 @@ public class UserFinder {
     }
 
     private static List<GSUser> users;
-    private static final ExpiringCache<View> VIEWS = new ExpiringCache<>();
 
-    static {
-	VIEWS.setDuration(VIEWS_CACHE_DURATION);
-    }
+    private final ViewManager viewManager;
 
     /**
      * @author Fabrizio
@@ -109,7 +105,6 @@ public class UserFinder {
     private Optional<String> authProvider;
     private StringBuilder logBuilder;
 
-    private ViewsReader viewsReader;
     private UsersWriter usersWriter;
     private UsersReader usersReader;
 
@@ -118,9 +113,11 @@ public class UserFinder {
     /**
      *
      */
-    public UserFinder() {
+    private UserFinder() {
 
 	tokenProvider = new TokenProvider();
+
+	viewManager = new ViewManager();
     }
 
     /**
@@ -134,7 +131,7 @@ public class UserFinder {
 	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
 	DatabaseReader reader = DatabaseProviderFactory.getReader(storageInfo);
 
-	finder.setWiewsReader(reader);
+	finder.viewManager.setDatabaseReader(reader);
 
 	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty()) {
 
@@ -284,14 +281,6 @@ public class UserFinder {
     }
 
     /**
-     * @param reader
-     */
-    public void setWiewsReader(ViewsReader reader) {
-
-	this.viewsReader = reader;
-    }
-
-    /**
      * @param writer
      */
     public void setUsersWriter(UsersWriter writer) {
@@ -406,12 +395,12 @@ public class UserFinder {
 
 	    Optional<String> viewId = webRequest.extractViewId();
 
-	    viewId.ifPresent(id -> {
+	    if (viewId.isPresent()) {
 
-		logBuilder.append("\n- View id: " + id);
-		identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_IDENTIFIER.getType(), id));
+		logBuilder.append("\n- View id: " + viewId.get());
+		identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_IDENTIFIER.getType(), viewId.get()));
 
-		Optional<String> creator = getViewCreator(id);
+		Optional<String> creator = getViewCreator(viewId.get());
 
 		if (creator.isPresent()) {
 
@@ -419,7 +408,7 @@ public class UserFinder {
 
 		    identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_CREATOR.getType(), creator.get()));
 		}
-	    });
+	    }
 	}
 
 	//
@@ -493,50 +482,15 @@ public class UserFinder {
     }
 
     /**
-     * @param identifier
-     * @return
-     * @throws GSException
-     */
-    protected Optional<View> getView(String identifier) {
-
-	if (identifier == null) {
-
-	    return Optional.empty();
-	}
-
-	Optional<View> view = Optional.ofNullable(VIEWS.get(identifier));
-
-	if (view.isEmpty()) {
-
-	    try {
-		view = viewsReader.getView(identifier);
-
-		view.ifPresent(value -> VIEWS.put(identifier, value));
-
-	    } catch (GSException e) {
-
-		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	    }
-	}
-
-	return view;
-    }
-
-    /**
      * @param id
      * @return
      */
-    private Optional<String> getViewCreator(String id) {
+    private Optional<String> getViewCreator(String id) throws Exception {
 
-	Optional<View> view = getView(id);
+	Optional<View> view = viewManager.getView(id);
 
-	if (view.isPresent()) {
-	    // we can extract the creator of the view
+	if (view.isEmpty()) {
 
-	    return Optional.ofNullable(view.get().getCreator());
-	} else {
-
-	    // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))
 	    Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(id);
 
 	    if (dynamicView.isPresent()) {
@@ -549,19 +503,14 @@ public class UserFinder {
 
 			if (operand instanceof ViewBond viewBond) {
 
-			    view = getView(viewBond.getViewIdentifier());
-
-			    if (view.isPresent()) {
-
-				return Optional.of(view.get().getCreator());
-			    }
+			    view = viewManager.getView(viewBond.getViewIdentifier());
 			}
 		    }
 		}
 	    }
 	}
 
-	return Optional.empty();
+	return view.map(View::getCreator);
     }
 
     /**
