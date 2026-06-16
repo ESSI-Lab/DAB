@@ -877,7 +877,7 @@ public class SupportService {
 
 	try {
 
-	    UserFinder uf = UserFinder.create();
+	    UserFinder uf = UserFinder.get();
 	    List<GSUser> users = uf.getUsers(false);
 
 	    for (GSUser user : users) {
@@ -953,7 +953,7 @@ public class SupportService {
 		listResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.get();
 		    List<GSUser> users = uf.getUsers(false);
 		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
 		    GSUser adminUser = null;
@@ -1012,7 +1012,7 @@ public class SupportService {
 		basicResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.get();
 		    List<GSUser> users = uf.getUsers(false);
 		    GSUser targetUser = null;
 		    for (GSUser user : users) {
@@ -1066,7 +1066,7 @@ public class SupportService {
 		basicResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.get();
 		    List<GSUser> users = uf.getUsers(false);
 		    GSUser targetUser = null;
 		    for (GSUser user : users) {
@@ -1120,7 +1120,7 @@ public class SupportService {
 		listResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.get();
 		    List<GSUser> users = uf.getUsers(false);
 		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
 		    GSUser adminUser = null;

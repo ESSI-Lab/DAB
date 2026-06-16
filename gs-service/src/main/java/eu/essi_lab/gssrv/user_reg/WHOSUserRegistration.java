@@ -169,14 +169,14 @@ public class WHOSUserRegistration {
 
     public static void activateUser(String id) throws Exception {
 
-	UserFinder finder = UserFinder.create();
+	UserFinder finder = UserFinder.get();
 
 	finder.enableUser(id);
     }
 
     public GSUser addUser() throws Exception {
 
-	UserFinder finder = UserFinder.create();
+	UserFinder finder = UserFinder.get();
 
 	String id = "whos-" + UUID.randomUUID().toString();
 	GSUser user = new GSUser(id,  UserIdentifierType.USER_TOKEN, "whos");
@@ -211,7 +211,7 @@ public class WHOSUserRegistration {
     public static List<WHOSUserRegistration> getUsers() throws Exception {
 
 	List<WHOSUserRegistration> ret = new ArrayList<>();
-	UserFinder finder = UserFinder.create();
+	UserFinder finder = UserFinder.get();
 
 	List<GSUser> users = finder.getUsers(false);
 	for (GSUser user : users) {

@@ -98,7 +98,7 @@ public class HISUserRegistration {
 
     public static void activateUser(String id) throws Exception {
 
-	UserFinder finder = UserFinder.create();
+	UserFinder finder = UserFinder.get();
 
 	finder.enableUser(id);
     }
@@ -107,7 +107,7 @@ public class HISUserRegistration {
     public static List<HISUserRegistration> getUsers() throws Exception {
 
 	List<HISUserRegistration> ret = new ArrayList<>();
-	UserFinder finder = UserFinder.create();
+	UserFinder finder = UserFinder.get();
 
 	List<GSUser> users = finder.getUsers(false);
 
@@ -269,7 +269,7 @@ public class HISUserRegistration {
 
     public GSUser addUser() throws Exception {
 
-	UserFinder finder = UserFinder.create();
+	UserFinder finder = UserFinder.get();
 
 	String id = "his_central-" + UUID.randomUUID().toString();
 

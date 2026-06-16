@@ -50,9 +50,7 @@ public class UserFinder {
 
     private static final long USERS_UPDATE_PERIOD = TimeUnit.MINUTES.toMillis(30);
     private static final UsersCacheUpdater USERS_UPDATER_TASK = new UsersCacheUpdater();
-
-    private static final long VIEWS_CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
-
+    
     static {
 
 	Timer timer = new Timer();
@@ -124,7 +122,7 @@ public class UserFinder {
      * @return
      * @throws GSException
      */
-    public static UserFinder create() throws GSException {
+    public static UserFinder get() throws GSException {
 
 	UserFinder finder = new UserFinder();
 
@@ -160,7 +158,7 @@ public class UserFinder {
      */
     public static GSUser findCurrentUser(HttpServletRequest request) throws GSException {
 
-	UserFinder finder = create();
+	UserFinder finder = get();
 
 	GSUser user = null;
 
