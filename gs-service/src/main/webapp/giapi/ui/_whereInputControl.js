@@ -37,6 +37,12 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		return groupKey;
 	};
 
+	var clearBboxLabel = function() {
+		var __t = window.__t || function(s) { return s; };
+		var label = __t('clear_bbox');
+		return label === 'clear_bbox' ? 'Clear bounding box' : label;
+	};
+
 	var buildGroupIndex = function(layers) {
 		var groups = {};
 		layers.forEach(function(layer) {
@@ -966,7 +972,7 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			closeButton = GIAPI.FontAwesomeButton({
 				'id': GIAPI.random(),
 				'width': 85,
-				'label': __t('clear'),
+				'label': clearBboxLabel(),
 				'icon': 'fa-times',
 
 				'handler': function() {

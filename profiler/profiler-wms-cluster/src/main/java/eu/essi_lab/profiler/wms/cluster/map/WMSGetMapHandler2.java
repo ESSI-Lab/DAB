@@ -106,6 +106,8 @@ import eu.essi_lab.profiler.wms.cluster.WMSRequest.Parameter;
  */
 public class WMSGetMapHandler2 extends StreamingRequestHandler {
 
+    private static final String ITA_ISPRA_ANNALI_SOURCE_ID = "ita-ispra-annali";
+
     @Override
     public ValidationMessage validate(WebRequest request) throws GSException {
 
@@ -216,6 +218,60 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    break;
 	case "uruguay-inumet":
 	    hexacode = "#2222cc";
+	    break;
+	case "ita-sir-lombardia":
+	    hexacode = "#CC00CC";
+	    break;
+	case "ita-sir-piemonte":
+	    hexacode = "#99FF33";
+	    break;
+	case "ita-sir-arpa-puglia":
+	    hexacode = "#FFCC99";
+	    break;
+	case "ita-sir-sardegna":
+	    hexacode = "#6600CC";
+	    break;
+	case "ita-sir-veneto":
+	    hexacode = "#D3A77B";
+	    break;
+	case "ita-sir-liguria":
+	    hexacode = "#CC99FF";
+	    break;
+	case "ita-sir-emilia-romagna":
+	    hexacode = "#00CCFF";
+	    break;
+	case "ita-sir-emilia-romagna-simc":
+	    hexacode = "#3333FF";
+	    break;
+	case "ita-sir-bolzano":
+	    hexacode = "#FFFF00";
+	    break;
+	case "ita-sir-basilicata":
+	    hexacode = "#B40000";
+	    break;
+	case "ita-sir-lazio":
+	    hexacode = "#FF0000";
+	    break;
+	case "ita-sir-marche":
+	    hexacode = "#009900";
+	    break;
+	case "ita-sir-puglia":
+	    hexacode = "#FF9900";
+	    break;
+	case "ita-sir-toscana":
+	    hexacode = "#00FFCC";
+	    break;
+	case "ita-sir-umbria":
+	    hexacode = "#FF66CC";
+	    break;
+	case "ita-sir-valle-d-aosta":
+	    hexacode = "#996633";
+	    break;
+	case "ita-sir-friuli-venezia-giulia":
+	    hexacode = "#FFFFCC";
+	    break;
+	case "ita-ispra-annali":
+	    hexacode = "#FFFFFF";
 	    break;
 	}
 	// switch (sourceId) {
@@ -768,6 +824,16 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 				    stations.add(station);
 				}
 
+				// draw annali triangles first so they remain visible under overlapping circles
+				stations.sort((a, b) -> {
+				    boolean aAnnali = ITA_ISPRA_ANNALI_SOURCE_ID.equals(a.getSourceIdentifier());
+				    boolean bAnnali = ITA_ISPRA_ANNALI_SOURCE_ID.equals(b.getSourceIdentifier());
+				    if (aAnnali == bAnnali) {
+					return 0;
+				    }
+				    return aAnnali ? -1 : 1;
+				});
+
 				// draws each station
 				for (StationRecord station : stations) {
 
@@ -800,18 +866,23 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 					color = getRandomColorFromSourceId(sourceId, finalAvailability);
 				    }
 				    Color ac = new Color(color.getRed(), color.getGreen(), color.getBlue());
-				    ig2.setColor(ac);
-				    int stationMinX = stationCenterX - (stationDiameterInPixels) / 2;
-				    int stationMinY = stationCenterY - (stationDiameterInPixels) / 2;
-				    int stationMaxX = stationCenterX + (stationDiameterInPixels) / 2;
-				    int stationMaxY = stationCenterY + (stationDiameterInPixels) / 2;
-				    if (stationMaxX < 0 || stationMinX >= width || stationMaxY < 0 || stationMinY >= height) {
+				    boolean drawTriangle = ITA_ISPRA_ANNALI_SOURCE_ID.equals(sourceId);
+				    int markerHalfX;
+				    int markerHalfY;
+				    if (drawTriangle) {
+					int triangleHeight = (int) Math.round(stationDiameterInPixels * 1.4);
+					markerHalfX = (int) Math.round(triangleHeight / Math.sqrt(3));
+					markerHalfY = (2 * triangleHeight) / 3;
+				    } else {
+					markerHalfX = stationDiameterInPixels / 2;
+					markerHalfY = stationDiameterInPixels / 2;
+				    }
+				    if (stationCenterX + markerHalfX < 0 || stationCenterX - markerHalfX >= width
+					    || stationCenterY + markerHalfY < 0 || stationCenterY - markerHalfY >= height) {
 					continue;
 				    }
 
-				    ig2.fillOval(stationMinX, stationMinY, stationDiameterInPixels, stationDiameterInPixels);
-				    ig2.setColor(Color.black);
-				    ig2.drawOval(stationMinX, stationMinY, stationDiameterInPixels, stationDiameterInPixels);
+				    drawStationMarker(ig2, stationCenterX, stationCenterY, stationDiameterInPixels, ac, drawTriangle);
 
 				}
 			    }
@@ -857,6 +928,29 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    color = new Color(color.getRed(), color.getGreen(), color.getBlue(), 200);
 	}
 	return color;
+    }
+
+    private void drawStationMarker(Graphics2D g2, int centerX, int centerY, int circleDiameter, Color fillColor,
+	    boolean triangle) {
+	if (triangle) {
+	    int height = (int) Math.round(circleDiameter * 1.4);
+	    double halfBase = height / Math.sqrt(3);
+	    int topY = centerY - (2 * height) / 3;
+	    int baseY = centerY + height / 3;
+	    int[] xs = { centerX, (int) Math.round(centerX - halfBase), (int) Math.round(centerX + halfBase) };
+	    int[] ys = { topY, baseY, baseY };
+	    g2.setColor(fillColor);
+	    g2.fillPolygon(xs, ys, 3);
+	    g2.setColor(Color.black);
+	    g2.drawPolygon(xs, ys, 3);
+	} else {
+	    int minX = centerX - circleDiameter / 2;
+	    int minY = centerY - circleDiameter / 2;
+	    g2.setColor(fillColor);
+	    g2.fillOval(minX, minY, circleDiameter, circleDiameter);
+	    g2.setColor(Color.black);
+	    g2.drawOval(minX, minY, circleDiameter, circleDiameter);
+	}
     }
 
     /**

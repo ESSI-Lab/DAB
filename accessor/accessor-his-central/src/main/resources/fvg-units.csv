@@ -14,11 +14,11 @@ HN_MIN;Altezza neve minima;m
 H_neve;Altezza strato nevoso;m
 BF;Bagnatura fogliare;minuti (0-60)
 BF_TOT;Bagnatura fogliare totale;minuti (0-1440)
-DD10;Direzione del vento a 10m;°N (0-360)
-DD2;Direzione del vento a 2m;°N (0-360)
-DD10MAX;Direzione della raffica massima a 10m;°N (0-360)
-DD2MAX;Direzione della raffica massima del vento a 2m;°N (0-360)
-DD2_MAX;Direzione della raffica massima del vento a 2m;°N (0-360)
+DD10;Direzione del vento a 10m;Â°N (0-360)
+DD2;Direzione del vento a 2m;Â°N (0-360)
+DD10MAX;Direzione della raffica massima a 10m;Â°N (0-360)
+DD2MAX;Direzione della raffica massima del vento a 2m;Â°N (0-360)
+DD2_MAX;Direzione della raffica massima del vento a 2m;Â°N (0-360)
 MIN_V10_E;Durata del vento a 10m da E;minuti (0-1440)
 MIN_V10_N;Durata del vento a 10m da N;minuti (0-1440)
 MIN_V10_NE;Durata del vento a 10m da NE;minuti (0-1440)
@@ -43,56 +43,56 @@ PRESS_M;Pressione ridotta a livello del mare;hPa
 RG;Radiazione globale;kJ/m2
 RG_TOT;Radiazione globale totale;kJ/m2
 RG_Riflessa;Radiazione solare riflessa;kJ/m2
-T180;Temperatura aria a 180cm;°C
-T50;Temperatura aria a 50 cm;°C
-T20;Temperatura dell'aria a 20 cm;°C
-TGrotta;Temperatura grotta;°C
-Tmare;Temperatura mare;°C
-T0_MAX;Temperatura massima a 0 cm;°C
-T-10_MAX;Temperatura massima a -10 cm;°C
-T180_MAX;Temperatura massima a 180 cm;°C
-T20_MAX;Temperatura massima a 20 cm;°C
-T-20_MAX;Temperatura massima a -20 cm;°C
-T50_MAX;Temperatura massima a 50 cm;°C
-Tmare_MAX;Temperatura massima del mare;°C
-TGrotta_MAX;Temperatura massima della grotta;°C
-T0_MED;Temperatura media a 0 cm;°C
-T-10_MED;Temperatura media a -10 cm;°C
-T180_MED;Temperatura media a 180 cm;°C
-T20_MED;Temperatura media a 20 cm;°C
-T-20_MED;Temperatura media a -20 cm;°C
-T50_MED;Temperatura media a 50 cm;°C
-Tmare_MED;Temperatura media del mare;°C
-TGrotta_MED;Temperatura media della grotta;°C
-T0_MIN;Temperatura minima a 0 cm;°C
-T-10_MIN;Temperatura minima a -10 cm;°C
-T180_MIN;Temperatura minima a 180 cm;°C
-T20_MIN;Temperatura minima a 20 cm;°C
-T-20_MIN;Temperatura minima a -20 cm;°C
-T50_MIN;Temperatura minima a 50 cm;°C
-Tmare_MIN;Temperatura minima del mare;°C
-TGrotta_MIN;Temperatura minima della grotta;°C
-T0;Temperatura suolo a 0 cm;°C
-T-10;Temperatura suolo a -10 cm;°C
-T-20;Temperatura suolo a -20 cm;°C
+T180;Temperatura aria a 180cm;Â°C
+T50;Temperatura aria a 50 cm;Â°C
+T20;Temperatura dell'aria a 20 cm;Â°C
+TGrotta;Temperatura grotta;Â°C
+Tmare;Temperatura mare;Â°C
+T0_MAX;Temperatura massima a 0 cm;Â°C
+T-10_MAX;Temperatura massima a -10 cm;Â°C
+T180_MAX;Temperatura massima a 180 cm;Â°C
+T20_MAX;Temperatura massima a 20 cm;Â°C
+T-20_MAX;Temperatura massima a -20 cm;Â°C
+T50_MAX;Temperatura massima a 50 cm;Â°C
+Tmare_MAX;Temperatura massima del mare;Â°C
+TGrotta_MAX;Temperatura massima della grotta;Â°C
+T0_MED;Temperatura media a 0 cm;Â°C
+T-10_MED;Temperatura media a -10 cm;Â°C
+T180_MED;Temperatura media a 180 cm;Â°C
+T20_MED;Temperatura media a 20 cm;Â°C
+T-20_MED;Temperatura media a -20 cm;Â°C
+T50_MED;Temperatura media a 50 cm;Â°C
+Tmare_MED;Temperatura media del mare;Â°C
+TGrotta_MED;Temperatura media della grotta;Â°C
+T0_MIN;Temperatura minima a 0 cm;Â°C
+T-10_MIN;Temperatura minima a -10 cm;Â°C
+T180_MIN;Temperatura minima a 180 cm;Â°C
+T20_MIN;Temperatura minima a 20 cm;Â°C
+T-20_MIN;Temperatura minima a -20 cm;Â°C
+T50_MIN;Temperatura minima a 50 cm;Â°C
+Tmare_MIN;Temperatura minima del mare;Â°C
+TGrotta_MIN;Temperatura minima della grotta;Â°C
+T0;Temperatura suolo a 0 cm;Â°C
+T-10;Temperatura suolo a -10 cm;Â°C
+T-20;Temperatura suolo a -20 cm;Â°C
 TINS;Tempo di insolazione;minuti (0-60)
 TINS_TOT;Tempo di insolazione totale;minuti (0-1440)
-RH_MAX;Umidità massima;%
-RH_MED;Umidità media;%
-RH_MIN;Umidità minima;%
-RH;Umidità relativa;%
-FF10;Velocità del vento a 10m;m/s
-FF2;Velocità del vento a 2m;m/s
-FF10MAX;Velocità della raffica massima del vento a 10m;m/s
-FF2MAX;Velocità della raffica massima del vento a 2m;m/s
-FF2_MAX;Velocità massima della raffica del vento a 2m;m/s
-V10_E;Velocità media del vento a 10 da E;m/s
-V10_N;Velocità media del vento a 10 da N;m/s
-V10_NE;Velocità media del vento a 10 da NE;m/s
-V10_NW;Velocità media del vento a 10 da NW;m/s
-V10_S;Velocità media del vento a 10 da S;m/s
-V10_SE;Velocità media del vento a 10 da SE;m/s
-V10_SW;Velocità media del vento a 10 da SW;m/s
-V10_W;Velocità media del vento a 10 da W;m/s
-V10_MED;Velocità media del vento a 10m;m/s
-V2_MED;Velocità media del vento a 2m;m/s
+RH_MAX;UmiditÃ  massima;%
+RH_MED;UmiditÃ  media;%
+RH_MIN;UmiditÃ  minima;%
+RH;UmiditÃ  relativa;%
+FF10;VelocitÃ  del vento a 10m;m/s
+FF2;VelocitÃ  del vento a 2m;m/s
+FF10MAX;VelocitÃ  della raffica massima del vento a 10m;m/s
+FF2MAX;VelocitÃ  della raffica massima del vento a 2m;m/s
+FF2_MAX;VelocitÃ  massima della raffica del vento a 2m;m/s
+V10_E;VelocitÃ  media del vento a 10 da E;m/s
+V10_N;VelocitÃ  media del vento a 10 da N;m/s
+V10_NE;VelocitÃ  media del vento a 10 da NE;m/s
+V10_NW;VelocitÃ  media del vento a 10 da NW;m/s
+V10_S;VelocitÃ  media del vento a 10 da S;m/s
+V10_SE;VelocitÃ  media del vento a 10 da SE;m/s
+V10_SW;VelocitÃ  media del vento a 10 da SW;m/s
+V10_W;VelocitÃ  media del vento a 10 da W;m/s
+V10_MED;VelocitÃ  media del vento a 10m;m/s
+V2_MED;VelocitÃ  media del vento a 2m;m/s
