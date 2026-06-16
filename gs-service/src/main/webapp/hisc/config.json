@@ -13,7 +13,7 @@
 	"showResultOverview": false,
 	"resultTitleFromObservedProperty": true,
 	"resultsVisibility": "hidden",
-	"performStartupQuery": false,
+	"performStartupQuery": true,
 	"bboxSelectorVisibility" : false,
 	"layersSelectorVisibility" : true,
 	"layersSelectorButtonVisibility" : true,

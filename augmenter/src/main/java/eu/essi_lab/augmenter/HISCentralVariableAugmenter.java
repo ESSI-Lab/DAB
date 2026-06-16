@@ -44,6 +44,37 @@ import eu.essi_lab.model.resource.GSResource;
  */
 public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSetting> {
 
+    private static final String[] CORE_VARIABLE_URIS =
+
+	    new String[]{
+		    "hydro-ontology/concept/49",//
+		    "hydro-ontology/concept/65",//
+		    "hydro-ontology/concept/133",//
+		    "hydro-ontology/concept/33",//
+		    "hydro-ontology/concept/11",//
+		    "hydro-ontology/concept/67",//
+		    "hydro-ontology/concept/78",//
+		    "hydro-ontology/concept/9",//
+		    "hydro-ontology/concept/105",//
+		    "hydro-ontology/concept/5167",//
+		    "hydro-ontology/concept/55",//
+		    "hydro-ontology/concept/5327",//
+		    "hydro-ontology/concept/5262",//
+		    "hydro-ontology/concept/68",//
+		    "hydro-ontology/concept/40",//
+		    "hydro-ontology/concept/51",//
+		    "hydro-ontology/concept/47",//
+		    "hydro-ontology/concept/51b",//
+		    "hydro-ontology/concept/141",//
+		    "hydro-ontology/concept/19",//
+		    "hydro-ontology/concept/5318",//
+		    "hydro-ontology/concept/2252",//
+		    "hydro-ontology/concept/2277"
+
+
+    }
+	    ;
+
     public HISCentralVariableAugmenter() {
 
     }
@@ -69,6 +100,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 
 	    if (uri.get().contains("his-central-ontology")) {
 		GSLoggerFactory.getLogger(getClass()).info("HIS-Central Variable URI already present in original metadata");
+		setCoreVariableIfNeeded(extensionHandler);
 		return Optional.of(resource);
 	    } else if (uri.get().contains("codes.wmo.int")) {
 		List<SKOSConcept> concepts = ontology.findConcepts(uri.get(), false, true);
@@ -86,6 +118,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 		    extensionHandler.setObservedPropertyURI(concepts.get(0).getURI());
 		    GSLoggerFactory.getLogger(getClass()).info("HIS-Central variable augmenter success");
 		    GSLoggerFactory.getLogger(getClass()).warn("HIS-Central variable augmentation of current resource ENDED");
+		    setCoreVariableIfNeeded(extensionHandler);
 		    return Optional.of(resource);
 		}
 
@@ -104,6 +137,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 	if (variable == null) {
 	    GSLoggerFactory.getLogger(getClass())
 		    .info("Unable to variable augment this resource.. no variable information in original metadata");
+	    setCoreVariableIfNeeded(extensionHandler);
 	    return Optional.of(resource);
 	}
 	try {
@@ -127,12 +161,26 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    GSLoggerFactory.getLogger(getClass()).warn("Exception occurred unit augmenting this resource");
+	    setCoreVariableIfNeeded(extensionHandler);
 	    return Optional.of(resource);
 	}
 
 	GSLoggerFactory.getLogger(getClass()).warn("HIS-Central variable augmentation of current resource ENDED");
+	setCoreVariableIfNeeded(extensionHandler);
 
 	return Optional.of(resource);
+    }
+
+    private void setCoreVariableIfNeeded(ExtensionHandler extensionHandler) {
+
+	extensionHandler.getObservedPropertyURI().ifPresent(observedPropertyURI -> {
+	    for(String coreVariable: CORE_VARIABLE_URIS){
+		if (observedPropertyURI.contains(coreVariable)) {
+		    extensionHandler.setCoreVariable(true);
+		}
+	    }
+
+	});
     }
 
     public List<SKOSConcept> getConcepts(String variable) {

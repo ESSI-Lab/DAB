@@ -272,17 +272,23 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    } catch (Exception e1) {
 		e1.printStackTrace();
 	    }
-	    Stats stats = sourceStats.getStatistics().get(s.getUniqueIdentifier());
+	    Stats stats = sourceStats != null ? sourceStats.getStatistics().get(s.getUniqueIdentifier()) : null;
+
+	    String sourceSummary = "Data provider: <b>" + s.getLabel() + "</b><br/>";
+	    if (stats != null) {
+		sourceSummary += "#Platforms: " + stats.getSiteCount() + "<br/>"//
+			+ "#Variables:" + stats.getAttributeCount() + "<br/>"//
+			+ "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
+			+ "Begin:" + stats.getBegin() + "<br/>"//
+			+ "End:" + stats.getEnd() + "<br/>"//
+			+ "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth() + "<br/>" //
+			+ "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>";
+	    } else {
+		sourceSummary += "<span style='color:red;'>Error: statistics unavailable for this source.</span><br/>";
+	    }
 
 	    content += "<tr><td colspan='15'><br/>"//
-		    + "Data provider: <b>" + s.getLabel() + "</b><br/>"//
-		    + "#Platforms: " + stats.getSiteCount() + "<br/>"//
-		    + "#Variables:" + stats.getAttributeCount() + "<br/>"//
-		    + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
-		    + "Begin:" + stats.getBegin() + "<br/>"//
-		    + "End:" + stats.getEnd() + "<br/>"//
-		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth() + "<br/>" //
-		    + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>"//
+		    + sourceSummary //
 		    + "</td></tr>" + "" //
 		    + "<tr>" + //
 		    // getHeader("#Platforms") + //
@@ -313,16 +319,18 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    }
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
-		Stats vs = sourceStats.getStatistics().get(s.getUniqueIdentifier());
-		ri.setSiteCount(vs.getSiteCount());
-		ri.setAttributeCount(vs.getAttributeCount());
-		ri.setTimeseriesCount(vs.getTimeSeriesCount());
-		ri.setBegin(vs.getBegin());
-		ri.setEnd(vs.getEnd());
-		ri.setWest(vs.getWest());
-		ri.setEast(vs.getEast());
-		ri.setSouth(vs.getSouth());
-		ri.setNorth(vs.getNorth());
+		Stats vs = sourceStats != null ? sourceStats.getStatistics().get(s.getUniqueIdentifier()) : null;
+		if (vs != null) {
+		    ri.setSiteCount(vs.getSiteCount());
+		    ri.setAttributeCount(vs.getAttributeCount());
+		    ri.setTimeseriesCount(vs.getTimeSeriesCount());
+		    ri.setBegin(vs.getBegin());
+		    ri.setEnd(vs.getEnd());
+		    ri.setWest(vs.getWest());
+		    ri.setEast(vs.getEast());
+		    ri.setSouth(vs.getSouth());
+		    ri.setNorth(vs.getNorth());
+		}
 
 	    }
 	    rows.sort(new Comparator<SimpleEntry<RowInfo, String>>() {
@@ -331,6 +339,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		public int compare(SimpleEntry<RowInfo, String> o1, SimpleEntry<RowInfo, String> o2) {
 		    String t1 = o1.getKey().getTimeseriesCount();
 		    String t2 = o2.getKey().getTimeseriesCount();
+		    if (t1==null||t2==null) {
+			return 0;
+		    }
 		    return Integer.valueOf(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
 		}
 	    });
