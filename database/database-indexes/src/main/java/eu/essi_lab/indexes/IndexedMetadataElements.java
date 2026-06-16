@@ -2191,6 +2191,17 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 	}
     };
+    public static final IndexedMetadataElement CORE_VARIABLE = new IndexedMetadataElement(MetadataElement.CORE_VARIABLE) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    resource.getExtensionHandler().getCoreVariable().ifPresent(coreVariable -> {
+
+		addValue(String.valueOf(coreVariable));
+
+	    });
+	}
+    };
     public static final IndexedMetadataElement EOP_POLARIZATION_MODE = new IndexedMetadataElement(MetadataElement.EOP_POLARIZATION_MODE) {
 	@Override
 	public void defineValues(GSResource resource) {
