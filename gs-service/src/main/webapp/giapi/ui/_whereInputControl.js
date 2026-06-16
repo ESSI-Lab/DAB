@@ -54,13 +54,23 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 		return groups;
 	};
 
+	var groupSortOrder = function(groupsByKey, groupKey) {
+		var layers = groupsByKey[groupKey] || [];
+		var order = Number.MAX_SAFE_INTEGER;
+		layers.forEach(function(layer) {
+			if (typeof layer.groupOrder === 'number' && Number.isInteger(layer.groupOrder) && layer.groupOrder < order) {
+				order = layer.groupOrder;
+			}
+		});
+		return order;
+	};
+
 	var sortedGroupKeys = function(groupsByKey) {
 		return Object.keys(groupsByKey).sort(function(a, b) {
-			if (a === PREDEFINED_NO_GROUP_KEY) {
-				return -1;
-			}
-			if (b === PREDEFINED_NO_GROUP_KEY) {
-				return 1;
+			var aOrder = groupSortOrder(groupsByKey, a);
+			var bOrder = groupSortOrder(groupsByKey, b);
+			if (aOrder !== bOrder) {
+				return aOrder - bOrder;
 			}
 			return groupDisplayLabel(a).localeCompare(groupDisplayLabel(b), undefined, { sensitivity: 'base' });
 		});

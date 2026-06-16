@@ -32,6 +32,7 @@ public class PredefinedShapeUpdateRequest {
     private String newIdentifier;
     private String name;
     private String group;
+    private Integer groupOrder;
     private String owner;
     private String shapeView;
 
@@ -84,6 +85,14 @@ public class PredefinedShapeUpdateRequest {
 
     public void setGroup(String group) {
 	this.group = group;
+    }
+
+    public Integer getGroupOrder() {
+	return groupOrder;
+    }
+
+    public void setGroupOrder(Integer groupOrder) {
+	this.groupOrder = groupOrder;
     }
 
     public String getOwner() {

@@ -127,10 +127,10 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 	    String capRequest = endpoint + "?service=WMS&request=GetCapabilities&version=" + version;
 
 	    LayerFilterContext layerFilter = null;
-	    Map<String, String> groupByOnlineId = null;
+	    Map<String, JSONObject> metadataByOnlineId = null;
 	    if (shapeView != null && !shapeView.isBlank()) {
 		layerFilter = ShapeWmsLayerFilter.createContext(token);
-		groupByOnlineId = loadShapeGroupsByOnlineId();
+		metadataByOnlineId = loadShapeMetadataByOnlineId();
 	    }
 
 	    Optional<String> response = downloader.downloadOptionalString(capRequest);
@@ -170,8 +170,14 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 			    layerObject.put("title", layerTitle);
 			    layerObject.put("name", layerName);
 
-			    if (groupByOnlineId != null) {
-				layerObject.put("group", groupByOnlineId.getOrDefault(layerName, ""));
+			    if (metadataByOnlineId != null) {
+				JSONObject metadata = metadataByOnlineId.get(layerName);
+				if (metadata != null) {
+				    layerObject.put("group", metadata.optString("group", ""));
+				    if (metadata.has("groupOrder") && !metadata.isNull("groupOrder")) {
+					layerObject.put("groupOrder", metadata.optInt("groupOrder"));
+				    }
+				}
 			    }
 
 			    //
@@ -230,9 +236,9 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 	return MediaType.APPLICATION_JSON_TYPE;
     }
 
-    private Map<String, String> loadShapeGroupsByOnlineId() {
+    private Map<String, JSONObject> loadShapeMetadataByOnlineId() {
 
-	Map<String, String> out = new HashMap<>();
+	Map<String, JSONObject> out = new HashMap<>();
 
 	try {
 
@@ -244,12 +250,17 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 		}
 
 		String onlineId = ShapeLayerOwner.OPENSEARCH_ONLINE_PREFIX + entryName;
-		out.put(onlineId, source.optString(ShapeFileMapping.SHAPE_GROUP, ""));
+		JSONObject metadata = new JSONObject();
+		metadata.put("group", source.optString(ShapeFileMapping.SHAPE_GROUP, ""));
+		if (source.has(ShapeFileMapping.SHAPE_GROUP_ORDER) && !source.isNull(ShapeFileMapping.SHAPE_GROUP_ORDER)) {
+		    metadata.put("groupOrder", source.optInt(ShapeFileMapping.SHAPE_GROUP_ORDER));
+		}
+		out.put(onlineId, metadata);
 	    }
 
 	} catch (Exception ex) {
 
-	    GSLoggerFactory.getLogger(getClass()).error("Failed to load shape groups for WMS layers handler", ex);
+	    GSLoggerFactory.getLogger(getClass()).error("Failed to load shape metadata for WMS layers handler", ex);
 	}
 
 	return out;

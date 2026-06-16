@@ -132,6 +132,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		String variableCode = null;
 		String variableName = null;
 		String variableURI = null;
+		String coreVariable = null;
 		String variableDescription = null;
 		String variableUnits = null;
 		String variableUnitsURI = null;
@@ -161,6 +162,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 			    .getAttributeDescription();
 		    if (resource.getExtensionHandler().getObservedPropertyURI().isPresent()) {
 			variableURI = resource.getExtensionHandler().getObservedPropertyURI().get();
+		    }
+		    if (resource.getExtensionHandler().getCoreVariable().isPresent()) {
+			coreVariable = resource.getExtensionHandler().getCoreVariable().get().toString();
 		    }
 		    variableCode = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
 			    .getAttributeIdentifier();
@@ -229,6 +233,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		info.setVariableCode(variableCode);
 		info.setVariableName(variableName);
 		info.setVariableURI(variableURI);
+		info.setCoreVariable(coreVariable);
 		info.setVariableDescription(variableDescription);
 		info.setVariableUnits(variableUnits);
 		info.setVariableUnitsURI(variableUnitsURI);
@@ -289,28 +294,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 
 	    content += "<tr><td colspan='15'><br/>"//
 		    + sourceSummary //
-		    + "</td></tr>" + "" //
-		    + "<tr>" + //
-		    // getHeader("#Platforms") + //
-		    // getHeader("#Variables") + // 1
-		    // getHeader("#Timeseries") + // 1
-		    // getHeader("Begin") + //
-		    // getHeader("End") + //
-		    // getHeader("BBOX(w,s,e,n)") + // 1
-		    getHeader("DAB generated variable identifier") + //
-		    getHeader("Data provider variable identifier") + //
-		    getHeader("Variable name") + //
-		    getHeader("Variable URI") + //
-		    getHeader("Variable description") + //
-		    getHeader("Variable units") + //
-		    getHeader("Variable units URI") + //
-		    getHeader("Interpolation type") + //
-		    getHeader("Aggregation period") + //
-		    getHeader("Intended observation spacing") + //
-		    getHeader("Time units") + //
-		    getHeader("Country") + //
-		    getHeader("Country ISO3") + //
-		    "</tr>";
+		    + "</td></tr>";
 	    try {
 		sourceStats = new SourceStatistics(s.getUniqueIdentifier(), webRequest.extractViewId(),
 			MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
@@ -345,6 +329,29 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    return Integer.valueOf(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
 		}
 	    });
+	    String tableHeaderRow = "<tr>" + //
+		    // getHeader("#Platforms") + //
+		    // getHeader("#Variables") + // 1
+		    // getHeader("#Timeseries") + // 1
+		    // getHeader("Begin") + //
+		    // getHeader("End") + //
+		    // getHeader("BBOX(w,s,e,n)") + // 1
+		    getHeader("DAB generated variable identifier") + //
+		    getHeader("Data provider variable identifier") + //
+		    getHeader("Variable name") + //
+		    getHeader("Variable URI") + //
+		    getHeader("Core variable") + //
+		    getHeader("Variable description") + //
+		    getHeader("Variable units") + //
+		    getHeader("Interpolation type") + //
+		    getHeader("Aggregation period") + //
+		    getHeader("Intended observation spacing") + //
+		    getHeader("Country") + //
+		    getHeader("Country ISO3") + //
+		    "</tr>";
+
+	    String coreVariablesRows = "";
+	    String otherVariablesRows = "";
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
 		TreeSet<String> props = observedProperties.get(s.getLabel());
@@ -361,7 +368,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		}else{
 		    props.add(ri.getVariableName());
 		}
-		content += "<tr>" + //
+		String rowHTML = "<tr>" + //
 			// getRow(ri.getSiteCount()) + //
 			// getRow(ri.getAttributeCount()) + // 1
 			// getRow(ri.getTimeseriesCount()) + // 1
@@ -372,16 +379,20 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 			getRow(ri.getVariableCode()) + //
 			getRow(ri.getVariableName()) + //
 			getRow(ri.getVariableURI(), ri.getVariableURI()) + //
+			getRow(ri.getCoreVariable()) + //
 			getRow(ri.getVariableDescription()) + //
 			getRow(ri.getVariableUnits()) + //
-			getRow(ri.getVariableUnitsURI(), ri.getVariableUnitsURI()) + //
 			getRow(ri.getInterpolation()) + //
 			getRow(ri.getAggregationPeriod()) + //
 			getRow(ri.getIntendedObservationSpacing()) + //
-			getRow(ri.getInterpolationSupportUnits()) + //
 			getRow(ri.getCountry()) + //
 			getRow(ri.getCountryISO3()) + //
 			"</tr>";
+		if ("true".equalsIgnoreCase(ri.getCoreVariable())) {
+		    coreVariablesRows += rowHTML;
+		} else {
+		    otherVariablesRows += rowHTML;
+		}
 		// if (writer != null) {
 		// try {
 		// writer.write(row.getValue());
@@ -390,6 +401,19 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		// }
 		// }
 	    }
+
+	    if (coreVariablesRows.isEmpty()) {
+		coreVariablesRows = "<tr><td colspan='12'>No core variables</td></tr>";
+	    }
+	    if (otherVariablesRows.isEmpty()) {
+		otherVariablesRows = "<tr><td colspan='12'>No non-core variables</td></tr>";
+	    }
+
+	    content += "<tr><td colspan='15'><b>Core variables (coreVariable=true)</b><br/>" //
+		    + "<table border='1px'>" + tableHeaderRow + coreVariablesRows + "</table><br/>" //
+		    + "<b>Other variables</b><br/>" //
+		    + "<table border='1px'>" + tableHeaderRow + otherVariablesRows + "</table>" //
+		    + "</td></tr>";
 
 	    // if (writer != null) {
 	    // try {

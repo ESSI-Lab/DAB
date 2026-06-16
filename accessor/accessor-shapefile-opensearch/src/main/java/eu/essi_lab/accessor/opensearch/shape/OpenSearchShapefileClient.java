@@ -55,6 +55,7 @@ public class OpenSearchShapefileClient {
 	    IndexData.ENTRY_NAME, //
 	    ShapeFileMapping.ENTRY_TITLE, //
 	    ShapeFileMapping.SHAPE_GROUP, //
+	    ShapeFileMapping.SHAPE_GROUP_ORDER, //
 	    ShapeFileMapping.OWNER);
 
     private static final List<String> RENAME_SOURCE_EXCLUDES = List.of(ShapeFileMapping.SHAPE_FILE);
@@ -217,6 +218,7 @@ public class OpenSearchShapefileClient {
 		    index, //
 		    query, //
 		    List.of(IndexData.ENTRY_NAME, ShapeFileMapping.ENTRY_TITLE, ShapeFileMapping.SHAPE_GROUP,
+			    ShapeFileMapping.SHAPE_GROUP_ORDER,
 			    ShapeFileMapping.OWNER), //
 		    from, //
 		    pageSize, //

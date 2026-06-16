@@ -50,6 +50,8 @@ public class ShapeFileMapping extends IndexMapping {
     public static final String ENTRY_TITLE = "entryTitle";
     /** User-defined group label for related predefined search areas. */
     public static final String SHAPE_GROUP = "shapeGroup";
+    /** Integer sort order used to rank groups in predefined search area selectors. */
+    public static final String SHAPE_GROUP_ORDER = "shapeGroupOrder";
     /** User id of the uploader ({@code admin} for administrators). */
     public static final String OWNER = "owner";
     /** CRS identifier ({@code EPSG:xxxx}) of coordinates in the {@link #SHAPE} geojson. */
@@ -86,6 +88,8 @@ public class ShapeFileMapping extends IndexMapping {
 	addProperty(ENTRY_TITLE, FieldType.Text.jsonValue());
 
 	addProperty(SHAPE_GROUP, FieldType.Text.jsonValue());
+
+	addProperty(SHAPE_GROUP_ORDER, FieldType.Integer.jsonValue());
 
 	addProperty(OWNER, FieldType.Keyword.jsonValue());
 

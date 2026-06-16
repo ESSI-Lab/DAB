@@ -1247,6 +1247,7 @@ function initializeLogin(config) {
 				.append(selectAllHeader)
 				.append('<th style="width:36px;"></th>')
 				.append('<th>' + t('shapes_col_group') + '</th>')
+				.append('<th>' + t('shapes_col_group_order') + '</th>')
 				.append('<th>' + t('shapes_col_name') + '</th>')
 				.append('<th>' + t('shapes_col_identifier') + '</th>')
 				.append('<th>' + t('shapes_col_owner') + '</th>');
@@ -1385,10 +1386,12 @@ function initializeLogin(config) {
 				const idInput = row.find('.shapes-id-input');
 				const nameInput = row.find('.shapes-name-input');
 				const groupInput = row.find('.shapes-group-input');
+				const groupOrderInput = row.find('.shapes-group-order-input');
 				const ownerInput = row.find('.shapes-owner-input');
 				let dirty = idInput.val().trim() !== idInput.data('original')
 					|| nameInput.val().trim() !== nameInput.data('original')
-					|| groupInput.val().trim() !== groupInput.data('original');
+					|| groupInput.val().trim() !== groupInput.data('original')
+					|| groupOrderInput.val().trim() !== groupOrderInput.data('original');
 				if (isAdmin) {
 					dirty = dirty || ownerInput.val().trim() !== ownerInput.data('original');
 				}
@@ -1406,14 +1409,18 @@ function initializeLogin(config) {
 				const idInput = row.find('.shapes-id-input');
 				const nameInput = row.find('.shapes-name-input');
 				const groupInput = row.find('.shapes-group-input');
+				const groupOrderInput = row.find('.shapes-group-order-input');
 				const ownerInput = row.find('.shapes-owner-input');
+				const groupOrderRaw = groupOrderInput.val().trim();
+				const groupOrder = groupOrderRaw === '' ? null : Number(groupOrderRaw);
 				const payload = {
 					email: userEmail,
 					apiKey: authToken,
 					identifier: idInput.data('original'),
 					newIdentifier: idInput.val().trim(),
 					name: nameInput.val().trim(),
-					group: groupInput.val().trim()
+					group: groupInput.val().trim(),
+					groupOrder: groupOrder
 				};
 				const portalShapeView = getPortalShapeView();
 				if (portalShapeView) {
@@ -1434,6 +1441,9 @@ function initializeLogin(config) {
 				}
 				if (!payload.name) {
 					return t('shapes_update_invalid_name');
+				}
+				if (payload.groupOrder !== null && !Number.isInteger(payload.groupOrder)) {
+					return t('shapes_update_invalid_group_order');
 				}
 				return null;
 			}
@@ -1529,7 +1539,7 @@ function initializeLogin(config) {
 			function renderEntries(entries) {
 				listBody.empty();
 				if (!entries || entries.length === 0) {
-					listBody.append('<tr><td colspan="6" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
+					listBody.append('<tr><td colspan="7" style="padding:12px;text-align:center;color:#666;">' + t('shapes_list_empty') + '</td></tr>');
 					updateDeleteSelectedState();
 					updateSaveChangesState();
 					return;
@@ -1547,6 +1557,10 @@ function initializeLogin(config) {
 					const groupInput = $('<input type="text" class="shapes-field-input shapes-group-input">')
 						.val(entry.group || '')
 						.data('original', entry.group || '');
+					const groupOrderValue = (entry.groupOrder === null || entry.groupOrder === undefined) ? '' : String(entry.groupOrder);
+					const groupOrderInput = $('<input type="number" step="1" class="shapes-field-input shapes-group-order-input">')
+						.val(groupOrderValue)
+						.data('original', groupOrderValue);
 					const ownerInput = $('<input type="text" class="shapes-field-input shapes-owner-input">')
 						.val(entry.owner || '')
 						.data('original', entry.owner || '')
@@ -1558,10 +1572,11 @@ function initializeLogin(config) {
 					idInput.on('input', onFieldInput);
 					nameInput.on('input', onFieldInput);
 					groupInput.on('input', onFieldInput);
+					groupOrderInput.on('input', onFieldInput);
 					if (isAdmin) {
 						ownerInput.on('input', onFieldInput);
 					}
-					idInput.add(nameInput).add(groupInput).add(isAdmin ? ownerInput : $()).on('keydown', function(e) {
+					idInput.add(nameInput).add(groupInput).add(groupOrderInput).add(isAdmin ? ownerInput : $()).on('keydown', function(e) {
 						if (e.key === 'Enter' && !saveChangesBtn.prop('disabled')) {
 							e.preventDefault();
 							saveAllDirtyEntries();
@@ -1570,6 +1585,7 @@ function initializeLogin(config) {
 					row.append($('<td>').css('textAlign', 'center').append(selectCb));
 					row.append($('<td>').html(selectionCell(entry)));
 					row.append($('<td>').append(groupInput));
+					row.append($('<td>').append(groupOrderInput));
 					row.append($('<td>').append(nameInput));
 					row.append($('<td>').append(idInput));
 					row.append($('<td>').append(ownerInput));
@@ -1600,7 +1616,16 @@ function initializeLogin(config) {
 						const entries = rawEntries.map(function(entry) {
 							return enrichEntryWithSelection(entry, wmsLayers);
 						}).sort(function(a, b) {
-							return (a.identifier || '').localeCompare(b.identifier || '');
+							const aOrder = Number.isInteger(a.groupOrder) ? a.groupOrder : Number.MAX_SAFE_INTEGER;
+							const bOrder = Number.isInteger(b.groupOrder) ? b.groupOrder : Number.MAX_SAFE_INTEGER;
+							if (aOrder !== bOrder) {
+								return aOrder - bOrder;
+							}
+							const groupCmp = (a.group || '').localeCompare((b.group || ''), undefined, { sensitivity: 'base' });
+							if (groupCmp !== 0) {
+								return groupCmp;
+							}
+							return (a.name || '').localeCompare((b.name || ''), undefined, { sensitivity: 'base' });
 						});
 						renderEntries(entries);
 					})
@@ -2729,6 +2754,10 @@ export function initializePortal(config) {
 						class: 'login-button',
 						click: function() {
 							$(this).dialog('close');
+							if (isToolbarLayout(config)) {
+								window.location.reload();
+								return;
+							}
 							clearAllConstraints();
 						}
 					},
