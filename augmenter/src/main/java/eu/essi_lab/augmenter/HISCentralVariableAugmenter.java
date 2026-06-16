@@ -47,6 +47,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
     private static final String[] CORE_VARIABLE_URIS =
 
 	    new String[]{
+		    "hydro-ontology/concept/1c",// scala di deflusso
 		    "hydro-ontology/concept/49",//
 		    "hydro-ontology/concept/65",//
 		    "hydro-ontology/concept/133",//
@@ -54,6 +55,7 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 		    "hydro-ontology/concept/11",//
 		    "hydro-ontology/concept/67",//
 		    "hydro-ontology/concept/78",//
+		    "hydro-ontology/concept/6",//
 		    "hydro-ontology/concept/9",//
 		    "hydro-ontology/concept/105",//
 		    "hydro-ontology/concept/5167",//
@@ -145,12 +147,12 @@ public class HISCentralVariableAugmenter extends ResourceAugmenter<AugmenterSett
 	    List<SKOSConcept> concepts = getConcepts(variable);
 	    if (concepts == null || concepts.isEmpty()) {
 		GSLoggerFactory.getLogger(getClass()).warn("No concept found in hydro ontology for this variable name");
-	    } else if (concepts.size() > 1) {
-		String value = "";
-		for (SKOSConcept concept : concepts) {
-		    value += concept.getURI() + " (" + concept.getPreferredLabel("en") + ") ";
-		}
-		GSLoggerFactory.getLogger(getClass()).warn("More than one concept found in hydro ontology! ", value);
+//	    } else if (concepts.size() > 1) {
+//		String value = "";
+//		for (SKOSConcept concept : concepts) {
+//		    value += concept.getURI() + " (" + concept.getPreferredLabel("en") + ") ";
+//		}
+//		GSLoggerFactory.getLogger(getClass()).warn("More than one concept found in hydro ontology! ", value);
 
 	    } else {
 		SKOSConcept concept = concepts.get(0);
