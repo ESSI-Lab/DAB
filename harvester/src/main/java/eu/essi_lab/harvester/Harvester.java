@@ -220,7 +220,7 @@ public class Harvester {
 	    //
 //	    if (!harvestingInterrupted) {
 //
-//		properties.setCompleted(true);
+		properties.setCompleted(true);
 //	    }
 
 	    ExecutionStage executionStage = null;
