@@ -10,12 +10,12 @@ package eu.essi_lab.pdk.wrt;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -51,11 +51,9 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
     private static final String FINDING_VIEW_ERROR = "FINDING_VIEW_ERROR";
 
     /**
-     * Transforms the supplied <code>request</code> in the correspondent {@link RequestMessage}. This partial
-     * implementation initialise the
-     * {@link RequestMessage} created with {@link #createMessage()} by setting the following common properties and
-     * invokes the {@link
-     * #refineMessage(RequestMessage)} method
+     * Transforms the supplied <code>request</code> in the correspondent {@link RequestMessage}. This partial implementation initialise the
+     * {@link RequestMessage} created with {@link #createMessage()} by setting the following common properties and invokes the
+     * {@link #refineMessage(RequestMessage)} method
      * <br>
      * <b>Common properties set</b>
      * <ul>
@@ -93,11 +91,10 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
     }
 
     /**
-     * Extracts the view identifier from the <code>request</code> and, if present, tries to retrieve the related view
-     * and sets it to the <code>message</code>.<br>
-     * This method is called at last in the {@link #transform(WebRequest)} method, just before
+     * Extracts the view identifier from the <code>request</code> and, if present, tries to retrieve the related view and sets it to the
+     * <code>message</code>.<br> This method is called at last in the {@link #transform(WebRequest)} method, just before
      * {@link #refineMessage(RequestMessage)}
-     * 
+     *
      * @param request
      * @param storageUri
      * @param message
@@ -122,8 +119,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
     public abstract String getProfilerType();
 
     /**
-     * Refines <code>message</code> created with {@link #createMessage()} and initialized with
-     * {@link #transform(WebRequest)}
+     * Refines <code>message</code> created with {@link #createMessage()} and initialized with {@link #transform(WebRequest)}
      */
     protected abstract M refineMessage(M message) throws GSException;
 
@@ -142,7 +138,7 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
     /**
      * Sets the view if present
-     * 
+     *
      * @param request
      * @param storageUri
      * @param message
@@ -152,7 +148,15 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
 	GSLoggerFactory.getLogger(WebRequestTransformer.class).debug("Finding view {} STARTED", viewId);
 
-	Optional<View> view = findView(storageUri, viewId);
+	Optional<View> view ;
+        try {
+
+	    view = findView(storageUri, viewId);
+
+        } catch (Exception e) {
+
+	    throw GSException.createException(WebRequestTransformer.class, "WebRequestTransformerFindViewError", e);
+	}
 
 	if (view.isPresent()) {
 
@@ -184,12 +188,11 @@ public abstract class WebRequestTransformer<M extends RequestMessage> implements
 
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(databaseURI);
 
-	    ViewManager manager = new ViewManager();
-	    manager.setDatabaseReader(reader);
+	    ViewManager manager = new ViewManager(reader);
 
 	    return manager.getResolvedView(viewIdentifier);
 
-	} catch (GSException ex) {
+	} catch (Exception ex) {
 
 	    GSLoggerFactory.getLogger(WebRequestTransformer.class).error(ex.getMessage(), ex);
 

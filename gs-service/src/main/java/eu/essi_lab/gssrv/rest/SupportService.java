@@ -130,7 +130,7 @@ public class SupportService {
 		}
 		sources = ConfigurationWrapper.getViewSources(optionalView.get());
 		WebRequestTransformer.setView(viewId, statisticsMessage.getDataBaseURI(), statisticsMessage);
-	    } catch (GSException e) {
+	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 		JSONObject error = new JSONObject();
 		error.put("error", e.getMessage());
@@ -426,7 +426,7 @@ public class SupportService {
 	View v;
 	try {
 	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
-	} catch (GSException e) {
+	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
 	}
@@ -567,8 +567,7 @@ public class SupportService {
 
 	try {
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
-	    ViewManager manager = new ViewManager();
-	    manager.setDatabaseReader(reader);
+	    ViewManager manager = new ViewManager(reader);
 
 	    GetViewIdentifiersRequest vir = GetViewIdentifiersRequest.create(0, 1000, null, null, null, sourceDeployment);
 	    List<String> viewIds = manager.getViewIdentifiers(vir);
@@ -877,7 +876,7 @@ public class SupportService {
 
 	try {
 
-	    UserFinder uf = UserFinder.get();
+	    UserFinder uf = UserFinder.newInstance();
 	    List<GSUser> users = uf.getUsers(false);
 
 	    for (GSUser user : users) {
@@ -953,7 +952,7 @@ public class SupportService {
 		listResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.get();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
 		    GSUser adminUser = null;
@@ -1012,7 +1011,7 @@ public class SupportService {
 		basicResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.get();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    GSUser targetUser = null;
 		    for (GSUser user : users) {
@@ -1066,7 +1065,7 @@ public class SupportService {
 		basicResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.get();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    GSUser targetUser = null;
 		    for (GSUser user : users) {
@@ -1120,7 +1119,7 @@ public class SupportService {
 		listResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.get();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
 		    GSUser adminUser = null;

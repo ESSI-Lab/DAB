@@ -147,8 +147,8 @@ public class OMHandler extends StreamingRequestHandler {
 	if (optView.isPresent()) {
 
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
-	    ViewManager manager = new ViewManager();
-	    manager.setDatabaseReader(reader);
+	    ViewManager manager = new ViewManager(reader);
+
 	    resolvedView = manager.getView(optView.get()).get();
 
 	    // only in this case permissions are checked
