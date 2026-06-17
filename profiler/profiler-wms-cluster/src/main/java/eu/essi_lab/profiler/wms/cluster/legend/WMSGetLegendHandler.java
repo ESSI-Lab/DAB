@@ -66,6 +66,7 @@ import eu.essi_lab.profiler.wms.cluster.map.WMSGetMapHandler2;
 public class WMSGetLegendHandler extends StreamingRequestHandler {
 
     private static final int LEGEND_TEXT_RIGHT_PADDING = 4;
+    private static final String ITA_ISPRA_ANNALI_SOURCE_ID = "ita-ispra-annali";
 
     private int fontSize;
     private int lineSize;
@@ -268,7 +269,8 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 			    }
 			    label = label.trim();
 			}
-			InfoLegend info = new InfoLegend(WMSGetMapHandler2.getRandomColorFromSourceId(sourceId, availability), label);
+			boolean triangle = ITA_ISPRA_ANNALI_SOURCE_ID.equals(sourceId);
+			InfoLegend info = new InfoLegend(WMSGetMapHandler2.getRandomColorFromSourceId(sourceId, availability), label, triangle);
 			infos.add(info);
 		    }
 
@@ -325,9 +327,42 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 			// point
 			if (drawIcon) {
 			    ig2.setColor(infoLegend.getColor());
-			    ig2.fillOval(pixMinX - r / 2, offset + pixMinY - r, r, r);
-			    ig2.setColor(Color.black);
-			    ig2.drawOval(pixMinX - r / 2, offset + pixMinY - r, r, r);
+			    if (infoLegend.isTriangle()) {
+				int circleDiameter = r;
+				int triangleHeight = (int) Math.round(r * 1.2); // a bit bigger than the circle marker
+				int centerX = pixMinX;
+				int centerY = offset + pixMinY - circleDiameter / 2;
+
+				double halfBase = triangleHeight / Math.sqrt(3);
+				int topY = centerY - (2 * triangleHeight) / 3;
+				int baseY = centerY + triangleHeight / 3;
+
+				int[] xs = { centerX, (int) Math.round(centerX - halfBase), (int) Math.round(centerX + halfBase) };
+				int[] ys = { topY, baseY, baseY };
+
+				// Avoid clipping the top/bottom edges for the first/last legend rows.
+				int minY = Math.min(ys[0], Math.min(ys[1], ys[2]));
+				int maxY = Math.max(ys[0], Math.max(ys[1], ys[2]));
+				int shift = 0;
+				if (minY < 0) {
+				    shift = -minY;
+				} else if (maxY > height - 1) {
+				    shift = (height - 1) - maxY;
+				}
+				if (shift != 0) {
+				    ys[0] += shift;
+				    ys[1] += shift;
+				    ys[2] += shift;
+				}
+
+				ig2.fillPolygon(xs, ys, 3);
+				ig2.setColor(Color.black);
+				ig2.drawPolygon(xs, ys, 3);
+			    } else {
+				ig2.fillOval(pixMinX - r / 2, offset + pixMinY - r, r, r);
+				ig2.setColor(Color.black);
+				ig2.drawOval(pixMinX - r / 2, offset + pixMinY - r, r, r);
+			    }
 			}
 			ig2.setColor(Color.black);
 			ig2.drawString(infoLegend.getLabel(), initialGap, offset + pixMinY);

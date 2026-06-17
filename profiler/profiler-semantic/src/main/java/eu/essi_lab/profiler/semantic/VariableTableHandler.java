@@ -132,6 +132,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		String variableCode = null;
 		String variableName = null;
 		String variableURI = null;
+		String coreVariable = null;
 		String variableDescription = null;
 		String variableUnits = null;
 		String variableUnitsURI = null;
@@ -161,6 +162,9 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 			    .getAttributeDescription();
 		    if (resource.getExtensionHandler().getObservedPropertyURI().isPresent()) {
 			variableURI = resource.getExtensionHandler().getObservedPropertyURI().get();
+		    }
+		    if (resource.getExtensionHandler().getCoreVariable().isPresent()) {
+			coreVariable = resource.getExtensionHandler().getCoreVariable().get().toString();
 		    }
 		    variableCode = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
 			    .getAttributeIdentifier();
@@ -229,6 +233,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		info.setVariableCode(variableCode);
 		info.setVariableName(variableName);
 		info.setVariableURI(variableURI);
+		info.setCoreVariable(coreVariable);
 		info.setVariableDescription(variableDescription);
 		info.setVariableUnits(variableUnits);
 		info.setVariableUnitsURI(variableUnitsURI);
@@ -272,19 +277,59 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 	    } catch (Exception e1) {
 		e1.printStackTrace();
 	    }
-	    Stats stats = sourceStats.getStatistics().get(s.getUniqueIdentifier());
+	    Stats stats = sourceStats != null ? sourceStats.getStatistics().get(s.getUniqueIdentifier()) : null;
+
+	    String sourceSummary = "Data provider: <b>" + s.getLabel() + "</b><br/>";
+	    if (stats != null) {
+		sourceSummary += "#Platforms: " + stats.getSiteCount() + "<br/>"//
+			+ "#Variables:" + stats.getAttributeCount() + "<br/>"//
+			+ "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
+			+ "Begin:" + stats.getBegin() + "<br/>"//
+			+ "End:" + stats.getEnd() + "<br/>"//
+			+ "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth() + "<br/>" //
+			+ "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>";
+	    } else {
+		sourceSummary += "<span style='color:red;'>Error: statistics unavailable for this source.</span><br/>";
+	    }
 
 	    content += "<tr><td colspan='15'><br/>"//
-		    + "Data provider: <b>" + s.getLabel() + "</b><br/>"//
-		    + "#Platforms: " + stats.getSiteCount() + "<br/>"//
-		    + "#Variables:" + stats.getAttributeCount() + "<br/>"//
-		    + "#Timeseries:" + stats.getTimeSeriesCount() + "<br/>"//
-		    + "Begin:" + stats.getBegin() + "<br/>"//
-		    + "End:" + stats.getEnd() + "<br/>"//
-		    + "BBOX(w,s,e,n): " + stats.getWest() + "," + stats.getSouth() + "," + stats.getEast() + "," + stats.getNorth() + "<br/>" //
-		    + "Altitude:" + stats.getMinimumAltitude() + "/" + stats.getMaximumAltitude() + "<br/>"//
-		    + "</td></tr>" + "" //
-		    + "<tr>" + //
+		    + sourceSummary //
+		    + "</td></tr>";
+	    try {
+		sourceStats = new SourceStatistics(s.getUniqueIdentifier(), webRequest.extractViewId(),
+			MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
+	    } catch (Exception e1) {
+		e1.printStackTrace();
+	    }
+	    for (SimpleEntry<RowInfo, String> row : rows) {
+		RowInfo ri = row.getKey();
+		Stats vs = sourceStats != null ? sourceStats.getStatistics().get(s.getUniqueIdentifier()) : null;
+		if (vs != null) {
+		    ri.setSiteCount(vs.getSiteCount());
+		    ri.setAttributeCount(vs.getAttributeCount());
+		    ri.setTimeseriesCount(vs.getTimeSeriesCount());
+		    ri.setBegin(vs.getBegin());
+		    ri.setEnd(vs.getEnd());
+		    ri.setWest(vs.getWest());
+		    ri.setEast(vs.getEast());
+		    ri.setSouth(vs.getSouth());
+		    ri.setNorth(vs.getNorth());
+		}
+
+	    }
+	    rows.sort(new Comparator<SimpleEntry<RowInfo, String>>() {
+
+		@Override
+		public int compare(SimpleEntry<RowInfo, String> o1, SimpleEntry<RowInfo, String> o2) {
+		    String t1 = o1.getKey().getTimeseriesCount();
+		    String t2 = o2.getKey().getTimeseriesCount();
+		    if (t1==null||t2==null) {
+			return 0;
+		    }
+		    return Integer.valueOf(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
+		}
+	    });
+	    String tableHeaderRow = "<tr>" + //
 		    // getHeader("#Platforms") + //
 		    // getHeader("#Variables") + // 1
 		    // getHeader("#Timeseries") + // 1
@@ -295,45 +340,18 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		    getHeader("Data provider variable identifier") + //
 		    getHeader("Variable name") + //
 		    getHeader("Variable URI") + //
+		    getHeader("Core variable") + //
 		    getHeader("Variable description") + //
 		    getHeader("Variable units") + //
-		    getHeader("Variable units URI") + //
 		    getHeader("Interpolation type") + //
 		    getHeader("Aggregation period") + //
 		    getHeader("Intended observation spacing") + //
-		    getHeader("Time units") + //
 		    getHeader("Country") + //
 		    getHeader("Country ISO3") + //
 		    "</tr>";
-	    try {
-		sourceStats = new SourceStatistics(s.getUniqueIdentifier(), webRequest.extractViewId(),
-			MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER);
-	    } catch (Exception e1) {
-		e1.printStackTrace();
-	    }
-	    for (SimpleEntry<RowInfo, String> row : rows) {
-		RowInfo ri = row.getKey();
-		Stats vs = sourceStats.getStatistics().get(s.getUniqueIdentifier());
-		ri.setSiteCount(vs.getSiteCount());
-		ri.setAttributeCount(vs.getAttributeCount());
-		ri.setTimeseriesCount(vs.getTimeSeriesCount());
-		ri.setBegin(vs.getBegin());
-		ri.setEnd(vs.getEnd());
-		ri.setWest(vs.getWest());
-		ri.setEast(vs.getEast());
-		ri.setSouth(vs.getSouth());
-		ri.setNorth(vs.getNorth());
 
-	    }
-	    rows.sort(new Comparator<SimpleEntry<RowInfo, String>>() {
-
-		@Override
-		public int compare(SimpleEntry<RowInfo, String> o1, SimpleEntry<RowInfo, String> o2) {
-		    String t1 = o1.getKey().getTimeseriesCount();
-		    String t2 = o2.getKey().getTimeseriesCount();
-		    return Integer.valueOf(Integer.parseInt(t2)).compareTo(Integer.parseInt(t1));
-		}
-	    });
+	    String coreVariablesRows = "";
+	    String otherVariablesRows = "";
 	    for (SimpleEntry<RowInfo, String> row : rows) {
 		RowInfo ri = row.getKey();
 		TreeSet<String> props = observedProperties.get(s.getLabel());
@@ -350,7 +368,7 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		}else{
 		    props.add(ri.getVariableName());
 		}
-		content += "<tr>" + //
+		String rowHTML = "<tr>" + //
 			// getRow(ri.getSiteCount()) + //
 			// getRow(ri.getAttributeCount()) + // 1
 			// getRow(ri.getTimeseriesCount()) + // 1
@@ -361,16 +379,20 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 			getRow(ri.getVariableCode()) + //
 			getRow(ri.getVariableName()) + //
 			getRow(ri.getVariableURI(), ri.getVariableURI()) + //
+			getRow(ri.getCoreVariable()) + //
 			getRow(ri.getVariableDescription()) + //
 			getRow(ri.getVariableUnits()) + //
-			getRow(ri.getVariableUnitsURI(), ri.getVariableUnitsURI()) + //
 			getRow(ri.getInterpolation()) + //
 			getRow(ri.getAggregationPeriod()) + //
 			getRow(ri.getIntendedObservationSpacing()) + //
-			getRow(ri.getInterpolationSupportUnits()) + //
 			getRow(ri.getCountry()) + //
 			getRow(ri.getCountryISO3()) + //
 			"</tr>";
+		if ("true".equalsIgnoreCase(ri.getCoreVariable())) {
+		    coreVariablesRows += rowHTML;
+		} else {
+		    otherVariablesRows += rowHTML;
+		}
 		// if (writer != null) {
 		// try {
 		// writer.write(row.getValue());
@@ -379,6 +401,19 @@ public class VariableTableHandler implements WebRequestHandler, WebRequestValida
 		// }
 		// }
 	    }
+
+	    if (coreVariablesRows.isEmpty()) {
+		coreVariablesRows = "<tr><td colspan='12'>No core variables</td></tr>";
+	    }
+	    if (otherVariablesRows.isEmpty()) {
+		otherVariablesRows = "<tr><td colspan='12'>No non-core variables</td></tr>";
+	    }
+
+	    content += "<tr><td colspan='15'><b>Core variables (coreVariable=true)</b><br/>" //
+		    + "<table border='1px'>" + tableHeaderRow + coreVariablesRows + "</table><br/>" //
+		    + "<b>Other variables</b><br/>" //
+		    + "<table border='1px'>" + tableHeaderRow + otherVariablesRows + "</table>" //
+		    + "</td></tr>";
 
 	    // if (writer != null) {
 	    // try {

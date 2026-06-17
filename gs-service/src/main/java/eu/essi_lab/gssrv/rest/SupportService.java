@@ -762,7 +762,7 @@ public class SupportService {
 
 	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
 	PredefinedShapeDeleteResult updateResult = new PredefinedShapeManagementService().updateEntry(request.getIdentifier(),
-		request.getNewIdentifier(), request.getName(), request.getGroup(), request.getOwner(), owner,
+		request.getNewIdentifier(), request.getName(), request.getGroup(), request.getGroupOrder(), request.getOwner(), owner,
 		loginResponse.isAdmin(), request.getShapeView());
 
 	if (!updateResult.isSuccess()) {

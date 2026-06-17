@@ -1407,7 +1407,13 @@ body.toolbar-layout #headerDiv.portal-toolbar-header .login-container {
 }
 
 .header-layers-btn.active {
-	background-color: #34495e;
+	background-color: #ffffff;
+	color: #2c3e50;
+}
+
+.header-layers-btn.active:hover {
+	background-color: #ffffff;
+	color: #2c3e50;
 }
 
 .header-layers-panel {
@@ -1491,9 +1497,13 @@ body.toolbar-layout .portal-toolbar-btn-icon {
 	margin-right: 6px;
 }
 
-body.toolbar-layout .portal-toolbar-btn:hover,
-body.toolbar-layout .portal-toolbar-btn.active {
+body.toolbar-layout .portal-toolbar-btn:hover {
 	background-color: #34495e;
+}
+
+body.toolbar-layout .portal-toolbar-btn.active {
+	background-color: #ffffff;
+	color: #2c3e50;
 }
 
 body.toolbar-layout {

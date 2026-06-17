@@ -82,6 +82,11 @@ public class PredefinedShapeManagementService {
 	    entry.put("identifier", identifier);
 	    entry.put("name", name);
 	    entry.put("group", source.optString(ShapeFileMapping.SHAPE_GROUP, ""));
+	    if (source.has(ShapeFileMapping.SHAPE_GROUP_ORDER) && !source.isNull(ShapeFileMapping.SHAPE_GROUP_ORDER)) {
+		entry.put("groupOrder", source.optInt(ShapeFileMapping.SHAPE_GROUP_ORDER));
+	    } else {
+		entry.put("groupOrder", JSONObject.NULL);
+	    }
 	    entry.put("owner", owner);
 	    entry.put("legacy", owner.isBlank());
 
@@ -272,16 +277,16 @@ public class PredefinedShapeManagementService {
      * @return update result
      */
     public PredefinedShapeDeleteResult updateEntry(String currentIdentifier, String newIdentifier, String newName, String newGroup,
-	    String newOwner, String actorOwner, boolean actorIsAdmin) {
+	    Integer newGroupOrder, String newOwner, String actorOwner, boolean actorIsAdmin) {
 
-	return updateEntry(currentIdentifier, newIdentifier, newName, newGroup, newOwner, actorOwner, actorIsAdmin, null);
+	return updateEntry(currentIdentifier, newIdentifier, newName, newGroup, newGroupOrder, newOwner, actorOwner, actorIsAdmin, null);
     }
 
     /**
      * @param shapeView WMS view id for tile cache invalidation (from portal {@code config.shapeView})
      */
     public PredefinedShapeDeleteResult updateEntry(String currentIdentifier, String newIdentifier, String newName, String newGroup,
-	    String newOwner, String actorOwner, boolean actorIsAdmin, String shapeView) {
+	    Integer newGroupOrder, String newOwner, String actorOwner, boolean actorIsAdmin, String shapeView) {
 
 	if (currentIdentifier == null || currentIdentifier.isBlank()) {
 
@@ -353,6 +358,15 @@ public class PredefinedShapeManagementService {
 		updatedGroup = newGroup.trim();
 	    }
 
+	    Integer currentGroupOrder = metadata.has(ShapeFileMapping.SHAPE_GROUP_ORDER)
+		    && !metadata.isNull(ShapeFileMapping.SHAPE_GROUP_ORDER)
+			    ? metadata.optInt(ShapeFileMapping.SHAPE_GROUP_ORDER)
+			    : null;
+	    Integer updatedGroupOrder = currentGroupOrder;
+	    if (newGroupOrder != null) {
+		updatedGroupOrder = newGroupOrder;
+	    }
+
 	    String currentOwner = metadata.optString(ShapeFileMapping.OWNER, "");
 	    String updatedOwner = currentOwner;
 
@@ -362,7 +376,8 @@ public class PredefinedShapeManagementService {
 	    }
 
 	    if (updatedIdentifier.equals(currentIdentifier) && updatedName.equals(currentTitle)
-		    && updatedGroup.equals(currentGroup) && updatedOwner.equals(currentOwner)) {
+		    && updatedGroup.equals(currentGroup) && java.util.Objects.equals(updatedGroupOrder, currentGroupOrder)
+		    && updatedOwner.equals(currentOwner)) {
 
 		return PredefinedShapeDeleteResult.failure("No changes to save");
 	    }
@@ -380,6 +395,9 @@ public class PredefinedShapeManagementService {
 
 		if (!updatedGroup.equals(currentGroup)) {
 		    patch.put(ShapeFileMapping.SHAPE_GROUP, updatedGroup);
+		}
+		if (!java.util.Objects.equals(updatedGroupOrder, currentGroupOrder)) {
+		    patch.put(ShapeFileMapping.SHAPE_GROUP_ORDER, updatedGroupOrder);
 		}
 
 		if (!updatedOwner.equals(currentOwner)) {
@@ -404,6 +422,9 @@ public class PredefinedShapeManagementService {
 		source.put(IndexData.ENTRY_NAME, updatedIdentifier);
 		source.put(ShapeFileMapping.ENTRY_TITLE, updatedName);
 		source.put(ShapeFileMapping.SHAPE_GROUP, updatedGroup);
+		if (updatedGroupOrder != null) {
+		    source.put(ShapeFileMapping.SHAPE_GROUP_ORDER, updatedGroupOrder);
+		}
 		source.put(ShapeFileMapping.OWNER, updatedOwner);
 
 		IndexData indexData = IndexData.fromShapeEntrySource(folder, source, updatedIdentifier);

@@ -256,7 +256,10 @@ function renameSpatialClearButton(bboxHost) {
 	}
 
 	clearBtn.css({ width: 'auto', minWidth: '130px', whiteSpace: 'nowrap' });
-	clearBtn.find('.font-awesome-button-label').text('CLEAR BBOX').css('white-space', 'nowrap');
+	var t = window.__t || function(s) { return s; };
+	clearBtn.find('.font-awesome-button-label').text(
+		toolbarLabel(t, 'clear_bbox', 'Clear bounding box')
+	).css('white-space', 'nowrap');
 }
 
 export function relocateSpatialControlToQueryPanel(config) {

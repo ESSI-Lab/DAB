@@ -107,6 +107,7 @@ public class RowInfo {
     private String variableCode = null;
     private String variableName = null;
     private String variableURI = null;
+    private String coreVariable = null;
     private String variableDescription = null;
     private String variableUnits = null;
     private String variableUnitsURI = null;
@@ -147,6 +148,14 @@ public class RowInfo {
 
     public void setVariableURI(String variableURI) {
 	this.variableURI = variableURI;
+    }
+
+    public String getCoreVariable() {
+	return coreVariable;
+    }
+
+    public void setCoreVariable(String coreVariable) {
+	this.coreVariable = coreVariable;
     }
 
     public String getVariableDescription() {
