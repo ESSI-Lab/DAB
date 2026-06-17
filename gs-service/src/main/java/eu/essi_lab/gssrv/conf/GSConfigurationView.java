@@ -183,9 +183,9 @@ public class GSConfigurationView extends ConfigurationView {
 	try {
 	    user = UserFinder.findCurrentUser(httpServletRequest);
 
-	} catch (GSException e) {
+	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error(e.getErrorInfoList().getFirst().getErrorDescription(), e.getCause());
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return false;
 	}
 
