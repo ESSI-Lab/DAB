@@ -10,20 +10,19 @@ package eu.essi_lab.api.database;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
 import eu.essi_lab.cfga.gs.*;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
-
+import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.model.exceptions.*;
@@ -33,84 +32,56 @@ import java.util.concurrent.*;
 
 /**
  * The {@link ViewManager} connects to the database trough {@link DatabaseReader} to resolve inner views and to handle dynamic views.<br> To
- * improve performances, this component uses a cache to store the resolved views. The cache holds a
- * maximum of 10 entries; the entries expire after 30 minutes.<br>
+ * improve performances, this component uses a cache to store the resolved views. The cache holds a maximum of 10 entries; the entries
+ * expire after 30 minutes.<br>
  *
  * @author boldrini
  */
 public class ViewManager {
 
-    private static final long CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
-    private static final int CACHE_SIZE = 10;
+    /**
+     *
+     */
+    private static final int REFRESH_INTERVAL_MINUTES = 5;
 
     private DatabaseReader reader;
 
-    /**
-     * @param executor
-     */
-    public void setDatabaseReader(DatabaseReader executor) {
+    private static SnapshotStore<View> viewsStore;
+    private static SnapshotStore<View> resolvedViewsStore;
 
-	this.reader = executor;
-    }
-
-    private static ExpiringCache<View> resolvedViewCache = null;
-    private static ExpiringCache<String> resolvedViewLocks = null;
-
-    static {
-	resolvedViewCache = new ExpiringCache<>();
-	resolvedViewCache.setDuration(CACHE_DURATION);
-	resolvedViewCache.setMaxSize(CACHE_SIZE);
-
-	resolvedViewLocks = new ExpiringCache<>();
-	resolvedViewLocks.setDuration(CACHE_DURATION);
-	resolvedViewLocks.setMaxSize(CACHE_SIZE);
+    public ViewManager() {
     }
 
     /**
-     * Gets the view associated with the given view identifier, resolved (inner views are converted into concrete bonds).
-     *
-     * @param viewId the view identifier
-     * @return the resolved view, or null if not found
-     * @throws GSException
+     * @param reader
      */
-    public Optional<View> getResolvedView(String viewId) throws GSException {
+    public ViewManager(DatabaseReader reader) throws Exception {
 
-	if( !ConfigurationWrapper.getSystemSettings().//
-		readKeyValue(KeyValueOptionKeys.VIEWS_CACHE.getLabel()).//
-		map(Boolean::parseBoolean). //
-		orElse(true)){
+	this.reader = reader;
 
-	    GSLoggerFactory.getLogger(getClass()).info("Views cache disabled");
+	if (viewsStore == null) {
 
-	    return getAndResolve(viewId);
-	}
+	    GSLoggerFactory.getLogger(getClass()).info("Creating views store STARTED");
 
-	String lock = null;
+	    viewsStore = new SnapshotStore<>(reader::getViews, TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
 
-	synchronized (resolvedViewLocks) {
-	    lock = resolvedViewLocks.get(viewId);
-	    if (lock == null) {
-		resolvedViewLocks.put(viewId, viewId);
-		lock = resolvedViewLocks.get(viewId);
-	    }
-	}
+	    GSLoggerFactory.getLogger(getClass()).info("Creating views store ENDED");
 
-	synchronized (lock) {
+	    GSLoggerFactory.getLogger(getClass()).info("Creating resolved views store STARTED");
 
-	    View cachedView = resolvedViewCache.get(viewId);
+	    resolvedViewsStore = new SnapshotStore<>(() -> reader.getViews().parallelStream().peek(v -> {
 
-	    if (cachedView != null) {
-		GSLoggerFactory.getLogger(getClass()).trace("View cache HIT: " + viewId);
-		return Optional.of(cachedView);
-	    }
+		try {
+		    resolve(v);
 
-	    GSLoggerFactory.getLogger(getClass()).trace("View cache MISS: " + viewId);
+		} catch (Exception e) {
 
-	    Optional<View> view = getAndResolve(viewId);
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
 
-	    view.ifPresent(v ->  resolvedViewCache.put(viewId, v));
+	    }).filter(Objects::nonNull).toList(), TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
 
-	    return view;
+	    GSLoggerFactory.getLogger(getClass()).info("Creating resolved views store ENDED");
 	}
     }
 
@@ -122,20 +93,63 @@ public class ViewManager {
      * @return the given view, or null if not found
      * @throws GSException
      */
-    public Optional<View> getView(String viewId) throws GSException {
+    public Optional<View> getView(String viewId) throws Exception {
 
 	if (viewId == null) {
-	    return Optional.empty();
+
+	    throw new IllegalArgumentException("viewId is null");
 	}
 
 	Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(viewId);
 
 	if (dynamicView.isPresent()) {
+
 	    View view = dynamicView.get();
 	    return Optional.of(view);
 	}
 
-	return reader.getView(viewId);
+	if (!ConfigurationWrapper.getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.VIEWS_CACHE.getLabel()).//
+		map(Boolean::parseBoolean). //
+		orElse(true)) {
+
+	    return reader.getView(viewId);
+	}
+
+	return viewsStore. //
+		getSnapshots().//
+		stream().//
+		filter(v -> v.getId().equals(viewId)).//
+		findFirst();
+    }
+
+    /**
+     * Gets the view associated with the given view identifier, resolved (inner views are converted into concrete bonds).
+     *
+     * @param viewId the view identifier
+     * @return the resolved view, or null if not found
+     * @throws GSException
+     */
+    public Optional<View> getResolvedView(String viewId) throws Exception {
+
+	if (viewId == null) {
+
+	    throw new IllegalArgumentException("viewId is null");
+	}
+
+	if (!ConfigurationWrapper.getSystemSettings().//
+		readKeyValue(KeyValueOptionKeys.VIEWS_CACHE.getLabel()).//
+		map(Boolean::parseBoolean). //
+		orElse(true)) {
+
+	    return getAndResolve(viewId);
+	}
+
+	return resolvedViewsStore. //
+		getSnapshots().//
+		stream().//
+		filter(v -> v.getId().equals(viewId)).//
+		findFirst();
     }
 
     /**
@@ -150,12 +164,11 @@ public class ViewManager {
     }
 
     /**
-     *
      * @param viewId
      * @return
      * @throws GSException
      */
-    private Optional<View> getAndResolve(String viewId) throws GSException {
+    private Optional<View> getAndResolve(String viewId) throws Exception {
 
 	Optional<View> ret = getView(viewId);
 
@@ -177,17 +190,20 @@ public class ViewManager {
      * @param bond
      * @return
      */
-    private void resolve(View view) throws GSException {
+    private void resolve(View view) throws Exception {
 
 	Bond bond = view.getBond();
 
 	if (bond instanceof ViewBond viewBond) {
 
-	    Optional<View> optionalResolved = getResolvedView(viewBond.getViewIdentifier());
+	    Optional<View> optionalResolved = getAndResolve(viewBond.getViewIdentifier());
 
 	    if (optionalResolved.isPresent()) {
+
 		bond = optionalResolved.get().getBond();
+
 		if (view.getCreator() == null) {
+
 		    view.setCreator(optionalResolved.get().getCreator());
 		}
 	    }
@@ -198,17 +214,23 @@ public class ViewManager {
 	    HashSet<String> creators = new HashSet<String>();
 
 	    for (Bond operand : logicalBond.getOperands()) {
+
 		View childView = new View();
 		childView.setBond(operand);
+
 		resolve(childView);
 		resolvedOperands.add(childView.getBond());
+
 		String creator = childView.getCreator();
+
 		if (creator != null) {
+
 		    creators.add(creator);
 		}
 	    }
 
 	    if (view.getCreator() == null && creators.size() == 1) {
+
 		view.setCreator(creators.iterator().next());
 	    }
 
