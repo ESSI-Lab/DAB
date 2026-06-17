@@ -192,6 +192,9 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	String description = jsonType.optString("descrizione");
 	String delta_t = jsonType.optString("delta_t");
 
+	String variableIdentifier = (timeSeriesId2 != null && !timeSeriesId2.isEmpty()) ? timeSeriesId2 : measureCode;
+	String resourceIdentifier = generateCode(dataset, code + "-" + variableIdentifier);
+
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
 	coreMetadata.getMIMetadata().setLanguage("Italian");
@@ -324,9 +327,11 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	online.setLinkage(linkage);
 	online.setFunctionCode("download");
 	online.setName(resourceTitle + "_" + timeSeriesId);
+	online.setIdentifier(resourceIdentifier);
 	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_FRIULI_NS_URI);
 
 	distribution.addDistributionOnline(online);
+	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
 	//
 	// coverage description
