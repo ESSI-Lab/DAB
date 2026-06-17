@@ -21,34 +21,24 @@ package eu.essi_lab.harvester;
  * #L%
  */
 
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.UUID;
-
+import eu.essi_lab.adk.harvest.*;
 import eu.essi_lab.api.database.*;
-import org.quartz.JobExecutionContext;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.*;
+import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.harvester.worker.HarvesterWorker.*;
+import eu.essi_lab.identifierdecorator.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.*;
+import eu.essi_lab.messages.JobStatus.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.quartz.*;
 
-import eu.essi_lab.adk.harvest.IHarvestedAccessor;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask;
-import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.ExecutionStage;
-import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
-import eu.essi_lab.harvester.worker.HarvesterWorker.RecoveringContext;
-import eu.essi_lab.identifierdecorator.ConflictingResourceException;
-import eu.essi_lab.identifierdecorator.DuplicatedResourceException;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.HarvestingProperties;
-import eu.essi_lab.messages.JobStatus.JobPhase;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSProperty;
-import eu.essi_lab.model.GSPropertyHandler;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.HarvestingStrategy;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.GSResource;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -225,10 +215,13 @@ public class Harvester {
 	try {
 
 	    // the harvesting procedure is completed only when the procedure ends without errors
-	    if (!harvestingInterrupted) {
-
-		properties.setCompleted(true);
-	    }
+	    //
+	    // temporary disabled due to issues occurred
+	    //
+//	    if (!harvestingInterrupted) {
+//
+//		properties.setCompleted(true);
+//	    }
 
 	    ExecutionStage executionStage = null;
 
