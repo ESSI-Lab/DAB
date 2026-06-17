@@ -138,7 +138,7 @@ public final class ShapeWmsLayerFilter {
 
 	try {
 
-	    for (GSUser user : UserFinder.get().getUsers(false)) {
+	    for (GSUser user : UserFinder.newInstance().getUsers(false)) {
 
 		if (token.equals(user.getUri())) {
 		    return Optional.of(user);

@@ -2,9 +2,9 @@ package eu.essi_lab.cfga.database.test;
 
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.bond.jaxb.*;
-import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import org.junit.*;
 import org.mockito.*;
@@ -22,7 +22,8 @@ public class ViewManagerTest {
     private LogicalBond view4;
 
     @Before
-    public void init() throws GSException {
+    public void init() throws Exception {
+
 	this.manager = Mockito.spy(new ViewManager());
 	this.view1 = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "temperature");
 	this.view2 = BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH, MetadataElement.TITLE, "discharge");
@@ -38,7 +39,14 @@ public class ViewManagerTest {
     @Test
     public void testResolve() throws Exception {
 
-	ConfigurationWrapper.setConfiguration(new SimpleConfiguration());
+	SimpleConfiguration simpleConfiguration = new SimpleConfiguration();
+
+	ConfigurationWrapper.setConfiguration(simpleConfiguration);
+
+	SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+	systemSettings.putKeyValue("viewsCache","false");
+
+	simpleConfiguration.replace(systemSettings);
 
 	assertEquals(view1, manager.getView("view1").get().getBond());
 	assertEquals(view1, manager.getResolvedView("view1").get().getBond());

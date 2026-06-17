@@ -46,58 +46,14 @@ import java.util.concurrent.*;
  */
 public class UserFinder {
 
-    private static final String USER_FINDING_ERROR = "USER_FINDING_ERROR";
-
-    private static final long USERS_UPDATE_PERIOD = TimeUnit.MINUTES.toMillis(30);
-    private static final UsersCacheUpdater USERS_UPDATER_TASK = new UsersCacheUpdater();
-    
-    static {
-
-	Timer timer = new Timer();
-	timer.scheduleAtFixedRate(USERS_UPDATER_TASK, 0, USERS_UPDATE_PERIOD);
-    }
-
-    private static List<GSUser> users;
-
-    private final ViewManager viewManager;
-
     /**
-     * @author Fabrizio
+     *
      */
-    private static class UsersCacheUpdater extends TimerTask {
+    private static final int REFRESH_INTERVAL_MINUTES = 30;
 
-	private UserFinder finder;
+    private static SnapshotStore<GSUser> usersStore;
 
-	/**
-	 * @param authorizer
-	 */
-	public void setUserFinder(UserFinder finder) {
-
-	    this.finder = finder;
-	}
-
-	@Override
-	public void run() {
-
-	    synchronized (this) {
-
-		if (Objects.isNull(finder)) {
-		    return;
-		}
-
-		try {
-
-		    finder.updateUsersCache();
-
-		} catch (Exception e) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("Error occurred while updating users cache");
-
-		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-		}
-	    }
-	}
-    }
+    private ViewManager viewManager;
 
     private Optional<String> email;
     private Optional<String> authProvider;
@@ -115,21 +71,20 @@ public class UserFinder {
 
 	tokenProvider = new TokenProvider();
 
-	viewManager = new ViewManager();
     }
 
     /**
      * @return
      * @throws GSException
      */
-    public static UserFinder get() throws GSException {
+    public static UserFinder newInstance() throws Exception {
 
 	UserFinder finder = new UserFinder();
 
 	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
 	DatabaseReader reader = DatabaseProviderFactory.getReader(storageInfo);
 
-	finder.viewManager.setDatabaseReader(reader);
+	finder.viewManager = new ViewManager(reader);
 
 	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty()) {
 
@@ -148,6 +103,11 @@ public class UserFinder {
 	    finder.setUsersWriter(usersManager);
 	}
 
+	if (usersStore == null) {
+
+	    usersStore = new SnapshotStore<>(() -> finder.usersReader.getUsers(), TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
+	}
+
 	return finder;
     }
 
@@ -156,14 +116,12 @@ public class UserFinder {
      * @return
      * @throws GSException
      */
-    public static GSUser findCurrentUser(HttpServletRequest request) throws GSException {
+    public static GSUser findCurrentUser(HttpServletRequest request) throws Exception {
 
-	UserFinder finder = get();
-
-	GSUser user = null;
+	GSUser user;
 
 	try {
-	    user = finder.findUser(request);
+	    user = newInstance().findUser(request);
 
 	} catch (Exception e) {
 
@@ -175,7 +133,7 @@ public class UserFinder {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    USER_FINDING_ERROR);
+		    "UserFindingError");
 	}
 
 	return user;
@@ -198,8 +156,6 @@ public class UserFinder {
      * @return
      */
     public GSUser findUser(HttpServletRequest request) throws Exception {
-
-	USERS_UPDATER_TASK.setUserFinder(this);
 
 	List<GSProperty<String>> identifiers = findIdentifiers(request);
 
@@ -235,20 +191,6 @@ public class UserFinder {
     }
 
     /**
-     * @throws Exception
-     */
-    public void updateUsersCache() throws Exception {
-
-	synchronized (USERS_UPDATER_TASK) {
-
-	    if (usersReader != null) {
-
-		users = usersReader.getUsers();
-	    }
-	}
-    }
-
-    /**
      * @return
      * @throws Exception
      */
@@ -263,19 +205,12 @@ public class UserFinder {
      */
     public List<GSUser> getUsers(boolean useCache) throws Exception {
 
-	synchronized (USERS_UPDATER_TASK) {
+	if (useCache) {
 
-	    if (users == null && usersReader != null || !useCache) {
-
-		updateUsersCache();
-
-	    } else {
-
-		// GSLoggerFactory.getLogger(getClass()).debug("Reading users from cache");
-	    }
-
-	    return users;
+	    return usersStore.getSnapshots();
 	}
+
+	return usersReader.getUsers();
     }
 
     /**
@@ -323,14 +258,12 @@ public class UserFinder {
 
 	    if (email.isPresent()) {
 
-		logBuilder.append("\n- OAuth 2.0 email: " + email.get());
+		logBuilder.append("\n- OAuth 2.0 email: ").append(email.get());
 		identifiers.add(new GSProperty<String>(UserIdentifierType.OAUTH_EMAIL.getType(), email.get()));
 	    }
 
-	    if (authProvider.isPresent()) {
+	    authProvider.ifPresent(s -> logBuilder.append("\n- OAuth 2.0 provider: ").append(s));
 
-		logBuilder.append("\n- OAuth 2.0 provider: " + authProvider.get());
-	    }
 	} else {
 
 	    email = Optional.empty();
