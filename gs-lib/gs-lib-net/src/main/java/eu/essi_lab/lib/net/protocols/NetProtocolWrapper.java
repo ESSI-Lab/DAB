@@ -62,6 +62,8 @@ public enum NetProtocolWrapper {
     NRFA(new NRFAProtocol()),//
     DMH(new DMHProtocol()),//
     KISTERS(new KISTERSProtocol()),//
+    UK_HYDROLOGY(new UKHydrologyProtocol()),//
+    CH_EXISTENZ_BAFU(new CHExistenzBafuProtocol()),//
     NASAGSFCOZONE(new NASAGSFCOZONEProtocol()),//
     NCML(new NCMLProtocol()),//
     NERRS(new NERRSProtocol()),//

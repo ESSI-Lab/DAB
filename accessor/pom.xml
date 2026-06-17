@@ -102,6 +102,8 @@
 		<module>accessor-sensor-things</module>
 		<module>accessor-meteotracker</module>
 		<module>accessor-kisters</module>
+		<module>accessor-uk-hydrology</module>
+		<module>accessor-ch-existenz-bafu</module>
 		<module>accessor-worldcereal</module>
 		<module>accessor-seanoe</module>
 		<module>accessor-eiffel-s3</module>

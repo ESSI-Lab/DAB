@@ -214,7 +214,7 @@ public class HarvestPreviewStarter extends GridMenuItemHandler implements Button
 		});
 
 	    } catch (Exception e) {
-
+e.printStackTrace();
 		session.access(() -> {
 
 		    msgDiv.setHtmlContent(
