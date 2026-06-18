@@ -13,12 +13,12 @@ package eu.essi_lab.api.database.opensearch;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -55,6 +55,7 @@ import java.io.*;
 import java.math.*;
 import java.util.AbstractMap.*;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.*;
 
@@ -69,7 +70,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     /**
      *
      */
-    private static final long MAP_UPDATE_PERIOD = TimeUnit.MINUTES.toMillis(5);
+    private static final int MAP_UPDATE_PERIOD = 5;
     /**
      *
      */
@@ -83,20 +84,7 @@ public class OpenSearchFinder implements DatabaseFinder {
     /**
      * @author Fabrizio
      */
-    private static class CachedMapUpdater extends TimerTask {
-
-	private final OpenSearchDatabase database;
-	private final OpenSearchWrapper wrapper;
-
-	/**
-	 * @param database
-	 * @param wrapper
-	 */
-	private CachedMapUpdater(OpenSearchDatabase database, OpenSearchWrapper wrapper) {
-
-	    this.database = database;
-	    this.wrapper = wrapper;
-	}
+    private record CachedMapUpdater(OpenSearchDatabase database, OpenSearchWrapper wrapper) implements Runnable {
 
 	@Override
 	public void run() {
@@ -142,8 +130,16 @@ public class OpenSearchFinder implements DatabaseFinder {
 
 	    MAP_UPDATER_TASK = new CachedMapUpdater(this.database, wrapper);
 
-	    Timer timer = new Timer();
-	    timer.scheduleAtFixedRate(MAP_UPDATER_TASK, TimeUnit.MINUTES.toMillis(10), MAP_UPDATE_PERIOD);
+	    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+	    scheduler.scheduleAtFixedRate( //
+		    MAP_UPDATER_TASK,//
+		    0,//
+		    MAP_UPDATE_PERIOD,//
+		    TimeUnit.MINUTES//
+	    );
+
+	    Runtime.getRuntime().addShutdownHook(new Thread(scheduler::shutdownNow));
 	}
     }
 
@@ -433,7 +429,7 @@ public class OpenSearchFinder implements DatabaseFinder {
 	int pageIndex = message.getPage().getSize() == 0
 		? 0
 		: message.getPage().getStart() <= message.getPage().getSize()
-			? 1
+		  ? 1
 			: (message.getPage().getStart() / message.getPage().getSize()) + 1;
 
 	countSet.setPageIndex(pageIndex);
