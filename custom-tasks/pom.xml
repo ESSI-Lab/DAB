@@ -618,6 +618,12 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-de-pegelonline</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-ch-existenz-bafu</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>

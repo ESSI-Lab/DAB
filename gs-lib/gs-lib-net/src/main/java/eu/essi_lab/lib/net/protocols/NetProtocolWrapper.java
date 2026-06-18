@@ -63,6 +63,7 @@ public enum NetProtocolWrapper {
     DMH(new DMHProtocol()),//
     KISTERS(new KISTERSProtocol()),//
     UK_HYDROLOGY(new UKHydrologyProtocol()),//
+    PEGELONLINE(new PegelonlineProtocol()),//
     CH_EXISTENZ_BAFU(new CHExistenzBafuProtocol()),//
     NASAGSFCOZONE(new NASAGSFCOZONEProtocol()),//
     NCML(new NCMLProtocol()),//
