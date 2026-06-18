@@ -1,14 +1,8 @@
 package eu.essi_lab.accessor.chexistenzbafu;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import org.json.JSONObject;
 import org.junit.Test;
@@ -53,5 +47,19 @@ public class CHExistenzBafuClientTest {
 	assertEquals("Bern, Schönau", object.getString(CHExistenzBafuClient.LOCATION_NAME));
 	assertEquals("Wassertemperatur", object.getString(CHExistenzBafuClient.PARAMETER_NAME));
 	assertEquals("°C", object.getString(CHExistenzBafuClient.PARAMETER_UNIT));
+	assertEquals("1989-12-31T23:00:00Z", object.getString(CHExistenzBafuClient.FROM));
+	assertEquals("2026-06-17T14:50:00Z", object.getString(CHExistenzBafuClient.TO));
+    }
+
+    @Test
+    public void swissLocalDateTimeToIso8601UtcConvertsCestToUtc() {
+
+	assertEquals("2026-06-17T18:10:00Z", CHExistenzBafuClient.toIso8601Utc("2026-06-17 20:10:00"));
+    }
+
+    @Test
+    public void swissLocalDateTimeToIso8601UtcConvertsCetToUtc() {
+
+	assertEquals("1989-12-31T23:00:00Z", CHExistenzBafuClient.toIso8601Utc("1990-01-01 00:00:00"));
     }
 }

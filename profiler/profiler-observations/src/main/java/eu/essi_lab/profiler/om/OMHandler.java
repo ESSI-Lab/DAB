@@ -579,7 +579,10 @@ public class OMHandler extends StreamingRequestHandler {
 			    accessMessage.setSources(discoveryMessage.getSources());
 			    accessMessage.setCurrentUser(discoveryMessage.getCurrentUser().orElse(null));
 			    accessMessage.setDataBaseURI(discoveryMessage.getDataBaseURI());
-
+			    Optional<View> optionalView = discoveryMessage.getView();
+			    if (optionalView.isPresent()) {
+				accessMessage.setView(optionalView.get());
+			    }
 			    DataDescriptor descriptor = new DataDescriptor();
 
 			    switch (type) {

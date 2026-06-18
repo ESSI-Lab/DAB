@@ -412,7 +412,7 @@ public class GIResourceParser extends StAXDocumentParser {
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ONLINE_LINKAGE.getName()), v -> this.distributionLinkage += v);
 	add(new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, MetadataElement.ONLINE_PROTOCOL_EL_NAME), v -> this.distributionProtocol = v);
 	
-	QName[] reportOnlineIdPath = new QName[] { new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "Dataset"),
+	QName[] reportOnlineIdPath = new QName[] { new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "*"),
 		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "harmonizedMetadata"),
 		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "extendedMetadata"),
 		new QName(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "extension"),

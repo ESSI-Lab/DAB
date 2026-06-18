@@ -110,7 +110,7 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
 	dataset.getExtensionHandler().setCountry("Switzerland");
 
 	if (from != null && to != null) {
-	    coreMetadata.addTemporalExtent(from, to);
+	    coreMetadata.addTemporalExtent(CHExistenzBafuClient.toIso8601Utc(from), CHExistenzBafuClient.toIso8601Utc(to));
 	}
 
 	if (object.has(CHExistenzBafuClient.STATION_LAT) && object.has(CHExistenzBafuClient.STATION_LON)) {
