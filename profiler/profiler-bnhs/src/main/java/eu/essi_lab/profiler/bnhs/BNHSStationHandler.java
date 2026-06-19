@@ -318,6 +318,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 			resource.getExtensionHandler().getUniqueAttributeIdentifier().get() : "";
 		String attributeLabel = "";
 		String attributeLabelIt = "";
+		String observedPropertyUri = "";
 		try {
 		    attributeLabel = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription()
 			    .getAttributeTitle();
@@ -328,6 +329,7 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		if (optionalAttributeURI.isPresent()) {
 		    String uri = optionalAttributeURI.get();
 		    if (uri != null) {
+			observedPropertyUri = uri;
 			HydroOntology ontology;
 			if (hisCentral){
 			    ontology=new HISCentralOntology();
@@ -577,6 +579,8 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		// attribute
 		//
 		object = create(object, "attribute_id", attributeId, "Observed variable ID");
+
+		object = create(object, "observed_property_uri", observedPropertyUri, "Observed property URI");
 
 		object = create(object, "attribute_label", attributeLabel, "Observed variable");
 
