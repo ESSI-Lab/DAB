@@ -13,12 +13,12 @@ package eu.essi_lab.authorization.userfinder;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -62,6 +62,9 @@ public class UserFinder {
     private UsersWriter usersWriter;
     private UsersReader usersReader;
 
+    private UsersWriter secUsersWriter;
+    private UsersReader secUsersReader;
+
     protected TokenProvider tokenProvider;
 
     /**
@@ -86,7 +89,8 @@ public class UserFinder {
 
 	finder.viewManager = new ViewManager(reader);
 
-	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty()) {
+	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty() && //
+		ConfigurationWrapper.getSecondaryUsersStorageInfo().isEmpty()) {
 
 	    DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageInfo);
 
@@ -95,17 +99,42 @@ public class UserFinder {
 
 	} else {
 
-	    StorageInfo usersStorageInfo = ConfigurationWrapper.getUsersStorageInfo().get();
+	    if (ConfigurationWrapper.getUsersStorageInfo().isPresent()) {
 
-	    UsersManager usersManager = UsersManagerFactory.get(usersStorageInfo);
+		StorageInfo info = ConfigurationWrapper.getUsersStorageInfo().get();
 
-	    finder.setUsersReader(usersManager);
-	    finder.setUsersWriter(usersManager);
+		UsersManager usersManager = UsersManagerFactory.get(info);
+
+		finder.setUsersReader(usersManager);
+		finder.setUsersWriter(usersManager);
+	    }
+
+	    if (ConfigurationWrapper.getSecondaryUsersStorageInfo().isPresent()) {
+
+		StorageInfo usersStorageInfo = ConfigurationWrapper.getSecondaryUsersStorageInfo().get();
+
+		UsersManager usersManager = UsersManagerFactory.get(usersStorageInfo);
+
+		finder.setSecondaryUsersReader(usersManager);
+		finder.setSecondaryUsersWriter(usersManager);
+	    }
 	}
 
 	if (usersStore == null) {
 
-	    usersStore = new SnapshotStore<>(() -> finder.usersReader.getUsers(), TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
+	    usersStore = new SnapshotStore<>(() -> {
+
+		List<GSUser> users = finder.usersReader.getUsers();
+
+		if (finder.secUsersReader != null) {
+
+		    List<GSUser> secUsers = finder.secUsersReader.getUsers();
+		    users.addAll(secUsers);
+		}
+
+		return users;
+
+	    }, TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
 	}
 
 	return finder;
@@ -210,7 +239,15 @@ public class UserFinder {
 	    return usersStore.getSnapshots();
 	}
 
-	return usersReader.getUsers();
+	List<GSUser> users = usersReader.getUsers();
+
+	if (secUsersReader != null) {
+
+	    List<GSUser> secUsers = secUsersReader.getUsers();
+	    users.addAll(secUsers);
+	}
+
+	return users;
     }
 
     /**
@@ -222,6 +259,14 @@ public class UserFinder {
     }
 
     /**
+     * @param writer
+     */
+    public void setSecondaryUsersWriter(UsersWriter writer) {
+
+	this.secUsersWriter = writer;
+    }
+
+    /**
      * @param reader
      */
     public void setUsersReader(UsersReader reader) {
@@ -230,11 +275,27 @@ public class UserFinder {
     }
 
     /**
-     * @return the writer
+     * @param reader
+     */
+    public void setSecondaryUsersReader(UsersReader reader) {
+
+	this.secUsersReader = reader;
+    }
+
+    /**
+     * @return
      */
     public UsersWriter getUsersWriter() {
 
 	return usersWriter;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<UsersWriter> getSecondaryUsersWriter() {
+
+	return Optional.ofNullable(secUsersWriter);
     }
 
     protected List<GSProperty<String>> findIdentifiers(HttpServletRequest request) throws Exception {
