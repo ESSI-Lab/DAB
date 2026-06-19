@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.rest;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -40,6 +40,7 @@ import eu.essi_lab.cfga.gs.setting.harvesting.HarvestingSetting;
 import eu.essi_lab.cfga.gs.setting.harvesting.SchedulerSupport;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.HostNamePropertyUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.HarvestingProperties;
 import eu.essi_lab.messages.JobStatus.JobPhase;
@@ -365,7 +366,16 @@ public class HarvestStatusService {
 	putIfNotEmpty(job, "endTime", running ? null : schedulerSupport.getEndTime(setting));
 	putIfNotEmpty(job, "elapsedTime", schedulerSupport.getElapsedTime(setting));
 	putIfNotEmpty(job, "nextFireTime", schedulerSupport.getNextFireTime(setting));
-	putIfNotEmpty(job, "hostName", schedulerSupport.getJobHostName(setting));
+	String hostName = schedulerSupport.getJobHostName(setting);
+	job.put("host", hostName == null || hostName.isBlank() ? "" : hostName);
+	debug.put("host", hostName == null || hostName.isBlank() ? "" : hostName);
+
+	String awsTaskId = schedulerSupport.getJobAwsTaskId(setting);
+	job.put("awsTaskId", awsTaskId == null || awsTaskId.isBlank() ? "" : awsTaskId);
+	if (awsTaskId != null && !awsTaskId.isBlank()) {
+	    HostNamePropertyUtils.getEcsTaskLogsUrl(awsTaskId).ifPresent(url -> job.put("awsTaskLogsUrl", url));
+	}
+	debug.put("awsTaskId", awsTaskId == null || awsTaskId.isBlank() ? "" : awsTaskId);
 
 	if (properties != null) {
 	    job.put("resourcesCount", properties.getResourcesCount());

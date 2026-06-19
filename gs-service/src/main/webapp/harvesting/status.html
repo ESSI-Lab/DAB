@@ -303,6 +303,8 @@
               <th>End time</th>
               <th>Elapsed</th>
               <th>Next fire</th>
+              <th>Host</th>
+              <th>ECS task</th>
               <th>Resources</th>
               <th>Debug</th>
             </tr>
@@ -390,6 +392,26 @@
         .replace(/"/g, '&quot;');
     }
 
+    function renderEcsTaskCell(job) {
+      const id = job.awsTaskId || '';
+      const url = job.awsTaskLogsUrl || '';
+      if (!id) {
+        return '';
+      }
+      if (url) {
+        return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(id)}</a>`;
+      }
+      return escapeHtml(id);
+    }
+
+    function ecsTaskHoverLine(job) {
+      const id = job.awsTaskId || '';
+      if (!id) {
+        return 'ECS task: n/a';
+      }
+      return `ECS task: ${escapeHtml(id)}`;
+    }
+
     function renderSummary(summary, windowInfo) {
       const el = document.getElementById('summary');
       const cards = [
@@ -450,6 +472,8 @@
           `stored=${debug.storedPhase || '—'}`,
           `start=${debug.startSource || '—'}`,
           `end=${debug.endSource || '—'}`,
+          (job.host || job.hostName) ? `host=${job.host || job.hostName}` : null,
+          job.awsTaskId ? `ecs=${job.awsTaskId}` : null,
           debug.executing ? 'executing=yes' : null
         ].filter(Boolean).join('; ');
 
@@ -459,9 +483,11 @@
           <td>${job.inWindow ? 'yes' : 'no'}</td>
           <td>${escapeHtml(job.firedTime || job.startIso || '')}</td>
           <td>${job.executing || job.status === 'Running' ? '—' : escapeHtml(job.endTime || job.endIso || '')}</td>
-            <td>${escapeHtml(job.elapsedTime || '')}</td>
-            <td>${escapeHtml(job.nextFireTime || '')}</td>
-            <td>${job.resourcesCount != null ? job.resourcesCount : '—'}</td>
+          <td>${escapeHtml(job.elapsedTime || '')}</td>
+          <td>${escapeHtml(job.nextFireTime || '')}</td>
+          <td>${escapeHtml(job.host || job.hostName || '')}</td>
+          <td>${renderEcsTaskCell(job)}</td>
+          <td>${job.resourcesCount != null ? job.resourcesCount : '—'}</td>
           <td><small>${escapeHtml(debugText)}</small></td>
         </tr>`;
       }).join('');
@@ -491,6 +517,8 @@
         `Status: ${escapeHtml(j.status || 'unknown')}<br>` +
         `Start: ${new Date(j.startMs).toISOString()}<br>` +
         `End: ${j.status === 'Running' ? 'in progress' : new Date(j.endMs).toISOString()}<br>` +
+        `Host: ${escapeHtml(j.host || j.hostName || 'n/a')}<br>` +
+        `${ecsTaskHoverLine(j)}<br>` +
         `Resources: ${j.resourcesCount != null ? j.resourcesCount : 'n/a'}`
       );
 

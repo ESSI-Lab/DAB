@@ -421,6 +421,15 @@ public class SchedulerSupport {
      * @param setting
      * @return
      */
+    public synchronized String getJobAwsTaskId(Setting setting) {
+
+	return getJobStatus(setting).flatMap(SchedulerJobStatus::getAwsTaskId).orElse("");
+    }
+
+    /**
+     * @param setting
+     * @return
+     */
     public synchronized String getAllMessages(Setting setting) {
 
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
