@@ -83,6 +83,24 @@ public class SchedulerJobStatus extends JobStatus {
 	object.put("workerClassName", workerClassName);
 
 	object.put("hostName", HostNamePropertyUtils.getHostNameProperty());
+	HostNamePropertyUtils.getAWSTaskId().ifPresent(taskId -> object.put("awsTaskId", taskId));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<String> getAwsTaskId() {
+
+	if (!object.has("awsTaskId")) {
+	    return Optional.empty();
+	}
+
+	String taskId = object.optString("awsTaskId", null);
+	if (taskId == null || taskId.isBlank()) {
+	    return Optional.empty();
+	}
+
+	return Optional.of(taskId);
     }
 
     /**

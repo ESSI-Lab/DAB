@@ -169,8 +169,8 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	    // operands.add(downBond);
 
 	    // we are interested only on TIME SERIES datasets
-	    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-	    operands.add(timeSeriesBond);
+//	    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
+//	    operands.add(timeSeriesBond);
 
 	    // we are interested only on datasets from a specific platform
 	    SimpleValueBond platformBond = BondFactory.createSimpleValueBond(//

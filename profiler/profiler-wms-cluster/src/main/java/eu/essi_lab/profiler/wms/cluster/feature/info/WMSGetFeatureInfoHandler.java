@@ -268,8 +268,8 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 		    // operands.add(downBond);
 
 		    // we are interested only on TIME SERIES datasets
-		    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
-		    operands.add(timeSeriesBond);
+//		    ResourcePropertyBond timeSeriesBond = BondFactory.createIsTimeSeriesBond(true);
+//		    operands.add(timeSeriesBond);
 
 		    Map<String, String[]> parameterMap = webRequest.getServletRequest().getParameterMap();
 
