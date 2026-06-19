@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harvesting status</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f8f9fa;
+      color: #222;
+      margin: 0;
+      padding: 0 0 40px 0;
+    }
+
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 32px;
+    }
+
+    h1 { color: #005aef; margin: 0 0 8px 0; }
+    h2 { margin-top: 0; font-size: 1.15em; }
+
+    .subtitle { color: #555; margin-bottom: 16px; }
+    .window-range { font-size: 0.92em; color: #666; margin-bottom: 16px; }
+
+    .controls {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-group label {
+      font-size: 0.9em;
+      color: #444;
+      font-weight: 600;
+    }
+
+    .control-group select,
+    .control-group input[type="text"] {
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 0.95em;
+      min-width: 180px;
+    }
+
+    .control-inline {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+    }
+
+    button {
+      background: #005aef;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 9px 16px;
+      font-size: 0.95em;
+      cursor: pointer;
+    }
+
+    button:hover { background: #0047c2; }
+    button.secondary {
+      background: #e5e7eb;
+      color: #111;
+    }
+
+    button.secondary:hover { background: #d1d5db; }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      min-width: 130px;
+    }
+
+    .summary-card .value {
+      font-size: 1.5em;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .summary-card .label { color: #666; font-size: 0.9em; }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 0.92em;
+    }
+
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+
+    .legend-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .chart-card,
+    .table-card,
+    .debug-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    #gantt-chart { width: 100%; min-height: 420px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92em;
+    }
+
+    th, td {
+      border-bottom: 1px solid #ececec;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3f6fb;
+      color: #333;
+      font-weight: 600;
+    }
+
+    tr.out-of-window { opacity: 0.55; }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 0.82em;
+      font-weight: 600;
+    }
+
+    .status-running { background: #f59e0b; }
+    .status-completed { background: #22c55e; }
+    .status-error { background: #ef4444; }
+    .status-canceled { background: #64748b; }
+    .status-rescheduled { background: #3b82f6; }
+    .status-unknown { background: #94a3b8; }
+
+    .empty-state, .loading, .error-box {
+      padding: 24px;
+      text-align: center;
+    }
+
+    .error-box {
+      color: #b91c1c;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .debug-pre {
+      background: #111827;
+      color: #e5e7eb;
+      padding: 12px;
+      border-radius: 6px;
+      overflow: auto;
+      font-size: 0.82em;
+      max-height: 360px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .api-url {
+      font-size: 0.85em;
+      color: #666;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <h1>Harvesting status</h1>
+    <p class="subtitle">Scheduler data from <code>/services/support/harvest-status</code> — same cached source as Brokering &rarr; Harvesting in the configurator (no per-source DB reads unless you opt in).</p>
+    <p class="window-range" id="window-range"></p>
+
+    <form class="controls" id="controls-form">
+      <div class="control-group">
+        <label for="hours">Time window</label>
+        <select id="hours" name="hours">
+          <option value="1">Last 1 hour</option>
+          <option value="2" selected>Last 2 hours</option>
+          <option value="6">Last 6 hours</option>
+          <option value="12">Last 12 hours</option>
+          <option value="24">Last 24 hours</option>
+          <option value="48">Last 48 hours</option>
+          <option value="168">Last 7 days</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="from">Custom from (ISO8601)</label>
+        <input type="text" id="from" name="from" placeholder="2026-06-18T10:00:00Z">
+      </div>
+      <div class="control-group">
+        <label for="to">Custom to (ISO8601)</label>
+        <input type="text" id="to" name="to" placeholder="2026-06-18T12:00:00Z">
+      </div>
+      <div class="control-group">
+        <label>Data loading</label>
+        <div class="control-inline">
+          <input type="checkbox" id="refreshScheduler" name="refreshScheduler">
+          <label for="refreshScheduler">Refresh scheduler from Quartz DB (slow; like clicking Reload in configurator)</label>
+        </div>
+        <div class="control-inline">
+          <input type="checkbox" id="includeProperties" name="includeProperties">
+          <label for="includeProperties">Include harvesting.properties per source (slow)</label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Display</label>
+        <div class="control-inline">
+          <input type="checkbox" id="showAll" name="showAll">
+          <label for="showAll">Show all settings (incl. out of window)</label>
+        </div>
+      </div>
+      <div class="control-group">
+        <label>Auto refresh</label>
+        <div class="control-inline">
+          <input type="checkbox" id="autoRefresh" name="autoRefresh">
+          <label for="autoRefresh">Auto-reload page every 60s when jobs are running</label>
+        </div>
+      </div>
+      <button type="submit">Apply</button>
+    </form>
+
+    <div id="error-box" class="error-box" hidden></div>
+    <div id="loading" class="loading">Loading harvest status…</div>
+
+    <div id="content" hidden>
+      <div class="summary" id="summary"></div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="legend-swatch" style="background:#f59e0b"></span> Running</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#22c55e"></span> Completed</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#ef4444"></span> Error</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#64748b"></span> Canceled</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#3b82f6"></span> Rescheduled</div>
+        <div class="legend-item"><span class="legend-swatch" style="background:#94a3b8"></span> Unknown / no data</div>
+      </div>
+
+      <div class="chart-card">
+        <h2>Gantt chart</h2>
+        <div id="gantt-chart"></div>
+        <div id="gantt-empty" class="empty-state" hidden>No harvesting activity overlaps the selected time window.</div>
+      </div>
+
+      <div class="table-card">
+        <div class="toolbar">
+          <h2 style="margin:0">Details</h2>
+          <button type="button" class="secondary" id="toggle-debug">Show raw API response</button>
+        </div>
+        <div id="table-empty" class="empty-state" hidden>No rows to display.</div>
+        <table id="details-table" hidden>
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Status</th>
+              <th>In window</th>
+              <th>Fired time</th>
+              <th>End time</th>
+              <th>Elapsed</th>
+              <th>Next fire</th>
+              <th>Resources</th>
+              <th>Debug</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="debug-card" id="debug-card" hidden>
+        <h2>Raw API response</h2>
+        <p class="api-url" id="api-url"></p>
+        <p class="api-url" id="timing-info"></p>
+        <pre class="debug-pre" id="raw-json"></pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '../services/support/harvest-status';
+    const STATUS_COLORS = {
+      running: '#f59e0b',
+      completed: '#22c55e',
+      error: '#ef4444',
+      canceled: '#64748b',
+      rescheduled: '#3b82f6',
+      unknown: '#94a3b8'
+    };
+
+    let refreshTimer = null;
+    let lastPayload = null;
+
+    function getFormParams() {
+      const params = new URLSearchParams();
+      params.set('hours', document.getElementById('hours').value || '2');
+      const from = document.getElementById('from').value.trim();
+      const to = document.getElementById('to').value.trim();
+      if (from) params.set('from', from);
+      if (to) params.set('to', to);
+      if (document.getElementById('refreshScheduler').checked) params.set('refresh', 'true');
+      if (document.getElementById('includeProperties').checked) params.set('includeProperties', 'true');
+      return params;
+    }
+
+    function getPageUrlParams() {
+      const params = getFormParams();
+      params.delete('refresh');
+      params.delete('includeProperties');
+      if (document.getElementById('showAll').checked) params.set('showAll', 'true');
+      if (document.getElementById('autoRefresh').checked) params.set('autoRefresh', 'true');
+      if (document.getElementById('refreshScheduler').checked) params.set('refreshScheduler', 'true');
+      if (document.getElementById('includeProperties').checked) params.set('includeProperties', 'true');
+      return params;
+    }
+
+    function syncFormFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('hours')) document.getElementById('hours').value = urlParams.get('hours');
+      if (urlParams.has('from')) document.getElementById('from').value = urlParams.get('from');
+      if (urlParams.has('to')) document.getElementById('to').value = urlParams.get('to');
+      document.getElementById('showAll').checked = urlParams.get('showAll') === 'true';
+      document.getElementById('autoRefresh').checked = urlParams.get('autoRefresh') === 'true';
+      document.getElementById('refreshScheduler').checked = urlParams.get('refreshScheduler') === 'true';
+      document.getElementById('includeProperties').checked = urlParams.get('includeProperties') === 'true';
+    }
+
+    function updateUrlFromForm() {
+      const params = getPageUrlParams();
+      if (document.getElementById('showAll').checked) params.set('showAll', 'true');
+      if (document.getElementById('autoRefresh').checked) params.set('autoRefresh', 'true');
+      if (document.getElementById('refreshScheduler').checked) params.set('refreshScheduler', 'true');
+      if (document.getElementById('includeProperties').checked) params.set('includeProperties', 'true');
+      const qs = params.toString();
+      history.replaceState(null, '', qs ? '?' + qs : window.location.pathname);
+    }
+
+    function statusKey(job) {
+      return (job.statusKey || (job.status ? String(job.status).toLowerCase() : 'unknown'));
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderSummary(summary, windowInfo) {
+      const el = document.getElementById('summary');
+      const cards = [
+        ['Jobs in window', summary.jobsInWindow, '#111'],
+        ['Running', summary.running, '#f59e0b'],
+        ['Completed', summary.completed, '#22c55e'],
+        ['Error', summary.error, '#ef4444'],
+        ['With scheduler data', summary.withSchedulerData, '#111'],
+        ['Total settings', summary.totalSettings, '#111']
+      ];
+      el.innerHTML = cards.map(([label, value, color]) =>
+        `<div class="summary-card"><div class="value" style="color:${color}">${value}</div><div class="label">${label}</div></div>`
+      ).join('');
+
+      document.getElementById('window-range').textContent =
+        `Showing ${windowInfo.hours} hour(s): ${windowInfo.startIso} — ${windowInfo.endIso}`;
+    }
+
+    function visibleJobs(jobs, showAll) {
+      if (showAll) {
+        return jobs;
+      }
+      return jobs.filter(j =>
+        j.executing ||
+        j.status === 'Running' ||
+        (j.startMs != null && j.inWindow)
+      );
+    }
+
+    function ganttJobs(jobs) {
+      return jobs.filter(j =>
+        j.startMs != null &&
+        j.endMs != null &&
+        (j.inWindow || j.executing || j.status === 'Running')
+      );
+    }
+
+    function renderTable(jobs, showAll) {
+      const rows = visibleJobs(jobs, showAll);
+      const table = document.getElementById('details-table');
+      const tbody = table.querySelector('tbody');
+      const empty = document.getElementById('table-empty');
+
+      if (!rows.length) {
+        table.hidden = true;
+        empty.hidden = false;
+        return;
+      }
+
+      empty.hidden = true;
+      table.hidden = false;
+      tbody.innerHTML = rows.map(job => {
+        const key = statusKey(job);
+        const label = job.status || '—';
+        const debug = job.debug || {};
+        const debugText = [
+          debug.skipReason ? `skip: ${debug.skipReason}` : null,
+          `stored=${debug.storedPhase || '—'}`,
+          `start=${debug.startSource || '—'}`,
+          `end=${debug.endSource || '—'}`,
+          debug.executing ? 'executing=yes' : null
+        ].filter(Boolean).join('; ');
+
+        return `<tr class="${job.inWindow ? '' : 'out-of-window'}">
+          <td><strong>${escapeHtml(job.label)}</strong><br><small>${escapeHtml(job.sourceId)}</small></td>
+          <td><span class="status-pill status-${escapeHtml(key)}">${escapeHtml(label)}</span></td>
+          <td>${job.inWindow ? 'yes' : 'no'}</td>
+          <td>${escapeHtml(job.firedTime || job.startIso || '')}</td>
+          <td>${job.executing || job.status === 'Running' ? '—' : escapeHtml(job.endTime || job.endIso || '')}</td>
+            <td>${escapeHtml(job.elapsedTime || '')}</td>
+            <td>${escapeHtml(job.nextFireTime || '')}</td>
+            <td>${job.resourcesCount != null ? job.resourcesCount : '—'}</td>
+          <td><small>${escapeHtml(debugText)}</small></td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderGantt(jobs, windowInfo) {
+      const chartJobs = ganttJobs(jobs)
+        .sort((a, b) => String(a.label).localeCompare(String(b.label)));
+
+      const empty = document.getElementById('gantt-empty');
+      const chartEl = document.getElementById('gantt-chart');
+
+      if (!chartJobs.length || typeof Plotly === 'undefined') {
+        Plotly.purge(chartEl);
+        empty.hidden = false;
+        return;
+      }
+
+      empty.hidden = true;
+
+      const labels = chartJobs.map(j => j.label);
+      const durations = chartJobs.map(j => j.durationMs || Math.max(1, j.endMs - j.startMs));
+      const bases = chartJobs.map(j => new Date(j.startMs));
+      const colors = chartJobs.map(j => STATUS_COLORS[statusKey(j)] || STATUS_COLORS.unknown);
+      const hoverTexts = chartJobs.map(j =>
+        `<b>${escapeHtml(j.label)}</b><br>` +
+        `Status: ${escapeHtml(j.status || 'unknown')}<br>` +
+        `Start: ${new Date(j.startMs).toISOString()}<br>` +
+        `End: ${j.status === 'Running' ? 'in progress' : new Date(j.endMs).toISOString()}<br>` +
+        `Resources: ${j.resourcesCount != null ? j.resourcesCount : 'n/a'}`
+      );
+
+      const barHeight = Math.max(420, labels.length * 34 + 80);
+      chartEl.style.height = barHeight + 'px';
+
+      Plotly.newPlot(chartEl, [{
+        type: 'bar',
+        orientation: 'h',
+        y: labels,
+        x: durations,
+        base: bases,
+        marker: { color: colors, line: { color: 'rgba(0,0,0,0.15)', width: 1 } },
+        text: hoverTexts,
+        hoverinfo: 'text',
+        hovertemplate: '%{text}<extra></extra>'
+      }], {
+        barmode: 'overlay',
+        margin: { l: 220, r: 24, t: 24, b: 48 },
+        height: barHeight,
+        xaxis: {
+          type: 'date',
+          range: [new Date(windowInfo.startMs), new Date(windowInfo.endMs)],
+          title: 'Time',
+          tickformat: '%H:%M<br>%d %b'
+        },
+        yaxis: { automargin: true },
+        showlegend: false,
+        plot_bgcolor: '#fafafa',
+        paper_bgcolor: '#ffffff'
+      }, { responsive: true, displayModeBar: true });
+    }
+
+    function scheduleRefresh(summary) {
+      if (refreshTimer) {
+        clearInterval(refreshTimer);
+        refreshTimer = null;
+      }
+      if (document.getElementById('autoRefresh').checked && summary.running > 0) {
+        refreshTimer = setInterval(() => loadData(false), 60000);
+      }
+    }
+
+    async function loadData(showLoading) {
+      const params = getFormParams();
+      const url = API_BASE + '?' + params.toString();
+      const fetchStart = performance.now();
+      console.log('[harvest-status] fetch START', url);
+
+      if (showLoading !== false) {
+        document.getElementById('loading').hidden = false;
+        document.getElementById('content').hidden = true;
+      }
+      document.getElementById('error-box').hidden = true;
+      document.getElementById('api-url').textContent = url;
+
+      try {
+        const response = await fetch(url);
+        const networkMs = Math.round(performance.now() - fetchStart);
+        console.log('[harvest-status] response headers received in', networkMs, 'ms, status=', response.status);
+
+        const parseStart = performance.now();
+        const payload = await response.json();
+        const parseMs = Math.round(performance.now() - parseStart);
+        const totalMs = Math.round(performance.now() - fetchStart);
+        lastPayload = payload;
+
+        console.log('[harvest-status] JSON parsed in', parseMs, 'ms, total client time', totalMs, 'ms');
+        if (payload.debug && payload.debug.timing) {
+          console.log('[harvest-status] server timing (ms):', payload.debug.timing);
+        }
+        if (payload.summary) {
+          console.log('[harvest-status] summary:', payload.summary);
+        }
+
+        if (!response.ok || payload.status === 'error') {
+          throw new Error(payload.message || ('HTTP ' + response.status));
+        }
+
+        document.getElementById('loading').hidden = true;
+        document.getElementById('content').hidden = false;
+        document.getElementById('raw-json').textContent = JSON.stringify(payload, null, 2);
+        const timingEl = document.getElementById('timing-info');
+        if (payload.debug && payload.debug.timing) {
+          const t = payload.debug.timing;
+          timingEl.textContent = 'Server timing (ms): total=' + t.totalMs +
+            ', schedulerUpdate=' + t.schedulerUpdateMs +
+            ', database=' + t.databaseInitMs +
+            ', settings=' + t.loadSettingsMs +
+            ', buildJobs=' + t.buildJobsMs +
+            (t.slowSources && t.slowSources.length ? ', slowSources=' + t.slowSources.length : '');
+        } else {
+          timingEl.textContent = '';
+        }
+
+        const showAll = document.getElementById('showAll').checked;
+        renderSummary(payload.summary, payload.window);
+        renderTable(payload.jobs || [], showAll);
+        renderGantt(payload.jobs || [], payload.window);
+        scheduleRefresh(payload.summary);
+        console.log('[harvest-status] render complete, total', Math.round(performance.now() - fetchStart), 'ms');
+      } catch (err) {
+        console.error('[harvest-status] FAILED after', Math.round(performance.now() - fetchStart), 'ms:', err);
+        document.getElementById('loading').hidden = true;
+        document.getElementById('content').hidden = true;
+        const box = document.getElementById('error-box');
+        box.hidden = false;
+        box.textContent = 'Failed to load harvest status: ' + err.message;
+      }
+    }
+
+    document.getElementById('controls-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      updateUrlFromForm();
+      loadData(true);
+    });
+
+    document.getElementById('showAll').addEventListener('change', () => {
+      updateUrlFromForm();
+      if (lastPayload) {
+        const showAll = document.getElementById('showAll').checked;
+        renderTable(lastPayload.jobs || [], showAll);
+      }
+    });
+
+    document.getElementById('toggle-debug').addEventListener('click', () => {
+      const card = document.getElementById('debug-card');
+      const visible = !card.hidden;
+      card.hidden = visible;
+      document.getElementById('toggle-debug').textContent = visible ? 'Show raw API response' : 'Hide raw API response';
+    });
+
+    syncFormFromUrl();
+    loadData(true);
+  </script>
+</body>
+</html>

@@ -103,6 +103,7 @@
 		<module>accessor-meteotracker</module>
 		<module>accessor-kisters</module>
 		<module>accessor-uk-hydrology</module>
+		<module>accessor-de-pegelonline</module>
 		<module>accessor-ch-existenz-bafu</module>
 		<module>accessor-worldcereal</module>
 		<module>accessor-seanoe</module>

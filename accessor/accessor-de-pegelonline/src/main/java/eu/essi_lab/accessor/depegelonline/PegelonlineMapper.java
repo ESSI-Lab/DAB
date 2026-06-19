@@ -1,4 +1,4 @@
-package eu.essi_lab.accessor.chexistenzbafu;
+package eu.essi_lab.accessor.depegelonline;
 
 import java.math.BigDecimal;
 
@@ -45,18 +45,18 @@ import eu.essi_lab.ommdk.AbstractResourceMapper;
 /**
  * @author boldrini
  */
-public class CHExistenzBafuMapper extends AbstractResourceMapper {
+public class PegelonlineMapper extends AbstractResourceMapper {
 
     /**
      * 
      */
-    public static final String CH_EXISTENZ_BAFU_SCHEMA = "https://api.existenz.ch/apiv1/hydro/schema";
+    public static final String PEGELONLINE_SCHEMA = "https://www.pegelonline.wsv.de/webservices/rest-api/schema";
 
     @Override
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
 
-	CHExistenzBafuEntity entity = getEntity(originalMD);
-	return mapMeasure(entity, source);
+	PegelonlineEntity entity = getEntity(originalMD);
+	return mapTimeseries(entity, source);
     }
 
     /**
@@ -64,7 +64,7 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
      * @param source
      * @return
      */
-    private Dataset mapMeasure(CHExistenzBafuEntity entity, GSSource source) {
+    private Dataset mapTimeseries(PegelonlineEntity entity, GSSource source) {
 
 	JSONObject object = entity.getObject();
 
@@ -74,10 +74,10 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setHierarchyLevelName("dataset");
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 
-	String locationId = object.optString(CHExistenzBafuClient.LOCATION_ID, "");
-	if (!locationId.isEmpty()) {
+	String stationUuid = object.optString(PegelonlineClient.STATION_UUID, null);
+	if (stationUuid != null) {
 	    dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		    .setParentIdentifier(decorateIdentifier(source.getEndpoint(), locationId));
+		    .setParentIdentifier(decorateIdentifier(source.getEndpoint(), stationUuid));
 	}
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
@@ -86,47 +86,45 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
 	Keywords keywords = new Keywords();
 	dataId.addKeywords(keywords);
 
-	String stationLabel = object.optString(CHExistenzBafuClient.LOCATION_NAME, "");
-	String parameterName = object.optString(CHExistenzBafuClient.PARAMETER_NAME, "");
-	String parameterCode = object.optString(CHExistenzBafuClient.PARAMETER, "");
-	String waterBodyName = object.optString(CHExistenzBafuClient.WATER_BODY_NAME, "");
-	String waterBodyType = object.optString(CHExistenzBafuClient.WATER_BODY_TYPE, "");
-	String measureNotation = object.optString(CHExistenzBafuClient.MEASURE_NOTATION, "");
-	String from = object.optString(CHExistenzBafuClient.FROM, null);
-	String to = object.optString(CHExistenzBafuClient.TO, null);
+	String stationLabel = object.optString(PegelonlineClient.STATION_LABEL, "");
+	String timeseriesLabel = object.optString(PegelonlineClient.TIMESERIES_LABEL, "");
+	String timeseriesId = object.optString(PegelonlineClient.TIMESERIES_ID, "");
+	String waterName = object.optString(PegelonlineClient.WATER_NAME, "");
+	String from = object.optString(PegelonlineClient.FROM, null);
+	String to = object.optString(PegelonlineClient.TO, null);
 
 	ResponsibleParty party = new ResponsibleParty();
-	party.setOrganisationName("Swiss Federal Office for the Environment (BAFU)");
+	party.setOrganisationName("Wasserstraßen- und Schifffahrtsverwaltung des Bundes (WSV)");
 	party.setRoleCode("pointOfContact");
 	dataId.addPointOfContact(party);
 
 	addKeywords(object, keywords);
 
-	coreMetadata.setTitle(stationLabel + " - " + parameterName);
+	coreMetadata.setTitle(stationLabel + " - " + timeseriesLabel);
 
-	coreMetadata.setAbstract("Timeseries " + parameterName + " from station " + stationLabel + ", water body " + waterBodyName
-		+ " (" + waterBodyType + ", Swiss BAFU Hydrology API via Existenz.ch)");
+	coreMetadata.setAbstract("Timeseries " + timeseriesLabel + " from station " + stationLabel + ", water body " + waterName
+		+ " (PEGELONLINE REST API, last " + PegelonlineClient.DATA_RETENTION_DAYS + " days)");
 
-	dataset.getExtensionHandler().setCountry("Switzerland");
+	dataset.getExtensionHandler().setCountry("Germany");
 
 	if (from != null && to != null) {
-	    coreMetadata.addTemporalExtent(CHExistenzBafuClient.toIso8601Utc(from), CHExistenzBafuClient.toIso8601Utc(to));
+	    coreMetadata.addTemporalExtent(from, to);
 	}
 
-	if (object.has(CHExistenzBafuClient.STATION_LAT) && object.has(CHExistenzBafuClient.STATION_LON)) {
-	    BigDecimal lat = new BigDecimal(object.get(CHExistenzBafuClient.STATION_LAT).toString());
-	    BigDecimal lon = new BigDecimal(object.get(CHExistenzBafuClient.STATION_LON).toString());
+	if (object.has(PegelonlineClient.STATION_LAT) && object.has(PegelonlineClient.STATION_LONG)) {
+	    BigDecimal lat = new BigDecimal(object.get(PegelonlineClient.STATION_LAT).toString());
+	    BigDecimal lon = new BigDecimal(object.get(PegelonlineClient.STATION_LONG).toString());
 	    coreMetadata.addBoundingBox(lat, lon, lat, lon);
 	}
 
-	addPlatform(locationId, stationLabel, coreMetadata);
-	addCoverageDescription(parameterName, coreMetadata, measureNotation);
+	addPlatform(object, stationUuid, stationLabel, coreMetadata);
+	addCoverageDescription(timeseriesLabel, coreMetadata, timeseriesId);
 	addExtensions(object, dataset.getExtensionHandler());
 
 	coreMetadata.addDistributionOnlineResource(//
-		measureNotation, //
+		timeseriesId, //
 		source.getEndpoint(), //
-		NetProtocolWrapper.CH_EXISTENZ_BAFU.getCommonURN(), //
+		NetProtocolWrapper.PEGELONLINE.getCommonURN(), //
 		"download");
 
 	return dataset;
@@ -138,14 +136,14 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
      */
     private void addKeywords(JSONObject object, Keywords keywords) {
 
-	addKeyword(keywords, object.optString(CHExistenzBafuClient.LOCATION_NAME, null));
-	addKeyword(keywords, object.optString(CHExistenzBafuClient.WATER_BODY_NAME, null));
-	addKeyword(keywords, object.optString(CHExistenzBafuClient.WATER_BODY_TYPE, null));
-	addKeyword(keywords, object.optString(CHExistenzBafuClient.PARAMETER_NAME, null));
-	addKeyword(keywords, object.optString(CHExistenzBafuClient.PARAMETER, null));
-	addKeyword(keywords, "Switzerland");
+	addKeyword(keywords, object.optString(PegelonlineClient.STATION_LABEL, null));
+	addKeyword(keywords, object.optString(PegelonlineClient.WATER_NAME, null));
+	addKeyword(keywords, object.optString(PegelonlineClient.TIMESERIES_LABEL, null));
+	addKeyword(keywords, object.optString(PegelonlineClient.TIMESERIES_SHORTNAME, null));
+	addKeyword(keywords, object.optString(PegelonlineClient.STATION_AGENCY, null));
+	addKeyword(keywords, "Germany");
 	addKeyword(keywords, "Hydrology");
-	addKeyword(keywords, "BAFU");
+	addKeyword(keywords, "PEGELONLINE");
     }
 
     /**
@@ -160,11 +158,16 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
     }
 
     /**
-     * @param locationId
+     * @param object
+     * @param stationUuid
      * @param stationLabel
      * @param coreMetadata
      */
-    private void addPlatform(String locationId, String stationLabel, CoreMetadata coreMetadata) {
+    private void addPlatform(JSONObject object, String stationUuid, String stationLabel, CoreMetadata coreMetadata) {
+
+	if (stationUuid == null) {
+	    stationUuid = object.optString(PegelonlineClient.STATION_UUID, "");
+	}
 
 	MIPlatform platform = new MIPlatform();
 
@@ -172,23 +175,23 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
 	citation.setTitle(stationLabel);
 	platform.setCitation(citation);
 
-	platform.setDescription("Station " + stationLabel + " (Switzerland)");
-	platform.setMDIdentifierCode(NetProtocolWrapper.CH_EXISTENZ_BAFU.getCommonURN() + "/" + locationId);
+	platform.setDescription("Station " + stationLabel + " (Germany)");
+	platform.setMDIdentifierCode(NetProtocolWrapper.PEGELONLINE.getCommonURN() + "/" + stationUuid);
 
 	coreMetadata.getMIMetadata().addMIPlatform(platform);
     }
 
     /**
-     * @param parameterName
+     * @param timeseriesLabel
      * @param coreMetadata
-     * @param measureNotation
+     * @param timeseriesId
      */
-    private void addCoverageDescription(String parameterName, CoreMetadata coreMetadata, String measureNotation) {
+    private void addCoverageDescription(String timeseriesLabel, CoreMetadata coreMetadata, String timeseriesId) {
 
 	CoverageDescription coverageDescription = new CoverageDescription();
-	coverageDescription.setAttributeTitle(parameterName);
-	coverageDescription.setAttributeDescription(parameterName);
-	coverageDescription.setAttributeIdentifier(NetProtocolWrapper.CH_EXISTENZ_BAFU.getCommonURN() + ":" + measureNotation);
+	coverageDescription.setAttributeTitle(timeseriesLabel);
+	coverageDescription.setAttributeDescription(timeseriesLabel);
+	coverageDescription.setAttributeIdentifier(NetProtocolWrapper.PEGELONLINE.getCommonURN() + ":" + timeseriesId);
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
     }
 
@@ -198,34 +201,60 @@ public class CHExistenzBafuMapper extends AbstractResourceMapper {
      */
     private void addExtensions(JSONObject object, ExtensionHandler handler) {
 
-	String unitName = object.optString(CHExistenzBafuClient.PARAMETER_UNIT, "");
+	String unitName = object.optString(PegelonlineClient.UNIT_NAME, "");
 	handler.setAttributeUnits(unitName);
 	handler.setAttributeUnitsAbbreviation(unitName);
-	handler.setCountry("Switzerland");
+	handler.setCountry("Germany");
 	handler.setTimeInterpolation("instantaneous");
-	handler.setTimeResolutionDuration8601("PT10M");
+
+	if (object.has(PegelonlineClient.PERIOD)) {
+	    int periodSeconds = object.getInt(PegelonlineClient.PERIOD);
+	    String duration = periodToIso8601(periodSeconds);
+	    handler.setTimeResolutionDuration8601(duration);
+	}
+    }
+
+    /**
+     * @param periodSeconds
+     * @return
+     */
+    private String periodToIso8601(int periodSeconds) {
+
+	if (periodSeconds % 86400 == 0) {
+	    int days = periodSeconds / 86400;
+	    return "P" + days + "D";
+	}
+	if (periodSeconds % 3600 == 0) {
+	    int hours = periodSeconds / 3600;
+	    return "PT" + hours + "H";
+	}
+	if (periodSeconds % 60 == 0) {
+	    int minutes = periodSeconds / 60;
+	    return "PT" + minutes + "M";
+	}
+	return "PT" + periodSeconds + "S";
     }
 
     /**
      * @param originalMD
      * @return
      */
-    private CHExistenzBafuEntity getEntity(OriginalMetadata originalMD) {
+    private PegelonlineEntity getEntity(OriginalMetadata originalMD) {
 
-	return new CHExistenzBafuEntity(originalMD.getMetadata());
+	return new PegelonlineEntity(originalMD.getMetadata());
     }
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
 
-	return CH_EXISTENZ_BAFU_SCHEMA;
+	return PEGELONLINE_SCHEMA;
     }
 
     @Override
     protected String createOriginalIdentifier(GSResource resource) {
 
-	CHExistenzBafuEntity entity = getEntity(resource.getOriginalMetadata());
-	String entityId = entity.getObject().optString(CHExistenzBafuClient.MEASURE_NOTATION, null);
+	PegelonlineEntity entity = getEntity(resource.getOriginalMetadata());
+	String entityId = entity.getObject().optString(PegelonlineClient.TIMESERIES_ID, null);
 	return decorateIdentifier(resource.getSource().getEndpoint(), entityId);
     }
 

@@ -50,7 +50,7 @@
 	"shapeView" : "his-central-shapes",
 	"clusterWMS" : true,
 	"wmsLayerExtent" : {
-		"south" : 38,
+		"south" : 36,
 		"west" : 6,
 		"north" : 48,
 		"east" : 19

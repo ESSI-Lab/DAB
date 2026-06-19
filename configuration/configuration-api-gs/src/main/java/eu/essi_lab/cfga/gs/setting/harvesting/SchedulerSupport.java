@@ -53,6 +53,11 @@ public class SchedulerSupport {
     private List<String> executingSettings;
 
     /**
+     * Fired time (epoch ms) per setting id for jobs currently in {@code GS_QRTZ_FIRED_TRIGGERS}.
+     */
+    private Map<String, Long> executingStartMsMap;
+
+    /**
      *
      */
     private HashMap<String, String> nextFireTimeMap;
@@ -73,6 +78,7 @@ public class SchedulerSupport {
     private SchedulerSupport() {
 
 	executingSettings = new ArrayList<>();
+	executingStartMsMap = new HashMap<>();
 	statusList = new ArrayList<>();
 	nextFireTimeMap = new HashMap<>();
 	userDateTimeZone = DateTimeZone.UTC;
@@ -110,43 +116,78 @@ public class SchedulerSupport {
     }
 
     /**
+     * Reloads only the executing jobs snapshot from Quartz ({@code GS_QRTZ_FIRED_TRIGGERS}).
+     * Lightweight compared to {@link #update()} and enough to detect currently running harvests.
+     */
+    public void refreshExecuting() {
+
+	synchronized (SchedulerSupport.this) {
+
+	    userDateTimeZone = ConfigurationWrapper.getSchedulerSetting().getUserDateTimeZone();
+	    Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
+
+	    loadExecutingSettings(scheduler);
+	}
+    }
+
+    /**
+     * @param scheduler
+     */
+    private void loadExecutingSettings(Scheduler scheduler) {
+
+	try {
+
+	    long stepStartMs = System.currentTimeMillis();
+	    Map<String, Long> startMsMap = new HashMap<>();
+	    executingSettings = scheduler.//
+		    listExecutingSettings().//
+		    stream().//
+		    map(s -> {
+			startMsMap.put(s.getIdentifier(), s.getFiredTime().get().getTime());
+			return s.getIdentifier() + "/" + parseDate(s.getFiredTime().get());
+		    }).//
+		    collect(Collectors.toList());
+	    executingStartMsMap = startMsMap;
+	    GSLoggerFactory.getLogger(SchedulerSupport.class).info("SchedulerSupport executing snapshot: {} entries, {} ms",
+		    executingSettings.size(), System.currentTimeMillis() - stepStartMs);
+
+	} catch (Exception e) {
+
+	    executingSettings = new ArrayList<>();
+	    executingStartMsMap = new HashMap<>();
+
+	    GSLoggerFactory.getLogger(SchedulerSupport.class).error("List executing settings failed: {}", e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @param setting
+     * @return fired time in epoch milliseconds for a job currently executing, if known
+     */
+    public synchronized Optional<Long> getExecutingStartMs(Setting setting) {
+
+	return Optional.ofNullable(executingStartMsMap.get(setting.getIdentifier()));
+    }
+
+    /**
      *
      */
     public void update() {
 
 	synchronized (SchedulerSupport.this) {
 
-	    GSLoggerFactory.getLogger(SchedulerSupport.class).debug("Updating scheduler support STARTED");
+	    long updateStartMs = System.currentTimeMillis();
+	    GSLoggerFactory.getLogger(SchedulerSupport.class).info("SchedulerSupport.update() STARTED");
 
 	    userDateTimeZone = ConfigurationWrapper.getSchedulerSetting().getUserDateTimeZone();
 
 	    Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
 
-	    //
-	    //
-	    //
+	    loadExecutingSettings(scheduler);
 
 	    try {
 
-		executingSettings = scheduler.//
-			listExecutingSettings().//
-			stream().//
-			map(s -> s.getIdentifier() + "/" + parseDate(s.getFiredTime().get())).//
-			collect(Collectors.toList());
-
-		//
-		//
-		//
-
-	    } catch (Exception e) {
-
-		executingSettings = new ArrayList<>();
-
-		GSLoggerFactory.getLogger(SchedulerSupport.class).error("List executing settings failed: {}", e.getMessage(), e);
-	    }
-
-	    try {
-
+		long stepStartMs = System.currentTimeMillis();
 		HashMap<String, List<Optional<Date>>> tempMap = scheduler.//
 			listScheduledSettings().//
 			stream().//
@@ -167,6 +208,8 @@ public class SchedulerSupport {
 			optional.ifPresent(date -> nextFireTimeMap.put(key, parseDate(date)));
 		    }
 		});
+		GSLoggerFactory.getLogger(SchedulerSupport.class).info("SchedulerSupport.update() listScheduledSettings: {} entries, {} ms",
+			nextFireTimeMap.size(), System.currentTimeMillis() - stepStartMs);
 
 	    } catch (Exception e) {
 
@@ -180,7 +223,10 @@ public class SchedulerSupport {
 	    //
 
 	    try {
+		long stepStartMs = System.currentTimeMillis();
 		statusList = scheduler.getJobStatuslist();
+		GSLoggerFactory.getLogger(SchedulerSupport.class).info("SchedulerSupport.update() getJobStatuslist: {} entries, {} ms",
+			statusList.size(), System.currentTimeMillis() - stepStartMs);
 
 	    } catch (SQLException e) {
 
@@ -191,7 +237,8 @@ public class SchedulerSupport {
 	    //
 	    //
 
-	    GSLoggerFactory.getLogger(SchedulerSupport.class).debug("Updating scheduler support ENDED");
+	    GSLoggerFactory.getLogger(SchedulerSupport.class).info("SchedulerSupport.update() ENDED in {} ms",
+		    System.currentTimeMillis() - updateStartMs);
 	}
     }
 
@@ -200,11 +247,6 @@ public class SchedulerSupport {
      * @return
      */
     public synchronized String getFiredTime(Setting setting) {
-
-	if (schedulingDisabled(setting)) {
-
-	    return "";
-	}
 
 	Optional<String> time = executingSettings.//
 		stream().//
@@ -215,6 +257,11 @@ public class SchedulerSupport {
 	if (time.isPresent()) {
 
 	    return time.get();
+	}
+
+	if (schedulingDisabled(setting)) {
+
+	    return "";
 	}
 
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
@@ -257,11 +304,6 @@ public class SchedulerSupport {
      */
     public synchronized String getEndTime(Setting setting) {
 
-	if (schedulingDisabled(setting)) {
-
-	    return "";
-	}
-
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
 
 	if (jobStatus.isPresent()) {
@@ -272,6 +314,11 @@ public class SchedulerSupport {
 
 		return parseTime(endTime.get()).replace("T", " ");
 	    }
+	}
+
+	if (schedulingDisabled(setting)) {
+
+	    return "";
 	}
 
 	return "";
@@ -297,7 +344,7 @@ public class SchedulerSupport {
 	return statusList.//
 		stream().//
 		filter(s -> s.getSettingId().equals(setting.getIdentifier())).//
-		findFirst();
+		max(Comparator.comparing(s -> s.getStartTime().orElse(""), Comparator.nullsLast(String::compareTo)));
 
     }
 
@@ -307,16 +354,58 @@ public class SchedulerSupport {
      */
     public synchronized String getJobPhase(Setting setting) {
 
-	boolean present = executingSettings.//
-		stream().//
-		anyMatch(s -> retrieveIdentifier(s).equals(setting.getIdentifier()));
-
-	if (present) {
+	if (isExecuting(setting)) {
 
 	    return JobPhase.RUNNING.getLabel();
 	}
 
-	return getJobStatus(setting).map(status -> status.getPhase().getLabel()).orElse("");
+	return resolveEffectivePhase(getJobStatus(setting)).map(JobPhase::getLabel).orElse("");
+    }
+
+    /**
+     * A job is running only while Quartz reports it in {@code GS_QRTZ_FIRED_TRIGGERS}. A persisted
+     * {@link JobPhase#RUNNING} phase without a matching fired trigger is treated as stale.
+     */
+    private boolean isExecuting(Setting setting) {
+
+	return executingSettings.//
+		stream().//
+		anyMatch(s -> retrieveIdentifier(s).equals(setting.getIdentifier()));
+    }
+
+    /**
+     * @param jobStatus
+     * @return
+     */
+    private Optional<JobPhase> resolveEffectivePhase(Optional<SchedulerJobStatus> jobStatus) {
+
+	if (jobStatus.isEmpty()) {
+
+	    return Optional.empty();
+	}
+
+	SchedulerJobStatus status = jobStatus.get();
+	JobPhase phase = status.getPhase();
+
+	if (phase != JobPhase.RUNNING) {
+
+	    return Optional.of(phase);
+	}
+
+	//
+	// Stale RUNNING: the job is not in fired triggers but JOB_STATUS was not finalized
+	//
+	if (status.getEndTime().isPresent()) {
+
+	    if (!status.getErrorMessages().isEmpty()) {
+
+		return Optional.of(JobPhase.ERROR);
+	    }
+
+	    return Optional.of(JobPhase.COMPLETED);
+	}
+
+	return Optional.empty();
     }
 
     /**
@@ -357,11 +446,6 @@ public class SchedulerSupport {
      */
     public synchronized String getElapsedTime(Setting setting) {
 
-	if (schedulingDisabled(setting)) {
-
-	    return "";
-	}
-
 	Optional<SchedulerJobStatus> jobStatus = getJobStatus(setting);
 
 	if (jobStatus.isPresent()) {
@@ -376,6 +460,11 @@ public class SchedulerSupport {
 
 		return computeElapsedTime(startTime, endTime);
 	    }
+	}
+
+	if (schedulingDisabled(setting)) {
+
+	    return "";
 	}
 
 	return "";

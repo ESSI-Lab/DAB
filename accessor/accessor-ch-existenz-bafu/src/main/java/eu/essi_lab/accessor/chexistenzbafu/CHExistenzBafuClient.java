@@ -39,6 +39,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.accessor.chexistenzbafu.CHExistenzBafuEntity.EntityType;
 import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 
 /**
  * @author boldrini
@@ -48,6 +49,10 @@ public class CHExistenzBafuClient {
     public static final String DEFAULT_ENDPOINT = "https://api.existenz.ch/apiv1/";
 
     public static final String APP_NAME = "dab";
+
+    public static final String SWISS_TIMEZONE = "Europe/Zurich";
+
+    public static final String API_DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     public static final String DEFAULT_HISTORICAL_START = "1990-01-01 00:00:00";
 
@@ -84,8 +89,8 @@ public class CHExistenzBafuClient {
 
 	this.endpoint = normalizeEndpoint(endpoint);
 	this.downloader = new Downloader();
-	this.apiDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	this.apiDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+	this.apiDateFormat = new SimpleDateFormat(API_DATE_PATTERN);
+	this.apiDateFormat.setTimeZone(TimeZone.getTimeZone(SWISS_TIMEZONE));
     }
 
     /**
@@ -212,8 +217,8 @@ public class CHExistenzBafuClient {
 	String locationId = getLocationId(location);
 	String parameterName = parameter.getObject().getString("name");
 	measure.put(MEASURE_NOTATION, getMeasureNotation(locationId, parameterName));
-	measure.put(FROM, DEFAULT_HISTORICAL_START);
-	measure.put(TO, formatTimestamp(latestTimestamp));
+	measure.put(FROM, toIso8601Utc(DEFAULT_HISTORICAL_START));
+	measure.put(TO, ISO8601DateTimeUtils.getISO8601DateTime(timestampToDate(latestTimestamp)));
 
 	return entity;
     }
@@ -335,9 +340,44 @@ public class CHExistenzBafuClient {
      */
     public static String formatTimestamp(long timestamp) {
 
-	SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	format.setTimeZone(TimeZone.getTimeZone("UTC"));
-	return format.format(timestampToDate(timestamp));
+	return ISO8601DateTimeUtils.getISO8601DateTime(timestampToDate(timestamp));
+    }
+
+    /**
+     * Converts a Swiss local date-time or an ISO8601 UTC string to ISO8601 UTC.
+     *
+     * @param dateTime
+     * @return
+     */
+    public static String toIso8601Utc(String dateTime) {
+
+	if (dateTime == null || dateTime.isEmpty()) {
+	    return dateTime;
+	}
+
+	if (dateTime.contains("T")) {
+	    Optional<Date> parsed = ISO8601DateTimeUtils.parseISO8601ToDate(dateTime);
+	    if (parsed.isPresent()) {
+		return ISO8601DateTimeUtils.getISO8601DateTime(parsed.get());
+	    }
+	}
+
+	return parseSwissLocalDateTime(dateTime).map(ISO8601DateTimeUtils::getISO8601DateTime).orElse(dateTime);
+    }
+
+    /**
+     * @param value
+     * @return
+     */
+    private static Optional<Date> parseSwissLocalDateTime(String value) {
+
+	try {
+	    SimpleDateFormat format = new SimpleDateFormat(API_DATE_PATTERN);
+	    format.setTimeZone(TimeZone.getTimeZone(SWISS_TIMEZONE));
+	    return Optional.of(format.parse(value));
+	} catch (Exception e) {
+	    return Optional.empty();
+	}
     }
 
     /**
@@ -346,11 +386,7 @@ public class CHExistenzBafuClient {
      */
     private Optional<Date> parseApiDate(String value) {
 
-	try {
-	    return Optional.of(apiDateFormat.parse(value));
-	} catch (Exception e) {
-	    return Optional.empty();
-	}
+	return parseSwissLocalDateTime(value);
     }
 
     /**
