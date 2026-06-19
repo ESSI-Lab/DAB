@@ -195,9 +195,10 @@ public class UserFinder {
 
     /**
      * @param identifier
+     * @param secondaryWriter
      * @throws Exception
      */
-    public void enableUser(String identifier) throws Exception {
+    public void enableUser(String identifier, boolean secondaryWriter) throws Exception {
 
 	List<GSUser> users = getUsers(false);
 
@@ -215,8 +216,24 @@ public class UserFinder {
 
 	    user.get().setEnabled(true);
 
-	    usersWriter.store(user.get());
+	    if (secondaryWriter) {
+
+		secUsersWriter.store(user.get());
+
+	    } else {
+
+		usersWriter.store(user.get());
+	    }
 	}
+    }
+
+    /**
+     * @param identifier
+     * @throws Exception
+     */
+    public void enableUser(String identifier) throws Exception {
+
+	this.enableUser(identifier, false);
     }
 
     /**

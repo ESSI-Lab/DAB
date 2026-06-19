@@ -92,7 +92,7 @@ public class HISUserRegistration {
 
 	UserFinder finder = UserFinder.newInstance();
 
-	finder.enableUser(id);
+	finder.enableUser(id, true);
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
