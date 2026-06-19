@@ -1772,6 +1772,20 @@ var parseRatingCurvesXML = function(xmlData) {
 	return ratingCurves;
 };
 
+var isRatingCurveTimeseries = function(data, i) {
+	var observedPropertyUri = findValue(data, i, 'observed_property_uri');
+	return observedPropertyUri && /hydro-ontology\/concept\/1c$/.test(observedPropertyUri);
+};
+
+var hasRatingCurveTimeseries = function(data) {
+	for (var i = 0, len = data.length; i < len; i++) {
+		if (isRatingCurveTimeseries(data, i)) {
+			return true;
+		}
+	}
+	return false;
+};
+
 // Display rating curves section with dropdown and plot
 var displayRatingCurvesSection = function(ratingCurves) {
 	if (!ratingCurves || ratingCurves.length === 0) {
@@ -2154,7 +2168,9 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 
 	var indexes = [];
 	for (var i = 0, len = data.length; i < len; i++) {
-		indexes.push(i);
+		if (!isRatingCurveTimeseries(data, i)) {
+			indexes.push(i);
+		}
 	}
 	indexes.sort(function(a, b) {
 		v1 = getAttributeLabel(data, a);
@@ -2271,9 +2287,9 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 
 	var timeserisId = findValue(data, 0, 'timeseries_id');
 
-	// Fetch rating curves for this platform
+	// Fetch rating curves only when a rating-curve timeseries is present
 	var platformId = findValue(data, 0, 'platform_id');
-	if (platformId) {
+	if (platformId && hasRatingCurveTimeseries(data)) {
 		var viewId = getViewIdFromUrl();
 
 		// Construct the rating curves endpoint URL
@@ -2301,7 +2317,7 @@ $.getJSON(stationCode + "/timeseries" + queryString, function(data) {
 		});
 	}
 
-	for (var x = 0, len = data.length; x < len; x++) {
+	for (var x = 0, len = indexes.length; x < len; x++) {
 
 		i = indexes[x];
 		//
