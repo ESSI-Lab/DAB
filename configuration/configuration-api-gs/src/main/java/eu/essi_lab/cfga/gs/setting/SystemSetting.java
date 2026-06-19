@@ -8,6 +8,7 @@ import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.validation.*;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
 import eu.essi_lab.lib.utils.*;
+import org.geotools.nature.*;
 import org.json.*;
 
 import java.util.*;
@@ -22,12 +23,12 @@ import java.util.*;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -47,6 +48,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     private static final String EMAIL_SETTING_ID = "emailSetting";
     private static final String WMS_CACHE_SETTING_ID = "wmsCacheSetting";
     private static final String USERS_DATABASE_SETTING_ID = "usersDatabase";
+    private static final String SECONDARY_USERS_DATABASE_SETTING_ID = "secUsersDatabase";
 
     /**
      * @author Fabrizio
@@ -173,6 +175,14 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	    return name;
 	}
+    }
+
+    public static void main(String[] args) {
+
+	SystemSetting systemSetting = new SystemSetting();
+	SelectionUtils.deepClean(systemSetting);
+
+	System.out.println(systemSetting);
     }
 
     /**
@@ -312,24 +322,18 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	//
 	// User database
 	//
-	UsersDatabaseSetting userdbSetting = new UsersDatabaseSetting();
+	UsersDatabaseSetting usersDbSetting = new UsersDatabaseSetting();
+	usersDbSetting.setIdentifier(USERS_DATABASE_SETTING_ID);
 
-	userdbSetting.setCanBeDisabled(true);
-	userdbSetting.setEditable(false);
-	userdbSetting.setEnabled(false);
+	addSetting(usersDbSetting);
 
-	userdbSetting.enableCompactMode(false);
-	userdbSetting.setName("User database setting");
-	userdbSetting.setIdentifier(USERS_DATABASE_SETTING_ID);
-	userdbSetting.setDescription(
-		"If enabled and configured, this setting allows to retrieve users information from a specific database");
-	userdbSetting.removeVolatileSettings();
-	userdbSetting.setSelectionMode(SelectionMode.UNSET);
+	//
+	// External user database
+	//
+	SecondaryUsersDatabaseSetting secUsersDbSetting = new SecondaryUsersDatabaseSetting();
+	secUsersDbSetting.setIdentifier(SECONDARY_USERS_DATABASE_SETTING_ID);
 
-	userdbSetting.hideDatabaseConfigurationName();
-	userdbSetting.hideDatabaseConfigurationFolderOption();
-
-	addSetting(userdbSetting);
+	addSetting(secUsersDbSetting);
 
 	//
 	// set the validator
@@ -593,6 +597,21 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     public Optional<UsersDatabaseSetting> getUsersDatabaseSetting() {
 
 	UsersDatabaseSetting setting = getSetting(USERS_DATABASE_SETTING_ID, UsersDatabaseSetting.class).get();
+
+	if (setting.isEnabled()) {
+
+	    return Optional.of(setting);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @return
+     */
+    public Optional<UsersDatabaseSetting> getSecondaryUsersDatabaseSetting() {
+
+	UsersDatabaseSetting setting = getSetting(SECONDARY_USERS_DATABASE_SETTING_ID, SecondaryUsersDatabaseSetting.class).get();
 
 	if (setting.isEnabled()) {
 
