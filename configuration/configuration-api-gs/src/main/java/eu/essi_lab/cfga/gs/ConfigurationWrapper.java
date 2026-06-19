@@ -738,6 +738,14 @@ public class ConfigurationWrapper {
     }
 
     /**
+     * @return
+     */
+    public static Optional<StorageInfo> getSecondaryUsersStorageInfo() {
+
+	return getSystemSettings().getSecondaryUsersDatabaseSetting().map(DatabaseSetting::asStorageInfo);
+    }
+
+    /**
      * @param settingClass
      * @return
      */

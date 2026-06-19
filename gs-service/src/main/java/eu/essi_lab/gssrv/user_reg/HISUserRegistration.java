@@ -10,31 +10,25 @@ package eu.essi_lab.gssrv.user_reg;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import eu.essi_lab.api.database.*;
+import eu.essi_lab.authorization.userfinder.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.auth.*;
 
-import eu.essi_lab.authorization.userfinder.UserFinder;
-import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.model.GSProperty;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.auth.UserIdentifierType;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -51,7 +45,7 @@ public class HISUserRegistration {
     private List<String> validationMessages;
     private String registrationURI;
     private Date registrationDate;
-    private Integer maxDownloadSizeMB =null;
+    private Integer maxDownloadSizeMB = null;
 
     public Integer getMaxDownloadSizeMB() {
 	return maxDownloadSizeMB;
@@ -60,8 +54,6 @@ public class HISUserRegistration {
     public void setMaxDownloadSizeMB(Integer maxDownloadSizeMB) {
 	this.maxDownloadSizeMB = maxDownloadSizeMB;
     }
-
-
 
     /**
      * @param fname
@@ -255,12 +247,13 @@ public class HISUserRegistration {
 	    return false;
 	}
 
-	String message = "Si prega di confermare la registrazione usando il seguente link di attivazione:\n\n" + registrationURI
-		+ "?verify=" + user.getIdentifier()
-		+ "\n\nSe hai ricevuto questa E-mail per errore, si prega di informarci rispondendo a questa E-mail ed eliminandola.";
+	String message =
+		"Si prega di confermare la registrazione usando il seguente link di attivazione:\n\n" + registrationURI + "?verify="
+			+ user.getIdentifier()
+			+ "\n\nSe hai ricevuto questa E-mail per errore, si prega di informarci rispondendo a questa E-mail ed eliminandola.";
 
 	String recipient = this.email;
-	
+
 	System.out.println("Sending mail to: " + recipient);
 	System.out.println(message);
 
@@ -291,7 +284,14 @@ public class HISUserRegistration {
 	properties.add(new GSProperty<String>("registrationDate", ISO8601DateTimeUtils.getISO8601DateTime()));
 	user.getProperties().addAll(properties);
 
-	finder.getUsersWriter().store(user);
+	UsersWriter writer = finder.getUsersWriter();
+
+	if (finder.getSecondaryUsersWriter().isPresent()) {
+
+	    writer = finder.getSecondaryUsersWriter().get();
+	}
+
+	writer.store(user);
 
 	return user;
     }

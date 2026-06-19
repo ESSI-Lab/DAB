@@ -1,7 +1,7 @@
 /**
- * 
+ *
  */
-package eu.essi_lab.api.database;
+package eu.essi_lab.cfga.gs.setting.database;
 
 /*-
  * #%L
@@ -13,53 +13,38 @@ package eu.essi_lab.api.database;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.util.List;
-import java.util.Optional;
-
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.model.auth.GSUser;
-import eu.essi_lab.model.exceptions.GSException;
-
 /**
  * @author Fabrizio
  */
-public interface UsersReader {
+public class SecondaryUsersDatabaseSetting extends UsersDatabaseSetting {
 
     /**
-     * Gets the {@link GSUser} with the provided identifier
      *
-     * @param identifier the identifier of the user
-     * @return the optional user
-     * @throws GSException
      */
-    default Optional<GSUser> getUser(String identifier) throws GSException {
+    public SecondaryUsersDatabaseSetting() {
 
-	try {
-
-	    return getUsers().stream().filter(u -> u.getIdentifier().equals(identifier)).findFirst();
-
-	} catch (Exception ex) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(ex);
-
-	    throw GSException.createException(getClass(), "DatabaseGetUserError", ex);
-	}
+	setName("Secondary user database setting");
     }
 
-    /**
-     * 
-     * 
-     */
-    List<GSUser> getUsers() throws GSException;
+    protected String getDbSettingId() {
+
+	return "secUsersDbSetting";
+    }
+
+    protected String getVolatileDbSettingId() {
+
+	return "secUsersVolFDbSetting";
+    }
+
 }
