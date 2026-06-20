@@ -304,7 +304,15 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		if (!messages.isEmpty()) {
 
+		    GSLoggerFactory.getLogger(getClass()).debug("Sending message STARTED");
+
 		    client.get().publish(kafkaTopic, messageArray.toString(3));
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Sending message ENDED");
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("No message to send");
 		}
 
 	    } else {
@@ -705,9 +713,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    } else {
 
-			GSLoggerFactory.getLogger(getClass()).error("One or more required Kafka settings not found!");
-
-			return Optional.empty();
+			GSLoggerFactory.getLogger(getClass()).warn("Security properties not set!");
 		    }
 
 		    //
@@ -852,7 +858,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    SearchResponse<Void> response = client.search(request, Void.class);
 
-	    if (!OpenSearchDatabase.debugQueries()) {
+	    if (OpenSearchDatabase.debugQueries()) {
 
 		JSONObject reqObject = OpenSearchUtils.toJSONObject(request);
 		GSLoggerFactory.getLogger(getClass()).debug(reqObject.toString(3));
