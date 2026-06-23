@@ -12,7 +12,7 @@
 	"toolbarLayout": true,
 	"showResultOverview": false,
 	"resultTitleFromObservedProperty": true,
-	"performStartupQuery": false,
+	"performStartupQuery": true,
 	"language": "en",
 	"zoomOnResults": true,
 	"sortBy": "platformTitle",

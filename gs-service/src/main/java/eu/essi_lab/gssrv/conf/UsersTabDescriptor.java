@@ -26,6 +26,7 @@ import com.vaadin.flow.component.grid.*;
 import com.vaadin.flow.data.renderer.*;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
+import eu.essi_lab.authorization.userfinder.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
@@ -129,23 +130,7 @@ class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridD
 	update(getVerticalLayout());
     }
 
-    /**
-     * @return
-     * @throws GSException
-     */
-    private static UsersReader getReader() throws GSException {
 
-	Optional<StorageInfo> usersStorageInfo = ConfigurationWrapper.getUsersStorageInfo();
-
-	if (usersStorageInfo.isEmpty()) {
-
-	    DatabaseSetting setting = ConfigurationWrapper.getDatabaseSetting();
-
-	    return DatabaseProviderFactory.getReader(setting.asStorageInfo());
-	}
-
-	return UsersManagerFactory.get(usersStorageInfo.get());
-    }
 
     /**
      * @return
@@ -154,7 +139,8 @@ class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridD
 
 	try {
 
-	    return getReader().getUsers();
+
+	    return UserFinder.newInstance().getUsers();
 
 	} catch (Exception e) {
 
@@ -224,7 +210,10 @@ class UsersTabDescriptor extends AbstractGridDescriptor<UsersTabDescriptor.GridD
 
 	    try {
 
-		GSUser user = getReader().getUser(gridData.getIdentifier()).get();
+		GSUser user = getUsers().//
+			stream().//
+			filter(u -> u.getIdentifier().equals(gridData.getIdentifier())).
+			findFirst().get();//
 
 		List<GSProperty> properties = user.getProperties();
 

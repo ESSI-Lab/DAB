@@ -3,7 +3,6 @@
 	import="ucar.nc2.ft2.coverage.remote.CdmrFeatureProto.CoordSysOrBuilder"%>
 <%@page import="java.util.HashMap"%>
 <%@page import="eu.essi_lab.pdk.wrt.DiscoveryRequestTransformer"%>
-<%@page import="eu.essi_lab.views.DefaultViewManager"%>
 <%@page import="eu.essi_lab.model.index.jaxb.CardinalValues"%>
 <%@page import="eu.essi_lab.profiler.semantic.Stats"%>
 <%@page import="eu.essi_lab.model.SortOrder"%>
@@ -34,14 +33,13 @@
 <%@page import="eu.essi_lab.messages.stats.ResponseItem"%>
 <%@page import="eu.essi_lab.messages.stats.StatisticsResponse"%>
 <%@page import="eu.essi_lab.messages.Page"%>
-<%@page import="eu.essi_lab.request.executor.IStatisticsExecutor"%>
+<%@page import="eu.essi_lab.request.executor.StatisticsExecutor"%>
 <%@page import="eu.essi_lab.messages.stats.StatisticsMessage"%>
 <%@page import="eu.essi_lab.model.GSSource"%>
 <%@page import="java.util.List"%>
 <%@page import="eu.essi_lab.messages.bond.ResourcePropertyBond"%>
 <%@page import="eu.essi_lab.messages.DiscoveryMessage"%>
 <%@page import="java.util.ServiceLoader"%>
-<%@page import="eu.essi_lab.request.executor.IDiscoveryExecutor"%>
 <%@page import="eu.essi_lab.messages.ResourceSelector.IndexesPolicy"%>
 <%@page import="eu.essi_lab.messages.ResourceSelector.ResourceSubset"%>
 <%@page import="eu.essi_lab.cfga.gs.ConfigurationWrapper"%>
@@ -51,34 +49,35 @@
 <%
 String viewId = request.getParameter("view");
 String sourceId = request.getParameter("source");
-if (viewId == null || viewId.isEmpty()) {
-    out.println("Unexpected: view parameter missing");
+if (sourceId == null || sourceId.isBlank()) {
+    out.println("Unexpected: source parameter missing");
     return;
 }
-if (sourceId == null || sourceId.isEmpty()) {
-    out.println("Unexpected: sourceId parameter missing");
-    return;
-}
-String format = request.getParameter("format");
-boolean csv = false;
 
+boolean hasView = viewId != null && !viewId.isBlank();
 StatisticsMessage statisticsMessage = new StatisticsMessage();
-View view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
-
-List<GSSource> sources = ConfigurationWrapper.getViewSources(view);
-
-// set the required properties
-statisticsMessage.setSources(sources);
 statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
-// set the view
+List<GSSource> sources;
+if (hasView) {
+    Optional<View> optionalView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+    if (optionalView.isEmpty()) {
+	out.println("Unexpected: view not found");
+	return;
+    }
+    sources = ConfigurationWrapper.getViewSources(optionalView.get());
+    WebRequestTransformer.setView(viewId, statisticsMessage.getDataBaseURI(), statisticsMessage);
+} else {
+    GSSource source = ConfigurationWrapper.getSource(sourceId);
+    if (source == null) {
+	out.println("Unexpected: source not found");
+	return;
+    }
+    sources = List.of(source);
+}
 
-WebRequestTransformer.setView(//
-	viewId, //
-	statisticsMessage.getDataBaseURI(), //
-	statisticsMessage);
-
-    statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
+statisticsMessage.setSources(sources);
+statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
 
 // groups by source id
 statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
@@ -89,8 +88,8 @@ statisticsMessage.setPage(new Page(1, 100));
 // computes union of bboxes
 statisticsMessage.computeBboxUnion();
 
-ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-IStatisticsExecutor executor = loader.iterator().next();
+ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+StatisticsExecutor executor = loader.iterator().next();
 
 StatisticsResponse statResponse = executor.compute(statisticsMessage);
 List<ResponseItem> items = statResponse.getItems();

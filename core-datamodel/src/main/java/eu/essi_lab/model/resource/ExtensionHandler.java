@@ -1477,6 +1477,39 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     /**
      * @return
      */
+    public Optional<Boolean> getCoreVariable() {
+
+	try {
+	    String value = this.metadata.getTextContent(MetadataElement.CORE_VARIABLE.getName());
+	    if (value == null) {
+		return Optional.empty();
+	    }
+
+	    return Optional.of(Boolean.valueOf(value));
+
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param coreVariable
+     */
+    public void setCoreVariable(boolean coreVariable) {
+	try {
+	    this.metadata.add(MetadataElement.CORE_VARIABLE.getName(), Boolean.toString(coreVariable));
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return
+     */
     public Optional<String> getMetadataVersion() {
 
 	try {

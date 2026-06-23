@@ -235,12 +235,17 @@ public abstract class AbstractResourceMapper implements IResourceMapper {
      */
     public static String generateCode(GSResource gsResource, String identifier) {
 
-	String out = gsResource.getSource().getUniqueIdentifier() + identifier;
+	return generateCode(gsResource.getSource().getUniqueIdentifier(),identifier);
+    }
+
+    public static String generateCode(String sourceId, String identifier) {
+
+	String out = sourceId + identifier;
 
 	try {
 	    out = StringUtils.hashSHA1messageDigest(out);
 	} catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-	   GSLoggerFactory.getLogger(AbstractResourceMapper.class).error(e);
+	    GSLoggerFactory.getLogger(AbstractResourceMapper.class).error(e);
 	}
 
 	return out;

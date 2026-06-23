@@ -43,7 +43,7 @@ public interface UsersReader {
      * @return the optional user
      * @throws GSException
      */
-    public default Optional<GSUser> getUser(String identifier) throws GSException {
+    default Optional<GSUser> getUser(String identifier) throws GSException {
 
 	try {
 
@@ -61,5 +61,5 @@ public interface UsersReader {
      * 
      * 
      */
-    public List<GSUser> getUsers() throws GSException;
+    List<GSUser> getUsers() throws GSException;
 }

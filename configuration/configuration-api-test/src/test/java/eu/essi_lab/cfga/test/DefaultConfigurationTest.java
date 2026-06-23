@@ -408,11 +408,11 @@ public class DefaultConfigurationTest {
 	// --- Rate Limiter settings ----
 	//
 
-	RateLimiterSetting rateLimiterSetting = ConfigurationWrapper.getRateLimiterSettingSettings();
+	Optional<RateLimiterSetting> rateLimiterSetting = ConfigurationWrapper.getRateLimiterSettingSettings();
 
-	Assert.assertNotNull(rateLimiterSetting);
+	Assert.assertNotNull(rateLimiterSetting.get());
 
-	ComputationType computationType = rateLimiterSetting.getComputationType();
+	ComputationType computationType = rateLimiterSetting.get().getComputationType();
 	Assert.assertEquals(ComputationType.DISABLED, computationType);
     }
 }

@@ -25,14 +25,14 @@
 <%@page import="eu.essi_lab.messages.stats.ResponseItem"%>
 <%@page import="eu.essi_lab.messages.stats.StatisticsResponse"%>
 <%@page import="eu.essi_lab.messages.Page"%>
-<%@page import="eu.essi_lab.request.executor.IStatisticsExecutor"%>
+<%@page import="eu.essi_lab.request.executor.StatisticsExecutor"%>
 <%@page import="eu.essi_lab.messages.stats.StatisticsMessage"%>
 <%@page import="eu.essi_lab.model.GSSource"%>
 <%@page import="java.util.List"%>
 <%@page import="eu.essi_lab.messages.bond.ResourcePropertyBond"%>
 <%@page import="eu.essi_lab.messages.DiscoveryMessage"%>
 <%@page import="java.util.ServiceLoader"%>
-<%@page import="eu.essi_lab.request.executor.IDiscoveryExecutor"%>
+<%@page import="eu.essi_lab.request.executor.DiscoveryExecutor"%>
 <%@page import="eu.essi_lab.messages.ResourceSelector.IndexesPolicy"%>
 <%@page import="eu.essi_lab.messages.ResourceSelector.ResourceSubset"%>
 <%@page import="eu.essi_lab.cfga.gs.ConfigurationWrapper"%>
@@ -89,8 +89,8 @@ iframe {
 	} else if (protocol != null && !protocol.isEmpty() && sourceParameter != null && !sourceParameter.isEmpty()) {
 		GSSource source = ConfigurationWrapper.getSource(sourceParameter);
 		DiscoveryMessage message = new DiscoveryMessage();
-		ServiceLoader<IDiscoveryExecutor> discovery = ServiceLoader.load(IDiscoveryExecutor.class);
-		IDiscoveryExecutor executor = discovery.iterator().next();
+		ServiceLoader<DiscoveryExecutor> discovery = ServiceLoader.load(DiscoveryExecutor.class);
+		DiscoveryExecutor executor = discovery.iterator().next();
 
 		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
 		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.ALL);
@@ -144,8 +144,8 @@ iframe {
 		statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 		// statisticsMessage.setSharedRepositoryInfo(ConfigurationUtils.getSharedRepositoryInfo());
 
-		ServiceLoader<IStatisticsExecutor> loader = ServiceLoader.load(IStatisticsExecutor.class);
-		IStatisticsExecutor executor = loader.iterator().next();
+		ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+		StatisticsExecutor executor = loader.iterator().next();
 		statisticsMessage.groupBy(ResourceProperty.SOURCE_ID);
 		// set the view
 		WebRequestTransformer.setView(//

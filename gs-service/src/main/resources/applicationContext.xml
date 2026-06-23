@@ -36,6 +36,7 @@
 	<jaxrs:server id="supportService" address="/support">
 		<jaxrs:serviceBeans>
 			<ref bean="support" />
+			<ref bean="harvestStatus" />
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="jsonProvider" />
@@ -43,6 +44,8 @@
 	</jaxrs:server>
 
 	<bean id="support" class="eu.essi_lab.gssrv.rest.SupportService" />
+
+	<bean id="harvestStatus" class="eu.essi_lab.gssrv.rest.HarvestStatusService" />
 	
 	<jaxrs:server id="essiUserServer" address="/user">
 		<jaxrs:serviceBeans>

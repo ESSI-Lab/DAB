@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.cfga.gs.setting.database;
 
@@ -30,13 +30,22 @@ package eu.essi_lab.cfga.gs.setting.database;
 public class UsersDatabaseSetting extends DatabaseSetting {
 
     /**
-     * 
+     *
      */
     public UsersDatabaseSetting() {
 
-	setName("Users database settings");
-	setShowHeader(true);
+	setName("User database setting");
 	setDescription("If enabled and configured, this setting allows to retrieve users information from a specific database");
+	setShowHeader(true);
+	setCanBeDisabled(true);
+	setEditable(false);
+	setEnabled(false);
+	enableCompactMode(false);
+	removeVolatileSettings();
+	setSelectionMode(SelectionMode.UNSET);
+
+	hideDatabaseConfigurationName();
+	hideDatabaseConfigurationFolderOption();
     }
 
     protected String getDbSettingId() {

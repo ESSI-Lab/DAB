@@ -710,7 +710,7 @@ public class BondFactory {
 	return new ComposedElementBond(operator, logicalOp, element, value.toArray(new ComposedElementItem[] {}));
     }
 
-    /**
+     /**
      * Creates a simple value bond applied on the given boolean <code>value</code> with the {@link BondOperator#EQUAL} operator.<br> The
      * supplied <code>element</code> must have the {@link ContentType#BOOLEAN}.
      *

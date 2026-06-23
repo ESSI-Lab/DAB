@@ -192,6 +192,9 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	String description = jsonType.optString("descrizione");
 	String delta_t = jsonType.optString("delta_t");
 
+	String variableIdentifier = (timeSeriesId2 != null && !timeSeriesId2.isEmpty()) ? timeSeriesId2 : measureCode;
+	String resourceIdentifier = generateCode(dataset, code + "-" + variableIdentifier);
+
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
 	coreMetadata.getMIMetadata().setLanguage("Italian");
@@ -324,9 +327,11 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	online.setLinkage(linkage);
 	online.setFunctionCode("download");
 	online.setName(resourceTitle + "_" + timeSeriesId);
+	online.setIdentifier(resourceIdentifier);
 	online.setProtocol(CommonNameSpaceContext.HISCENTRAL_FRIULI_NS_URI);
 
 	distribution.addDistributionOnline(online);
+	coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
 	//
 	// coverage description
@@ -375,14 +380,9 @@ public class HISCentralFriuliMapper extends FileIdentifierMapper {
 	String missingValue = "-9999";
 	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
 
-	// if (uom != null) {
-	// dataset.getExtensionHandler().setAttributeUnits(uom);
-	// }
-	//
-	// String units = uom != null ? " Units: " + uom : "";
+	HISCentralFriuliVariableUnits.getUnits(measureCode).ifPresent(unit -> dataset.getExtensionHandler().setAttributeUnits(unit));
 
-	// // as no description is given this field is calculated
-	// HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
+	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 
 	coverageDescription.setAttributeDescription(description);
 

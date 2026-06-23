@@ -327,11 +327,6 @@
       var query = parseQueryParams();
       var app = document.getElementById('app');
 
-      if (!query.viewId) {
-        renderError('Unexpected: view parameter missing');
-        return;
-      }
-
       loadTranslations(query.language || DEFAULT_LANGUAGE)
         .then(function (translations) {
           var translator = createTranslator(query.language || DEFAULT_LANGUAGE, translations);
@@ -529,7 +524,9 @@
 
       function fetchStatsData(query) {
         var params = new URLSearchParams();
-        params.append('view', query.viewId);
+        if (query.viewId) {
+          params.append('view', query.viewId);
+        }
         if (query.sourceId) {
           params.append('source', query.sourceId);
         }
@@ -553,7 +550,9 @@
 
       function initiateCsvDownload(query) {
         var params = new URLSearchParams();
-        params.append('view', query.viewId);
+        if (query.viewId) {
+          params.append('view', query.viewId);
+        }
         if (query.sourceId) {
           params.append('source', query.sourceId);
         }
@@ -668,7 +667,11 @@
         } else {
           url.searchParams.delete('source');
         }
-        url.searchParams.set('view', query.viewId);
+        if (query.viewId) {
+          url.searchParams.set('view', query.viewId);
+        } else {
+          url.searchParams.delete('view');
+        }
         if (query.token) {
           url.searchParams.set('token', query.token);
         } else {

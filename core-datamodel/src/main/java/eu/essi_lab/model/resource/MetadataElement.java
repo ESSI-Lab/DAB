@@ -584,6 +584,11 @@ public enum MetadataElement implements Queryable {
     /**
      * Extended
      */
+    CORE_VARIABLE(MetadataElement.CORE_VARIABLE_EL_NAME, false, true, ContentType.BOOLEAN, true),
+
+    /**
+     * Extended
+     */
     SITE_INFO("siteInfo"),
 
     /**
@@ -748,6 +753,7 @@ public enum MetadataElement implements Queryable {
     // etc.
     public static final String ATTRIBUTE_UNITS_ABBREVIATION_EL_NAME = "attributeUnitsAbbreviation"; // can be m, etc.
     public static final String ATTRIBUTE_MISSING_VALUE_EL_NAME = "attributeMissingValue"; // can be -9999
+    public static final String CORE_VARIABLE_EL_NAME = "coreVariable";
 
     public static final String ORGANISATION_NAME_EL_NAME = "organisationName";
     public static final String ORGANISATION_URI_EL_NAME = "organisationURI";

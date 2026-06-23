@@ -382,14 +382,13 @@ public class AugmenterWorker extends SchedulerWorker<AugmenterWorkerSetting> {
      * @param andBond
      * @throws GSException
      */
-    private void handleViewOption(AugmenterWorkerSetting setting, DatabaseReader dataBaseReader, LogicalBond andBond) throws GSException {
+    private void handleViewOption(AugmenterWorkerSetting setting, DatabaseReader dataBaseReader, LogicalBond andBond) throws Exception {
 
 	Optional<String> viewIdentifier = getSetting().getViewIdentifier();
 
 	if (viewIdentifier.isPresent()) {
 
-	    ViewManager manager = new ViewManager();
-	    manager.setDatabaseReader(dataBaseReader);
+	    ViewManager manager = new ViewManager(dataBaseReader);
 
 	    Optional<View> resolvedView = manager.getResolvedView(viewIdentifier.get());
 

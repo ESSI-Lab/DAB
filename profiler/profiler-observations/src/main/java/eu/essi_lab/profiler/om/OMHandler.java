@@ -147,8 +147,8 @@ public class OMHandler extends StreamingRequestHandler {
 	if (optView.isPresent()) {
 
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
-	    ViewManager manager = new ViewManager();
-	    manager.setDatabaseReader(reader);
+	    ViewManager manager = new ViewManager(reader);
+
 	    resolvedView = manager.getView(optView.get()).get();
 
 	    // only in this case permissions are checked
@@ -355,12 +355,7 @@ public class OMHandler extends StreamingRequestHandler {
 	Optional<Bond> initial = discoveryMessage.getUserBond();
 	String resumption = request.getParameterValue(eu.essi_lab.profiler.om.OMRequest.APIParameters.RESUMPTION_TOKEN);
 	if (resumption != null) {
-	    List<Object> values = new ArrayList<Object>();
-	    String[] split = resumption.split(",");
-	    for (String rs : split) {
-		values.add(rs);
-	    }
-	    searchAfter = new SearchAfter(values);
+	    searchAfter = OMRequestUtils.toSearchAfter(resumption);
 	    discoveryMessage.setSearchAfter(searchAfter);
 	}
 	boolean asynchDownloadRequest = request.isAsynchDownloadRequest();
@@ -584,7 +579,10 @@ public class OMHandler extends StreamingRequestHandler {
 			    accessMessage.setSources(discoveryMessage.getSources());
 			    accessMessage.setCurrentUser(discoveryMessage.getCurrentUser().orElse(null));
 			    accessMessage.setDataBaseURI(discoveryMessage.getDataBaseURI());
-
+			    Optional<View> optionalView = discoveryMessage.getView();
+			    if (optionalView.isPresent()) {
+				accessMessage.setView(optionalView.get());
+			    }
 			    DataDescriptor descriptor = new DataDescriptor();
 
 			    switch (type) {
@@ -699,22 +697,7 @@ public class OMHandler extends StreamingRequestHandler {
 
 	} while (tempSize < userSize && searchAfter != null);
 
-	String resumptionToken = "";
-
-	if (searchAfter != null && searchAfter.getValues().
-
-		isPresent() && !searchAfter.getValues().
-
-		get().
-
-		isEmpty()) {
-	    for (Object v : searchAfter.getValues().get()) {
-		resumptionToken += v.toString() + ",";
-	    }
-	    if (resumptionToken.endsWith(",")) {
-		resumptionToken = resumptionToken.substring(0, resumptionToken.length() - 1);
-	    }
-	}
+	String resumptionToken = OMRequestUtils.toResumptionToken(searchAfter);
 	Integer count = null;
 	CountSet countResponse = resultSet.getCountResponse();
 	if (countResponse != null) {

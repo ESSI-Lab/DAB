@@ -21,14 +21,18 @@ package eu.essi_lab.gssrv.rest;
  * #L%
  */
 
+import java.util.List;
+
 /**
- * Request body for deleting a predefined shape upload group.
+ * Request body for deleting predefined shape entries.
  */
 public class PredefinedShapeDeleteRequest {
 
     private String email;
     private String apiKey;
     private String prefix;
+    private List<String> identifiers;
+    private String shapeView;
 
     public PredefinedShapeDeleteRequest() {
     }
@@ -55,5 +59,21 @@ public class PredefinedShapeDeleteRequest {
 
     public void setPrefix(String prefix) {
 	this.prefix = prefix;
+    }
+
+    public List<String> getIdentifiers() {
+	return identifiers;
+    }
+
+    public void setIdentifiers(List<String> identifiers) {
+	this.identifiers = identifiers;
+    }
+
+    public String getShapeView() {
+	return shapeView;
+    }
+
+    public void setShapeView(String shapeView) {
+	this.shapeView = shapeView;
     }
 }

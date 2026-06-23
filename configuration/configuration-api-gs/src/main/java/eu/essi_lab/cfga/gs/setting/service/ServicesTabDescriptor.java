@@ -79,7 +79,7 @@ public class ServicesTabDescriptor extends TabDescriptor {
 		ColumnDescriptor.create("Messages", 70, s -> "", new ServiceMessagesRenderer())
 
 	), getItemsList()).//
-		reloadable(() -> ManagedServiceSupport.getInstance().update(), true, true).//
+		reloadable(() -> ManagedServiceSupport.getInstance().update(), true, false).//
 
 		build();
 

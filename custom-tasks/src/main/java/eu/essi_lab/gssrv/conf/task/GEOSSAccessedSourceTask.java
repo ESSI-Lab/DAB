@@ -50,8 +50,7 @@ public class GEOSSAccessedSourceTask extends AbstractCustomTask {
 
 	DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
 
-	ViewManager viewManager = new ViewManager();
-	viewManager.setDatabaseReader(reader);
+	ViewManager viewManager = new ViewManager(reader);
 
 	List<String> sourceIds = ((LogicalBond) viewManager.getView("geoss").//
 		get().//

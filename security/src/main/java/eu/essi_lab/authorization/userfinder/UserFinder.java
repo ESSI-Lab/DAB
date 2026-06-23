@@ -26,7 +26,6 @@ package eu.essi_lab.authorization.userfinder;
 
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
-import eu.essi_lab.authentication.*;
 import eu.essi_lab.authentication.token.*;
 import eu.essi_lab.authorization.*;
 import eu.essi_lab.cfga.gs.*;
@@ -47,96 +46,51 @@ import java.util.concurrent.*;
  */
 public class UserFinder {
 
-    private static final String USER_FINDING_ERROR = "USER_FINDING_ERROR";
-
-    private static final long USERS_UPDATE_PERIOD = TimeUnit.MINUTES.toMillis(30);
-    private static final UsersCacheUpdater USERS_UPDATER_TASK = new UsersCacheUpdater();
-
-    private static final long VIEWS_CACHE_DURATION = TimeUnit.MINUTES.toMillis(30);
-
-    static {
-
-	Timer timer = new Timer();
-	timer.scheduleAtFixedRate(USERS_UPDATER_TASK, 0, USERS_UPDATE_PERIOD);
-    }
-
-    private static List<GSUser> users;
-    private static final ExpiringCache<View> VIEWS = new ExpiringCache<>();
-
-    static {
-	VIEWS.setDuration(VIEWS_CACHE_DURATION);
-    }
-
     /**
-     * @author Fabrizio
+     *
      */
-    private static class UsersCacheUpdater extends TimerTask {
+    private static final int REFRESH_INTERVAL_MINUTES = 5;
 
-	private UserFinder finder;
+    private static SnapshotStore<GSUser> usersStore;
 
-	/**
-	 * @param authorizer
-	 */
-	public void setUserFinder(UserFinder finder) {
-
-	    this.finder = finder;
-	}
-
-	@Override
-	public void run() {
-
-	    synchronized (this) {
-
-		if (Objects.isNull(finder)) {
-		    return;
-		}
-
-		try {
-
-		    finder.updateUsersCache();
-
-		} catch (Exception e) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("Error occurred while updating users cache");
-
-		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-		}
-	    }
-	}
-    }
+    private ViewManager viewManager;
 
     private Optional<String> email;
     private Optional<String> authProvider;
     private StringBuilder logBuilder;
 
-    private ViewsReader viewsReader;
     private UsersWriter usersWriter;
     private UsersReader usersReader;
+
+    private UsersWriter secUsersWriter;
+    private UsersReader secUsersReader;
 
     protected TokenProvider tokenProvider;
 
     /**
      *
      */
-    public UserFinder() {
+    private UserFinder() {
 
 	tokenProvider = new TokenProvider();
+
     }
 
     /**
      * @return
      * @throws GSException
      */
-    public static UserFinder create() throws GSException {
+    public static UserFinder newInstance() throws Exception {
 
 	UserFinder finder = new UserFinder();
 
 	StorageInfo storageInfo = ConfigurationWrapper.getStorageInfo();
 	DatabaseReader reader = DatabaseProviderFactory.getReader(storageInfo);
 
-	finder.setWiewsReader(reader);
+	finder.viewManager = new ViewManager(reader);
 
-	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty()) {
+	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty() && //
+		ConfigurationWrapper.getSecondaryUsersStorageInfo().isEmpty()) {
 
 	    DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageInfo);
 
@@ -145,12 +99,42 @@ public class UserFinder {
 
 	} else {
 
-	    StorageInfo usersStorageInfo = ConfigurationWrapper.getUsersStorageInfo().get();
+	    if (ConfigurationWrapper.getUsersStorageInfo().isPresent()) {
 
-	    UsersManager usersManager = UsersManagerFactory.get(usersStorageInfo);
+		StorageInfo info = ConfigurationWrapper.getUsersStorageInfo().get();
 
-	    finder.setUsersReader(usersManager);
-	    finder.setUsersWriter(usersManager);
+		UsersManager usersManager = UsersManagerFactory.get(info);
+
+		finder.setUsersReader(usersManager);
+		finder.setUsersWriter(usersManager);
+	    }
+
+	    if (ConfigurationWrapper.getSecondaryUsersStorageInfo().isPresent()) {
+
+		StorageInfo usersStorageInfo = ConfigurationWrapper.getSecondaryUsersStorageInfo().get();
+
+		UsersManager usersManager = UsersManagerFactory.get(usersStorageInfo);
+
+		finder.setSecondaryUsersReader(usersManager);
+		finder.setSecondaryUsersWriter(usersManager);
+	    }
+	}
+
+	if (usersStore == null) {
+
+	    usersStore = new SnapshotStore<>(() -> {
+
+		List<GSUser> users = finder.usersReader.getUsers();
+
+		if (finder.secUsersReader != null) {
+
+		    List<GSUser> secUsers = finder.secUsersReader.getUsers();
+		    users.addAll(secUsers);
+		}
+
+		return users;
+
+	    }, TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
 	}
 
 	return finder;
@@ -161,14 +145,12 @@ public class UserFinder {
      * @return
      * @throws GSException
      */
-    public static GSUser findCurrentUser(HttpServletRequest request) throws GSException {
+    public static GSUser findCurrentUser(HttpServletRequest request) throws Exception {
 
-	UserFinder finder = create();
-
-	GSUser user = null;
+	GSUser user;
 
 	try {
-	    user = finder.findUser(request);
+	    user = newInstance().findUser(request);
 
 	} catch (Exception e) {
 
@@ -180,7 +162,7 @@ public class UserFinder {
 		    null, //
 		    ErrorInfo.ERRORTYPE_INTERNAL, //
 		    ErrorInfo.SEVERITY_ERROR, //
-		    USER_FINDING_ERROR);
+		    "UserFindingError");
 	}
 
 	return user;
@@ -204,8 +186,6 @@ public class UserFinder {
      */
     public GSUser findUser(HttpServletRequest request) throws Exception {
 
-	USERS_UPDATER_TASK.setUserFinder(this);
-
 	List<GSProperty<String>> identifiers = findIdentifiers(request);
 
 	GSUser user = findUser(identifiers);
@@ -215,9 +195,10 @@ public class UserFinder {
 
     /**
      * @param identifier
+     * @param secondaryWriter
      * @throws Exception
      */
-    public void enableUser(String identifier) throws Exception {
+    public void enableUser(String identifier, boolean secondaryWriter) throws Exception {
 
 	List<GSUser> users = getUsers(false);
 
@@ -235,22 +216,24 @@ public class UserFinder {
 
 	    user.get().setEnabled(true);
 
-	    usersWriter.store(user.get());
+	    if (secondaryWriter) {
+
+		secUsersWriter.store(user.get());
+
+	    } else {
+
+		usersWriter.store(user.get());
+	    }
 	}
     }
 
     /**
+     * @param identifier
      * @throws Exception
      */
-    public void updateUsersCache() throws Exception {
+    public void enableUser(String identifier) throws Exception {
 
-	synchronized (USERS_UPDATER_TASK) {
-
-	    if (usersReader != null) {
-
-		users = usersReader.getUsers();
-	    }
-	}
+	this.enableUser(identifier, false);
     }
 
     /**
@@ -268,27 +251,20 @@ public class UserFinder {
      */
     public List<GSUser> getUsers(boolean useCache) throws Exception {
 
-	synchronized (USERS_UPDATER_TASK) {
+	if (useCache) {
 
-	    if (users == null && usersReader != null || !useCache) {
-
-		updateUsersCache();
-
-	    } else {
-
-		// GSLoggerFactory.getLogger(getClass()).debug("Reading users from cache");
-	    }
-
-	    return users;
+	    return usersStore.getSnapshots();
 	}
-    }
 
-    /**
-     * @param reader
-     */
-    public void setWiewsReader(ViewsReader reader) {
+	List<GSUser> users = usersReader.getUsers();
 
-	this.viewsReader = reader;
+	if (secUsersReader != null) {
+
+	    List<GSUser> secUsers = secUsersReader.getUsers();
+	    users.addAll(secUsers);
+	}
+
+	return users;
     }
 
     /**
@@ -300,6 +276,14 @@ public class UserFinder {
     }
 
     /**
+     * @param writer
+     */
+    public void setSecondaryUsersWriter(UsersWriter writer) {
+
+	this.secUsersWriter = writer;
+    }
+
+    /**
      * @param reader
      */
     public void setUsersReader(UsersReader reader) {
@@ -308,11 +292,27 @@ public class UserFinder {
     }
 
     /**
-     * @return the writer
+     * @param reader
+     */
+    public void setSecondaryUsersReader(UsersReader reader) {
+
+	this.secUsersReader = reader;
+    }
+
+    /**
+     * @return
      */
     public UsersWriter getUsersWriter() {
 
 	return usersWriter;
+    }
+
+    /**
+     * @return
+     */
+    public Optional<UsersWriter> getSecondaryUsersWriter() {
+
+	return Optional.ofNullable(secUsersWriter);
     }
 
     protected List<GSProperty<String>> findIdentifiers(HttpServletRequest request) throws Exception {
@@ -336,14 +336,12 @@ public class UserFinder {
 
 	    if (email.isPresent()) {
 
-		logBuilder.append("\n- OAuth 2.0 email: " + email.get());
+		logBuilder.append("\n- OAuth 2.0 email: ").append(email.get());
 		identifiers.add(new GSProperty<String>(UserIdentifierType.OAUTH_EMAIL.getType(), email.get()));
 	    }
 
-	    if (authProvider.isPresent()) {
+	    authProvider.ifPresent(s -> logBuilder.append("\n- OAuth 2.0 provider: ").append(s));
 
-		logBuilder.append("\n- OAuth 2.0 provider: " + authProvider.get());
-	    }
 	} else {
 
 	    email = Optional.empty();
@@ -406,12 +404,12 @@ public class UserFinder {
 
 	    Optional<String> viewId = webRequest.extractViewId();
 
-	    viewId.ifPresent(id -> {
+	    if (viewId.isPresent()) {
 
-		logBuilder.append("\n- View id: " + id);
-		identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_IDENTIFIER.getType(), id));
+		logBuilder.append("\n- View id: " + viewId.get());
+		identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_IDENTIFIER.getType(), viewId.get()));
 
-		Optional<String> creator = getViewCreator(id);
+		Optional<String> creator = getViewCreator(viewId.get());
 
 		if (creator.isPresent()) {
 
@@ -419,7 +417,7 @@ public class UserFinder {
 
 		    identifiers.add(new GSProperty<>(UserIdentifierType.VIEW_CREATOR.getType(), creator.get()));
 		}
-	    });
+	    }
 	}
 
 	//
@@ -493,50 +491,15 @@ public class UserFinder {
     }
 
     /**
-     * @param identifier
-     * @return
-     * @throws GSException
-     */
-    protected Optional<View> getView(String identifier) {
-
-	if (identifier == null) {
-
-	    return Optional.empty();
-	}
-
-	Optional<View> view = Optional.ofNullable(VIEWS.get(identifier));
-
-	if (view.isEmpty()) {
-
-	    try {
-		view = viewsReader.getView(identifier);
-
-		view.ifPresent(value -> VIEWS.put(identifier, value));
-
-	    } catch (GSException e) {
-
-		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
-	    }
-	}
-
-	return view;
-    }
-
-    /**
      * @param id
      * @return
      */
-    private Optional<String> getViewCreator(String id) {
+    private Optional<String> getViewCreator(String id) throws Exception {
 
-	Optional<View> view = getView(id);
+	Optional<View> view = viewManager.getView(id);
 
-	if (view.isPresent()) {
-	    // we can extract the creator of the view
+	if (view.isEmpty()) {
 
-	    return Optional.ofNullable(view.get().getCreator());
-	} else {
-
-	    // we can extract the creator of the view also in case of dynamic AND bonds (e.g. gs-view-and(...))
 	    Optional<DynamicView> dynamicView = DynamicView.resolveDynamicView(id);
 
 	    if (dynamicView.isPresent()) {
@@ -549,19 +512,14 @@ public class UserFinder {
 
 			if (operand instanceof ViewBond viewBond) {
 
-			    view = getView(viewBond.getViewIdentifier());
-
-			    if (view.isPresent()) {
-
-				return Optional.of(view.get().getCreator());
-			    }
+			    view = viewManager.getView(viewBond.getViewIdentifier());
 			}
 		    }
 		}
 	    }
 	}
 
-	return Optional.empty();
+	return view.map(View::getCreator);
     }
 
     /**

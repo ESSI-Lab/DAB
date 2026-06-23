@@ -27,11 +27,20 @@ public class InfoLegend {
 
     private Color color;
     private String label;
+    private boolean triangle;
 
     public InfoLegend(Color color, String label) {
 	super();
 	this.color = color;
 	this.label = label;
+	this.triangle = false;
+    }
+
+    public InfoLegend(Color color, String label, boolean triangle) {
+	super();
+	this.color = color;
+	this.label = label;
+	this.triangle = triangle;
     }
 
     public Color getColor() {
@@ -48,6 +57,14 @@ public class InfoLegend {
 
     public void setLabel(String label) {
 	this.label = label;
+    }
+
+    public boolean isTriangle() {
+	return triangle;
+    }
+
+    public void setTriangle(boolean triangle) {
+	this.triangle = triangle;
     }
 
 }

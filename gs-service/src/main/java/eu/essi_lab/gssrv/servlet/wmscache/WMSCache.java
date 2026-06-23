@@ -32,6 +32,7 @@ import jakarta.ws.rs.core.*;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.*;
 import java.util.stream.Collectors;
@@ -59,12 +60,23 @@ public class WMSCache {
 
     WMSCacheStorage storage;
 
+    /** View id for predefined shape WMS tiles (e.g. {@code his-central-shapes}); optional. */
+    private String shapeView;
+
     public WMSCacheStorage getStorage() {
 	return storage;
     }
 
     public void setStorage(WMSCacheStorage storage) {
 	this.storage = storage;
+    }
+
+    public Optional<String> getShapeView() {
+	return Optional.ofNullable(shapeView).filter(v -> !v.isBlank());
+    }
+
+    public void setShapeView(String shapeView) {
+	this.shapeView = shapeView;
     }
 
     private WMSCache() {
@@ -106,11 +118,30 @@ public class WMSCache {
     }
 
     /**
+     * Cache layer folder key for a predefined shape online id, matching {@link #extractViewLayerHashRequest}.
+     */
+    public static String toCacheLayerKeyFromOnlineId(String profile, String onlineId) {
+
+	String layersValue = URLEncoder.encode(onlineId, StandardCharsets.UTF_8).replace("+", "%20").toLowerCase();
+
+	return profile + ":" + layersValue;
+    }
+
+    /**
      * Removes cached GetMap tiles and stats for predefined shape entry names (after OpenSearch delete).
      *
      * @param entryNames shape-files folder entry names that were removed
      */
     public static void invalidatePredefinedShapeEntries(Collection<String> entryNames) {
+
+	invalidatePredefinedShapeEntries(entryNames, null);
+    }
+
+    /**
+     * @param entryNames shape-files folder entry names that were removed
+     * @param shapeView WMS view id from the portal (e.g. {@code his-central-shapes}); falls back to cache settings when blank
+     */
+    public static void invalidatePredefinedShapeEntries(Collection<String> entryNames, String shapeView) {
 
 	if (!WMSCacheFilter.enabled || entryNames == null || entryNames.isEmpty()) {
 	    return;
@@ -118,10 +149,53 @@ public class WMSCache {
 
 	List<String> cacheLayerKeys = entryNames.stream()//
 		.filter(name -> name != null && !name.isBlank())//
-		.map(name -> toCacheLayerKey("wms", ShapeLayerOwner.OPENSEARCH_ONLINE_PREFIX + name))//
+		.map(name -> toCacheLayerKeyFromOnlineId("wms", ShapeLayerOwner.OPENSEARCH_ONLINE_PREFIX + name))//
 		.collect(Collectors.toList());
 
-	getInstance().invalidateCachedWmsLayers(cacheLayerKeys);
+	getInstance().invalidatePredefinedShapeLayers(cacheLayerKeys, shapeView);
+    }
+
+    /**
+     * @param cacheLayerKeys layer keys as stored under {@code view/layer/} in cache storage
+     */
+    public void invalidatePredefinedShapeLayers(Collection<String> cacheLayerKeys) {
+
+	invalidatePredefinedShapeLayers(cacheLayerKeys, null);
+    }
+
+    /**
+     * @param cacheLayerKeys layer keys as stored under {@code view/layer/} in cache storage
+     * @param requestShapeView WMS view id from the portal; falls back to {@link #getShapeView()} when blank
+     */
+    public void invalidatePredefinedShapeLayers(Collection<String> cacheLayerKeys, String requestShapeView) {
+
+	if (cacheLayerKeys == null || cacheLayerKeys.isEmpty() || storage == null) {
+	    return;
+	}
+
+	Optional<String> shapeView = Optional.ofNullable(requestShapeView).filter(v -> !v.isBlank());
+	if (shapeView.isEmpty()) {
+	    shapeView = getShapeView();
+	}
+
+	for (String cacheLayerKey : cacheLayerKeys) {
+
+	    if (cacheLayerKey == null || cacheLayerKey.isBlank()) {
+		continue;
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Invalidating predefined shape WMS cache layer {} (view={})",
+		    cacheLayerKey, shapeView.orElse("all"));
+
+	    if (shapeView.isPresent()) {
+		storage.deleteCachedLayer(shapeView.get(), cacheLayerKey);
+		if (stats != null) {
+		    stats.deleteLayer(shapeView.get(), cacheLayerKey);
+		}
+	    } else {
+		invalidateCachedWmsLayers(List.of(cacheLayerKey));
+	    }
+	}
     }
 
     /**

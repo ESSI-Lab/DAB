@@ -114,33 +114,43 @@ public class SupportService {
 	output.put("stats", statsArray);
 	PortalTranslator translator = new PortalTranslator(language);
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
-	View view = null;
-	try {
-	    view = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId).get();
-	} catch (GSException e) {
-	    e.printStackTrace();
-	}
-
-	List<GSSource> sources = ConfigurationWrapper.getViewSources(view);
-
-	// set the required properties
-	statisticsMessage.setSources(sources);
 	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
 
-	// set the view
+	boolean hasView = viewId != null && !viewId.isBlank();
+	boolean hasSource = sourceId != null && !sourceId.isBlank();
 
-	try {
-	    WebRequestTransformer.setView(//
-		    viewId, //
-		    statisticsMessage.getDataBaseURI(), //
-		    statisticsMessage);
-	} catch (GSException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	List<GSSource> sources;
+	if (hasView) {
+	    try {
+		Optional<View> optionalView = WebRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), viewId);
+		if (optionalView.isEmpty()) {
+		    JSONObject error = new JSONObject();
+		    error.put("error", "View not found: " + viewId);
+		    return Response.status(Response.Status.BAD_REQUEST).entity(error.toString()).build();
+		}
+		sources = ConfigurationWrapper.getViewSources(optionalView.get());
+		WebRequestTransformer.setView(viewId, statisticsMessage.getDataBaseURI(), statisticsMessage);
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+		JSONObject error = new JSONObject();
+		error.put("error", e.getMessage());
+		return Response.status(Response.Status.BAD_REQUEST).entity(error.toString()).build();
+	    }
+	} else if (hasSource) {
+	    GSSource source = ConfigurationWrapper.getSource(sourceId);
+	    if (source == null) {
+		JSONObject error = new JSONObject();
+		error.put("error", "Source not found: " + sourceId);
+		return Response.status(Response.Status.BAD_REQUEST).entity(error.toString()).build();
+	    }
+	    sources = List.of(source);
+	} else {
+	    sources = ConfigurationWrapper.getHarvestedSources();
 	}
 
-	// set the user bond
-	if (sourceId != null && !sourceId.isEmpty()) {
+	statisticsMessage.setSources(sources);
+
+	if (hasSource) {
 	    statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(sourceId));
 	}
 
@@ -416,7 +426,7 @@ public class SupportService {
 	View v;
 	try {
 	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
-	} catch (GSException e) {
+	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
 	}
@@ -557,8 +567,7 @@ public class SupportService {
 
 	try {
 	    DatabaseReader reader = DatabaseProviderFactory.getReader(ConfigurationWrapper.getStorageInfo());
-	    ViewManager manager = new ViewManager();
-	    manager.setDatabaseReader(reader);
+	    ViewManager manager = new ViewManager(reader);
 
 	    GetViewIdentifiersRequest vir = GetViewIdentifiersRequest.create(0, 1000, null, null, null, sourceDeployment);
 	    List<String> viewIds = manager.getViewIdentifiers(vir);
@@ -700,8 +709,22 @@ public class SupportService {
 	}
 
 	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
-	PredefinedShapeDeleteResult deleteResult = new PredefinedShapeManagementService().deleteByPrefix(request.getPrefix(),
-		owner, loginResponse.isAdmin());
+	PredefinedShapeManagementService managementService = new PredefinedShapeManagementService();
+	PredefinedShapeDeleteResult deleteResult;
+	String successMessage;
+
+	if (request.getIdentifiers() != null && !request.getIdentifiers().isEmpty()) {
+
+	    deleteResult = managementService.deleteByIdentifiers(request.getIdentifiers(), owner, loginResponse.isAdmin(),
+		    request.getShapeView());
+	    successMessage = "Deleted " + request.getIdentifiers().size() + " search area(s)";
+
+	} else {
+
+	    deleteResult = managementService.deleteByPrefix(request.getPrefix(), owner, loginResponse.isAdmin(),
+		    request.getShapeView());
+	    successMessage = "Deleted shape area \"" + request.getPrefix() + "\"";
+	}
 
 	if (!deleteResult.isSuccess()) {
 
@@ -714,7 +737,46 @@ public class SupportService {
 	}
 
 	basicResponse.setSuccess(true);
-	basicResponse.setMessage("Deleted shape area \"" + request.getPrefix() + "\"");
+	basicResponse.setMessage(successMessage);
+
+	return Response.ok(basicResponse).build();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @POST
+    @Path("/predefinedShapes/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updatePredefinedShape(PredefinedShapeUpdateRequest request) {
+
+	BasicResponse basicResponse = new BasicResponse();
+	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
+	LoginResponse loginResponse = getLoginResponse(loginRequest);
+
+	if (!loginResponse.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage("not authenticated");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
+	}
+
+	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	PredefinedShapeDeleteResult updateResult = new PredefinedShapeManagementService().updateEntry(request.getIdentifier(),
+		request.getNewIdentifier(), request.getName(), request.getGroup(), request.getGroupOrder(), request.getOwner(), owner,
+		loginResponse.isAdmin(), request.getShapeView());
+
+	if (!updateResult.isSuccess()) {
+
+	    basicResponse.setSuccess(false);
+	    basicResponse.setMessage(updateResult.getErrorMessage().orElse("Update failed"));
+	    if (updateResult.isForbidden()) {
+		return Response.status(Response.Status.FORBIDDEN).entity(basicResponse).build();
+	    }
+	    return Response.status(Response.Status.BAD_REQUEST).entity(basicResponse).build();
+	}
+
+	basicResponse.setSuccess(true);
+	basicResponse.setMessage("Search area updated in OpenSearch. Run harvest to refresh the selection panel.");
 
 	return Response.ok(basicResponse).build();
     }
@@ -753,12 +815,13 @@ public class SupportService {
 	    }
 
 	    String shapeId = multipart.getField("shapeId").orElse("");
+	    String group = multipart.getField("group").orElse("");
 	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
 
 	    PredefinedShapeUploadService uploadService = new PredefinedShapeUploadService();
 
 	    PredefinedShapeUploadService.UploadOutcome outcome = uploadService.upload(multipart.getFileName(), shapeId,
-		    multipart.getFileStream(), owner, loginResponse.isAdmin());
+		    multipart.getFileStream(), group, owner, loginResponse.isAdmin());
 
 	    if (!outcome.isSuccess()) {
 
@@ -813,7 +876,7 @@ public class SupportService {
 
 	try {
 
-	    UserFinder uf = UserFinder.create();
+	    UserFinder uf = UserFinder.newInstance();
 	    List<GSUser> users = uf.getUsers(false);
 
 	    for (GSUser user : users) {
@@ -889,7 +952,7 @@ public class SupportService {
 		listResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
 		    GSUser adminUser = null;
@@ -948,7 +1011,7 @@ public class SupportService {
 		basicResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    GSUser targetUser = null;
 		    for (GSUser user : users) {
@@ -1002,7 +1065,7 @@ public class SupportService {
 		basicResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    GSUser targetUser = null;
 		    for (GSUser user : users) {
@@ -1056,7 +1119,7 @@ public class SupportService {
 		listResponse.setSuccess(true);
 
 		try {
-		    UserFinder uf = UserFinder.create();
+		    UserFinder uf = UserFinder.newInstance();
 		    List<GSUser> users = uf.getUsers(false);
 		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
 		    GSUser adminUser = null;

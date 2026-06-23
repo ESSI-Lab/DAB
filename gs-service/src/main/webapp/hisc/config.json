@@ -13,7 +13,7 @@
 	"showResultOverview": false,
 	"resultTitleFromObservedProperty": true,
 	"resultsVisibility": "hidden",
-	"performStartupQuery": false,
+	"performStartupQuery": true,
 	"bboxSelectorVisibility" : false,
 	"layersSelectorVisibility" : true,
 	"layersSelectorButtonVisibility" : true,
@@ -25,6 +25,7 @@
 	"logo-right" : "logo-right-full.png",
 	"title-left" : "",
 	"title-right" : "",
+	"predefinedSearchAreaVisibility" : true,
 	"disclaimer" : "Dati dei Servizi idro-meteorologici regionali e delle province autonome. I dati possono essere soggetti a revisioni.",
 	"disclaimer_to_accept": "Disclaimer da accettare",
 	"attributeSearch" : true,
@@ -49,7 +50,7 @@
 	"shapeView" : "his-central-shapes",
 	"clusterWMS" : true,
 	"wmsLayerExtent" : {
-		"south" : 38,
+		"south" : 36,
 		"west" : 6,
 		"north" : 48,
 		"east" : 19
@@ -61,5 +62,5 @@
 	"beta-title" : true,
 	"beta-message" : true,
 	"zoomOnResults" : true,
-	"sortBy" : "platformTitle"
+	"sortByPlatformTitle" : true
 }

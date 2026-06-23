@@ -26,10 +26,9 @@ import eu.essi_lab.authorization.userfinder.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.web.*;
 import eu.essi_lab.model.auth.*;
-import eu.essi_lab.model.exceptions.*;
-
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
+
 import java.io.*;
 
 /**
@@ -58,11 +57,9 @@ public class UserFinderFilter implements Filter {
 
 	    user = UserFinder.findCurrentUser(httpRequest);
 
-	} catch (GSException e) {
+	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(getClass()).error("Error occurred, unable to find current user. Using anonymous user");
-
-	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	}
 
 	WebRequest.setCurrentUser(user, httpRequest);

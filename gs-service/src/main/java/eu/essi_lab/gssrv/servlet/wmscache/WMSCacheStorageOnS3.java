@@ -36,7 +36,9 @@ import java.util.Optional;
 
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import software.amazon.awssdk.services.s3.model.CommonPrefix;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
 import jakarta.ws.rs.core.Response;
@@ -129,54 +131,47 @@ public class WMSCacheStorageOnS3 implements WMSCacheStorage {
     @Override
     public void deleteCachedLayer(String view, String layer) {
 
-	deleteObjectsWithPrefix(DEFAULT_FOLDER + "/" + view + "/" + layer + "/");
+	String prefix = DEFAULT_FOLDER + "/" + view + "/" + layer + "/";
+	GSLoggerFactory.getLogger(getClass()).info("Deleting WMS cache folder s3://{}/{}", bucketname, prefix);
+	deleteObjectsWithPrefix(prefix);
     }
 
     @Override
     public void deleteCachedLayerAllViews(String layer) {
 
-	String layerSegment = "/" + layer + "/";
-	String prefix = DEFAULT_FOLDER + "/";
-	String token = null;
-
-	do {
-
-	    ListObjectsV2Response response = manager.listObjects(bucketname, prefix, token);
-	    List<String> keys = new ArrayList<>();
-
-	    for (S3Object object : response.contents()) {
-
-		String key = object.key();
-		if (key.contains(layerSegment)) {
-		    keys.add(key);
-		}
-	    }
-
-	    if (!keys.isEmpty()) {
-		manager.deleteObjects(bucketname, keys);
-	    }
-
-	    token = response.nextContinuationToken();
-
-	} while (token != null);
+	for (String view : getViews()) {
+	    deleteCachedLayer(view, layer);
+	}
     }
 
     private void deleteObjectsWithPrefix(String prefix) {
 
 	String token = null;
+	int page = 0;
+	int deletedTotal = 0;
 
 	do {
 
+	    page++;
 	    ListObjectsV2Response response = manager.listObjects(bucketname, prefix, token);
 	    List<String> keys = response.contents().stream().map(S3Object::key).toList();
 
+	    GSLoggerFactory.getLogger(getClass()).info(
+		    "WMS cache delete (prefix={}, page={}, matched={})",
+		    prefix, page, keys.size());
+
 	    if (!keys.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).info("Deleting WMS cache objects with prefix {}: {}", prefix, keys);
 		manager.deleteObjects(bucketname, keys);
+		deletedTotal += keys.size();
 	    }
 
 	    token = response.nextContinuationToken();
 
 	} while (token != null);
+
+	GSLoggerFactory.getLogger(getClass()).info("WMS cache delete completed for prefix {} ({} object(s) deleted)", prefix,
+		deletedTotal);
     }
 
     @Override
@@ -215,30 +210,74 @@ public class WMSCacheStorageOnS3 implements WMSCacheStorage {
 
     @Override
     public List<String> getViews() {
-	List<String> ret = new ArrayList<String>();
-	if (bucketname == null || bucketname.isEmpty()) {
-	    return ret;
-	}
-	ListObjectsV2Response objects = manager.listObjects(bucketname, DEFAULT_FOLDER);
-	List<S3Object> contents = objects.contents();
-	for (S3Object content : contents) {
-	    ret.add(content.key());
-	}
-	return ret;
+
+	return listChildPrefixes(DEFAULT_FOLDER);
     }
 
     @Override
     public List<String> getLayers(String view) {
-	List<String> ret = new ArrayList<String>();
+
+	if (view == null || view.isBlank()) {
+	    return List.of();
+	}
+
+	return listChildPrefixes(DEFAULT_FOLDER + "/" + view);
+    }
+
+    /**
+     * @param prefix virtual folder prefix without a trailing slash (e.g. {@code dab-wms-cache/his-central-shapes})
+     */
+    private List<String> listChildPrefixes(String prefix) {
+
+	List<String> children = new ArrayList<>();
+
 	if (bucketname == null || bucketname.isEmpty()) {
-	    return ret;
+	    return children;
 	}
-	ListObjectsV2Response objects = manager.listObjects(bucketname, DEFAULT_FOLDER + "/" + view);
-	List<S3Object> contents = objects.contents();
-	for (S3Object content : contents) {
-	    ret.add(content.key());
-	}
-	return ret;
+
+	String folderPrefix = prefix.endsWith("/") ? prefix : prefix + "/";
+	String token = null;
+
+	do {
+
+	    ListObjectsV2Request.Builder requestBuilder = ListObjectsV2Request.builder().//
+		    bucket(bucketname).//
+		    prefix(folderPrefix).//
+		    delimiter("/");
+
+	    if (token != null) {
+		requestBuilder.continuationToken(token);
+	    }
+
+	    ListObjectsV2Response response = manager.listObjects(requestBuilder.build());
+
+	    if (response == null) {
+		break;
+	    }
+
+	    for (CommonPrefix commonPrefix : response.commonPrefixes()) {
+
+		String childPrefix = commonPrefix.prefix();
+		if (!childPrefix.startsWith(folderPrefix)) {
+		    continue;
+		}
+
+		String name = childPrefix.substring(folderPrefix.length());
+
+		if (name.endsWith("/")) {
+		    name = name.substring(0, name.length() - 1);
+		}
+
+		if (!name.isBlank()) {
+		    children.add(name);
+		}
+	    }
+
+	    token = response.nextContinuationToken();
+
+	} while (token != null);
+
+	return children;
     }
 
 }

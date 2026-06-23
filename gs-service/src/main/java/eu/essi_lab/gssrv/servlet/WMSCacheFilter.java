@@ -206,6 +206,7 @@ public class WMSCacheFilter implements Filter {
 	Optional<WMSCacheSetting> setting = ConfigurationWrapper.getWMSCacheSettings();
 
 	if (setting != null && setting.isPresent()) {
+	    applyShapeViewSetting(setting.get());
 	    WMSCacheMode mode = setting.get().getMode();
 	    Optional<Integer> size = setting.get().getCachesize();
 	    if (mode != null) {
@@ -258,6 +259,16 @@ public class WMSCacheFilter implements Filter {
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("WMS Cache initialization ENDED");
+    }
+
+    private void applyShapeViewSetting(WMSCacheSetting setting) {
+
+	Optional<String> shapeView = setting.getShapeView();
+	if (shapeView.isPresent() && !shapeView.get().isBlank()) {
+	    WMSCache.getInstance().setShapeView(shapeView.get().trim());
+	} else {
+	    WMSCache.getInstance().setShapeView(null);
+	}
     }
 
 }

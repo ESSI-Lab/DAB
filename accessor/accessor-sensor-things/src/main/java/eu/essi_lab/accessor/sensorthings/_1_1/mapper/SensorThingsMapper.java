@@ -345,17 +345,21 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
      * @param coreMetadata
      * @param sourceUrl
      */
-    protected void addDistributionInfo(Datastream stream, CoreMetadata coreMetadata, String sourceUrl) {
+    protected void addDistributionInfo(Datastream stream, CoreMetadata coreMetadata, String sourceUrl, String sourceIdentifier) {
 	SensorThingsMangler mangler = new SensorThingsMangler();
+	String datastreamIdProperty = null;
 
 	Optional<JSONObject> props = stream.getProperties();
 	String[] idProperties = new String[] { "datastreamId", "annalsDatastreamId" };
 	if (props.isPresent()) {
 	    for (String idProperty : idProperties) {
 		String propValue = props.get().optString(idProperty);
-		if (propValue != null) {
+		if (propValue != null && !propValue.isEmpty() && !"null".equalsIgnoreCase(propValue)) {
 		    mangler.setPropertyKey(idProperty);
 		    mangler.setPropertyValue(propValue);
+		    if ("datastreamId".equals(idProperty)) {
+			datastreamIdProperty = propValue;
+		    }
 		}
 	    }
 
@@ -364,8 +368,13 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	mangler.setStreamIdentifer(stream.getIdentifier().get());
 	mangler.setQuoteIdentifiers(quoteIdentifiers.toString());
 
+	String onlineResourceIdentifier = mangler.getMangling();
+	if (datastreamIdProperty != null && sourceIdentifier != null && !sourceIdentifier.isEmpty()) {
+	    onlineResourceIdentifier = generateCode(sourceIdentifier ,datastreamIdProperty);
+	}
+
 	coreMetadata.addDistributionOnlineResource(//
-		mangler.getMangling(), //
+		onlineResourceIdentifier, //
 		sourceUrl, //
 		getSupportedProtocol(), //
 		"download");
@@ -731,7 +740,7 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	//
 	// Distribution info
 	//
-	addDistributionInfo(stream, coreMetadata, dataset.getSource().getEndpoint());
+	addDistributionInfo(stream, coreMetadata, dataset.getSource().getEndpoint(), dataset.getSource().getUniqueIdentifier());
 
 	//
 	// Extensions
