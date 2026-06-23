@@ -145,11 +145,17 @@ public class ViewManager {
 	    return getAndResolve(viewId);
 	}
 
-	return resolvedViewsStore. //
-		getSnapshots().//
-		stream().//
-		filter(v -> v.getId().equals(viewId)).//
-		findFirst();
+		Optional<View> ret = resolvedViewsStore. //
+				getSnapshots().//
+				stream().//
+				filter(v -> v.getId().equals(viewId)).//
+				findFirst();
+		if (ret.isPresent()){
+			return ret;
+		}else{
+			return getAndResolve(viewId);
+		}
+
     }
 
     /**
