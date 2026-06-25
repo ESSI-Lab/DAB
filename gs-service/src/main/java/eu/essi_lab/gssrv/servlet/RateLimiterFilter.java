@@ -37,6 +37,7 @@ import eu.essi_lab.shared.driver.es.stats.*;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.ws.rs.core.Response.*;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -137,7 +138,7 @@ public class RateLimiterFilter implements Filter {
 	//
 	//
 
-	RateLimiterSetting setting = ConfigurationWrapper.getRateLimiterSettingSettings();
+	Optional<RateLimiterSetting> setting = ConfigurationWrapper.getRateLimiterSettingSettings();
 
 	if (bouncer == null || //
 		address.startsWith("149.139.19") || // CNR-IIA
@@ -151,7 +152,8 @@ public class RateLimiterFilter implements Filter {
 		requestPath.endsWith("/wms-cluster") || //
 		requestPath.contains("/FeatureServer/") || //
 		requestPath.contains("/worldcereal/") || //
-		setting.getComputationType() == ComputationType.DISABLED) {
+		setting.isEmpty() || //
+		setting.get().getComputationType() == ComputationType.DISABLED) {
 
 	    filterChain.doFilter(servletRequest, response);
 	    return;
@@ -309,9 +311,9 @@ public class RateLimiterFilter implements Filter {
 	// skips initialization if disabled
 	//
 
-	RateLimiterSetting setting = ConfigurationWrapper.getRateLimiterSettingSettings();
+	Optional<RateLimiterSetting> setting = ConfigurationWrapper.getRateLimiterSettingSettings();
 
-	if (setting.getComputationType() == ComputationType.DISABLED) {
+	if (setting.isPresent() && setting.get().getComputationType() == ComputationType.DISABLED) {
 
 	    GSLoggerFactory.getLogger(getClass()).info("RequestBouncer disabled, initialization SKIPPED");
 
@@ -326,71 +328,77 @@ public class RateLimiterFilter implements Filter {
      */
     private void initRateLimiter() {
 
-	RateLimiterSetting setting = ConfigurationWrapper.getRateLimiterSettingSettings();
+	Optional<RateLimiterSetting> setting = ConfigurationWrapper.getRateLimiterSettingSettings();
 
 	GSLoggerFactory.getLogger(getClass()).info("RequestBouncer initialization STARTED");
 
-	String db = setting.getDefaultDB();
-	Integer overallMaxRequestsPerIp = setting.getDefaultMaxRequestsPerIP();
-	Integer maxConcurrentRequests = setting.getDefaultMaxConcurrentRequests();
-	Integer maxConcurrentRequestsPerIp = setting.getDefaultMaxConcurrenRequestsPerIP();
-	String hostname = setting.getHostName();
-	Integer port = setting.getPort();
+	if (setting.isPresent()) {
+	    String db = setting.get().getDefaultDB();
+	    Integer overallMaxRequestsPerIp = setting.get().getDefaultMaxRequestsPerIP();
+	    Integer maxConcurrentRequests = setting.get().getDefaultMaxConcurrentRequests();
+	    Integer maxConcurrentRequestsPerIp = setting.get().getDefaultMaxConcurrenRequestsPerIP();
+	    String hostname = setting.get().getHostName();
+	    Integer port = setting.get().getPort();
 
-	Optional<ExecutionModeSetting> specificSetting = setting.getExecutionModeSetting(ExecutionMode.get());
+	    Optional<ExecutionModeSetting> specificSetting = setting.get().getExecutionModeSetting(ExecutionMode.get());
 
-	if (specificSetting.isPresent()) {
+	    if (specificSetting.isPresent()) {
 
-	    String tmpDb = specificSetting.get().getDB();
+		String tmpDb = specificSetting.get().getDB();
 
-	    if (tmpDb != null && !tmpDb.isEmpty()) {
-		db = tmpDb;
-	    }
-
-	    Integer tmpOverallMaxRequestsPerIp = specificSetting.get().getMaxRequestsPerIP();
-	    if (tmpOverallMaxRequestsPerIp != null) {
-		overallMaxRequestsPerIp = tmpOverallMaxRequestsPerIp;
-	    }
-
-	    Integer tmpMaxRequests = specificSetting.get().getMaxConcurrentRequests();
-	    if (tmpMaxRequests != null) {
-		maxConcurrentRequests = tmpMaxRequests;
-	    }
-
-	    Integer tmpMaxRequestsPerIp = specificSetting.get().getMaxConcurrentRequestsPerIP();
-	    if (tmpMaxRequestsPerIp != null) {
-		maxConcurrentRequestsPerIp = tmpMaxRequestsPerIp;
-	    }
-	}
-
-	AbstractRequestBouncer tmp = null;
-
-	if (setting.getComputationType().equals(ComputationType.DISTRIBUTED)) {
-	    try {
-		if (bouncer != null && bouncer instanceof DistributedRequestBouncer) {
-		    DistributedRequestBouncer drb = (DistributedRequestBouncer) bouncer;
-		    if (drb.getHostname().equals(hostname) && //
-			    port == drb.getPort() && //
-			    db.equals(drb.getHash())) {
-			// it is already initialized.. just setting
-			bouncer.setMaximumOverallRequestsPerIp(overallMaxRequestsPerIp);
-			bouncer.setMaxConcurrentRequests(maxConcurrentRequests);
-			bouncer.setMaxConcurrentRequestsPerIP(maxConcurrentRequestsPerIp);
-			GSLoggerFactory.getLogger(getClass()).info("Distributed bouncer just setting");
-			return;
-		    }
+		if (tmpDb != null && !tmpDb.isEmpty()) {
+		    db = tmpDb;
 		}
-		tmp = new DistributedRequestBouncer(hostname, port, db, maxConcurrentRequests, maxConcurrentRequestsPerIp,
-			overallMaxRequestsPerIp);
-	    } catch (Exception e) {
-		GSLoggerFactory.getLogger(getClass()).error(e);
-	    }
-	}
 
-	if (tmp != null) {
-	    bouncer = tmp;
-	} else {
-	    bouncer = new LocalRequestBouncer(maxConcurrentRequests, maxConcurrentRequestsPerIp, overallMaxRequestsPerIp);
+		Integer tmpOverallMaxRequestsPerIp = specificSetting.get().getMaxRequestsPerIP();
+		if (tmpOverallMaxRequestsPerIp != null) {
+		    overallMaxRequestsPerIp = tmpOverallMaxRequestsPerIp;
+		}
+
+		Integer tmpMaxRequests = specificSetting.get().getMaxConcurrentRequests();
+		if (tmpMaxRequests != null) {
+		    maxConcurrentRequests = tmpMaxRequests;
+		}
+
+		Integer tmpMaxRequestsPerIp = specificSetting.get().getMaxConcurrentRequestsPerIP();
+		if (tmpMaxRequestsPerIp != null) {
+		    maxConcurrentRequestsPerIp = tmpMaxRequestsPerIp;
+		}
+	    }
+
+	    AbstractRequestBouncer tmp = null;
+
+	    if (setting.get().getComputationType().equals(ComputationType.DISTRIBUTED)) {
+		try {
+		    if (bouncer != null && bouncer instanceof DistributedRequestBouncer) {
+			DistributedRequestBouncer drb = (DistributedRequestBouncer) bouncer;
+			if (drb.getHostname().equals(hostname) && //
+				port == drb.getPort() && //
+				db.equals(drb.getHash())) {
+			    // it is already initialized.. just setting
+			    bouncer.setMaximumOverallRequestsPerIp(overallMaxRequestsPerIp);
+			    bouncer.setMaxConcurrentRequests(maxConcurrentRequests);
+			    bouncer.setMaxConcurrentRequestsPerIP(maxConcurrentRequestsPerIp);
+			    GSLoggerFactory.getLogger(getClass()).info("Distributed bouncer just setting");
+			    return;
+			}
+		    }
+		    tmp = new DistributedRequestBouncer(hostname, port, db, maxConcurrentRequests, maxConcurrentRequestsPerIp,
+			    overallMaxRequestsPerIp);
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).error(e);
+		}
+	    }
+
+	    if (tmp != null) {
+		bouncer = tmp;
+	    } else {
+		bouncer = new LocalRequestBouncer(maxConcurrentRequests, maxConcurrentRequestsPerIp, overallMaxRequestsPerIp);
+	    }
+
+	}else{
+	    GSLoggerFactory.getLogger(getClass()).error("Rate limiter setting not present");
+
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("RequestBouncer initialization ENDED");

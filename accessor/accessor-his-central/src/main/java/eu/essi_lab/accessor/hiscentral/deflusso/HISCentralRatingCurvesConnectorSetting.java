@@ -1,7 +1,4 @@
-/**
- *
- */
-package eu.essi_lab.cfga.gs.setting.database;
+package eu.essi_lab.accessor.hiscentral.deflusso;
 
 /*-
  * #%L
@@ -24,27 +21,38 @@ package eu.essi_lab.cfga.gs.setting.database;
  * #L%
  */
 
+import org.json.JSONObject;
+
+import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
+
 /**
- * @author Fabrizio
+ * @author boldrini
  */
-public class SecondaryUsersDatabaseSetting extends UsersDatabaseSetting {
+public class HISCentralRatingCurvesConnectorSetting extends HarvestedConnectorSetting {
 
-    /**
-     *
-     */
-    public SecondaryUsersDatabaseSetting() {
+    public HISCentralRatingCurvesConnectorSetting() {
 
-	setName("Secondary user database setting");
     }
 
-    protected String getDbSettingId() {
+    public HISCentralRatingCurvesConnectorSetting(JSONObject object) {
 
-	return "secUsersDbSetting";
+	super(object);
     }
 
-    protected String getVolatileDbSettingId() {
+    public HISCentralRatingCurvesConnectorSetting(String object) {
 
-	return "secUsersVolFDbSetting";
+	super(object);
     }
 
+    @Override
+    protected String initConnectorType() {
+
+	return HISCentralRatingCurvesConnector.TYPE;
+    }
+
+    @Override
+    protected String initSettingName() {
+
+	return "HIS-Central Rating Curves Connector settings";
+    }
 }

@@ -17,3 +17,4 @@ eu.essi_lab.downloader.hiscentral.HISCentralPugliaDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralARPAPugliaDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralPiemonteScaleDeflussoDownloader
 eu.essi_lab.downloader.hiscentral.HISCentralMarcheScaleDeflussoDownloader
+eu.essi_lab.downloader.hiscentral.HISCentralRatingCurvesDownloader

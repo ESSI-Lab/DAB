@@ -46,18 +46,25 @@ import eu.essi_lab.model.ratings.RatingCurves;
  *
  * @author boldrini
  */
-public class RatingCurvesHarvester {
+public class RatingCurvesClient {
 
-    private static final int GENERATED_POINTS = 100;
     private static final String STATION_HEADER = "Id stazione";
     private static final String SKIP_MARKER = "skip";
+
+    private static final int COL_ID = 0;
+    private static final int COL_NAME = 1;
+    private static final int COL_RANGE = 2;
+    private static final int COL_FORMULA = 3;
+    private static final int COL_MIN = 4;
+    private static final int COL_MAX = 5;
+    private static final int COL_POINTS = 6;
 
     private final String endpoint;
 
     /**
      * @param endpoint SharePoint folder sharing link (publicly readable)
      */
-    public RatingCurvesHarvester(String endpoint) {
+    public RatingCurvesClient(String endpoint) {
 	this.endpoint = endpoint;
     }
 
@@ -70,21 +77,46 @@ public class RatingCurvesHarvester {
 	List<RatingCurves> stations = new ArrayList<>();
 	SharePointClient client = new SharePointClient(endpoint);
 
-	parseFolderFiles(client, stations);
+	parseFolderFiles(client, stations, null);
 
 	for (String folder : client.listFolders()) {
 	    client.cd(folder);
-	    parseFolderFiles(client, stations);
+	    parseFolderFiles(client, stations, folder);
 	    client.cdRoot();
 	}
 	return stations;
     }
 
-    private void parseFolderFiles(SharePointClient client, List<RatingCurves> stations) throws IOException {
+    /**
+     * Harvests the shared folder and returns the rating curves of the station with the given identifier in the
+     * given HIS-Central source (SharePoint sub-folder name).
+     *
+     * @return the matching station, or {@code null} if no station matches
+     */
+    public RatingCurves getRatingCurves(String sourceId, String stationIdentifier) throws IOException {
+
+	for (RatingCurves station : harvest()) {
+	    if (station.getStationIdentifier() != null && station.getStationIdentifier().equals(stationIdentifier)
+		    && (sourceId == null || sourceId.equals(station.getSourceId()))) {
+		return station;
+	    }
+	}
+	return null;
+    }
+
+    /**
+     * @deprecated use {@link #getRatingCurves(String, String)}
+     */
+    @Deprecated
+    public RatingCurves getRatingCurves(String stationIdentifier) throws IOException {
+	return getRatingCurves(null, stationIdentifier);
+    }
+
+    private void parseFolderFiles(SharePointClient client, List<RatingCurves> stations, String sourceId) throws IOException {
 
 	for (String xlsx : client.listFiles("*.xlsx")) {
 	    try (XSSFWorkbook workbook = client.readXlsx(xlsx)) {
-		stations.addAll(parseWorkbook(workbook));
+		stations.addAll(parseWorkbook(workbook, sourceId));
 	    }
 	}
     }
@@ -93,6 +125,10 @@ public class RatingCurvesHarvester {
      * Parses the first sheet of a workbook into per-station {@link RatingCurves}, generating sample points for each.
      */
     static List<RatingCurves> parseWorkbook(XSSFWorkbook workbook) {
+	return parseWorkbook(workbook, null);
+    }
+
+    static List<RatingCurves> parseWorkbook(XSSFWorkbook workbook, String sourceId) {
 
 	List<RatingCurves> stations = new ArrayList<>();
 	DataFormatter formatter = new DataFormatter();
@@ -103,10 +139,10 @@ public class RatingCurvesHarvester {
 
 	for (Row row : sheet) {
 
-	    String id = cell(formatter, row, 0).trim();
-	    String name = cell(formatter, row, 1).trim();
-	    String rangeExpression = cell(formatter, row, 2).trim();
-	    String formulaExpression = cell(formatter, row, 3).trim();
+	    String id = cell(formatter, row, COL_ID).trim();
+	    String name = cell(formatter, row, COL_NAME).trim();
+	    String rangeExpression = cell(formatter, row, COL_RANGE).trim();
+	    String formulaExpression = cell(formatter, row, COL_FORMULA).trim();
 
 	    if (!id.isEmpty()) {
 
@@ -125,8 +161,12 @@ public class RatingCurvesHarvester {
 		RatingCurve curve = new RatingCurve();
 		currentFormula = new Formula();
 		curve.setFormula(currentFormula);
+		curve.setMinLevel(parseNumber(cell(formatter, row, COL_MIN)));
+		curve.setMaxLevel(parseNumber(cell(formatter, row, COL_MAX)));
+		curve.setNumberOfPoints((int) Math.round(parseNumber(cell(formatter, row, COL_POINTS))));
 
 		RatingCurves station = new RatingCurves(id, name);
+		station.setSourceId(sourceId);
 		station.getCurves().add(curve);
 		stations.add(station);
 	    }
@@ -143,7 +183,7 @@ public class RatingCurvesHarvester {
 
 	for (RatingCurves station : stations) {
 	    for (RatingCurve curve : station.getCurves()) {
-		curve.generatePoints(GENERATED_POINTS);
+		curve.generatePoints();
 	    }
 	}
 	return stations;
@@ -156,6 +196,23 @@ public class RatingCurvesHarvester {
     }
 
     /**
+     * Parses a numeric cell value, tolerating comma decimal separators. Returns {@link Double#NaN} when empty or
+     * not a number.
+     */
+    private static double parseNumber(String value) {
+
+	String normalized = value.replace(',', '.').trim();
+	if (normalized.isEmpty()) {
+	    return Double.NaN;
+	}
+	try {
+	    return Double.parseDouble(normalized);
+	} catch (NumberFormatException e) {
+	    return Double.NaN;
+	}
+    }
+
+    /**
      * Example: harvests the shared rating-curve folder and prints every parsed station.
      */
     public static void main(String[] args) throws Exception {
@@ -163,7 +220,7 @@ public class RatingCurvesHarvester {
 	String url = args.length > 0 ? args[0]
 		: "https://cnrsc-my.sharepoint.com/:f:/g/personal/enrico_boldrini_cnr_it/IgDKzX2pfPsjSItF5ROJac6-AXIn4fWaJP6_1bGif-8w5hw?e=z5v4xO";
 
-	RatingCurvesHarvester harvester = new RatingCurvesHarvester(url);
+	RatingCurvesClient harvester = new RatingCurvesClient(url);
 	List<RatingCurves> stations = harvester.harvest();
 
 	System.out.println("Parsed " + stations.size() + " stations\n");

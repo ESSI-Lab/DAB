@@ -36,6 +36,7 @@ public class RatingCurves {
     private final Collection<RatingCurve> curves;
     private String stationIdentifier;
     private String name;
+    private String sourceId;
 
     public RatingCurves() {
 	this(new ArrayList<>());
@@ -68,6 +69,17 @@ public class RatingCurves {
     }
 
     /**
+     * HIS-Central source identifier, typically the SharePoint sub-folder name (e.g. {@code ita-sir-val-d-aosta}).
+     */
+    public String getSourceId() {
+	return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+	this.sourceId = sourceId;
+    }
+
+    /**
      * Prints this station's rating curves (formula ranges and generated points) to {@code System.out}.
      */
     public void print() {
@@ -79,7 +91,7 @@ public class RatingCurves {
      */
     public void print(PrintStream out) {
 
-	out.println("Station: " + stationIdentifier + " - " + name);
+	out.println("Station: " + stationIdentifier + " - " + name + (sourceId != null ? " [" + sourceId + "]" : ""));
 	for (RatingCurve curve : curves) {
 	    Formula formula = curve.getFormula();
 	    if (formula != null && !formula.isEmpty()) {
@@ -87,7 +99,8 @@ public class RatingCurves {
 		for (FormulaRange range : formula.getRanges()) {
 		    out.println("    " + range);
 		}
-		out.println("  Points (" + curve.getPoints().size() + "):");
+		out.println(String.format("  Points (%d, requested %d from %.4f to %.4f):", curve.getPoints().size(),
+			curve.getNumberOfPoints(), curve.getMinLevel(), curve.getMaxLevel()));
 		for (RatingCurvePoint point : curve.getPoints()) {
 		    out.println(String.format("    h=%.4f -> Q=%.4f", point.getLevel().doubleValue(),
 			    point.getDischarge().doubleValue()));

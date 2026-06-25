@@ -262,32 +262,88 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	if (client.isPresent()) {
 
-	    if (!newRecords.isEmpty()) {
+	    if (client.get() instanceof KafkaPublisher) {
 
-		String topic = buildTopic(gsSource, "added", client.get());
-		String message = buildMessage(newRecords, gsSource.getUniqueIdentifier(), "added", Optional.empty());
+		JSONArray messageArray = new JSONArray();
 
-		client.get().publish(topic, message);
-	    }
+		List<JSONObject> messages = new ArrayList<>();
 
-	    if (!deletedRecords.isEmpty()) {
+		if (!newRecords.isEmpty()) {
 
-		String topic = buildTopic(gsSource, "deleted", client.get());
-		String message = buildMessage(deletedRecords, gsSource.getUniqueIdentifier(), "deleted", Optional.empty());
+		    messages.addAll(buildMessages(newRecords, gsSource.getUniqueIdentifier(), "added", List.of()));
+		}
 
-		client.get().publish(topic, message);
-	    }
+		if (!deletedRecords.isEmpty()) {
 
-	    if (!modifiedRecords.isEmpty()) {
+		    messages.addAll(buildMessages(deletedRecords, gsSource.getUniqueIdentifier(), "deleted", List.of()));
+		}
 
-		for (String property : modifiedRecords.keySet()) {
+		if (!modifiedRecords.isEmpty()) {
 
-		    List<String> idsList = modifiedRecords.get(property);
+		    // title    -> [a,b,c]
+		    // abstract -> [a,b,d]
+		    // keyword  -> [a,c,d,e]
 
-		    String topic = buildTopic(gsSource, property, true, client.get());
-		    String message = buildMessage(idsList, gsSource.getUniqueIdentifier(), "modified", Optional.of(property));
+		    // a -> [title, abstract, keyword]
+		    // b -> [title, abstract]
+		    // c -> [title, keyword]
+		    // d -> [keyword, abstract]
+		    // e -> [keyword]
+
+		    Map<String, List<String>> invertedMap = invert(modifiedRecords);
+
+		    for (String id : invertedMap.keySet()) {
+
+			List<String> properties = invertedMap.get(id);
+
+			messages.addAll(buildMessages(List.of(id), gsSource.getUniqueIdentifier(), "modified", properties));
+		    }
+		}
+
+		messages.forEach(messageArray::put);
+
+		if (!messages.isEmpty()) {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Sending message STARTED");
+
+		    client.get().publish(kafkaTopic, messageArray.toString(3));
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Sending message ENDED");
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("No message to send");
+		}
+
+	    } else {
+
+		if (!newRecords.isEmpty()) {
+
+		    String topic = buildTopic(gsSource, "added");
+		    String message = buildMessage(newRecords, gsSource.getUniqueIdentifier(), "added", Optional.empty());
 
 		    client.get().publish(topic, message);
+		}
+
+		if (!deletedRecords.isEmpty()) {
+
+		    String topic = buildTopic(gsSource, "deleted");
+		    String message = buildMessage(deletedRecords, gsSource.getUniqueIdentifier(), "deleted", Optional.empty());
+
+		    client.get().publish(topic, message);
+		}
+
+		if (!modifiedRecords.isEmpty()) {
+
+		    for (String property : modifiedRecords.keySet()) {
+
+			List<String> idsList = modifiedRecords.get(property);
+
+			String topic = buildTopic(gsSource, property, true);
+			String message = buildMessage(idsList, gsSource.getUniqueIdentifier(), "modified", Optional.of(property));
+
+			client.get().publish(topic, message);
+		    }
 		}
 	    }
 	}
@@ -509,9 +565,9 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      * @param client
      * @return
      */
-    private String buildTopic(GSSource source, String topic, MessagePublisher client) {
+    private String buildTopic(GSSource source, String topic) {
 
-	return buildTopic(source, topic, false, client);
+	return buildTopic(source, topic, false);
 
     }
 
@@ -522,12 +578,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
      * @param client
      * @return
      */
-    private String buildTopic(GSSource source, String property, boolean modified, MessagePublisher client) {
-
-	if (client instanceof KafkaPublisher) {
-
-	    return kafkaTopic;
-	}
+    private String buildTopic(GSSource source, String property, boolean modified) {
 
 	property = modified ? "modified/" + property : property;
 
@@ -554,6 +605,32 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    return object.toString(3);
 
 	}).collect(Collectors.joining(",", "[", "]"));
+    }
+
+    /**
+     * @param idsList
+     * @param sourceId
+     * @param event
+     * @param properties
+     * @return
+     */
+    private List<JSONObject> buildMessages(List<String> idsList, String sourceId, String event, List<String> properties) {
+
+	return idsList.stream().map(id -> {
+
+	    JSONObject object = new JSONObject();
+	    object.put("metadataId", id);
+	    object.put("sourceId", sourceId);
+	    object.put("event", event); // added, modified, deleted
+
+	    if (!properties.isEmpty()) {
+
+		object.put("property", properties);
+	    }
+
+	    return object;
+
+	}).toList();
     }
 
     /**
@@ -636,9 +713,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 		    } else {
 
-			GSLoggerFactory.getLogger(getClass()).error("One or more required Kafka settings not found!");
-
-			return Optional.empty();
+			GSLoggerFactory.getLogger(getClass()).warn("Security properties not set!");
 		    }
 
 		    //
@@ -783,7 +858,7 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    SearchResponse<Void> response = client.search(request, Void.class);
 
-	    if (!OpenSearchDatabase.debugQueries()) {
+	    if (OpenSearchDatabase.debugQueries()) {
 
 		JSONObject reqObject = OpenSearchUtils.toJSONObject(request);
 		GSLoggerFactory.getLogger(getClass()).debug(reqObject.toString(3));
@@ -896,5 +971,26 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	}
 
 	return out;
+    }
+
+    /**
+     * @param source
+     * @return
+     */
+    private Map<String, List<String>> invert(Map<String, List<String>> source) {
+
+	Map<String, List<String>> target = new HashMap<>();
+
+	for (Map.Entry<String, List<String>> entry : source.entrySet()) {
+
+	    String property = entry.getKey();
+
+	    for (String id : entry.getValue()) {
+
+		target.computeIfAbsent(id, k -> new ArrayList<>()).add(property);
+	    }
+	}
+
+	return target;
     }
 }

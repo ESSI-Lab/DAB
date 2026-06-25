@@ -808,11 +808,13 @@ public class ConfigurationWrapper {
     //
     // ----
 
-    public static RateLimiterSetting getRateLimiterSettingSettings() {
+    public static Optional<RateLimiterSetting> getRateLimiterSettingSettings() {
 
-	return configuration.get(//
+	Optional<RateLimiterSetting> opt = configuration.get(//
 		SingletonSettingsId.RATE_LIMITER_SETTING.getLabel(), //
-		RateLimiterSetting.class).get();
+		RateLimiterSetting.class);
+	    return opt;
+
     }
 
     /**

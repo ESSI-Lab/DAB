@@ -34,6 +34,9 @@ public class RatingCurve {
     private final LocalDate endDate;
     private final List<RatingCurvePoint> points = new ArrayList<>();
     private Formula formula;
+    private double minLevel = Double.NaN;
+    private double maxLevel = Double.NaN;
+    private int numberOfPoints = 0;
 
     public RatingCurve() {
 	this(null, null);
@@ -68,26 +71,56 @@ public class RatingCurve {
 	this.formula = formula;
     }
 
+    public double getMinLevel() {
+	return minLevel;
+    }
+
+    public void setMinLevel(double minLevel) {
+	this.minLevel = minLevel;
+    }
+
+    public double getMaxLevel() {
+	return maxLevel;
+    }
+
+    public void setMaxLevel(double maxLevel) {
+	this.maxLevel = maxLevel;
+    }
+
+    public int getNumberOfPoints() {
+	return numberOfPoints;
+    }
+
+    public void setNumberOfPoints(int numberOfPoints) {
+	this.numberOfPoints = numberOfPoints;
+    }
+
+    /**
+     * Generates the points using the configured {@link #getNumberOfPoints() number of points} over the
+     * {@code [minLevel, maxLevel]} range. No-op if those are not set.
+     */
+    public void generatePoints() {
+
+	generatePoints(numberOfPoints, minLevel, maxLevel);
+    }
+
     /**
      * Replaces the current points with a list generated from the {@link Formula}, sampling {@code count} water
-     * levels evenly from {@code 0} up to twice the formula's top range value, and evaluating the discharge at each.
-     * Levels for which the formula cannot be evaluated are skipped.
+     * levels evenly from {@code minLevel} to {@code maxLevel} and evaluating the discharge at each. Levels for
+     * which the formula cannot be evaluated are skipped.
      *
-     * @param count the number of sample points (e.g. 100)
+     * @param count    the number of sample points
+     * @param minLevel the lowest water level to sample
+     * @param maxLevel the highest water level to sample
      */
-    public void generatePoints(int count) {
+    public void generatePoints(int count, double minLevel, double maxLevel) {
 
 	points.clear();
-	if (formula == null || formula.isEmpty() || count < 2) {
+	if (formula == null || formula.isEmpty() || count < 1 || Double.isNaN(minLevel) || Double.isNaN(maxLevel)) {
 	    return;
 	}
-	double top = formula.getTopRangeValue();
-	if (Double.isNaN(top) || top <= 0) {
-	    return;
-	}
-	double max = top * 2;
 	for (int i = 0; i < count; i++) {
-	    double level = max * i / (count - 1);
+	    double level = count == 1 ? minLevel : minLevel + (maxLevel - minLevel) * i / (count - 1);
 	    double discharge = formula.evaluate(level);
 	    if (Double.isFinite(discharge)) {
 		points.add(new RatingCurvePoint(//
