@@ -32,6 +32,7 @@ public class LegendFactory {
 	case "utci": return buildUtci();
 	case "2r": return buildHumidity();
 	case "wbgt": return buildWbgt();
+	case "wct": return buildWct();
 	default: return null;
 	}
     }
@@ -121,6 +122,28 @@ public class LegendFactory {
 			new LegendItem("10.0 – 15.0", "Mild", "#fdae61"),
 			new LegendItem("15.0 – 20.0", "Warm", "#f46d43"),
 			new LegendItem("> 20.0", "Heat Stress Threshold", "#d73027")
+		)
+	);
+    }
+
+    private static Legend buildWct() {
+	return new Legend(
+		"Wind Chill Temperature (WCT) (°C)",
+		List.of(
+			// --- HEAT SPECTRUM ---
+			new LegendItem("40.0 – 50.0", "Extreme Heat / Danger", "#7f0000"),
+			new LegendItem("30.0 – 40.0", "Very Warm / Caution", "#d73027"),
+			new LegendItem("20.0 – 30.0", "Warm / Comfortable", "#fee090"),
+			new LegendItem("10.0 – 20.0", "Mild / Neutral", "#e0f3f8"),
+
+			// --- COLD SPECTRUM (Your exact detailed thresholds) ---
+			new LegendItem("0.0 – 10.0", "Cool / Low Risk", "#b3cde3"),
+			new LegendItem("-9.0 – 0.0", "Slightly Cold / Mild Discomfort", "#8c96c6"),
+			new LegendItem("-27.0 – -10.0", "Cold / Moderate Risk", "#88419d"),
+			new LegendItem("-39.0 – -28.0", "Very Cold / Frostbite ~30 min", "#810f7c"),
+			new LegendItem("-47.0 – -40.0", "Extreme Cold / Frostbite 5-10 min", "#4d004b"),
+			new LegendItem("-54.0 – -48.0", "Severe Extreme Cold / Frostbite 2-5 min", "#250025"),
+			new LegendItem("≤ -55.0", "Hazardous / Deadly / Frostbite < 2 min", "#000000")
 		)
 	);
     }
