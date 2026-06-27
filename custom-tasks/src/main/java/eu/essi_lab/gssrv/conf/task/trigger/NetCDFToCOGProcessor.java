@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class NetCDFToCOGProcessor {
 
@@ -26,55 +27,99 @@ public class NetCDFToCOGProcessor {
 
     private static final String TARGET_EPSG = "EPSG:3857";
 
+
+//    private static class FileStats {
+//	double min = Double.MAX_VALUE;
+//	double max = -Double.MAX_VALUE;
+//	boolean hasData = false;
+//
+//	void merge(double bandMin, double bandMax) {
+//	    this.min = Math.min(this.min, bandMin);
+//	    this.max = Math.max(this.max, bandMax);
+//	    this.hasData = true;
+//	}
+//    }
+
     public static void main(String[] args) {
-	String resourceFileName = "wbgt_wrfout_20250101.nc";
-	String variableName = "wbgt";
-	Path outputDir = Paths.get("./output_cogs");
-	Path tempNcFile = null;
+	String[] targetVariables = {"WCT"};
+	Path baseTriggerPath = Paths.get("E:/TRIGGER/CIMA");
 
-	try {
-	    InputStream is = NetCDFToCOGProcessor.class.getClassLoader().getResourceAsStream(resourceFileName);
-	    if (is == null) {
-		throw new IllegalArgumentException("Resource file not found in src/main/resources: " + resourceFileName);
+	for (String variable : targetVariables) {
+	    Path varSourceDir = baseTriggerPath.resolve(variable);
+
+	    // 1. Setup the isolated nested target folder: E:\TRIGGER\CIMA\[VAR]\output_cog\
+	    Path outputCogDir = varSourceDir.resolve("output_cog");
+
+	    System.out.println("\n==============================================");
+	    System.out.println("Processing Local Variable: " + variable);
+	    System.out.println("Source Path: " + varSourceDir.toAbsolutePath());
+	    System.out.println("Output Path: " + outputCogDir.toAbsolutePath());
+	    System.out.println("==============================================");
+
+	    if (!Files.exists(varSourceDir)) {
+		System.err.println("Source directory does not exist! Skipping " + variable);
+		continue;
 	    }
 
-	    tempNcFile = Files.createTempFile("gdal_input_", "_" + resourceFileName);
-	    System.out.println("Extracting classpath resource to temporary disk location: " + tempNcFile);
+	    try {
+		Files.createDirectories(outputCogDir);
 
-	    Files.copy(is, tempNcFile, StandardCopyOption.REPLACE_EXISTING);
-	    is.close();
+		// Dynamically look up all local NetCDF files inside the folder
+		List<Path> netCdfFiles;
+		try (Stream<Path> walk = Files.walk(varSourceDir, 1)) {
+		    netCdfFiles = walk
+			    .filter(p -> p.getFileName().toString().toLowerCase().endsWith(".nc"))
+			    .toList();
+		}
 
-	    NetCDFToCOGProcessor processor = new NetCDFToCOGProcessor();
-	    List<Path> createdCogs = processor.processNetCdfToMultipleCogs(tempNcFile, variableName, outputDir);
+		if (netCdfFiles.isEmpty()) {
+		    System.out.println("No matching .nc files found in this directory.");
+		    continue;
+		}
+		NetCDFToCOGProcessor processor = new NetCDFToCOGProcessor();
+		List<String> generatedCogNames = new ArrayList<>();
 
-	    System.out.println("\nProcessing Complete! Created " + createdCogs.size() + " COG files.");
-	    for (Path cog : createdCogs) {
-		System.out.println("-> Generated: " + cog.toAbsolutePath());
-	    }
+		// Track absolute minimum and maximum values across all bands and files
+		double globalMin = Double.MAX_VALUE;
+		double globalMax = -Double.MAX_VALUE;
 
-	} catch (Exception e) {
-	    e.printStackTrace();
-	} finally {
-	    if (tempNcFile != null) {
-		try {
-		    Files.deleteIfExists(tempNcFile);
-		} catch (Exception ignored) {}
+		for (Path ncFile : netCdfFiles) {
+		    System.out.println("\nProcessing: " + ncFile.getFileName());
+
+		    // Convert NetCDF and parse statistics
+		    processor.processNetCdfToMultipleCogs(ncFile, variable.toLowerCase(), outputCogDir, generatedCogNames);
+
+//		    if (stats.hasData) {
+//			globalMin = Math.min(globalMin, stats.min);
+//			globalMax = Math.max(globalMax, stats.max);
+//		    }
+		}
+
+		// 2. Wrap up configuration asset assets into the clean output folder
+		if (!generatedCogNames.isEmpty()) {
+		    Collections.sort(generatedCogNames);
+		    System.out.println("\nWriting index.json and legend.svg configurations...");
+		    processor.generateLegend(outputCogDir, variable.toLowerCase());
+		    processor.generateIndexFile(outputCogDir, variable.toLowerCase(), generatedCogNames);
+
+		    // Print the true calculated min/max boundaries
+		    System.out.println(String.format("\n>>> [%s] HISTORICAL MATRIX BOUNDARIES:", variable.toUpperCase()));
+		    System.out.println(String.format(" -> Absolute Global Minimum: %.4f", globalMin));
+		    System.out.println(String.format(" -> Absolute Global Maximum: %.4f", globalMax));
+		}
+
+	    } catch (Exception e) {
+		System.err.println("Critical error compiling cluster " + variable);
+		e.printStackTrace();
 	    }
 	}
     }
 
-    public List<Path> processNetCdfToMultipleCogs(Path ncFile, String variableName, Path outputDir) throws Exception {
-	List<Path> structuralCogFiles = new ArrayList<>();
-	List<String> createdFileNames = new ArrayList<>();
-
-	// Create the clean variable folder: output_cogs/wbgt/
-	Path varOutputDir = outputDir.resolve(variableName);
-	Files.createDirectories(varOutputDir);
+    public void processNetCdfToMultipleCogs(Path ncFile, String variableName, Path outputCogDir, List<String> generatedCogNames) throws Exception {
 
 	String subdataset = String.format("NETCDF:\"%s\":%s", ncFile.toAbsolutePath(), variableName);
 
-	System.out.println("Inspecting NetCDF dimensions via gdalinfo...");
-	String jsonMetadataStr = executeGdalInfo(subdataset);
+	String jsonMetadataStr = executeGdalInfo(subdataset, false); // True to compute min/max statistics via -stats
 	JSONObject root = new JSONObject(jsonMetadataStr);
 
 	JSONObject globalMetadata = root.getJSONObject("metadata").getJSONObject("");
@@ -86,6 +131,13 @@ public class NetCDFToCOGProcessor {
 	JSONArray bandsArray = root.getJSONArray("bands");
 	System.out.println("Detected " + bandsArray.length() + " temporal bands. Starting pipeline...");
 
+	JSONObject firstBand = bandsArray.getJSONObject(0);
+	JSONObject firstBandMeta = firstBand.getJSONObject("metadata").getJSONObject("");
+	long initialFileOffset = Long.parseLong(firstBandMeta.getString("NETCDF_DIM_XTIME"));
+	long duplicateCutoffOffset = initialFileOffset + 1440;
+	System.out.println(String.format("File starts at offset: %d min. Dynamic hour 24 cutoff set at: %d min.",
+		initialFileOffset, duplicateCutoffOffset));
+
 	for (int i = 0; i < bandsArray.length(); i++) {
 	    JSONObject bandInfo = bandsArray.getJSONObject(i);
 	    int bandNum = bandInfo.getInt("band");
@@ -93,15 +145,27 @@ public class NetCDFToCOGProcessor {
 	    JSONObject bandMeta = bandInfo.getJSONObject("metadata").getJSONObject("");
 	    long minutesOffset = Long.parseLong(bandMeta.getString("NETCDF_DIM_XTIME"));
 
+	    // Skip hour 24 to prevent next-day collision
+	    if (minutesOffset >= duplicateCutoffOffset) {
+		System.out.println(String.format("Skipping Band %d (Offset: %d min) to prevent cross-day overlapping.", bandNum, minutesOffset));
+		continue;
+	    }
+
+	    // Read the band statistics safely generated by gdalinfo -stats
+//	    if (bandInfo.has("minimum") && bandInfo.has("maximum")) {
+//		double bMin = bandInfo.getDouble("minimum");
+//		double bMax = bandInfo.getDouble("maximum");
+//		stats.merge(bMin, bMax);
+//	    }
+
 	    Instant validInstant = baseInstant.plus(Duration.ofMinutes(minutesOffset));
 	    String formattedTimestamp = FILE_TIME_FORMATTER.format(validInstant);
 
 	    String baseFileName = variableName + "_" + formattedTimestamp;
 
-	    // Fix: Use a true temporary filename extension for the intermediate warp step
-	    Path tempVrt = varOutputDir.resolve(baseFileName + ".vrt");
-	    Path tempWarpTiff = varOutputDir.resolve(baseFileName + "_intermediate_warp.tif");
-	    Path finalCog = varOutputDir.resolve(baseFileName + ".tif");
+	    Path tempVrt = outputCogDir.resolve(baseFileName + ".vrt");
+	    Path tempWarpTiff = outputCogDir.resolve(baseFileName + "_warp.tif");
+	    Path finalCog = outputCogDir.resolve(baseFileName + ".tif");
 
 	    System.out.println(String.format("[%d/%d] Slicing Band %d -> Time: %s",
 		    bandNum, bandsArray.length(), bandNum, formattedTimestamp));
@@ -150,25 +214,20 @@ public class NetCDFToCOGProcessor {
 	    Files.deleteIfExists(tempVrt);
 	    Files.deleteIfExists(tempWarpTiff);
 
-	    structuralCogFiles.add(finalCog);
-	    createdFileNames.add(finalCog.getFileName().toString());
+	    generatedCogNames.add(finalCog.getFileName().toString());
 	}
 
 	// Post-Processing: Generate index and legend directly inside output_cogs/wbgt/
-	System.out.println("Generating index and vector configuration resources...");
-	generateLegend(varOutputDir, variableName);
-	generateIndexFile(varOutputDir, variableName, createdFileNames);
+	//System.out.println("Generating index and vector configuration resources...");
+	//generateLegend(varOutputDir, variableName);
+	//generateIndexFile(varOutputDir, variableName, createdFileNames);
 
-	return structuralCogFiles;
+	//return stats;
     }
 
     private void generateIndexFile(Path varDir, String var, List<String> files) throws Exception {
-	if (files.isEmpty()) return;
-
-	Collections.sort(files);
-
-	String minDate = formatIsoTime(files.get(0));
-	String maxDate = formatIsoTime(files.get(files.size() - 1));
+	String minDate = formatIsoTime(files.getFirst());
+	String maxDate = formatIsoTime(files.getLast());
 
 	JSONObject indexJson = new JSONObject();
 	indexJson.put("variable", var);
@@ -180,12 +239,12 @@ public class NetCDFToCOGProcessor {
 	phenomenonTime.put("end", maxDate);
 	indexJson.put("phenomenonTime", phenomenonTime);
 
-	String baseUrl = String.format("https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/%s/", var);
+	String baseUrl = String.format("https://s3.amazonaws.com/your-bucket-name/%s/output_cog/", var);
 	indexJson.put("legend", baseUrl + "legend.svg");
 
 	JSONArray availabilityArray = new JSONArray();
 	if (files.size() >= 2) {
-	    Instant intervalStart = Instant.parse(formatIsoTime(files.get(0)));
+	    Instant intervalStart = Instant.parse(formatIsoTime(files.getFirst()));
 	    Instant currentTrackedTime = intervalStart;
 	    long currentStepHours = -1;
 
@@ -218,8 +277,7 @@ public class NetCDFToCOGProcessor {
 	}
 	indexJson.put("files", filesArray);
 
-	Path indexPath = varDir.resolve("index.json");
-	Files.writeString(indexPath, indexJson.toString(2), StandardCharsets.UTF_8);
+	Files.writeString(varDir.resolve("index.json"), indexJson.toString(2), StandardCharsets.UTF_8);
     }
 
     private JSONObject buildAvailabilityObject(Instant from, Instant to, long stepHours) {
@@ -248,16 +306,42 @@ public class NetCDFToCOGProcessor {
 
 	int y = 40;
 	for (LegendItem item : legend.items) {
-	    svg.append("<rect x='10' y='").append(y).append("' width='18' height='18' fill='").append(item.color)
-		    .append("' stroke='black' stroke-width='0.5'/>");
-	    svg.append("<text x='35' y='").append(y + 13).append("' font-size='12'>").append(escapeXml(item.range)).append(" (")
-		    .append(escapeXml(item.label)).append(")</text>");
+	    svg.append("<rect x='10' y='").append(y).append("' width='18' height='18' fill='").append(item.color).append("' stroke='black' stroke-width='0.5'/>");
+	    svg.append("<text x='35' y='").append(y + 13).append("' font-size='12'>").append(escapeXml(item.range)).append(" (").append(escapeXml(item.label)).append(")</text>");
 	    y += itemHeight + spacing;
 	}
 	svg.append("</svg>");
 
-	Path svgPath = varDir.resolve("legend.svg");
-	Files.writeString(svgPath, svg.toString(), StandardCharsets.UTF_8);
+	Files.writeString(varDir.resolve("legend.svg"), svg.toString(), StandardCharsets.UTF_8);
+    }
+
+    private String executeGdalInfo(String datasetPath, boolean computeStats) throws Exception {
+	List<String> commands = new ArrayList<>(List.of("gdalinfo", "-json"));
+	if (computeStats) {
+	    commands.add("-stats"); // Forces GDAL to scan and append min/max data structures
+	}
+	commands.add(datasetPath);
+
+	ProcessBuilder pb = new ProcessBuilder(commands);
+	Process process = pb.start();
+	StringBuilder output = new StringBuilder();
+	try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+	    String line;
+	    while ((line = reader.readLine()) != null) {
+		output.append(line).append("\n");
+	    }
+	}
+	if (process.waitFor() != 0) throw new RuntimeException("gdalinfo failed.");
+	return output.toString();
+    }
+
+    private void runProcess(ProcessBuilder pb) throws Exception {
+	pb.redirectErrorStream(true);
+	Process p = pb.start();
+	try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+	    while (r.readLine() != null) { }
+	}
+	if (p.waitFor() != 0) throw new RuntimeException("GDAL failed: " + pb.command());
     }
 
     private String escapeXml(String text) {
@@ -271,33 +355,6 @@ public class NetCDFToCOGProcessor {
 	    return String.format("%s-%s-%sT%s:00:00Z", ts.substring(0, 4), ts.substring(4, 6), ts.substring(6, 8), ts.substring(8, 10));
 	} catch (Exception e) {
 	    return "N/A";
-	}
-    }
-
-    private String executeGdalInfo(String datasetPath) throws Exception {
-	ProcessBuilder pb = new ProcessBuilder("gdalinfo", "-json", datasetPath);
-	Process process = pb.start();
-	StringBuilder output = new StringBuilder();
-	try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-	    String line;
-	    while ((line = reader.readLine()) != null) {
-		output.append(line).append("\n");
-	    }
-	}
-	if (process.waitFor() != 0) {
-	    throw new RuntimeException("gdalinfo execution failed.");
-	}
-	return output.toString();
-    }
-
-    private void runProcess(ProcessBuilder pb) throws Exception {
-	pb.redirectErrorStream(true);
-	Process p = pb.start();
-	try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
-	    while (r.readLine() != null) { /* drain stream buffer */ }
-	}
-	if (p.waitFor() != 0) {
-	    throw new RuntimeException("GDAL failed command execution: " + pb.command());
 	}
     }
 }
