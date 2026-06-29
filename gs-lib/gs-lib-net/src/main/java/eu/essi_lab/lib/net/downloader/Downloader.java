@@ -544,8 +544,6 @@ public class Downloader {
 	    response = client.send(this.request, HttpResponse.BodyHandlers.ofInputStream());
 	}
 
-	client.close();
-
 	GSLoggerFactory.getLogger(getClass()).trace("Execution of {} ENDED with code {}", request.uri().toString(), response.statusCode());
 
 	return response;
