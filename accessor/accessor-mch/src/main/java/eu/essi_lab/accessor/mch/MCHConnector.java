@@ -122,7 +122,7 @@ public class MCHConnector extends HarvestedQueryConnector<MCHConnectorSetting> {
 
 	    stations: for (MCHStation station : stations) {
 		GSLoggerFactory.getLogger(getClass()).info("Adding station " + station.getStationName());
-		List<MCHAvailability> avails = client.getAvailability(station.getStationName());
+		List<MCHAvailability> avails = client.getAvailability(station.getStationId());
 		for (MCHAvailability avail : avails) {
 
 		    if (!unlimited && mr.isPresent() && added >= mr.get()) {

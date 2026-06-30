@@ -94,7 +94,7 @@ public class MCHDownloader extends WMLDataDownloader {
 	    descriptor.setCRS(CRS.EPSG_4326());
 
 	    MCHStation station = client.getStationById(stationCode);
-	    List<MCHAvailability> avails = client.getAvailability(station.getStationName());
+	    List<MCHAvailability> avails = client.getAvailability(station.getStationId());
 	    MCHAvailability availability = null;
 	    for (MCHAvailability avail : avails) {
 		if (avail.getVariable().equals(parameterCode)) {
@@ -146,7 +146,7 @@ public class MCHDownloader extends WMLDataDownloader {
 	    MCHClient client = new MCHClient(online.getLinkage());
 
 	    MCHStation station = client.getStationById(stationCode);
-	    List<MCHAvailability> avails = client.getAvailability(station.getStationName());
+	    List<MCHAvailability> avails = client.getAvailability(station.getStationId());
 	    MCHAvailability availability = null;
 	    for (MCHAvailability avail : avails) {
 		if (avail.getVariable().equals(parameterCode)) {

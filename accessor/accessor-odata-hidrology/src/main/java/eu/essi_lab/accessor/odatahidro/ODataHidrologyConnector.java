@@ -274,7 +274,7 @@ public class ODataHidrologyConnector extends StationConnector<ODataHidrologyConn
     @Override
     public boolean supports(GSSource source) {
 
-	return source.getEndpoint().startsWith("http://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0");
+	return source.getEndpoint().contains("rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0");
     }
 
     @Override
