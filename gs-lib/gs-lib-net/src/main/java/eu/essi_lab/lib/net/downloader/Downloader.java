@@ -92,6 +92,14 @@ public class Downloader {
      */
     private Redirect redirect;
 
+    private static final ConcurrentHashMap<ClientCacheKey, HttpClient> HTTP_CLIENT_CACHE = new ConcurrentHashMap<>();
+
+    private record ClientCacheKey(Version version, Redirect redirect, long connectionTimeout, String sslKey) {
+    }
+
+    private record TrustStoreConfig(String sslKey, byte[] trustStoreBytes, String trustStorePath, String trustStorePassword) {
+    }
+
     /**
      *
      */
@@ -262,7 +270,7 @@ public class Downloader {
     /**
      * @param url
      * @param user
-     * @param password
+     * @param pwd
      * @param headers
      * @return
      */
@@ -403,7 +411,7 @@ public class Downloader {
     }
 
     /**
-     * @param request
+     * @param url
      * @param username
      * @param password
      * @return
@@ -590,33 +598,74 @@ public class Downloader {
 	    InputStream trustStoreStream, //
 	    String trustStorePassword) {
 
-	Builder builder = HttpClient.newBuilder().version(version);
+	TrustStoreConfig trustStoreConfig = resolveTrustStoreConfig(https, trustStoreStream, trustStorePassword);
 
-	if (trustStoreStream == null) {
+	ClientCacheKey cacheKey = new ClientCacheKey(version, redirect, connectionTimeout, trustStoreConfig.sslKey());
 
-	    if (System.getProperty("dab.net.ssl.trustStore") != null) {
+	return HTTP_CLIENT_CACHE.computeIfAbsent(cacheKey, key -> buildHttpClient(hostname, trustStoreConfig));
+    }
 
-		GSLoggerFactory.getLogger(getClass()).debug("Using dab trust store from system property");
+    private TrustStoreConfig resolveTrustStoreConfig(boolean https, InputStream trustStoreStream, String trustStorePassword) {
 
-		try {
-		    trustStoreStream = new FileInputStream(System.getProperty("dab.net.ssl.trustStore"));
+	if (!https) {
 
-		    trustStorePassword = System.getProperty("dab.net.ssl.trustStorePassword");
-
-		} catch (IOException e) {
-
-		    throw new RuntimeException(e);
-		}
-	    }
+	    return new TrustStoreConfig("default", null, null, null);
 	}
 
-	if (https && trustStoreStream != null) {
+	if (trustStoreStream == null && System.getProperty("dab.net.ssl.trustStore") != null) {
+
+	    String path = System.getProperty("dab.net.ssl.trustStore");
+	    String password = System.getProperty("dab.net.ssl.trustStorePassword");
+	    String sslKey = "sys:" + path + ":" + Objects.toString(password, "");
+
+	    return new TrustStoreConfig(sslKey, null, path, password);
+	}
+
+	if (trustStoreStream != null) {
 
 	    try {
 
+		byte[] trustStoreBytes = IOUtils.toByteArray(trustStoreStream);
+		trustStoreStream.close();
+
+		return new TrustStoreConfig("custom:" + sha256Hex(trustStoreBytes), trustStoreBytes, null, trustStorePassword);
+
+	    } catch (IOException e) {
+
+		throw new RuntimeException(e);
+	    }
+	}
+
+	return new TrustStoreConfig("default", null, null, null);
+    }
+
+    private HttpClient buildHttpClient(String hostname, TrustStoreConfig trustStoreConfig) {
+
+	Builder builder = HttpClient.newBuilder().version(version);
+
+	if (!"default".equals(trustStoreConfig.sslKey())) {
+
+	    try {
+
+		InputStream trustStoreStream;
+
+		if (trustStoreConfig.trustStoreBytes() != null) {
+
+		    trustStoreStream = new ByteArrayInputStream(trustStoreConfig.trustStoreBytes());
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).debug("Using dab trust store from system property");
+
+		    trustStoreStream = new FileInputStream(trustStoreConfig.trustStorePath());
+		}
+
 		GSLoggerFactory.getLogger(getClass()).debug("Using trust store");
 
-		X509TrustManager combinedTm = getX509TrustManager(trustStoreStream, trustStorePassword, hostname);
+		X509TrustManager combinedTm = getX509TrustManager(//
+			trustStoreStream, //
+			trustStoreConfig.trustStorePassword(), //
+			hostname);
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 
@@ -638,7 +687,20 @@ public class Downloader {
 	builder.followRedirects(redirect);
 
 	return builder.build();
+    }
 
+    private static String sha256Hex(byte[] data) {
+
+	try {
+
+	    MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+	    return HexFormat.of().formatHex(digest.digest(data));
+
+	} catch (NoSuchAlgorithmException e) {
+
+	    throw new IllegalStateException(e);
+	}
     }
 
     /**

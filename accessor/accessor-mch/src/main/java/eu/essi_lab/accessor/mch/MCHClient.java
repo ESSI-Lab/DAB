@@ -267,11 +267,11 @@ public class MCHClient {
 	return null;
     }
 
-    public List<MCHAvailability> getAvailability(String stationName) {
+    public List<MCHAvailability> getAvailability(String stationId) {
 	List<MCHAvailability> ret = new ArrayList<>();
 	List<MCHAvailability> all = getAvailability();
 	for (MCHAvailability avail : all) {
-	    if (avail.getStation().equals(stationName)) {
+	    if (avail.getStation().equalsIgnoreCase(stationId)) {
 		ret.add(avail);
 	    }
 	}

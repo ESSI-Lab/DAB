@@ -15,3 +15,4 @@ eu.essi_lab.accessor.hiscentral.basilicata.HISCentralBasilicataConnector
 eu.essi_lab.accessor.hiscentral.umbria.HISCentralUmbriaConnector
 eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaConnector
 eu.essi_lab.accessor.hiscentral.puglia.arpa.HISCentralARPAPugliaConnector
+eu.essi_lab.accessor.hiscentral.deflusso.HISCentralRatingCurvesConnector

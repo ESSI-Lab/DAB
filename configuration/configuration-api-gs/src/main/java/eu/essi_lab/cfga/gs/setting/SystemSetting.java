@@ -8,7 +8,6 @@ import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.validation.*;
 import eu.essi_lab.cfga.setting.validation.ValidationResponse.*;
 import eu.essi_lab.lib.utils.*;
-import org.geotools.nature.*;
 import org.json.*;
 
 import java.util.*;
@@ -101,6 +100,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	 */
 	SEND_HEALTH_CHECK_REPORT("sendHealthCheckReport"), //
 	PROFILER_HEALTH_CHECK_METHOD_ENABLED("profilerHealthCheckMethodEnabled"),
+	DISK_SIZE_THRESHOLD("diskSizeThreshold"),
+	THREADS_COUNT_THRESHOLD("threadsCountThreshold"),
 
 	/**
 	 * Trust store options

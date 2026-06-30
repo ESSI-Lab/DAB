@@ -36,6 +36,12 @@
 			</exclusions>
 		</dependency>
 
+		<dependency>
+			<groupId>eu.essi_lab</groupId>
+			<artifactId>augmenter</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
