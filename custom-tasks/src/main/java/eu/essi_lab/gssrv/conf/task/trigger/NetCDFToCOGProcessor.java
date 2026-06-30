@@ -41,7 +41,7 @@ public class NetCDFToCOGProcessor {
 //    }
 
     public static void main(String[] args) {
-	String[] targetVariables = {"WCT"};
+	String[] targetVariables = {"UTCI"};
 	Path baseTriggerPath = Paths.get("E:/TRIGGER/CIMA");
 
 	for (String variable : targetVariables) {
@@ -239,7 +239,7 @@ public class NetCDFToCOGProcessor {
 	phenomenonTime.put("end", maxDate);
 	indexJson.put("phenomenonTime", phenomenonTime);
 
-	String baseUrl = String.format("https://s3.amazonaws.com/your-bucket-name/%s/output_cog/", var);
+	String baseUrl = String.format("https://s3.amazonaws.com/s3-demo-geotiff/CIMA/%s/", var);
 	indexJson.put("legend", baseUrl + "legend.svg");
 
 	JSONArray availabilityArray = new JSONArray();
