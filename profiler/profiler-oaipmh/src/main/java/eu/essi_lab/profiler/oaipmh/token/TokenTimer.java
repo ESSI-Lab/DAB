@@ -21,16 +21,10 @@ package eu.essi_lab.profiler.oaipmh.token;
  * #L%
  */
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
+import eu.essi_lab.lib.utils.*;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.XMLGregorianCalendar;
-
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.XMLGregorianCalendarUtils;
+import javax.xml.datatype.*;
+import java.util.*;
 
 /**
  * @author Fabrizio
@@ -70,11 +64,11 @@ public class TokenTimer {
 
 	GSLoggerFactory.getLogger(getClass()).debug("Adding new token: {} ", tokenId);
 
-	Timer timer = new Timer();
-	// after 5 minutes removes the token
-	timer.schedule(new TokenTask(tokenId), 1000 * 60 * 5); // 5 minutes
-
-	timerMap.put(tokenId, timer);
+//	Timer timer = new Timer();
+//	// after 5 minutes removes the token
+//	timer.schedule(new TokenTask(tokenId), 1000 * 60 * 5); // 5 minutes
+//
+//	timerMap.put(tokenId, timer);
 
 	long expiration = System.currentTimeMillis() + (1000 * 60 * 5);
 
