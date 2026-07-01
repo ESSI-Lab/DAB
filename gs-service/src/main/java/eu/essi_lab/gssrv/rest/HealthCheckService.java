@@ -266,6 +266,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 	row(html, "Name", runtime.getName());
 	row(html, "Host", HostNamePropertyUtils.getHostNameProperty());
+	row(html, "Cluster", ExecutionMode.get());
 	row(html, "Uptime", formatMillis(runtime.getUptime()));
 	row(html, "Java Version", System.getProperty("java.version"));
 	row(html, "Vendor", System.getProperty("java.vendor"));
