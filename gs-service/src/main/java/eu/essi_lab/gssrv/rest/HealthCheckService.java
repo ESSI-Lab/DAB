@@ -80,6 +80,306 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
+    @Path("/status2")
+    public jakarta.ws.rs.core.Response status2(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @Context WebServiceContext wsContext) {
+
+
+	StringBuilder html = new StringBuilder();
+
+	html.append("""
+	    <!DOCTYPE html>
+	    <html>
+	    <head>
+	    
+	    <meta charset="UTF-8">
+	    
+	    <title>ECS Dashboard</title>
+	    
+	    <style>
+	    
+	    body{
+		font-family:Arial,Helvetica,sans-serif;
+		margin:10px;
+	    }
+	    
+	    table{
+		width:100%;
+		border-collapse:collapse;
+	    }
+	    
+	    th,td{
+		border:1px solid #bdbdbd;
+		padding:6px;
+		text-align:center;
+		vertical-align:top;
+	    }
+	    
+	    th{
+		background:#ececec;
+	    }
+	    
+	    .cluster{
+		background:#d9e8fb;
+		font-size:18px;
+		font-weight:bold;
+	    }
+	    
+	    .service{
+		background:#f3f3f3;
+		font-weight:bold;
+	    }
+	    
+	    .taskContainer{
+		padding:6px;
+		min-height:40px;
+	    }
+	    
+	    .taskButton{
+	    
+		display:inline-block;
+	    
+		margin:2px;
+	    
+		padding:5px 10px;
+	    
+		border:1px solid #999;
+	    
+		border-radius:4px;
+	    
+		cursor:pointer;
+	    
+		background:#ffffff;
+	    }
+	    
+	    .taskButton:hover{
+		background:#dbeeff;
+	    }
+	    
+	    .taskButton.selected{
+		background:#3f7dd8;
+		color:white;
+	    }
+	    
+	    iframe{
+	    
+		width:100%;
+	    
+		height:900px;
+	    
+		border:1px solid #999;
+	    
+		margin-top:15px;
+	    }
+	    
+	    </style>
+	    
+	    <script>
+	    
+	    function openTask(button,url){
+	    
+		document.querySelectorAll(".taskButton").forEach(
+		    b=>b.classList.remove("selected"));
+	    
+		button.classList.add("selected");
+	    
+		document.getElementById("diagnosticFrame").src=url;
+	    }
+	    
+	    window.onload=function(){
+		
+		  let first = document.querySelector(".taskButton");
+	     
+		  if(first){
+	    
+		       // first.click();
+		  }
+	     }
+	    
+	    </script>
+	    
+	    </head>
+	    
+	    <body>
+	    
+	    <h2>ECS Dashboard</h2>
+	    
+	    <table>
+	    
+	    """);
+
+	String[] clusterColors = {
+		"#D6EAF8",
+		"#D5F5E3",
+		"#FCF3CF",
+		"#FADBD8",
+		"#E8DAEF",
+		"#FDEBD0"
+	};
+
+	String[] serviceColors = {
+		"#AED6F1",
+		"#ABEBC6",
+		"#F9E79F",
+		"#F5B7B1",
+		"#D2B4DE",
+		"#F8C471"
+	};
+
+	Map<String,List<String>> clusterServices = new HashMap<>();
+
+	clusterServices.put("Harvest", List.of("Service1","Service2"));
+
+	clusterServices.put("Frontend", List.of("Service3"));
+
+	//
+	// Cluster
+	//
+
+	html.append("<tr>");
+
+	int clusterIndex = 0;
+
+
+	for (Map.Entry<String,List<String>> entry : clusterServices.entrySet()) {
+
+	    String color = clusterColors[clusterIndex % clusterColors.length];
+
+	    boolean lastCluster = clusterIndex == clusterServices.size() - 1;
+
+	    html.append("<th class='cluster' style='background:")
+		    .append(color);
+
+	    if (!lastCluster) {
+		html.append(";border-right:4px solid #666");
+	    }
+
+	    html.append("' colspan='")
+		    .append(entry.getValue().size())
+		    .append("'>")
+		    .append(entry.getKey())
+		    .append("</th>");
+
+	    clusterIndex++;
+	}
+
+	html.append("</tr>");
+
+	//
+	// Services
+	//
+
+
+	html.append("<tr>");
+
+	clusterIndex = 0;
+
+	for (List<String> services : clusterServices.values()) {
+
+	    boolean lastCluster = clusterIndex == clusterServices.size() - 1;
+
+	    String color = serviceColors[clusterIndex % serviceColors.length];
+
+	    for (int i = 0; i < services.size(); i++) {
+
+		html.append("<th class='service' style='background:")
+			.append(color);
+
+		if (i == services.size() - 1 && !lastCluster) {
+		    html.append(";border-right:4px solid #666");
+		}
+
+		html.append("'>")
+			.append(services.get(i))
+			.append("</th>");
+	    }
+
+	    clusterIndex++;
+	}
+
+	html.append("</tr>");
+
+	//
+	// Task
+	//
+
+	Map<String,List<String>> serviceExternalLinks = new HashMap<>();
+
+
+	serviceExternalLinks.put("Service1", List.of("http://link1","http://link2","http://link3"));
+	serviceExternalLinks.put("Service2", List.of("http://link1","http://link2","http://link3"));
+	serviceExternalLinks.put("Service3", List.of("http://link1","http://link2","http://link3"));
+
+	html.append("<tr>");
+
+	clusterIndex = 0;
+
+	for (List<String> services : clusterServices.values()) {
+
+	    for (String service : services) {
+
+		html.append("<td class='taskContainer'");
+
+		boolean lastCluster = clusterIndex == clusterServices.size() - 1;
+
+
+		if (!lastCluster) {
+
+		    html.append(" style='border-right:4px solid #666;'");
+		}
+
+		html.append(">");
+
+		List<String> links = serviceExternalLinks.get(service);
+
+		if (links != null) {
+
+		    int task = 1;
+
+		    for (String link : links) {
+
+			String diagnosticUrl =
+				"http://" + link + "/diagnostic";
+
+			html.append("<button ")
+				.append("class='taskButton' ")
+				.append("onclick=\"openTask(this,'")
+				.append(diagnosticUrl)
+				.append("')\">")
+
+				.append("Task ")
+				.append(task++)
+
+				.append("</button>");
+		    }
+		}
+
+		html.append("</td>");
+	    }
+	}
+
+	html.append("</tr>");
+
+	html.append("""
+
+	    </table>
+	    
+	    <iframe
+		id="diagnosticFrame">
+	    </iframe>
+	    
+	    </body>
+	    
+	    </html>
+	    
+	    """);
+
+	return Response.ok(html.toString()).build();
+
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
     @Path("/status")
     public Response status(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @Context WebServiceContext wsContext) {
 
