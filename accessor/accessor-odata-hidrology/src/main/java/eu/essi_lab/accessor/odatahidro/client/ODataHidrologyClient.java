@@ -75,7 +75,7 @@ public class ODataHidrologyClient {
 	/**
 	 * The correct id is 6, but the server returns a 404 error for this variable,
 	 * so it is excluded
-	 * http://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0/odata/SadantaPiste?$top=1&$filter=Paikka_Id+eq+544&$orderby=Aika+asc&$select=Arvo,Aika&$skip=0
+	 * https://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0/odata/SadantaPiste?$top=1&$filter=Paikka_Id+eq+544&$orderby=Aika+asc&$select=Arvo,Aika&$skip=0
 	 */
 	POINT_PREC("NONE", "P", "SadantaPiste", "Point Precipitation [mm]"),
 
@@ -400,7 +400,7 @@ public class ODataHidrologyClient {
      */
     private static final int DEFAULT_MAX_RESULTS = 500;
 
-    public static final String DEFAULT_URL = "http://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0/odata/";
+    public static final String DEFAULT_URL = "https://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0/odata/";
 
     private String url;
 
@@ -654,7 +654,7 @@ public class ODataHidrologyClient {
 
     public static void main(String[] args) throws Exception {
 
-	ODataHidrologyClient client = new ODataHidrologyClient("http://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0/odata/");
+	ODataHidrologyClient client = new ODataHidrologyClient("https://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0/odata/");
 
 	JSONObject placeQueryResponse = client.execPlaceQuery(0, 10);
 

@@ -185,7 +185,7 @@ public class BNHSConnector extends HarvestedQueryConnector<BNHSConnectorSetting>
 
 		    // FINLAND
 		} else if (realtimeLink.contains("http://wwwi3.ymparisto.fi/")) {
-		    realtimeLink = "http://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0";
+		    realtimeLink = "https://rajapinnat.ymparisto.fi/api/Hydrologiarajapinta/1.0";
 		    connector = new ODataHidrologyConnector();
 		    mapper = new ODataHidrologyMapper();
 
