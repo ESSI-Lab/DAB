@@ -7,18 +7,70 @@ body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family:
     position: absolute;
     top: 20px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95); /* Slightly less transparent for better readability */
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     width: 300px;
+    box-sizing: border-box;
+    z-index: 1000;
 }
 
-#timeMain { font-weight: bold; margin-bottom: 10px; }
-#forecastSlider { width: 100%; cursor: pointer; }
+#timeMain { font-weight: bold; margin-bottom: 12px; font-size: 14px; color: #222; }
+#forecastSlider { width: 100%; cursor: pointer; margin-bottom: 12px; }
+
+/* --- NEW Controls Styling --- */
+.media-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 8px;
+}
+
+.media-controls button {
+    padding: 6px 12px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    flex-grow: 1;
+}
+
+.media-controls button:hover { background: #f5f5f5; }
+.media-controls button:active { background: #e5e5e5; }
+
+.media-controls select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.jump-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+    font-size: 12px;
+    color: #555;
+}
+
+.jump-container input[type="date"] {
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+}
 
 /* Legend Styling */
-
 .legend-subtitle {
     font-size: 13px;
     font-weight: bold;
@@ -28,6 +80,6 @@ body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family:
     border-bottom: 1px solid #eee;
     padding-bottom: 4px;
 }
-#legend { margin-top: 15px; }
-.legend-item { display: flex; align-items: center; margin: 4px 0; font-size: 12px; }
-.legend-color { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #ccc; }
+#legend { margin-top: 10px; }
+.legend-item { display: flex; align-items: center; margin: 5px 0; font-size: 12px; }
+.legend-color { width: 20px; height: 14px; margin-right: 10px; border: 1px solid #bbb; border-radius: 2px; }
