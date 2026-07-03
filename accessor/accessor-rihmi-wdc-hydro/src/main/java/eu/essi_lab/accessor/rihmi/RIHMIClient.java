@@ -71,6 +71,8 @@ public class RIHMIClient {
 
     public static String hydrolareStationListendpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetWHOSHydroStationsHydrolare/whos";
 
+    public static String hydrolareWaterLevelEndpoint = "http://hydroweb.meteo.ru/hydro-service/rest/GetHydroAveMonLevelHydrolare/xml/";
+
     public String getRealTimeEndpoint() {
 	return realtimeEndpoint;
     }
@@ -81,6 +83,10 @@ public class RIHMIClient {
     
     public String getHydrolareStationEndpoint() {
 	return hydrolareStationListendpoint;
+    }
+
+    public String getHydrolareWaterLevelEndpoint() {
+	return hydrolareWaterLevelEndpoint;
     }
 
     public String getAralStationEndpoint() {
@@ -181,7 +187,8 @@ public class RIHMIClient {
 
     public Set<String> getStationIdentifiers(String linkage) throws Exception {
 	String identifierEndpoint = "";
-	if(linkage.contains(aralStationListendpoint) || linkage.contains(moldovaStationListendpoint)) {
+	if (linkage.contains(aralStationListendpoint) || linkage.contains(moldovaStationListendpoint)
+		|| linkage.contains(hydrolareStationListendpoint)) {
 	    identifierEndpoint = linkage;
 	}else {
 	    identifierEndpoint = stationListendpoint;
@@ -227,6 +234,10 @@ public class RIHMIClient {
 
     public String getHistoricalDownloadUrl(String stationId) {
 	return historicalEndpoint + stationId;
+    }
+
+    public String getHydrolareWaterLevelDownloadUrl(String stationId) {
+	return hydrolareWaterLevelEndpoint + stationId;
     }
 
     public HttpResponse<InputStream> getHistoricalWaterML(String stationId) throws IOException, InterruptedException, URISyntaxException {

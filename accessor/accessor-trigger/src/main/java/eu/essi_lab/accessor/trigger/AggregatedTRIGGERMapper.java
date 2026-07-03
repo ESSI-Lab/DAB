@@ -29,6 +29,7 @@ import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.*;
@@ -237,10 +238,15 @@ public class AggregatedTRIGGERMapper extends OriginalIdentifierMapper {
     protected String createOriginalIdentifier(GSResource resource) {
 
 	String metadata = resource.getOriginalMetadata().getMetadata();
-	JSONObject object = new JSONObject(metadata);
+	OriginalMetadata om = new OriginalMetadata();
+	om.setMetadata(metadata);
+
+	JSONObject object = retrieveDatasetInfo(om);
+	String varName = retrieveVariableInfo(om);
 
 	if (object.has("_id")) {
-	    return object.getString("_id");
+	    String toHash = object.getString("_id") + "_" + varName;
+	    return StringUtils.toUUID(toHash);
 	}
 
 	return null;
@@ -554,7 +560,7 @@ public class AggregatedTRIGGERMapper extends OriginalIdentifierMapper {
 
 		    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
-		    String linkage = TRIGGERConnector.BASE_URL + queryPath + "select=year,month,day,hour,minute,second,userId," +  variable.toLowerCase() +"&where=userId=" + userId;// +
+		    String linkage = AggregatedTRIGGERConnector.BASE_URL + queryPath + AggregatedTRIGGERConnector.MIN_VALID_PARAM;// +
 														    // station.getName()
 														    // +
 		    // buildingURL;
@@ -563,7 +569,7 @@ public class AggregatedTRIGGERMapper extends OriginalIdentifierMapper {
 		    o.setFunctionCode("download");
 		    o.setName(userId + ":" + variable);
 		    o.setIdentifier(userId + ":" + variableId);
-		    o.setProtocol(CommonNameSpaceContext.TRIGGER);
+		    o.setProtocol(CommonNameSpaceContext.AGGREGATED_TRIGGER);
 		    o.setDescription(var.getLabel() + " Station name: " + userId);
 		    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(o);
 

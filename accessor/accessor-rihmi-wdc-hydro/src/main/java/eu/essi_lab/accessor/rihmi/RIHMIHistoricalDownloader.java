@@ -78,7 +78,7 @@ public class RIHMIHistoricalDownloader extends DataDownloader {
     @Override
     public boolean canConnect() throws GSException {
 	try {
-	    HttpResponse<InputStream> response = client.getDownloadResponse(client.getHistoricalDownloadUrl(stationId));
+	    HttpResponse<InputStream> response = client.getDownloadResponse(online.getLinkage());
 	    if (response.statusCode() != 200) {
 		return false;
 	    }
@@ -163,7 +163,7 @@ public class RIHMIHistoricalDownloader extends DataDownloader {
 		String parameterName = mangler.getParameterIdentifier();
 		String stationId = mangler.getPlatformIdentifier();
 
-		HttpResponse<InputStream> response = client.getHistoricalWaterML(stationId);
+		HttpResponse<InputStream> response = client.getDownloadResponse(online.getLinkage());
 
 		InputStream wml = response.body();
 
