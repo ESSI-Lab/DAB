@@ -34,6 +34,8 @@ public class ECSExternalLinkFinder implements Closeable {
 	    ));
 
 	    links.forEach(System.out::println);
+
+	    System.exit(0);
 	}
     }
 
@@ -45,9 +47,13 @@ public class ECSExternalLinkFinder implements Closeable {
      */
     public ECSExternalLinkFinder(Region region) {
 
-	this.ecsClient = EcsClient.builder().region(region).build();
+	this.ecsClient = EcsClient.builder(). //
+		region(region).//
+		build();//
 
-	this.ec2Client = Ec2Client.builder().region(region).build();
+	this.ec2Client = Ec2Client.builder().//
+		region(region).//
+		build();//
     }
 
     /**
@@ -58,12 +64,12 @@ public class ECSExternalLinkFinder implements Closeable {
 
 	List<ExternalLink> links = new ArrayList<>();
 
-	for (String clusterName : clusterNames) {
+	clusterNames.parallelStream().forEach(clusterName -> {
 
 	    ClusterContext ctx = loadClusterContext(clusterName);
 
 	    links.addAll(buildExternalLinks(ctx, clusterName));
-	}
+	});
 
 	Collections.sort(links);
 
