@@ -258,6 +258,38 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 	Runtime rt = Runtime.getRuntime();
 
+	MemoryUsage heap = memoryBean.getHeapMemoryUsage();
+
+	//------------------------------------------
+	// Status
+	//------------------------------------------
+
+	html.append("<h2>Status</h2><table>");
+
+	double percent_ = ((double) heap.getUsed() / heap.getCommitted()) * 100;
+
+	String percent = DECIMAL_FORMAT.format(percent_) + "%";
+
+	html.append(row("Heap", percent, counterClass(percent_, 70, 90)));
+
+	html.append(
+		row("Threads", DECIMAL_FORMAT.format(threadBean.getThreadCount()), counterClass(threadBean.getThreadCount(), 200, 500)));
+
+	for (File f : File.listRoots()) {
+
+	    html.append("<tr>");
+
+	    String path = f.getAbsolutePath();
+
+	    long used = f.getTotalSpace() - f.getFreeSpace();
+	    double perc_ = ((double) used / f.getTotalSpace()) * 100;
+	    String perc = DECIMAL_FORMAT.format(perc_) + "%";
+
+	    html.append(row(path, perc, counterClass(perc_, 70, 90)));
+	}
+
+	html.append("</table>");
+
 	//------------------------------------------
 	// Runtime
 	//------------------------------------------
@@ -266,7 +298,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 	row(html, "Name", runtime.getName());
 	row(html, "Host", HostNamePropertyUtils.getHostNameProperty());
-	row(html, "Cluster", ExecutionMode.get());
+	row(html, "Cluster", ClusterType.get());
+	row(html, "Execution mode", ExecutionMode.get());
 	row(html, "Uptime", formatMillis(runtime.getUptime()));
 	row(html, "Java Version", System.getProperty("java.version"));
 	row(html, "Vendor", System.getProperty("java.vendor"));
@@ -282,7 +315,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
 	row(html, "Environment", "<details><summary></summary><pre>" + System.getenv().keySet(). //
 		stream().//
 		sorted().//
-		map(k -> k + " = " + System.getProperties().getProperty(k) + "<br>").//
+		map(k -> k + " = " + System.getenv().get(k) + "<br>").//
 		toList().toString().replace("[", "").replace("]", "").replace(",", "") + "</pre></details>");
 
 	html.append("</table>");
@@ -310,7 +343,6 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 	html.append("<h2>Memory</h2><table>");
 
-	MemoryUsage heap = memoryBean.getHeapMemoryUsage();
 	MemoryUsage nonHeap = memoryBean.getNonHeapMemoryUsage();
 
 	html.append(row("Heap used", human(heap.getUsed()), memoryClass(heap.getUsed(), heap.getMax())));
@@ -659,7 +691,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
      * @param error
      * @return
      */
-    private String counterClass(long value, long warning, long error) {
+    private String counterClass(double value, long warning, long error) {
 
 	if (value >= error) {
 	    return "error";

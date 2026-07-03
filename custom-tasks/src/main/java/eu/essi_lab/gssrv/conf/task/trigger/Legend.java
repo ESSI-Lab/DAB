@@ -25,8 +25,8 @@ import java.util.List;
 
 public class Legend {
 
-    String title;
-    List<LegendItem> items;
+    public String title;
+    public List<LegendItem> items;
 
     public Legend(String title, List<LegendItem> items) {
 	this.title = title;

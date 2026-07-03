@@ -13,16 +13,40 @@
     </script>
 </head>
 <body>
+
 <div id="map"></div>
 
-<div id="ui-panel">
-    <h3>WBGT Monitor</h3><div id="timeMain">Loading...</div>
-    <input type="range" id="forecastSlider" min="0" step="1" value="0">
 
-    <div id="legend">
+<div id="ui-panel">
+    <div id="timeMain">Select an event or date</div>
+
+    <div class="event-container" style="display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px;">
+        <span style="font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; tracking-spacing: 0.5px;">Curated Events:</span>
+        <select id="eventSelector"
+                style="padding: 6px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; background: #fff;">
+            <option value="">-- Choose a Significant Outbreak --</option>
+            <option value="2024-01-04">January 2024: Record-Breaking Arctic Cold Wave</option>
+            <option value="2023-11-30">November 2023: Early-Winter Alpine Blizzard</option>
+            <option value="2025-01-22">January 2025: Mid-Winter Northern Freeze</option>
+            <option value="2023-02-05">February 2023: Historic Polar Blast</option>
+        </select>
     </div>
+
+    <div class="jump-container"
+         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-top: 8px; border-top: 1px solid #eee;">
+        <span style="font-size: 12px; color: #555;">Or Pick a Date:</span>
+        <input type="date" id="datePicker">
+    </div>
+
+    <div class="legend-subtitle">Wind Chill Temperature (WCT)</div>
+    <div id="legend"></div>
+</div>
 </div>
 
-<script type="module" src="main.js"></script>
+<script type="module" src="./main.js"></script>
 </body>
 </html>
+
+
+
+

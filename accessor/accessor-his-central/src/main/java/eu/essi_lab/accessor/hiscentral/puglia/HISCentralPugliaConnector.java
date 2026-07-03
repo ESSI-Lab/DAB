@@ -10,12 +10,12 @@ package eu.essi_lab.accessor.hiscentral.puglia;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -24,10 +24,7 @@ package eu.essi_lab.accessor.hiscentral.puglia;
 import java.io.InputStream;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
@@ -56,12 +53,12 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentralPugliaConnectorSetting> {
 
     /**
-     * 
+     *
      */
     static final String TYPE = "HISCentralPugliaConnector";
 
     /**
-     * 
+     *
      */
     public HISCentralPugliaConnector() {
 
@@ -69,7 +66,7 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
     }
 
     /**
-     * 
+     *
      */
 
     static final String STATIONS_URL = "user-permissions";
@@ -80,14 +77,14 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 
     static final String PARAMETERS = "parameters";
     /**
-     * 
+     *
      */
     static final String SENSOR_URL = "elements?";
 
     private static final String HIS_CENTRAL_PUGLIA_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_PUGLIA_CONNECTOR_DOWNLOAD_ERROR";
 
     /**
-     * 
+     *
      */
 
     JSONObject originalMetadata;
@@ -127,11 +124,25 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 	}
 
 	JSONArray metadataArray = originalMetadata.optJSONArray("data");
-	
+
 	if (page < metadataArray.length() && !maxNumberReached) {
 
 	    JSONObject datasetMetadata = metadataArray.getJSONObject(page);
 	    JSONArray stationsArray = datasetMetadata.optJSONArray("station");
+	    if (stationsArray == null) {
+		stationsArray = new JSONArray();
+		JSONObject stationsObj = datasetMetadata.optJSONObject("station");
+		if (stationsObj != null) {
+
+		    List<String> keys = new ArrayList<>(stationsObj.keySet());
+		    keys.sort(Comparator.comparingInt(Integer::parseInt));
+
+		    for (String key : keys) {
+			stationsArray.put(stationsObj.getJSONObject(key));
+		    }
+		}
+
+	    }
 	    JSONArray aggregationArray = datasetMetadata.optJSONArray("aggregation");
 	    List<JSONObject> stationList = new ArrayList<JSONObject>();
 	    List<JSONObject> aggregationList = new ArrayList<JSONObject>();
@@ -150,7 +161,7 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 		}
 	    }
 
-	    if(page == (metadataArray.length()-1)) {
+	    if (page == (metadataArray.length() - 1)) {
 		ret.setResumptionToken(null);
 	    } else {
 		ret.setResumptionToken(String.valueOf(page + 1));
@@ -168,8 +179,6 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 
 	return ret;
     }
-
-   
 
     private JSONObject getInfo(String param) throws GSException {
 
