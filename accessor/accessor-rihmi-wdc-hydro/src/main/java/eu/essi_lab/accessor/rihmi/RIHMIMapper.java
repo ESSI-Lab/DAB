@@ -139,7 +139,11 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	    // russian case
 	    if (interpolation != null) {
 		onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
-		onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
+		if (dataset.getSource().getEndpoint().contains(RIHMIClient.hydrolareStationListendpoint)) {
+		    onlineValues.setLinkage(RIHMIClient.hydrolareWaterLevelEndpoint + stationId);
+		} else {
+		    onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
+		}
 	    } else {
 		onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
 		onlineValues.setLinkage(endpoint);

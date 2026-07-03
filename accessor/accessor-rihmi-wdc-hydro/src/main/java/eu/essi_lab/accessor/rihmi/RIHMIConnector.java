@@ -99,30 +99,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		client = new RIHMIClient();
 	    }
 
-	    if (getSourceURL().contains(client.getHydrolareStationEndpoint())) {
-		HttpResponse<InputStream> response = null;
-		String token = request.getResumptionToken();
-		int start = 0;
-		if (token != null) {
-		    start = Integer.valueOf(token);
-		} else {
-		    response = client.getDownloadResponse(getSourceURL());
-		    XMLDocumentReader reader = new XMLDocumentReader(response.body());
-		    Node[] nodes = reader.evaluateNodes("//*:observationMember");
-		    for (Node n : nodes) {
-			OriginalMetadata om = new OriginalMetadata();
-			om = getOM(reader, n);
-			if (om != null) {
-			    ret.addRecord(om);
-			}
-		    }
-		}
-
-		ret.setResumptionToken(null);
-
-		return ret;
-	    }
-
 	    stationIdentifiers = new ArrayList<>(getStationIdentifiers(getSourceURL()));
 	} catch (Exception e) {
 
@@ -453,6 +429,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getMoldovaDischargeEndpoint(), stationId));
 		    // water temperature
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getMoldovaWaterTemperatureEndpoint(), stationId));
+		} else if (sourceURL.contains(client.getHydrolareStationEndpoint())) {
+		    downloadUrls.add(client.getHydrolareWaterLevelDownloadUrl(stationId));
 		} else {
 		    // real time download url
 		    downloadUrls.add(getRealtimeDownloadUrl(getSourceURL(), stationId));
@@ -504,6 +482,11 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    RIHMIMetadata rm = new RIHMIMetadata();
 		    if (from == null || from.isEmpty()) {
+			if (!url.contains("?")) {
+			    GSLoggerFactory.getLogger(getClass()).info("No data while downloading from station {} Reference URL: {}", stationId,
+				    url);
+			    continue;
+			}
 			GSLoggerFactory.getLogger(getClass()).info("No data while downloading from station {} Reference URL: {}", stationId,
 				url);
 			GSLoggerFactory.getLogger(getClass()).info("Try again with larger date range");
@@ -577,7 +560,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    String pos = reader.evaluateString("//*:shape/*:Point/*:pos");
 		    String[] split = new String[2];
-		    if (sourceURL.contains(client.getAralStationEndpoint())) {
+		    if (sourceURL.contains(client.getAralStationEndpoint()) || sourceURL.contains(client.getHydrolareStationEndpoint())) {
 			String[] splittedPos = pos.split(", ");
 			if (splittedPos != null && splittedPos.length > 1) {
 			    split[0] = splittedPos[0].replace(",", ".");
@@ -592,7 +575,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 			rm.setLatitude(new BigDecimal(split[0]));
 			rm.setLongitude(new BigDecimal(split[1]));
 		    }
-		    if (url.contains(client.getAralWaterLevelEndpoint()) || url.contains(client.getMoldovaWaterLevelEndpoint())) {
+		    if (url.contains(client.getAralWaterLevelEndpoint()) || url.contains(client.getMoldovaWaterLevelEndpoint())
+			    || url.contains(client.getHydrolareWaterLevelEndpoint())) {
 			rm.setParameterId("RIHMI:WaterLevel");
 			rm.setParameterName("Water Level");
 		    } else if (url.contains(client.getAralDischargeEndpoint()) || url.contains(client.getMoldovaDischargeEndpoint())
@@ -625,6 +609,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    } else if (sourceURL.contains(client.getMoldovaStationEndpoint())
 			    || sourceURL.contains(client.getAralStationEndpoint())) {
 			rm.setInterpolation(InterpolationType.DISCONTINUOUS);
+		    } else if (sourceURL.contains(client.getHydrolareStationEndpoint())) {
+			rm.setInterpolation(InterpolationType.AVERAGE_SUCC);
 		    }
 
 		    String aggregationDuration = reader.evaluateString(
@@ -634,6 +620,8 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    } else if (sourceURL.contains(client.getMoldovaStationEndpoint())
 			    || sourceURL.contains(client.getAralStationEndpoint())) {
 			rm.setAggregationDuration("P1D");
+		    } else if (sourceURL.contains(client.getHydrolareStationEndpoint())) {
+			rm.setAggregationDuration("P1M");
 		    }
 
 		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -730,7 +718,12 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     public static String extractStationId(String url) {
 	String ret = "70801"; // by default
-	if (url.contains("index=")) {
+	if (url.contains(RIHMIClient.hydrolareWaterLevelEndpoint) || url.contains(RIHMIClient.historicalEndpoint)) {
+	    ret = url.substring(url.lastIndexOf("/") + 1);
+	    if (ret.contains("?")) {
+		ret = ret.substring(0, ret.indexOf("?"));
+	    }
+	} else if (url.contains("index=")) {
 	    ret = url.substring(url.indexOf("index="));
 	    ret = ret.substring(ret.indexOf("=") + 1);
 	    if (ret.contains("&")) {
