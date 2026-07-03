@@ -93,7 +93,9 @@ public class McpServlet extends HttpServlet {
 		    .resources(//
 			    HydroOntologyMcpSpecifications.hydroOntologyMetadataResource(objectMapper)) //
 		    .resourceTemplates(//
-			    HydroOntologyMcpSpecifications.hydroOntologyTermsResourceTemplate(objectMapper)) //
+			    HydroOntologyMcpSpecifications.hydroOntologyTermsResourceTemplate(objectMapper), //
+			    ViewObservedPropertiesMcpSpecifications.viewObservedPropertiesResourceTemplate(objectMapper)) //
+		    .tools(OmApiMcpTools.toolSpecifications(jsonMapper, objectMapper)) //
 		    .build();
 
 	    GSLoggerFactory.getLogger(getClass()).info("{} {} started (draft MCP servlet, MCP endpoint suffix: {})",
