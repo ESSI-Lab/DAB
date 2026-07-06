@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.rest;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -367,16 +367,27 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 		if (links != null) {
 
-		    for (String link : links) {
+		    for (int j = 0; j < links.size(); j++) {
+
+			String link = links.get(j);
+
+			String thread = "Task " + j;
+
+			String pre = linksToTask.get(link) + " " + link;
+
+			String details = "<details style='cursor: pointer; '><summary style='padding: 3px;margin-left:3px'>Info</summary>"
+				+ "<pre style='border-bottom: 1px solid gray'>" + pre + "</pre></details>";
 
 			String diagnosticUrl = "http://" + link + "/gs-service/services/health/status";
 
-			html.append("<button ").append("class='taskButton' "). //
-				append("onclick=\"openTask(this,'").//
-				append(diagnosticUrl). //
-				append("')\">").//
-				append(linksToTask.get(link)).//
-				append("</button>");//
+			String button =
+				"<button style='margin-left: 3px; width:70%' class='taskButton' onclick=\"openTask(this,'" + diagnosticUrl
+					+ "')\">Diagnostic</button>";
+
+			String div = "<div style='padding: 3px; margin-bottom: 3px; font-size:85%; display: flex;margin-right: 3px'>" //
+				+ "<div style='padding:3px'>" + thread + "</div>" + details + button + "</div>";
+
+			html.append(div);
 		    }
 		}
 
@@ -633,7 +644,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
 	    double perc_ = ((double) used / f.getTotalSpace()) * 100;
 	    String perc = DECIMAL_FORMAT.format(perc_) + "%";
 
-	    html.append(row(path, perc, counterClass(perc_, 70, 90)));
+	    html.append(row(path, perc + (" (used)"), counterClass(perc_, 70, 90)));
 	}
 
 	html.append("</table>");
