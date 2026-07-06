@@ -10,41 +10,32 @@ package eu.essi_lab.accessor.wof.client;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.stax.*;
+import eu.essi_lab.model.exceptions.*;
+import org.apache.commons.io.*;
+import org.slf4j.*;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.stax.StAXDocumentIterator;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import java.io.*;
+import java.net.http.*;
+import java.util.*;
 
 /**
  * Utility class to be used inside the Hydro Server client to make SOAP requests to HydroServers
- * 
+ *
  * @author boldrini
  */
 class SOAPExecutorStAX {
@@ -101,9 +92,17 @@ class SOAPExecutorStAX {
 
 		InputStream output = response.body();
 
-		tmpFile = File.createTempFile("SOAPExecutorStAX", ".xml");
+		tmpFile = new File(IOStreamUtils.getUserTempDirectory(), StringUtils.hashSHA256messageDigest(endpoint) + ".xml");
+
+		if (tmpFile.exists()) {
+
+		    logger.info("File already downloaded : " + tmpFile.getAbsolutePath());
+		    return tmpFile;
+		}
+
 		logger.info("Downloading sites document to : " + tmpFile.getAbsolutePath());
 		tmpFile.deleteOnExit();
+
 		FileOutputStream fos = new FileOutputStream(tmpFile);
 		if (decodeEntities) {
 		    output = new CUAHSIDecoderInputStream(output);
