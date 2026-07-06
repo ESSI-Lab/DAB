@@ -375,8 +375,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 			String pre = linksToTask.get(link) + " " + link;
 
-			String details = "<details style='cursor: pointer; '><summary style='padding: 3px;margin-left:3px'>Info</summary>"
-				+ "<pre style='border-bottom: 1px solid gray'>" + pre + "</pre></details>";
+			String details = "<details><summary style='cursor: pointer; padding: 3px;margin-left:3px'>Info</summary>"
+				+ "<pre >" + pre + "</pre></details>";
 
 			String diagnosticUrl = "http://" + link + "/gs-service/services/health/status";
 
