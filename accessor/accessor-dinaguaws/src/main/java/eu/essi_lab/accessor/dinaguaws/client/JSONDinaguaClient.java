@@ -21,40 +21,22 @@ package eu.essi_lab.accessor.dinaguaws.client;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.apache.commons.io.*;
+import org.json.*;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.InterpolationType;
+import java.io.*;
+import java.math.*;
+import java.net.*;
+import java.net.http.*;
+import java.nio.charset.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author Fabrizio
@@ -322,9 +304,15 @@ public class JSONDinaguaClient extends DinaguaClient {
 
 	if (stations.size() == 0) {
 
-	    String response = downloadString(getEndpoint() + "/service/estaciones").get();
+	    Optional<String> response = downloadString(getEndpoint() + "/service/estaciones");
 
-	    JSONArray stationsArray = new JSONArray(response);
+	    if(response.isEmpty()){
+
+		GSLoggerFactory.getLogger(getClass()).warn("Stations not found");
+		return;
+	    }
+
+	    JSONArray stationsArray = new JSONArray(response.get());
 
 	    for (int i = 0; i < stationsArray.length(); i++) {
 
