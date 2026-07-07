@@ -99,8 +99,9 @@ public class HealthCheckService implements RuntimeInfoProvider {
 		   <style>
 		
 		   body{
-		font-family:Arial,Helvetica,sans-serif;
-		margin:10px;
+		    font-family:Arial,Helvetica,sans-serif;
+		    margin: 0 auto;
+		     max-width: 1230px;
 		   }
 		
 		   table{
@@ -381,7 +382,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
 			String diagnosticUrl = "http://" + link + "/gs-service/services/health/status";
 
 			String button =
-				"<button style='margin-left: 3px; width:70%' class='taskButton' onclick=\"openTask(this,'" + diagnosticUrl
+				"<button style='margin-left: 3px;  ' class='taskButton' onclick=\"openTask(this,'" + diagnosticUrl
 					+ "')\">Diagnostic</button>";
 
 			String div = "<div style='padding: 3px; margin-bottom: 3px; font-size:85%; display: flex;margin-right: 3px'>" //
@@ -454,7 +455,9 @@ public class HealthCheckService implements RuntimeInfoProvider {
 		    body {
 			font-family: Arial;
 			font-size: 13px;
-			margin:20px;
+			 
+			 margin: 0 auto;
+		   	 max-width: 1230px;
 		    }
 		
 		    .ok {
