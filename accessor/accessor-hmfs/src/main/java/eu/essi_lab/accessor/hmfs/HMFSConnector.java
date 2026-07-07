@@ -10,52 +10,34 @@ package eu.essi_lab.accessor.hmfs;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import eu.essi_lab.cdk.harvest.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.net.protocols.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.utils.GSLoggerFactory.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import eu.essi_lab.ommdk.*;
+import net.opengis.iso19139.gmd.v_20060504.*;
 
-import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.ConfiguredSMTPClient;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.Dimension;
-import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.Online;
-import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.GSLoggerFactory.GSLogger;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.Dataset;
-import eu.essi_lab.model.resource.InterpolationType;
-import eu.essi_lab.model.resource.OriginalMetadata;
-import eu.essi_lab.ommdk.AbstractResourceMapper;
-import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
+import java.math.*;
+import java.util.*;
+import java.util.Date;
 
 /**
  * @author boldrini
@@ -63,11 +45,11 @@ import net.opengis.iso19139.gmd.v_20060504.MDTopicCategoryCodeType;
 public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting> {
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "HMFSConnector";
     /**
-     * 
+     *
      */
     private static final String HMFS_CONNECTOR_SOURCE_NOT_FOUND_ERROR = "HMFS_CONNECTOR_SOURCE_NOT_FOUND_ERROR";
 
@@ -286,7 +268,8 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 				}
 				try {
 				    java.math.BigDecimal value = new java.math.BigDecimal(tsValue);
-				    javax.xml.datatype.Duration duration = eu.essi_lab.lib.utils.ISO8601DateTimeUtils.getDuration(value, tsUnits);
+				    javax.xml.datatype.Duration duration = eu.essi_lab.lib.utils.ISO8601DateTimeUtils.getDuration(value,
+					    tsUnits);
 				    if (duration != null) {
 					dataset.getExtensionHandler().setTimeAggregationDuration8601(duration.toString());
 					dataset.getExtensionHandler().setTimeResolutionDuration8601(duration.toString());
@@ -319,8 +302,9 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 
 			coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(datasetContact);
 
-			String title = "HMFS forecast at station " + stationCode + " - " + variable.getVariableName() + " (qualifier "
-				+ qualifier + ")";
+			String title =
+				"HMFS forecast at station " + stationCode + " - " + variable.getVariableName() + " (qualifier " + qualifier
+					+ ")";
 			coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(title);
 
 			// coreMetadata.getMIMetadata().getDataIdentification().setCitationAlternateTitle(parameterDescription);
@@ -381,7 +365,7 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 	    e.printStackTrace();
 	    String subject = ConfiguredSMTPClient.MAIL_REPORT_SUBJECT + ConfiguredSMTPClient.MAIL_HARVESTING_SUBJECT
 		    + ConfiguredSMTPClient.MAIL_ERROR_SUBJECT;
-	    ConfiguredSMTPClient.sendEmail(subject, "ERROR DURING HMFS HARVESTING: {}", e.getMessage());
+	    ConfiguredSMTPClient.sendEmail(subject, "ERROR DURING HMFS HARVESTING: " + e.getMessage());
 	    throw GSException.createException(getClass(), e.getMessage(), e);
 	}
 
@@ -396,23 +380,26 @@ public class HMFSConnector extends HarvestedQueryConnector<HMFSConnectorSetting>
 
 	switch (variableCode) {
 	case "90":
-	    ret.add(new HMFSSeriesInformation("{\"series_id\": " + seriesCode + ",\"series_table\": \"series_areal\",\"estacion_id\": "
-		    + stationCode + "," + "\"var_id\": " + variableCode + ",\"qualifier\": \"main\",\"begin_date\": \"" + forecastDate
-		    + "\",\n" + "\"end_date\": \"" + add(date, "P91D") + "\"}"));
+	    ret.add(new HMFSSeriesInformation(
+		    "{\"series_id\": " + seriesCode + ",\"series_table\": \"series_areal\",\"estacion_id\": " + stationCode + ","
+			    + "\"var_id\": " + variableCode + ",\"qualifier\": \"main\",\"begin_date\": \"" + forecastDate + "\",\n"
+			    + "\"end_date\": \"" + add(date, "P91D") + "\"}"));
 	    break;
 	case "20":
 	    for (int q = 1; q < 11; q++) {
-		ret.add(new HMFSSeriesInformation("{\"series_id\": " + seriesCode + ",\"series_table\": \"series_areal\",\"estacion_id\": "
-			+ stationCode + "," + "\"var_id\": " + variableCode + ",\"qualifier\": \"" + q + "\",\"begin_date\": \""
-			+ add(date, "PT6H") + "\",\n" + "\"end_date\": \"" + add(date, "P120D") + "\"}"));
+		ret.add(new HMFSSeriesInformation(
+			"{\"series_id\": " + seriesCode + ",\"series_table\": \"series_areal\",\"estacion_id\": " + stationCode + ","
+				+ "\"var_id\": " + variableCode + ",\"qualifier\": \"" + q + "\",\"begin_date\": \"" + add(date, "PT6H")
+				+ "\",\n" + "\"end_date\": \"" + add(date, "P120D") + "\"}"));
 	    }
 	    break;
 	case "4":
 	    if (stationCode.equals(DISCHARGE_STATION)) {
 		for (int q = 1; q < 11; q++) {
-		    ret.add(new HMFSSeriesInformation("{\"series_id\": " + seriesCode + ",\"series_table\": \"series\",\"estacion_id\": "
-			    + stationCode + "," + "\"var_id\": " + variableCode + ",\"qualifier\": \"" + q + "\",\"begin_date\": \""
-			    + add(date, "PT1H") + "\",\n" + "\"end_date\": \"" + add(date, "P120D") + "\"}"));
+		    ret.add(new HMFSSeriesInformation(
+			    "{\"series_id\": " + seriesCode + ",\"series_table\": \"series\",\"estacion_id\": " + stationCode + ","
+				    + "\"var_id\": " + variableCode + ",\"qualifier\": \"" + q + "\",\"begin_date\": \"" + add(date, "PT1H")
+				    + "\",\n" + "\"end_date\": \"" + add(date, "P120D") + "\"}"));
 		}
 	    }
 	    break;
