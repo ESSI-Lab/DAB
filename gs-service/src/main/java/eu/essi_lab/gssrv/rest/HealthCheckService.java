@@ -168,7 +168,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
 		
 		height:900px;
 		
-		border:1px solid #999;
+		border: none;
 		
 		margin-top:15px;
 		   }
@@ -364,32 +364,27 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 		html.append(">");
 
-		List<String> links = serviceToLinks.get(services.get(i));
+		List<String> links = serviceToLinks.get(services.get(i)).stream().sorted().toList();
 
-		if (links != null) {
+		for (int j = 0; j < links.size(); j++) {
 
-		    for (int j = 0; j < links.size(); j++) {
+		    String link = links.get(j);
 
-			String link = links.get(j);
+		    String thread = "Task " + j;
 
-			String thread = "Task " + j;
+		    String pre = linksToTask.get(link) + " " + link;
 
-			String pre = linksToTask.get(link) + " " + link;
+		    String details =
+			    "<details><summary style='cursor: pointer; padding: 3px;margin-left:3px'>Info</summary>" + "<pre >" + pre + "</pre></details>";
 
-			String details = "<details><summary style='cursor: pointer; padding: 3px;margin-left:3px'>Info</summary>"
-				+ "<pre >" + pre + "</pre></details>";
+		    String diagnosticUrl = "http://" + link + "/gs-service/services/health/status";
 
-			String diagnosticUrl = "http://" + link + "/gs-service/services/health/status";
+		    String button = "<button style='margin-left: 3px;  ' class='taskButton' onclick=\"openTask(this,'" + diagnosticUrl + "')\">Diagnostic</button>";
 
-			String button =
-				"<button style='margin-left: 3px;  ' class='taskButton' onclick=\"openTask(this,'" + diagnosticUrl
-					+ "')\">Diagnostic</button>";
+		    String div = "<div style='padding: 3px; margin-bottom: 3px; font-size:85%; display: flex;margin-right: 3px'>" //
+			    + "<div style='padding:3px'>" + thread + "</div>" + details + button + "</div>";
 
-			String div = "<div style='padding: 3px; margin-bottom: 3px; font-size:85%; display: flex;margin-right: 3px'>" //
-				+ "<div style='padding:3px'>" + thread + "</div>" + details + button + "</div>";
-
-			html.append(div);
-		    }
+		    html.append(div);
 		}
 
 		html.append("</td>");
