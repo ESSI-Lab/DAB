@@ -21,48 +21,26 @@ package eu.essi_lab.accessor.cehq;
  * #L%
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.xml.*;
-import jakarta.xml.bind.annotation.XmlTransient;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
-
-import jakarta.xml.bind.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.lib.xml.*;
-import org.apache.commons.io.IOUtils;
+import eu.essi_lab.model.exceptions.*;
+import jakarta.xml.bind.annotation.*;
+import org.apache.commons.io.*;
 import org.ccil.cowan.tagsoup.Parser;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
+import org.w3c.dom.*;
+import org.xml.sax.*;
 
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.ExpiringCache;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.*;
+import javax.xml.transform.sax.*;
+import java.io.*;
+import java.math.*;
+import java.nio.charset.*;
+import java.text.*;
+import java.util.AbstractMap.*;
+import java.util.*;
+import java.util.Map.*;
 
 public class CEHQClient {
     private static final String CEHQ_CLIENT_ERROR = "CEHQ_CLIENT_ERROR";
@@ -451,6 +429,9 @@ public class CEHQClient {
 	GSLoggerFactory.getLogger(getClass()).info("NOT found in cache url: {}", url);
 	Downloader downloader = new Downloader();
 	Optional<InputStream> stream = downloader.downloadOptionalStream(url);
+	if(stream.isEmpty()){
+	    throw new IOException("Unable to open url: " + url);
+	}
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	InputStream ss = stream.get();
 	IOUtils.copy(ss, baos);
