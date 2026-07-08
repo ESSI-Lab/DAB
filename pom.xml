@@ -1047,6 +1047,18 @@
                 <version>${aws-java-sdk-bom.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>ecs</artifactId>
+                <version>${aws-java-sdk-bom.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>ec2</artifactId>
+                <version>${aws-java-sdk-bom.version}</version>
+            </dependency>
+
             <!-- OGC Schemas from Aleksei Valikov -->
 
             <!-- Source: https://mvnrepository.com/artifact/org.w3c-schemas/xlink-v_1_0 -->
@@ -1478,6 +1490,18 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ecs</artifactId>
+            <version>${aws-java-sdk-bom.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>ec2</artifactId>
+            <version>${aws-java-sdk-bom.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>net.java.dev.jna</groupId>

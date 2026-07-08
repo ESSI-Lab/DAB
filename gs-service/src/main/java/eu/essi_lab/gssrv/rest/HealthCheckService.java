@@ -40,6 +40,7 @@ import jakarta.ws.rs.core.*;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.*;
 import jakarta.xml.ws.*;
+import software.amazon.awssdk.regions.*;
 
 import java.io.*;
 import java.lang.management.*;
@@ -80,6 +81,360 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
+    @Path("/ecs")
+    public jakarta.ws.rs.core.Response ecs(@Context HttpServletRequest hsr, @Context UriInfo uriInfo,
+	    @Context WebServiceContext wsContext) {
+
+	StringBuilder html = new StringBuilder();
+
+	html.append("""
+		   <!DOCTYPE html>
+		   <html>
+		   <head>
+		
+		   <meta charset="UTF-8">
+		
+		   <title>ECS Diagnostic Dashboard</title>
+		
+		   <style>
+		
+		   body{
+		    font-family:Arial,Helvetica,sans-serif;
+		    margin: 0 auto;
+		     max-width: 1230px;
+		   }
+		
+		   table{
+		width:100%;
+		border-collapse:collapse;
+		   }
+		
+		   th,td{
+		border:1px solid #bdbdbd;
+		padding:6px;
+		text-align:center;
+		vertical-align:top;
+		   }
+		
+		   th{
+		background:#ececec;
+		   }
+		
+		   .cluster{
+		background:#d9e8fb;
+		font-size:18px;
+		font-weight:bold;
+		   }
+		
+		   .service{
+		background:#f3f3f3;
+		font-weight:bold;
+		   }
+		
+		   .taskContainer{
+		padding:6px;
+		min-height:40px;
+		   }
+		
+		   .taskButton{
+		
+		display:inline-block;
+		
+		margin:2px;
+		
+		padding:5px 10px;
+		
+		border:1px solid #999;
+		
+		border-radius:4px;
+		
+		cursor:pointer;
+		
+		background:#ffffff;
+		   }
+		
+		   .taskButton:hover{
+		background:#dbeeff;
+		   }
+		
+		   .taskButton.selected{
+		background:#3f7dd8;
+		color:white;
+		   }
+		
+		   iframe{
+		
+		width:100%;
+		
+		height:900px;
+		
+		border: none;
+		
+		margin-top:15px;
+		   }
+		
+		   </style>
+		
+		   <script>
+		
+		   function openTask(button,url){
+		
+		document.querySelectorAll(".taskButton").forEach(
+		    b=>b.classList.remove("selected"));
+		
+		button.classList.add("selected");
+		
+		document.getElementById("diagnosticFrame").src=url;
+		   }
+		
+		   window.onload=function(){
+		
+		  let first = document.querySelector(".taskButton");
+		
+		  if(first){
+		
+		       first.click();
+		  }
+		    }
+		
+		   </script>
+		
+		   </head>
+		
+		   <body>
+		
+		   <h2>ECS Diagnostic Dashboard</h2>
+		
+		   <table>
+		
+		""");
+
+	String[] clusterColors = { "#D6EAF8", "#D5F5E3", "#FCF3CF", "#FADBD8", "#E8DAEF", "#FDEBD0" };
+
+	String[] serviceColors = { "#AED6F1", "#ABEBC6", "#F9E79F", "#F5B7B1", "#D2B4DE", "#F8C471" };
+
+	//
+	//
+	//
+
+	System.setProperty("aws.accessKeyId", ConfigurationWrapper.getStorageInfo().getUser());
+	System.setProperty("aws.secretAccessKey", ConfigurationWrapper.getStorageInfo().getPassword());
+
+	ECSExternalLinkFinder finder = new ECSExternalLinkFinder(Region.US_EAST_1);
+
+	List<ECSExternalLinkFinder.ExternalLink> externalLinks = finder.getExternalLinks(List.of(
+
+		"GSServiceProductionCluster", //
+		"GSServiceProductionHarvestCluster",//
+		"GSServiceProductionIntensiveCluster",//
+		"GSServiceProductionAccessCluster",//
+		"GSServiceProductionAugmentCluster"//
+	));
+
+	//
+	// Cluster
+	//
+
+	Map<String, List<String>> clusterToServices = new HashMap<>();
+
+	Map<String, List<ECSExternalLinkFinder.ExternalLink>> clusterMap = externalLinks.stream()
+		.collect(Collectors.groupingBy(ECSExternalLinkFinder.ExternalLink::cluster));
+
+	clusterMap.keySet().forEach(key -> {
+
+	    List<String> services = clusterMap.get(key).stream().//
+		    map(ECSExternalLinkFinder.ExternalLink::service).//
+		    distinct().//
+		    toList();//
+
+	    clusterToServices.put(key, services);
+	});
+
+	html.append("<tr>");
+
+	int clusterIndex = 0;
+
+	for (Map.Entry<String, List<String>> entry : clusterToServices.entrySet()) {
+
+	    String color = clusterColors[clusterIndex % clusterColors.length];
+
+	    boolean lastCluster = clusterIndex == clusterToServices.size() - 1;
+
+	    html.append("<th class='cluster' style='background:").append(color);
+
+	    if (!lastCluster) {
+
+		html.append(";border-right:2px solid lightgray");
+	    }
+
+	    html.append("' colspan='"). //
+		    append(entry.getValue().size()). //
+		    append("'>"). //
+		    append(mapCluster(entry.getKey())). //
+		    append("</th>");//
+
+	    clusterIndex++;
+	}
+
+	html.append("</tr>");
+
+	//
+	// Services
+	//
+
+	html.append("<tr>");
+
+	clusterIndex = 0;
+
+	for (List<String> services : clusterToServices.values()) {
+
+	    boolean lastCluster = clusterIndex == clusterToServices.size() - 1;
+
+	    String color = serviceColors[clusterIndex % serviceColors.length];
+
+	    for (int i = 0; i < services.size(); i++) {
+
+		html.append("<th class='service' style='background:").append(color);
+
+		if (i == services.size() - 1 && !lastCluster) {
+
+		    html.append(";border-right:2px solid lightgray");
+		}
+
+		html.append("'>"). //
+			append(mapService(services.get(i))).//
+			append("</th>");
+	    }
+
+	    clusterIndex++;
+	}
+
+	html.append("</tr>");
+
+	//
+	// Task
+	//
+
+	Map<String, List<String>> serviceToLinks = new HashMap<>();
+	Map<String, String> linksToTask = new HashMap<>();
+
+	Map<String, List<ECSExternalLinkFinder.ExternalLink>> serviceMap = externalLinks.stream()
+		.collect(Collectors.groupingBy(ECSExternalLinkFinder.ExternalLink::service));
+
+	Map<String, List<ECSExternalLinkFinder.ExternalLink>> linksMap = externalLinks.stream()
+		.collect(Collectors.groupingBy(ECSExternalLinkFinder.ExternalLink::externalLink));
+
+	serviceMap.keySet().forEach(key -> {
+
+	    List<String> taskLink = serviceMap.get(key).stream().//
+		    map(ECSExternalLinkFinder.ExternalLink::externalLink).//
+		    distinct().//
+		    toList();//
+
+	    serviceToLinks.put(key, taskLink);
+	});
+
+	linksMap.keySet().forEach(key -> {
+
+	    String taskName = linksMap.get(key).stream().//
+		    map(ECSExternalLinkFinder.ExternalLink::taskName).//
+		    distinct().//
+		    findFirst(). //
+		    get();
+
+	    linksToTask.put(key, taskName);
+	});
+
+	html.append("<tr>");
+
+	clusterIndex = 0;
+
+	for (List<String> services : clusterToServices.values()) {
+
+	    for (int i = 0; i < services.size(); i++) {
+
+		html.append("<td class='taskContainer'");
+
+		boolean lastCluster = clusterIndex == clusterToServices.size() - 1;
+
+		if (!lastCluster && i == services.size() - 1) {
+
+		    html.append(" style='border-right:2px solid lightgray;'");
+		}
+
+		html.append(">");
+
+		List<String> links = serviceToLinks.get(services.get(i)).stream().sorted().toList();
+
+		for (int j = 0; j < links.size(); j++) {
+
+		    String link = links.get(j);
+
+		    String thread = "Task " + j;
+
+		    String pre = linksToTask.get(link) + " " + link;
+
+		    String details =
+			    "<details><summary style='cursor: pointer; padding: 3px;margin-left:3px'>Info</summary>" + "<pre >" + pre + "</pre></details>";
+
+		    String diagnosticUrl = "http://" + link + "/gs-service/services/health/status";
+
+		    String button = "<button style='margin-left: 3px;  ' class='taskButton' onclick=\"openTask(this,'" + diagnosticUrl + "')\">Diagnostic</button>";
+
+		    String div = "<div style='padding: 3px; margin-bottom: 3px; font-size:85%; display: flex;margin-right: 3px'>" //
+			    + "<div style='padding:3px'>" + thread + "</div>" + details + button + "</div>";
+
+		    html.append(div);
+		}
+
+		html.append("</td>");
+	    }
+	}
+
+	html.append("</tr>");
+
+	html.append("""
+		
+		   </table>
+		
+		   <iframe
+		id="diagnosticFrame">
+		   </iframe>
+		
+		   </body>
+		
+		   </html>
+		
+		""");
+
+	return Response.ok(html.toString()).build();
+
+    }
+
+    /**
+     *
+     */
+    private String mapService(String service) {
+
+	service = service.replace("GSProduction", "").replace("Service", "");
+	service = service.isEmpty() ? "Frontend" : service;
+
+	return service;
+    }
+
+    /**
+     *
+     */
+    private String mapCluster(String cluster) {
+
+	cluster = cluster.replace("GSServiceProduction", "").replace("Cluster", "");
+	cluster = cluster.isEmpty() ? "Frontend" : cluster;
+
+	return cluster;
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
     @Path("/status")
     public Response status(@Context HttpServletRequest hsr, @Context UriInfo uriInfo, @Context WebServiceContext wsContext) {
 
@@ -95,7 +450,9 @@ public class HealthCheckService implements RuntimeInfoProvider {
 		    body {
 			font-family: Arial;
 			font-size: 13px;
-			margin:20px;
+			 
+			 margin: 0 auto;
+		   	 max-width: 1230px;
 		    }
 		
 		    .ok {
@@ -285,7 +642,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
 	    double perc_ = ((double) used / f.getTotalSpace()) * 100;
 	    String perc = DECIMAL_FORMAT.format(perc_) + "%";
 
-	    html.append(row(path, perc, counterClass(perc_, 70, 90)));
+	    html.append(row(path, perc + (" (used)"), counterClass(perc_, 70, 90)));
 	}
 
 	html.append("</table>");

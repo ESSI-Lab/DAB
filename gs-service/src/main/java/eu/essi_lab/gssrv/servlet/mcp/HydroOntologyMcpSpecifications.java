@@ -82,8 +82,7 @@ public final class HydroOntologyMcpSpecifications {
 		uri(RESOURCE_METADATA_URI).//
 		name("his-central-hydro-ontology-info").//
 		title("HIS-Central hydro ontology").//
-		description("Metadata and MCP resource template URIs for the HIS-Central hydro SKOS ontology (SPARQL: " + SPARQL_ENDPOINT
-			+ "). Use dab://ontology/his-central/hydro/terms/{term} with a UTF-8 search term to retrieve concepts as JSON.").//
+		description("Metadata and MCP resource template URIs for DAB (HIS-Central hydro SKOS ontology and view observed properties).").//
 		mimeType("application/json").//
 		build();
 
@@ -95,9 +94,12 @@ public final class HydroOntologyMcpSpecifications {
 		payload.put("title", "HIS-Central hydro ontology");
 		payload.put("sparqlEndpoint", SPARQL_ENDPOINT);
 		payload.put("resourceTemplateTerms", TERMS_URI_TEMPLATE);
+		payload.put("resourceTemplateViewObservedProperties", ViewObservedPropertiesMcpSpecifications.VIEW_OBSERVED_PROPERTIES_URI_TEMPLATE);
+		payload.put("mcpTools", List.of("om_search_features", "om_search_observations", "om_list_query_properties"));
 		payload.put("usage",
-			"Hydrate MCP resources/read with dab://ontology/his-central/hydro/terms/<term> "
-				+ "where <term> is a Unicode search string (concept labels/terms). Returned JSON aggregates SKOS concepts.");
+			"Hydro ontology term search: dab://ontology/his-central/hydro/terms/<term> (Unicode search string). "
+				+ "View observed properties: dab://view/<viewId>/observed-properties (URL-encode viewId when needed). "
+				+ "O&M search: MCP tools om_search_features, om_search_observations, om_list_query_properties.");
 
 		String json = mapper.writeValueAsString(payload);
 		return new ReadResourceResult(List.of(new TextResourceContents(request.uri(), "application/json", json)));

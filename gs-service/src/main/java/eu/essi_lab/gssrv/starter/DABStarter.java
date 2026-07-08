@@ -49,6 +49,7 @@ import eu.essi_lab.gssrv.conf.*;
 import eu.essi_lab.gssrv.conf.task.*;
 import eu.essi_lab.gssrv.health.*;
 import eu.essi_lab.gssrv.servlet.*;
+import eu.essi_lab.gssrv.servlet.mcp.ViewObservedPropertiesMcpSpecifications;
 import eu.essi_lab.harvester.*;
 import eu.essi_lab.jaxb.common.*;
 import eu.essi_lab.jaxb.wms.extension.*;
@@ -263,6 +264,8 @@ public class DABStarter implements ConfigurationChangeListener {
 	}
 
 	initDatabase();
+
+	//initMcpObservedPropertiesCache();
 
 	initMultiServiceManager();
     }
@@ -1175,6 +1178,17 @@ public class DABStarter implements ConfigurationChangeListener {
     private void initDatabase() throws GSException {
 
 	DatabaseFactory.get(ConfigurationWrapper.getDatabaseSetting().asStorageInfo());
+    }
+
+    /**
+     * Pre-warms the MCP observed-properties resource cache for frequently used views (background thread).
+     */
+    private void initMcpObservedPropertiesCache() {
+
+	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduling MCP observed-properties cache warmup for view {}",
+		ViewObservedPropertiesMcpSpecifications.STARTUP_WARMUP_VIEW_ID);
+
+	ViewObservedPropertiesMcpSpecifications.warmCacheAsync(ViewObservedPropertiesMcpSpecifications.STARTUP_WARMUP_VIEW_ID);
     }
 
     /**
