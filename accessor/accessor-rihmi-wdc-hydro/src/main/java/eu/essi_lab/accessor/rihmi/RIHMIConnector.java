@@ -40,21 +40,10 @@ import java.util.TimeZone;
 import org.w3c.dom.Node;
 
 import eu.essi_lab.adk.timeseries.StationConnector;
-import eu.essi_lab.iso.datamodel.classes.Address;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.Contact;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.Dimension;
-import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.utils.Chronometer;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLNodeReader;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSProperty;
@@ -62,9 +51,6 @@ import eu.essi_lab.model.GSPropertyHandler;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.Country;
-import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
@@ -81,7 +67,9 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     private RIHMIClient client = null;
 
-    private List<Node> stationList = new ArrayList<Node>();
+    private List<Node> hydrolareObservationMembers = new ArrayList<Node>();
+
+    private XMLDocumentReader hydrolareReader = null;
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listTimeseries(String stationId) throws GSException {
@@ -97,6 +85,10 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	try {
 	    if (client == null) {
 		client = new RIHMIClient();
+	    }
+
+	    if (getSourceURL().contains(client.getHydrolareStationEndpoint())) {
+		return listHydrolareRecords(request);
 	    }
 
 	    stationIdentifiers = new ArrayList<>(getStationIdentifiers(getSourceURL()));
@@ -136,64 +128,99 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
     }
 
-    private OriginalMetadata getOM(XMLDocumentReader reader, Node row) {
-	OriginalMetadata record = new OriginalMetadata();
+    private ListRecordsResponse<OriginalMetadata> listHydrolareRecords(ListRecordsRequest request) throws GSException {
+	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
 	try {
-	    Dataset dataset = new Dataset();
-	    GSSource source = new GSSource();
-	    source.setEndpoint(getSourceURL());
-	    dataset.setSource(source);
-	    // String shortName = reader.evaluateString(row, "*:td[@class='shortname']/*:a");
-	    String from = reader.evaluateString(row, "*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:beginPosition");
-	    String to = reader.evaluateString(row, "*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:endPosition");
-	    String pos = reader.evaluateString(row, "*:OM_Observation/*:featureOfInterest/*:MonitoringPoint/*:shape/*:Point/*:pos");
-	    String[] split = new String[2];
-	    split = pos.split(" ");
-
-	    String start = null;
-	    String end = null;
-	    if (from != null && !from.isEmpty()) {
-		start = getIsoDateFromYear(from);
+	    if (hydrolareObservationMembers.isEmpty()) {
+		HttpResponse<InputStream> response = client.getDownloadResponse(getSourceURL());
+		hydrolareReader = new XMLDocumentReader(response.body());
+		Node[] nodes = hydrolareReader.evaluateNodes("//*:observationMember");
+		for (Node node : nodes) {
+		    hydrolareObservationMembers.add(node);
+		}
+		GSLoggerFactory.getLogger(getClass()).info("Hydrolare: loaded {} station metadata records", hydrolareObservationMembers.size());
 	    }
 
-	    if (to != null && !to.isEmpty()) {
-		end = getIsoDateFromYear(to);
+	    int start = 0;
+	    String token = request.getResumptionToken();
+	    if (token != null) {
+		start = Integer.parseInt(token);
 	    }
 
+	    if (start < hydrolareObservationMembers.size()) {
+		OriginalMetadata record = buildHydrolareRecord(hydrolareReader, hydrolareObservationMembers.get(start));
+		if (record != null) {
+		    ret.addRecord(record);
+		}
+		if (start < hydrolareObservationMembers.size() - 1) {
+		    ret.setResumptionToken(String.valueOf(start + 1));
+		}else{
+		    ret.setResumptionToken(null);
+		}
+	    }
+
+	    return ret;
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    throw GSException.createException(getClass(), ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_ERROR, RIHMI_CONNECTOR_ERROR, e);
+	}
+    }
+
+    private OriginalMetadata buildHydrolareRecord(XMLDocumentReader reader, Node row) {
+	try {
 	    String stationId = reader.evaluateString(row, "*:OM_Observation/*:featureOfInterest/*:MonitoringPoint/*:identifier");
-
-	    RIHMIMetadata rm = new RIHMIMetadata();
-	    rm.setStationId(stationId);
-	    dataset.setOriginalId("Hydrolare:" + stationId);
-
-	    if (split.length > 1 && split[0] != null) {
-		rm.setLatitude(new BigDecimal(split[0]));
-		rm.setLongitude(new BigDecimal(split[1]));
+	    if (stationId == null || stationId.trim().isEmpty()) {
+		return null;
 	    }
+	    stationId = stationId.trim();
 
-	    rm.setParameterId("RIHMI:WaterLevel");
-	    rm.setParameterName("Water Level");
-
-	    // if (url.contains(client.getAralWaterLevelEndpoint()) ||
-	    // url.contains(client.getMoldovaWaterLevelEndpoint())) {
-
-	    // } else if (url.contains(client.getAralDischargeEndpoint()) ||
-	    // url.contains(client.getMoldovaDischargeEndpoint())
-	    // || url.contains(client.getHistoricalEndpoint()) || url.contains(client.getRealTimeEndpoint())) {
-	    // rm.setParameterId("RIHMI:Discharge");
-	    // rm.setParameterName("Discharge");
-	    // } else if (url.contains(client.getAralWaterTemperatureEndpoint())
-	    // || url.contains(client.getMoldovaWaterTemperatureEndpoint())) {
-	    // rm.setParameterId("RIHMI:WaterTemperature");
-	    // rm.setParameterName("Water Temperature");
-	    // }
+	    String parameterName = reader.evaluateString(row, "*:OM_Observation/*:observedProperty/@*:title");
+	    if (parameterName == null || parameterName.isEmpty()) {
+		parameterName = reader.evaluateString(row, "*:OM_Observation/*:observedProperty/@title");
+	    }
+	    if (parameterName == null || parameterName.isEmpty()) {
+		parameterName = "Level";
+	    }
+	    parameterName = parameterName.trim();
 
 	    String stationName = reader.evaluateString(row,
 		    "*:OM_Observation/*:featureOfInterest//*:NamedValue[*:name/@*:title='station name']/*:value/*:CharacterString/text()");
+	    if (stationName == null || stationName.isEmpty()) {
+		stationName = reader.evaluateString(row,
+			"*:OM_Observation/*:featureOfInterest/*:MonitoringPoint[1]/*:parameter[1]/*:NamedValue[1]/*:value[1]/*:CharacterString[1]");
+	    }
 
-	    String name = reader.evaluateString(row,
-		    "*:OM_Observation/*:featureOfInterest/*:MonitoringPoint[1]/*:parameter[1]/*:NamedValue[1]/*:value[1]/*:CharacterString[1]");
-	    rm.setStationName(name);
+	    String pos = reader.evaluateString(row, "*:OM_Observation/*:featureOfInterest/*:MonitoringPoint/*:shape/*:Point/*:pos");
+	    BigDecimal latitude = null;
+	    BigDecimal longitude = null;
+	    if (pos != null && !pos.isEmpty()) {
+		pos = pos.trim();
+		String[] split;
+		if (pos.contains(",")) {
+		    split = pos.split(",\\s*");
+		    if (split.length > 1) {
+			latitude = new BigDecimal(split[0].replace(",", "."));
+			longitude = new BigDecimal(split[1].replace(",", "."));
+		    }
+		} else {
+		    split = pos.split("\\s+");
+		    if (split.length > 1) {
+			latitude = new BigDecimal(split[0]);
+			longitude = new BigDecimal(split[1]);
+		    }
+		}
+	    }
+	    if (latitude == null || longitude == null) {
+		return null;
+	    }
+
+	    RIHMIMetadata rm = new RIHMIMetadata();
+	    rm.setStationId(stationId);
+	    rm.setStationName(stationName);
+	    rm.setParameterName(parameterName);
+	    rm.setParameterId("RIHMI:" + parameterName.replace(" ", ""));
+	    rm.setLatitude(latitude);
+	    rm.setLongitude(longitude);
 
 	    String units = reader.evaluateString(row,
 		    "*:OM_Observation/*:result/*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:uom[1]/@code");
@@ -201,183 +228,67 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 	    String interpolation = reader.evaluateString(row,
 		    "*:OM_Observation/*:result/*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:interpolationType[1]/@*:href");
-
 	    if (interpolation != null && !interpolation.isEmpty()) {
 		if (interpolation.equals("http://www.opengis.net/def/waterml/2.0/interpolationType/AverageSucc")) {
 		    rm.setInterpolation(InterpolationType.AVERAGE_SUCC);
 		} else {
 		    GSLoggerFactory.getLogger(getClass()).error("Interpolation not recognized: {}", interpolation);
 		}
+	    } else {
+		rm.setInterpolation(InterpolationType.AVERAGE_SUCC);
 	    }
 
 	    String aggregationDuration = reader.evaluateString(row,
 		    "*:OM_Observation/*:result/*:MeasurementTimeseries[1]/*:defaultPointMetadata[1]/*:DefaultTVPMeasurementMetadata[1]/*:aggregationDuration[1]");
-	    if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
-		rm.setAggregationDuration(aggregationDuration);
+	    if (aggregationDuration == null || aggregationDuration.isEmpty()) {
+		aggregationDuration = "P1M";
 	    }
+	    rm.setAggregationDuration(aggregationDuration);
 
-	    // ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	    // rm.marshal(baos);
-	    // String str = new String(baos.toByteArray());
-	    // try {
-	    // baos.close();
-	    // } catch (IOException e) {
-	    // e.printStackTrace();
-	    // }
+	    String from = reader.evaluateString(row, "*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:beginPosition");
+	    String to = reader.evaluateString(row, "*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:endPosition");
+	    parseHydrolareTime(from).ifPresent(rm::setBegin);
+	    parseHydrolareTime(to).ifPresent(rm::setEnd);
 
-	    String orgNamePub = reader.evaluateString(row,
-		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='publisher']/*:CI_ResponsibleParty/*:organisationName/*:CharacterString/text()");
-	    String emailPub = reader.evaluateString(row,
-		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='publisher']//*:electronicMailAddress/*:CharacterString/text()");
+	    OriginalMetadata record = new OriginalMetadata();
+	    record.setSchemeURI(CommonNameSpaceContext.RIHMI_URI);
 
-	    String orgNameOriginator = reader.evaluateString(row,
-		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='originator']/*:CI_ResponsibleParty/*:organisationName/*:CharacterString/text()");
-	    String emailOriginator = reader.evaluateString(row,
-		    "*:OM_Observation/*:metadata/*:ObservationMetadata/*:contact[*:CI_ResponsibleParty/*:role/*:CI_RoleCode/@codeListValue='originator']//*:electronicMailAddress/*:CharacterString/text()");
-
-	    String country = reader.evaluateString(row,
-		    "*:OM_Observation/*:featureOfInterest//*:NamedValue[*:name/@*:title='country']/*:value/*:CharacterString/text()");
-
-	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
-
-	    // TIME
-	    if (start != null && end != null) {
-		TemporalExtent extent = new TemporalExtent();
-		extent.setBeginPosition(start);
-		extent.setEndPosition(end);
-		coreMetadata.getMIMetadata().getDataIdentification().addTemporalExtent(extent);
-		GridSpatialRepresentation grid = new GridSpatialRepresentation();
-		grid.setNumberOfDimensions(1);
-		grid.setCellGeometryCode("point");
-		Dimension time = new Dimension();
-		time.setDimensionNameTypeCode("time");
-	    }
-
-	    String interpolationString = "";
-	    if (interpolation != null && !interpolation.isEmpty()) {
-		if (interpolation.equals(InterpolationType.AVERAGE_SUCC)) {
-		    interpolationString = "(" + aggregationDuration + " average)";
-		} else {
-		    interpolationString = "(" + aggregationDuration + " " + interpolation + ")";
+	    String downloadUrl = client.getHydrolareWaterLevelDownloadUrl(stationId);
+	    try {
+		HttpResponse<InputStream> response = client.getDownloadResponse(downloadUrl);
+		if (response.statusCode() == 200) {
+		    XMLDocumentReader dlReader = new XMLDocumentReader(response.body());
+		    if (!dlReader.asString().contains("Internal Server Error")) {
+			String dlFrom = normalizeTime(dlReader.evaluateString("//*:TimePeriod/*:beginPosition"));
+			if (dlFrom == null || dlFrom.isEmpty()) {
+			    dlFrom = dlReader.evaluateString("//*:MeasurementTVP[1]/*:time[1]");
+			}
+			String dlTo = normalizeTime(dlReader.evaluateString("//*:TimePeriod/*:endPosition"));
+			if (dlTo == null || dlTo.isEmpty()) {
+			    dlTo = ISO8601DateTimeUtils.getISO8601DateTime();
+			}
+			if (dlFrom != null && !dlFrom.isEmpty()) {
+			    ISO8601DateTimeUtils.parseISO8601ToDate(dlFrom).ifPresent(rm::setBegin);
+			    ISO8601DateTimeUtils.parseISO8601ToDate(dlTo).ifPresent(rm::setEnd);
+			    GSPropertyHandler handler = GSPropertyHandler.of(new GSProperty<String>("downloadLink", downloadUrl));
+			    record.setAdditionalInfo(handler);
+			}
+		    }
 		}
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).debug("Hydrolare station {} has no downloadable water level data", stationId);
 	    }
 
-	    coreMetadata.setTitle((rm.getParameterName() + " acquisitions " + interpolationString + " at station " + stationName));
-	    coreMetadata.setAbstract("This dataset contains a hydrology time series of a specific variable (" + rm.getParameterName()
-		    + ") acquired by RIHMI-WDC station " + stationName);
+	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	    rm.marshal(baos);
+	    record.setMetadata(new String(baos.toByteArray()));
+	    baos.close();
 
-	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword(stationName);
-
-	    coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
-	    // BBOX
-	    if (rm.getLatitude() != null && rm.getLongitude() != null) {
-		coreMetadata.addBoundingBox(rm.getLatitude(), rm.getLongitude(), rm.getLatitude(), rm.getLongitude());
-	    } else {
-		return null;
-	    }
-
-	    // RESPONSIBLES
-	    if (orgNameOriginator != null && !orgNameOriginator.isEmpty()) {
-		ResponsibleParty originatorContact = new ResponsibleParty();
-
-		originatorContact.setOrganisationName(orgNameOriginator);
-		originatorContact.setRoleCode("originator");
-		if (emailOriginator != null && !emailOriginator.isEmpty()) {
-		    Contact contact = new Contact();
-		    Address address = new Address();
-		    address.addElectronicMailAddress(emailOriginator);
-		    contact.setAddress(address);
-		    originatorContact.setContactInfo(contact);
-		}
-		coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(originatorContact);
-	    }
-
-	    if (orgNamePub != null && !orgNamePub.isEmpty()) {
-		ResponsibleParty publisherContact = new ResponsibleParty();
-
-		publisherContact.setOrganisationName(orgNamePub);
-		publisherContact.setRoleCode("publisher");
-		if (emailPub != null && !emailPub.isEmpty()) {
-		    Contact contact = new Contact();
-		    Address address = new Address();
-		    address.addElectronicMailAddress(emailPub);
-		    contact.setAddress(address);
-		    publisherContact.setContactInfo(contact);
-		}
-		coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(publisherContact);
-	    }
-
-	    ResponsibleParty creatorContact = new ResponsibleParty();
-
-	    creatorContact.setOrganisationName("RIHMI-WDC");
-	    creatorContact.setRoleCode("pointOfContact");
-	    Contact contact = new Contact();
-	    Address address = new Address();
-	    address.addElectronicMailAddress("shevchen2007@yandex.ru");
-	    contact.setAddress(address);
-	    creatorContact.setContactInfo(contact);
-	    coreMetadata.getMIMetadata().getDataIdentification().addPointOfContact(creatorContact);
-
-	    /**
-	     * MIPLATFORM
-	     **/
-
-	    MIPlatform platform = new MIPlatform();
-
-	    platform.setMDIdentifierCode("urn:rihmi:station:" + stationId);
-
-	    platform.setDescription(stationName);
-
-	    Citation platformCitation = new Citation();
-	    platformCitation.setTitle(stationName);
-	    platform.setCitation(platformCitation);
-
-	    coreMetadata.getMIMetadata().addMIPlatform(platform);
-
-	    /**
-	     * COVERAGEDescription
-	     **/
-
-	    CoverageDescription coverageDescription = new CoverageDescription();
-
-	    coverageDescription.setAttributeIdentifier("urn:ru:meteo:ws:variable:" + rm.getParameterName() + interpolationString);
-	    coverageDescription.setAttributeTitle(rm.getParameterName());
-
-	    String attributeDescription = rm.getParameterName() + " Units: " + units;
-
-	    coverageDescription.setAttributeDescription(attributeDescription);
-	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
-
-	    if (interpolation != null && !interpolation.isEmpty()) {
-		dataset.getExtensionHandler().setTimeInterpolation(interpolation);
-	    }
-	    if (aggregationDuration != null && !aggregationDuration.isEmpty()) {
-		dataset.getExtensionHandler().setTimeAggregationDuration8601(aggregationDuration);
-		dataset.getExtensionHandler().setTimeResolutionDuration8601(aggregationDuration);
-	    }
-	    
-	    dataset.getExtensionHandler().setAttributeUnits(units);
-	    dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
-
-	    // COUNTRY
-	    if (country != null && !country.isEmpty()) {
-		Country c = Country.decode(country);
-		if (c != null)
-		    dataset.getExtensionHandler().setCountry(c.getShortName());
-	    }
-	    dataset.getPropertyHandler().setIsTimeseries(true);
-	    String str = dataset.asString(true);
-	    record.setMetadata(str);
-	    record.setSchemeURI(CommonNameSpaceContext.GS_DATA_MODEL_SCHEMA_URI_GS_RESOURCE);
-
+	    return record;
 	} catch (Exception e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return null;
 	}
-	
-	return record;
-
     }
 
     private Set<String> stationIdentifiers = null;
@@ -429,8 +340,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getMoldovaDischargeEndpoint(), stationId));
 		    // water temperature
 		    downloadUrls.add(getRealtimeDownloadUrl(client.getMoldovaWaterTemperatureEndpoint(), stationId));
-		} else if (sourceURL.contains(client.getHydrolareStationEndpoint())) {
-		    downloadUrls.add(client.getHydrolareWaterLevelDownloadUrl(stationId));
 		} else {
 		    // real time download url
 		    downloadUrls.add(getRealtimeDownloadUrl(getSourceURL(), stationId));
@@ -560,7 +469,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 
 		    String pos = reader.evaluateString("//*:shape/*:Point/*:pos");
 		    String[] split = new String[2];
-		    if (sourceURL.contains(client.getAralStationEndpoint()) || sourceURL.contains(client.getHydrolareStationEndpoint())) {
+		    if (sourceURL.contains(client.getAralStationEndpoint())) {
 			String[] splittedPos = pos.split(", ");
 			if (splittedPos != null && splittedPos.length > 1) {
 			    split[0] = splittedPos[0].replace(",", ".");
@@ -575,8 +484,7 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 			rm.setLatitude(new BigDecimal(split[0]));
 			rm.setLongitude(new BigDecimal(split[1]));
 		    }
-		    if (url.contains(client.getAralWaterLevelEndpoint()) || url.contains(client.getMoldovaWaterLevelEndpoint())
-			    || url.contains(client.getHydrolareWaterLevelEndpoint())) {
+		    if (url.contains(client.getAralWaterLevelEndpoint()) || url.contains(client.getMoldovaWaterLevelEndpoint())) {
 			rm.setParameterId("RIHMI:WaterLevel");
 			rm.setParameterName("Water Level");
 		    } else if (url.contains(client.getAralDischargeEndpoint()) || url.contains(client.getMoldovaDischargeEndpoint())
@@ -609,8 +517,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    } else if (sourceURL.contains(client.getMoldovaStationEndpoint())
 			    || sourceURL.contains(client.getAralStationEndpoint())) {
 			rm.setInterpolation(InterpolationType.DISCONTINUOUS);
-		    } else if (sourceURL.contains(client.getHydrolareStationEndpoint())) {
-			rm.setInterpolation(InterpolationType.AVERAGE_SUCC);
 		    }
 
 		    String aggregationDuration = reader.evaluateString(
@@ -620,8 +526,6 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 		    } else if (sourceURL.contains(client.getMoldovaStationEndpoint())
 			    || sourceURL.contains(client.getAralStationEndpoint())) {
 			rm.setAggregationDuration("P1D");
-		    } else if (sourceURL.contains(client.getHydrolareStationEndpoint())) {
-			rm.setAggregationDuration("P1M");
 		    }
 
 		    ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -676,6 +580,24 @@ public class RIHMIConnector extends StationConnector<RIHMIConnectorSetting> {
 	} else {
 	    return time.replace(" ", "") + "Z";
 	}
+    }
+
+    private java.util.Optional<Date> parseHydrolareTime(String time) {
+	if (time == null || time.trim().isEmpty()) {
+	    return java.util.Optional.empty();
+	}
+
+	if (time.matches("\\d{4}")) {
+	    return ISO8601DateTimeUtils.parseISO8601ToDate(getIsoDateFromYear(time));
+	}
+
+	time = time.trim();
+	java.util.Optional<Date> parsed = ISO8601DateTimeUtils.parseISO8601ToDate(normalizeTime(time));
+	if (parsed.isPresent()) {
+	    return parsed;
+	}
+
+	return java.util.Optional.empty();
     }
 
     private String getIsoDateFromYear(String yearStr) {
