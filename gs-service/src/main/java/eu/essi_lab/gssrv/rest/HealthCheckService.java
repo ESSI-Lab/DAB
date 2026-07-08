@@ -231,6 +231,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
 		"GSServiceProductionAugmentCluster"//
 	));
 
+	finder.close();
+
 	//
 	// Cluster
 	//
@@ -623,7 +625,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
 
 	html.append("<h2>Status</h2><table>");
 
-	double percent_ = ((double) heap.getUsed() / heap.getCommitted()) * 100;
+	double percent_ = ((double) heap.getUsed() / heap.getMax()) * 100;
 
 	String percent = DECIMAL_FORMAT.format(percent_) + "%";
 
