@@ -10,12 +10,12 @@ package eu.essi_lab.gssrv.conf.task.trigger;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -62,23 +62,26 @@ public class LegendFactory {
 
     private static Legend buildTemperature() {
 	return new Legend("Air Temperature at 2 m (°C)",
-		List.of(new LegendItem("≤ -20", "Extreme cold", "#313695"), new LegendItem("-20 – -13", "Very cold", "#4575b4"),
-			new LegendItem("-13 – -6", "Cold", "#74add1"), new LegendItem("-6 – 1", "Near freezing", "#abd9e9"),
-			new LegendItem("1 – 8", "Cool", "#e0f3f8"), new LegendItem("8 – 15", "Mild", "#ffffbf"),
-			new LegendItem("15 – 22", "Warm", "#fee090"), new LegendItem("22 – 29", "Hot", "#fdae61"),
-			new LegendItem("29 – 36", "Very hot", "#f46d43"), new LegendItem("36 – 43", "Extreme heat", "#d73027"),
-			new LegendItem("≥ 43", "Exceptional heat", "#a50026")));
+		List.of(new LegendItem("≤ -20.0", "Extreme cold", "#313695"), new LegendItem("-20 – -13", "Very cold", "#4575b4"),
+			new LegendItem("-13.0 to -6.0", "Cold", "#74add1"), new LegendItem("-6 – 1", "Near freezing", "#abd9e9"),
+			new LegendItem("1.0 to 8.0", "Cool", "#e0f3f8"), new LegendItem("8 – 15", "Mild", "#ffffbf"),
+			new LegendItem("15.0 to 22.0", "Warm", "#fee090"), new LegendItem("22 – 29", "Hot", "#fdae61"),
+			new LegendItem("29.0 to 36.0", "Very hot", "#f46d43"), new LegendItem("36 – 43", "Extreme heat", "#d73027"),
+			new LegendItem("≥ 43.0", "Exceptional heat", "#a50026")));
     }
 
     private static Legend buildUtci() {
-	return new Legend("UTCI (°C)", List.of(new LegendItem("≤ -50", "Extreme cold stress", "#08306b"),
-		new LegendItem("-50 – -40", "Very strong cold stress", "#2171b5"),
-		new LegendItem("-40 – -30", "Strong cold stress", "#6baed6"),
-		new LegendItem("-30 – -20", "Moderate cold stress", "#bdd7e7"),
-		new LegendItem("-20 – -10", "Slight cold stress", "#eff3ff"), new LegendItem("-10 – 0", "No thermal stress", "#ffffbf"),
-		new LegendItem("0 – 10", "Moderate heat stress", "#fee090"), new LegendItem("10 – 20", "Strong heat stress", "#fdae61"),
-		new LegendItem("20 – 30", "Very strong heat stress", "#f46d43"),
-		new LegendItem("30 – 40", "Extreme heat stress", "#d73027"), new LegendItem("> 40", "Exceptional heat stress", "#a50026")));
+	return new Legend("Universal Thermal Climate Index (UTCI) (°C)", List.of(
+		new LegendItem("≤ -40.0", "Extreme cold stress", "#000066"),
+		new LegendItem("-40.0 to -27.0", "Very strong cold stress", "#0000ff"),
+		new LegendItem("-27.0 to -13.0", "Strong cold stress", "#007fff"),
+		new LegendItem("-13.0 to 0.0", "Moderate cold stress", "#add8e6"),
+		new LegendItem("0.0 to 9.0", "Slight cold stress", "#e0f3f8"),
+		new LegendItem("9.0 to 26.0", "No thermal stress", "#2ca25f"),
+		new LegendItem("26.0 to 32.0", "Moderate heat stress", "#fee090"),
+		new LegendItem("32.0 to 38.0", "Strong heat stress", "#fdae61"),
+		new LegendItem("38.0 to 46.0", "Very strong heat stress", "#f46d43"),
+		new LegendItem("≥ 46.0", "Extreme heat stress", "#d73027")));
     }
 
     private static Legend buildHumidity() {
@@ -93,58 +96,41 @@ public class LegendFactory {
     private static Legend buildWbgt() {
 	return new Legend("WBGT (Wet Bulb Globe Temperature) (°C)", List.of(
 		// --- HEAT RISK SPECTRUM ---
-		new LegendItem("40.0 – 50.0", "Extreme Heat Risk / Danger", "#7f0000"),
-		new LegendItem("32.2 – 40.0", "Extreme Heat / Black Flag", "#d73027"),
-		new LegendItem("31.1 – 32.1", "Very High Heat / Red Flag", "#f46d43"),
-		new LegendItem("29.5 – 31.0", "High Heat / Yellow Flag", "#fdae61"),
-		new LegendItem("27.8 – 29.4", "Moderate Heat / Green Flag", "#fee090"),
-		new LegendItem("15.0 – 27.7", "Low Heat Risk / White Flag", "#e0f3f8"),
-
-		// --- COMFORT & COLD SPECTRUM ---
-		new LegendItem("5.0 – 15.0", "Comfortable / Neutral Zone", "#f7f7f7"),
-		new LegendItem("0.0 – 5.0", "Cold / Low Risk", "#6baed6"),
-		new LegendItem("-5.0 – 0.0", "Severe Cold / Increased Risk", "#2171b5"),
-		new LegendItem("≤ -5.0", "Extreme Cold Stress / Danger", "#08306b")));
+		new LegendItem("< 26.7", "Normal Conditions", "#e0f3f8"),
+		new LegendItem("26.7 to 29.4", "Green Flag Condition", "#008000"),
+		new LegendItem("29.4 to 31.1", "Yellow Flag Condition", "#ffff00"),
+		new LegendItem("31.1 to 32.2", "Red Flag Condition", "#ff0000"),
+		new LegendItem("≥ 32.2", "Black Flag Condition", "#000000")));
     }
 
     private static Legend buildWct() {
 	return new Legend("Wind Chill Temperature (WCT) (°C)", List.of(
 		// --- COLD SPECTRUM (Your exact detailed thresholds) ---
-		new LegendItem("≥ -10.0", "Low Cold Stress", "#add8e6"),
-		new LegendItem("-27.0 to -10.0", "Uncomfortable Cold", "#0000ff"),
+		new LegendItem("≥ -10.0", "Low Cold Stress", "#add8e6"), new LegendItem("-27.0 to -10.0", "Uncomfortable Cold", "#0000ff"),
 		new LegendItem("-35.0 to -27.0", "Risk of frostbite during prolonged exposure", "#00008b"),
 		new LegendItem("-40.0 to -35.0", "Frostbite possible in 10-15 min", "#7f00ff"),
 		new LegendItem("-45.0 to -40.0", "Frostbite possible in < 10 min", "#ff00ff"),
-		new LegendItem("< -45.0", "Frostbite possible within minutes", "#4d004d")));
+		new LegendItem("< -45.0", "Frostbite possible within minutes", "#8b008b")));
     }
 
     private static Legend buildAt() {
 	return new Legend("Apparent Temperature (AT) (°C)", List.of(
 		// --- HEAT SPECTRUM ---
-		new LegendItem("40.0 – 50.0", "Extreme Heat / Danger", "#7f0000"),
-		new LegendItem("30.0 – 40.0", "Very Warm / Caution", "#d73027"),
-		new LegendItem("20.0 – 30.0", "Warm / Comfortable", "#fee090"), new LegendItem("10.0 – 20.0", "Mild / Neutral", "#e0f3f8"),
+		new LegendItem("< 26.7", "Normal / No Stress", "#e0f3f8"), new LegendItem("26.7 to 32.2", "Caution", "#ffff00"),
+		new LegendItem("32.2 to 39.4", "Extreme Caution", "#ffb300"), new LegendItem("39.4 to 51.1", "Danger", "#ff6600"),
+		new LegendItem("≥ 51.7", "Extreme Danger", "#d73027")));
 
-		// --- COLD SPECTRUM (Your exact detailed thresholds) ---
-		new LegendItem("0.0 – 10.0", "Cool / Low Risk", "#b3cde3"),
-		new LegendItem("-9.0 – 0.0", "Slightly Cold / Mild Discomfort", "#8c96c6"),
-		new LegendItem("-27.0 – -10.0", "Cold / Moderate Risk", "#88419d"),
-		new LegendItem("-39.0 – -28.0", "Very Cold / Frostbite ~30 min", "#810f7c"),
-		new LegendItem("-47.0 – -40.0", "Extreme Cold / Frostbite 5-10 min", "#4d004b"),
-		new LegendItem("-54.0 – -48.0", "Severe Extreme Cold / Frostbite 2-5 min", "#250025"),
-		new LegendItem("≤ -55.0", "Hazardous / Deadly / Frostbite < 2 min", "#000000")));
     }
 
     private static String escapeXml(String text) {
 	return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
-
-
     public static void main(String[] args) throws IOException {
 	String var = "wct";
 	Legend legend = LegendFactory.getLegend(var);
-	if (legend == null) return;
+	if (legend == null)
+	    return;
 	int width = 320;
 	int itemHeight = 22;
 	int spacing = 6;
@@ -159,8 +145,10 @@ public class LegendFactory {
 
 	int y = 40;
 	for (LegendItem item : legend.items) {
-	    svg.append("<rect x='10' y='").append(y).append("' width='18' height='18' fill='").append(item.color).append("' stroke='black' stroke-width='0.5'/>");
-	    svg.append("<text x='35' y='").append(y + 13).append("' font-size='12'>").append(escapeXml(item.range)).append(" (").append(escapeXml(item.label)).append(")</text>");
+	    svg.append("<rect x='10' y='").append(y).append("' width='18' height='18' fill='").append(item.color)
+		    .append("' stroke='black' stroke-width='0.5'/>");
+	    svg.append("<text x='35' y='").append(y + 13).append("' font-size='12'>").append(escapeXml(item.range)).append(" (")
+		    .append(escapeXml(item.label)).append(")</text>");
 	    y += itemHeight + spacing;
 	}
 	svg.append("</svg>");
