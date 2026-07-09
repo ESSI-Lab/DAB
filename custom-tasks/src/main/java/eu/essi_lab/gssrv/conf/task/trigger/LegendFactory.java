@@ -21,6 +21,11 @@ package eu.essi_lab.gssrv.conf.task.trigger;
  * #L%
  */
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class LegendFactory {
@@ -130,8 +135,13 @@ public class LegendFactory {
 		new LegendItem("≤ -55.0", "Hazardous / Deadly / Frostbite < 2 min", "#000000")));
     }
 
+    private static String escapeXml(String text) {
+	return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
 
-    public static void main(String[] args) {
+
+
+    public static void main(String[] args) throws IOException {
 	String var = "wct";
 	Legend legend = LegendFactory.getLegend(var);
 	if (legend == null) return;
