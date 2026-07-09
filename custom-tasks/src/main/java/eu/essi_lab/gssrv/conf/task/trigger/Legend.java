@@ -29,7 +29,7 @@ public class Legend {
     //public String description;
     public List<LegendItem> items;
 
-    public Legend(String title, String description, List<LegendItem> items) {
+    public Legend(String title, List<LegendItem> items) {
 	this.title = title;
 	//this.description = description;
 	this.items = items;
