@@ -165,9 +165,12 @@ public class LegendFactory {
 	}
 	svg.append("</svg>");
 	Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), "legends_");
-	Files.createDirectories(workingDir);
 	Path varDir = workingDir.resolve(var);
 
+	// CRITICAL FIX: Create the full directory path (including the variable subfolder)
+	Files.createDirectories(varDir);
+
+	// Now this will write perfectly without throwing an exception
 	Files.writeString(varDir.resolve("legend.svg"), svg.toString(), StandardCharsets.UTF_8);
     }
 
