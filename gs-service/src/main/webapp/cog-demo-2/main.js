@@ -9,13 +9,12 @@ import GeoTIFF from 'ol/source/GeoTIFF.js';
 const wctStyle = {
   color: [
     'case',
-    ['<=', ['band', 1], -45.0], '#4d004d', // Extreme Frostbite Hazard
-    ['<=', ['band', 1], -25.0], '#313695', // Severe Cold
-    ['<=', ['band', 1], -10.0], '#4575b4', // Very Cold
-    ['<=', ['band', 1], 0.0],   '#74add1', // Freezing Threshold
-    ['<=', ['band', 1], 10.0],  '#abd9e9', // Cool
-    ['<=', ['band', 1], 20.0],  '#fe9929', // Mild
-    '#cc4c02'                              // Warm
+    ['<', ['band', 1], -45.0], '#8b008b', // Frostbite possible within minutes (Dark magenta / near black)
+    ['<', ['band', 1], -40.0], '#ff00ff', // Frostbite possible in <10 min / warning level (Magenta)
+    ['<', ['band', 1], -35.0], '#7f00ff', // Frostbite possible in 10-15 min (Purple)
+    ['<', ['band', 1], -27.0], '#00008b', // Risk of frostbite during prolonged exposure (Dark blue)
+    ['<', ['band', 1], -10.0], '#0000ff', // Uncomfortable cold (Blue)
+    '#add8e6'                             // Low cold stress (Light cyan / pale blue)
   ],
   opacity: 1.0
 };
@@ -140,19 +139,18 @@ function updateMap(index) {
 function buildLegend() {
   const legendDiv = document.getElementById('legend');
   const schema = [
-    { range: '≤ -45.0 °C', label: 'Extreme Hazard (Frostbite < 10m)', color: '#4d004d' },
-    { range: '-45.0 to -25.0 °C', label: 'High Danger', color: '#313695' },
-    { range: '-25.0 to -10.0 °C', label: 'Moderate Cold', color: '#4575b4' },
-    { range: '-10.0 to 0.0 °C', label: 'Freezing Zone', color: '#74add1' },
-    { range: '0.0 to 10.0 °C', label: 'Cool / Chilly', color: '#abd9e9' },
-    { range: '10.0 to 20.0 °C', label: 'Mild', color: '#fe9929' },
-    { range: '> 20.0 °C', label: 'Warm', color: '#cc4c02' }
+    { range: '≥ -10.0 °C', label: 'Low cold stress', color: '#add8e6' },
+    { range: '-27.0 to -10.0 °C', label: 'Uncomfortable cold', color: '#0000ff' },
+    { range: '-35.0 to -27.0 °C', label: 'Risk of frostbite during prolonged exposure', color: '#00008b' },
+    { range: '-40.0 to -35.0 °C', label: 'Frostbite possible in 10–15 min', color: '#7f00ff' },
+    { range: '-45.0 to -40.0 °C', label: 'Frostbite possible in < 10 min / warning level', color: '#ff00ff' },
+    { range: '< -45.0 °C', label: 'Frostbite possible within minutes', color: '#8b008b' }
   ];
 
   legendDiv.innerHTML = schema.map(item => `
-    <div class="legend-item">
-      <div class="legend-color" style="background:${item.color};"></div>
-      <div><strong>${item.range}</strong> — ${item.label}</div>
+    <div class="legend-item" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+      <div class="legend-color" style="background:${item.color}; width: 18px; height: 18px; border: 1px solid #ccc; border-radius: 2px; flex-shrink: 0;"></div>
+      <div style="font-size: 12px; color: #333;"><strong>${item.range}</strong> — ${item.label}</div>
     </div>
   `).join('');
 }
