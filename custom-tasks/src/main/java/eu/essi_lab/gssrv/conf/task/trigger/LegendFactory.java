@@ -39,6 +39,8 @@ public class LegendFactory {
 	    return buildWbgt();
 	case "wct":
 	    return buildWct();
+	case "at":
+	    return buildAt();
 	default:
 	    return null;
 	}
@@ -102,6 +104,17 @@ public class LegendFactory {
 
     private static Legend buildWct() {
 	return new Legend("Wind Chill Temperature (WCT) (°C)", List.of(
+		// --- COLD SPECTRUM (Your exact detailed thresholds) ---
+		new LegendItem("≥ -10.0", "Low Cold Stress", "#add8e6"),
+		new LegendItem("-27.0 to -10.0", "Uncomfortable Cold", "#0000ff"),
+		new LegendItem("-35.0 to -27.0", "Risk of frostbite during prolonged exposure", "#00008b"),
+		new LegendItem("-40.0 to -35.0", "Frostbite possible in 10-15 min", "#7f00ff"),
+		new LegendItem("-45.0 to -40.0", "Frostbite possible in < 10 min", "#ff00ff"),
+		new LegendItem("< -45.0", "Frostbite possible within minutes", "#4d004d")));
+    }
+
+    private static Legend buildAt() {
+	return new Legend("Apparent Temperature (AT) (°C)", List.of(
 		// --- HEAT SPECTRUM ---
 		new LegendItem("40.0 – 50.0", "Extreme Heat / Danger", "#7f0000"),
 		new LegendItem("30.0 – 40.0", "Very Warm / Caution", "#d73027"),
@@ -115,6 +128,37 @@ public class LegendFactory {
 		new LegendItem("-47.0 – -40.0", "Extreme Cold / Frostbite 5-10 min", "#4d004b"),
 		new LegendItem("-54.0 – -48.0", "Severe Extreme Cold / Frostbite 2-5 min", "#250025"),
 		new LegendItem("≤ -55.0", "Hazardous / Deadly / Frostbite < 2 min", "#000000")));
+    }
+
+
+    public static void main(String[] args) {
+	String var = "wct";
+	Legend legend = LegendFactory.getLegend(var);
+	if (legend == null) return;
+	int width = 320;
+	int itemHeight = 22;
+	int spacing = 6;
+	int margin = 10;
+	int height = margin + 30 + legend.items.size() * (itemHeight + spacing);
+
+	StringBuilder svg = new StringBuilder();
+	svg.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+	svg.append("<svg xmlns='http://www.w3.org/2000/svg' width='").append(width).append("' height='").append(height).append("'>");
+	svg.append("<rect width='100%' height='100%' fill='#f5f5f5'/>");
+	svg.append("<text x='10' y='20' font-size='14' font-weight='bold'>").append(escapeXml(legend.title)).append("</text>");
+
+	int y = 40;
+	for (LegendItem item : legend.items) {
+	    svg.append("<rect x='10' y='").append(y).append("' width='18' height='18' fill='").append(item.color).append("' stroke='black' stroke-width='0.5'/>");
+	    svg.append("<text x='35' y='").append(y + 13).append("' font-size='12'>").append(escapeXml(item.range)).append(" (").append(escapeXml(item.label)).append(")</text>");
+	    y += itemHeight + spacing;
+	}
+	svg.append("</svg>");
+	Path workingDir = Paths.get(System.getProperty("java.io.tmpdir"), "legends_");
+	Files.createDirectories(workingDir);
+	Path varDir = workingDir.resolve(var);
+
+	Files.writeString(varDir.resolve("legend.svg"), svg.toString(), StandardCharsets.UTF_8);
     }
 
 }
