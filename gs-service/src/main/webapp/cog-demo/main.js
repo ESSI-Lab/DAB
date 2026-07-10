@@ -77,17 +77,16 @@ const humidityStyle = {
 const utciStyle = {
   color: [
     'case',
-        ['<=', ['band', 1], -50], '#08306b',
-        ['<=', ['band', 1], -40], '#2171b5',
-        ['<=', ['band', 1], -30], '#6baed6',
-        ['<=', ['band', 1], -20], '#bdd7e7',
-        ['<=', ['band', 1], -10], '#eff3ff',
-        ['<=', ['band', 1], 0], '#ffffbf',
-        ['<=', ['band', 1], 10], '#fee090',
-        ['<=', ['band', 1], 20], '#fdae61',
-        ['<=', ['band', 1], 30], '#f46d43',
-        ['<=', ['band', 1], 40], '#d73027',
-        '#a50026'
+        ['<', ['band', 1], -40.0], '#000066', // Extreme cold stress (Dark Blue)
+        ['<', ['band', 1], -27.0], '#0000ff', // Very strong cold stress (Blue)
+        ['<', ['band', 1], -13.0], '#007fff', // Strong cold stress (Light Blue)
+        ['<', ['band', 1], 0.0],   '#add8e6', // Moderate cold stress (Cyan/Pale Blue)
+        ['<', ['band', 1], 9.0],   '#e0f3f8', // Slight cold stress (Very Light Blue)
+        ['<', ['band', 1], 26.0],  '#2ca25f', // No thermal stress (Comfort Green)
+        ['<', ['band', 1], 32.0],  '#fee090', // Moderate heat stress (Yellow/Light Orange)
+        ['<', ['band', 1], 38.0],  '#fdae61', // Strong heat stress (Orange)
+        ['<', ['band', 1], 46.0],  '#f46d43', // Very strong heat stress (Bright Red-Orange)
+        '#d73027'
   ],
   opacity: 1.0
 };
@@ -129,18 +128,16 @@ const legends = {
       utci: {
         title: 'UTCI (°C)',
         items: [
-          { range: '≤ −50', label: 'Extreme cold stress',color: '#08306b' },
-          { range: '-50 - −40', label: 'Very strong cold stress',color: '#2171b5' },
-          { range: '-40 - −30', label: 'Strong cold stress',color: '#6baed6' },
-          { range: '−30 – −20', label: 'Moderate cold stress',color: '#bdd7e7' },
-          { range: '−20 – 10', label: 'Slight cold stress',color: '#eff3ff' },
-          { range: '-10 – 0', label: 'No thermal stress', color: '#ffffbf' },
-          { range: '0 – 10', label: 'Moderate heat stress', color: '#fee090' },
-          { range: '10 – 20', label: 'Strong heat stress', color: '#fdae61' },
-          { range: '20 – 30', label: 'Very strong heat stress',color: '#f46d43' },
-          { range: '30 – 40', label: 'Extreme heat stress',color: '#d73027' },
-          { range: '> 40', label: 'Exceptional heat stress',color: '#a50026' }
-        ]
+          { range: '< -40.0 °C', label: 'Extreme cold stress', color: '#000066' },
+          { range: '-40.0 to -27.0 °C', label: 'Very strong cold stress', color: '#0000ff' },
+          { range: '-27.0 to -13.0 °C', label: 'Strong cold stress', color: '#007fff' },
+          { range: '-13.0 to 0.0 °C', label: 'Moderate cold stress', color: '#add8e6' },
+          { range: '0.0 to 9.0 °C', label: 'Slight cold stress', color: '#e0f3f8' },
+          { range: '9.0 to 26.0 °C', label: 'No thermal stress', color: '#2ca25f' },
+          { range: '26.0 to 32.0 °C', label: 'Moderate heat stress', color: '#fee090' },
+          { range: '32.0 to 38.0 °C', label: 'Strong heat stress', color: '#fdae61' },
+          { range: '38.0 to 46.0 °C', label: 'Very strong heat stress', color: '#f46d43' },
+          { range: '≥ 46.0 °C', label: 'Extreme heat stress', color: '#d73027' }        ]
       },
 
       '2r': {

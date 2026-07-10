@@ -128,35 +128,38 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 
 	onlineValues.setName(id);
 	boolean isAralOrMoldova = false;
+	boolean isHydrolare = dataset.getSource().getEndpoint().contains(RIHMIClient.hydrolareStationListendpoint);
 	GSPropertyHandler additionalInfo = originalMD.getAdditionalInfo();
 	if (additionalInfo != null) {
-	    isAralOrMoldova = true;
 	    String linkage = originalMD.getAdditionalInfo().get("downloadLink", String.class);
-	    onlineValues.setProtocol(CommonNameSpaceContext.ARAL_MOLDOVA_URI);
-	    onlineValues.setLinkage(linkage);
+	    if (isHydrolare) {
+		onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
+		onlineValues.setLinkage(linkage);
+	    } else {
+		isAralOrMoldova = true;
+		onlineValues.setProtocol(CommonNameSpaceContext.ARAL_MOLDOVA_URI);
+		onlineValues.setLinkage(linkage);
+	    }
 
 	} else {
 	    // russian case
-	    if (interpolation != null) {
+	    if (interpolation != null && !isHydrolare) {
 		onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_HISTORICAL_URI);
-		if (dataset.getSource().getEndpoint().contains(RIHMIClient.hydrolareStationListendpoint)) {
-		    onlineValues.setLinkage(RIHMIClient.hydrolareWaterLevelEndpoint + stationId);
-		} else {
-		    onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
-		}
-	    } else {
+		onlineValues.setLinkage(RIHMIClient.historicalEndpoint + stationId);
+	    } else if (!isHydrolare) {
 		onlineValues.setProtocol(CommonNameSpaceContext.RIHMI_URI);
 		onlineValues.setLinkage(endpoint);
 	    }
 	}
 
-	onlineValues.setFunctionCode("download");
-
-	coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(onlineValues);
+	if (onlineValues.getProtocol() != null) {
+	    onlineValues.setFunctionCode("download");
+	    coreMetadata.getMIMetadata().getDistribution().addDistributionOnline(onlineValues);
+	}
 
 	if (begin != null && end != null) {
 	    TemporalExtent extent = new TemporalExtent();
-	    if (interpolation == null && !isAralOrMoldova) {
+	    if (interpolation == null && !isAralOrMoldova && !isHydrolare) {
 		TimeIndeterminateValueType endTimeInderminate = TimeIndeterminateValueType.NOW;
 		extent.setIndeterminateEndPosition(endTimeInderminate);
 		extent.setBeforeNowBeginPosition(FrameValue.P1Y);
@@ -265,9 +268,9 @@ public class RIHMIMapper extends OriginalIdentifierMapper {
 	dataset.getExtensionHandler().setAttributeUnits(units);
 	dataset.getExtensionHandler().setAttributeUnitsAbbreviation(units);
 	dataset.getPropertyHandler().setIsTimeseries(true);
-	if (!isAralOrMoldova) {
+	if (!isAralOrMoldova && !isHydrolare) {
 	    dataset.getExtensionHandler().setCountry(Country.RUSSIAN_FEDERATION.getShortName());
-	}else if(onlineValues.getLinkage().contains("Moldova")){
+	} else if (onlineValues.getLinkage() != null && onlineValues.getLinkage().contains("Moldova")) {
 	    dataset.getExtensionHandler().setCountry(Country.REPUBLIC_OF_MOLDOVA.getShortName());
 	}
 
