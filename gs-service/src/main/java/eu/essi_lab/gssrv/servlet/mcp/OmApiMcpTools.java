@@ -27,7 +27,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncToolSpecification;
+import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolRequest;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
@@ -97,7 +97,7 @@ public final class OmApiMcpTools {
 				+ "Uses the same query constraints as GET .../om-api/features.")//
 			.inputSchema(jsonMapper, inputSchema)//
 			.build())//
-		.callHandler((exchange, request) -> executeTool("om_search_features", request, () -> OmApiMcpSupport.invoke("features",
+		.callHandler((context, request) -> executeTool("om_search_features", request, () -> OmApiMcpSupport.invoke("features",
 			OmApiMcpSupport.toArgumentMap(request.arguments()))))//
 		.build();
     }
@@ -124,7 +124,7 @@ public final class OmApiMcpTools {
 				+ "Uses the same query constraints as GET .../om-api/observations.")//
 			.inputSchema(jsonMapper, inputSchema)//
 			.build())//
-		.callHandler((exchange, request) -> executeTool("om_search_observations", request,
+		.callHandler((context, request) -> executeTool("om_search_observations", request,
 			() -> OmApiMcpSupport.invoke("observations", OmApiMcpSupport.toArgumentMap(request.arguments()))))//
 		.build();
     }
@@ -155,7 +155,7 @@ public final class OmApiMcpTools {
 				+ "Equivalent to GET .../om-api/observations?observationIdentifier=...&includeData=true.")//
 			.inputSchema(jsonMapper, inputSchema)//
 			.build())//
-		.callHandler((exchange, request) -> executeTool("om_get_observation", request,
+		.callHandler((context, request) -> executeTool("om_get_observation", request,
 			() -> OmApiMcpSupport.invokeObservationData(OmApiMcpSupport.toArgumentMap(request.arguments()))))//
 		.build();
     }
@@ -185,7 +185,7 @@ public final class OmApiMcpTools {
 				+ "Accepts the same spatial/temporal/feature filters to scope facet counts.")//
 			.inputSchema(jsonMapper, inputSchema)//
 			.build())//
-		.callHandler((exchange, request) -> {
+		.callHandler((context, request) -> {
 
 		    Map<String, Object> args = OmApiMcpSupport.toArgumentMap(request.arguments());
 		    try {

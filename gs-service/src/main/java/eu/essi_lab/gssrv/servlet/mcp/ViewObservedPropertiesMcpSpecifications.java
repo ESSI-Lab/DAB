@@ -60,7 +60,7 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.impl.discover.QueryInitializer;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncResourceTemplateSpecification;
+import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncResourceTemplateSpecification;
 import io.modelcontextprotocol.spec.McpSchema.ReadResourceResult;
 import io.modelcontextprotocol.spec.McpSchema.ResourceTemplate;
 import io.modelcontextprotocol.spec.McpSchema.TextResourceContents;
@@ -151,7 +151,7 @@ public final class ViewObservedPropertiesMcpSpecifications {
 		.mimeType("application/json").//
 		build();
 
-	return new SyncResourceTemplateSpecification(template, (exchange, request) -> {
+	return new SyncResourceTemplateSpecification(template, (context, request) -> {
 
 	    String resolvedUri = request.uri();
 

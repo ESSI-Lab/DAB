@@ -28,6 +28,7 @@ import org.eclipse.jetty.ee11.webapp.*;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.*;
 import org.eclipse.jetty.util.resource.*;
+import org.eclipse.jetty.util.ssl.*;
 
 import java.nio.file.*;
 import java.time.*;
@@ -56,6 +57,12 @@ public class JettyLauncher {
 
 	HttpConfiguration httpConfig = new HttpConfiguration();
 	httpConfig.setRequestHeaderSize(MAX_REQUEST_HEADER_SIZE);
+
+	JVMOption.getIntValue(JVMOption.JETTY_LAUNCHER_HTTPS_PORT).ifPresent(httpsPort -> {
+	    httpConfig.setSecureScheme("https");
+	    httpConfig.setSecurePort(httpsPort);
+	    server.addConnector(createHttpsConnector(server, httpsPort));
+	});
 
 	ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
 	connector.setPort(JVMOption.getIntValue(JVMOption.JETTY_LAUNCHER_PORT).get());
@@ -88,5 +95,57 @@ public class JettyLauncher {
 
 	server.start();
 	server.join();
+    }
+
+    private static ServerConnector createHttpsConnector(Server server, int httpsPort) {
+
+	Path keystorePath = JVMOption.getStringValue(JVMOption.JETTY_LAUNCHER_HTTPS_KEYSTORE_PATH).//
+		map(Path::of).//
+		orElseThrow(() -> requiredHttpsOptionMissing(JVMOption.JETTY_LAUNCHER_HTTPS_KEYSTORE_PATH));
+
+	if (!Files.isRegularFile(keystorePath)) {
+
+	    throw new IllegalStateException("HTTPS keystore not found: " + keystorePath.toAbsolutePath());
+	}
+
+	String keystorePassword = JVMOption.getStringValue(JVMOption.JETTY_LAUNCHER_HTTPS_KEYSTORE_PASSWORD).//
+		orElseThrow(() -> requiredHttpsOptionMissing(JVMOption.JETTY_LAUNCHER_HTTPS_KEYSTORE_PASSWORD));
+
+	String keystoreType = JVMOption.getStringValue(JVMOption.JETTY_LAUNCHER_HTTPS_KEYSTORE_TYPE).//
+		or(() -> JVMOption.JETTY_LAUNCHER_HTTPS_KEYSTORE_TYPE.getDefaultStringValue()).//
+		orElse("PKCS12");
+
+	String keyManagerPassword = JVMOption.getStringValue(JVMOption.JETTY_LAUNCHER_HTTPS_KEY_MANAGER_PASSWORD).//
+		orElse(keystorePassword);
+
+	SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+	sslContextFactory.setKeyStorePath(keystorePath.toAbsolutePath().toString());
+	sslContextFactory.setKeyStorePassword(keystorePassword);
+	sslContextFactory.setKeyStoreType(keystoreType);
+	sslContextFactory.setKeyManagerPassword(keyManagerPassword);
+
+	JVMOption.getStringValue(JVMOption.JETTY_LAUNCHER_HTTPS_KEY_ALIAS).ifPresent(sslContextFactory::setCertAlias);
+
+	HttpConfiguration httpsConfig = new HttpConfiguration();
+	httpsConfig.setRequestHeaderSize(MAX_REQUEST_HEADER_SIZE);
+	httpsConfig.addCustomizer(new SecureRequestCustomizer());
+
+	HttpConnectionFactory httpsConnectionFactory = new HttpConnectionFactory(httpsConfig);
+	SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, httpsConnectionFactory.getProtocol());
+
+	ServerConnector httpsConnector = new ServerConnector(server, sslConnectionFactory, httpsConnectionFactory);
+	httpsConnector.setPort(httpsPort);
+
+	GSLoggerFactory.getLogger(JettyLauncher.class).info("HTTPS connector enabled on port {} with keystore {}", httpsPort,
+		keystorePath.toAbsolutePath());
+
+	return httpsConnector;
+    }
+
+    private static IllegalStateException requiredHttpsOptionMissing(JVMOption option) {
+
+	return new IllegalStateException(
+		"JVM option '" + option.getOption() + "' is required when '" + JVMOption.JETTY_LAUNCHER_HTTPS_PORT.getOption()
+			+ "' is set");
     }
 }

@@ -41,8 +41,8 @@ import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncResourceSpecification;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncResourceTemplateSpecification;
+import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncResourceSpecification;
+import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncResourceTemplateSpecification;
 import io.modelcontextprotocol.spec.McpSchema.ReadResourceResult;
 import io.modelcontextprotocol.spec.McpSchema.Resource;
 import io.modelcontextprotocol.spec.McpSchema.ResourceTemplate;
@@ -86,7 +86,7 @@ public final class HydroOntologyMcpSpecifications {
 		mimeType("application/json").//
 		build();
 
-	return new SyncResourceSpecification(resource, (exchange, request) -> {
+	return new SyncResourceSpecification(resource, (context, request) -> {
 
 	    try {
 
@@ -138,7 +138,7 @@ public final class HydroOntologyMcpSpecifications {
 		mimeType("application/json").//
 		build();
 
-	return new SyncResourceTemplateSpecification(template, (exchange, request) -> {
+	return new SyncResourceTemplateSpecification(template, (context, request) -> {
 
 	    String resolvedUri = request.uri();
 

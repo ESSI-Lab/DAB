@@ -26,9 +26,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
-import io.modelcontextprotocol.server.McpSyncServer;
-import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
-import io.modelcontextprotocol.spec.HttpHeaders;
+import io.modelcontextprotocol.server.McpStatelessSyncServer;
+import io.modelcontextprotocol.server.transport.HttpServletStatelessServerTransport;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -42,14 +41,15 @@ import java.nio.charset.StandardCharsets;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 /**
- * Draft MCP server exposing streamable HTTP via the MCP Java SDK.
+ * Draft MCP server exposing stateless streamable HTTP via the MCP Java SDK.
  * Registers {@link HydroOntologyMcpSpecifications HIS-Central hydro ontology} resources
  * (JSON) backed by {@link eu.essi_lab.lib.skos.SKOSClient} against HIS-Central SPARQL.
  * <p>
- * For this transport, plain GET requests (e.g. from a browser) are not MCP traffic:
- * SSE GET requires {@link HttpHeaders#ACCEPT Accept: text/event-stream} and header
- * {@link HttpHeaders#MCP_SESSION_ID Mcp-Session-Id} returned from an earlier POST. Those
- * requests are answered with a short plain-text notice instead of a JSON-RPC error.
+ * Stateless transport: each POST is handled independently (no {@code Mcp-Session-Id}),
+ * so the endpoint can run behind a load balancer without session affinity.
+ * <p>
+ * Plain GET requests (e.g. from a browser) are not MCP traffic and receive a short
+ * plain-text notice instead of a JSON-RPC error.
  *
  * @author ESSI-Lab
  */
@@ -63,8 +63,8 @@ public class McpServlet extends HttpServlet {
     private static final String SERVER_NAME = "DAB MCP";
     private static final String SERVER_VERSION = "0.1.0-draft";
 
-    private transient HttpServletStreamableServerTransportProvider transport;
-    private transient McpSyncServer mcpServer;
+    private transient HttpServletStatelessServerTransport transport;
+    private transient McpStatelessSyncServer mcpServer;
 
     @Override
     public void init() throws ServletException {
@@ -74,18 +74,14 @@ public class McpServlet extends HttpServlet {
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    JacksonMcpJsonMapper jsonMapper = new JacksonMcpJsonMapper(objectMapper);
 
-	    transport = HttpServletStreamableServerTransportProvider.builder() //
+	    transport = HttpServletStatelessServerTransport.builder() //
 		    .jsonMapper(jsonMapper) //
-		    .mcpEndpoint(MCP_ENDPOINT) //
+		    .messageEndpoint(MCP_ENDPOINT) //
 		    .build();
 
 	    /*
-	     * Do not pass a custom ServerCapabilities object here: McpServerFeatures.Sync
-	     * auto-derives capabilities from registered features when serverCapabilities is
-	     * null (see McpServerFeatures.Sync constructor). That sets a non-null
-	     * ResourceCapabilities when the resources map is non-empty, which is required for
-	     * McpAsyncServer to register JSON-RPC handlers for resources/list and
-	     * resources/read.
+	     * Do not pass a custom ServerCapabilities object here: capabilities are
+	     * auto-derived from registered features when serverCapabilities is null.
 	     */
 	    mcpServer = McpServer.sync(transport) //
 		    .serverInfo(SERVER_NAME, SERVER_VERSION) //
@@ -98,7 +94,7 @@ public class McpServlet extends HttpServlet {
 		    .tools(OmApiMcpTools.toolSpecifications(jsonMapper, objectMapper)) //
 		    .build();
 
-	    GSLoggerFactory.getLogger(getClass()).info("{} {} started (draft MCP servlet, MCP endpoint suffix: {})",
+	    GSLoggerFactory.getLogger(getClass()).info("{} {} started (stateless MCP servlet, endpoint suffix: {})",
 		    SERVER_NAME, SERVER_VERSION, MCP_ENDPOINT);
 
 	} catch (RuntimeException e) {
@@ -111,8 +107,8 @@ public class McpServlet extends HttpServlet {
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-	if (isNonSseGetProbe(request)) {
-	    writeStreamableHttpInfo(response);
+	if (isBrowserGetProbe(request)) {
+	    writeEndpointInfo(response);
 	    return;
 	}
 
@@ -120,35 +116,23 @@ public class McpServlet extends HttpServlet {
     }
 
     /**
-     * Returns true for GETs that the streamable transport would reject: GET is only for
-     * opening an SSE stream on an existing session (see SDK {@code doGet}).
+     * Returns true for plain GETs that the stateless transport would reject (POST only).
      */
-    private static boolean isNonSseGetProbe(HttpServletRequest request) {
+    private static boolean isBrowserGetProbe(HttpServletRequest request) {
 
-	if (!"GET".equalsIgnoreCase(request.getMethod())) {
-	    return false;
-	}
-
-	String accept = request.getHeader(HttpHeaders.ACCEPT);
-	String sessionId = request.getHeader(HttpHeaders.MCP_SESSION_ID);
-
-	boolean wantsEventStream = accept != null && accept.contains(HttpServletStreamableServerTransportProvider.TEXT_EVENT_STREAM);
-	boolean hasSession = sessionId != null && !sessionId.isBlank();
-
-	return !(wantsEventStream && hasSession);
+	return "GET".equalsIgnoreCase(request.getMethod());
     }
 
-    private static void writeStreamableHttpInfo(HttpServletResponse response) throws IOException {
+    private static void writeEndpointInfo(HttpServletResponse response) throws IOException {
 
 	response.setStatus(SC_OK);
 	response.setCharacterEncoding(StandardCharsets.UTF_8.name());
 	response.setContentType("text/plain;charset=UTF-8");
 	response.setHeader("Cache-Control", "no-store");
 
-	String body = "DAB MCP — streamable HTTP endpoint (Model Context Protocol).\r\n\r\n"
-		+ "Opening this URL in a browser is not a supported use case. MCP clients must:\r\n"
-		+ "  1) POST JSON-RPC to this path to negotiate a session (the response sets header Mcp-Session-Id).\r\n"
-		+ "  2) For the SSE stream, send GET with header Accept: text/event-stream and Mcp-Session-Id set to that value.\r\n\r\n"
+	String body = "DAB MCP — stateless streamable HTTP endpoint (Model Context Protocol).\r\n\r\n"
+		+ "Opening this URL in a browser is not a supported use case. MCP clients must send "
+		+ "JSON-RPC POST requests to this path (no session id required).\r\n\r\n"
 		+ "Specification: https://modelcontextprotocol.io/\r\n";
 
 	try (PrintWriter out = response.getWriter()) {
@@ -163,11 +147,11 @@ public class McpServlet extends HttpServlet {
 
 	    try {
 
-		mcpServer.closeGracefully();
+		mcpServer.close();
 
 	    } catch (RuntimeException e) {
 
-		GSLoggerFactory.getLogger(getClass()).warn("Error closing MCP sync server", e);
+		GSLoggerFactory.getLogger(getClass()).warn("Error closing MCP stateless server", e);
 	    }
 
 	    mcpServer = null;

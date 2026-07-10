@@ -130,7 +130,38 @@ public enum JVMOption {
     /**
      * - Integer
      */
-    JETTY_LAUNCHER_PORT("jettyLauncherPort", "Jetty launcher port: ", 9090);
+    JETTY_LAUNCHER_PORT("jettyLauncherPort", "Jetty launcher port: ", 9090),
+
+    /**
+     * - Integer (optional)
+     */
+    JETTY_LAUNCHER_HTTPS_PORT("jettyLauncherHttpsPort", "Jetty launcher HTTPS port: "),
+
+    /**
+     * - String (required when HTTPS port is set)
+     */
+    JETTY_LAUNCHER_HTTPS_KEYSTORE_PATH("jettyLauncherHttpsKeystorePath", "Jetty launcher HTTPS keystore path: "),
+
+    /**
+     * - String (required when HTTPS port is set)
+     */
+    JETTY_LAUNCHER_HTTPS_KEYSTORE_PASSWORD("jettyLauncherHttpsKeystorePassword", "Jetty launcher HTTPS keystore password: "),
+
+    /**
+     * - String
+     */
+    JETTY_LAUNCHER_HTTPS_KEYSTORE_TYPE("jettyLauncherHttpsKeystoreType", "Jetty launcher HTTPS keystore type: ", "PKCS12"),
+
+    /**
+     * - String (optional, defaults to the keystore password)
+     */
+    JETTY_LAUNCHER_HTTPS_KEY_MANAGER_PASSWORD("jettyLauncherHttpsKeyManagerPassword",
+	    "Jetty launcher HTTPS key manager password: "),
+
+    /**
+     * - String (optional)
+     */
+    JETTY_LAUNCHER_HTTPS_KEY_ALIAS("jettyLauncherHttpsKeyAlias", "Jetty launcher HTTPS key alias: ");
 
     /**
      *
