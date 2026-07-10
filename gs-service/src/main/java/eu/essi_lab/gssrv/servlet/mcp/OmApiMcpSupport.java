@@ -72,7 +72,9 @@ final class OmApiMcpSupport {
 	    "provider", //
 	    "limit", //
 	    "resumptionToken", //
-	    "property");
+	    "property", //
+	    "includeData", //
+	    "format");
 
     static final List<String> LISTABLE_QUERY_PROPERTIES = List.of(//
 	    "country", //
@@ -107,6 +109,17 @@ final class OmApiMcpSupport {
 	StreamingOutput streaming = handler.getStreamingResponse(webRequest);
 	streaming.write(output);
 	return output.toString(StandardCharsets.UTF_8);
+    }
+
+    static String invokeObservationData(Map<String, Object> arguments) throws Exception {
+
+	requiredString(arguments, "observationIdentifier");
+	requiredString(arguments, "beginPosition");
+	requiredString(arguments, "endPosition");
+
+	Map<String, Object> query = new LinkedHashMap<>(arguments);
+	query.put("includeData", true);
+	return invoke("observations", query);
     }
 
     static String listAvailableQueryPropertiesJson(ObjectMapper mapper) throws Exception {
@@ -181,6 +194,9 @@ final class OmApiMcpSupport {
 
     private static String stringify(Object value) {
 
+	if (value instanceof Boolean bool) {
+	    return bool.toString();
+	}
 	if (value instanceof Number number) {
 	    double d = number.doubleValue();
 	    if (d == Math.rint(d)) {

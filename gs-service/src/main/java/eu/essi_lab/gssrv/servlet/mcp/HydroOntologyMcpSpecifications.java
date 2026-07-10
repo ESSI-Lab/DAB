@@ -95,11 +95,11 @@ public final class HydroOntologyMcpSpecifications {
 		payload.put("sparqlEndpoint", SPARQL_ENDPOINT);
 		payload.put("resourceTemplateTerms", TERMS_URI_TEMPLATE);
 		payload.put("resourceTemplateViewObservedProperties", ViewObservedPropertiesMcpSpecifications.VIEW_OBSERVED_PROPERTIES_URI_TEMPLATE);
-		payload.put("mcpTools", List.of("om_search_features", "om_search_observations", "om_list_query_properties"));
+		payload.put("mcpTools", List.of("om_search_features", "om_search_observations", "om_get_observation", "om_list_query_properties"));
 		payload.put("usage",
 			"Hydro ontology term search: dab://ontology/his-central/hydro/terms/<term> (Unicode search string). "
 				+ "View observed properties: dab://view/<viewId>/observed-properties (URL-encode viewId when needed). "
-				+ "O&M search: MCP tools om_search_features, om_search_observations, om_list_query_properties.");
+				+ "O&M search: MCP tools om_search_features, om_search_observations, om_get_observation, om_list_query_properties.");
 
 		String json = mapper.writeValueAsString(payload);
 		return new ReadResourceResult(List.of(new TextResourceContents(request.uri(), "application/json", json)));
