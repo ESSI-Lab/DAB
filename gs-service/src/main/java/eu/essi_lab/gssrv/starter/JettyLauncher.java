@@ -47,8 +47,10 @@ public class JettyLauncher {
     private static final int MAX_REQUEST_HEADER_SIZE = 16384;
 
     /**
-     * @param args
-     * @throws Exception
+     * Starts an embedded Jetty server with HTTP (and optional HTTPS) for local development.
+     *
+     * @param args command-line arguments (unused)
+     * @throws Exception if the server fails to start or the HTTPS keystore is invalid
      */
     public static void main(String[] args) throws Exception {
 

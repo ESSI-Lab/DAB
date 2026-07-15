@@ -90,6 +90,8 @@ public final class ViewObservedPropertiesMcpSpecifications {
 
     /**
      * Builds and stores the observed-properties payload for {@code viewId}. Safe to call from a background thread.
+     *
+     * @param viewId the DAB view identifier to warm
      */
     public static void warmCache(String viewId) {
 
@@ -128,6 +130,8 @@ public final class ViewObservedPropertiesMcpSpecifications {
 
     /**
      * Schedules {@link #warmCache(String)} on a daemon thread so startup is not blocked.
+     *
+     * @param viewId the DAB view identifier to warm
      */
     public static void warmCacheAsync(String viewId) {
 

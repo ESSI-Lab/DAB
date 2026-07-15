@@ -414,7 +414,10 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
+     * Normalizes an ECS service name for display in the health-check page.
      *
+     * @param service the raw ECS service name
+     * @return the shortened display name
      */
     private String mapService(String service) {
 
@@ -425,7 +428,10 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
+     * Normalizes an ECS cluster name for display in the health-check page.
      *
+     * @param cluster the raw ECS cluster name
+     * @return the shortened display name
      */
     private String mapCluster(String cluster) {
 
@@ -1002,8 +1008,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param bytes
-     * @return
+     * @param bytes the byte count to convert
+     * @return the equivalent size in gigabytes
      */
     private long getGB(long bytes) {
 	bytes /= 1024;
@@ -1013,8 +1019,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param healthy
-     * @return
+     * @param healthy whether the health check passed
+     * @return {@link Response.Status#OK} when healthy, otherwise {@link Response.Status#INTERNAL_SERVER_ERROR}
      */
     private Response.Status responseStatus(boolean healthy) {
 
@@ -1026,8 +1032,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param info
-     * @return
+     * @param info thread information from the JVM thread dump
+     * @return a CSS class name reflecting the thread state, or an empty string
      */
     private String threadClass(ThreadInfo info) {
 
@@ -1045,10 +1051,10 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param value
-     * @param warning
-     * @param error
-     * @return
+     * @param value the measured counter value
+     * @param warning threshold above which a warning CSS class is applied
+     * @param error threshold above which an error CSS class is applied
+     * @return a CSS class name ({@code ok}, {@code warning}, or {@code error})
      */
     private String counterClass(double value, long warning, long error) {
 
@@ -1064,8 +1070,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param bean
-     * @return
+     * @param bean the JVM thread MX bean used to dump thread information
+     * @return an HTML table with the full thread dump
      */
     private String renderThreadsDump(ThreadMXBean bean) {
 
@@ -1123,7 +1129,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     *
+     * Sends an email alert when the JVM thread count exceeds the configured threshold.
      */
     private void checkThreadsCount() {
 
@@ -1164,7 +1170,7 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     *
+     * Sends an email alert when free disk space on the temporary folder falls below the configured threshold.
      */
     private void checkDiskSpace() {
 
@@ -1208,9 +1214,9 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param sb
-     * @param k
-     * @param v
+     * @param sb the HTML builder to append to
+     * @param k the row label
+     * @param v the row value
      */
     private void row(StringBuilder sb, String k, Object v) {
 
@@ -1218,10 +1224,10 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param label
-     * @param value
-     * @param cssClass
-     * @return
+     * @param label the row label
+     * @param value the row value
+     * @param cssClass the CSS class applied to the row
+     * @return an HTML table row
      */
     private String row(String label, Object value, String cssClass) {
 
@@ -1231,9 +1237,9 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param used
-     * @param max
-     * @return
+     * @param used used heap memory in bytes
+     * @param max maximum heap memory in bytes
+     * @return a CSS class name reflecting memory pressure, or an empty string
      */
     private String memoryClass(long used, long max) {
 
@@ -1255,8 +1261,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param s
-     * @return
+     * @param s the string to escape for HTML output
+     * @return the escaped string, or {@code "-"} when {@code s} is {@code null}
      */
     private String escape(String s) {
 
@@ -1269,8 +1275,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param sb
-     * @param v
+     * @param sb the HTML builder to append to
+     * @param v the table cell value
      */
     private void td(StringBuilder sb, Object v) {
 
@@ -1278,8 +1284,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param bytes
-     * @return
+     * @param bytes the byte count to format
+     * @return a human-readable size string (B, KB, MB, GB, or TB)
      */
     private String human(long bytes) {
 
@@ -1304,8 +1310,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param value
-     * @return
+     * @param value the fractional value to format (0.0–1.0)
+     * @return a percentage string, or {@code "-"} when the value is negative
      */
     private String percent(double value) {
 
@@ -1317,8 +1323,8 @@ public class HealthCheckService implements RuntimeInfoProvider {
     }
 
     /**
-     * @param millis
-     * @return
+     * @param millis the duration in milliseconds
+     * @return a human-readable duration string ({@code days HH:MM:SS})
      */
     private String formatMillis(long millis) {
 

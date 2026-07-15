@@ -75,6 +75,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * MCP static resource describing the ontology service and template usage (JSON body).
+     *
+     * @param mapper the Jackson object mapper used to serialize the JSON payload
+     * @return the MCP sync resource specification
      */
     public static SyncResourceSpecification hydroOntologyMetadataResource(ObjectMapper mapper) {
 
@@ -125,6 +128,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * MCP resource template: {@value #TERMS_URI_TEMPLATE} resolves to JSON aggregating matched concepts.
+     *
+     * @param mapper the Jackson object mapper used to serialize the JSON payload
+     * @return the MCP sync resource template specification
      */
     public static SyncResourceTemplateSpecification hydroOntologyTermsResourceTemplate(ObjectMapper mapper) {
 
@@ -188,6 +194,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * Resolves UTF-8 path segment(s) after {@value #TERMS_URI_PREFIX}.
+     *
+     * @param resourceUri the resolved MCP resource URI
+     * @return the decoded search term, or an empty string when not present
      */
     static String extractEncodedTerm(String resourceUri) {
 

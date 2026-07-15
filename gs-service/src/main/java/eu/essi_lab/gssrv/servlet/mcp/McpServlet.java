@@ -116,7 +116,10 @@ public class McpServlet extends HttpServlet {
     }
 
     /**
-     * Returns true for plain GETs that the stateless transport would reject (POST only).
+     * Returns {@code true} for plain GET requests that are not valid MCP traffic.
+     *
+     * @param request the incoming HTTP servlet request
+     * @return {@code true} when the request method is GET
      */
     private static boolean isBrowserGetProbe(HttpServletRequest request) {
 
