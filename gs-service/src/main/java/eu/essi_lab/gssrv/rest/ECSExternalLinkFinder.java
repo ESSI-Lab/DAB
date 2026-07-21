@@ -39,7 +39,9 @@ import java.util.stream.*;
 public class ECSExternalLinkFinder implements Closeable {
 
     /**
-     * @param args
+     * Prints external ECS links for the given production clusters.
+     *
+     * @param args command-line arguments (unused)
      */
     public static void main(String[] args) {
 
@@ -64,7 +66,7 @@ public class ECSExternalLinkFinder implements Closeable {
     private final Ec2Client ec2Client;
 
     /**
-     * @param region
+     * @param region the AWS region used for ECS and EC2 API calls
      */
     public ECSExternalLinkFinder(Region region) {
 
@@ -78,8 +80,8 @@ public class ECSExternalLinkFinder implements Closeable {
     }
 
     /**
-     * @param clusterNames
-     * @return
+     * @param clusterNames the ECS cluster names to inspect
+     * @return external host:port links for running tasks in the given clusters
      */
     public List<ExternalLink> getExternalLinks(List<String> clusterNames) {
 
@@ -105,8 +107,8 @@ public class ECSExternalLinkFinder implements Closeable {
     }
 
     /**
-     * @param clusterName
-     * @return
+     * @param clusterName the ECS cluster name
+     * @return the resolved task, container-instance, and EC2 networking context
      */
     private ClusterContext loadClusterContext(String clusterName) {
 
@@ -196,8 +198,8 @@ public class ECSExternalLinkFinder implements Closeable {
     }
 
     /**
-     * @param clusterName
-     * @return
+     * @param clusterName the ECS cluster name
+     * @return ARNs of running tasks in the cluster
      */
     private List<String> listRunningTaskArns(String clusterName) {
 
@@ -219,8 +221,9 @@ public class ECSExternalLinkFinder implements Closeable {
     }
 
     /**
-     * @param ctx
-     * @return
+     * @param ctx the resolved ECS/EC2 networking context
+     * @param clusterName the ECS cluster name
+     * @return external host:port links for the tasks in the context
      */
     private List<ExternalLink> buildExternalLinks(ClusterContext ctx, String clusterName) {
 
@@ -270,10 +273,10 @@ public class ECSExternalLinkFinder implements Closeable {
     }
 
     /**
-     * @param taskName
-     * @param cluster
-     * @param service
-     * @param externalLink
+     * @param taskName the ECS task name
+     * @param cluster the ECS cluster name
+     * @param service the ECS service name
+     * @param externalLink the public host:port endpoint
      * @author Fabrizio
      */
     public record ExternalLink(String taskName, String cluster, String service, String externalLink) implements Comparable<ExternalLink> {

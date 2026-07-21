@@ -60,7 +60,7 @@ import eu.essi_lab.messages.termfrequency.TermFrequencyItem;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.request.executor.impl.discover.QueryInitializer;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncResourceTemplateSpecification;
+import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncResourceTemplateSpecification;
 import io.modelcontextprotocol.spec.McpSchema.ReadResourceResult;
 import io.modelcontextprotocol.spec.McpSchema.ResourceTemplate;
 import io.modelcontextprotocol.spec.McpSchema.TextResourceContents;
@@ -90,6 +90,8 @@ public final class ViewObservedPropertiesMcpSpecifications {
 
     /**
      * Builds and stores the observed-properties payload for {@code viewId}. Safe to call from a background thread.
+     *
+     * @param viewId the DAB view identifier to warm
      */
     public static void warmCache(String viewId) {
 
@@ -128,6 +130,8 @@ public final class ViewObservedPropertiesMcpSpecifications {
 
     /**
      * Schedules {@link #warmCache(String)} on a daemon thread so startup is not blocked.
+     *
+     * @param viewId the DAB view identifier to warm
      */
     public static void warmCacheAsync(String viewId) {
 
@@ -151,7 +155,7 @@ public final class ViewObservedPropertiesMcpSpecifications {
 		.mimeType("application/json").//
 		build();
 
-	return new SyncResourceTemplateSpecification(template, (exchange, request) -> {
+	return new SyncResourceTemplateSpecification(template, (context, request) -> {
 
 	    String resolvedUri = request.uri();
 
