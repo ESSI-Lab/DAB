@@ -10,12 +10,12 @@ package eu.essi_lab.lib.net.downloader;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -35,12 +35,14 @@ import java.net.*;
 import java.net.http.*;
 import java.net.http.HttpClient.*;
 import java.nio.charset.*;
+import java.nio.file.*;
 import java.security.*;
 import java.security.cert.*;
 import java.time.*;
 import java.time.temporal.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.*;
 
 /**
  * @author Fabrizio
@@ -233,6 +235,77 @@ public class Downloader {
     public Redirect getRedirectStrategy() {
 
 	return redirect;
+    }
+
+    /**
+     * Returns the local cache file for the given URL, downloading using this {@link Downloader} instance or refreshing it first if needed.
+     * <p>
+     * The cache file name is derived from the SHA-256 hash of {@code url}. If no cache file exists yet, or the existing one is older than
+     * {@code age}, its content is (re)downloaded and written to disk before the path is returned. If a valid, sufficiently fresh cache file
+     * already exists, it is returned as-is without touching the network.
+     *
+     * @param url the source URL identifying the resource to cache; also used to derive the cache file name
+     * @param age the maximum age, in milliseconds, that a cached file may have before it is considered stale and refreshed
+     * @param extension extension of the local cache file
+     * @return the path to a valid, up-to-date cache file, or {@link Optional#empty()} if the file could not be created or refreshed
+     * @throws IOException if an I/O error occurs while reading, writing, or checking the cache file
+     * @throws NoSuchAlgorithmException if the SHA-256 algorithm is not available
+     */
+    public Optional<File> getOrRefreshCachedFile(String url, long age, String extension) throws IOException, NoSuchAlgorithmException {
+
+	return getOrRefreshCachedFile(url, () -> downloadOptionalStream(url).orElse(null), age, extension);
+    }
+
+    /**
+     * Returns the local cache file for the given URL, downloading with the given <code>streamSupplier</code> or refreshing it first if
+     * needed.
+     * <p>
+     * The cache file name is derived from the SHA-256 hash of {@code url}. If no cache file exists yet, or the existing one is older than
+     * {@code age}, its content is (re)downloaded and written to disk before the path is returned. If a valid, sufficiently fresh cache file
+     * already exists, it is returned as-is without touching the network.
+     *
+     * @param url the source URL identifying the resource to cache; also used to derive the cache file name
+     * @param streamSupplier the supplier which download the url stream
+     * @param age the maximum age, in milliseconds, that a cached file may have before it is considered stale and refreshed
+     * @param extension extension of the local cache file
+     * @return the path to a valid, up-to-date cache file, or {@link Optional#empty()} if the file could not be created or refreshed
+     * @throws IOException if an I/O error occurs while reading, writing, or checking the cache file
+     * @throws NoSuchAlgorithmException if the SHA-256 algorithm is not available
+     */
+    public static Optional<File> getOrRefreshCachedFile( //
+	    String url, //
+	    Supplier<InputStream> streamSupplier,//
+	    long age, String extension)//
+	    throws IOException, NoSuchAlgorithmException {
+
+	Optional<InputStream> optionalStream = Optional.ofNullable(streamSupplier.get());
+
+	File out = null;
+
+	if (optionalStream.isPresent()) {
+
+	    out = new File(IOStreamUtils.getUserTempDirectory(), StringUtils.hashSHA256messageDigest(url) + "." + extension);
+
+	    boolean stale =
+		    Files.notExists(out.toPath()) || Files.getLastModifiedTime(out.toPath()).toMillis() < System.currentTimeMillis() - age;
+
+	    if (stale) {
+
+		Path tmp = Files.createTempFile(out.toPath().getParent(), "file", ".tmp");
+
+		try (InputStream capStream = optionalStream.get()) {
+
+		    Files.copy(capStream, tmp, StandardCopyOption.REPLACE_EXISTING);
+		    Files.move(tmp, out.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+
+		} finally {
+
+		    Files.deleteIfExists(tmp);
+		}
+	    }
+	}
+
+	return Optional.ofNullable(out);
     }
 
     /**
