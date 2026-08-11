@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package eu.essi_lab.accessor.sos._1_0_0;
 
@@ -13,46 +13,35 @@ package eu.essi_lab.accessor.sos._1_0_0;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileAttribute;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.stax.*;
+import org.apache.commons.io.*;
+import org.geotools.api.geometry.*;
+import org.geotools.geometry.jts.*;
+import org.geotools.referencing.crs.*;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-
-import org.apache.commons.io.IOUtils;
-import org.geotools.api.geometry.BoundingBox;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-
-import eu.essi_lab.accessor.sos.SOSRequestBuilder;
-import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.stax.StAXDocumentParser;
+import javax.xml.namespace.*;
+import javax.xml.stream.*;
+import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
+import java.security.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.*;
 
 /**
  * @author Fabrizio
@@ -77,7 +66,7 @@ public class SOSCapabilities {
     private String administrativeArea;
 
     /**
-     * 
+     *
      */
     private SOSCapabilities() {
 
@@ -104,31 +93,28 @@ public class SOSCapabilities {
      * @throws IOException
      * @throws XMLStreamException
      */
-    public SOSCapabilities(String url) throws XMLStreamException, IOException {
+    public SOSCapabilities(String url) throws XMLStreamException, IOException, NoSuchAlgorithmException {
 
 	this();
 
 	Downloader downloader = new Downloader();
 	downloader.setResponseTimeout(TimeUnit.MINUTES, 3);
 
-	Optional<InputStream> optionalStream = downloader.downloadOptionalStream(url);
+	Optional<File> optFile = downloader.getOrRefreshCachedFile(url, TimeUnit.DAYS.toMillis(7), "xml");
 
-	if (optionalStream.isPresent()) {
+	if (optFile.isPresent()) {
 
-	    capabilities = Files.createTempFile("capabilities", ".xml", new FileAttribute[] {}).toFile();
+	    capabilities = optFile.get();
 
-	    Files.copy(optionalStream.get(), capabilities.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	    try (InputStream stream = Files.newInputStream(capabilities.toPath())) {
 
-	    FileInputStream stream = new FileInputStream(capabilities);
-
-	    parseStream(stream);
-
-	    capabilities.deleteOnExit();
+		parseStream(stream);
+	    }
 	}
     }
 
     /**
-     * 
+     *
      */
     public void release() {
 
@@ -296,8 +282,8 @@ public class SOSCapabilities {
 	    File file = Files.createTempFile("offering", ".xml", new FileAttribute[] {}).toFile();
 
 	    Files.copy(IOUtils.toInputStream(//
-		    offering.get(), //
-		    "UTF-8"), //
+			    offering.get(), //
+			    "UTF-8"), //
 		    file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 	    try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file)))) {
@@ -500,24 +486,28 @@ public class SOSCapabilities {
 
     public static void main(String[] args) throws Exception {
 
-	String url = "https://ggis.un-igrac.org/istsos?api-key=724df1163f0a99f81af89f3b446d76281d07d3ac";
+	String url = "https://www.google.com/";
 
-	SOSRequestBuilder requestBuilder = new SOSRequestBuilder(url, "1.0.0");
+	Downloader downloader = new Downloader();
+	downloader.setResponseTimeout(TimeUnit.MINUTES, 3);
 
-	SOSCapabilities capabilities = new SOSCapabilities(requestBuilder.createCapabilitiesRequest());
+	Optional<File> orRefreshCachedFile = downloader.getOrRefreshCachedFile(url, TimeUnit.SECONDS.toMillis(7), "xml");
 
-	List<String> names = capabilities.getOfferingNames();
+	orRefreshCachedFile.ifPresent(f -> {
 
-	Optional<TemporalExtent> temporalExtent = capabilities.getTemporalExtent(names.get(0));
+	    try (InputStream stream = Files.newInputStream(f.toPath())) {
 
-	System.out.println(temporalExtent.get().asString(false));
+		try {
+		    System.out.println(IOStreamUtils.asUTF8String(stream));
+		} catch (IOException e) {
+		    throw new RuntimeException(e);
+		}
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    }
 
-	Optional<BoundingBox> boundingBox = capabilities.getBoundingBox(names.get(0));
+	});
 
-	System.out.println(boundingBox.get());
-
-	List<String> procedures = capabilities.getProcedures(names.get(0));
-	System.out.println(procedures.size());
     }
 
 }
