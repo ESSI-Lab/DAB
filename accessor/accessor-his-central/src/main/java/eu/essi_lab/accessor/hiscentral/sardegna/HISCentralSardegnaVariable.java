@@ -52,7 +52,7 @@ public class HISCentralSardegnaVariable {
     }
 
     public String getVariableURI() {
-	return json.getString("WMO_observed_property");
+	return json.optString("WMO_observed_property");
     }
 
     public String getVariableName() {
@@ -60,7 +60,7 @@ public class HISCentralSardegnaVariable {
     }
 
     public String getAggregationPeriodUnits() {
-	return json.getString("Risoluzione temporale (ISO8601)");
+	return json.optString("Risoluzione temporale (ISO8601)");
     }
     
     public String getInterpolation() {

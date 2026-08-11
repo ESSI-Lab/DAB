@@ -1,0 +1,16 @@
+{
+  "WMO_observed_property": null,
+  "WMO_name": "Rating curve",
+  "ARPAS_CODIFICA": "SDF",
+  "Unita di misura": "table",
+  "Tipo interpolazione": "Average",
+  "Risoluzione temporale (ISO8601)": null,
+  "url_anagrafica": "https://api.arpasambiente.it/anagrafiche/scaledeflusso",
+  "Hydro-ontology": null,
+  "keyword": [
+    {
+      "label": "scala di deflusso",
+      "uri": null
+    }
+  ]
+}

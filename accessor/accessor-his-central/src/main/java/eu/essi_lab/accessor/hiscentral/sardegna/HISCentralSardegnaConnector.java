@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteConnector;
+import eu.essi_lab.lib.utils.ClonableInputStream;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -87,6 +89,8 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
     private int maxRecords;
 
     public static String API_KEY = null;
+
+    public JSONObject ratingCurvesObj = null;
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
@@ -209,6 +213,26 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
 
 		for (HISCentralSardegnaVariable var : varList) {
 		    ret.addRecord(HISCentralSardegnaMapper.create(datasetMetadata, var, metadataInfo));
+		    if(var.getId().equals("QIT")){
+			//scala di deflusso
+			try {
+
+
+			if(ratingCurvesObj == null){
+			    InputStream in = HISCentralSardegnaConnector.class.getClassLoader()
+				    .getResourceAsStream("sardegna/curve_rating.json");
+			    ratingCurvesObj = new JSONObject(IOStreamUtils.asUTF8String(in));
+			}
+
+			HISCentralSardegnaVariable ratingCurvesVar = new HISCentralSardegnaVariable(ratingCurvesObj);
+
+			ret.addRecord(HISCentralSardegnaMapper.create(datasetMetadata, ratingCurvesVar, metadataInfo));
+
+			}catch (Exception e) {
+			    GSLoggerFactory.getLogger(getClass()).error("Unable to retrieve rating curves");
+			}
+
+		    }
 		}
 
 	    }

@@ -142,6 +142,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 
     public static final String HISCENTRAL_BASILICATA_NS_URI = "http://essi-lab.eu/his-central/basilicata";
     public static final String HISCENTRAL_SARDEGNA_NS_URI = "http://essi-lab.eu/his-central/sardegna";
+    public static final String HISCENTRAL_SARDEGNA_SCALE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/sardegna-scala-deflusso";
     public static final String HISCENTRAL_TOSCANA_NS_URI = "http://essi-lab.eu/his-central/toscana";
     public static final String HISCENTRAL_UMBRIA_NS_URI = "http://essi-lab.eu/his-central/umbria";
 
@@ -155,7 +156,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String HISCENTRAL_LAZIO_NS_URI = "http://essi-lab.eu/his-central/lazio";
     public static final String HISCENTRAL_VALDAOSTA_NS_URI = "http://essi-lab.eu/his-central/valdaosta";
     public static final String HISCENTRAL_PIEMONTE_NS_URI = "http://essi-lab.eu/his-central/piemonte";
-    public static final String HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/piemonte-scala-deflusso";
+    public static final String HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/piemonte-scala-deflusso";
     public static final String HISCENTRAL_RATING_CURVES_NS_URI = "http://essi-lab.eu/his-central/rating-curves";
     public static final String HISCENTRAL_LIGURIA_NS_URI = "http://essi-lab.eu/his-central/liguria";
     public static final String HISCENTRAL_BOLZANO_NS_URI = "http://essi-lab.eu/his-central/bolzano";
@@ -254,11 +255,12 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("hiscentrallazio", HISCENTRAL_LAZIO_NS_URI);
 	map.put("hiscentralvaldaosta", HISCENTRAL_VALDAOSTA_NS_URI);
 	map.put("hiscentralpiemonte", HISCENTRAL_PIEMONTE_NS_URI);
-	map.put("hiscentralpiemontescaladeflusso", HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI);
+	map.put("hiscentralpiemontescaladeflusso", HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI);
 	map.put("hiscentralratingcurves", HISCENTRAL_RATING_CURVES_NS_URI);
 	map.put("hiscentralliguria", HISCENTRAL_LIGURIA_NS_URI);
 	map.put("hiscentralbolzano", HISCENTRAL_BOLZANO_NS_URI);
 	map.put("hiscentralsardegna", HISCENTRAL_SARDEGNA_NS_URI);
+	map.put("hiscentralsardegnascaladeflusso", HISCENTRAL_SARDEGNA_SCALE_DEFLUSSO_NS_URI);
 	map.put("hiscentralbasilicata", HISCENTRAL_BASILICATA_NS_URI);
 	map.put("hiscentralpuglia", HISCENTRAL_PUGLIA_NS_URI);
 	map.put("hiscentralarpapuglia", HISCENTRAL_ARPA_PUGLIA_NS_URI);
