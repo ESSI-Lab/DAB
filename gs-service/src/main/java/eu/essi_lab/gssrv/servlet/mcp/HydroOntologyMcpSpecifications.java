@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.servlet.mcp;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -75,6 +75,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * MCP static resource describing the ontology service and template usage (JSON body).
+     *
+     * @param mapper the Jackson object mapper used to serialize the JSON payload
+     * @return the MCP sync resource specification
      */
     public static SyncResourceSpecification hydroOntologyMetadataResource(ObjectMapper mapper) {
 
@@ -125,6 +128,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * MCP resource template: {@value #TERMS_URI_TEMPLATE} resolves to JSON aggregating matched concepts.
+     *
+     * @param mapper the Jackson object mapper used to serialize the JSON payload
+     * @return the MCP sync resource template specification
      */
     public static SyncResourceTemplateSpecification hydroOntologyTermsResourceTemplate(ObjectMapper mapper) {
 
@@ -188,6 +194,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * Resolves UTF-8 path segment(s) after {@value #TERMS_URI_PREFIX}.
+     *
+     * @param resourceUri the resolved MCP resource URI
+     * @return the decoded search term, or an empty string when not present
      */
     static String extractEncodedTerm(String resourceUri) {
 

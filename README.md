@@ -103,7 +103,7 @@ AGPL license is more restrictive with respect to GPL with regard to online servi
 
 This is the case where a third party downloads the DAB source code and offers its functionalities through an online service (e.g. through a server managed by the third party). In this case **the following statement should appear at the third party site** offering the service:
 
-<code>The brokering service is offered by DAB, a software developed by National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab. More information is available at https://github.com/ESSI-Lab/DAB/</code>
+<code>The brokering service is offered by DAB, a software developed by National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab. More information is available at https://github.com/ESSI-Lab/DAB/</code>
 
 </details>
 
@@ -142,7 +142,7 @@ In any case the following attribution headers should be preserved in modified ve
 
 <code>Discovery and Access Broker (DAB) Community Edition (CE)</code>
 
-<code>Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab</code>
+<code>Copyright (C) 2021 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab</code>
 
 
 In case a modified version of the DAB is offered by a third party as an Internet service, additionally to the attribution described above also the code (or a link to the DAB GitHub repository holding the modifications) should be made available on the third party site.
@@ -178,7 +178,7 @@ If you're interested in contributing, please take a look as well at <a href="htt
 
 <br/>	
 	
-DAB was first conceived and is still maintained and advanced by the [ESSI-Lab](https://essi-lab.eu) based at the [Florence division](https://iia.cnr.it/sede-firenze/) of the [Institute of Atmospheric Pollution Research (IIA)](https://iia.cnr.it/) of [National Research Council of Italy (CNR)](https://www.cnr.it/).
+DAB was first conceived and is still maintained and advanced by the [ESSI-Lab](https://essi-lab.eu) based at the [Florence division](https://iia.cnr.it/sede-firenze/) of the [Institute of Technologies and Environmental Intelligence (ITIAm)](https://iia.cnr.it/) of [National Research Council of Italy (CNR)](https://www.cnr.it/).
 
 DAB implements the **data brokering approach** as introduced by Stefano Nativi et al. in the position paper: <code><a href="https://ieeexplore.ieee.org/abstract/document/6506981">S. Nativi, M. Craglia and J. Pearlman, "Earth Science Infrastructures Interoperability: The Brokering Approach," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 6, no. 3, pp. 1118-1129, June 2013, doi: 10.1109/JSTARS.2013.2243113.</a></code> by applying the mediation pattern <code><a href="https://ieeexplore.ieee.org/abstract/document/5200393">S. Nativi and L. Bigagli, "Discovery, Mediation, and Access Services for Earth Observation Data," in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing, vol. 2, no. 4, pp. 233-240, Dec. 2009, doi: 10.1109/JSTARS.2009.2028584.</a></code>
 

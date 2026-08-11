@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.servlet.mcp;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -90,6 +90,8 @@ public final class ViewObservedPropertiesMcpSpecifications {
 
     /**
      * Builds and stores the observed-properties payload for {@code viewId}. Safe to call from a background thread.
+     *
+     * @param viewId the DAB view identifier to warm
      */
     public static void warmCache(String viewId) {
 
@@ -128,6 +130,8 @@ public final class ViewObservedPropertiesMcpSpecifications {
 
     /**
      * Schedules {@link #warmCache(String)} on a daemon thread so startup is not blocked.
+     *
+     * @param viewId the DAB view identifier to warm
      */
     public static void warmCacheAsync(String viewId) {
 

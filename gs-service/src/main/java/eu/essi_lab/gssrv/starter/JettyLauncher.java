@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.starter;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -47,8 +47,10 @@ public class JettyLauncher {
     private static final int MAX_REQUEST_HEADER_SIZE = 16384;
 
     /**
-     * @param args
-     * @throws Exception
+     * Starts an embedded Jetty server with HTTP (and optional HTTPS) for local development.
+     *
+     * @param args command-line arguments (unused)
+     * @throws Exception if the server fails to start or the HTTPS keystore is invalid
      */
     public static void main(String[] args) throws Exception {
 

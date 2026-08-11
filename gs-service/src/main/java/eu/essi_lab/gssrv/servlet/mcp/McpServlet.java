@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.servlet.mcp;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -116,7 +116,10 @@ public class McpServlet extends HttpServlet {
     }
 
     /**
-     * Returns true for plain GETs that the stateless transport would reject (POST only).
+     * Returns {@code true} for plain GET requests that are not valid MCP traffic.
+     *
+     * @param request the incoming HTTP servlet request
+     * @return {@code true} when the request method is GET
      */
     private static boolean isBrowserGetProbe(HttpServletRequest request) {
 

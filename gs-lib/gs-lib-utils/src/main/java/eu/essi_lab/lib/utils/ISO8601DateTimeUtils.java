@@ -4,7 +4,7 @@ package eu.essi_lab.lib.utils;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -521,10 +521,14 @@ public class ISO8601DateTimeUtils {
     }
 
     public static void main(String[] args) throws Exception {
-	String start = "2024-01-01T10:15:00Z";
+	String start = "2022-02-03T00:00:00.000000Z";
 	String end = "2024-01-03T13:45:00Z";
-
-	System.out.println(humanDuration(start, end));
+	Optional<Date> startDate = ISO8601DateTimeUtils.parseISO8601ToDate(start);
+	if (startDate.isPresent()) {
+	    String ret = ISO8601DateTimeUtils.getISO8601DateTime(startDate.get());
+	    System.out.println(ret);
+	}
+//	System.out.println(humanDuration(start, end));
 
     }
 
@@ -616,4 +620,12 @@ public class ISO8601DateTimeUtils {
 	return null;
     }
 
+    public static String normalizeISO8601Instant(String timeString) {
+	Optional<Date> parsed = parseISO8601ToDate(timeString);
+	if (parsed.isPresent()) {
+	    return getISO8601DateTime(parsed.get());
+	}else{
+	    return timeString;
+	}
+    }
 }

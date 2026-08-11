@@ -3,75 +3,47 @@
  */
 package eu.essi_lab.accessor.elixena;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import eu.essi_lab.cdk.harvest.*;
+import eu.essi_lab.iso.datamodel.classes.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.apache.commons.io.*;
+import org.json.*;
+import org.w3c.dom.*;
+
+import java.io.*;
+import java.net.http.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.Date;
+import java.util.concurrent.*;
 
 /*-
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.io.InputStream;
-import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.w3c.dom.Node;
-
-import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
-import eu.essi_lab.iso.datamodel.classes.Citation;
-import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
-import eu.essi_lab.iso.datamodel.classes.DataIdentification;
-import eu.essi_lab.iso.datamodel.classes.Format;
-import eu.essi_lab.iso.datamodel.classes.Keywords;
-import eu.essi_lab.iso.datamodel.classes.MIInstrument;
-import eu.essi_lab.iso.datamodel.classes.MIMetadata;
-import eu.essi_lab.iso.datamodel.classes.MIPlatform;
-import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
-import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.StringUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.DatasetCollection;
-import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**
  * @author Fabrizio
@@ -519,7 +491,9 @@ public class ElixirENAConnector extends HarvestedQueryConnector<ElixirEnaConnect
 
 	    }
 
-	    for (String parameter : parameters) {
+	    List<String> params = parameters.stream().toList().subList(0, Math.min(1000, parameters.size()));
+
+	    for (String parameter : params) {
 		CoverageDescription description = new CoverageDescription();
 		// description.setAttributeIdentifier(parameter);
 		description.setAttributeDescription(parameter);

@@ -7,7 +7,7 @@ package eu.essi_lab.messages;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -178,10 +178,10 @@ public enum JVMOption {
     private String defaultStringValue;
 
     /**
-     * @param option
-     * @param enabledMessage
-     * @param disabledMessage
-     * @param defaultValue
+     * @param option the JVM property / environment variable key
+     * @param enabledMessage log message when the option is enabled
+     * @param disabledMessage log message when the option is disabled
+     * @param defaultValue default boolean value when the option is not declared
      */
     JVMOption(String option, String enabledMessage, String disabledMessage, boolean defaultValue) {
 
@@ -192,10 +192,9 @@ public enum JVMOption {
     }
 
     /**
-     * @param option
-     * @param enabledMessage
-     * @param disabledMessage
-     * @param defaultValue
+     * @param option the JVM property / environment variable key
+     * @param infoMessage log message prefix when the option is declared
+     * @param defaultValue default integer value when the option is not declared
      */
     JVMOption(String option, String infoMessage, int defaultValue) {
 
@@ -205,10 +204,10 @@ public enum JVMOption {
     }
 
     /**
-     * @param option
-     * @param enabledMessage
-     * @param disabledMessage
-     * @param defaultValue
+     * @param option the JVM property / environment variable key
+     * @param infoMessage log message prefix when the option is declared
+     * @param defaultValue default integer value when the option is not declared
+     * @param intMapper optional mapper applied to the declared integer value
      */
     JVMOption(String option, String infoMessage, int defaultValue, Function<Integer, Integer> intMapper) {
 
@@ -219,10 +218,9 @@ public enum JVMOption {
     }
 
     /**
-     * @param option
-     * @param enabledMessage
-     * @param disabledMessage
-     * @param defaultValue
+     * @param option the JVM property / environment variable key
+     * @param infoMessage log message prefix when the option is declared
+     * @param defaultValue default string value when the option is not declared
      */
     JVMOption(String option, String infoMessage, String defaultValue) {
 
@@ -232,8 +230,8 @@ public enum JVMOption {
     }
 
     /**
-     * @param option
-     * @param infoMessage
+     * @param option the JVM property / environment variable key
+     * @param infoMessage log message prefix when the option is declared
      */
     JVMOption(String option, String infoMessage) {
 
@@ -242,7 +240,7 @@ public enum JVMOption {
     }
 
     /**
-     * @return
+     * @return the JVM property / environment variable key
      */
     public String getOption() {
 
@@ -250,7 +248,7 @@ public enum JVMOption {
     }
 
     /**
-     * @return
+     * @return the default string value, if defined
      */
     public Optional<String> getDefaultStringValue() {
 
@@ -258,7 +256,7 @@ public enum JVMOption {
     }
 
     /**
-     * @return
+     * @return the default boolean value, if defined
      */
     public Optional<Boolean> getDefaultBooleanValue() {
 
@@ -266,7 +264,7 @@ public enum JVMOption {
     }
 
     /**
-     * @return
+     * @return the default integer value, if defined
      */
     public Optional<Integer> getDefaultIntValue() {
 
@@ -274,8 +272,8 @@ public enum JVMOption {
     }
 
     /**
-     * @param javaOpt
-     * @return
+     * @param javaOpt the JVM option to resolve
+     * @return the declared value from system property or environment, if present
      */
     public static Optional<String> getStringValue(JVMOption javaOpt) {
 
@@ -300,8 +298,8 @@ public enum JVMOption {
     }
 
     /**
-     * @param javaOpt
-     * @return
+     * @param javaOpt the JVM option to resolve
+     * @return the declared integer value, optionally mapped, or the default if not declared
      */
     public static Optional<Integer> getIntValue(JVMOption javaOpt) {
 
@@ -324,8 +322,8 @@ public enum JVMOption {
     }
 
     /**
-     * @param javaOpt
-     * @return
+     * @param javaOpt the JVM option to resolve
+     * @return {@code true} when the option is enabled
      */
     public static boolean isEnabled(JVMOption javaOpt) {
 
@@ -340,8 +338,8 @@ public enum JVMOption {
     }
 
     /**
-     * @param javaOpt
-     * @return
+     * @param javaOpt the JVM option
+     * @return the optional integer mapper, if defined
      */
     private static Optional<Function<Integer, Integer>> getIntMapper(JVMOption javaOpt) {
 
@@ -349,7 +347,7 @@ public enum JVMOption {
     }
 
     /**
-     *
+     * Logs all JVM options and their declared or default values to the application log.
      */
     public static void log() {
 
@@ -392,8 +390,8 @@ public enum JVMOption {
     }
 
     /**
-     * @param option
-     * @return
+     * @param option the JVM option whose default value is read
+     * @return the default value as a display string
      */
     private static String readDefValue(JVMOption option) {
 
@@ -415,8 +413,8 @@ public enum JVMOption {
     }
 
     /**
-     * @param maxValueLength
-     * @return
+     * @param maxValueLength maximum column width for the value column
+     * @return the table row separator length
      */
     private static int getTableLength(int maxValueLength) {
 
@@ -452,7 +450,7 @@ public enum JVMOption {
     }
 
     /**
-     * @return
+     * @return the maximum length among all option values and default values
      */
     private static int getMaxValueLength() {
 
@@ -468,11 +466,11 @@ public enum JVMOption {
     }
 
     /**
-     * @param option
-     * @param value
-     * @param present
-     * @param maxValueLength
-     * @return
+     * @param option the option key
+     * @param value the displayed value
+     * @param present whether the option is explicitly declared
+     * @param maxValueLength maximum column width for the value column
+     * @return a formatted table row
      */
     private static String buildRow(String option, String value, boolean present, int maxValueLength) {
 
@@ -483,9 +481,9 @@ public enum JVMOption {
     }
 
     /**
-     * @param str
-     * @param len
-     * @return
+     * @param str the string whose display length is measured
+     * @param len the target column width
+     * @return padding spaces to align columns
      */
     private static String getSpaces(String str, int len) {
 
