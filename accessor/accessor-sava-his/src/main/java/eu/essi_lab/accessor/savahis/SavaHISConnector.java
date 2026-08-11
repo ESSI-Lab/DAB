@@ -10,56 +10,36 @@ package eu.essi_lab.accessor.savahis;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.http.HttpResponse;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.concurrent.TimeUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import eu.essi_lab.cdk.harvest.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.*;
+import eu.essi_lab.lib.xml.stax.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.w3c.dom.*;
 
-import javax.xml.xpath.XPathExpressionException;
-
-import org.apache.commons.io.IOUtils;
-import org.w3c.dom.Node;
-
-import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
-import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.xml.XMLDocumentReader;
-import eu.essi_lab.lib.xml.XMLDocumentWriter;
-import eu.essi_lab.lib.xml.XMLNodeReader;
-import eu.essi_lab.lib.xml.XMLNodeWriter;
-import eu.essi_lab.lib.xml.stax.StAXDocumentIterator;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.OriginalMetadata;
+import javax.xml.xpath.*;
+import java.io.*;
+import java.net.http.*;
+import java.util.AbstractMap.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * @author boldrini
@@ -67,7 +47,7 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 public class SavaHISConnector extends HarvestedQueryConnector<SavaHISConnectorSetting> {
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "SavaHISConnector";
 
@@ -326,10 +306,10 @@ public class SavaHISConnector extends HarvestedQueryConnector<SavaHISConnectorSe
 	    XMLDocumentReader actualSeries = multipleSeries.next();
 	    String stationCode = actualSeries.evaluateString("*:observationMember/*:OM_Observation/*:observedProperty/@MonitoringPoint");
 	    String property = actualSeries.evaluateString("*:observationMember/*:OM_Observation/*:observedProperty/@ObservedProperty");
-	    String beginPosition = actualSeries
-		    .evaluateString("*:observationMember/*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:beginPosition");
-	    String endPosition = actualSeries
-		    .evaluateString("*:observationMember/*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:endPosition");
+	    String beginPosition = actualSeries.evaluateString(
+		    "*:observationMember/*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:beginPosition");
+	    String endPosition = actualSeries.evaluateString(
+		    "*:observationMember/*:OM_Observation/*:phenomenonTime/*:TimePeriod/*:endPosition");
 	    Date actualBeginDate = parseDate(beginPosition);
 	    Date actualEndDate = parseDate(endPosition);
 
@@ -441,16 +421,24 @@ public class SavaHISConnector extends HarvestedQueryConnector<SavaHISConnectorSe
     }
 
     private File downloadFile(String url) throws Exception {
-	InputStream output = downloadStreamWithRetry(url);
-	File tmpFile = File.createTempFile(getClass().getSimpleName(), ".xml");
-	GSLoggerFactory.getLogger(getClass()).info("Downloading XML document to : " + tmpFile.getAbsolutePath());
-	tmpFile.deleteOnExit();
-	FileOutputStream fos = new FileOutputStream(tmpFile);
-	IOUtils.copy(output, fos);
-	output.close();
-	fos.close();
-	GSLoggerFactory.getLogger(getClass()).info("Downloaded XML document. Size: " + tmpFile.length() + " bytes");
-	return tmpFile;
+
+	Downloader downloader = new Downloader();
+	downloader.setResponseTimeout(TimeUnit.MINUTES, 3);
+
+	Optional<File> optFile = downloader.getOrRefreshCachedFile(url, TimeUnit.DAYS.toMillis(7), "xml");
+
+	if (optFile.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Downloaded XML document. Size: " + optFile.get().length() + " bytes");
+
+	    return optFile.get();
+	}
+
+	throw GSException.createException( //
+		getClass(), //
+		"Unable to download XML file", ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_ERROR,//
+		"SavaHISConnectorDownloadFileError");//
     }
 
     private InputStream downloadStreamWithRetry(String url) throws Exception {
@@ -469,18 +457,24 @@ public class SavaHISConnector extends HarvestedQueryConnector<SavaHISConnectorSe
     }
 
     private XMLDocumentReader downloadDom(String url) throws Exception {
-	InputStream output = downloadStreamWithRetry(url);
-	File tmpFile = File.createTempFile(getClass().getSimpleName(), ".xml");
-	GSLoggerFactory.getLogger(getClass()).info("Downloading XML document to : " + tmpFile.getAbsolutePath());
-	tmpFile.deleteOnExit();
-	FileOutputStream fos = new FileOutputStream(tmpFile);
-	IOUtils.copy(output, fos);
-	output.close();
-	fos.close();
-	GSLoggerFactory.getLogger(getClass()).info("Downloaded XML document. Size: " + tmpFile.length() + " bytes");
-	XMLDocumentReader reader = new XMLDocumentReader(tmpFile);
-	return reader;
 
+	Downloader downloader = new Downloader();
+	downloader.setResponseTimeout(TimeUnit.MINUTES, 3);
+
+	Optional<File> optFile = downloader.getOrRefreshCachedFile(url, TimeUnit.DAYS.toMillis(7), "xml");
+
+	if (optFile.isPresent()) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Downloaded XML document. Size: " + optFile.get().length() + " bytes");
+
+	    return new XMLDocumentReader(optFile.get());
+	}
+
+	throw GSException.createException( //
+		getClass(), //
+		"Unable to download XML file", ErrorInfo.ERRORTYPE_INTERNAL, //
+		ErrorInfo.SEVERITY_ERROR,//
+		"SavaHISConnectorDownloadDomError");//
     }
 
     public static void main(String[] args) throws GSException {
