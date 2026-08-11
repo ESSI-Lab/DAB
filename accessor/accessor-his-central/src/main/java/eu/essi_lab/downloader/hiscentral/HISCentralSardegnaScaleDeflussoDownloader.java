@@ -10,12 +10,12 @@ package eu.essi_lab.downloader.hiscentral;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
@@ -23,10 +23,13 @@ package eu.essi_lab.downloader.hiscentral;
 
 import eu.essi_lab.access.wml.WMLDataDownloader;
 import eu.essi_lab.accessor.hiscentral.sardegna.HISCentralSardegnaConnector;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
 import eu.essi_lab.lib.net.utils.HttpConnectionUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.ratings.RatingCurve;
@@ -41,13 +44,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Fabrizio
@@ -87,14 +93,30 @@ public class HISCentralSardegnaScaleDeflussoDownloader extends WMLDataDownloader
     public File download(DataDescriptor targetDescriptor) throws GSException {
 
 	Exception ex = null;
-
+	InputStream stream = null;
+	int timeout = 120;
+	int responseTimeout = 200;
 	try {
+
 	    String linkage = online.getLinkage();
 	    Downloader d = new Downloader();
-	    Optional<String> response = d.downloadOptionalString(linkage);
+	    downloader.setConnectionTimeout(TimeUnit.SECONDS, timeout);
+	    downloader.setResponseTimeout(TimeUnit.SECONDS, responseTimeout);
+	    if (HISCentralSardegnaConnector.API_KEY == null) {
+		HISCentralSardegnaConnector.API_KEY = ConfigurationWrapper.getCredentialsSetting().getSardegnaApiKey().orElse(null);
+	    }
+	    HttpResponse<InputStream> getStationResponse = downloader.downloadResponse(//
+		    linkage.trim(), //
+		    HttpHeaderUtils.build("x-api-key", HISCentralSardegnaConnector.API_KEY));
+
+	    stream = getStationResponse.body();
+
+	    GSLoggerFactory.getLogger(getClass()).info("Got " + linkage);
+
 	    RatingCurves ratingCurves = null;
-	    if(response.isPresent()) {
-		ratingCurves = getRatingCurves(response.get());
+	    if (stream != null) {
+		ratingCurves = getRatingCurves(IOStreamUtils.asUTF8String(stream));
+		stream.close();
 	    }
 
 	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".xml");
@@ -125,23 +147,24 @@ public class HISCentralSardegnaScaleDeflussoDownloader extends WMLDataDownloader
 
 	try {
 
+	    JSONObject root = new JSONObject(s);
+	    JSONArray results = root.getJSONArray("ratingCurves");
+	    for (int i = 0; i < results.length(); i++) {
+		JSONObject obj = results.getJSONObject(i);
 
-	JSONObject root = new JSONObject(s);
-	JSONArray results = root.getJSONArray("ratingCurves");
-	for (int i = 0; i < results.length(); i++) {
-	    JSONObject obj = results.getJSONObject(i);
+		String key = obj.optString("validPeriod");
 
-	    String key = obj.optString("validPeriod");
+		String[] splittedTime = key.split("/");
 
-	    String[] splittedTime = key.split("/");
+		LocalDate beginDate = convertDate(splittedTime[0]);
+		LocalDate endDate = convertDate(splittedTime[1]);
+		if (endDate == null) {
+		    endDate = LocalDate.now();
+		}
 
+		JSONArray values = obj.optJSONArray("points");
 
-
-	    LocalDate beginDate = convertDate(splittedTime[0]);
-	    LocalDate endDate = convertDate(splittedTime[1]);
-	    JSONArray values = obj.optJSONArray("points");
-
-		for(int k=0; k < values.length(); k++){
+		for (int k = 0; k < values.length(); k++) {
 		    JSONObject point = values.getJSONObject(k);
 		    BigDecimal level = point.optBigDecimal("stage", null);
 		    BigDecimal discharge = point.optBigDecimal("discharge", null);
@@ -155,7 +178,7 @@ public class HISCentralSardegnaScaleDeflussoDownloader extends WMLDataDownloader
 
 		}
 
-	}
+	    }
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error while parsing paginated rating curves", e);
@@ -168,16 +191,11 @@ public class HISCentralSardegnaScaleDeflussoDownloader extends WMLDataDownloader
     }
 
     private LocalDate convertDate(String input) {
-	// formatter matching your pattern
-	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ssXXX");
+	if (input == null || input.isBlank() || "open".equalsIgnoreCase(input.trim())) {
+	    return null;
+	}
 
-	// parse to OffsetDateTime
-	OffsetDateTime odt = OffsetDateTime.parse(input, formatter);
-
-	// extract LocalDate
-	LocalDate date = odt.toLocalDate();
-
-	return date;
+	return OffsetDateTime.parse(input.trim()).toLocalDate();
     }
 
     @Override
@@ -196,7 +214,7 @@ public class HISCentralSardegnaScaleDeflussoDownloader extends WMLDataDownloader
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_SCALE_DEFLUSSO_NS_URI));
 
-	if (ret){
+	if (ret) {
 	    GSLoggerFactory.getLogger(getClass()).info("Deflusso downloader found");
 	}
 
