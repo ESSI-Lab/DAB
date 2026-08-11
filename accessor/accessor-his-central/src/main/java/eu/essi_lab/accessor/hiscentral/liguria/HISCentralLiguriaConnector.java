@@ -1,15 +1,23 @@
 package eu.essi_lab.accessor.hiscentral.liguria;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import eu.essi_lab.cdk.harvest.*;
+import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.jaxb.common.*;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.messages.listrecords.*;
+import eu.essi_lab.model.*;
+import eu.essi_lab.model.exceptions.*;
+import eu.essi_lab.model.resource.*;
+import org.json.*;
+import org.slf4j.*;
+
+import java.io.*;
+import java.net.http.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
 
 /*-
  * #%L
@@ -21,52 +29,16 @@ import java.nio.file.Path;
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * #L%
  */
-
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.slf4j.Logger;
-
-import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
-import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.IOStreamUtils;
-import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.utils.JSONArrayStreamParser;
-import eu.essi_lab.lib.utils.JSONArrayStreamParserListener;
-import eu.essi_lab.messages.listrecords.ListRecordsRequest;
-import eu.essi_lab.messages.listrecords.ListRecordsResponse;
-import eu.essi_lab.model.GSSource;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
-import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**
  * @author Fabrizio
@@ -74,21 +46,21 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentralLiguriaConnectorSetting> {
 
     /**
-     * 
+     *
      */
     static final String TYPE = "HISCentralLiguriaConnector";
 
     private Downloader downloader;
 
     /**
-     * 
+     *
      */
     public HISCentralLiguriaConnector() {
 	downloader = new Downloader();
     }
 
     /**
-     * 
+     *
      */
     static final String SENSORS_URL = "HIS_Anagrafica";
 
@@ -124,9 +96,8 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
     String startTime = null;
 
     /**
-     * Anagrafica delle stazioni: https://aws.arpal.liguria.it/siapi/Service/Query/HIS_Anagrafica
-     * Descrizione variabili: https://aws.arpal.liguria.it/siapi/Service/Query/HIS_Descrizione
-     * Dati da stazione:
+     * Anagrafica delle stazioni: https://aws.arpal.liguria.it/siapi/Service/Query/HIS_Anagrafica Descrizione variabili:
+     * https://aws.arpal.liguria.it/siapi/Service/Query/HIS_Descrizione Dati da stazione:
      * https://aws.arpal.liguria.it/siapi/Service/Query/HIS_Dati?dtrf_beg=202301010000&dtrf_end=202301010100&code=CFUNZ
      **/
 
@@ -153,7 +124,8 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 
 	String url = getSourceURL().endsWith("/") ? getSourceURL() + SENSORS_URL : getSourceURL() + "/" + SENSORS_URL;
 
-	String descriptionVariableURL = getSourceURL().endsWith("/") ? getSourceURL() + VAR_DESCRIPTION
+	String descriptionVariableURL = getSourceURL().endsWith("/")
+		? getSourceURL() + VAR_DESCRIPTION
 		: getSourceURL() + "/" + VAR_DESCRIPTION;
 
 	if (allStation == null) {
@@ -190,136 +162,134 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 		JSONObject sensorInfo = response.getJSONObject(j);
 
 		String code = sensorInfo.optString("CODE");
+
 		if (code != null && !code.isEmpty()) {
 		    Date d = new Date();
 		    String date = HISCentralLiguriaMapper.getDate(d);
 		    String initialDate = "197001010000";
 
 		    String dataUrl = getSourceURL().endsWith("/") ? getSourceURL() + DATI_URL // + "?dtrf_beg=" +
-											      // initialDate +
-											      // "&dtrf_end=" + date +
-											      // "&code=" + code
+			    // initialDate +
+			    // "&dtrf_end=" + date +
+			    // "&code=" + code
 			    : getSourceURL() + "/" + DATI_URL;// + "?dtrf_beg=" + initialDate + "&dtrf_end=" + date +
-							      // "&code=" + code;
+		    // "&code=" + code;
 
 		    // InputStream streamResp = getData(dataUrl, code, initialDate, date);//
 		    // downloader.downloadOptionalString(dataUrl);
 		    List<String> vars = new ArrayList<String>();
 
-		    File tempFile = null;
 		    try {
 
-			tempFile = File.createTempFile(getClass().getSimpleName(), ".json");
-			tempFile.deleteOnExit();
-			try (InputStream is = getData(dataUrl, code, initialDate, date);
-				OutputStream fileOut = new FileOutputStream(tempFile)) {
-			    is.transferTo(fileOut);
-			}
-		    } catch (IOException e) {
-			logger.error("Failed to download or write HTTP response: " + e.getMessage());
-			e.printStackTrace();
-			continue;
+			Optional<File> json = Downloader.getOrRefreshCachedFile(dataUrl, () -> {
 
-		    }
-		    // if (streamResp != null) {
-		    try (InputStream cachedStream = new FileInputStream(tempFile)) {
+			    try {
+				return getData(dataUrl, code, initialDate, date);
+			    } catch (GSException e) {
+				GSLoggerFactory.getLogger(HISCentralLiguriaConnector.class).error(e);
+				return null;
+			    }
+			}, TimeUnit.DAYS.toMillis(7), "json");
 
-			JSONArrayStreamParser parser = new JSONArrayStreamParser();
-			startTime = null;
+			if (json.isPresent()) {
 
-			// JSONObject varObject = parser.parseFirstObject(streamResp);
+			    try (InputStream cachedStream = new FileInputStream(json.get())) {
 
-			// JSONObject varObject = new JSONObject(tmpJSON);
-			// JSONObject varObject = dataResp.optJSONObject(0);
-			// startTime = varObject.optString("DTRF");
+				JSONArrayStreamParser parser = new JSONArrayStreamParser();
+				startTime = null;
 
-			Set<String> vars2 = new HashSet<String>();
-			index = 0;
+				// JSONObject varObject = parser.parseFirstObject(streamResp);
 
-			parser.parse(cachedStream, new JSONArrayStreamParserListener() {
-			    @Override
-			    public void notifyJSONObject(JSONObject object) {
+				// JSONObject varObject = new JSONObject(tmpJSON);
+				// JSONObject varObject = dataResp.optJSONObject(0);
+				// startTime = varObject.optString("DTRF");
 
-				try {
-				    String dtrf = object.optString("DTRF");
-				    if (dtrf != null && !dtrf.isEmpty()) {
-					// Response rows are not ordered; use earliest DTRF (lexical order matches time for YYYYMMDDHHmm).
-					if (startTime == null || dtrf.compareTo(startTime) < 0) {
-					    startTime = dtrf;
+				Set<String> vars2 = new HashSet<String>();
+				index = 0;
+
+				parser.parse(cachedStream, new JSONArrayStreamParserListener() {
+				    @Override
+				    public void notifyJSONObject(JSONObject object) {
+
+					try {
+					    String dtrf = object.optString("DTRF");
+					    if (dtrf != null && !dtrf.isEmpty()) {
+						// Response rows are not ordered; use earliest DTRF (lexical order matches time for YYYYMMDDHHmm).
+						if (startTime == null || dtrf.compareTo(startTime) < 0) {
+						    startTime = dtrf;
+						}
+					    }
+					    index++;
+					    Iterator<String> iterator = object.keys();
+					    while (iterator.hasNext()) {
+						String s = iterator.next();
+						if (s.contains("CODE") || s.contains("DTRF")) {
+						    continue;
+						}
+						String valueString = object.optString(s);
+						if (valueString != null && !valueString.isEmpty()) {
+						    vars2.add(s);
+						}
+					    }
+					} catch (Exception e) {
+					    GSLoggerFactory.getLogger(HISCentralLiguriaConnector.class).error(e);
+					    logger.debug("Error at index:" + index);
 					}
+
 				    }
-				    index++;
-				    Iterator<String> iterator = object.keys();
-				    while (iterator.hasNext()) {
-					String s = iterator.next();
-					if (s.contains("CODE") || s.contains("DTRF")) {
-					    continue;
-					}
-					String valueString = object.optString(s);
-					if (valueString != null && !valueString.isEmpty()) {
-					    vars2.add(s);
-					}
+
+				    @Override
+				    public void finished() {
+					map.put(code, vars2);
 				    }
-				} catch (Exception e) {
-				    e.printStackTrace();
-				    logger.debug("Error at index:" + index);
+
+				    @Override
+				    public void notifyJSONArray(JSONArray object) {
+					// TODO Auto-generated method stub
+
+				    }
+				});
+
+				Set<String> toAdd = map.get(code);
+				if (toAdd != null) {
+				    for (String s : toAdd) {
+					if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+					    stoppedByMax = true;
+					    break;
+					}
+					partialNumbers++;
+					ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo, stationsParameter));
+				    }
 				}
 
-			    }
-
-			    @Override
-			    public void finished() {
-				map.put(code, vars2);
-			    }
-
-			    @Override
-			    public void notifyJSONArray(JSONArray object) {
-				// TODO Auto-generated method stub
-				
-			    }
-			});
-
-			Set<String> toAdd = map.get(code);
-			if (toAdd != null) {
-			    for (String s : toAdd) {
-				if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
-				    stoppedByMax = true;
+				if (stoppedByMax) {
 				    break;
 				}
-				partialNumbers++;
-				ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo, stationsParameter));
-			    }
-			}
-			// Now it is safe to delete the file
-			if (tempFile != null && tempFile.exists()) {
-			    boolean deleted = tempFile.delete();
-			    if (!deleted) {
-			        logger.debug("Could not delete temp file: " + tempFile.getAbsolutePath());
-			    }
-			}
-			if (stoppedByMax) {
-			    break;
-			}
-			// while (iterator.hasNext()) {
-			// String s = iterator.next();
-			// if (s.contains("CODE") || s.contains("DTRF")) {
-			// continue;
-			// }
-			// String valueString = varObject.optString(s);
-			// if (valueString != null && !valueString.isEmpty()) {
-			// vars.add(s);
-			// }
-			// partialNumbers++;
-			// ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo,
-			// stationsParameter));
-			// }
+				// while (iterator.hasNext()) {
+				// String s = iterator.next();
+				// if (s.contains("CODE") || s.contains("DTRF")) {
+				// continue;
+				// }
+				// String valueString = varObject.optString(s);
+				// if (valueString != null && !valueString.isEmpty()) {
+				// vars.add(s);
+				// }
+				// partialNumbers++;
+				// ret.addRecord(HISCentralLiguriaMapper.create(s, startTime, dataUrl, sensorInfo,
+				// stationsParameter));
+				// }
 
-		    } catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			    } catch (Exception ex) {
+
+				GSLoggerFactory.getLogger(HISCentralLiguriaConnector.class).error(ex);
+			    }
+			}
+
+		    } catch (Exception e) {
+
+			throw GSException.createException(getClass(), "HISCentralLiguriaConnectorDownloadError", e);
 		    }
 		}
-
 	    }
 
 	    if (stoppedByMax) {
@@ -377,9 +347,9 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 
 	try {
 
-	    String postRequest = "{\"parametri\": [{ \"alias\": \"code\", \"value\":\"" + stationCode
-		    + "\"},{ \"alias\": \"dtrf_beg\", \"value\":\"" + startTime + "\"},{ \"alias\": \"dtrf_end\", \"value\":\"" + endTime
-		    + "\"}]}";
+	    String postRequest =
+		    "{\"parametri\": [{ \"alias\": \"code\", \"value\":\"" + stationCode + "\"},{ \"alias\": \"dtrf_beg\", \"value\":\""
+			    + startTime + "\"},{ \"alias\": \"dtrf_end\", \"value\":\"" + endTime + "\"}]}";
 	    HashMap<String, String> map = new HashMap<String, String>();
 	    map.put("accept", "text/plain");
 	    map.put("Content-Type", "application/json");
