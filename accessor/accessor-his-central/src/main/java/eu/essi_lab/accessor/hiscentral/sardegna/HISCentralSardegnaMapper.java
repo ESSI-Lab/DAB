@@ -681,6 +681,7 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    online.setIdentifier(resourceIdentifier);
 	    if (paramCode.equals("SDF")) {
 		online.setProtocol(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_SCALE_DEFLUSSO_NS_URI);
+		dataset.getPropertyHandler().setIsRatingCurve(true);
 	    } else {
 		online.setProtocol(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_NS_URI);
 	    }
