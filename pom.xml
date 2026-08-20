@@ -21,7 +21,7 @@
     </scm>
 
     <organization>
-        <name>Earth &amp; Space Science Informatics-Laboratory (ESSI-Lab) of CNR-IIA</name>
+        <name>Earth &amp; Space Science Informatics-Laboratory (ESSI-Lab) of CNR-ITIAm</name>
         <url>http://www.essi-lab.eu/</url>
     </organization>
 
@@ -30,7 +30,7 @@
         <developer>
             <name>Lorenzo Bigagli</name>
             <email>lorenzo.bigagli@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>software design</role>
@@ -40,7 +40,7 @@
         <developer>
             <name>Enrico Boldrini</name>
             <email>enrico.boldrini@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>software design</role>
@@ -52,7 +52,7 @@
         <developer>
             <name>Paolo Mazzetti</name>
             <email>paolo.mazzetti@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>software design</role>
@@ -62,7 +62,7 @@
         <developer>
             <name>Stefano Nativi</name>
             <email>stefano.nativi@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>DAB father</role>
@@ -72,7 +72,7 @@
         <developer>
             <name>Massimiliano Olivieri</name>
             <email>massimiliano.olivieri@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>sysadmin</role>
@@ -82,7 +82,7 @@
         <developer>
             <name>Fabrizio Papeschi</name>
             <email>fabrizio.papeschi@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>software design</role>
@@ -93,7 +93,7 @@
         <developer>
             <name>Roberto Roncella</name>
             <email>roberto.roncella@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>developer</role>
@@ -103,7 +103,7 @@
         <developer>
             <name>Mattia Santoro</name>
             <email>mattia.santoro@cnr.it</email>
-            <organization>ESSI-Lab of CNR-IIA</organization>
+            <organization>ESSI-Lab of CNR-ITIAm</organization>
             <organizationUrl>https://essi-lab.eu/</organizationUrl>
             <roles>
                 <role>software design</role>
@@ -1833,7 +1833,7 @@
                             <licenseName>agpl_v3</licenseName>
                             <inceptionYear>2021</inceptionYear>
                             <organizationName>
-                                <![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
+                                <![CDATA[National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab]]></organizationName>
                             <projectName><![CDATA[Discovery and Access Broker (DAB)]]></projectName>
                             <canUpdateCopyright>true</canUpdateCopyright>
                             <canUpdateDescription>true</canUpdateDescription>
@@ -1850,7 +1850,7 @@
                             <licenseName>agpl_v3</licenseName>
                             <inceptionYear>2021</inceptionYear>
                             <organizationName>
-                                <![CDATA[National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab]]></organizationName>
+                                <![CDATA[National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab]]></organizationName>
                             <projectName><![CDATA[Discovery and Access Broker (DAB)]]></projectName>
                         </configuration>
                     </execution>

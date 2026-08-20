@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.starter;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -49,6 +49,7 @@ import eu.essi_lab.gssrv.conf.*;
 import eu.essi_lab.gssrv.conf.task.*;
 import eu.essi_lab.gssrv.health.*;
 import eu.essi_lab.gssrv.servlet.*;
+import eu.essi_lab.gssrv.servlet.mcp.ViewObservedPropertiesMcpSpecifications;
 import eu.essi_lab.harvester.*;
 import eu.essi_lab.jaxb.common.*;
 import eu.essi_lab.jaxb.wms.extension.*;
@@ -117,7 +118,9 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * @throws GSException
+     * Starts DAB initialization: configuration, health check, scheduler, caches, and database.
+     *
+     * @throws GSException if a fatal startup error occurs
      */
     public void start() throws GSException {
 
@@ -264,11 +267,13 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	initDatabase();
 
+	//initMcpObservedPropertiesCache();
+
 	initMultiServiceManager();
     }
 
     /**
-     *
+     * Logs all declared JVM options and their values.
      */
     private void logJVMOptions() {
 
@@ -276,7 +281,7 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
+     * Refreshes managed service definitions from the current configuration.
      */
     private void updateServiceDefinitions() {
 
@@ -290,7 +295,7 @@ public class DABStarter implements ConfigurationChangeListener {
      * {@link eu.essi_lab.cfga.ConfigurationChangeListener.EventType#CONFIGURATION_FORCED_RELOADED} events after the flush of the cloned
      * configuration
      *
-     * @param event
+     * @param event the configuration change event
      * @see GSConfigurationView#onConfigurationFlushed()
      */
     @Override
@@ -329,7 +334,9 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * @throws GSException
+     * Loads or clones the DAB configuration from the configured source URL.
+     *
+     * @throws GSException if configuration initialization fails
      */
     private void initConfig() throws GSException {
 
@@ -686,7 +693,10 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * @throws GSException
+     * Runs post-load configuration consistency checks.
+     *
+     * @return the similarity check response
+     * @throws GSException if a registered editable settings check fails
      */
     private CheckResponse checkConfig() throws GSException {
 
@@ -825,7 +835,7 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
+     * Initializes the JVM trust store from system settings when configured.
      */
     private void initTrustStore() {
 
@@ -967,7 +977,7 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
+     * Applies runtime system settings such as error-log publishing and runtime-info storage.
      */
     private void applySystemSettings() {
 
@@ -1034,7 +1044,7 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
+     * Sets the default GISuite time zone.
      */
     private void initLocale() {
 	// set the English locale
@@ -1044,7 +1054,9 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * @throws GSException
+     * Initializes JAXB marshallers, authorizers, and other startup context objects.
+     *
+     * @throws GSException if context initialization fails
      */
     private void initContext() throws GSException {
 
@@ -1090,7 +1102,9 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * @throws GSException
+     * Runs the startup health check unless disabled by JVM option.
+     *
+     * @throws GSException if the health check fails
      */
     private void healthCheckTest() throws GSException {
 
@@ -1126,7 +1140,7 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
+     * Preloads WMS layers and cached collections for the current execution mode.
      */
     private void initCaches() {
 
@@ -1170,7 +1184,9 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * @throws GSException
+     * Initializes the configured database connection.
+     *
+     * @throws GSException if database initialization fails
      */
     private void initDatabase() throws GSException {
 
@@ -1178,7 +1194,18 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
+     * Pre-warms the MCP observed-properties resource cache for frequently used views (background thread).
+     */
+    private void initMcpObservedPropertiesCache() {
+
+	GSLoggerFactory.getLogger(DABStarter.class).info("Scheduling MCP observed-properties cache warmup for view {}",
+		ViewObservedPropertiesMcpSpecifications.STARTUP_WARMUP_VIEW_ID);
+
+	ViewObservedPropertiesMcpSpecifications.warmCacheAsync(ViewObservedPropertiesMcpSpecifications.STARTUP_WARMUP_VIEW_ID);
+    }
+
+    /**
+     * Initializes the {@link MultiServiceManager} for the current execution mode.
      */
     private void initMultiServiceManager() {
 
@@ -1248,7 +1275,7 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     *
+     * Starts the scheduler after the configured delay.
      */
     private void startSchedulerDelayed() {
 
@@ -1285,7 +1312,9 @@ public class DABStarter implements ConfigurationChangeListener {
     }
 
     /**
-     * @throws GSException
+     * Starts the scheduler immediately.
+     *
+     * @throws GSException if the scheduler fails to start
      */
     private void startScheduler() throws GSException {
 

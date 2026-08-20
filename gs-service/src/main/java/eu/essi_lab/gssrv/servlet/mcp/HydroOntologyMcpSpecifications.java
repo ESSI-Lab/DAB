@@ -4,7 +4,7 @@ package eu.essi_lab.gssrv.servlet.mcp;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -41,8 +41,8 @@ import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit;
 import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
 import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncResourceSpecification;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncResourceTemplateSpecification;
+import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncResourceSpecification;
+import io.modelcontextprotocol.server.McpStatelessServerFeatures.SyncResourceTemplateSpecification;
 import io.modelcontextprotocol.spec.McpSchema.ReadResourceResult;
 import io.modelcontextprotocol.spec.McpSchema.Resource;
 import io.modelcontextprotocol.spec.McpSchema.ResourceTemplate;
@@ -75,6 +75,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * MCP static resource describing the ontology service and template usage (JSON body).
+     *
+     * @param mapper the Jackson object mapper used to serialize the JSON payload
+     * @return the MCP sync resource specification
      */
     public static SyncResourceSpecification hydroOntologyMetadataResource(ObjectMapper mapper) {
 
@@ -82,12 +85,11 @@ public final class HydroOntologyMcpSpecifications {
 		uri(RESOURCE_METADATA_URI).//
 		name("his-central-hydro-ontology-info").//
 		title("HIS-Central hydro ontology").//
-		description("Metadata and MCP resource template URIs for the HIS-Central hydro SKOS ontology (SPARQL: " + SPARQL_ENDPOINT
-			+ "). Use dab://ontology/his-central/hydro/terms/{term} with a UTF-8 search term to retrieve concepts as JSON.").//
+		description("Metadata and MCP resource template URIs for DAB (HIS-Central hydro SKOS ontology and view observed properties).").//
 		mimeType("application/json").//
 		build();
 
-	return new SyncResourceSpecification(resource, (exchange, request) -> {
+	return new SyncResourceSpecification(resource, (context, request) -> {
 
 	    try {
 
@@ -95,9 +97,12 @@ public final class HydroOntologyMcpSpecifications {
 		payload.put("title", "HIS-Central hydro ontology");
 		payload.put("sparqlEndpoint", SPARQL_ENDPOINT);
 		payload.put("resourceTemplateTerms", TERMS_URI_TEMPLATE);
+		payload.put("resourceTemplateViewObservedProperties", ViewObservedPropertiesMcpSpecifications.VIEW_OBSERVED_PROPERTIES_URI_TEMPLATE);
+		payload.put("mcpTools", List.of("om_search_features", "om_search_observations", "om_get_observation", "om_list_query_properties"));
 		payload.put("usage",
-			"Hydrate MCP resources/read with dab://ontology/his-central/hydro/terms/<term> "
-				+ "where <term> is a Unicode search string (concept labels/terms). Returned JSON aggregates SKOS concepts.");
+			"Hydro ontology term search: dab://ontology/his-central/hydro/terms/<term> (Unicode search string). "
+				+ "View observed properties: dab://view/<viewId>/observed-properties (URL-encode viewId when needed). "
+				+ "O&M search: MCP tools om_search_features, om_search_observations, om_get_observation, om_list_query_properties.");
 
 		String json = mapper.writeValueAsString(payload);
 		return new ReadResourceResult(List.of(new TextResourceContents(request.uri(), "application/json", json)));
@@ -123,6 +128,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * MCP resource template: {@value #TERMS_URI_TEMPLATE} resolves to JSON aggregating matched concepts.
+     *
+     * @param mapper the Jackson object mapper used to serialize the JSON payload
+     * @return the MCP sync resource template specification
      */
     public static SyncResourceTemplateSpecification hydroOntologyTermsResourceTemplate(ObjectMapper mapper) {
 
@@ -136,7 +144,7 @@ public final class HydroOntologyMcpSpecifications {
 		mimeType("application/json").//
 		build();
 
-	return new SyncResourceTemplateSpecification(template, (exchange, request) -> {
+	return new SyncResourceTemplateSpecification(template, (context, request) -> {
 
 	    String resolvedUri = request.uri();
 
@@ -186,6 +194,9 @@ public final class HydroOntologyMcpSpecifications {
 
     /**
      * Resolves UTF-8 path segment(s) after {@value #TERMS_URI_PREFIX}.
+     *
+     * @param resourceUri the resolved MCP resource URI
+     * @return the decoded search term, or an empty string when not present
      */
     static String extractEncodedTerm(String resourceUri) {
 

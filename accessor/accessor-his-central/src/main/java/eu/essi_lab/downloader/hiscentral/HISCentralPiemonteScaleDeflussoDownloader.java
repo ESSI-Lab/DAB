@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.hiscentral;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -138,7 +138,7 @@ public class HISCentralPiemonteScaleDeflussoDownloader extends WMLDataDownloader
 		online.getLinkage() != null && //
 		online.getLinkage().contains(HISCentralPiemonteConnector.BASE_URL) && //
 		online.getProtocol() != null && //
-		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI));
+		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI));
 
 	if (ret){
 	    GSLoggerFactory.getLogger(getClass()).info("Deflusso downloader found");

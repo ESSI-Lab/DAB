@@ -4,7 +4,7 @@ package eu.essi_lab.indexes;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -273,6 +273,8 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 
 			if (checkStringValue(beginPosition)) {
 
+			    beginPosition = ISO8601DateTimeUtils.normalizeISO8601Instant(beginPosition);
+
 			    if (beginPosition.equals("now")) {
 
 				resource.getIndexesMetadata().write(IndexedElements.TEMP_EXTENT_BEGIN_NOW);
@@ -322,6 +324,8 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 			String endPosition = te.getEndPosition();
 
 			if (checkStringValue(endPosition)) {
+
+			    endPosition = ISO8601DateTimeUtils.normalizeISO8601Instant(endPosition);
 
 			    if (endPosition.equals("now")) {
 

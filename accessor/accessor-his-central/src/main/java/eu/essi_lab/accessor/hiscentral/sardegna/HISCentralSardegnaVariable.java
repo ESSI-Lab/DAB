@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.hiscentral.sardegna;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -52,7 +52,7 @@ public class HISCentralSardegnaVariable {
     }
 
     public String getVariableURI() {
-	return json.getString("WMO_observed_property");
+	return json.optString("WMO_observed_property");
     }
 
     public String getVariableName() {
@@ -60,7 +60,7 @@ public class HISCentralSardegnaVariable {
     }
 
     public String getAggregationPeriodUnits() {
-	return json.getString("Risoluzione temporale (ISO8601)");
+	return json.optString("Risoluzione temporale (ISO8601)");
     }
     
     public String getInterpolation() {

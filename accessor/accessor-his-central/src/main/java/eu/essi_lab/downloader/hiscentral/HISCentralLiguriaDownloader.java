@@ -4,7 +4,7 @@ package eu.essi_lab.downloader.hiscentral;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -219,6 +219,9 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			ErrorInfo.ERRORTYPE_INTERNAL, ErrorInfo.SEVERITY_ERROR, HISCENTRAL_LIGURIA_DOWNLOAD_ERROR);
 	    }
 
+	    // Scale factor from original UNIT (e.g. "°C/10", "m/s/10", "m/100") — mapped units already strip it
+	    BigDecimal scaleFactor = resolveScaleFactor(resolveOriginalUnit(var));
+
 	    TimeSeriesTemplate template = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
 
@@ -267,20 +270,12 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 			if (valueString != null && !valueString.isEmpty()) {
 
 			    //
-			    // value
+			    // value — divide when original UNIT has a trailing scale (e.g. /10, /100)
 			    //
-			    // temperature and wind values need to be divided by 10
-			    if (finalVar.toLowerCase().contains("temp") || finalVar.toLowerCase().contains("wspd")) {
-				double d = Double.valueOf(valueString) / 10;
-				valueString = String.valueOf(d);
-			    }
-			    // creek level values need to be divided by 100
-			    if (finalVar.toLowerCase().contains("crlvm")) {
-				double d = Double.valueOf(valueString) / 100;
-				valueString = String.valueOf(d);
-			    }
-
 			    BigDecimal dataValue = new BigDecimal(valueString);
+			    if (scaleFactor != null) {
+				dataValue = dataValue.divide(scaleFactor);
+			    }
 			    variable.setValue(dataValue);
 
 			    //
@@ -542,6 +537,68 @@ public class HISCentralLiguriaDownloader extends WMLDataDownloader {
 	    ret = splittedTime[0] + splittedTime[1];
 	}
 	return ret;
+    }
+
+    /**
+     * Reads the original UNIT for {@code varId} from original metadata var-info
+     * (e.g. "°C/10", "m/s/10", "m/100"). Mapped attribute units have the scale
+     * suffix already removed.
+     */
+    private String resolveOriginalUnit(String varId) {
+
+	try {
+	    if (resource == null || resource.getOriginalMetadata() == null) {
+		return null;
+	    }
+
+	    String metadata = resource.getOriginalMetadata().getMetadata();
+	    if (metadata == null || metadata.isEmpty()) {
+		return null;
+	    }
+
+	    JSONArray varInfo = new JSONObject(metadata).optJSONArray("var-info");
+	    if (varInfo == null) {
+		return null;
+	    }
+
+	    for (int i = 0; i < varInfo.length(); i++) {
+		JSONObject desc = varInfo.optJSONObject(i);
+		if (desc == null) {
+		    continue;
+		}
+		if (varId.equalsIgnoreCase(desc.optString("FIELD_NAME"))) {
+		    return desc.optString("UNIT", null);
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to resolve original unit for variable {}: {}", varId, e.getMessage());
+	}
+
+	return null;
+    }
+
+    /**
+     * If {@code unit} ends with a trailing numeric scale after '/', returns that
+     * factor (e.g. "°C/10" → 10, "m3/s/100" → 100); otherwise {@code null}.
+     */
+    static BigDecimal resolveScaleFactor(String unit) {
+
+	if (unit == null || unit.isEmpty()) {
+	    return null;
+	}
+
+	int lastSlash = unit.lastIndexOf('/');
+	if (lastSlash < 0 || lastSlash == unit.length() - 1) {
+	    return null;
+	}
+
+	String trailing = unit.substring(lastSlash + 1);
+	if (!trailing.matches("\\d+")) {
+	    return null;
+	}
+
+	BigDecimal factor = new BigDecimal(trailing);
+	return factor.compareTo(BigDecimal.ONE) > 0 ? factor : null;
     }
 
     @Override

@@ -4,7 +4,7 @@ package eu.essi_lab.accessor.wof.client;
  * #%L
  * Discovery and Access Broker (DAB)
  * %%
- * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Atmospheric Pollution Research (IIA)/ESSI-Lab
+ * Copyright (C) 2021 - 2026 National Research Council of Italy (CNR)/Institute of Technologies and Environmental Intelligence (ITIAm)/ESSI-Lab
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -21,30 +21,21 @@ package eu.essi_lab.accessor.wof.client;
  * #L%
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.HashMap;
+import eu.essi_lab.lib.net.downloader.*;
+import eu.essi_lab.lib.net.downloader.HttpRequestUtils.*;
+import eu.essi_lab.lib.utils.*;
+import eu.essi_lab.lib.xml.stax.*;
+import eu.essi_lab.model.exceptions.*;
+import org.apache.commons.io.*;
+import org.slf4j.*;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-
-import eu.essi_lab.lib.net.downloader.Downloader;
-import eu.essi_lab.lib.net.downloader.HttpHeaderUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
-import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
-import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.xml.stax.StAXDocumentIterator;
-import eu.essi_lab.model.exceptions.ErrorInfo;
-import eu.essi_lab.model.exceptions.GSException;
+import java.io.*;
+import java.net.http.*;
+import java.util.*;
 
 /**
  * Utility class to be used inside the Hydro Server client to make SOAP requests to HydroServers
- * 
+ *
  * @author boldrini
  */
 class SOAPExecutorStAX {
@@ -101,9 +92,17 @@ class SOAPExecutorStAX {
 
 		InputStream output = response.body();
 
-		tmpFile = File.createTempFile("SOAPExecutorStAX", ".xml");
+		tmpFile = new File(IOStreamUtils.getUserTempDirectory(), StringUtils.hashSHA256messageDigest(endpoint) + ".xml");
+
+		if (tmpFile.exists()) {
+
+		    logger.info("File already downloaded : " + tmpFile.getAbsolutePath());
+		    return tmpFile;
+		}
+
 		logger.info("Downloading sites document to : " + tmpFile.getAbsolutePath());
 		tmpFile.deleteOnExit();
+
 		FileOutputStream fos = new FileOutputStream(tmpFile);
 		if (decodeEntities) {
 		    output = new CUAHSIDecoderInputStream(output);
