@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.hiscentral.deflusso;
  */
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -158,7 +159,7 @@ public class RatingCurvesClient {
 		}
 
 		skipping = false;
-		RatingCurve curve = new RatingCurve();
+		RatingCurve curve = new RatingCurve(LocalDate.now(), null);
 		currentFormula = new Formula();
 		curve.setFormula(currentFormula);
 		curve.setMinLevel(parseNumber(cell(formatter, row, COL_MIN)));
