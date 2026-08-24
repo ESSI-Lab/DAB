@@ -114,7 +114,10 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	JSONObject jsonObject = new JSONObject();
 	jsonObject.put("dataset-info", datasetInfo);
 	jsonObject.put("variable", var.getJson());
-	jsonObject.put("metadata-info", metadataInfo);
+	if(metadataInfo != null){
+	    jsonObject.put("metadata-info", metadataInfo);
+	}
+
 
 	originalMetadata.setMetadata(jsonObject.toString(4));
 
@@ -324,6 +327,9 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 		if (paramCode.equals("RGI")) {
 		    varPath = "misure/meteo/getDataRGI";
 		}
+		if (paramCode.equals("SDF")) {
+		    varPath = "anagrafiche/scaledeflusso";
+		}
 	    }
 
 	    String resourceTitle = datasetInfo.optString("NOME");
@@ -340,6 +346,13 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    // temporal
 	    String tempExtentBegin = datasetInfo.optString("DATA_INIZIO_STAZIONE");
 	    String tempExtentEnd = datasetInfo.optString("DATA_FINE");
+
+	    if (tempExtentBegin != null) {
+		tempExtentBegin = tempExtentBegin.contains(" ") ? tempExtentBegin.replace(" ", "T") : tempExtentBegin;
+	    }
+	    if (tempExtentEnd != null) {
+		tempExtentEnd = tempExtentEnd.contains(" ") ? tempExtentEnd.replace(" ", "T") : tempExtentEnd;
+	    }
 
 	    /**
 	     * Organizations
@@ -499,12 +512,15 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	     * INTERPOLATION
 	     */
 
-	    if (interp.toLowerCase().equals("istantaneo")) {
+	    if (interp.toLowerCase().equals("istantaneo") || interp.toLowerCase().equals("istantanea")) {
 		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.CONTINUOUS);
-	    }else if (interp.toLowerCase().contains("cumulato")) {
+	    } else if (interp.toLowerCase().contains("cumulato")) {
 		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
+	    } else if (interp.toLowerCase().contains("average")) {
+		dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);
 	    } else {
-		GSLoggerFactory.getLogger(getClass()).error("Unknown interpolation type: " + interp.toLowerCase()+" please add to the mapper!");
+		GSLoggerFactory.getLogger(getClass())
+			.error("Unknown interpolation type: " + interp.toLowerCase() + " please add to the mapper!");
 	    }
 
 	    // String uom = sensorInfo.getJSONObject("observedProperty").getString("uom");
@@ -663,7 +679,12 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 	    online.setFunctionCode("download");
 	    online.setName(resourceTitle + "_" + stationCode + "_" + parameterName);
 	    online.setIdentifier(resourceIdentifier);
-	    online.setProtocol(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_NS_URI);
+	    if (paramCode.equals("SDF")) {
+		online.setProtocol(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_SCALE_DEFLUSSO_NS_URI);
+		dataset.getPropertyHandler().setIsRatingCurve(true);
+	    } else {
+		online.setProtocol(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_NS_URI);
+	    }
 
 	    distribution.addDistributionOnline(online);
 

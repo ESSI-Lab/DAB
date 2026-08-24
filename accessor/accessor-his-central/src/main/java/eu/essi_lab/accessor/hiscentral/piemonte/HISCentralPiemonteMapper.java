@@ -160,7 +160,7 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 	while (onlines.hasNext()) {
 	    Online online = onlines.next();
 	    if (online.getProtocol() != null && online.getProtocol()
-		    .equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI)) {
+		    .equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI)) {
 		HISCentralPiemonteClient client = new HISCentralPiemonteClient(online.getLinkage());
 		RatingCurves ratingCurves = client.getRatingCurves("&format=json");
 		if (ratingCurves == null || (ratingCurves != null && ratingCurves.getCurves().isEmpty())) {
@@ -551,7 +551,7 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		    o.setFunctionCode("download");
 		    o.setName(identifier);
 		    o.setIdentifier(resourceIdentifier);
-		    o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCLAE_DEFLUSSO_NS_URI);
+		    o.setProtocol(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI);
 		    distribution.addDistributionOnline(o);
 		    dataset.getPropertyHandler().setIsRatingCurve(true);
 
