@@ -115,6 +115,9 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
     }
 
     private void mapMetadata(OriginalMetadata originalMD, Dataset dataset, GSSource source) {
+	String stationId = null;
+	String stationName = null;
+	String summaryHref = null;
 	try {
 	    JSONObject root = new JSONObject(originalMD.getMetadata());
 	    JSONObject stationJson = root.getJSONObject("station");
@@ -125,8 +128,11 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
 		datasetResource = null;
 	    }
 
-	    String stationId = stationJson.optString("_id", null);
-	    String stationName = stationJson.optString("name", stationId);
+	    stationId = stationJson.optString("_id", null);
+	    stationName = stationJson.optString("name", stationId);
+	    if (summaryJson != null) {
+		summaryHref = summaryJson.optString("href", null);
+	    }
 	    Double heightM = stationJson.has("height") && !stationJson.isNull("height") ? stationJson.getDouble("height") : null;
 
 	    double[] lonLat = lonLatFromGeometry(stationJson.optJSONObject("geometry"));
@@ -290,8 +296,15 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline().setIdentifier(resourceIdentifier);
 	    dataset.getPropertyHandler().setIsTimeseries(true);
 
+	    GSLoggerFactory.getLogger(getClass()).info(
+		    "Emilia-SIMC mapped dataset: stationId={} name='{}' href='{}' resource='{}' bcode={} interpolation={} aggregation={} fileId={} resourceId={} title='{}'",
+		    stationId, stationName, summaryHref, datasetResource, bcode, interpolationLabel, aggregationPeriod, id,
+		    resourceIdentifier, coreMetadata.getMIMetadata().getDataIdentification().getCitationTitle());
+
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Emilia-SIMC mapping error", e);
+	    GSLoggerFactory.getLogger(getClass()).error(
+		    "Emilia-SIMC mapping error: stationId={} name='{}' href='{}' — {}", stationId, stationName, summaryHref,
+		    e.getMessage(), e);
 	}
     }
 

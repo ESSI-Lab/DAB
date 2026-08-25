@@ -25,9 +25,11 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.slf4j.Logger;
 
@@ -98,16 +100,28 @@ public class HISCentralEmiliaSimcConnector extends HarvestedQueryConnector<HISCe
 		ret.addRecord(harvestRecords.get(i));
 		partialCount++;
 	    }
+	    logger.info("Emilia-SIMC listRecords batch [{}..{}) of {} (pageSize={}, maxRecords={})", start, end,
+		    harvestRecords.size(), pageSize, mr.orElse(null));
 	    if (end < harvestRecords.size() && (getSetting().isMaxRecordsUnlimited() || !mr.isPresent() || end < mr.get())) {
 		ret.setResumptionToken(String.valueOf(end));
 	    } else {
 		ret.setResumptionToken(null);
-		logger.info("Emilia-SIMC harvest finished: {} dataset records", harvestRecords.size());
+		if (maxNumberReached) {
+		    logger.warn("Emilia-SIMC harvest stopped by maxRecords={} before all {} records were emitted", mr.get(),
+			    harvestRecords.size());
+		} else {
+		    logger.info("Emilia-SIMC harvest finished: {} dataset records emitted", harvestRecords.size());
+		}
 		partialCount = 0;
 	    }
 	} else {
 	    ret.setResumptionToken(null);
-	    logger.debug("Emilia-SIMC listRecords complete (total {})", harvestRecords.size());
+	    if (maxNumberReached) {
+		logger.warn("Emilia-SIMC listRecords skipped: start={} reached maxRecords={} (total available={})", start,
+			mr.orElse(null), harvestRecords.size());
+	    } else {
+		logger.info("Emilia-SIMC listRecords complete (total {})", harvestRecords.size());
+	    }
 	    partialCount = 0;
 	}
 
@@ -119,24 +133,65 @@ public class HISCentralEmiliaSimcConnector extends HarvestedQueryConnector<HISCe
 	if (baseUrl == null || baseUrl.isEmpty()) {
 	    baseUrl = BASE_URL;
 	}
+	logger.info("Emilia-SIMC populateHarvestRecords START baseUrl={} apiPageSize={}", baseUrl, API_PAGE_SIZE);
 	ArpaeSimcMeteoOpenDataClient client = new ArpaeSimcMeteoOpenDataClient(baseUrl);
 	try {
 	    Map<String, ArpaeSimcMeteoOpenDataClient.SimcDatasetDescriptor> datasetIndex = loadDatasetIndex(client);
 	    List<ArpaeSimcMeteoOpenDataClient.SimcStation> stations = client.listAllStations(null, "_id", API_PAGE_SIZE);
 	    logger.info("Emilia-SIMC: loaded {} stations, {} dataset catalogue entries", stations.size(), datasetIndex.size());
 
+	    int stationsWithoutSummaries = 0;
+	    int summariesSkippedEmptyHref = 0;
+	    int descriptorMisses = 0;
+	    int duplicateKeys = 0;
+	    Set<String> harvestKeys = new HashSet<>();
+
 	    for (ArpaeSimcMeteoOpenDataClient.SimcStation station : stations) {
+		String stationId = station.id();
+		String stationName = station.name();
 		List<ArpaeSimcMeteoOpenDataClient.SimcStationSummary> summaries = station.summaries();
 		if (summaries == null || summaries.isEmpty()) {
+		    stationsWithoutSummaries++;
+		    logger.warn("Emilia-SIMC station skipped (no summaries): id={} name='{}'", stationId, stationName);
 		    continue;
 		}
+		int recordsAddedForStation = 0;
 		for (ArpaeSimcMeteoOpenDataClient.SimcStationSummary summary : summaries) {
-		    String datasetResource = datasetResourceFromHref(client, summary.href());
-		    ArpaeSimcMeteoOpenDataClient.SimcDatasetDescriptor descriptor = lookupDataset(client, datasetIndex,
-			    summary.href());
+		    String href = summary.href();
+		    if (href == null || href.isEmpty()) {
+			summariesSkippedEmptyHref++;
+			logger.warn("Emilia-SIMC summary skipped (empty href): stationId={} name='{}'", stationId, stationName);
+			continue;
+		    }
+		    String datasetResource = datasetResourceFromHref(client, href);
+		    ArpaeSimcMeteoOpenDataClient.SimcDatasetDescriptor descriptor = lookupDataset(client, datasetIndex, href);
+		    if (descriptor == null) {
+			descriptorMisses++;
+			logger.warn(
+				"Emilia-SIMC dataset descriptor not found in catalogue: stationId={} name='{}' href='{}' resource='{}'",
+				stationId, stationName, href, datasetResource);
+		    }
+		    String harvestKey = stationId + "|" + href;
+		    if (!harvestKeys.add(harvestKey)) {
+			duplicateKeys++;
+			logger.warn("Emilia-SIMC duplicate station/summary key: stationId={} name='{}' href='{}'", stationId,
+				stationName, href);
+		    }
 		    harvestRecords.add(HISCentralEmiliaSimcMapper.create(station, summary, descriptor, datasetResource));
+		    recordsAddedForStation++;
+		    logger.info(
+			    "Emilia-SIMC harvest record #{}: stationId={} name='{}' href='{}' resource='{}' descriptor={} reftime=[{} .. {}]",
+			    harvestRecords.size(), stationId, stationName, href, datasetResource, descriptor != null ? "found"
+				    : "MISSING",
+			    summary.reftimeStart(), summary.reftimeEnd());
 		}
+		logger.info("Emilia-SIMC station done: id={} name='{}' summaries={} recordsAdded={}", stationId, stationName,
+			summaries.size(), recordsAddedForStation);
 	    }
+	    logger.info(
+		    "Emilia-SIMC populateHarvestRecords END totalRecords={} stations={} stationsWithoutSummaries={} summariesSkippedEmptyHref={} descriptorMisses={} duplicateKeys={}",
+		    harvestRecords.size(), stations.size(), stationsWithoutSummaries, summariesSkippedEmptyHref, descriptorMisses,
+		    duplicateKeys);
 	} catch (IOException e) {
 	    throw GSException.createException(getClass(), "Unable to read ARPAE-SIMC open data", null, ErrorInfo.ERRORTYPE_SERVICE,
 		    ErrorInfo.SEVERITY_ERROR, HISCENTRAL_EMILIA_SIMC_URL_NOT_FOUND_ERROR, e);
