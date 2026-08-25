@@ -140,6 +140,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String THREDDS_NS_URI = "http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0";
     public static final String INVENIO_NS_URI = "http://essi-lab.eu/invenio";
 
+    public static final String HISCENTRAL_ABRUZZO_NS_URI = "http://essi-lab.eu/his-central/abruzzo";
     public static final String HISCENTRAL_BASILICATA_NS_URI = "http://essi-lab.eu/his-central/basilicata";
     public static final String HISCENTRAL_SARDEGNA_NS_URI = "http://essi-lab.eu/his-central/sardegna";
     public static final String HISCENTRAL_SARDEGNA_SCALE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/sardegna-scala-deflusso";
@@ -245,6 +246,7 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 		map.put("emobon", EMOBON_NS_URI);
 		map.put("catalog", THREDDS_NS_URI);
 	map.put("invenio", INVENIO_NS_URI);
+	map.put("hiscentralabruzzo", HISCENTRAL_ABRUZZO_NS_URI);
 	map.put("hiscentraltoscana", HISCENTRAL_TOSCANA_NS_URI);
 	map.put("hiscentralumbria", HISCENTRAL_UMBRIA_NS_URI);
 	map.put("hiscentralemilia", HISCENTRAL_EMILIA_NS_URI);

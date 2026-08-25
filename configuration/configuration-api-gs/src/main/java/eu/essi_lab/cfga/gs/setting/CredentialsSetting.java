@@ -40,6 +40,7 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     private static final String HIS_CENTRAL_PUGLIA_TOKEN = "pugliaToken";
     private static final String AGROSTAC_TOKEN = "agrostacToken";
     private static final String HIS_CENTRAL_SARDEGNA_API_KEY = "sardegnaApiKey";
+    private static final String HIS_CENTRAL_ABRUZZO_API_TOKEN = "abruzzoApiToken";
     private static final String HIS_CENTRAL_LOMBARDIA_KEYSTORE_PASSWORD = "lombardiaKeystorePassword";
     private static final String HIS_CENTRAL_LOMBARDIA_USERNAME = "lombardiaUser";
     private static final String HIS_CENTRAL_LOMBARDIA_PASSWORD = "lombardiaPassword";
@@ -234,6 +235,18 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 		    get().//
 		    withKey(HIS_CENTRAL_SARDEGNA_API_KEY).//
 		    withLabel("The Api-key used by the Sardegna connector and downloader").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(password);
+	}
+
+	{
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_ABRUZZO_API_TOKEN).//
+		    withLabel("The Api-token used by the Abruzzo connector and downloader").//
 		    required().//
 		    cannotBeDisabled().//
 		    build();
@@ -1348,6 +1361,22 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     public Optional<String> getSardegnaApiKey() {
 
 	return getOption(HIS_CENTRAL_SARDEGNA_API_KEY, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param password
+     */
+    public void setAbruzzoApiToken(String password) {
+
+	getOption(HIS_CENTRAL_ABRUZZO_API_TOKEN, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getAbruzzoApiToken() {
+
+	return getOption(HIS_CENTRAL_ABRUZZO_API_TOKEN, String.class).get().getOptionalValue();
     }
 
     /**
