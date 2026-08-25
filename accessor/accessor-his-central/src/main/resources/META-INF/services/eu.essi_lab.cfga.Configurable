@@ -1,3 +1,5 @@
+eu.essi_lab.accessor.hiscentral.abruzzo.HISCentralAbruzzoConnector
+eu.essi_lab.accessor.hiscentral.abruzzo.HISCentralAbruzzoAccessor
 eu.essi_lab.accessor.hiscentral.toscana.HISCentralToscanaConnector
 eu.essi_lab.accessor.hiscentral.toscana.HISCentralToscanaAccessor
 eu.essi_lab.accessor.hiscentral.marche.HISCentralMarcheConnector
