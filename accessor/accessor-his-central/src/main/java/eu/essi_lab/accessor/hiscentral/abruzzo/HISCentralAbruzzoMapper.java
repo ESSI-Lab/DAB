@@ -240,7 +240,8 @@ public class HISCentralAbruzzoMapper extends FileIdentifierMapper {
 
 	CoverageDescription coverageDescription = new CoverageDescription();
 	coverageDescription.setAttributeIdentifier(String.valueOf(measureId));
-	coverageDescription.setAttributeTitle(measureName);
+	String attributeTitle = normalizeAttributeTitle(measureName, shortName);
+	coverageDescription.setAttributeTitle(attributeTitle);
 
 	String missingValue = "-9999";
 	dataset.getExtensionHandler().setAttributeMissingValue(missingValue);
@@ -251,5 +252,53 @@ public class HISCentralAbruzzoMapper extends FileIdentifierMapper {
 
 	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
+    }
+
+    /**
+     * Maps Polaris instrument / short names to HIS-Central ontology-friendly titles
+     * used by {@code HISCentralVariableAugmenter} (exact label match).
+     */
+    static String normalizeAttributeTitle(String measureName, String shortName) {
+
+	String name = measureName != null ? measureName.trim() : "";
+	String shortN = shortName != null ? shortName.trim() : "";
+	String combined = (name + " " + shortN).toLowerCase();
+
+	if (combined.contains("termometro") || combined.contains("t_aria") || combined.contains("temperatura")) {
+	    return "Temperatura aria";
+	}
+	if (combined.contains("pluviometro") || combined.contains("pluv") || combined.contains("precipit")) {
+	    return "Precipitazione";
+	}
+	if (combined.contains("igrometro") || combined.contains("umidit") || shortN.equalsIgnoreCase("RH")) {
+	    return "Umidità relativa";
+	}
+	if (combined.contains("livello idrometrico") || (combined.contains("livello") && !combined.contains("neve")
+		&& !combined.contains("nivo"))) {
+	    return "Livello idrometrico";
+	}
+	if (combined.contains("nivometro") || combined.contains("nivo") || combined.contains("neve")) {
+	    return "Altezza neve";
+	}
+	if (combined.contains("pressione")) {
+	    return "Pressione atmosferica";
+	}
+	if (combined.contains("direzione")) {
+	    return "Direzione vento";
+	}
+	if (combined.contains("raffica")) {
+	    return "Velocità raffica";
+	}
+	if (combined.contains("velocit") && combined.contains("scalar")) {
+	    return "Velocità vento";
+	}
+	if (combined.contains("velocit") && combined.contains("vento")) {
+	    return "Velocità vento";
+	}
+	if (combined.contains("radiazione") || shortN.equalsIgnoreCase("Rad")) {
+	    return "Radiazione globale";
+	}
+
+	return name.isEmpty() ? shortN : name;
     }
 }
