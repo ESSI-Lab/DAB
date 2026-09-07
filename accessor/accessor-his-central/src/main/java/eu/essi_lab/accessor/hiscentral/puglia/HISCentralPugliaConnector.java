@@ -71,7 +71,7 @@ public class HISCentralPugliaConnector extends HarvestedQueryConnector<HISCentra
 
     static final String STATIONS_URL = "user-permissions";
 
-    public static final String BASE_URL = "http://93.57.89.5:9000/api/";
+    public static final String BASE_URL = "http://138.66.75.116:9000/api/";
 
     static final String ORGANIZATION_URL = "organization";
 
