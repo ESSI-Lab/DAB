@@ -264,7 +264,8 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 	    if (propertyKey != null && !propertyKey.isEmpty() && propertyValue != null && !propertyValue.isEmpty()) {
 		
 		// Filter Observations by Datastream properties: Datastream/properties/key eq 'value'
-		String datastreamPropertyFilter = "Datastream/properties/" + propertyKey + " eq '" + propertyValue + "'";
+		String datastreamPropertyFilter = "Datastream/properties/" + propertyKey.replace("'","''") + " eq '"
+			+ propertyValue.replace("'","''") + "'";
 		// Combine with phenomenonTime filter
 		String combinedFilter = datastreamPropertyFilter + " and " + phenomenonTimeFilter;
 		
