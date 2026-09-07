@@ -79,7 +79,7 @@ public class OSCARTask extends AbstractCustomTask {
     // source_id=argentina-ina
     // view_id=whos
 
-    public static final String OSCAR_ENDPOINT = "https://oscardepl.wmo.int/surface/rest/api/wmd/upload";
+    public static final String OSCAR_ENDPOINT = "https://oscardepl.wmo.int/surface/rest/api/wmd/upload?useOnlyGmlIds=false";
 
     public enum OSCARTaskOptions implements OptionsKey {
 	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX, MAX_RECORD;
@@ -289,7 +289,7 @@ public class OSCARTask extends AbstractCustomTask {
 			continue;
 		    }
 		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-		    params.put("UseOnlyGmlIds", "FALSE");
+		    //params.put("useOnlyGmlIds", "FALSE");
 		    HttpRequest postRequest = HttpRequestUtils.build(//
 			    MethodWithBody.POST, //
 			    finalEndpoint, doc, params);
