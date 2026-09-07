@@ -113,6 +113,39 @@ public class DataStreamClient {
     }
 
     /**
+     * Dataset-level temporal bounds from the Metadata {@code TemporalExtent} field
+     * ({@code ["YYYY-MM-DD", "YYYY-MM-DD"]}).
+     */
+    public static class TemporalExtentDates {
+	public String beginDate;
+	public String endDate;
+    }
+
+    /**
+     * Parses {@code TemporalExtent} from a Metadata JSON object.
+     *
+     * @return begin/end dates when present, or {@code null} if the field is missing or empty
+     */
+    public static TemporalExtentDates parseTemporalExtent(JSONObject metadata) {
+	if (metadata == null) {
+	    return null;
+	}
+	JSONArray arr = metadata.optJSONArray("TemporalExtent");
+	if (arr == null || arr.isEmpty()) {
+	    return null;
+	}
+	String begin = arr.length() > 0 ? arr.optString(0, null) : null;
+	String end = arr.length() > 1 ? arr.optString(1, null) : null;
+	if ((begin == null || begin.isEmpty()) && (end == null || end.isEmpty())) {
+	    return null;
+	}
+	TemporalExtentDates dates = new TemporalExtentDates();
+	dates.beginDate = (begin != null && !begin.isEmpty()) ? begin : null;
+	dates.endDate = (end != null && !end.isEmpty()) ? end : null;
+	return dates;
+    }
+
+    /**
      * Simple value object representing the first and last observation dates and
      * result unit for a given series (DOI, location, CharacteristicName).
      */
