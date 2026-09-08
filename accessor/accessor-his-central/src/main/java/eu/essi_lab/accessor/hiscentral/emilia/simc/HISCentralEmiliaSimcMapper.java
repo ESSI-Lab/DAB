@@ -241,10 +241,7 @@ public class HISCentralEmiliaSimcMapper extends FileIdentifierMapper {
 	    HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 
 	    String baseUrl = source.getEndpoint();
-	    if (baseUrl == null || baseUrl.isEmpty()) {
-		baseUrl = HISCentralEmiliaSimcConnector.BASE_URL;
-	    }
-	    if (baseUrl.endsWith("/")) {
+	    if (baseUrl != null && baseUrl.endsWith("/")) {
 		baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
 	    }
 

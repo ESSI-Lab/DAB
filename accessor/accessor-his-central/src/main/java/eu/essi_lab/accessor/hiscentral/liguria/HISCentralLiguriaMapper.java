@@ -482,7 +482,10 @@ public class HISCentralLiguriaMapper extends FileIdentifierMapper {
 
 	String identifier = mangler.getMangling();
 
-	String linkage = HISCentralLiguriaConnector.BASE_URL + HISCentralLiguriaConnector.DATI_URL;
+	String baseUrl = dataset.getSource().getEndpoint();
+	String linkage = baseUrl.endsWith("/")
+		? baseUrl + HISCentralLiguriaConnector.DATI_URL
+		: baseUrl + "/" + HISCentralLiguriaConnector.DATI_URL;
 
 	coreMetadata.addDistributionOnlineResource(identifier, linkage, CommonNameSpaceContext.HISCENTRAL_LIGURIA_NS_URI, "download");
 

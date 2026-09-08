@@ -78,8 +78,6 @@ public class HISCentralSardegnaConnector extends HarvestedQueryConnector<HISCent
      * 
      */
 
-    public static final String BASE_URL = "https://api.arpasambiente.it/";
-
     private static final String HIS_CENTRAL_SARDEGNA_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_SARDEGNA_CONNECTOR_DOWNLOAD_ERROR";
 
     /**
