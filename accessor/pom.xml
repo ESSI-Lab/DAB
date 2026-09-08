@@ -116,6 +116,7 @@
 		<module>accessor-agrostac</module>
 		<module>accessor-oai-pmh-wrapper</module>
 		<module>accessor-datastream</module>
+		<module>accessor-datalakes</module>
 	</modules>
 
 	<dependencies>
