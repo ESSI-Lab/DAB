@@ -67,7 +67,7 @@
   "rating_curve": "Scale di deflusso",
   "plot_library_error": "Errore: Libreria grafica non caricata",
   "qualifiers": "Qualificatori",
-  "hover_to_display": "<passa sul grafico per visualizzare>",
+  "hover_to_display": "(passa sul grafico per visualizzare)",
   "qualifier_qualityFlag": "Codice di validazione",
   "qualifier_editorIndividual": "Curatore (individuo)",
   "qualifier_annalInstrumentType": "Tipo di strumento (annali)",

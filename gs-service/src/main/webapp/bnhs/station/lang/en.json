@@ -67,7 +67,7 @@
   "rating_curve": "Rating Curve",
   "plot_library_error": "Error: Plot library not loaded",
   "qualifiers": "Qualifiers",
-  "hover_to_display": "<hover the plot to display>",
+  "hover_to_display": "(hover the plot to display)",
   "qualifier_qualityFlag": "Quality flag",
   "qualifier_editorIndividual": "Editor (individual)",
   "qualifier_annalInstrumentType": "Instrument type (annals)",
