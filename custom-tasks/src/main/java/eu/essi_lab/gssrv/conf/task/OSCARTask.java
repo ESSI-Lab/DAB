@@ -52,7 +52,7 @@ import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.JSONUtils;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -67,6 +67,7 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.SortOrder;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
@@ -79,10 +80,10 @@ public class OSCARTask extends AbstractCustomTask {
     // source_id=argentina-ina
     // view_id=whos
 
-    public static final String OSCAR_ENDPOINT = "https://oscardepl.wmo.int/surface/rest/api/wmd/upload?useOnlyGmlIds=false";
+    public static final String OSCAR_ENDPOINT = "https://oscardepl.wmo.int/surface/rest/api/wmd/upload?useOnlyGmlIds=FALSE";
 
     public enum OSCARTaskOptions implements OptionsKey {
-	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX, MAX_RECORD;
+	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX, COUNTRY, MAX_RECORD;
     }
 
     @Override
@@ -121,6 +122,7 @@ public class OSCARTask extends AbstractCustomTask {
 	}
 
 	String bbox = taskOptions.get().get(OSCARTaskOptions.BBOX);
+	String countryOption = taskOptions.get().get(OSCARTaskOptions.COUNTRY);
 
 	String tokenName = "X-WMO-WMDR-Token";
 
@@ -184,21 +186,27 @@ public class OSCARTask extends AbstractCustomTask {
 	    Bond bond;
 
 	    Bond b = BondFactory.createResourceTypeBond(ResourceType.DATASET);
-	    if (bbox != null) {
-		bond = BondFactory.createSourceIdentifierBond(split);
+	    bond = BondFactory.createSourceIdentifierBond(split);
+
+	    if (countryOption != null && !countryOption.isBlank()) {
+		Country country = Country.decode(countryOption.trim());
+		if (country == null) {
+		    GSLoggerFactory.getLogger(getClass()).error("Unrecognized country option: {}", countryOption);
+		    return;
+		}
+		// Prefer ISO3 index (same as timeseries API); Country short name is also stored on harvest
+		Bond countryBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.COUNTRY_ISO3, country.getISO3());
+		bond = BondFactory.createAndBond(bond, countryBond, b);
+		GSLoggerFactory.getLogger(getClass()).info("Filtering by country {} ({})", country.getShortName(), country.getISO3());
+	    } else if (bbox != null) {
 		String[] splittedBox = bbox.split(",");
-		SpatialExtent saExtent = new SpatialExtent(); // bbox=11.558,-38.098,39.868,-23.743
-		saExtent.setEast(Double.valueOf(splittedBox[2])); // 'ZA': ('South Africa', (16.3449768409,
-								  // -34.8191663551,
-								  // // 32.830120477, -22.0913127581)),
+		SpatialExtent saExtent = new SpatialExtent(); // bbox=west,south,east,north
+		saExtent.setEast(Double.valueOf(splittedBox[2]));
 		saExtent.setNorth(Double.valueOf(splittedBox[3]));
 		saExtent.setSouth(Double.valueOf(splittedBox[1]));
 		saExtent.setWest(Double.valueOf(splittedBox[0]));
 		bond = BondFactory.createAndBond(bond, BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, saExtent), b);
-		// bond = BondFactory.createAndBond(bond, BondFactory.createSimpleValueBond(BondOperator.EQUAL,
-		// MetadataElement.COUNTRY, "South Africa")); //
 	    } else {
-		bond = BondFactory.createSourceIdentifierBond(split);
 		bond = BondFactory.createAndBond(bond, b);
 	    }
 
@@ -216,8 +224,10 @@ public class OSCARTask extends AbstractCustomTask {
 	    int start = 1;
 	    int pageSize = 50;
 	    Downloader downloader = new Downloader();
-	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put(tokenName, tokenValue);
+	    HashMap<String, String> headers = new HashMap<>();
+	    headers.put(tokenName, tokenValue);
+	    headers.put("Content-Type", "application/xml");
+	    headers.put("Accept", "*/*");
 	    String platformIdentifier = null;
 	    Map<String, List<GSResource>> oscarMap = new LinkedHashMap<String, List<GSResource>>();
 	    List<GSResource> resList = new ArrayList<GSResource>();
@@ -289,16 +299,25 @@ public class OSCARTask extends AbstractCustomTask {
 			continue;
 		    }
 		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-		    //params.put("useOnlyGmlIds", "FALSE");
 		    HttpRequest postRequest = HttpRequestUtils.build(//
 			    MethodWithBody.POST, //
-			    finalEndpoint, doc, params);
+			    finalEndpoint, doc, headers);
 
 		    HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
 
 		    InputStream content = response.body();
+		    String responseBody = IOStreamUtils.asUTF8String(content);
+		    int statusCode = response.statusCode();
+		    GSLoggerFactory.getLogger(getClass()).info("OSCAR HTTP {} response body: {}", statusCode, responseBody);
 
-		    JSONObject jsonObject = JSONUtils.fromStream(content);
+		    String trimmed = responseBody == null ? "" : responseBody.trim();
+		    if (trimmed.isEmpty() || (!trimmed.startsWith("{") && !trimmed.startsWith("["))) {
+			GSLoggerFactory.getLogger(getClass()).error("OSCAR non-JSON response for {}: HTTP {} - {}", key, statusCode,
+				responseBody);
+			continue;
+		    }
+
+		    JSONObject jsonObject = new JSONObject(responseBody);
 
 		    String xmlStatus = jsonObject.optString("xmlStatus");
 		    String logs = jsonObject.optString("logs");
