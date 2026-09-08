@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.essi_lab.accessor.hiscentral.friuli.HISCentralFriuliConnector;
 import eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaAccessor;
 import eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaConnector;
 import eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaConnectorSetting;
@@ -133,7 +132,7 @@ public class HISCentralValdaostaAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralValdaostaConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralFriuliConnector.DEFAULT_BASE_URL);
+	gsSourceSetting.setSourceEndpoint("https://cf-api.regione.vda.it/ws2/");
 
 	GSSource accessorSource = accessor.getSource();
 

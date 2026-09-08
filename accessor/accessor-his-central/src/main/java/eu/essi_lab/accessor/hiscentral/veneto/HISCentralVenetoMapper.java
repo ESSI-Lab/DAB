@@ -396,7 +396,11 @@ public class HISCentralVenetoMapper extends FileIdentifierMapper {
 	Calendar c = Calendar.getInstance();
 	String currentYear = String.valueOf(c.get(Calendar.YEAR));
 
-	String linkage = HISCentralVenetoConnector.BASE_URL + HISCentralVenetoConnector.DATA_URL + "?anno=" + currentYear + "&codseq="
+	String baseUrl = dataset.getSource().getEndpoint();
+	if (!baseUrl.endsWith("/")) {
+	    baseUrl = baseUrl + "/";
+	}
+	String linkage = baseUrl + HISCentralVenetoConnector.DATA_URL + "?anno=" + currentYear + "&codseq="
 		+ timeSeriesId;
 
 	Online online = new Online();

@@ -79,8 +79,6 @@ public class HISCentralBasilicataConnector extends HarvestedQueryConnector<HISCe
      */
     static final String SENSOR_URL = "elements?";
 
-    public static final String BASE_URL = "http://rbasil.dynalias.org/Datascape/v1/";
-
     public static final String TOKEN_URL = "http://rbasil.dynalias.org/Datascape/connect/token";
 
 

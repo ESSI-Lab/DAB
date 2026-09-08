@@ -145,9 +145,6 @@ public class HISCentralEmiliaSimcDownloader extends WMLDataDownloader {
 	    }
 
 	    String baseUrl = connector.getSourceURL();
-	    if (baseUrl == null || baseUrl.isEmpty()) {
-		baseUrl = HISCentralEmiliaSimcConnector.BASE_URL;
-	    }
 	    ArpaeSimcMeteoOpenDataClient client = new ArpaeSimcMeteoOpenDataClient(baseUrl);
 
 	    JSONObject where = ArpaeSimcMeteoOpenDataClient.mergeWhere(ArpaeSimcMeteoOpenDataClient.whereStationId(stationId),
@@ -204,7 +201,7 @@ public class HISCentralEmiliaSimcDownloader extends WMLDataDownloader {
     @Override
     public boolean canDownload() {
 	return online.getFunctionCode() != null && online.getFunctionCode().equals("download") && online.getLinkage() != null
-		&& online.getLinkage().contains("apps.arpae.it") && online.getProtocol() != null
+		&& online.getProtocol() != null
 		&& online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_EMILIA_SIMC_NS_URI);
     }
 
