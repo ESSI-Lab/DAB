@@ -44,7 +44,7 @@
   "disclaimer": "Dati dei Servizi idro-meteorologici regionali e delle province autonome. I dati possono essere soggetti a revisioni.",
   "accept": "Accetta",
   "cancel": "Annulla",
-  "full_extent_note": "* Si noti che il tracciamento dei dati per l'estensione completa potrebbe richiedere molto tempo",
+  "full_extent_note": "N.B. la visualizzazione in formato grafico della serie dei dati sull'estensione completa potrebbe richiedere un tempo maggiore, stimato comunque al di sotto del minuto",
   "page_info_text": "Questa pagina contiene grafici interattivi di dati di serie temporali in tempo reale e/o storici disponibili per una stazione selezionata.",
   "plot_features_include": "Le funzionalità del grafico includono:",
   "interactive_zoom": "Zoom interattivo: Trascina verticalmente o orizzontalmente nel grafico per ingrandire.",
