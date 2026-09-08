@@ -57,7 +57,6 @@ import eu.essi_lab.lib.sensorthings._1_1.client.request.options.SelectOption;
 import eu.essi_lab.lib.sensorthings._1_1.client.request.options.SystemQueryOptions;
 import eu.essi_lab.lib.sensorthings._1_1.client.response.DataArrayFormatResult;
 import eu.essi_lab.lib.sensorthings._1_1.client.response.DataArrayResultItem;
-import eu.essi_lab.lib.sensorthings._1_1.client.response.PaginatedResult;
 import eu.essi_lab.lib.sensorthings._1_1.model.entities.Datastream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
@@ -254,63 +253,54 @@ public abstract class SensorThingsDownloader extends WMLDataDownloader {
 
 	List<DataArrayResultItem> resultItems = new ArrayList<>();
 
-	Optional<String> nextLink = Optional.empty();
+	SensorThingsRequest request;
 
-	do {
+	// If propertyKey and propertyValue are present, query Observations directly with filter on Datastream properties
+	if (propertyKey != null && !propertyKey.isEmpty() && propertyValue != null && !propertyValue.isEmpty()) {
 
-	    SensorThingsRequest request;
-	    
-	    // If propertyKey and propertyValue are present, query Observations directly with filter on Datastream properties
-	    if (propertyKey != null && !propertyKey.isEmpty() && propertyValue != null && !propertyValue.isEmpty()) {
-		
-		// Filter Observations by Datastream properties: Datastream/properties/key eq 'value'
-		String datastreamPropertyFilter = "Datastream/properties/" + propertyKey.replace("'","''") + " eq '"
-			+ propertyValue.replace("'","''") + "'";
-		// Combine with phenomenonTime filter
-		String combinedFilter = datastreamPropertyFilter + " and " + phenomenonTimeFilter;
-		
-		SystemQueryOptions requestOptions = SystemQueryOptions.//
-			get().//
-			filter(combinedFilter);
-		
-		// Query Observations collection directly with the combined filter
-		request = FluentSensorThingsRequest.//
-			get().//
-			quoteIdentifiers(quoteIds).//
-			add(EntityRef.OBSERVATIONS).//
-			setDataArrayResultFormat().//
-			with(requestOptions);
-	    } else {
-		
-		// Use ID-based approach (existing logic)
-		request = FluentSensorThingsRequest.//
-			get().//
-			quoteIdentifiers(quoteIds).//
-			add(EntityRef.DATASTREAMS, streamIdentifer).//
-			add(EntityRef.OBSERVATIONS).//
-			setDataArrayResultFormat().//
-			with(options);
-	    }
+	    // Filter Observations by Datastream properties: Datastream/properties/key eq 'value'
+	    String datastreamPropertyFilter = "Datastream/properties/" + propertyKey.replace("'","''") + " eq '"
+		    + propertyValue.replace("'","''") + "'";
+	    // Combine with phenomenonTime filter
+	    String combinedFilter = datastreamPropertyFilter + " and " + phenomenonTimeFilter;
 
-	    DataArrayFormatResult result = client.//
-		    execute(request).//
-		    getDataArrayFormatResult().//
-		    get();
+	    SystemQueryOptions requestOptions = SystemQueryOptions.//
+		    get().//
+		    filter(combinedFilter);
 
-	    // usually there is only one item in each DataArrayFormatResult
+	    // Query Observations collection directly with the combined filter
+	    request = FluentSensorThingsRequest.//
+		    get().//
+		    quoteIdentifiers(quoteIds).//
+		    add(EntityRef.OBSERVATIONS).//
+		    setDataArrayResultFormat().//
+		    with(requestOptions);
+	} else {
+
+	    // Use ID-based approach (existing logic)
+	    request = FluentSensorThingsRequest.//
+		    get().//
+		    quoteIdentifiers(quoteIds).//
+		    add(EntityRef.DATASTREAMS, streamIdentifer).//
+		    add(EntityRef.OBSERVATIONS).//
+		    setDataArrayResultFormat().//
+		    with(options);
+	}
+
+	DataArrayFormatResult result = client.//
+		execute(request).//
+		getDataArrayFormatResult().//
+		get();
+
+	resultItems.addAll(result.getResultItems());
+
+	Optional<String> nextLink = result.getNextLink();
+	while (nextLink.isPresent()) {
+
+	    result = client.executeDataArrayNextLink(nextLink.get());
 	    resultItems.addAll(result.getResultItems());
-
 	    nextLink = result.getNextLink();
-
-	    if (!nextLink.isEmpty()) {
-
-		Integer skip = PaginatedResult.getSkip(nextLink.get()).get();
-		Integer top = PaginatedResult.getTop(nextLink.get()).orElse(100);
-
-		options = options.skip(skip).top(top);
-	    }
-
-	} while (nextLink.isPresent());
+	}
 
 	try {
 	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");

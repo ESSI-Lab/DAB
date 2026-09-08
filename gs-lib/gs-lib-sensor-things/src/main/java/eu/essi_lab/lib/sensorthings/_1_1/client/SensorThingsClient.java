@@ -110,6 +110,36 @@ public class SensorThingsClient {
     }
 
     /**
+     * Executes a paginated dataArray request using the {@code @iot.nextLink} URL from a previous response.
+     *
+     * @param nextLinkUrl absolute next link URL returned by the service
+     * @return parsed dataArray result
+     * @throws GSException
+     */
+    public DataArrayFormatResult executeDataArrayNextLink(String nextLinkUrl) throws GSException {
+
+	validateNextLink(nextLinkUrl);
+
+	RetryPolicy<HttpResponseWrapper> retryPolicy = RetryPolicy.<HttpResponseWrapper> //
+		builder().//
+		handleResultIf(r -> r.getException().isPresent()).//
+		withDelay(Duration.ofSeconds(retry.getValue())).//
+		withMaxAttempts(retry.getKey()).//
+		onRetry(e -> GSLoggerFactory.getLogger(getClass()).warn("Failure #{}. Retrying...", e.getAttemptCount())).//
+		onRetriesExceeded(e -> GSLoggerFactory.getLogger(getClass()).warn("Failed to connect. Max retries exceeded")).//
+		build();
+
+	HttpResponseWrapper wrapper = Failsafe.with(retryPolicy).get(() -> downloadResponse(nextLinkUrl));
+
+	if (wrapper.getException().isPresent()) {
+
+	    throw wrapper.getException().get();
+	}
+
+	return new DataArrayFormatResult(getResponseString(wrapper.getResponse().body()));
+    }
+
+    /**
      * @param request
      * @return
      * @throws GSException
@@ -128,7 +158,7 @@ public class SensorThingsClient {
 		onRetriesExceeded(e -> GSLoggerFactory.getLogger(getClass()).warn("Failed to connect. Max retries exceeded")).//
 		build();
 
-	HttpResponseWrapper wrapper = Failsafe.with(retryPolicy).get(() -> downloadReponse(request));
+	HttpResponseWrapper wrapper = Failsafe.with(retryPolicy).get(() -> downloadResponse(request.compose()));
 
 	if (wrapper.getException().isPresent()) {
 
@@ -264,17 +294,47 @@ public class SensorThingsClient {
     }
 
     /**
-     * @param request
-     * @return
+     * @param nextLinkUrl
      * @throws GSException
      */
-    private HttpResponseWrapper downloadReponse(SensorThingsRequest request) {
+    private void validateNextLink(String nextLinkUrl) throws GSException {
+
+	try {
+	    URL nextLink = new URL(nextLinkUrl);
+	    URL serviceRoot = getServiceRootUrl();
+	    if (!nextLink.getHost().equalsIgnoreCase(serviceRoot.getHost())) {
+
+		throw GSException.createException(//
+			getClass(), //
+			"Next link host [" + nextLink.getHost() + "] does not match service root host [" + serviceRoot.getHost() + "]", //
+			ErrorInfo.ERRORTYPE_CLIENT, //
+			ErrorInfo.SEVERITY_ERROR, //
+			"SensorThings1.1_Client_NextLinkHostMismatchError");
+	    }
+	} catch (MalformedURLException e) {
+
+	    throw GSException.createException(//
+		    getClass(), //
+		    e.getMessage(), //
+		    null, //
+		    ErrorInfo.ERRORTYPE_CLIENT, //
+		    ErrorInfo.SEVERITY_ERROR, //
+		    "SensorThings1.1_Client_MalformedNextLinkError", //
+		    e);
+	}
+    }
+
+    /**
+     * @param url
+     * @return
+     */
+    private HttpResponseWrapper downloadResponse(String url) {
 
 	HttpResponseWrapper wrapper = new HttpResponseWrapper();
 	
 	try {
 
-	    HttpResponse<InputStream> response = downloader.downloadResponse(request.compose());
+	    HttpResponse<InputStream> response = downloader.downloadResponse(url);
 
 	    if (response.body() == null) {
 
