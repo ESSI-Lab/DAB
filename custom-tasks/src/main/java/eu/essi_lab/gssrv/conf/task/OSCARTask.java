@@ -71,6 +71,7 @@ import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WIGOS_MAPPER;
 
 public class OSCARTask extends AbstractCustomTask {
@@ -170,6 +171,14 @@ public class OSCARTask extends AbstractCustomTask {
 	String finalEndpoint = OSCAR_ENDPOINT;
 
 	String[] splits = sourceId.split(";");
+
+	int totalStations = 0;
+	int totalDatasets = 0;
+	int totalUploadedOk = 0;
+	int totalUploadedFailed = 0;
+	int totalSkipped = 0;
+
+	log(status, "OSCAR upload task STARTED");
 
 	for (String split : splits) {
 
@@ -281,9 +290,19 @@ public class OSCARTask extends AbstractCustomTask {
 	    if (!resList.isEmpty()) {
 		oscarMap.put(platformIdentifier, new ArrayList<>(resList));
 	    }
-	    GSLoggerFactory.getLogger(getClass()).info("OSCAR MAP SIZE" + ": " + oscarMap.size());
+
+	    int sourceDatasets = oscarMap.values().stream().mapToInt(List::size).sum();
+	    int sourceStations = oscarMap.size();
+	    totalStations += sourceStations;
+	    totalDatasets += sourceDatasets;
+
+	    GSLoggerFactory.getLogger(getClass()).info("OSCAR MAP SIZE: {}", sourceStations);
+	    log(status, "Source " + split + ": " + sourceStations + " stations, " + sourceDatasets + " datasets");
 
 	    int count = 0;
+	    int uploadedOk = 0;
+	    int uploadedFailed = 0;
+	    int skipped = 0;
 	    for (Map.Entry<String, List<GSResource>> entry : oscarMap.entrySet()) {
 		if (limit != null && count >= limit) {
 		    break;
@@ -295,7 +314,8 @@ public class OSCARTask extends AbstractCustomTask {
 		try {
 
 		    String doc = wigosMapper.mapStations(gsresources, key);
-		    if(doc == null) {
+		    if (doc == null) {
+			skipped++;
 			continue;
 		    }
 		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
@@ -314,6 +334,7 @@ public class OSCARTask extends AbstractCustomTask {
 		    if (trimmed.isEmpty() || (!trimmed.startsWith("{") && !trimmed.startsWith("["))) {
 			GSLoggerFactory.getLogger(getClass()).error("OSCAR non-JSON response for {}: HTTP {} - {}", key, statusCode,
 				responseBody);
+			uploadedFailed++;
 			continue;
 		    }
 
@@ -324,40 +345,33 @@ public class OSCARTask extends AbstractCustomTask {
 		    String idResponse = jsonObject.optString("id");
 
 		    GSLoggerFactory.getLogger(getClass()).info("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
+
+		    boolean failedStatus = xmlStatus.equalsIgnoreCase("ERROR") || xmlStatus.equalsIgnoreCase("FAILED")
+			    || xmlStatus.equalsIgnoreCase("FAILURE");
+		    if (statusCode >= 200 && statusCode < 300 && !failedStatus) {
+			uploadedOk++;
+		    } else {
+			uploadedFailed++;
+		    }
 		    count++;
 
 		} catch (Exception e) {
+		    uploadedFailed++;
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 		}
 
 	    }
-	    // oscarMap.forEach((key, gsresource) -> {
-	    // try {
-	    // String doc = wigosMapper.mapStations(gsresource, key);
-	    // doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-	    // HttpRequest postRequest = HttpRequestUtils.build(//
-	    // MethodWithBody.POST, //
-	    // finalEndpoint, doc, params);
-	    //
-	    // HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
-	    //
-	    // InputStream content = response.body();
-	    //
-	    // JSONObject jsonObject = JSONUtils.fromStream(content);
-	    //
-	    // String xmlStatus = jsonObject.optString("xmlStatus");
-	    // String logs = jsonObject.optString("logs");
-	    // String idResponse = jsonObject.optString("id");
-	    //
-	    // GSLoggerFactory.getLogger(getClass()).info("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
-	    //
-	    //
-	    // } catch (Exception e) {
-	    // GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-	    // }
-	    // });
-	    // }
+
+	    totalUploadedOk += uploadedOk;
+	    totalUploadedFailed += uploadedFailed;
+	    totalSkipped += skipped;
+
+	    log(status, "Source " + split + " upload result: ok=" + uploadedOk + ", failed=" + uploadedFailed + ", skipped=" + skipped);
 	}
+
+	log(status, "OSCAR upload task ENDED - stations=" + totalStations + ", datasets=" + totalDatasets + ", uploadedOk="
+		+ totalUploadedOk + ", uploadedFailed=" + totalUploadedFailed + ", skipped=" + totalSkipped);
+	status.setPhase(JobPhase.COMPLETED);
 
     }
 
