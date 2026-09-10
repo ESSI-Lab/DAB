@@ -1,0 +1,20 @@
+{
+    "userId": "124",
+    "deviceId": "0QKHKEEC",
+    "firmware": "2.40.1",
+    "date": "2025-10-17",
+    "records_n": 395,
+    "hours_n": 9,
+    "pm1_mean": 1.709435626102293,
+    "pm1_min": 0,
+    "pm1_max": 28,
+    "pm1_raw_n": 395,
+    "temperature_mean": 25.826537012002664,
+    "temperature_min": 15.979999542236328,
+    "temperature_max": 29.5,
+    "temperature_raw_n": 395,
+    "humidity_mean": 35.22915869465581,
+    "humidity_min": 24.59000015258789,
+    "humidity_max": 55,
+    "humidity_raw_n": 395
+}
