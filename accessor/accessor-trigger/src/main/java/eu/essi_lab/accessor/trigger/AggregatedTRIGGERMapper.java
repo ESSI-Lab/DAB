@@ -297,7 +297,7 @@ public class AggregatedTRIGGERMapper extends OriginalIdentifierMapper {
 		String userId = object.optString("userId");
 
 		AGGREGATED_TRIGGER_VARIABLES var = AGGREGATED_TRIGGER_VARIABLES.decode(variable);
-		if (var != null) {
+		if (var != null && object.has(var.getJsonField()) && !object.isNull(var.getJsonField())) {
 
 		    units = var.getUnits();
 		    if (units.contains("°C")) {
@@ -560,10 +560,7 @@ public class AggregatedTRIGGERMapper extends OriginalIdentifierMapper {
 
 		    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 
-		    String linkage = AggregatedTRIGGERConnector.BASE_URL + queryPath + AggregatedTRIGGERConnector.MIN_VALID_PARAM;// +
-														    // station.getName()
-														    // +
-		    // buildingURL;
+		    String linkage = AggregatedTRIGGERConnector.BASE_URL + queryPath + "where=userId=" + userId;
 		    Online o = new Online();
 		    o.setLinkage(linkage);
 		    o.setFunctionCode("download");

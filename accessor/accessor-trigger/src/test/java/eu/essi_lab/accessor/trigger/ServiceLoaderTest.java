@@ -28,16 +28,24 @@ public class ServiceLoaderTest {
 
 	    List<IHarvestedAccessor> disAccessors = AccessorFactory.getHarvestedAccessors(LookupPolicy.SPECIFIC);
 
-	    Assert.assertEquals(1, disAccessors.size());
+	    Assert.assertEquals(2, disAccessors.size());
 
-	    Assert.assertEquals(TRIGGERAccessor.class, disAccessors.get(0).getClass());
+	    List<Class> classes = StreamUtils.iteratorToStream(disAccessors.iterator()).map(Object::getClass).//
+		    collect(java.util.stream.Collectors.toList());
+
+	    Assert.assertTrue(classes.contains(TRIGGERAccessor.class));
+	    Assert.assertTrue(classes.contains(AggregatedTRIGGERAccessor.class));
 	}
 	{
 	    List<IHarvestedAccessor> disAccessors = AccessorFactory.getHarvestedAccessors(LookupPolicy.ALL);
 
-	    Assert.assertEquals(1, disAccessors.size());
+	    Assert.assertEquals(2, disAccessors.size());
 
-	    Assert.assertEquals(TRIGGERAccessor.class, disAccessors.get(0).getClass());
+	    List<Class> classes = StreamUtils.iteratorToStream(disAccessors.iterator()).map(Object::getClass).//
+		    collect(java.util.stream.Collectors.toList());
+
+	    Assert.assertTrue(classes.contains(TRIGGERAccessor.class));
+	    Assert.assertTrue(classes.contains(AggregatedTRIGGERAccessor.class));
 	}
 
 	{
@@ -53,7 +61,11 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<IHarvestedQueryConnector> loader = ServiceLoader.load(IHarvestedQueryConnector.class);
 
-	Assert.assertEquals(TRIGGERConnector.class, loader.iterator().next().getClass());
+	List<Class> classes = StreamUtils.iteratorToStream(loader.iterator()).map(Object::getClass).//
+		collect(java.util.stream.Collectors.toList());
+
+	Assert.assertTrue(classes.contains(TRIGGERConnector.class));
+	Assert.assertTrue(classes.contains(AggregatedTRIGGERConnector.class));
     }
 
     @Test
@@ -63,6 +75,11 @@ public class ServiceLoaderTest {
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
 		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.TRIGGER)).//
+		findFirst().//
+		isPresent());
+
+	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator()).//
+		filter(c -> c.getSupportedOriginalMetadataSchema().equals(CommonNameSpaceContext.AGGREGATED_TRIGGER)).//
 		findFirst().//
 		isPresent());
 
@@ -81,6 +98,16 @@ public class ServiceLoaderTest {
 
 	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
 		.filter(c -> c.getClass().getName().equals(TRIGGERConnector.class.getName())).//
+		findFirst().//
+		isPresent());
+
+	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
+		.filter(c -> c.getClass().getName().equals(AggregatedTRIGGERAccessor.class.getName())).//
+		findFirst().//
+		isPresent());
+
+	Assert.assertTrue(StreamUtils.iteratorToStream(loader.iterator())
+		.filter(c -> c.getClass().getName().equals(AggregatedTRIGGERConnector.class.getName())).//
 		findFirst().//
 		isPresent());
 
