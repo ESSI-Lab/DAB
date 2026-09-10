@@ -226,9 +226,7 @@ public class HISCentralAbruzzoMapper extends FileIdentifierMapper {
 	String identifier = mangler.getMangling();
 
 	String baseUrl = dataset.getSource().getEndpoint();
-	if (baseUrl == null || baseUrl.isEmpty()) {
-	    baseUrl = HISCentralAbruzzoConnector.BASE_URL;
-	}
+
 	String linkage = HISCentralAbruzzoConnector.buildDataSeriesLinkage(baseUrl, stationId, measureId);
 
 	coreMetadata.addDistributionOnlineResource(identifier, linkage, CommonNameSpaceContext.HISCENTRAL_ABRUZZO_NS_URI,

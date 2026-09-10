@@ -67,6 +67,7 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 
     private static final int LEGEND_TEXT_RIGHT_PADDING = 4;
     private static final String ITA_ISPRA_ANNALI_SOURCE_ID = "ita-ispra-annali";
+    private static final String ITA_ISPRA_RATING_CURVES_SOURCE_ID = "ita-ispra-rating-curves";
 
     private int fontSize;
     private int lineSize;
@@ -259,8 +260,11 @@ public class WMSGetLegendHandler extends StreamingRequestHandler {
 		    igTest.setFont(font);
 		    FontRenderContext fontRenderContext = igTest.getFontRenderContext();
 		    for (GSSource source : sources) {
-			String label = source.getLabel();
 			String sourceId = source.getUniqueIdentifier();
+			if (ITA_ISPRA_RATING_CURVES_SOURCE_ID.equals(sourceId)) {
+			    continue;
+			}
+			String label = source.getLabel();
 			if (sourceId.startsWith("ita-sir") || sourceId.toLowerCase().contains("hiscentral")) {
 			    label = label.replace("Italy, Sistema Informativo Regionale", "");
 			    label = label.replace("Italy, Sistema Informativo della Provincia Autonoma di", "");

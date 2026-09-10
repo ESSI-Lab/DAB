@@ -56,12 +56,8 @@ public class HISCentralBolzanoConnector extends HarvestedQueryConnector<HISCentr
     }
 
     /**
-     * BASE_URL= http://daten.buergernetz.bz.it/services/meteo/v1/
-     * 
-     * GET STATIONS: http://daten.buergernetz.bz.it/services/meteo/v1/stations?coord_sys=EPSG:3857
-     * GET SENSORS: http://daten.buergernetz.bz.it/services/meteo/v1/sensors?station_code=19850PG
-     * GET DATA FROM TO:
-     * http://daten.buergernetz.bz.it/services/meteo/v1/timeseries?station_code=19850PG&sensor_code=Q&date_from=20160114&date_to=20160214
+     *
+     *
      */
 
     static final String STATIONS_URL = "stations?coord_sys=EPSG:3857";
@@ -71,11 +67,9 @@ public class HISCentralBolzanoConnector extends HarvestedQueryConnector<HISCentr
      */
     static final String SENSOR_URL = "sensors?station_code=";
 
-    public static final String BASE_URL = "http://daten.buergernetz.bz.it/services/meteo/v1/";
-
     private static final String HIS_CENTRAL_BOLZANO_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_BOLZANO_CONNECTOR_DOWNLOAD_ERROR";
 
-    private Downloader downloaader = new Downloader();
+    private Downloader downloader = new Downloader();
 
     /**
      * 
@@ -141,7 +135,7 @@ public class HISCentralBolzanoConnector extends HarvestedQueryConnector<HISCentr
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 
 	try {
-	    Optional<String> response = downloaader.downloadOptionalString(url);
+	    Optional<String> response = downloader.downloadOptionalString(url);
 
 	    if (response.isPresent()) {
 		JSONArray obj = new JSONArray(response.get());
@@ -158,7 +152,7 @@ public class HISCentralBolzanoConnector extends HarvestedQueryConnector<HISCentr
 	String url = getSourceURL() + STATIONS_URL;
 	GSLoggerFactory.getLogger(getClass()).info("Getting " + url);
 	try {
-	    Optional<String> response = downloaader.downloadOptionalString(url);
+	    Optional<String> response = downloader.downloadOptionalString(url);
 
 	    if (response.isPresent()) {
 		JSONObject obj = new JSONObject(response.get());

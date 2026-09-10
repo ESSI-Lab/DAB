@@ -55,7 +55,7 @@ public class HISCentralMarcheAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralMarcheConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralMarcheConnector.BASE_URL);
+	gsSourceSetting.setSourceEndpoint("http://app.protezionecivile.marche.it");
 
 	GSSource accessorSource = accessor.getSource();
 
@@ -114,7 +114,7 @@ public class HISCentralMarcheAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralMarcheConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralMarcheConnector.BASE_URL);
+	gsSourceSetting.setSourceEndpoint("http://app.protezionecivile.marche.it");
 
 	GSSource accessorSource = accessor.getSource();
 

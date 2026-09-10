@@ -209,6 +209,11 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	}
 
 	//
+	// Temporal extent from dataset-level Metadata TemporalExtent
+	//
+	addTemporalExtentFromMetadata(md, mi);
+
+	//
 	// Reference system (WGS84, as used by DataStream Locations)
 	//
 	ReferenceSystem referenceSystem = new ReferenceSystem();
@@ -417,14 +422,21 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	}
 
 	//
-	// Temporal extent: when available, use the first/last observation dates
-	// computed at connector level; otherwise fall back to a placeholder extent to
-	// mark it as a time series.
+	// Temporal extent: dataset-level TemporalExtent propagated by the connector,
+	// or parsed directly from embedded metadata when present.
 	//
 	String firstObsDate = json.optString("firstObservationDate", null);
 	String firstObsTime = json.optString("firstObservationTime", null);
 	String lastObsDate = json.optString("lastObservationDate", null);
 	String lastObsTime = json.optString("lastObservationTime", null);
+
+	if ((firstObsDate == null || firstObsDate.isEmpty()) && (lastObsDate == null || lastObsDate.isEmpty()) && md != null) {
+	    DataStreamClient.TemporalExtentDates extent = DataStreamClient.parseTemporalExtent(md);
+	    if (extent != null) {
+		firstObsDate = extent.beginDate;
+		lastObsDate = extent.endDate;
+	    }
+	}
 
 	TemporalExtent tempExtent = new TemporalExtent();
 	if (firstObsDate != null && !firstObsDate.isEmpty()) {
@@ -441,8 +453,10 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	    }
 	    tempExtent.setEndPosition(end);
 	}
-	mi.getDataIdentification().addTemporalExtent(tempExtent);
-	setIndeterminatePosition(dataset);
+	if (tempExtent.getBeginPosition() != null || tempExtent.getEndPosition() != null) {
+	    mi.getDataIdentification().addTemporalExtent(tempExtent);
+	    setIndeterminatePosition(dataset);
+	}
 	//
 	// Reference system (WGS84)
 	//
@@ -515,6 +529,21 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	mi.setLanguage("English");
 	mi.setCharacterSetCode("utf8");
 	mi.addHierarchyLevelScopeCodeListValue("dataset");
+    }
+
+    private static void addTemporalExtentFromMetadata(JSONObject md, MIMetadata mi) {
+	DataStreamClient.TemporalExtentDates extent = DataStreamClient.parseTemporalExtent(md);
+	if (extent == null) {
+	    return;
+	}
+	TemporalExtent tempExtent = new TemporalExtent();
+	if (extent.beginDate != null) {
+	    tempExtent.setBeginPosition(extent.beginDate);
+	}
+	if (extent.endDate != null) {
+	    tempExtent.setEndPosition(extent.endDate);
+	}
+	mi.getDataIdentification().addTemporalExtent(tempExtent);
     }
 }
 

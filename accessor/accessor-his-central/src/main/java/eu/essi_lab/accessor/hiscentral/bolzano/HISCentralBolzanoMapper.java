@@ -311,7 +311,9 @@ public class HISCentralBolzanoMapper extends FileIdentifierMapper {
 
 	String identifier = mangler.getMangling();
 
-	String linkage = HISCentralBolzanoConnector.BASE_URL + "timeseries?station_code=" + stationId + "&sensor_code=" + parameterType;
+	String url = dataset.getSource().getEndpoint();
+
+	String linkage = !url.endsWith("/") ? url + "/timeseries?station_code=" + stationId + "&sensor_code=" + parameterType : url + "timeseries?station_code=" + stationId + "&sensor_code=" + parameterType;;
 
 	coreMetadata.addDistributionOnlineResource(identifier, linkage, CommonNameSpaceContext.HISCENTRAL_BOLZANO_NS_URI, "download");
 

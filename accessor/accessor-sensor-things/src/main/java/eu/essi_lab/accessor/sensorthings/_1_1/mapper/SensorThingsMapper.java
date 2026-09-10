@@ -368,16 +368,18 @@ public abstract class SensorThingsMapper extends AbstractResourceMapper {
 	mangler.setStreamIdentifer(stream.getIdentifier().get());
 	mangler.setQuoteIdentifiers(quoteIdentifiers.toString());
 
-	String onlineResourceIdentifier = mangler.getMangling();
-	if (datastreamIdProperty != null && sourceIdentifier != null && !sourceIdentifier.isEmpty()) {
-	    onlineResourceIdentifier = generateCode(sourceIdentifier ,datastreamIdProperty);
-	}
+	String onlineResourceName = mangler.getMangling();
 
 	coreMetadata.addDistributionOnlineResource(//
-		onlineResourceIdentifier, //
+		onlineResourceName, //
 		sourceUrl, //
 		getSupportedProtocol(), //
 		"download");
+
+	if (datastreamIdProperty != null && sourceIdentifier != null && !sourceIdentifier.isEmpty()) {
+	    coreMetadata.getMIMetadata().getDistribution().getDistributionOnline()
+		    .setIdentifier(generateCode(sourceIdentifier, datastreamIdProperty));
+	}
     }
 
     /**

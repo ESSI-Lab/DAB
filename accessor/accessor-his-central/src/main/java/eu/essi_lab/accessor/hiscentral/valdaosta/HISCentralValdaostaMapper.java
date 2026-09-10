@@ -555,9 +555,10 @@ public class HISCentralValdaostaMapper extends FileIdentifierMapper {
 	    tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	}
 	// data linkage (last 24 hours)
-	String linkage = HISCentralValdaostaConnector.BASE_URL.endsWith("/")
-		? HISCentralValdaostaConnector.BASE_URL + "data_time_series/" + timeSeriesId + "/24"
-		: HISCentralValdaostaConnector.BASE_URL + "/data_time_series/" + timeSeriesId + "/24";
+	String baseUrl = dataset.getSource().getEndpoint();
+	String linkage = baseUrl.endsWith("/")
+		? baseUrl + "data_time_series/" + timeSeriesId + "/24"
+		: baseUrl + "/data_time_series/" + timeSeriesId + "/24";
 
 	Online online = new Online();
 	online.setLinkage(linkage);

@@ -238,8 +238,6 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    hexacode = "#CC99FF";
 	    break;
 	case "ita-sir-emilia-romagna":
-	    hexacode = "#00CCFF";
-	    break;
 	case "ita-sir-emilia-romagna-simc":
 	    hexacode = "#3333FF";
 	    break;

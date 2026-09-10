@@ -414,7 +414,6 @@ public class HISCentralBasilicataDownloader extends WMLDataDownloader {
 		return (online.getFunctionCode() != null && //
 				online.getFunctionCode().equals("download") && //
 				online.getLinkage() != null && //
-				online.getLinkage().contains(HISCentralBasilicataConnector.BASE_URL) && //
 				online.getProtocol() != null && //
 				online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_BASILICATA_NS_URI));
 	}

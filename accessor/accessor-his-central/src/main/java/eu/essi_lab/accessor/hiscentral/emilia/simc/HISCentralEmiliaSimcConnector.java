@@ -51,9 +51,6 @@ public class HISCentralEmiliaSimcConnector extends HarvestedQueryConnector<HISCe
 
     private static final String HISCENTRAL_EMILIA_SIMC_URL_NOT_FOUND_ERROR = "HISCENTRAL_EMILIA_SIMC_URL_NOT_FOUND_ERROR";
 
-    /** Default Eve REST root (see {@link ArpaeSimcMeteoOpenDataClient#DEFAULT_BASE_URL}). */
-    public static final String BASE_URL = ArpaeSimcMeteoOpenDataClient.DEFAULT_BASE_URL;
-
     /** Eve max_results per page when listing stations and the dataset catalogue. */
     private static final int API_PAGE_SIZE = 200;
 
@@ -130,9 +127,6 @@ public class HISCentralEmiliaSimcConnector extends HarvestedQueryConnector<HISCe
 
     private void populateHarvestRecords() throws GSException {
 	String baseUrl = getSourceURL();
-	if (baseUrl == null || baseUrl.isEmpty()) {
-	    baseUrl = BASE_URL;
-	}
 	logger.info("Emilia-SIMC populateHarvestRecords START baseUrl={} apiPageSize={}", baseUrl, API_PAGE_SIZE);
 	ArpaeSimcMeteoOpenDataClient client = new ArpaeSimcMeteoOpenDataClient(baseUrl);
 	try {

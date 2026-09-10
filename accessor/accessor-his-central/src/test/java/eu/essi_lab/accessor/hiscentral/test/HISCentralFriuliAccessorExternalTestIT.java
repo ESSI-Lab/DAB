@@ -129,7 +129,7 @@ public class HISCentralFriuliAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralFriuliConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralFriuliConnector.DEFAULT_BASE_URL);
+	gsSourceSetting.setSourceEndpoint("https://api.meteo.fvg.it/api/ws/");
 
 	GSSource accessorSource = accessor.getSource();
 

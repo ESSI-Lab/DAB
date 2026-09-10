@@ -246,9 +246,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
     /**
      *
      */
-    public static final String BASE_URL = "https://utility.arpa.piemonte.it/meteoidro/";
-
-    public static final String REAL_TIME_URL = "https://utility.arpa.piemonte.it/api_realtime/";
+    public static final String REAL_TIME_PATH = "api_realtime";
 
     private int maxRecords;
 
@@ -268,7 +266,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 		page = Integer.valueOf(rt);
 	    }
 
-	    HISCentralPiemonteClient client = new HISCentralPiemonteClient(BASE_URL);
+	    HISCentralPiemonteClient client = new HISCentralPiemonteClient(getSourceURL());
 
 	    String path = "";
 	    String getVariableField = "";
@@ -347,7 +345,7 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
 
 			    if (!ids.contains(stationCode)) {
 				ids.add(stationCode);
-				HISCentralPiemonteClient rt_client = new HISCentralPiemonteClient(REAL_TIME_URL);
+				HISCentralPiemonteClient rt_client = new HISCentralPiemonteClient(getRealTimeURL());
 
 				// 'https://utility.arpa.piemonte.it/api_realtime/data_pie?station_code=001&page=1&page_size=100
 				String rt_path = DATA_URL + "?station_code=" + stationCode + "&page=1&page_size=100";
@@ -525,6 +523,37 @@ public class HISCentralPiemonteConnector extends HarvestedQueryConnector<HISCent
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
 	return endpoint.contains("arpa.piemonte.it");
+    }
+
+    /**
+     * Real-time API root derived from the configured source host (sibling of {@code /meteoidro/}).
+     */
+    public static String realTimeUrlFromEndpoint(String endpoint) {
+
+	try {
+	    java.net.URI uri = java.net.URI.create(endpoint);
+	    StringBuilder root = new StringBuilder();
+	    root.append(uri.getScheme()).append("://").append(uri.getHost());
+	    if (uri.getPort() > 0) {
+		root.append(":").append(uri.getPort());
+	    }
+	    return root.append("/").append(REAL_TIME_PATH).append("/").toString();
+	} catch (Exception e) {
+	    String base = endpoint;
+	    int idx = base.indexOf("://");
+	    if (idx > 0) {
+		int pathStart = base.indexOf('/', idx + 3);
+		if (pathStart > 0) {
+		    base = base.substring(0, pathStart);
+		}
+	    }
+	    return base.endsWith("/") ? base + REAL_TIME_PATH + "/" : base + "/" + REAL_TIME_PATH + "/";
+	}
+    }
+
+    private String getRealTimeURL() {
+
+	return realTimeUrlFromEndpoint(getSourceURL());
     }
 
     @Override

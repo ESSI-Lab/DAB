@@ -556,7 +556,9 @@ public class HISCentralPiemonteMapper extends FileIdentifierMapper {
 		    dataset.getPropertyHandler().setIsRatingCurve(true);
 
 		} else if (realTimeData) {
-		    puntoMisuraUrl = HISCentralPiemonteConnector.REAL_TIME_URL + HISCentralPiemonteConnector.DATA_URL + "?station_code=" + stationCode + "&page=1&page_size=10000";
+		    String realTimeBase = HISCentralPiemonteConnector.realTimeUrlFromEndpoint(dataset.getSource().getEndpoint());
+		    puntoMisuraUrl = realTimeBase + HISCentralPiemonteConnector.DATA_URL + "?station_code=" + stationCode
+			    + "&page=1&page_size=10000";
 
 		    Online o = new Online();
 		    o.setLinkage(puntoMisuraUrl);
