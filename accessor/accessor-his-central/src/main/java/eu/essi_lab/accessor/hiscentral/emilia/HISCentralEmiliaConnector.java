@@ -61,8 +61,6 @@ public class HISCentralEmiliaConnector extends HarvestedQueryConnector<HISCentra
 
     private static final String HISCENTRAL_EMILIA_URL_NOT_FOUND_ERROR = "HISCENTRAL_EMILIA_URL_NOT_FOUND_ERROR";
 
-    public static final String BASE_URL = "https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl";
-
     private List<HISCentralEmiliaStation> stations;
 
     private int partialNumbers;

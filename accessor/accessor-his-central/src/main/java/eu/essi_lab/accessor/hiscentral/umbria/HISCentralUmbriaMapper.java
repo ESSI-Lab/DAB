@@ -367,7 +367,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 
 	// temporal extent
 
-	Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> postResult = HISCentralUmbriaConnector.postData(sensorObj, SORT_ORDER.DESC, resourceIdentifier);
+	Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> postResult = HISCentralUmbriaConnector.postData(
+		dataset.getSource().getEndpoint(), sensorObj, SORT_ORDER.DESC, resourceIdentifier);
 	HISCentralUmbriaMeasurementInfo listRes = postResult.get(variable);
 	String tempExtentEnd = listRes.getDate();
 	if (tempExtenBegin != null && tempExtentEnd != null) {
@@ -445,7 +446,8 @@ public class HISCentralUmbriaMapper extends FileIdentifierMapper {
 
 	String identifier = mangler.getMangling();
 
-	coreMetadata.addDistributionOnlineResource(identifier, HISCentralUmbriaConnector.BASE_SQL_URL,
+	coreMetadata.addDistributionOnlineResource(identifier,
+		HISCentralUmbriaConnector.sqlUrlFromEndpoint(dataset.getSource().getEndpoint()),
 		CommonNameSpaceContext.HISCENTRAL_UMBRIA_NS_URI, "download");
 
 	coreMetadata.getDataIdentification().setResourceIdentifier(identifier);

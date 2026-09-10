@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
@@ -39,6 +40,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileManager;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -49,12 +51,16 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class EMOBONClient {
 
-	private String DCAT_NS = "http://www.w3.org/ns/dcat#";
-	private String DATASET_LOCALNAME = "dataset";
+	private static final String DCAT_NS = "http://www.w3.org/ns/dcat#";
+	private static final String CATALOG_LOCALNAME = "Catalog";
+	private static final String DATASET_LOCALNAME = "dataset";
+	private static final String CATALOG_FRAGMENT_PREFIX = "#catalog-";
+	private static final String EXCLUDED_CATALOG_CODE = "analysis_results_profile";
+	private static final String EMOBON_BASE_URL = "https://data.emobon.embrc.eu/";
 
 	private String endpoint = "";
 
-	private static String DEFAULT_ENDPOINT = "https://data.emobon.embrc.eu/metadata.ttl";
+	private static String DEFAULT_ENDPOINT = "https://data.emobon.embrc.eu/dump-dset-catalogue-docker/emobon-dcat-combined.ttl";
 
 	private Logger logger = GSLoggerFactory.getLogger(getClass());
 	
@@ -88,35 +94,81 @@ public class EMOBONClient {
 			// Load data from a Turtle file into the model
 			mainModel = FileManager.get().readModel(mainModel, tempFile.getAbsolutePath());
 
-			// Iterate over the statements in the model and extract dataset URIs
-			StmtIterator iter = mainModel.listStatements();
-			while (iter.hasNext()) {
-				Statement statement = iter.nextStatement();
-				Property predicate = statement.getPredicate();
-				RDFNode object = statement.getObject();
-				if (isDataset(predicate)) {
-					Resource datasetResource = object.asResource();
-					String datasetURI = datasetResource.getURI();
-					// Only add observatory crates, skip profile datasets
-					if (datasetURI != null && datasetURI.contains("observatory-") && datasetURI.endsWith("-crate/")) {
-						// Store the actual URI as it appears in the model
-						datasetURIs.add(datasetURI);
-						datasetResources.add(datasetResource);
-					}
-				}
-			}
+			discoverObservatoryCrates();
 			tempFile.delete();
 		}
 	}
 
+	private void discoverObservatoryCrates() {
+		TreeSet<String> observatoryCrateURIs = discoverFromObservatoryCatalogs();
+		if (!observatoryCrateURIs.isEmpty()) {
+			datasetURIs.addAll(observatoryCrateURIs);
+			logger.info("Found {} EMOBON observatory catalogs (combined DCAT format)", datasetURIs.size());
+			return;
+		}
+
+		observatoryCrateURIs = discoverFromObservatoryDatasets();
+		datasetURIs.addAll(observatoryCrateURIs);
+		logger.info("Found {} EMOBON observatory datasets (legacy DCAT format)", datasetURIs.size());
+	}
+
+	private TreeSet<String> discoverFromObservatoryCatalogs() {
+		TreeSet<String> observatoryCrateURIs = new TreeSet<>();
+		Resource catalogType = mainModel.createResource(DCAT_NS + CATALOG_LOCALNAME);
+		StmtIterator iter = mainModel.listStatements(null, RDF.type, catalogType);
+		while (iter.hasNext()) {
+			Statement statement = iter.nextStatement();
+			String catalogURI = statement.getSubject().getURI();
+			String observatoryCrateURI = mapCatalogUriToObservatoryCrateUri(catalogURI);
+			if (observatoryCrateURI != null) {
+				observatoryCrateURIs.add(observatoryCrateURI);
+			}
+		}
+		iter.close();
+		return observatoryCrateURIs;
+	}
+
+	private TreeSet<String> discoverFromObservatoryDatasets() {
+		TreeSet<String> observatoryCrateURIs = new TreeSet<>();
+		StmtIterator iter = mainModel.listStatements();
+		while (iter.hasNext()) {
+			Statement statement = iter.nextStatement();
+			if (!isDataset(statement.getPredicate())) {
+				continue;
+			}
+			RDFNode object = statement.getObject();
+			if (!object.isResource()) {
+				continue;
+			}
+			String datasetURI = object.asResource().getURI();
+			if (isObservatoryCrateUri(datasetURI)) {
+				observatoryCrateURIs.add(datasetURI);
+			}
+		}
+		iter.close();
+		return observatoryCrateURIs;
+	}
+
 	private boolean isDataset(Property predicate) {
-		String ns = predicate.getNameSpace();
-		String localname = predicate.getLocalName();
-		return ns.equals(DCAT_NS) && localname.equals(DATASET_LOCALNAME);
+		return DCAT_NS.equals(predicate.getNameSpace()) && DATASET_LOCALNAME.equals(predicate.getLocalName());
+	}
+
+	private boolean isObservatoryCrateUri(String datasetURI) {
+		return datasetURI != null && datasetURI.contains("observatory-") && datasetURI.endsWith("-crate/");
+	}
+
+	private String mapCatalogUriToObservatoryCrateUri(String catalogURI) {
+		if (catalogURI == null || !catalogURI.contains(CATALOG_FRAGMENT_PREFIX)) {
+			return null;
+		}
+		String catalogCode = catalogURI.substring(catalogURI.indexOf(CATALOG_FRAGMENT_PREFIX) + CATALOG_FRAGMENT_PREFIX.length());
+		if (catalogCode.isEmpty() || EXCLUDED_CATALOG_CODE.equals(catalogCode)) {
+			return null;
+		}
+		return EMOBON_BASE_URL + "observatory-" + catalogCode + "-crate/";
 	}
 
 	private List<String> datasetURIs = new ArrayList<>();
-	private List<Resource> datasetResources = new ArrayList<>();
 
 	public List<String> getDatasetURIs() {
 		return datasetURIs;

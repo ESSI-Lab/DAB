@@ -136,7 +136,6 @@ public class HISCentralPiemonteScaleDeflussoDownloader extends WMLDataDownloader
 	boolean ret = (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralPiemonteConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI));
 

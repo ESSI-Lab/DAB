@@ -52,7 +52,7 @@ import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodWithBody;
 import eu.essi_lab.lib.utils.ClonableInputStream;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.utils.JSONUtils;
+import eu.essi_lab.lib.utils.IOStreamUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
 import eu.essi_lab.lib.xml.XMLDocumentWriter;
 import eu.essi_lab.messages.DiscoveryMessage;
@@ -67,9 +67,11 @@ import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.spatial.SpatialExtent;
 import eu.essi_lab.model.SortOrder;
+import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceType;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.profiler.oaipmh.profile.mapper.wigos.WIGOS_MAPPER;
 
 public class OSCARTask extends AbstractCustomTask {
@@ -79,10 +81,10 @@ public class OSCARTask extends AbstractCustomTask {
     // source_id=argentina-ina
     // view_id=whos
 
-    public static final String OSCAR_ENDPOINT = "https://oscardepl.wmo.int/surface/rest/api/wmd/upload";
+    public static final String OSCAR_ENDPOINT = "https://oscardepl.wmo.int/surface/rest/api/wmd/upload?useOnlyGmlIds=FALSE";
 
     public enum OSCARTaskOptions implements OptionsKey {
-	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX, MAX_RECORD;
+	TOKEN, OSCAR_ENDPOINT, SOURCE, BBOX, COUNTRY, MAX_RECORD;
     }
 
     @Override
@@ -121,6 +123,7 @@ public class OSCARTask extends AbstractCustomTask {
 	}
 
 	String bbox = taskOptions.get().get(OSCARTaskOptions.BBOX);
+	String countryOption = taskOptions.get().get(OSCARTaskOptions.COUNTRY);
 
 	String tokenName = "X-WMO-WMDR-Token";
 
@@ -169,6 +172,14 @@ public class OSCARTask extends AbstractCustomTask {
 
 	String[] splits = sourceId.split(";");
 
+	int totalStations = 0;
+	int totalDatasets = 0;
+	int totalUploadedOk = 0;
+	int totalUploadedFailed = 0;
+	int totalSkipped = 0;
+
+	log(status, "OSCAR upload task STARTED");
+
 	for (String split : splits) {
 
 	    WIGOS_MAPPER wigosMapper = new WIGOS_MAPPER();
@@ -184,21 +195,27 @@ public class OSCARTask extends AbstractCustomTask {
 	    Bond bond;
 
 	    Bond b = BondFactory.createResourceTypeBond(ResourceType.DATASET);
-	    if (bbox != null) {
-		bond = BondFactory.createSourceIdentifierBond(split);
+	    bond = BondFactory.createSourceIdentifierBond(split);
+
+	    if (countryOption != null && !countryOption.isBlank()) {
+		Country country = Country.decode(countryOption.trim());
+		if (country == null) {
+		    GSLoggerFactory.getLogger(getClass()).error("Unrecognized country option: {}", countryOption);
+		    return;
+		}
+		// Prefer ISO3 index (same as timeseries API); Country short name is also stored on harvest
+		Bond countryBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.COUNTRY_ISO3, country.getISO3());
+		bond = BondFactory.createAndBond(bond, countryBond, b);
+		GSLoggerFactory.getLogger(getClass()).info("Filtering by country {} ({})", country.getShortName(), country.getISO3());
+	    } else if (bbox != null) {
 		String[] splittedBox = bbox.split(",");
-		SpatialExtent saExtent = new SpatialExtent(); // bbox=11.558,-38.098,39.868,-23.743
-		saExtent.setEast(Double.valueOf(splittedBox[2])); // 'ZA': ('South Africa', (16.3449768409,
-								  // -34.8191663551,
-								  // // 32.830120477, -22.0913127581)),
+		SpatialExtent saExtent = new SpatialExtent(); // bbox=west,south,east,north
+		saExtent.setEast(Double.valueOf(splittedBox[2]));
 		saExtent.setNorth(Double.valueOf(splittedBox[3]));
 		saExtent.setSouth(Double.valueOf(splittedBox[1]));
 		saExtent.setWest(Double.valueOf(splittedBox[0]));
 		bond = BondFactory.createAndBond(bond, BondFactory.createSpatialEntityBond(BondOperator.INTERSECTS, saExtent), b);
-		// bond = BondFactory.createAndBond(bond, BondFactory.createSimpleValueBond(BondOperator.EQUAL,
-		// MetadataElement.COUNTRY, "South Africa")); //
 	    } else {
-		bond = BondFactory.createSourceIdentifierBond(split);
 		bond = BondFactory.createAndBond(bond, b);
 	    }
 
@@ -216,8 +233,10 @@ public class OSCARTask extends AbstractCustomTask {
 	    int start = 1;
 	    int pageSize = 50;
 	    Downloader downloader = new Downloader();
-	    HashMap<String, String> params = new HashMap<String, String>();
-	    params.put(tokenName, tokenValue);
+	    HashMap<String, String> headers = new HashMap<>();
+	    headers.put(tokenName, tokenValue);
+	    headers.put("Content-Type", "application/xml");
+	    headers.put("Accept", "*/*");
 	    String platformIdentifier = null;
 	    Map<String, List<GSResource>> oscarMap = new LinkedHashMap<String, List<GSResource>>();
 	    List<GSResource> resList = new ArrayList<GSResource>();
@@ -271,9 +290,19 @@ public class OSCARTask extends AbstractCustomTask {
 	    if (!resList.isEmpty()) {
 		oscarMap.put(platformIdentifier, new ArrayList<>(resList));
 	    }
-	    GSLoggerFactory.getLogger(getClass()).info("OSCAR MAP SIZE" + ": " + oscarMap.size());
+
+	    int sourceDatasets = oscarMap.values().stream().mapToInt(List::size).sum();
+	    int sourceStations = oscarMap.size();
+	    totalStations += sourceStations;
+	    totalDatasets += sourceDatasets;
+
+	    GSLoggerFactory.getLogger(getClass()).info("OSCAR MAP SIZE: {}", sourceStations);
+	    log(status, "Source " + split + ": " + sourceStations + " stations, " + sourceDatasets + " datasets");
 
 	    int count = 0;
+	    int uploadedOk = 0;
+	    int uploadedFailed = 0;
+	    int skipped = 0;
 	    for (Map.Entry<String, List<GSResource>> entry : oscarMap.entrySet()) {
 		if (limit != null && count >= limit) {
 		    break;
@@ -285,60 +314,64 @@ public class OSCARTask extends AbstractCustomTask {
 		try {
 
 		    String doc = wigosMapper.mapStations(gsresources, key);
-		    if(doc == null) {
+		    if (doc == null) {
+			skipped++;
 			continue;
 		    }
 		    doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-		    params.put("UseOnlyGmlIds", "FALSE");
 		    HttpRequest postRequest = HttpRequestUtils.build(//
 			    MethodWithBody.POST, //
-			    finalEndpoint, doc, params);
+			    finalEndpoint, doc, headers);
 
 		    HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
 
 		    InputStream content = response.body();
+		    String responseBody = IOStreamUtils.asUTF8String(content);
+		    int statusCode = response.statusCode();
+		    GSLoggerFactory.getLogger(getClass()).info("OSCAR HTTP {} response body: {}", statusCode, responseBody);
 
-		    JSONObject jsonObject = JSONUtils.fromStream(content);
+		    String trimmed = responseBody == null ? "" : responseBody.trim();
+		    if (trimmed.isEmpty() || (!trimmed.startsWith("{") && !trimmed.startsWith("["))) {
+			GSLoggerFactory.getLogger(getClass()).error("OSCAR non-JSON response for {}: HTTP {} - {}", key, statusCode,
+				responseBody);
+			uploadedFailed++;
+			continue;
+		    }
+
+		    JSONObject jsonObject = new JSONObject(responseBody);
 
 		    String xmlStatus = jsonObject.optString("xmlStatus");
 		    String logs = jsonObject.optString("logs");
 		    String idResponse = jsonObject.optString("id");
 
 		    GSLoggerFactory.getLogger(getClass()).info("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
+
+		    boolean failedStatus = xmlStatus.equalsIgnoreCase("ERROR") || xmlStatus.equalsIgnoreCase("FAILED")
+			    || xmlStatus.equalsIgnoreCase("FAILURE");
+		    if (statusCode >= 200 && statusCode < 300 && !failedStatus) {
+			uploadedOk++;
+		    } else {
+			uploadedFailed++;
+		    }
 		    count++;
 
 		} catch (Exception e) {
+		    uploadedFailed++;
 		    GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
 		}
 
 	    }
-	    // oscarMap.forEach((key, gsresource) -> {
-	    // try {
-	    // String doc = wigosMapper.mapStations(gsresource, key);
-	    // doc = doc.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-	    // HttpRequest postRequest = HttpRequestUtils.build(//
-	    // MethodWithBody.POST, //
-	    // finalEndpoint, doc, params);
-	    //
-	    // HttpResponse<InputStream> response = downloader.downloadResponse(postRequest);
-	    //
-	    // InputStream content = response.body();
-	    //
-	    // JSONObject jsonObject = JSONUtils.fromStream(content);
-	    //
-	    // String xmlStatus = jsonObject.optString("xmlStatus");
-	    // String logs = jsonObject.optString("logs");
-	    // String idResponse = jsonObject.optString("id");
-	    //
-	    // GSLoggerFactory.getLogger(getClass()).info("ID_RESPONSE:" + idResponse + "-" + xmlStatus + ": " + logs);
-	    //
-	    //
-	    // } catch (Exception e) {
-	    // GSLoggerFactory.getLogger(getClass()).error(e.getMessage());
-	    // }
-	    // });
-	    // }
+
+	    totalUploadedOk += uploadedOk;
+	    totalUploadedFailed += uploadedFailed;
+	    totalSkipped += skipped;
+
+	    log(status, "Source " + split + " upload result: ok=" + uploadedOk + ", failed=" + uploadedFailed + ", skipped=" + skipped);
 	}
+
+	log(status, "OSCAR upload task ENDED - stations=" + totalStations + ", datasets=" + totalDatasets + ", uploadedOk="
+		+ totalUploadedOk + ", uploadedFailed=" + totalUploadedFailed + ", skipped=" + totalSkipped);
+	status.setPhase(JobPhase.COMPLETED);
 
     }
 

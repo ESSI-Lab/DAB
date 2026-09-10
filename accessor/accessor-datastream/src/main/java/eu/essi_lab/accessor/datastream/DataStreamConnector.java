@@ -22,7 +22,6 @@ package eu.essi_lab.accessor.datastream;
  */
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -288,10 +287,7 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    List<DataStreamClient.Location> block = locations.subList(fromIndex, toIndex);
 	    int observationSampleSet = getSetting().getObservationSampleSet();
 
-	    LocalDate now = LocalDate.now();
-	    LocalDate oneYearAgo = now.minusYears(1);
-	    String defaultFirstDate = oneYearAgo.toString();
-	    String defaultLastDate = now.toString();
+	    DataStreamClient.TemporalExtentDates temporalExtent = DataStreamClient.parseTemporalExtent(dataset.raw);
 
 	    for (DataStreamClient.Location location : block) {
 		Map<String, String> characteristicNamesToUnits = client.getCharacteristicNamesWithUnits(dataset.doi, location.id,
@@ -307,8 +303,14 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 		    seriesJson.put("metadata", dataset.raw);
 		    seriesJson.put("characteristicName", cn);
 		    seriesJson.put("location", location.raw);
-		    seriesJson.put("firstObservationDate", defaultFirstDate);
-		    seriesJson.put("lastObservationDate", defaultLastDate);
+		    if (temporalExtent != null) {
+			if (temporalExtent.beginDate != null) {
+			    seriesJson.put("firstObservationDate", temporalExtent.beginDate);
+			}
+			if (temporalExtent.endDate != null) {
+			    seriesJson.put("lastObservationDate", temporalExtent.endDate);
+			}
+		    }
 		    if (unit != null && !unit.isEmpty()) {
 			seriesJson.put("resultUnit", unit);
 		    }
