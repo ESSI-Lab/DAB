@@ -81,8 +81,6 @@ public class HISCentralFriuliConnector extends HarvestedQueryConnector<HISCentra
      */
     static final String SENSOR_URL = "measures?station_id=";
 
-    public static final String DEFAULT_BASE_URL = "https://api.meteo.fvg.it/api/ws/";
-
     private static final String HIS_CENTRAL_FRIULI_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_FRIULI_CONNECTOR_DOWNLOAD_ERROR";
 
     private int countDataset = 0;

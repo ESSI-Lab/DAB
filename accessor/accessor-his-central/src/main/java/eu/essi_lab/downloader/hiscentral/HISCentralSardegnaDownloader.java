@@ -382,7 +382,6 @@ public class HISCentralSardegnaDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralSardegnaConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_NS_URI));
     }

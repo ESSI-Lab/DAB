@@ -198,7 +198,6 @@ public class HISCentralMarcheScaleDeflussoDownloader extends WMLDataDownloader {
 	boolean ret = (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralMarcheConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_MARCHE_SCALE_DEFLUSSO_NS_URI));
 

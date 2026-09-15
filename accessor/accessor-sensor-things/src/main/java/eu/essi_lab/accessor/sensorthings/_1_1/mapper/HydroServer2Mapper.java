@@ -54,6 +54,7 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.ExtensionHandler;
+import eu.essi_lab.model.resource.InterpolationType;
 
 /**
  * @author Fabrizio
@@ -454,7 +455,12 @@ public class HydroServer2Mapper extends SensorThingsMapper {
 	    aggregationStatistic = properties.optString("interpolationType");
 	}
 	if (!aggregationStatistic.isEmpty()) {
-	    handler.setTimeInterpolation(aggregationStatistic);
+	    InterpolationType interpolation = InterpolationType.decode(aggregationStatistic);
+	    if (interpolation != null) {
+		handler.setTimeInterpolation(interpolation);
+	    } else {
+		handler.setTimeInterpolation(aggregationStatistic);
+	    }
 	}
 
 	//

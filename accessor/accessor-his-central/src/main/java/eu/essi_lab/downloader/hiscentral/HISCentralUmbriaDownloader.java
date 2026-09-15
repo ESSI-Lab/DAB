@@ -109,7 +109,7 @@ public class HISCentralUmbriaDownloader extends WMLDataDownloader {
     @Override
     public boolean canDownload() {
 
-	return (online.getLinkage().contains("dati.regione.umbria.it") && online.getProtocol() != null
+	return (online.getLinkage() != null && online.getProtocol() != null
 		&& online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_UMBRIA_NS_URI));
 
     }

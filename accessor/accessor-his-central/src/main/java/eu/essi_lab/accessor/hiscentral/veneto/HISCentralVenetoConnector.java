@@ -79,11 +79,6 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 
     }
 
-    public static final String BASE_URL = "https://api.arpa.veneto.it/REST/v1/";
-
-    /**
-     * 
-     */
     public static final String DATA_URL = "meteo_storici_tabella";
     /**
      * 
@@ -298,7 +293,7 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 	Map<String, VenetoStation> map = new HashMap<String, VenetoStation>();
 
 	for (int i = startYear; i <= currentYear; i++) {
-	    String base_station_url = BASE_URL + METADATA_URL + "?";
+	    String base_station_url = getBaseURL() + METADATA_URL + "?";
 	    base_station_url += "anno=" + i + "&coordcd=" + sensorType;
 	    logger.info("Getting " + base_station_url);
 	    logger.trace("SIR VENETO LIST STATION FOR YEAR: {}", i);
@@ -368,7 +363,7 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 
     private JSONObject getMeasures(String id, int year) throws GSException {
 
-	String base_url = BASE_URL + DATA_URL + "?";// + STATIONS_URL;
+	String base_url = getBaseURL() + DATA_URL + "?";// + STATIONS_URL;
 
 	base_url += "anno=" + year + "&codseq=" + id;
 	logger.info("Getting " + base_url);
@@ -398,7 +393,7 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
 
     private JSONObject getStationsList(String sensorId) throws GSException {
 
-	String base_url = BASE_URL + METADATA_URL + "?";// + STATIONS_URL;
+	String base_url = getBaseURL() + METADATA_URL + "?";// + STATIONS_URL;
 
 	base_url += "anno=" + currentYear + "&coordcd=" + sensorId;
 	logger.info("Getting " + base_url);
@@ -442,6 +437,18 @@ public class HISCentralVenetoConnector extends HarvestedQueryConnector<HISCentra
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
 	return endpoint.contains("api.arpa.veneto.it");
+    }
+
+    /**
+     * @return source URL ending with {@code /}
+     */
+    private String getBaseURL() {
+
+	String url = getSourceURL();
+	if (!url.endsWith("/")) {
+	    url = url + "/";
+	}
+	return url;
     }
 
     @Override

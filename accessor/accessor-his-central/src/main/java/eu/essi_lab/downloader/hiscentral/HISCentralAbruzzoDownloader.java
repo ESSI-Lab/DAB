@@ -352,7 +352,6 @@ public class HISCentralAbruzzoDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains("idrodataabruzzo.siapmicros.com") && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_ABRUZZO_NS_URI));
     }
@@ -362,7 +361,7 @@ public class HISCentralAbruzzoDownloader extends WMLDataDownloader {
 
 	try {
 	    HISCentralAbruzzoConnector.ensureApiToken();
-	    return HttpConnectionUtils.checkConnectivity(HISCentralAbruzzoConnector.BASE_URL + "ping?api_token="
+	    return HttpConnectionUtils.checkConnectivity(online.getLinkage() + "ping?api_token="
 		    + HISCentralAbruzzoConnector.API_TOKEN);
 	} catch (URISyntaxException e) {
 

@@ -1517,7 +1517,8 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	DataGenerationType dgt = dataGeneration.getDataGeneration();
 	if (dgt == null) {
 	    dgt = new DataGenerationType();
-	    dgt.setId("_" + UUID.randomUUID().toString());
+	    // No gml:id: with UseOnlyGmlIds=FALSE OSCAR matches on content fields instead
+	    // dgt.setId("_" + UUID.randomUUID().toString());
 	}
 	dataGeneration.setDataGeneration(dgt);
 	return dataGeneration.getDataGeneration();
@@ -1812,7 +1813,7 @@ public class WIGOSMetadata implements IWIGOSMetadata {
 	    CIOnlineResourceType cionline = new CIOnlineResourceType();
 	    cionline.setId("_" + UUID.randomUUID().toString());
 	    URLPropertyType urlPt = new URLPropertyType();
-	    urlPt.setURL("<![CDATA[" + url + "]]>");
+	    urlPt.setURL(url);
 	    cionline.setLinkage(urlPt);
 	    online.setCIOnlineResource(cionline);
 	    mdo.getOnLine().add(online);

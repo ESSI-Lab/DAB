@@ -80,8 +80,6 @@ public class HISCentralValdaostaConnector extends HarvestedQueryConnector<HISCen
      */
     static final String SENSOR_URL = "elements?";
 
-    public static final String BASE_URL = "https://cf-api.regione.vda.it/ws2/";
-
     public static final String TOKEN_URL = "https://cf-api.regione.vda.it/ws2/login";
 
     private static final String HIS_CENTRAL_VALDAOSTA_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_VALDAOSTA_CONNECTOR_DOWNLOAD_ERROR";

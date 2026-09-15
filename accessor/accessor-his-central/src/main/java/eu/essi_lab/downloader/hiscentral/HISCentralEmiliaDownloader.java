@@ -303,7 +303,6 @@ public class HISCentralEmiliaDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralEmiliaConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_EMILIA_NS_URI));
     }

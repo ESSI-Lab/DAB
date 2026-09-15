@@ -385,10 +385,10 @@ public class HISCentralARPAPugliaMapper extends FileIdentifierMapper {
 	//
 
 	// data linkage (last 24 hours)
-	String linkage = HISCentralARPAPugliaConnector.BASE_URL.endsWith("/")
-		? HISCentralARPAPugliaConnector.BASE_URL.substring(0, HISCentralARPAPugliaConnector.BASE_URL.length() - 1) + "?id_station="
-		+ stationId + "&label_pollutant=" + measureName
-		: HISCentralARPAPugliaConnector.BASE_URL + "?id_station=" + stationId + "&label_pollutant=" + measureName;
+	String baseUrl = dataset.getSource().getEndpoint();
+	String linkage = baseUrl.endsWith("/")
+		? baseUrl.substring(0, baseUrl.length() - 1) + "?id_station=" + stationId + "&label_pollutant=" + measureName
+		: baseUrl + "?id_station=" + stationId + "&label_pollutant=" + measureName;
 
 	Online online = new Online();
 	online.setLinkage(linkage);

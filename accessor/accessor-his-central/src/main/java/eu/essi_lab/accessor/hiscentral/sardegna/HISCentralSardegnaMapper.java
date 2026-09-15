@@ -631,9 +631,10 @@ public class HISCentralSardegnaMapper extends FileIdentifierMapper {
 
 	    // data linkage (last 24 hours)
 
-	    String linkage = HISCentralSardegnaConnector.BASE_URL.endsWith("/")
-		    ? HISCentralSardegnaConnector.BASE_URL + varPath + "?cod_staz=" + stationCode
-		    : HISCentralSardegnaConnector.BASE_URL + "/" + varPath + "?cod_staz=" + stationCode;
+	    String baseUrl = dataset.getSource().getEndpoint();
+	    String linkage = baseUrl.endsWith("/")
+		    ? baseUrl + varPath + "?cod_staz=" + stationCode
+		    : baseUrl + "/" + varPath + "?cod_staz=" + stationCode;
 
 	    TemporalExtent temporalExtent = new TemporalExtent();
 	    temporalExtent.setBeginPosition(tempExtentBegin);

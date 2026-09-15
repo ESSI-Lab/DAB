@@ -82,7 +82,8 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 
     /**
      * @param datasetInfo
-     * @param sensorInfo
+     * @param stationInfo
+     * @param aggregationInfo
      * @return
      */
     static OriginalMetadata create(JSONObject datasetInfo, JSONObject stationInfo, JSONObject aggregationInfo) {
@@ -503,10 +504,11 @@ public class HISCentralPugliaMapper extends FileIdentifierMapper {
 	//
 
 	// data linkage (last 24 hours)
-	String linkage = HISCentralPugliaConnector.BASE_URL.endsWith("/")
-		? HISCentralPugliaConnector.BASE_URL + "data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
+	String baseUrl = dataset.getSource().getEndpoint();
+	String linkage = baseUrl.endsWith("/")
+		? baseUrl + "data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
 			+ measureId
-		: HISCentralPugliaConnector.BASE_URL + "/data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
+		: baseUrl + "/data/aggregation/" + aggregationId + "/station/" + stationId + "/measure/"
 			+ measureId;
 
 	Online online = new Online();

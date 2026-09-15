@@ -56,17 +56,12 @@ public class HISCentralMarcheConnector extends HarvestedQueryConnector<HISCentra
     /**
      * 
      */
-    static final String SENSORS_URL = "http://app.protezionecivile.marche.it/his/sensors";
+    static final String SENSORS_PATH = "his/sensors";
 
     /**
      * 
      */
-    static final String SENSOR_URL = "http://app.protezionecivile.marche.it/his/sensor";
-
-    /**
-     * 
-     */
-    public static final String BASE_URL = "http://app.protezionecivile.marche.it";
+    static final String SENSOR_PATH = "his/sensor";
 
     private int maxRecords;
 
@@ -77,7 +72,7 @@ public class HISCentralMarcheConnector extends HarvestedQueryConnector<HISCentra
 
 	Downloader downloader = new Downloader();
 
-	Optional<String> response = downloader.downloadOptionalString(SENSORS_URL);
+	Optional<String> response = downloader.downloadOptionalString(sensorsUrl());
 
 	if (response.isPresent()) {
 
@@ -136,6 +131,39 @@ public class HISCentralMarcheConnector extends HarvestedQueryConnector<HISCentra
     public boolean supports(GSSource source) {
 	String endpoint = source.getEndpoint();
 	return endpoint.contains("app.protezionecivile.marche.it");
+    }
+
+    /**
+     * @param baseUrl configured source endpoint
+     * @return sensors catalogue URL
+     */
+    public static String sensorsUrlFromEndpoint(String baseUrl) {
+
+	return join(baseUrl, SENSORS_PATH);
+    }
+
+    /**
+     * @param baseUrl configured source endpoint
+     * @param timeSeriesId sensor id
+     * @return single-sensor download linkage
+     */
+    public static String sensorLinkageFromEndpoint(String baseUrl, String timeSeriesId) {
+
+	return join(baseUrl, SENSOR_PATH) + "?id=" + timeSeriesId;
+    }
+
+    private String sensorsUrl() {
+
+	return sensorsUrlFromEndpoint(getSourceURL());
+    }
+
+    private static String join(String baseUrl, String path) {
+
+	String base = baseUrl == null ? "" : baseUrl;
+	if (base.endsWith("/")) {
+	    return base + path;
+	}
+	return base + "/" + path;
     }
 
     @Override

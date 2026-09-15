@@ -405,7 +405,6 @@ public class HISCentralPugliaDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralPugliaConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_PUGLIA_NS_URI));
     }

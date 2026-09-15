@@ -68,8 +68,6 @@ public class HISCentralLiguriaConnector extends HarvestedQueryConnector<HISCentr
 
     static final String VAR_DESCRIPTION = "HIS_Descrizione";
 
-    public static final String BASE_URL = "https://aws.arpal.liguria.it/siapi/Service/Query/";
-
     public static final String TOKEN_URL = "https://aws.arpal.liguria.it/siapi/Authentication/Login";
 
     public static String BEARER_TOKEN = null;

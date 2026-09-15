@@ -192,7 +192,7 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 	    DateFormat iso8601OutputFormat = null;
 	    DatatypeFactory xmlFactory = DatatypeFactory.newInstance();
-	    boolean realTimeData = newLink.contains(HISCentralPiemonteConnector.REAL_TIME_URL) ? true : false;
+	    boolean realTimeData = newLink.contains(HISCentralPiemonteConnector.REAL_TIME_PATH);
 
 	    while (!completed) {
 
@@ -359,9 +359,6 @@ public class HISCentralPiemonteDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		(online.getLinkage().contains(HISCentralPiemonteConnector.BASE_URL)
-			|| online.getLinkage().contains(HISCentralPiemonteConnector.REAL_TIME_URL))
-		&& //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_PIEMONTE_NS_URI));
     }

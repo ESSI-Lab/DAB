@@ -59,10 +59,6 @@ public class HISCentralAbruzzoConnector extends HarvestedQueryConnector<HISCentr
      */
     public static final String TYPE = "HISCentralAbruzzoConnector";
 
-    /**
-     * 
-     */
-    public static final String BASE_URL = "https://idrodataabruzzo.siapmicros.com/api/polaris/";
 
     /**
      * API token for Abruzzo Polaris, loaded from {@link eu.essi_lab.cfga.gs.setting.CredentialsSetting}
@@ -179,9 +175,7 @@ public class HISCentralAbruzzoConnector extends HarvestedQueryConnector<HISCentr
     private String getBaseURL() {
 
 	String url = getSourceURL();
-	if (url == null || url.isEmpty()) {
-	    url = BASE_URL;
-	}
+
 	if (!url.endsWith("/")) {
 	    url = url + "/";
 	}

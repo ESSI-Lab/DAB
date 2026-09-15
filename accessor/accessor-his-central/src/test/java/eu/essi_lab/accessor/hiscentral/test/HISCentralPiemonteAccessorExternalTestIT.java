@@ -65,7 +65,7 @@ public class HISCentralPiemonteAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralPiemonteConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralPiemonteConnector.BASE_URL);
+	gsSourceSetting.setSourceEndpoint("https://utility.arpa.piemonte.it/meteoidro/");
 
 	GSSource accessorSource = accessor.getSource();
 
@@ -124,7 +124,7 @@ public class HISCentralPiemonteAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralPiemonteConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralPiemonteConnector.BASE_URL);
+	gsSourceSetting.setSourceEndpoint("https://utility.arpa.piemonte.it/meteoidro/");
 
 	GSSource accessorSource = accessor.getSource();
 

@@ -323,7 +323,6 @@ public class HISCentralBolzanoDownloader extends WMLDataDownloader {
 	return (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralBolzanoConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_BOLZANO_NS_URI));
     }

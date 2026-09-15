@@ -373,7 +373,7 @@ public class HISCentralMarcheMapper extends FileIdentifierMapper {
 	}
 
 	if (linkage == null) {
-	    linkage = HISCentralMarcheConnector.SENSOR_URL + "?id=" + timeSeriesId;
+	    linkage = HISCentralMarcheConnector.sensorLinkageFromEndpoint(dataset.getSource().getEndpoint(), timeSeriesId);
 	    protocol = CommonNameSpaceContext.HISCENTRAL_MARCHE_NS_URI;
 	}
 

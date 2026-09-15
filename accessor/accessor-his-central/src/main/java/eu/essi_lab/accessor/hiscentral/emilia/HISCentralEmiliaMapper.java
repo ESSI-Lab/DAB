@@ -225,7 +225,7 @@ public class HISCentralEmiliaMapper extends FileIdentifierMapper {
 
 	    String startDate = retrieveDate(originalMD, "starDate");
 	    String endDate = retrieveDate(originalMD, "endDate");
-	    String dataUrl = HISCentralEmiliaConnector.BASE_URL;
+	    String dataUrl = dataset.getSource().getEndpoint();
 	    String unitName = null;
 	    int dataLength = 0;
 
