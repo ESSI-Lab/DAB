@@ -853,6 +853,7 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	    report.put("attributeTitle", attributeTitle);
 	}
 
+	putMetadataStringArray(report, "doi", MetadataElement.DOI, resource);
 	putMetadataStringArray(report, "observedPropertyURI", MetadataElement.OBSERVED_PROPERTY_URI, resource);
 	putObservedPropertyTitles(report, message, resource);
 	putMetadataStringArray(report, "timeInterpolation", MetadataElement.TIME_INTERPOLATION, resource);

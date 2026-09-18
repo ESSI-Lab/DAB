@@ -356,6 +356,11 @@ public enum MetadataElement implements Queryable {
     /**
      *
      */
+    DOI("doi", "DOI"),
+
+    /**
+     *
+     */
     RESOURCE_LANGUAGE("resLanguage"),
 
     /**
