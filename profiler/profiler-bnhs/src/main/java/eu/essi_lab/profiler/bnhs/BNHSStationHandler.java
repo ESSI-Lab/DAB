@@ -560,6 +560,10 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    object = create(object, "timeseries_id", onlineId, "Timeseries ID");
 		}
 
+		Optional<String> doi = resource.getDoi();
+		if (doi.isPresent()) {
+		    object = create(object, "doi", doi.get(), "DOI");
+		}
 
 		object = create(object, "title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle(), "Title");
 

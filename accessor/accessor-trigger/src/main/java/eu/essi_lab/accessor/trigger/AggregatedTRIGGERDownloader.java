@@ -374,6 +374,12 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 		"TRIGGER ERROR");
     }
 
+    /**
+     * The TRIGGER API does not use conventional HTTP status codes for an invalid/expired token: it replies with
+     * <code>201</code> and a plain-text body containing this marker instead of 401/403.
+     */
+    private static final String INVALID_TOKEN_MARKER = "invalid token provided";
+
     private List<JSONObject> getData(String linkage) throws Exception {
 
 	ArrayList<JSONObject> out = Lists.newArrayList();
@@ -382,26 +388,44 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 	    AggregatedTRIGGERConnector.TRIGGER_TOKEN = AggregatedTRIGGERConnector.getBearerToken();
 	}
 
-	InputStream stream = null;
 
-	HttpResponse<InputStream> triggerResponse = null;
+	String body;
+
 
 	try {
-	    triggerResponse = new Downloader().downloadResponse(//
+	    HttpResponse<InputStream> triggerResponse = new Downloader().downloadResponse(//
 		    linkage.trim(), //
 		    HttpHeaderUtils.build("token", AggregatedTRIGGERConnector.TRIGGER_TOKEN));
 
 	    int statusCode = triggerResponse.statusCode();
+	    body = readBody(triggerResponse);
 
-	    if (statusCode > 400 || statusCode == 201) {
-		// token expired - refresh token
+
+	    if (statusCode >= 500) {
+		// a server-side failure: retrying with a fresh token won't help, so don't bother
+		GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).error(
+			"TRIGGER aggregated API returned HTTP {} for {} - service appears unavailable, skipping", statusCode, linkage);
+		return out;
+	    }
+
+	    if (body != null && body.toLowerCase().contains(INVALID_TOKEN_MARKER)) {
+		// token expired/invalid - refresh and retry once
 		AggregatedTRIGGERConnector.TRIGGER_TOKEN = AggregatedTRIGGERConnector.getBearerToken();
 
 		triggerResponse = new Downloader().downloadResponse(//
 			linkage.trim(), HttpHeaderUtils.build("token", AggregatedTRIGGERConnector.TRIGGER_TOKEN));
+
+		if (triggerResponse.statusCode() >= 500) {
+		    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).error(
+			    "TRIGGER aggregated API returned HTTP {} for {} - service appears unavailable, skipping",
+			    triggerResponse.statusCode(), linkage);
+		    return out;
+		}
+
+		body = readBody(triggerResponse);
 	    }
 
-	    stream = triggerResponse.body();
+
 	    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).info("Got " + linkage);
 
 	} catch (Exception e) {
@@ -415,27 +439,31 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 		    AGGREGATED_TRIGGER_DOWNLOADER_ERROR);
 	}
 
-	if (stream != null) {
+	if (body != null) {
 
-	    ClonableInputStream clone = new ClonableInputStream(stream);
-
-	    String res = IOStreamUtils.asUTF8String(clone.clone());
-
-	    if (res.toLowerCase().contains("invalid token provided")) {
-		return getData(linkage);
-	    }
-
-	    JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
+	    JSONArray array = new JSONArray(body);
 
 	    for (int i = 0; i < array.length(); i++) {
 
 		JSONObject object = array.getJSONObject(i);
 		out.add(object);
 	    }
-	    stream.close();
 	}
 
 	return out;
+    }
+
+    private static String readBody(HttpResponse<InputStream> response) throws Exception {
+
+	InputStream stream = response.body();
+	if (stream == null) {
+	    return null;
+	}
+
+	ClonableInputStream clone = new ClonableInputStream(stream);
+	String body = IOStreamUtils.asUTF8String(clone.clone());
+	stream.close();
+	return body;
     }
 
     public Date convertToDate(int year, int month, int day, int hour, int minute, int second, Integer microseconds) {

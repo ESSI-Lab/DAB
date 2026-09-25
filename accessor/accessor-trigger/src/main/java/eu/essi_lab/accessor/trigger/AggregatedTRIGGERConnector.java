@@ -74,10 +74,11 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
     private static final String SMARTWATCHLOW_URL = "smartwatchlow_daily?";
 
     /**
-     * The daily aggregated tables have, per user, one row per day: a single request with a generous limit is
-     * enough to retrieve the whole history for every user in one shot.
+     * The daily aggregated tables have, per user, one row per day: a single request is enough to retrieve the
+     * whole history for every user in one shot. 10000 is the maximum <code>limit</code> value allowed by the
+     * TRIGGER API specification.
      */
-    private static final String LARGE_LIMIT_PARAM = "limit=100000";
+    private static final String LARGE_LIMIT_PARAM = "limit=10000";
 
     private static final String USER_ID = "userId";
 
@@ -416,11 +417,15 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 	return token;
     }
 
+    /**
+     * The TRIGGER API does not use conventional HTTP status codes for an invalid/expired token: it replies with
+     * <code>201</code> and a plain-text body containing this marker instead of 401/403.
+     */
+    private static final String INVALID_TOKEN_MARKER = "invalid token provided";
+
     public static String getResponse(String url) {
 
 	GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).info("Getting Data from TRIGGER service");
-
-	String response = null;
 
 	if (TRIGGER_TOKEN == null) {
 	    TRIGGER_TOKEN = getBearerToken();
@@ -433,31 +438,57 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 		    HttpHeaderUtils.build("token", TRIGGER_TOKEN));
 
 	    int statusCode = triggerResponse.statusCode();
-	    if (statusCode > 400) {
-		// token expired - refresh token
+
+	    String body = readBody(triggerResponse);
+
+	    if (statusCode >= 500) {
+		// a server-side failure: retrying with a fresh token won't help, so don't bother
+		GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class)
+			.error("TRIGGER aggregated API returned HTTP {} for {} - service appears unavailable, skipping", statusCode, url);
+		return null;
+	    }
+
+	    if (body != null && body.toLowerCase().contains(INVALID_TOKEN_MARKER)) {
+		// token expired/invalid - refresh and retry once
+
 		TRIGGER_TOKEN = getBearerToken();
 
 		triggerResponse = new Downloader().downloadResponse(//
 			url.trim(), //
 			HttpHeaderUtils.build("token", TRIGGER_TOKEN));
 
+		if (triggerResponse.statusCode() >= 500) {
+		    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class)
+			    .error("TRIGGER aggregated API returned HTTP {} for {} - service appears unavailable, skipping",
+				    triggerResponse.statusCode(), url);
+		    return null;
+		}
+
+		body = readBody(triggerResponse);
 	    }
 
-	    InputStream stream = triggerResponse.body();
 	    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).info("Got " + url);
 
-	    if (stream != null) {
-
-		ClonableInputStream clone = new ClonableInputStream(stream);
-		response = IOStreamUtils.asUTF8String(clone.clone());
-		stream.close();
-	    }
+	    return body;
 
 	} catch (Exception e) {
-	    e.printStackTrace();
+	    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).error("Unable to retrieve " + url, e);
 	}
 
-	return response;
+	return null;
+    }
+
+    private static String readBody(HttpResponse<InputStream> response) throws Exception {
+
+	InputStream stream = response.body();
+	if (stream == null) {
+	    return null;
+	}
+
+	ClonableInputStream clone = new ClonableInputStream(stream);
+	String body = IOStreamUtils.asUTF8String(clone.clone());
+	stream.close();
+	return body;
     }
 
     @Override

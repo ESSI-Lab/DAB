@@ -39,6 +39,7 @@ import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.GridSpatialRepresentation;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
+import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
@@ -176,6 +177,19 @@ public class DatalakesMapper extends FileIdentifierMapper {
 	    setIndeterminatePosition(dataset);
 	}
 
+	Double minDepth = parseDepth(datasetInfo.optString("mindepth", null));
+	Double maxDepth = parseDepth(datasetInfo.optString("maxdepth", null));
+	if (minDepth != null || maxDepth != null) {
+	    VerticalExtent verticalExtent = new VerticalExtent();
+	    if (minDepth != null) {
+		verticalExtent.setMinimumValue(minDepth);
+	    }
+	    if (maxDepth != null) {
+		verticalExtent.setMaximumValue(maxDepth);
+	    }
+	    mi.getDataIdentification().addVerticalExtent(verticalExtent);
+	}
+
 	if (sensor != null) {
 	    MIPlatform platform = new MIPlatform();
 	    platform.setMDIdentifierCode(String.valueOf(sensor.optInt("id")));
@@ -202,6 +216,9 @@ public class DatalakesMapper extends FileIdentifierMapper {
 	mi.addCoverageDescription(coverageDescription);
 
 	ExtensionHandler extensionHandler = dataset.getExtensionHandler();
+	if (lake != null && lake.optString("name", null) != null) {
+	    extensionHandler.setRiver(lake.getString("name"));
+	}
 	if (unit != null && !unit.isEmpty() && !"none".equalsIgnoreCase(unit)) {
 	    extensionHandler.setAttributeUnits(unit);
 	    extensionHandler.setAttributeUnitsAbbreviation(unit);
@@ -227,5 +244,20 @@ public class DatalakesMapper extends FileIdentifierMapper {
 	mi.setLanguage("English");
 	mi.setCharacterSetCode("utf8");
 	mi.addHierarchyLevelScopeCodeListValue("dataset");
+    }
+
+    private Double parseDepth(String value) {
+	if (value == null || value.isEmpty()) {
+	    return null;
+	}
+	try {
+	    double depth = Double.parseDouble(value);
+	    if (depth > -9990) {
+		return depth;
+	    }
+	} catch (NumberFormatException e) {
+	    logger.debug("Skipping invalid depth value '{}'", value);
+	}
+	return null;
     }
 }

@@ -6,6 +6,7 @@
   "temporal_extent": "Temporal extent",
   "aggregation_duration": "Aggregation duration",
   "interpolation_type": "Interpolation type",
+  "doi": "DOI",
   "available_for_period": "Available for the period from",
   "to": "to",
   "present": "present",

@@ -42,8 +42,8 @@ public enum WMSLayer {
     WHOS_ACTIVITY("whos", "activity", "whosCategory", "sensor", new WHOSActivityLegendCreator(), new DatasetFeatureInfoGenerator()), //
     WHOS_SOURCES("whos", "sources", "whosCategory", "sensor", new WHOSSourcesLegendCreator(), new DatasetFeatureInfoGenerator()),//
     ICHANGE_MONITORING_POINTS("i-change", "i-change-monitoring-points", "themeCategory", "i-change", new ICHANGESourcesLegendCreator(), new StationFeatureInfoGenerator()),
-    TRIGGER_MONITORING_POINTS("trigger", "trigger-monitoring-points", "themeCategory", "trigger", new TRIGGERSourcesLegendCreator(), new StationFeatureInfoGenerator())
-    ;
+    TRIGGER_MONITORING_POINTS("trigger", "trigger-monitoring-points", "sourceIdentifier", "trigger-aux", new TRIGGERSourcesLegendCreator(), new StationFeatureInfoGenerator()),
+    TEST_TRIGGER_MONITORING_POINTS("test-trigger", "test-trigger-monitoring-points", "sourceIdentifier", "aggregated-trigger", new AggregatedTRIGGERSourcesLegendCreator(), new StationFeatureInfoGenerator());
 
     private String view;
 

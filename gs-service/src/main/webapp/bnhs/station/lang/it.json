@@ -6,6 +6,7 @@
   "temporal_extent": "Estensione temporale",
   "aggregation_duration": "Durata di aggregazione",
   "interpolation_type": "Tipo di interpolazione",
+  "doi": "DOI",
   "available_for_period": "Disponibile per il periodo da",
   "to": "a",
   "present": "presente",
