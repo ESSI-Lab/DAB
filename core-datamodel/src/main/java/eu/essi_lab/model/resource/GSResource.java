@@ -176,6 +176,22 @@ public abstract class GSResource extends DOMSerializer {
 	getHarmonizedMetadata().getCoreMetadata().setIdentifier(publicId);
     }
 
+    /**
+     * Returns the DOI indexed for this resource, or the first DOI found in the harmonized metadata identifiers.
+     *
+     * @return
+     */
+    @XmlTransient
+    public Optional<String> getDoi() {
+
+	List<String> indexedDois = getIndexesMetadata().read(MetadataElement.DOI);
+	if (!indexedDois.isEmpty()) {
+	    return Optional.of(indexedDois.get(0));
+	}
+
+	return DoiUtils.extractDoi(this);
+    }
+
     @XmlTransient
     @NotNull(message = "source field of GSResource cannot be null")
     public GSSource getSource() {

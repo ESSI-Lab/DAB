@@ -28,7 +28,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -63,6 +62,8 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 
     /** Cache of dataset collection identifiers (id, doi, name only), sorted alphabetically by DOI. */
     private List<DataStreamClient.DatasetMetadata> collectionIdCache;
+    /** When false, the cache holds only an initial subset and may be expanded on resumption. */
+    private boolean collectionIdCacheComplete;
     private int partialNumbers;
     private DataStreamClient client;
 
@@ -97,6 +98,11 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    locationOffset = 0;
 	} else {
 	    int idx = findCollectionIndexByDoi(cache, tokenParts.doi);
+	    if (idx < 0) {
+		ensureFullCollectionCacheFilled();
+		cache = collectionIdCache;
+		idx = findCollectionIndexByDoi(cache, tokenParts.doi);
+	    }
 	    if (idx < 0) {
 		logger.warn("Resumption token '{}' not found in collection cache; starting from first collection", request.getResumptionToken());
 		index = 0;
@@ -154,8 +160,15 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	if (maxRecords <= 0 || partialNumbers < maxRecords) {
 	    if (locationOffset + LOCATION_BLOCK_SIZE < result.totalLocations) {
 		nextToken = currentDoi + ":" + (locationOffset + LOCATION_BLOCK_SIZE);
-	    } else if (index + 1 < cache.size()) {
-		nextToken = cache.get(index + 1).doi + ":0";
+	    } else {
+		int nextIndex = index + 1;
+		if (nextIndex >= cache.size() && !collectionIdCacheComplete) {
+		    ensureFullCollectionCacheFilled();
+		    cache = collectionIdCache;
+		}
+		if (nextIndex < cache.size()) {
+		    nextToken = cache.get(nextIndex).doi + ":0";
+		}
 	    }
 	}
 	ret.setResumptionToken(nextToken);
@@ -170,6 +183,33 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	if (!collectionIdCache.isEmpty()) {
 	    return;
 	}
+	int fetchLimit = resolveInitialCollectionFetchLimit();
+	fillCollectionCache(fetchLimit);
+    }
+
+    /**
+     * Expands a partial collection cache to include all dataset collections.
+     */
+    private void ensureFullCollectionCacheFilled() throws GSException {
+	if (collectionIdCacheComplete) {
+	    return;
+	}
+	fillCollectionCache(0);
+    }
+
+    /**
+     * When {@code maxRecords} is set, only the first collection id is needed to start
+     * (e.g. harvest preview with maxRecords=1). Unlimited harvest paginates all collections.
+     */
+    private int resolveInitialCollectionFetchLimit() {
+	if (getSetting().isMaxRecordsUnlimited()) {
+	    return 0;
+	}
+	Optional<Integer> maxRecords = getSetting().getMaxRecords();
+	return maxRecords.filter(v -> v > 0).map(v -> 1).orElse(0);
+    }
+
+    private void fillCollectionCache(int maxCollections) throws GSException {
 	String endpoint = getSourceURL();
 	if (endpoint == null || endpoint.isEmpty()) {
 	    throw GSException.createException(//
@@ -181,13 +221,17 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 		    DATASTREAM_URL_NOT_FOUND_ERROR);
 	}
 	try {
-	    String apiKey = getSetting().getApiKey();
-	    this.client = new DataStreamClient(endpoint, apiKey);
-	    List<DataStreamClient.DatasetMetadata> list = client.listDatasetIdentifiers(0);
+	    if (client == null) {
+		String apiKey = getSetting().getApiKey();
+		this.client = new DataStreamClient(endpoint, apiKey);
+	    }
+	    List<DataStreamClient.DatasetMetadata> list = client.listDatasetIdentifiers(maxCollections);
 	    list.removeIf(d -> d.doi == null || d.doi.isEmpty());
 	    Collections.sort(list, Comparator.comparing(d -> d.doi != null ? d.doi : ""));
 	    collectionIdCache = list;
-	    logger.trace("DataStream collection cache filled with {} DOIs", collectionIdCache.size());
+	    collectionIdCacheComplete = maxCollections <= 0;
+	    logger.trace("DataStream collection cache filled with {} DOIs (complete={})", collectionIdCache.size(),
+		    collectionIdCacheComplete);
 	} catch (IOException | InterruptedException e) {
 	    logger.error("Error retrieving DataStream collection list", e);
 	    throw GSException.createException(//
@@ -263,9 +307,6 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 		return result;
 	    }
 
-	    List<DataStreamClient.Location> locations = client.listLocationsByDoi(dataset.doi);
-	    result.totalLocations = locations.size();
-
 	    // Collection-level record only when starting from the first location block
 	    if (locationOffset == 0) {
 		JSONObject collectionJson = new JSONObject();
@@ -281,6 +322,9 @@ public class DataStreamConnector extends HarvestedQueryConnector<DataStreamConne
 	    if (remainingRecordBudget > 0 && emitted >= remainingRecordBudget) {
 		return result;
 	    }
+
+	    List<DataStreamClient.Location> locations = client.listLocationsByDoi(dataset.doi);
+	    result.totalLocations = locations.size();
 
 	    int fromIndex = Math.min(locationOffset, result.totalLocations);
 	    int toIndex = Math.min(locationOffset + locationLimit, result.totalLocations);

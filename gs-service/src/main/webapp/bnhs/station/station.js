@@ -478,6 +478,45 @@ var formatGeoCoordinate = function(value) {
 	return parseFloat(num.toFixed(4));
 }
 
+var isDoiIdentifier = function(identifier) {
+	if (!identifier || typeof identifier !== 'string') {
+		return false;
+	}
+	var trimmed = identifier.trim();
+	var lower = trimmed.toLowerCase();
+	return trimmed.indexOf('10.') === 0 || lower.indexOf('doi:') === 0 || lower.indexOf('doi.org') >= 0;
+};
+
+var normalizeDoiValue = function(identifier) {
+	if (!isDoiIdentifier(identifier)) {
+		return null;
+	}
+	var trimmed = identifier.trim();
+	var lower = trimmed.toLowerCase();
+	if (lower.indexOf('doi:') === 0) {
+		trimmed = trimmed.substring(4).trim();
+	} else {
+		var doiOrgIndex = lower.indexOf('doi.org/');
+		if (doiOrgIndex >= 0) {
+			trimmed = trimmed.substring(doiOrgIndex + 'doi.org/'.length).trim();
+		}
+	}
+	var queryIndex = trimmed.indexOf('?');
+	if (queryIndex >= 0) {
+		trimmed = trimmed.substring(0, queryIndex);
+	}
+	trimmed = trimmed.replace(/\/+$/, '');
+	return trimmed.indexOf('10.') === 0 ? trimmed : null;
+};
+
+var buildDoiUrl = function(identifier) {
+	var bareDoi = normalizeDoiValue(identifier);
+	if (!bareDoi) {
+		return null;
+	}
+	return 'https://doi.org/' + bareDoi;
+};
+
 // Get attribute label with language support (uses attribute_label_it for Italian, attribute_label otherwise)
 var getAttributeLabel = function(data, i) {
 	var currentLang = lang();
@@ -589,6 +628,12 @@ var createDataTable = function(data, i) {
 	interpolationType = getInterpolationTypeLabel(data, i);
 	if (!(typeof interpolationType === 'undefined' || interpolationType === "")) {
 		items.push("<tr><td>" + t('interpolation_type') + "</td><td>" + interpolationType + "</td></tr>");
+	}
+
+	var doi = findValue(data, i, 'doi');
+	var doiUrl = doi ? buildDoiUrl(doi) : null;
+	if (doiUrl) {
+		items.push("<tr><td>" + t('doi') + "</td><td><a target='_blank' rel='noopener noreferrer' style='color:blue;text-decoration:underline;' href='" + doiUrl + "'>" + doiUrl + "</a></td></tr>");
 	}
 
 
