@@ -438,6 +438,7 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 		    HttpHeaderUtils.build("token", TRIGGER_TOKEN));
 
 	    int statusCode = triggerResponse.statusCode();
+
 	    String body = readBody(triggerResponse);
 
 	    if (statusCode >= 500) {
@@ -449,6 +450,7 @@ public class AggregatedTRIGGERConnector extends HarvestedQueryConnector<Aggregat
 
 	    if (body != null && body.toLowerCase().contains(INVALID_TOKEN_MARKER)) {
 		// token expired/invalid - refresh and retry once
+
 		TRIGGER_TOKEN = getBearerToken();
 
 		triggerResponse = new Downloader().downloadResponse(//
