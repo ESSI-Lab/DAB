@@ -517,6 +517,49 @@ var buildDoiUrl = function(identifier) {
 	return 'https://doi.org/' + bareDoi;
 };
 
+var escapeHtml = function(text) {
+	return ('' + text)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
+};
+
+var isHttpsUrl = function(value) {
+	if (!value || typeof value !== 'string') {
+		return false;
+	}
+	return value.trim().toLowerCase().indexOf('https://') === 0;
+};
+
+var metadataExternalLinkStyle = "color:blue;text-decoration:underline;";
+
+var formatMetadataExternalLink = function(url) {
+	var trimmed = url.trim();
+	var safeHref = escapeHtml(trimmed);
+	return "<a target='_blank' rel='noopener noreferrer' style='" + metadataExternalLinkStyle + "' href='" + safeHref + "'>" + safeHref + "</a>";
+};
+
+var formatMetadataCellValue = function(value) {
+	if (value == null || value === '') {
+		return '';
+	}
+	var str = ('' + value).trim();
+	if (isHttpsUrl(str)) {
+		return formatMetadataExternalLink(str);
+	}
+	if (str.indexOf('; ') >= 0) {
+		return str.split('; ').map(function(part) {
+			part = part.trim();
+			if (isHttpsUrl(part)) {
+				return formatMetadataExternalLink(part);
+			}
+			return escapeHtml(part);
+		}).join('; ');
+	}
+	return escapeHtml(str);
+};
+
 // Get attribute label with language support (uses attribute_label_it for Italian, attribute_label otherwise)
 var getAttributeLabel = function(data, i) {
 	var currentLang = lang();
@@ -634,6 +677,16 @@ var createDataTable = function(data, i) {
 	var doiUrl = doi ? buildDoiUrl(doi) : null;
 	if (doiUrl) {
 		items.push("<tr><td>" + t('doi') + "</td><td><a target='_blank' rel='noopener noreferrer' style='color:blue;text-decoration:underline;' href='" + doiUrl + "'>" + doiUrl + "</a></td></tr>");
+	}
+
+	var citationDetails = findValue(data, i, 'citation_details');
+	if (citationDetails) {
+		items.push("<tr><td>" + t('citation_details') + "</td><td>" + formatMetadataCellValue(citationDetails) + "</td></tr>");
+	}
+
+	var useLicense = findValue(data, i, 'use_license');
+	if (useLicense) {
+		items.push("<tr><td>" + t('use_license') + "</td><td>" + formatMetadataCellValue(useLicense) + "</td></tr>");
 	}
 
 

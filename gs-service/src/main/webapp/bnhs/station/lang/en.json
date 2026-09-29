@@ -7,6 +7,8 @@
   "aggregation_duration": "Aggregation duration",
   "interpolation_type": "Interpolation type",
   "doi": "DOI",
+  "citation_details": "Citation",
+  "use_license": "License",
   "available_for_period": "Available for the period from",
   "to": "to",
   "present": "present",

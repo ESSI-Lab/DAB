@@ -214,6 +214,8 @@
 	"sources_tab" : "SOURCES",
 	"measurement_info" : "Measurement info",
 	"result_doi" : "DOI",
+	"result_citation" : "Citation",
+	"result_license" : "License",
 	"more_info" : "More info",
 	"full_metadata" : "Full metadata",
 	"platform_description" : "Platform from which the observation was made",

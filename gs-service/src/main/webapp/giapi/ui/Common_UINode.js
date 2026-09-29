@@ -275,6 +275,82 @@ GIAPI.Common_UINode = function(options) {
 		return out;
 	};
 
+	GIAPI.Common_UINode.escapeHtml = function(text) {
+		return ('' + text)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;');
+	};
+
+	GIAPI.Common_UINode.isHttpsUrl = function(value) {
+		if (!value || typeof value !== 'string') {
+			return false;
+		}
+		return value.trim().toLowerCase().indexOf('https://') === 0;
+	};
+
+	GIAPI.Common_UINode.formatReportMetadataValue = function(value) {
+		if (value == null || value === '') {
+			return '';
+		}
+		var str = ('' + value).trim();
+		var linkStyle = 'color:blue;cursor:pointer;text-decoration:underline;';
+		if (GIAPI.Common_UINode.isHttpsUrl(str)) {
+			var safeHref = GIAPI.Common_UINode.escapeHtml(str);
+			return '<a target="_blank" rel="noopener noreferrer" class="dont-break-out" style="' + linkStyle + '" href="' + safeHref + '" title="' + safeHref + '">' + safeHref + '</a>';
+		}
+		if (str.indexOf('; ') >= 0) {
+			return str.split('; ').map(function(part) {
+				part = part.trim();
+				if (GIAPI.Common_UINode.isHttpsUrl(part)) {
+					var href = GIAPI.Common_UINode.escapeHtml(part);
+					return '<a target="_blank" rel="noopener noreferrer" class="dont-break-out" style="' + linkStyle + '" href="' + href + '" title="' + href + '">' + href + '</a>';
+				}
+				return GIAPI.Common_UINode.escapeHtml(part);
+			}).join('; ');
+		}
+		return GIAPI.Common_UINode.escapeHtml(str);
+	};
+
+	GIAPI.Common_UINode.reportMetadataArrayRow = function(report, fieldName, labelKey, defaultLabel) {
+
+		var raw = report[fieldName];
+		var values = [];
+		if (Array.isArray(raw)) {
+			values = raw;
+		} else if (raw) {
+			values = [raw];
+		}
+		if (!values.length) {
+			return '';
+		}
+
+		var label = typeof __t === 'function' ? __t(labelKey) : defaultLabel;
+		if (label === labelKey) {
+			label = defaultLabel;
+		}
+
+		var out = '<tr><td class="common-ui-node-report-content-table-left-td"><label class="common-ui-node-report-content-table-left">' + label + '</td>';
+		out += '<td class="common-ui-node-report-content-table-right-td">';
+
+		for (var i = 0; i < values.length; i++) {
+			out += '<label class="common-ui-node-report-content-table-right dont-break-out">' + GIAPI.Common_UINode.formatReportMetadataValue(values[i]) + '</label><br>';
+		}
+
+		out += '</td></tr>';
+
+		return out;
+	};
+
+	GIAPI.Common_UINode.citationRow = function(report) {
+		return GIAPI.Common_UINode.reportMetadataArrayRow(report, 'citation_details', 'result_citation', 'Citation');
+	};
+
+	GIAPI.Common_UINode.useLicenseRow = function(report) {
+		return GIAPI.Common_UINode.reportMetadataArrayRow(report, 'use_license', 'result_license', 'License');
+	};
+
 	/**
 	 * 
 	 */
@@ -1205,6 +1281,8 @@ GIAPI.Common_UINode = function(options) {
 		}
 
 		content += GIAPI.Common_UINode.doiRow(report);
+		content += GIAPI.Common_UINode.citationRow(report);
+		content += GIAPI.Common_UINode.useLicenseRow(report);
 
 		// content
 		if (report.content && report.content.length) {
