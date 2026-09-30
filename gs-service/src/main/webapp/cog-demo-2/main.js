@@ -10,7 +10,7 @@ import GeoTIFF from 'ol/source/GeoTIFF.js';
 const CONFIG = {
   wct: {
     title: "Wind Chill Temperature (WCT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/wct/index.json",
     style: {
       color: [
         'case',
@@ -40,7 +40,7 @@ const CONFIG = {
   },
   at: {
     title: "Apparent Temperature (AT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/at/index.json",
     style: {
       color: [
         'case',
@@ -67,7 +67,7 @@ const CONFIG = {
   },
   wbgt: {
     title: "Wet Bulb Globe Temperature (WBGT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/wbgt/index.json",
     style: {
       color: [
         'case',
@@ -94,7 +94,7 @@ const CONFIG = {
   },
   utci: {
     title: "Universal Thermal Climate Index (UTCI)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/utci/index.json",
     style: {
       color: [
         'case',
