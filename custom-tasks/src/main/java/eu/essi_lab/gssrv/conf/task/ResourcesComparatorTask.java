@@ -254,8 +254,10 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    log(status, "Consolidated folder survived, nothing is changed");
 	}
 
+	long modifiedCount = modifiedRecords.values().stream().flatMap(Collection::stream).distinct().count();
+
 	log(status, "New records: " + newRecords.size());
-	log(status, "Modified records: " + modifiedRecords.values().stream().flatMap(Collection::stream).distinct().count());
+	log(status, "Modified records: " + modifiedCount);
 	log(status, "Deleted records: " + deletedRecords.size());
 
 	Optional<MessagePublisher> client = createClient();
@@ -345,6 +347,11 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 			client.get().publish(topic, message);
 		    }
 		}
+
+		String topic = buildTopic(gsSource, "harvested");
+		String message = buildSummary(gsSource.getUniqueIdentifier(), newRecords.size(), deletedRecords.size(), modifiedCount);
+
+		client.get().publish(topic, message);
 	    }
 	}
 
@@ -605,6 +612,26 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 	    return object.toString(3);
 
 	}).collect(Collectors.joining(",", "[", "]"));
+    }
+
+    /**
+     * Completion summary published on {@code dab/{sourceId}/harvested}.
+     *
+     * @param sourceId
+     * @param added
+     * @param deleted
+     * @param modified
+     * @return
+     */
+    private String buildSummary(String sourceId, int added, int deleted, long modified) {
+
+	JSONObject object = new JSONObject();
+	object.put("sourceId", sourceId);
+	object.put("added", added);
+	object.put("deleted", deleted);
+	object.put("modified", modified);
+
+	return object.toString(3);
     }
 
     /**
