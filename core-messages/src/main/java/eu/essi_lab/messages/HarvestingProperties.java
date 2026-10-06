@@ -54,6 +54,8 @@ public class HarvestingProperties extends Properties {
     private static final String CONNECTIVITY_TEST_DURATION_MS_KEY = "connectivityTestDurationMs";
     private static final String CONNECTIVITY_TEST_UNIX_MS_KEY = "connectivityTestUnixTimestampMs";
     private static final String LAST_SOURCE_UP_UNIX_MS_KEY = "lastSourceUpUnixTimestampMs";
+    private static final String HARVESTING_ID_KEY = "harvestingId";
+    private static final String ROOT_HARVESTING_ID_KEY = "rootHarvestingId";
 
     /**
      * 
@@ -175,6 +177,43 @@ public class HarvestingProperties extends Properties {
     public String getEndHarvestingTimestamp() {
 
 	return getProperty(END_TIME_STAMP_KEY);
+    }
+
+    /**
+     * Set the identifier of the last (possibly running) harvesting execution, used to correlate the harvesting statistics
+     *
+     * @param harvestingId
+     */
+    public void setHarvestingId(String harvestingId) {
+
+	setProperty(HARVESTING_ID_KEY, harvestingId);
+    }
+
+    /**
+     * Get the identifier of the last (possibly running) harvesting execution
+     */
+    public Optional<String> getHarvestingId() {
+
+	return Optional.ofNullable(getProperty(HARVESTING_ID_KEY));
+    }
+
+    /**
+     * Set the identifier of the first execution of the last harvesting. It differs from the
+     * {@link #getHarvestingId()} when the harvesting has been interrupted and then continued by other executions
+     *
+     * @param rootHarvestingId
+     */
+    public void setRootHarvestingId(String rootHarvestingId) {
+
+	setProperty(ROOT_HARVESTING_ID_KEY, rootHarvestingId);
+    }
+
+    /**
+     * Get the identifier of the first execution of the last harvesting
+     */
+    public Optional<String> getRootHarvestingId() {
+
+	return Optional.ofNullable(getProperty(ROOT_HARVESTING_ID_KEY));
     }
 
     /**

@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import org.json.JSONObject;
 
@@ -49,6 +50,8 @@ public class ElasticsearchHarvestingPublisher {
      */
     public static final String HARVESTS_INDEX = "harvests";
 
+    private static Optional<String> awsTaskId;
+
     private static final ExecutorService THREAD_POOL = Executors.newSingleThreadExecutor(r -> {
 
 	Thread thread = new Thread(r);
@@ -59,13 +62,157 @@ public class ElasticsearchHarvestingPublisher {
     });
 
     /**
-     * Asynchronously writes the given harvesting statistics document. The host name and the execution mode are added to
-     * the document
+     * Asynchronously writes (creates or replaces) the given harvesting statistics document. The host name and the
+     * execution mode are added to the document
      *
      * @param id the document identifier
      * @param document
      */
     public static void publish(String id, JSONObject document) {
+
+	JSONObject copy = new JSONObject(document.toString());
+	copy.put("hostName", HostNamePropertyUtils.getHostNameProperty());
+	copy.put("executionMode", ExecutionMode.get().name());
+	getAwsTaskId().ifPresent(taskId -> copy.put("awsTaskId", taskId));
+
+	String docId = id != null ? id : UUID.randomUUID().toString();
+
+	execute("Storing harvesting statistics " + docId, client -> {
+
+	    HashMap<String, String> items = new HashMap<>();
+	    items.put(docId, copy.toString());
+
+	    client.write(HARVESTS_INDEX, items);
+	});
+    }
+
+    /**
+     * Asynchronously adds or replaces the given fields of the harvesting statistics document with the given id, only if
+     * its <code>result</code> field has the given value
+     *
+     * @param id the document identifier
+     * @param fields
+     * @param expectedResult
+     */
+    public static void update(String id, JSONObject fields, String expectedResult) {
+
+	execute("Updating harvesting statistics " + id, client -> {
+
+	    boolean updated = client.conditionalUpdate(HARVESTS_INDEX, id, fields, "result", expectedResult);
+
+	    if (!updated) {
+
+		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class)
+			.info("Harvesting statistics {} not updated (missing or with result other than {})", id, expectedResult);
+	    }
+	});
+    }
+
+    /**
+     * Executes the given action in the publisher thread, which is single, so actions are executed in the submission
+     * order
+     *
+     * @param description
+     * @param action
+     */
+    private static void execute(String description, Consumer<ElasticsearchClient> action) {
+
+	Optional<StatisticsDatabase> database = getStatisticsDatabase();
+
+	if (database.isEmpty()) {
+
+	    return;
+	}
+
+	THREAD_POOL.execute(() -> {
+
+	    ElasticsearchClient client = null;
+
+	    try {
+
+		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).info("{} STARTED", description);
+
+		client = database.get().createClient();
+		client.init(HARVESTS_INDEX);
+
+		action.accept(client);
+
+		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).info("{} ENDED", description);
+
+	    } catch (Exception ex) {
+
+		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).error("{} failed: {}", description, ex.getMessage(),
+			ex);
+
+	    } finally {
+
+		close(client);
+	    }
+	});
+    }
+
+    /**
+     * Creates a client to the "DAB statistics gathering" database, if configured. The caller must close the client
+     *
+     * @return
+     */
+    public static Optional<ElasticsearchClient> createClient() {
+
+	return getStatisticsDatabase().map(StatisticsDatabase::createClient);
+    }
+
+    /**
+     * @param client
+     */
+    public static void close(ElasticsearchClient client) {
+
+	if (client != null) {
+
+	    try {
+		client.close();
+	    } catch (Exception ex) {
+		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).warn("Unable to close client: {}", ex.getMessage());
+	    }
+	}
+    }
+
+    /**
+     * @return the ECS task id of this node, if any. The id is retrieved only once, since it requires an HTTP request
+     */
+    private static synchronized Optional<String> getAwsTaskId() {
+
+	if (awsTaskId == null) {
+
+	    awsTaskId = HostNamePropertyUtils.getAWSTaskId();
+	}
+
+	return awsTaskId;
+    }
+
+    /**
+     * @param endpoint
+     * @param dbName
+     * @param user
+     * @param password
+     */
+    private record StatisticsDatabase(String endpoint, String dbName, String user, String password) {
+
+	/**
+	 * @return
+	 */
+	ElasticsearchClient createClient() {
+
+	    ElasticsearchClient client = new ElasticsearchClient(endpoint, user, password);
+	    client.setDbName(dbName);
+
+	    return client;
+	}
+    }
+
+    /**
+     * @return
+     */
+    private static Optional<StatisticsDatabase> getStatisticsDatabase() {
 
 	Optional<DatabaseSetting> setting;
 
@@ -77,14 +224,14 @@ public class ElasticsearchHarvestingPublisher {
 
 	    GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).error("Unable to read statistics setting: {}",
 		    ex.getMessage(), ex);
-	    return;
+	    return Optional.empty();
 	}
 
 	if (setting.isEmpty()) {
 
 	    GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class)
-		    .debug("Statistics gathering disabled, harvesting statistics not stored");
-	    return;
+		    .debug("Statistics gathering disabled, harvesting statistics not available");
+	    return Optional.empty();
 	}
 
 	DatabaseSetting databaseSetting = setting.get();
@@ -98,51 +245,9 @@ public class ElasticsearchHarvestingPublisher {
 
 	    GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class)
 		    .warn("Statistics database options missing, harvesting statistics not stored");
-	    return;
+	    return Optional.empty();
 	}
 
-	JSONObject copy = new JSONObject(document.toString());
-	copy.put("hostName", HostNamePropertyUtils.getHostNameProperty());
-	copy.put("executionMode", ExecutionMode.get().name());
-
-	String docId = id != null ? id : UUID.randomUUID().toString();
-
-	THREAD_POOL.execute(() -> {
-
-	    ElasticsearchClient client = null;
-
-	    try {
-
-		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).info("Storing harvesting statistics {} STARTED", docId);
-
-		client = new ElasticsearchClient(endpoint, user, password);
-		client.setDbName(dbName);
-		client.init(HARVESTS_INDEX);
-
-		HashMap<String, String> items = new HashMap<>();
-		items.put(docId, copy.toString());
-
-		client.write(HARVESTS_INDEX, items);
-
-		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).info("Storing harvesting statistics {} ENDED", docId);
-
-	    } catch (Exception ex) {
-
-		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).error("Unable to store harvesting statistics: {}",
-			ex.getMessage(), ex);
-
-	    } finally {
-
-		if (client != null) {
-
-		    try {
-			client.close();
-		    } catch (Exception ex) {
-			GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).warn("Unable to close client: {}",
-				ex.getMessage());
-		    }
-		}
-	    }
-	});
+	return Optional.of(new StatisticsDatabase(endpoint, dbName, user, password));
     }
 }

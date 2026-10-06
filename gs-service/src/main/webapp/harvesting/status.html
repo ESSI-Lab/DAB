@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Harvesting status</title>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -15,7 +15,7 @@
     }
 
     .page-container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 0 auto;
       padding: 24px 16px 32px;
     }
@@ -44,26 +44,30 @@
       gap: 6px;
     }
 
-    .control-group label {
+    .control-group label.title {
       font-size: 0.9em;
       color: #444;
       font-weight: 600;
     }
 
     .control-group select,
-    .control-group input[type="text"] {
+    .control-group input[type="text"],
+    .control-group input[type="number"] {
       padding: 8px 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
       font-size: 0.95em;
-      min-width: 180px;
+      min-width: 160px;
     }
+
+    .control-group input[type="number"] { min-width: 80px; width: 80px; }
 
     .control-inline {
       display: flex;
       align-items: center;
       gap: 8px;
-      min-height: 38px;
+      min-height: 19px;
+      font-size: 0.92em;
     }
 
     button {
@@ -77,11 +81,7 @@
     }
 
     button:hover { background: #0047c2; }
-    button.secondary {
-      background: #e5e7eb;
-      color: #111;
-    }
-
+    button.secondary { background: #e5e7eb; color: #111; }
     button.secondary:hover { background: #d1d5db; }
 
     .summary {
@@ -96,15 +96,12 @@
       border: 1px solid #e0e0e0;
       border-radius: 8px;
       padding: 12px 16px;
-      min-width: 130px;
+      min-width: 110px;
+      cursor: pointer;
     }
 
-    .summary-card .value {
-      font-size: 1.5em;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
+    .summary-card.active { outline: 2px solid #005aef; }
+    .summary-card .value { font-size: 1.5em; font-weight: 700; line-height: 1.2; }
     .summary-card .label { color: #666; font-size: 0.9em; }
 
     .legend {
@@ -124,6 +121,12 @@
       display: inline-block;
     }
 
+    .legend-swatch.hatched {
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.65) 0 2px, transparent 2px 5px) !important;
+    }
+
+    .legend-note { color: #666; font-size: 0.88em; }
+
     .chart-card,
     .table-card,
     .debug-card {
@@ -134,7 +137,9 @@
       margin-bottom: 20px;
     }
 
-    #gantt-chart { width: 100%; min-height: 420px; }
+    #gantt-chart { width: 100%; min-height: 200px; }
+
+    .table-wrapper { overflow-x: auto; }
 
     table {
       width: 100%;
@@ -153,9 +158,13 @@
       background: #f3f6fb;
       color: #333;
       font-weight: 600;
+      white-space: nowrap;
     }
 
-    tr.out-of-window { opacity: 0.55; }
+    td.num { text-align: right; white-space: nowrap; }
+    td.nowrap { white-space: nowrap; }
+
+    tr.highlight td { background: #fff7d6; }
 
     .status-pill {
       display: inline-block;
@@ -164,14 +173,33 @@
       color: #fff;
       font-size: 0.82em;
       font-weight: 600;
+      white-space: nowrap;
     }
 
     .status-running { background: #f59e0b; }
+    .status-stale { background: #b45309; }
+    .status-interrupted { background: #9333ea; }
     .status-completed { background: #22c55e; }
-    .status-error { background: #ef4444; }
+    .status-consolidated { background: #0ea5e9; }
+    .status-failed { background: #ef4444; }
     .status-canceled { background: #64748b; }
-    .status-rescheduled { background: #3b82f6; }
     .status-unknown { background: #94a3b8; }
+
+    .tag {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: #eef2f7;
+      color: #334155;
+      font-size: 0.8em;
+      margin: 1px 2px 1px 0;
+      white-space: nowrap;
+    }
+
+    .delta-pos { color: #15803d; }
+    .delta-neg { color: #b91c1c; }
+
+    .errors { color: #b91c1c; font-size: 0.85em; max-width: 360px; }
 
     .empty-state, .loading, .error-box {
       padding: 24px;
@@ -183,6 +211,15 @@
       background: #fef2f2;
       border: 1px solid #fecaca;
       border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .warning-box {
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 10px 16px;
       margin-bottom: 20px;
     }
 
@@ -209,108 +246,103 @@
       color: #666;
       word-break: break-all;
     }
+
+    a.chain { color: #005aef; text-decoration: none; }
+    a.chain:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <div class="page-container">
     <h1>Harvesting status</h1>
-    <p class="subtitle">Scheduler data from <code>/services/support/harvest-status</code> — same cached source as Brokering &rarr; Harvesting in the configurator (no per-source DB reads unless you opt in).</p>
+    <p class="subtitle">Harvesting executions from the harvesting statistics index (<code>/services/support/harvest-status</code>).</p>
     <p class="window-range" id="window-range"></p>
 
     <form class="controls" id="controls-form">
       <div class="control-group">
-        <label for="hours">Time window</label>
+        <label class="title" for="hours">Time window</label>
         <select id="hours" name="hours">
-          <option value="1">Last 1 hour</option>
-          <option value="2" selected>Last 2 hours</option>
+          <option value="2">Last 2 hours</option>
           <option value="6">Last 6 hours</option>
           <option value="12">Last 12 hours</option>
-          <option value="24">Last 24 hours</option>
+          <option value="24" selected>Last 24 hours</option>
           <option value="48">Last 48 hours</option>
           <option value="168">Last 7 days</option>
+          <option value="720">Last 30 days</option>
         </select>
       </div>
       <div class="control-group">
-        <label for="from">Custom from (ISO8601)</label>
+        <label class="title" for="from">Custom from (ISO8601)</label>
         <input type="text" id="from" name="from" placeholder="2026-06-18T10:00:00Z">
       </div>
       <div class="control-group">
-        <label for="to">Custom to (ISO8601)</label>
+        <label class="title" for="to">Custom to (ISO8601)</label>
         <input type="text" id="to" name="to" placeholder="2026-06-18T12:00:00Z">
       </div>
       <div class="control-group">
-        <label>Data loading</label>
-        <div class="control-inline">
-          <input type="checkbox" id="refreshScheduler" name="refreshScheduler">
-          <label for="refreshScheduler">Refresh scheduler from Quartz DB (slow; like clicking Reload in configurator)</label>
-        </div>
-        <div class="control-inline">
-          <input type="checkbox" id="includeProperties" name="includeProperties">
-          <label for="includeProperties">Include harvesting.properties per source (slow)</label>
-        </div>
+        <label class="title" for="staleHours">Stale after (hours)</label>
+        <input type="number" id="staleHours" name="staleHours" min="1" step="1" value="24">
       </div>
       <div class="control-group">
-        <label>Display</label>
-        <div class="control-inline">
-          <input type="checkbox" id="showAll" name="showAll">
-          <label for="showAll">Show all settings (incl. out of window)</label>
-        </div>
+        <label class="title" for="filter">Source filter</label>
+        <input type="text" id="filter" name="filter" placeholder="Source name or identifier">
       </div>
       <div class="control-group">
-        <label>Auto refresh</label>
+        <label class="title">Display</label>
+        <div class="control-inline">
+          <input type="checkbox" id="problemsOnly" name="problemsOnly">
+          <label for="problemsOnly">Only stale, interrupted, failed and consolidated</label>
+        </div>
         <div class="control-inline">
           <input type="checkbox" id="autoRefresh" name="autoRefresh">
-          <label for="autoRefresh">Auto-reload page every 60s when jobs are running</label>
+          <label for="autoRefresh">Reload every 60s while harvestings are running</label>
         </div>
       </div>
       <button type="submit">Apply</button>
     </form>
 
     <div id="error-box" class="error-box" hidden></div>
-    <div id="loading" class="loading">Loading harvest status…</div>
+    <div id="loading" class="loading">Loading harvesting status…</div>
 
     <div id="content" hidden>
+      <div id="truncated-box" class="warning-box" hidden>Too many harvestings in the selected window: only the first ones are shown. Narrow the time window.</div>
+
       <div class="summary" id="summary"></div>
 
-      <div class="legend">
-        <div class="legend-item"><span class="legend-swatch" style="background:#f59e0b"></span> Running</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#22c55e"></span> Completed</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#ef4444"></span> Error</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#64748b"></span> Canceled</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#3b82f6"></span> Rescheduled</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#94a3b8"></span> Unknown / no data</div>
-      </div>
+      <div class="legend" id="legend"></div>
 
       <div class="chart-card">
-        <h2>Gantt chart</h2>
+        <h2>Timeline</h2>
         <div id="gantt-chart"></div>
-        <div id="gantt-empty" class="empty-state" hidden>No harvesting activity overlaps the selected time window.</div>
+        <div id="gantt-empty" class="empty-state" hidden>No harvesting overlaps the selected time window.</div>
       </div>
 
       <div class="table-card">
         <div class="toolbar">
-          <h2 style="margin:0">Details</h2>
+          <h2 style="margin:0">Executions</h2>
           <button type="button" class="secondary" id="toggle-debug">Show raw API response</button>
         </div>
-        <div id="table-empty" class="empty-state" hidden>No rows to display.</div>
-        <table id="details-table" hidden>
-          <thead>
-            <tr>
-              <th>Source</th>
-              <th>Status</th>
-              <th>In window</th>
-              <th>Fired time</th>
-              <th>End time</th>
-              <th>Elapsed</th>
-              <th>Next fire</th>
-              <th>Host</th>
-              <th>ECS task</th>
-              <th>Resources</th>
-              <th>Debug</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div id="table-empty" class="empty-state" hidden>No harvesting to display.</div>
+        <div class="table-wrapper">
+          <table id="details-table" hidden>
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Status</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+                <th>Records before</th>
+                <th>Records after</th>
+                <th>Change</th>
+                <th>Type</th>
+                <th>Host</th>
+                <th>ECS task</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="debug-card" id="debug-card" hidden>
@@ -324,65 +356,71 @@
 
   <script>
     const API_BASE = '../services/support/harvest-status';
-    const STATUS_COLORS = {
-      running: '#f59e0b',
-      completed: '#22c55e',
-      error: '#ef4444',
-      canceled: '#64748b',
-      rescheduled: '#3b82f6',
-      unknown: '#94a3b8'
+
+    // status key -> [label, color, hatched]; hatched bars have an uncertain end
+    const STATUSES = {
+      running: ['Running', '#f59e0b', false],
+      stale: ['Stale', '#b45309', true],
+      interrupted: ['Interrupted', '#9333ea', true],
+      completed: ['Completed', '#22c55e', false],
+      consolidated: ['Low records count', '#0ea5e9', false],
+      failed: ['Failed', '#ef4444', false],
+      canceled: ['Canceled', '#64748b', false],
+      unknown: ['Unknown', '#94a3b8', false]
     };
+
+    const PROBLEM_KEYS = ['stale', 'interrupted', 'failed', 'consolidated'];
 
     let refreshTimer = null;
     let lastPayload = null;
+    let statusFilter = null;
 
-    function getFormParams() {
+    // ------------------------------------------------------------
+    // form and URL
+    // ------------------------------------------------------------
+
+    function getApiParams() {
       const params = new URLSearchParams();
-      params.set('hours', document.getElementById('hours').value || '2');
+      params.set('hours', document.getElementById('hours').value || '24');
       const from = document.getElementById('from').value.trim();
       const to = document.getElementById('to').value.trim();
       if (from) params.set('from', from);
       if (to) params.set('to', to);
-      if (document.getElementById('refreshScheduler').checked) params.set('refresh', 'true');
-      if (document.getElementById('includeProperties').checked) params.set('includeProperties', 'true');
+      const stale = document.getElementById('staleHours').value.trim();
+      if (stale) params.set('staleHours', stale);
       return params;
     }
 
-    function getPageUrlParams() {
-      const params = getFormParams();
-      params.delete('refresh');
-      params.delete('includeProperties');
-      if (document.getElementById('showAll').checked) params.set('showAll', 'true');
+    function getPageParams() {
+      const params = getApiParams();
+      const filter = document.getElementById('filter').value.trim();
+      if (filter) params.set('filter', filter);
+      if (document.getElementById('problemsOnly').checked) params.set('problemsOnly', 'true');
       if (document.getElementById('autoRefresh').checked) params.set('autoRefresh', 'true');
-      if (document.getElementById('refreshScheduler').checked) params.set('refreshScheduler', 'true');
-      if (document.getElementById('includeProperties').checked) params.set('includeProperties', 'true');
+      if (statusFilter) params.set('status', statusFilter);
       return params;
     }
 
     function syncFormFromUrl() {
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.has('hours')) document.getElementById('hours').value = urlParams.get('hours');
-      if (urlParams.has('from')) document.getElementById('from').value = urlParams.get('from');
-      if (urlParams.has('to')) document.getElementById('to').value = urlParams.get('to');
-      document.getElementById('showAll').checked = urlParams.get('showAll') === 'true';
-      document.getElementById('autoRefresh').checked = urlParams.get('autoRefresh') === 'true';
-      document.getElementById('refreshScheduler').checked = urlParams.get('refreshScheduler') === 'true';
-      document.getElementById('includeProperties').checked = urlParams.get('includeProperties') === 'true';
+      const p = new URLSearchParams(window.location.search);
+      if (p.has('hours')) document.getElementById('hours').value = p.get('hours');
+      if (p.has('from')) document.getElementById('from').value = p.get('from');
+      if (p.has('to')) document.getElementById('to').value = p.get('to');
+      if (p.has('staleHours')) document.getElementById('staleHours').value = p.get('staleHours');
+      if (p.has('filter')) document.getElementById('filter').value = p.get('filter');
+      document.getElementById('problemsOnly').checked = p.get('problemsOnly') === 'true';
+      document.getElementById('autoRefresh').checked = p.get('autoRefresh') === 'true';
+      statusFilter = STATUSES[p.get('status')] ? p.get('status') : null;
     }
 
     function updateUrlFromForm() {
-      const params = getPageUrlParams();
-      if (document.getElementById('showAll').checked) params.set('showAll', 'true');
-      if (document.getElementById('autoRefresh').checked) params.set('autoRefresh', 'true');
-      if (document.getElementById('refreshScheduler').checked) params.set('refreshScheduler', 'true');
-      if (document.getElementById('includeProperties').checked) params.set('includeProperties', 'true');
-      const qs = params.toString();
+      const qs = getPageParams().toString();
       history.replaceState(null, '', qs ? '?' + qs : window.location.pathname);
     }
 
-    function statusKey(job) {
-      return (job.statusKey || (job.status ? String(job.status).toLowerCase() : 'unknown'));
-    }
+    // ------------------------------------------------------------
+    // helpers
+    // ------------------------------------------------------------
 
     function escapeHtml(value) {
       return String(value == null ? '' : value)
@@ -392,67 +430,115 @@
         .replace(/"/g, '&quot;');
     }
 
-    function renderEcsTaskCell(job) {
-      const id = job.awsTaskId || '';
-      const url = job.awsTaskLogsUrl || '';
-      if (!id) {
-        return '';
-      }
-      if (url) {
-        return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(id)}</a>`;
-      }
-      return escapeHtml(id);
+    function statusOf(h) {
+      return STATUSES[h.statusKey] ? h.statusKey : 'unknown';
     }
 
-    function ecsTaskHoverLine(job) {
-      const id = job.awsTaskId || '';
-      if (!id) {
-        return 'ECS task: n/a';
-      }
-      return `ECS task: ${escapeHtml(id)}`;
+    function sourceLabel(h) {
+      return h.sourceLabel || h.sourceId || '';
     }
 
-    function renderSummary(summary, windowInfo) {
+    function formatDate(ms) {
+      if (ms == null) return '';
+      return new Date(ms).toISOString().replace('T', ' ').replace(/\.\d+Z$/, 'Z');
+    }
+
+    function formatDuration(ms) {
+      if (ms == null || ms < 0) return '';
+      const s = Math.round(ms / 1000);
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      if (d > 0) return `${d}d ${h}h ${m}m`;
+      if (h > 0) return `${h}h ${m}m`;
+      if (m > 0) return `${m}m ${sec}s`;
+      return `${sec}s`;
+    }
+
+    function formatCount(value) {
+      return value == null || value < 0 ? '—' : Number(value).toLocaleString();
+    }
+
+    function isOpen(h) {
+      return h.statusKey === 'running' || h.statusKey === 'stale';
+    }
+
+    function endLabel(h) {
+      if (h.statusKey === 'running') return 'in progress';
+      if (h.statusKey === 'stale') return 'no news (process died?)';
+      if (h.statusKey === 'interrupted') return 'interrupted (detected ' + formatDate(h.endMs) + ')';
+      return formatDate(h.endMs);
+    }
+
+    function filteredHarvests(harvests) {
+      const text = document.getElementById('filter').value.trim().toLowerCase();
+      const problemsOnly = document.getElementById('problemsOnly').checked;
+      return harvests.filter(h => {
+        if (statusFilter && statusOf(h) !== statusFilter) return false;
+        if (problemsOnly && !PROBLEM_KEYS.includes(statusOf(h))) return false;
+        if (text && !(sourceLabel(h).toLowerCase().includes(text) || String(h.sourceId).toLowerCase().includes(text))) return false;
+        return true;
+      });
+    }
+
+    // ------------------------------------------------------------
+    // rendering
+    // ------------------------------------------------------------
+
+    function renderLegend() {
+      document.getElementById('legend').innerHTML = Object.entries(STATUSES)
+        .filter(([key]) => key !== 'unknown')
+        .map(([key, [label, color, hatched]]) =>
+          `<div class="legend-item"><span class="legend-swatch${hatched ? ' hatched' : ''}" style="background-color:${color}"></span> ${label}</div>`)
+        .join('') +
+        '<div class="legend-item legend-note">Hatched bars: the actual end is unknown</div>';
+    }
+
+    function renderSummary(payload) {
+      const summary = payload.summary;
+      const cards = [[null, 'All', summary.total, '#111']].concat(
+        Object.entries(STATUSES)
+          .filter(([key]) => key !== 'unknown' || summary.unknown > 0)
+          .map(([key, [label, color]]) => [key, label, summary[key] || 0, color]));
+
       const el = document.getElementById('summary');
-      const cards = [
-        ['Jobs in window', summary.jobsInWindow, '#111'],
-        ['Running', summary.running, '#f59e0b'],
-        ['Completed', summary.completed, '#22c55e'],
-        ['Error', summary.error, '#ef4444'],
-        ['With scheduler data', summary.withSchedulerData, '#111'],
-        ['Total settings', summary.totalSettings, '#111']
-      ];
-      el.innerHTML = cards.map(([label, value, color]) =>
-        `<div class="summary-card"><div class="value" style="color:${color}">${value}</div><div class="label">${label}</div></div>`
-      ).join('');
+      el.innerHTML = cards.map(([key, label, value, color]) =>
+        `<div class="summary-card${statusFilter === key ? ' active' : ''}" data-status="${key || ''}" title="Show only ${escapeHtml(label.toLowerCase())}">
+           <div class="value" style="color:${color}">${value}</div><div class="label">${escapeHtml(label)}</div>
+         </div>`).join('');
 
+      el.querySelectorAll('.summary-card').forEach(card => card.addEventListener('click', () => {
+        statusFilter = card.dataset.status || null;
+        updateUrlFromForm();
+        render();
+      }));
+
+      const w = payload.window;
       document.getElementById('window-range').textContent =
-        `Showing ${windowInfo.hours} hour(s): ${windowInfo.startIso} — ${windowInfo.endIso}`;
+        `Showing ${w.hours} hour(s): ${w.startIso} — ${w.endIso}. Running harvestings older than ${w.staleHours} hour(s) are stale.`;
+
+      document.getElementById('truncated-box').hidden = !summary.truncated;
     }
 
-    function visibleJobs(jobs, showAll) {
-      if (showAll) {
-        return jobs;
-      }
-      return jobs.filter(j =>
-        j.executing ||
-        j.status === 'Running' ||
-        (j.startMs != null && j.inWindow)
-      );
+    function typeTags(h) {
+      const tags = [h.strategy || ''];
+      if (h.continuation) tags.push(h.continuation.toLowerCase());
+      else if (h.recovery) tags.push('recovery');
+      else if (h.resumed) tags.push('resumed');
+      return tags.filter(Boolean).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
     }
 
-    function ganttJobs(jobs) {
-      return jobs.filter(j =>
-        j.startMs != null &&
-        j.endMs != null &&
-        (j.inWindow || j.executing || j.status === 'Running')
-      );
+    function chainLink(id, label, byId) {
+      if (!id) return '';
+      const target = byId[id];
+      const text = target ? `${label} ${formatDate(target.startMs)}` : `${label} (outside window)`;
+      return `<div><a class="chain" href="#${encodeURIComponent(id)}" data-target="${escapeHtml(id)}">${escapeHtml(text)}</a></div>`;
     }
 
-    function renderTable(jobs, showAll) {
-      const rows = visibleJobs(jobs, showAll);
+    function renderTable(harvests, byId) {
+      const rows = harvests.slice().sort((a, b) => b.startMs - a.startMs);
       const table = document.getElementById('details-table');
-      const tbody = table.querySelector('tbody');
       const empty = document.getElementById('table-empty');
 
       if (!rows.length) {
@@ -463,110 +549,165 @@
 
       empty.hidden = true;
       table.hidden = false;
-      tbody.innerHTML = rows.map(job => {
-        const key = statusKey(job);
-        const label = job.status || '—';
-        const debug = job.debug || {};
-        const debugText = [
-          debug.skipReason ? `skip: ${debug.skipReason}` : null,
-          `stored=${debug.storedPhase || '—'}`,
-          `start=${debug.startSource || '—'}`,
-          `end=${debug.endSource || '—'}`,
-          (job.host || job.hostName) ? `host=${job.host || job.hostName}` : null,
-          job.awsTaskId ? `ecs=${job.awsTaskId}` : null,
-          debug.executing ? 'executing=yes' : null
-        ].filter(Boolean).join('; ');
 
-        return `<tr class="${job.inWindow ? '' : 'out-of-window'}">
-          <td><strong>${escapeHtml(job.label)}</strong><br><small>${escapeHtml(job.sourceId)}</small></td>
-          <td><span class="status-pill status-${escapeHtml(key)}">${escapeHtml(label)}</span></td>
-          <td>${job.inWindow ? 'yes' : 'no'}</td>
-          <td>${escapeHtml(job.firedTime || job.startIso || '')}</td>
-          <td>${job.executing || job.status === 'Running' ? '—' : escapeHtml(job.endTime || job.endIso || '')}</td>
-          <td>${escapeHtml(job.elapsedTime || '')}</td>
-          <td>${escapeHtml(job.nextFireTime || '')}</td>
-          <td>${escapeHtml(job.host || job.hostName || '')}</td>
-          <td>${renderEcsTaskCell(job)}</td>
-          <td>${job.resourcesCount != null ? job.resourcesCount : '—'}</td>
-          <td><small>${escapeHtml(debugText)}</small></td>
+      table.querySelector('tbody').innerHTML = rows.map(h => {
+        const key = statusOf(h);
+        const before = h.recordsBefore;
+        const after = h.recordsAfter;
+        let change = '—';
+        if (!isOpen(h) && key !== 'interrupted' && before != null && after != null && before >= 0 && after >= 0) {
+          const delta = after - before;
+          change = delta === 0 ? '0' : `<span class="${delta > 0 ? 'delta-pos' : 'delta-neg'}">${delta > 0 ? '+' : ''}${delta.toLocaleString()}</span>`;
+        }
+        const harvested = h.harvestedRecords != null ? `<div><small>harvested ${formatCount(h.harvestedRecords)}</small></div>` : '';
+        const errors = (h.errors || []).length
+          ? `<div class="errors">${(h.errors || []).slice(0, 3).map(escapeHtml).join('<br>')}${h.errors.length > 3 ? '<br>…' : ''}</div>` : '';
+        const task = h.awsTaskId
+          ? (h.awsTaskLogsUrl
+            ? `<a href="${escapeHtml(h.awsTaskLogsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(h.awsTaskId)}</a>`
+            : escapeHtml(h.awsTaskId))
+          : '';
+        const duration = h.durationMillis != null ? h.durationMillis : (isOpen(h) ? h.endMs - h.startMs : null);
+
+        return `<tr id="${escapeHtml(h.harvestingId)}">
+          <td><strong>${escapeHtml(sourceLabel(h))}</strong><br><small>${escapeHtml(h.sourceId)}</small></td>
+          <td><span class="status-pill status-${key}">${escapeHtml(STATUSES[key][0])}</span></td>
+          <td class="nowrap">${escapeHtml(formatDate(h.startMs))}</td>
+          <td>${escapeHtml(endLabel(h))}</td>
+          <td class="nowrap">${key === 'interrupted'
+            ? '≤ ' + escapeHtml(formatDuration(h.endMs - h.startMs))
+            : escapeHtml(formatDuration(duration)) + (isOpen(h) ? ' so far' : '')}</td>
+          <td class="num">${formatCount(before)}</td>
+          <td class="num">${isOpen(h) || key === 'interrupted' ? '—' : formatCount(after)}${harvested}</td>
+          <td class="num">${change}</td>
+          <td>${typeTags(h)}</td>
+          <td>${escapeHtml(h.hostName || '')}</td>
+          <td>${task}</td>
+          <td>${chainLink(h.continuationOf, 'Continues', byId)}${chainLink(h.continuedBy, 'Continued by', byId)}${errors}</td>
         </tr>`;
       }).join('');
+
+      table.querySelectorAll('a.chain').forEach(a => a.addEventListener('click', e => {
+        const row = document.getElementById(a.dataset.target);
+        if (!row) return;
+        e.preventDefault();
+        highlightRow(row);
+      }));
     }
 
-    function renderGantt(jobs, windowInfo) {
-      const chartJobs = ganttJobs(jobs)
-        .sort((a, b) => String(a.label).localeCompare(String(b.label)));
+    function highlightRow(row) {
+      document.querySelectorAll('tr.highlight').forEach(r => r.classList.remove('highlight'));
+      row.classList.add('highlight');
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
-      const empty = document.getElementById('gantt-empty');
+    function renderGantt(harvests, windowInfo) {
       const chartEl = document.getElementById('gantt-chart');
+      const empty = document.getElementById('gantt-empty');
 
-      if (!chartJobs.length || typeof Plotly === 'undefined') {
-        Plotly.purge(chartEl);
+      if (!harvests.length || typeof Plotly === 'undefined') {
+        if (typeof Plotly !== 'undefined') Plotly.purge(chartEl);
+        chartEl.style.height = '0px';
         empty.hidden = false;
         return;
       }
 
       empty.hidden = true;
 
-      const labels = chartJobs.map(j => j.label);
-      const durations = chartJobs.map(j => j.durationMs || Math.max(1, j.endMs - j.startMs));
-      const bases = chartJobs.map(j => new Date(j.startMs));
-      const colors = chartJobs.map(j => STATUS_COLORS[statusKey(j)] || STATUS_COLORS.unknown);
-      const hoverTexts = chartJobs.map(j =>
-        `<b>${escapeHtml(j.label)}</b><br>` +
-        `Status: ${escapeHtml(j.status || 'unknown')}<br>` +
-        `Start: ${new Date(j.startMs).toISOString()}<br>` +
-        `End: ${j.status === 'Running' ? 'in progress' : new Date(j.endMs).toISOString()}<br>` +
-        `Host: ${escapeHtml(j.host || j.hostName || 'n/a')}<br>` +
-        `${ecsTaskHoverLine(j)}<br>` +
-        `Resources: ${j.resourcesCount != null ? j.resourcesCount : 'n/a'}`
-      );
+      // one row per source, sorted by label
+      const sources = new Map();
+      harvests.forEach(h => sources.set(h.sourceId, sourceLabel(h)));
+      const sourceIds = Array.from(sources.keys()).sort((a, b) => sources.get(a).localeCompare(sources.get(b)));
 
-      const barHeight = Math.max(420, labels.length * 34 + 80);
-      chartEl.style.height = barHeight + 'px';
+      // one trace per status, so colors and patterns are consistent
+      const traces = Object.entries(STATUSES).map(([key, [label, color, hatched]]) => {
+        const items = harvests.filter(h => statusOf(h) === key);
+        return {
+          type: 'bar',
+          orientation: 'h',
+          name: label,
+          y: items.map(h => h.sourceId),
+          x: items.map(h => Math.max(60000, h.endMs - h.startMs)),
+          base: items.map(h => new Date(h.startMs)),
+          customdata: items.map(h => h.harvestingId),
+          marker: {
+            color,
+            line: { color: 'rgba(0,0,0,0.25)', width: 1 },
+            pattern: hatched ? { shape: '/', fillmode: 'overlay', fgcolor: 'rgba(255,255,255,0.7)', size: 6, solidity: 0.35 } : undefined
+          },
+          hovertext: items.map(h =>
+            `<b>${escapeHtml(sourceLabel(h))}</b><br>` +
+            `Status: ${label}<br>` +
+            `Start: ${formatDate(h.startMs)}<br>` +
+            `End: ${escapeHtml(endLabel(h))}<br>` +
+            `Records: ${formatCount(h.recordsBefore)} → ${isOpen(h) || key === 'interrupted' ? '…' : formatCount(h.recordsAfter)}<br>` +
+            `Host: ${escapeHtml(h.hostName || 'n/a')}` +
+            (h.continuationOf ? `<br>Continues an interrupted harvesting (${escapeHtml(h.continuation || '')})` : '')),
+          hoverinfo: 'text',
+          showlegend: false
+        };
+      }).filter(t => t.y.length);
 
-      Plotly.newPlot(chartEl, [{
-        type: 'bar',
-        orientation: 'h',
-        y: labels,
-        x: durations,
-        base: bases,
-        marker: { color: colors, line: { color: 'rgba(0,0,0,0.15)', width: 1 } },
-        text: hoverTexts,
-        hoverinfo: 'text',
-        hovertemplate: '%{text}<extra></extra>'
-      }], {
+      const height = Math.max(200, sourceIds.length * 26 + 90);
+      chartEl.style.height = height + 'px';
+
+      Plotly.newPlot(chartEl, traces, {
         barmode: 'overlay',
-        margin: { l: 220, r: 24, t: 24, b: 48 },
-        height: barHeight,
+        margin: { l: 240, r: 24, t: 16, b: 48 },
+        height,
         xaxis: {
           type: 'date',
           range: [new Date(windowInfo.startMs), new Date(windowInfo.endMs)],
-          title: 'Time',
           tickformat: '%H:%M<br>%d %b'
         },
-        yaxis: { automargin: true },
-        showlegend: false,
+        yaxis: {
+          type: 'category',
+          categoryorder: 'array',
+          categoryarray: sourceIds.slice().reverse(),
+          tickvals: sourceIds,
+          ticktext: sourceIds.map(id => { const l = sources.get(id); return l.length > 38 ? l.slice(0, 36) + '…' : l; }),
+          automargin: true
+        },
         plot_bgcolor: '#fafafa',
         paper_bgcolor: '#ffffff'
       }, { responsive: true, displayModeBar: true });
+
+      // clicking a bar highlights the execution in the table
+      chartEl.on('plotly_click', data => {
+        const id = data.points && data.points[0] && data.points[0].customdata;
+        const row = id ? document.getElementById(id) : null;
+        if (row) highlightRow(row);
+      });
     }
 
-    function scheduleRefresh(summary) {
+    function render() {
+      if (!lastPayload) return;
+      const harvests = lastPayload.harvests || [];
+      const byId = {};
+      harvests.forEach(h => { byId[h.harvestingId] = h; });
+      const visible = filteredHarvests(harvests);
+      renderSummary(lastPayload);
+      renderTable(visible, byId);
+      renderGantt(visible, lastPayload.window);
+    }
+
+    function scheduleRefresh() {
       if (refreshTimer) {
-        clearInterval(refreshTimer);
+        clearTimeout(refreshTimer);
         refreshTimer = null;
       }
-      if (document.getElementById('autoRefresh').checked && summary.running > 0) {
-        refreshTimer = setInterval(() => loadData(false), 60000);
+      const running = lastPayload && lastPayload.summary ? lastPayload.summary.running : 0;
+      if (document.getElementById('autoRefresh').checked && running > 0) {
+        refreshTimer = setTimeout(() => loadData(false), 60000);
       }
     }
 
+    // ------------------------------------------------------------
+    // loading
+    // ------------------------------------------------------------
+
     async function loadData(showLoading) {
-      const params = getFormParams();
-      const url = API_BASE + '?' + params.toString();
-      const fetchStart = performance.now();
-      console.log('[harvest-status] fetch START', url);
+      const url = API_BASE + '?' + getApiParams().toString();
 
       if (showLoading !== false) {
         document.getElementById('loading').hidden = false;
@@ -577,71 +718,51 @@
 
       try {
         const response = await fetch(url);
-        const networkMs = Math.round(performance.now() - fetchStart);
-        console.log('[harvest-status] response headers received in', networkMs, 'ms, status=', response.status);
-
-        const parseStart = performance.now();
         const payload = await response.json();
-        const parseMs = Math.round(performance.now() - parseStart);
-        const totalMs = Math.round(performance.now() - fetchStart);
-        lastPayload = payload;
-
-        console.log('[harvest-status] JSON parsed in', parseMs, 'ms, total client time', totalMs, 'ms');
-        if (payload.debug && payload.debug.timing) {
-          console.log('[harvest-status] server timing (ms):', payload.debug.timing);
-        }
-        if (payload.summary) {
-          console.log('[harvest-status] summary:', payload.summary);
-        }
 
         if (!response.ok || payload.status === 'error') {
           throw new Error(payload.message || ('HTTP ' + response.status));
         }
 
+        lastPayload = payload;
+
         document.getElementById('loading').hidden = true;
         document.getElementById('content').hidden = false;
         document.getElementById('raw-json').textContent = JSON.stringify(payload, null, 2);
-        const timingEl = document.getElementById('timing-info');
-        if (payload.debug && payload.debug.timing) {
-          const t = payload.debug.timing;
-          timingEl.textContent = 'Server timing (ms): total=' + t.totalMs +
-            ', schedulerUpdate=' + t.schedulerUpdateMs +
-            ', database=' + t.databaseInitMs +
-            ', settings=' + t.loadSettingsMs +
-            ', buildJobs=' + t.buildJobsMs +
-            (t.slowSources && t.slowSources.length ? ', slowSources=' + t.slowSources.length : '');
-        } else {
-          timingEl.textContent = '';
-        }
+        document.getElementById('timing-info').textContent = payload.timing
+          ? `Server timing (ms): total=${payload.timing.totalMs}, search=${payload.timing.searchMs}` : '';
 
-        const showAll = document.getElementById('showAll').checked;
-        renderSummary(payload.summary, payload.window);
-        renderTable(payload.jobs || [], showAll);
-        renderGantt(payload.jobs || [], payload.window);
-        scheduleRefresh(payload.summary);
-        console.log('[harvest-status] render complete, total', Math.round(performance.now() - fetchStart), 'ms');
+        render();
+        scheduleRefresh();
+
       } catch (err) {
-        console.error('[harvest-status] FAILED after', Math.round(performance.now() - fetchStart), 'ms:', err);
+        console.error('[harvest-status] FAILED:', err);
         document.getElementById('loading').hidden = true;
         document.getElementById('content').hidden = true;
         const box = document.getElementById('error-box');
         box.hidden = false;
-        box.textContent = 'Failed to load harvest status: ' + err.message;
+        box.textContent = 'Failed to load harvesting status: ' + err.message;
       }
     }
 
-    document.getElementById('controls-form').addEventListener('submit', (e) => {
+    document.getElementById('controls-form').addEventListener('submit', e => {
       e.preventDefault();
       updateUrlFromForm();
       loadData(true);
     });
 
-    document.getElementById('showAll').addEventListener('change', () => {
+    // client-side filters don't need a reload
+    ['filter', 'problemsOnly'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', () => {
+        updateUrlFromForm();
+        render();
+      });
+    });
+
+    document.getElementById('autoRefresh').addEventListener('change', () => {
       updateUrlFromForm();
-      if (lastPayload) {
-        const showAll = document.getElementById('showAll').checked;
-        renderTable(lastPayload.jobs || [], showAll);
-      }
+      scheduleRefresh();
     });
 
     document.getElementById('toggle-debug').addEventListener('click', () => {
@@ -651,6 +772,7 @@
       document.getElementById('toggle-debug').textContent = visible ? 'Show raw API response' : 'Hide raw API response';
     });
 
+    renderLegend();
     syncFormFromUrl();
     loadData(true);
   </script>

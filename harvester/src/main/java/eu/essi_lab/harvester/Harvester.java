@@ -109,11 +109,20 @@ public class Harvester {
 
 	boolean recovery = context.isRecovering() && getAccessor().supportsRecovery();
 
+	//
+	// a previous execution which is not completed has been interrupted (e.g. the process died), and this execution
+	// continues it (by recovery, resuming, or from scratch)
+	//
+
+	boolean previousInterrupted = !properties.isCompleted().orElse(true);
+	Optional<String> previousHarvestingId = properties.getHarvestingId();
+	Optional<String> previousRootHarvestingId = properties.getRootHarvestingId();
+
 	// always reset the completed state
 	properties.setCompleted(false);
 
 	//
-	// the notifier sent at the end of the harvesting procedure
+	// the notifier sent at the start and at the end of the harvesting procedure
 	//
 
 	HarvestingNotifier notifier = new HarvestingNotifier(//
@@ -122,6 +131,22 @@ public class Harvester {
 		recovery, //
 		resumed, //
 		properties.getResourcesCount());
+
+	notifier.setAccessorType(getAccessor().getClass().getSimpleName());
+	notifier.setIncrementalFrom(isIncremental ? properties.getStartHarvestingTimestamp() : null);
+	notifier.setPreviousHarvestingEndDate(properties.getEndHarvestingTimestamp());
+	notifier.setHarvestingCount(properties.getHarvestingCount());
+
+	if (previousInterrupted && previousHarvestingId.isPresent()) {
+
+	    Continuation continuation = recovery ? Continuation.RECOVERY : resumed ? Continuation.RESUME : Continuation.RESTART;
+
+	    notifier.setContinuationOf(previousHarvestingId.get(), previousRootHarvestingId, continuation);
+	}
+
+	// stored with the harvesting properties during the harvesting, so they survive an interruption
+	properties.setHarvestingId(notifier.getHarvestingId());
+	properties.setRootHarvestingId(notifier.getRootHarvestingId());
 
 	//
 	// sends the harvesting started email
@@ -178,8 +203,15 @@ public class Harvester {
 
 	    reportsHandler.sendErrorAndWarnMessageEmail();
 
+	    notifier.setRecordsAfter(properties.getResourcesCount());
+	    notifier.setResult(HarvestingResult.FAILED);
+	    notifier.setException(ex);
+	    notifier.publish();
+
 	    throw ex;
 	}
+
+	notifier.publishStarted();
 
 	//
 	// executes the harvesting procedure

@@ -1,12 +1,23 @@
 {
   "properties": {
+    "harvestingId": { "type": "keyword" },
+    "rootHarvestingId": { "type": "keyword" },
+    "continuationOf": { "type": "keyword" },
+    "continuation": { "type": "keyword" },
+    "continuedBy": { "type": "keyword" },
     "sourceId": { "type": "keyword" },
     "sourceLabel": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+    "sourceEndpoint": { "type": "keyword", "ignore_above": 2048 },
+    "accessorType": { "type": "keyword" },
     "strategy": { "type": "keyword" },
     "recovery": { "type": "boolean" },
     "resumed": { "type": "boolean" },
     "startDate": { "type": "date" },
     "endDate": { "type": "date" },
+    "interruptionDetectedDate": { "type": "date" },
+    "incrementalFrom": { "type": "date" },
+    "previousHarvestingEndDate": { "type": "date" },
+    "harvestingCount": { "type": "long" },
     "durationMillis": { "type": "long" },
     "duration": { "type": "keyword" },
     "recordsBefore": { "type": "long" },
@@ -15,6 +26,7 @@
     "result": { "type": "keyword" },
     "errors": { "type": "text" },
     "hostName": { "type": "keyword" },
+    "awsTaskId": { "type": "keyword" },
     "executionMode": { "type": "keyword" }
   }
 }

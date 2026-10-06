@@ -37,14 +37,19 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
- * Publishes a summary of a metadata harvesting procedure:
+ * Publishes the notifications of a metadata harvesting execution, at its start ({@link #publishStarted()}) and at its end
+ * ({@link #publish()}):
  * <ul>
  * <li>on the MQTT broker configured in the system settings key-value options, on the topic
  * {@code dab/{sourceId}/harvesting}. If the MQTT options are missing, nothing is published</li>
  * <li>in the {@code {dbName}-harvests} index of the "DAB statistics gathering" database (see
  * {@link ElasticsearchHarvestingPublisher}). If the statistics gathering is disabled, nothing is stored</li>
  * </ul>
- * Finally, the registered {@link HarvestingEndListener}s are notified.<br>
+ * Each execution is stored as a single document with id {@link #getHarvestingId()}, created at the start with result
+ * {@link HarvestingResult#RUNNING} and replaced at the end with the final result. If the execution continues a
+ * previous execution which has been interrupted (e.g. because the process died), the previous execution document is
+ * marked as {@link HarvestingResult#INTERRUPTED} and linked to this execution.<br>
+ * At the end, the registered {@link HarvestingEndListener}s are notified.<br>
  * Publishing errors are logged and never propagated, so they cannot affect the harvesting procedure
  *
  * @author boldrini
@@ -56,6 +61,10 @@ public class HarvestingNotifier {
      */
     public enum HarvestingResult {
 
+	/**
+	 * The harvesting is running
+	 */
+	RUNNING,
 	/**
 	 * The harvested records replaced the previous ones
 	 */
@@ -71,7 +80,32 @@ public class HarvestingNotifier {
 	/**
 	 * The harvesting ended with errors
 	 */
-	FAILED
+	FAILED,
+	/**
+	 * The harvesting execution has been interrupted (e.g. the process died), and continued by another execution
+	 */
+	INTERRUPTED
+    }
+
+    /**
+     * How an execution continues a previous interrupted execution
+     *
+     * @author boldrini
+     */
+    public enum Continuation {
+
+	/**
+	 * The scheduler re-fired the interrupted job, and the accessor supports recovery
+	 */
+	RECOVERY,
+	/**
+	 * A successive scheduled execution resumed the interrupted harvesting from its resumption token
+	 */
+	RESUME,
+	/**
+	 * The accessor supports neither recovery nor resuming, so the harvesting started from scratch
+	 */
+	RESTART
     }
 
     private static final List<HarvestingEndListener> LISTENERS = new CopyOnWriteArrayList<>();
@@ -87,6 +121,15 @@ public class HarvestingNotifier {
     private int recordsAfter;
     private HarvestingResult result;
     private GSException exception;
+
+    private String harvestingId;
+    private String rootHarvestingId;
+    private String continuationOf;
+    private Continuation continuation;
+    private String accessorType;
+    private String incrementalFrom;
+    private String previousHarvestingEndDate;
+    private Integer harvestingCount;
 
     /**
      * @param source
@@ -106,6 +149,8 @@ public class HarvestingNotifier {
 	this.startTimestamp = ISO8601DateTimeUtils.getISO8601DateTime();
 	this.startTimeMillis = System.currentTimeMillis();
 	this.result = HarvestingResult.COMPLETED;
+	this.harvestingId = source.getUniqueIdentifier() + "_" + startTimeMillis;
+	this.rootHarvestingId = harvestingId;
     }
 
     /**
@@ -116,6 +161,69 @@ public class HarvestingNotifier {
     public static void addListener(HarvestingEndListener listener) {
 
 	LISTENERS.add(listener);
+    }
+
+    /**
+     * @return the identifier of this harvesting execution
+     */
+    public String getHarvestingId() {
+
+	return harvestingId;
+    }
+
+    /**
+     * @return the identifier of the first execution of this harvesting; it differs from {@link #getHarvestingId()} if this
+     *         execution continues one or more interrupted executions
+     */
+    public String getRootHarvestingId() {
+
+	return rootHarvestingId;
+    }
+
+    /**
+     * Declares that this execution continues the given interrupted execution
+     *
+     * @param previousHarvestingId the identifier of the interrupted execution
+     * @param previousRootHarvestingId the root identifier of the interrupted execution, if known
+     * @param continuation
+     */
+    public void setContinuationOf(String previousHarvestingId, Optional<String> previousRootHarvestingId, Continuation continuation) {
+
+	this.continuationOf = previousHarvestingId;
+	this.rootHarvestingId = previousRootHarvestingId.orElse(previousHarvestingId);
+	this.continuation = continuation;
+    }
+
+    /**
+     * @param accessorType
+     */
+    public void setAccessorType(String accessorType) {
+
+	this.accessorType = accessorType;
+    }
+
+    /**
+     * @param incrementalFrom the start date of the selective harvesting, if any
+     */
+    public void setIncrementalFrom(String incrementalFrom) {
+
+	this.incrementalFrom = incrementalFrom;
+    }
+
+    /**
+     * @param previousHarvestingEndDate
+     */
+    public void setPreviousHarvestingEndDate(String previousHarvestingEndDate) {
+
+	this.previousHarvestingEndDate = previousHarvestingEndDate;
+    }
+
+    /**
+     * @param harvestingCount number of the completed harvestings of the source, before this one
+     */
+    public void setHarvestingCount(int harvestingCount) {
+
+	this.harvestingCount = harvestingCount;
     }
 
     /**
@@ -199,18 +307,24 @@ public class HarvestingNotifier {
     }
 
     /**
-     * @return
+     * @return the message published at the start of the harvesting
+     */
+    public JSONObject buildStartMessage() {
+
+	JSONObject object = buildCommonFields();
+
+	object.put("result", HarvestingResult.RUNNING.name());
+
+	return object;
+    }
+
+    /**
+     * @return the message published at the end of the harvesting
      */
     public JSONObject buildMessage() {
 
-	JSONObject object = new JSONObject();
+	JSONObject object = buildCommonFields();
 
-	object.put("sourceId", source.getUniqueIdentifier());
-	object.put("sourceLabel", source.getLabel());
-	object.put("strategy", strategy.name());
-	object.put("recovery", recovery);
-	object.put("resumed", resumed);
-	object.put("startDate", startTimestamp);
 	object.put("endDate", ISO8601DateTimeUtils.getISO8601DateTime());
 
 	long durationMillis = System.currentTimeMillis() - startTimeMillis;
@@ -218,7 +332,6 @@ public class HarvestingNotifier {
 	// duration in milliseconds and in ISO 8601 format (e.g. PT42M3.5S)
 	object.put("durationMillis", durationMillis);
 	object.put("duration", Duration.ofMillis(durationMillis).toString());
-	object.put("recordsBefore", recordsBefore);
 
 	if (harvestedRecords != null) {
 
@@ -241,7 +354,44 @@ public class HarvestingNotifier {
     }
 
     /**
-     * Publishes the harvesting summary on the MQTT broker and stores it in the statistics database, if configured
+     * @return the fields used to update the document of the interrupted execution continued by this one
+     */
+    public JSONObject buildInterruptedMessage() {
+
+	JSONObject object = new JSONObject();
+
+	object.put("result", HarvestingResult.INTERRUPTED.name());
+	object.put("interruptionDetectedDate", startTimestamp);
+	object.put("continuedBy", harvestingId);
+
+	return object;
+    }
+
+    /**
+     * Publishes the harvesting start notification on the MQTT broker and stores it in the statistics database, if
+     * configured. If this execution continues an interrupted one, the interrupted execution document is updated
+     */
+    public void publishStarted() {
+
+	JSONObject message = buildStartMessage();
+
+	publishMQTT(message);
+
+	ElasticsearchHarvestingPublisher.publish(harvestingId, message);
+
+	if (continuationOf != null) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Harvesting {} continues interrupted harvesting {} ({})", harvestingId,
+		    continuationOf, continuation);
+
+	    // the update is applied only if the interrupted execution is still RUNNING, so a final result is never replaced
+	    ElasticsearchHarvestingPublisher.update(continuationOf, buildInterruptedMessage(), HarvestingResult.RUNNING.name());
+	}
+    }
+
+    /**
+     * Publishes the harvesting end notification on the MQTT broker and stores it in the statistics database, if
+     * configured. Then notifies the registered {@link HarvestingEndListener}s
      */
     public void publish() {
 
@@ -249,9 +399,36 @@ public class HarvestingNotifier {
 
 	publishMQTT(message);
 
-	ElasticsearchHarvestingPublisher.publish(source.getUniqueIdentifier() + "_" + startTimeMillis, message);
+	ElasticsearchHarvestingPublisher.publish(harvestingId, message);
 
 	notifyListeners();
+    }
+
+    /**
+     * @return
+     */
+    private JSONObject buildCommonFields() {
+
+	JSONObject object = new JSONObject();
+
+	object.put("harvestingId", harvestingId);
+	object.put("rootHarvestingId", rootHarvestingId);
+	object.put("continuationOf", continuationOf);
+	object.put("continuation", continuation != null ? continuation.name() : null);
+	object.put("sourceId", source.getUniqueIdentifier());
+	object.put("sourceLabel", source.getLabel());
+	object.put("sourceEndpoint", source.getEndpoint());
+	object.put("accessorType", accessorType);
+	object.put("strategy", strategy.name());
+	object.put("recovery", recovery);
+	object.put("resumed", resumed);
+	object.put("startDate", startTimestamp);
+	object.put("incrementalFrom", incrementalFrom);
+	object.put("previousHarvestingEndDate", previousHarvestingEndDate);
+	object.put("harvestingCount", harvestingCount);
+	object.put("recordsBefore", recordsBefore);
+
+	return object;
     }
 
     /**
