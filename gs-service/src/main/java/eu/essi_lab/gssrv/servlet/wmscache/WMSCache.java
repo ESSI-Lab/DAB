@@ -225,6 +225,37 @@ public class WMSCache {
 	}
     }
 
+    /**
+     * Removes all the cached layers (tiles and stats) of the given view
+     *
+     * @param view the view identifier
+     */
+    public void invalidateView(String view) {
+
+	if (view == null || view.isBlank() || storage == null) {
+	    return;
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Invalidating all WMS cache layers of view {} STARTED", view);
+
+	for (String layer : storage.getLayers(view)) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Invalidating WMS cache layer {} of view {}", layer, view);
+
+	    storage.deleteCachedLayer(view, layer);
+	}
+
+	if (stats != null) {
+
+	    for (String layer : stats.getLayers(view)) {
+
+		stats.deleteLayer(view, layer);
+	    }
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Invalidating all WMS cache layers of view {} ENDED", view);
+    }
+
     public void cacheResponse(String profile, WebRequest request, byte[] body) {
 	GSLoggerFactory.getLogger(getClass()).info("WMS CACHE TILE");
 	String[] viewLayerHashRequest = extractViewLayerHashRequest(profile, request);

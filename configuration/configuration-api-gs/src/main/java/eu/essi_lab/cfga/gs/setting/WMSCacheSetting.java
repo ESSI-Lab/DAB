@@ -48,6 +48,7 @@ public class WMSCacheSetting extends Setting {
     private static final String WMS_CACHE_FOLDERNAME = "wmsCacheFolderName";
     private static final String WMS_CACHE_SIZE = "wmsCacheSize";
     private static final String WMS_CACHE_SHAPE_VIEW = "wmsCacheShapeView";
+    private static final String WMS_CACHE_INVALIDATION_SETTING_ID = "wmsCacheInvalidationSetting";
 
     public enum WMSCacheMode implements LabeledEnum {
 
@@ -170,6 +171,15 @@ public class WMSCacheSetting extends Setting {
 		withLabel("Predefined shapes view").//
 		cannotBeDisabled().//
 		build());
+
+	//
+	// Cache invalidation on harvesting
+	//
+
+	WMSCacheInvalidationSetting invalidationSetting = new WMSCacheInvalidationSetting();
+	invalidationSetting.setIdentifier(WMS_CACHE_INVALIDATION_SETTING_ID);
+
+	addSetting(invalidationSetting);
     }
 
     /**
@@ -362,6 +372,15 @@ public class WMSCacheSetting extends Setting {
     public Optional<String> getShapeView() {
 
 	return getOption(WMS_CACHE_SHAPE_VIEW, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @return the cache invalidation on harvesting setting, if present and enabled
+     */
+    public Optional<WMSCacheInvalidationSetting> getInvalidationSetting() {
+
+	return getSetting(WMS_CACHE_INVALIDATION_SETTING_ID, WMSCacheInvalidationSetting.class).//
+		filter(Setting::isEnabled);
     }
 
 }

@@ -505,16 +505,29 @@ public class ConfigurationWrapper {
      */
     public static List<GSSource> getViewSources(View view) {
 
-	final List<String> sourceIds = new ArrayList<>();
-
-	Bond bond = view.getBond();
-
-	findSourceIdentifiers(bond, sourceIds, view.getSourceDeployment());
+	final List<String> sourceIds = getViewSourceIdentifiers(view);
 
 	return getAllSources().//
 		stream().//
 		filter(s -> sourceIds.isEmpty() || sourceIds.contains(s.getUniqueIdentifier())).//
 		collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves the identifiers of the sources explicitly referenced by the given <code>view</code> (through source
+     * identifier or source deployment constraints). Unlike {@link #getViewSources(View)}, if the view has no source
+     * constraints, the returned list is empty
+     *
+     * @param view
+     * @return
+     */
+    public static List<String> getViewSourceIdentifiers(View view) {
+
+	final List<String> sourceIds = new ArrayList<>();
+
+	findSourceIdentifiers(view.getBond(), sourceIds, view.getSourceDeployment());
+
+	return sourceIds;
     }
 
     /**

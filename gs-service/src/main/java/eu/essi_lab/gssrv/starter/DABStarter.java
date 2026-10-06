@@ -49,6 +49,7 @@ import eu.essi_lab.gssrv.conf.*;
 import eu.essi_lab.gssrv.conf.task.*;
 import eu.essi_lab.gssrv.health.*;
 import eu.essi_lab.gssrv.servlet.*;
+import eu.essi_lab.gssrv.servlet.wmscache.*;
 import eu.essi_lab.gssrv.servlet.mcp.ViewObservedPropertiesMcpSpecifications;
 import eu.essi_lab.harvester.*;
 import eu.essi_lab.jaxb.common.*;
@@ -1019,6 +1020,12 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    HarvestingReportsHandler.enable();
 	}
+
+	//
+	// registers the WMS cache invalidation at the end of the harvesting procedures.
+	// the listener checks the WMS cache settings at each harvesting end, so it is always registered
+	//
+	HarvestingNotifier.addListener(new WMSCacheHarvestingInvalidator());
 
 	//
 	// enables the email reporting during augmentation

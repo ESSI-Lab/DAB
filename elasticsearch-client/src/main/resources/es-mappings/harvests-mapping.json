@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "sourceId": { "type": "keyword" },
+    "sourceLabel": { "type": "text", "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } } },
+    "strategy": { "type": "keyword" },
+    "recovery": { "type": "boolean" },
+    "resumed": { "type": "boolean" },
+    "startDate": { "type": "date" },
+    "endDate": { "type": "date" },
+    "durationMillis": { "type": "long" },
+    "duration": { "type": "keyword" },
+    "recordsBefore": { "type": "long" },
+    "harvestedRecords": { "type": "long" },
+    "recordsAfter": { "type": "long" },
+    "result": { "type": "keyword" },
+    "errors": { "type": "text" },
+    "hostName": { "type": "keyword" },
+    "executionMode": { "type": "keyword" }
+  }
+}
