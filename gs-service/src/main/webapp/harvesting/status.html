@@ -21,9 +21,8 @@
     }
 
     h1 { color: #005aef; margin: 0 0 8px 0; }
-    h2 { margin-top: 0; font-size: 1.15em; }
+    h2 { margin: 0 0 12px 0; font-size: 1.15em; }
 
-    .subtitle { color: #555; margin-bottom: 16px; }
     .window-range { font-size: 0.92em; color: #666; margin-bottom: 16px; }
 
     .controls {
@@ -44,31 +43,25 @@
       gap: 6px;
     }
 
-    .control-group label.title {
+    [hidden] { display: none !important; }
+
+    .control-group label {
       font-size: 0.9em;
       color: #444;
       font-weight: 600;
     }
 
     .control-group select,
-    .control-group input[type="text"],
-    .control-group input[type="number"] {
+    .control-group input {
       padding: 8px 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
       font-size: 0.95em;
-      min-width: 160px;
+      min-width: 170px;
+      font-family: inherit;
     }
 
-    .control-group input[type="number"] { min-width: 80px; width: 80px; }
-
-    .control-inline {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 19px;
-      font-size: 0.92em;
-    }
+    .control-group input#source { min-width: 240px; }
 
     button {
       background: #005aef;
@@ -97,39 +90,25 @@
       border-radius: 8px;
       padding: 12px 16px;
       min-width: 110px;
-      cursor: pointer;
     }
 
-    .summary-card.active { outline: 2px solid #005aef; }
     .summary-card .value { font-size: 1.5em; font-weight: 700; line-height: 1.2; }
-    .summary-card .label { color: #666; font-size: 0.9em; }
+    .summary-card .label { color: #666; font-size: 0.9em; display: flex; align-items: center; gap: 6px; }
 
-    .legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 16px;
-      font-size: 0.92em;
-    }
-
-    .legend-item { display: flex; align-items: center; gap: 8px; }
-
-    .legend-swatch {
-      width: 16px;
-      height: 16px;
+    .swatch {
+      width: 12px;
+      height: 12px;
       border-radius: 3px;
       display: inline-block;
+      flex: none;
     }
 
-    .legend-swatch.hatched {
-      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.65) 0 2px, transparent 2px 5px) !important;
+    .swatch.hatched {
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.65) 0 2px, transparent 2px 5px);
     }
-
-    .legend-note { color: #666; font-size: 0.88em; }
 
     .chart-card,
-    .table-card,
-    .debug-card {
+    .table-card {
       background: #fff;
       border: 1px solid #e0e0e0;
       border-radius: 8px;
@@ -137,7 +116,9 @@
       margin-bottom: 20px;
     }
 
-    #gantt-chart { width: 100%; min-height: 200px; }
+    .chart-note { color: #666; font-size: 0.88em; margin: -6px 0 8px 0; }
+
+    #timeline { width: 100%; }
 
     .table-wrapper { overflow-x: auto; }
 
@@ -176,15 +157,6 @@
       white-space: nowrap;
     }
 
-    .status-running { background: #f59e0b; }
-    .status-stale { background: #b45309; }
-    .status-interrupted { background: #9333ea; }
-    .status-completed { background: #22c55e; }
-    .status-consolidated { background: #0ea5e9; }
-    .status-failed { background: #ef4444; }
-    .status-canceled { background: #64748b; }
-    .status-unknown { background: #94a3b8; }
-
     .tag {
       display: inline-block;
       padding: 1px 6px;
@@ -206,6 +178,8 @@
       text-align: center;
     }
 
+    .empty-state { color: #666; }
+
     .error-box {
       color: #b91c1c;
       background: #fef2f2;
@@ -223,29 +197,43 @@
       margin-bottom: 20px;
     }
 
-    .debug-pre {
-      background: #111827;
-      color: #e5e7eb;
-      padding: 12px;
-      border-radius: 6px;
-      overflow: auto;
-      font-size: 0.82em;
-      max-height: 360px;
-    }
-
-    .toolbar {
+    .header {
       display: flex;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
       flex-wrap: wrap;
-      margin-bottom: 12px;
-      align-items: center;
     }
 
-    .api-url {
-      font-size: 0.85em;
-      color: #666;
-      word-break: break-all;
+    .user-info { font-size: 0.92em; color: #444; }
+    .user-info button { margin-left: 8px; padding: 5px 12px; }
+
+    .login-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 420px;
+      margin: 40px auto;
     }
+
+    .login-card p { color: #555; margin: 0 0 16px 0; font-size: 0.95em; }
+    .login-card .control-group { margin-bottom: 14px; }
+    .login-card .control-group input { min-width: 0; width: 100%; box-sizing: border-box; }
+    .login-error { color: #b91c1c; font-size: 0.9em; margin: 0 0 12px 0; }
+
+    .info-box {
+      color: #166534;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+    }
+
+    button.danger { background: #fff; color: #b91c1c; border: 1px solid #fca5a5; padding: 4px 10px; font-size: 0.85em; }
+    button.danger:hover { background: #fef2f2; }
+    button:disabled { opacity: 0.6; cursor: default; }
 
     a.chain { color: #005aef; text-decoration: none; }
     a.chain:hover { text-decoration: underline; }
@@ -253,14 +241,36 @@
 </head>
 <body>
   <div class="page-container">
-    <h1>Harvesting status</h1>
-    <p class="subtitle">Harvesting executions from the harvesting statistics index (<code>/services/support/harvest-status</code>).</p>
+    <div class="header">
+      <h1>Harvesting status</h1>
+      <div class="user-info" id="user-info" hidden>
+        <span id="user-email"></span>
+        <button type="button" class="secondary" id="logout">Log out</button>
+      </div>
+    </div>
+
+    <form class="login-card" id="login-form" hidden>
+      <h2>Administrator login</h2>
+      <p>The harvesting status is available to the DAB administrators only.</p>
+      <p class="login-error" id="login-error" hidden></p>
+      <div class="control-group">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" autocomplete="username" required>
+      </div>
+      <div class="control-group">
+        <label for="login-apikey">API key</label>
+        <input type="password" id="login-apikey" autocomplete="current-password" required>
+      </div>
+      <button type="submit" id="login-submit">Log in</button>
+    </form>
+
+    <div id="main" hidden>
     <p class="window-range" id="window-range"></p>
 
     <form class="controls" id="controls-form">
       <div class="control-group">
-        <label class="title" for="hours">Time window</label>
-        <select id="hours" name="hours">
+        <label for="hours">Time window</label>
+        <select id="hours">
           <option value="2">Last 2 hours</option>
           <option value="6">Last 6 hours</option>
           <option value="12">Last 12 hours</option>
@@ -268,62 +278,49 @@
           <option value="48">Last 48 hours</option>
           <option value="168">Last 7 days</option>
           <option value="720">Last 30 days</option>
+          <option value="custom">Custom range</option>
         </select>
       </div>
-      <div class="control-group">
-        <label class="title" for="from">Custom from (ISO8601)</label>
-        <input type="text" id="from" name="from" placeholder="2026-06-18T10:00:00Z">
+      <div class="control-group custom-range" hidden>
+        <label for="from">From (UTC)</label>
+        <input type="datetime-local" id="from">
+      </div>
+      <div class="control-group custom-range" hidden>
+        <label for="to">To (UTC)</label>
+        <input type="datetime-local" id="to">
       </div>
       <div class="control-group">
-        <label class="title" for="to">Custom to (ISO8601)</label>
-        <input type="text" id="to" name="to" placeholder="2026-06-18T12:00:00Z">
+        <label for="source">Source</label>
+        <input type="search" id="source" placeholder="Source name or identifier (optional)">
       </div>
-      <div class="control-group">
-        <label class="title" for="staleHours">Stale after (hours)</label>
-        <input type="number" id="staleHours" name="staleHours" min="1" step="1" value="24">
-      </div>
-      <div class="control-group">
-        <label class="title" for="filter">Source filter</label>
-        <input type="text" id="filter" name="filter" placeholder="Source name or identifier">
-      </div>
-      <div class="control-group">
-        <label class="title">Display</label>
-        <div class="control-inline">
-          <input type="checkbox" id="problemsOnly" name="problemsOnly">
-          <label for="problemsOnly">Only stale, interrupted, failed and consolidated</label>
-        </div>
-        <div class="control-inline">
-          <input type="checkbox" id="autoRefresh" name="autoRefresh">
-          <label for="autoRefresh">Reload every 60s while harvestings are running</label>
-        </div>
-      </div>
-      <button type="submit">Apply</button>
+      <button type="submit">Search</button>
+      <button type="button" class="secondary" id="reload" title="Run the same search again">Reload</button>
     </form>
 
     <div id="error-box" class="error-box" hidden></div>
-    <div id="loading" class="loading">Loading harvesting status…</div>
+    <div id="info-box" class="info-box" hidden></div>
+    <div id="loading" class="loading" hidden>Loading harvests…</div>
 
     <div id="content" hidden>
-      <div id="truncated-box" class="warning-box" hidden>Too many harvestings in the selected window: only the first ones are shown. Narrow the time window.</div>
+      <div id="truncated-box" class="warning-box" hidden>Too many harvests in the selected window: only the first ones are shown. Narrow the time window or filter by source.</div>
 
       <div class="summary" id="summary"></div>
 
-      <div class="legend" id="legend"></div>
-
       <div class="chart-card">
         <h2>Timeline</h2>
-        <div id="gantt-chart"></div>
-        <div id="gantt-empty" class="empty-state" hidden>No harvesting overlaps the selected time window.</div>
+        <p class="chart-note">Hatched bars: the actual end is unknown (interrupted harvests end when the interruption was detected; stale harvests are still marked as running).</p>
+        <div id="timeline"></div>
+        <div id="timeline-empty" class="empty-state" hidden>No harvest in the selected time window.</div>
       </div>
 
       <div class="table-card">
-        <div class="toolbar">
-          <h2 style="margin:0">Executions</h2>
-          <button type="button" class="secondary" id="toggle-debug">Show raw API response</button>
+        <div class="header">
+          <h2>Harvests</h2>
+          <button type="button" class="danger" id="remove-stale" hidden></button>
         </div>
-        <div id="table-empty" class="empty-state" hidden>No harvesting to display.</div>
+        <div id="table-empty" class="empty-state" hidden>No harvest in the selected time window.</div>
         <div class="table-wrapper">
-          <table id="details-table" hidden>
+          <table id="harvests-table" hidden>
             <thead>
               <tr>
                 <th>Source</th>
@@ -338,26 +335,87 @@
                 <th>Host</th>
                 <th>ECS task</th>
                 <th>Details</th>
+                <th></th>
               </tr>
             </thead>
             <tbody></tbody>
           </table>
         </div>
       </div>
-
-      <div class="debug-card" id="debug-card" hidden>
-        <h2>Raw API response</h2>
-        <p class="api-url" id="api-url"></p>
-        <p class="api-url" id="timing-info"></p>
-        <pre class="debug-pre" id="raw-json"></pre>
-      </div>
+    </div>
     </div>
   </div>
 
   <script>
     const API_BASE = '../services/support/harvest-status';
+    const LOGIN_URL = '../services/support/auth/login';
 
-    // status key -> [label, color, hatched]; hatched bars have an uncertain end
+    let lastPayload = null;
+
+    // ------------------------------------------------------------
+    // credentials: shared with the portal (same origin, same keys)
+    // ------------------------------------------------------------
+
+    function storageGet(key) {
+      try { return localStorage.getItem(key); } catch (e) { return null; }
+    }
+
+    function storageSet(key, value) {
+      try { value == null ? localStorage.removeItem(key) : localStorage.setItem(key, value); } catch (e) { }
+    }
+
+    function getCredentials() {
+      const email = storageGet('userEmail');
+      const apiKey = storageGet('authToken');
+      return email && apiKey ? { email, apiKey } : null;
+    }
+
+    function clearCredentials() {
+      ['authToken', 'userEmail', 'isAdmin', 'userPermissions'].forEach(k => storageSet(k, null));
+    }
+
+    function showLogin(message) {
+      el('main').hidden = true;
+      el('user-info').hidden = true;
+      el('login-form').hidden = false;
+      el('login-error').hidden = !message;
+      el('login-error').textContent = message || '';
+      const credentials = getCredentials();
+      if (credentials && !el('login-email').value) el('login-email').value = credentials.email;
+    }
+
+    function showMain(credentials) {
+      el('login-form').hidden = true;
+      el('main').hidden = false;
+      el('user-info').hidden = false;
+      el('user-email').textContent = credentials.email;
+    }
+
+    async function postJson(url, body) {
+      const credentials = getCredentials();
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(Object.assign({ email: credentials.email, apiKey: credentials.apiKey }, body))
+      });
+      let payload = {};
+      try { payload = await response.json(); } catch (e) { }
+      if (response.status === 401) {
+        clearCredentials();
+        showLogin('Your session is no longer valid. Log in again.');
+        return null;
+      }
+      if (response.status === 403) {
+        showLogin('The account ' + credentials.email + ' is not an administrator.');
+        return null;
+      }
+      if (!response.ok || payload.status === 'error') {
+        throw new Error(payload.message || ('HTTP ' + response.status));
+      }
+      return payload;
+    }
+
+    // status key -> [label, color, hatched]; hatched bars have an unknown end
     const STATUSES = {
       running: ['Running', '#f59e0b', false],
       stale: ['Stale', '#b45309', true],
@@ -369,53 +427,72 @@
       unknown: ['Unknown', '#94a3b8', false]
     };
 
-    const PROBLEM_KEYS = ['stale', 'interrupted', 'failed', 'consolidated'];
-
-    let refreshTimer = null;
-    let lastPayload = null;
-    let statusFilter = null;
-
     // ------------------------------------------------------------
     // form and URL
     // ------------------------------------------------------------
 
-    function getApiParams() {
+    const el = id => document.getElementById(id);
+
+    function isCustom() {
+      return el('hours').value === 'custom';
+    }
+
+    // datetime-local values are interpreted as UTC
+    function toIso(localValue) {
+      return localValue ? localValue + (localValue.length === 16 ? ':00Z' : 'Z') : '';
+    }
+
+    function toLocalValue(iso) {
+      const m = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})/.exec(iso || '');
+      return m ? m[1] : '';
+    }
+
+    // the search parameters, also kept in the page URL (credentials excluded)
+    function getParams() {
       const params = new URLSearchParams();
-      params.set('hours', document.getElementById('hours').value || '24');
-      const from = document.getElementById('from').value.trim();
-      const to = document.getElementById('to').value.trim();
-      if (from) params.set('from', from);
-      if (to) params.set('to', to);
-      const stale = document.getElementById('staleHours').value.trim();
-      if (stale) params.set('staleHours', stale);
+      if (isCustom()) {
+        params.set('from', toIso(el('from').value));
+        params.set('to', toIso(el('to').value));
+      } else {
+        params.set('hours', el('hours').value);
+      }
+      const source = el('source').value.trim();
+      if (source) params.set('source', source);
       return params;
     }
 
-    function getPageParams() {
-      const params = getApiParams();
-      const filter = document.getElementById('filter').value.trim();
-      if (filter) params.set('filter', filter);
-      if (document.getElementById('problemsOnly').checked) params.set('problemsOnly', 'true');
-      if (document.getElementById('autoRefresh').checked) params.set('autoRefresh', 'true');
-      if (statusFilter) params.set('status', statusFilter);
-      return params;
+    function validate() {
+      if (!isCustom()) return null;
+      if (!el('from').value || !el('to').value) return 'Enter both the start and the end of the custom range.';
+      if (el('from').value >= el('to').value) return 'The start of the custom range must be before its end.';
+      return null;
     }
 
     function syncFormFromUrl() {
       const p = new URLSearchParams(window.location.search);
-      if (p.has('hours')) document.getElementById('hours').value = p.get('hours');
-      if (p.has('from')) document.getElementById('from').value = p.get('from');
-      if (p.has('to')) document.getElementById('to').value = p.get('to');
-      if (p.has('staleHours')) document.getElementById('staleHours').value = p.get('staleHours');
-      if (p.has('filter')) document.getElementById('filter').value = p.get('filter');
-      document.getElementById('problemsOnly').checked = p.get('problemsOnly') === 'true';
-      document.getElementById('autoRefresh').checked = p.get('autoRefresh') === 'true';
-      statusFilter = STATUSES[p.get('status')] ? p.get('status') : null;
+      if (p.has('from') && p.has('to')) {
+        el('hours').value = 'custom';
+        el('from').value = toLocalValue(p.get('from'));
+        el('to').value = toLocalValue(p.get('to'));
+      } else if (p.has('hours') && el('hours').querySelector(`option[value="${CSS.escape(p.get('hours'))}"]`)) {
+        el('hours').value = p.get('hours');
+      }
+      el('source').value = p.get('source') || '';
+      toggleCustomRange();
     }
 
-    function updateUrlFromForm() {
-      const qs = getPageParams().toString();
+    function updateUrl() {
+      const qs = getParams().toString();
       history.replaceState(null, '', qs ? '?' + qs : window.location.pathname);
+    }
+
+    function toggleCustomRange() {
+      document.querySelectorAll('.custom-range').forEach(g => { g.hidden = !isCustom(); });
+      if (isCustom() && !el('from').value && !el('to').value) {
+        const now = new Date();
+        el('to').value = now.toISOString().slice(0, 16);
+        el('from').value = new Date(now.getTime() - 24 * 3600000).toISOString().slice(0, 16);
+      }
     }
 
     // ------------------------------------------------------------
@@ -449,11 +526,10 @@
       const d = Math.floor(s / 86400);
       const h = Math.floor((s % 86400) / 3600);
       const m = Math.floor((s % 3600) / 60);
-      const sec = s % 60;
       if (d > 0) return `${d}d ${h}h ${m}m`;
       if (h > 0) return `${h}h ${m}m`;
-      if (m > 0) return `${m}m ${sec}s`;
-      return `${sec}s`;
+      if (m > 0) return `${m}m ${s % 60}s`;
+      return `${s}s`;
     }
 
     function formatCount(value) {
@@ -464,6 +540,10 @@
       return h.statusKey === 'running' || h.statusKey === 'stale';
     }
 
+    function hasFinalCount(h) {
+      return !isOpen(h) && h.statusKey !== 'interrupted';
+    }
+
     function endLabel(h) {
       if (h.statusKey === 'running') return 'in progress';
       if (h.statusKey === 'stale') return 'no news (process died?)';
@@ -471,58 +551,40 @@
       return formatDate(h.endMs);
     }
 
-    function filteredHarvests(harvests) {
-      const text = document.getElementById('filter').value.trim().toLowerCase();
-      const problemsOnly = document.getElementById('problemsOnly').checked;
-      return harvests.filter(h => {
-        if (statusFilter && statusOf(h) !== statusFilter) return false;
-        if (problemsOnly && !PROBLEM_KEYS.includes(statusOf(h))) return false;
-        if (text && !(sourceLabel(h).toLowerCase().includes(text) || String(h.sourceId).toLowerCase().includes(text))) return false;
-        return true;
-      });
+    function durationLabel(h) {
+      if (h.statusKey === 'interrupted') return '≤ ' + formatDuration(h.endMs - h.startMs);
+      if (isOpen(h)) return formatDuration(h.endMs - h.startMs) + ' so far';
+      return formatDuration(h.durationMillis != null ? h.durationMillis : h.endMs - h.startMs);
     }
 
     // ------------------------------------------------------------
     // rendering
     // ------------------------------------------------------------
 
-    function renderLegend() {
-      document.getElementById('legend').innerHTML = Object.entries(STATUSES)
-        .filter(([key]) => key !== 'unknown')
-        .map(([key, [label, color, hatched]]) =>
-          `<div class="legend-item"><span class="legend-swatch${hatched ? ' hatched' : ''}" style="background-color:${color}"></span> ${label}</div>`)
-        .join('') +
-        '<div class="legend-item legend-note">Hatched bars: the actual end is unknown</div>';
-    }
-
     function renderSummary(payload) {
       const summary = payload.summary;
-      const cards = [[null, 'All', summary.total, '#111']].concat(
+      const cards = [['All', summary.total, '#111', null, false]].concat(
         Object.entries(STATUSES)
-          .filter(([key]) => key !== 'unknown' || summary.unknown > 0)
-          .map(([key, [label, color]]) => [key, label, summary[key] || 0, color]));
+          .filter(([key]) => summary[key] > 0 || key !== 'unknown')
+          .map(([key, [label, color, hatched]]) => [label, summary[key] || 0, color, color, hatched]));
 
-      const el = document.getElementById('summary');
-      el.innerHTML = cards.map(([key, label, value, color]) =>
-        `<div class="summary-card${statusFilter === key ? ' active' : ''}" data-status="${key || ''}" title="Show only ${escapeHtml(label.toLowerCase())}">
-           <div class="value" style="color:${color}">${value}</div><div class="label">${escapeHtml(label)}</div>
+      el('summary').innerHTML = cards.map(([label, value, color, swatch, hatched]) =>
+        `<div class="summary-card">
+           <div class="value" style="color:${color}">${value}</div>
+           <div class="label">${swatch ? `<span class="swatch${hatched ? ' hatched' : ''}" style="background-color:${swatch}"></span>` : ''}${escapeHtml(label)}</div>
          </div>`).join('');
 
-      el.querySelectorAll('.summary-card').forEach(card => card.addEventListener('click', () => {
-        statusFilter = card.dataset.status || null;
-        updateUrlFromForm();
-        render();
-      }));
-
       const w = payload.window;
-      document.getElementById('window-range').textContent =
-        `Showing ${w.hours} hour(s): ${w.startIso} — ${w.endIso}. Running harvestings older than ${w.staleHours} hour(s) are stale.`;
+      const source = el('source').value.trim();
+      el('window-range').textContent =
+        `Harvests from ${formatDate(w.startMs)} to ${formatDate(w.endMs)}` +
+        (source ? `, source matching "${source}"` : '') + '.';
 
-      document.getElementById('truncated-box').hidden = !summary.truncated;
+      el('truncated-box').hidden = !summary.truncated;
     }
 
     function typeTags(h) {
-      const tags = [h.strategy || ''];
+      const tags = [h.strategy];
       if (h.continuation) tags.push(h.continuation.toLowerCase());
       else if (h.recovery) tags.push('recovery');
       else if (h.resumed) tags.push('resumed');
@@ -536,56 +598,60 @@
       return `<div><a class="chain" href="#${encodeURIComponent(id)}" data-target="${escapeHtml(id)}">${escapeHtml(text)}</a></div>`;
     }
 
-    function renderTable(harvests, byId) {
-      const rows = harvests.slice().sort((a, b) => b.startMs - a.startMs);
-      const table = document.getElementById('details-table');
-      const empty = document.getElementById('table-empty');
+    function changeCell(h) {
+      if (!hasFinalCount(h) || h.recordsBefore == null || h.recordsAfter == null || h.recordsBefore < 0 || h.recordsAfter < 0) {
+        return '—';
+      }
+      const delta = h.recordsAfter - h.recordsBefore;
+      if (delta === 0) return '0';
+      return `<span class="${delta > 0 ? 'delta-pos' : 'delta-neg'}">${delta > 0 ? '+' : ''}${delta.toLocaleString()}</span>`;
+    }
 
-      if (!rows.length) {
+    function renderTable(harvests, byId) {
+      const table = el('harvests-table');
+
+      if (!harvests.length) {
         table.hidden = true;
-        empty.hidden = false;
+        el('table-empty').hidden = false;
         return;
       }
 
-      empty.hidden = true;
+      el('table-empty').hidden = true;
       table.hidden = false;
+
+      const rows = harvests.slice().sort((a, b) => b.startMs - a.startMs);
 
       table.querySelector('tbody').innerHTML = rows.map(h => {
         const key = statusOf(h);
-        const before = h.recordsBefore;
-        const after = h.recordsAfter;
-        let change = '—';
-        if (!isOpen(h) && key !== 'interrupted' && before != null && after != null && before >= 0 && after >= 0) {
-          const delta = after - before;
-          change = delta === 0 ? '0' : `<span class="${delta > 0 ? 'delta-pos' : 'delta-neg'}">${delta > 0 ? '+' : ''}${delta.toLocaleString()}</span>`;
-        }
+        const [label, color] = STATUSES[key];
         const harvested = h.harvestedRecords != null ? `<div><small>harvested ${formatCount(h.harvestedRecords)}</small></div>` : '';
         const errors = (h.errors || []).length
-          ? `<div class="errors">${(h.errors || []).slice(0, 3).map(escapeHtml).join('<br>')}${h.errors.length > 3 ? '<br>…' : ''}</div>` : '';
-        const task = h.awsTaskId
-          ? (h.awsTaskLogsUrl
-            ? `<a href="${escapeHtml(h.awsTaskLogsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(h.awsTaskId)}</a>`
-            : escapeHtml(h.awsTaskId))
-          : '';
-        const duration = h.durationMillis != null ? h.durationMillis : (isOpen(h) ? h.endMs - h.startMs : null);
+          ? `<div class="errors">${h.errors.slice(0, 3).map(escapeHtml).join('<br>')}${h.errors.length > 3 ? '<br>…' : ''}</div>` : '';
+        const task = !h.awsTaskId ? '' : h.awsTaskLogsUrl
+          ? `<a href="${escapeHtml(h.awsTaskLogsUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(h.awsTaskId)}</a>`
+          : escapeHtml(h.awsTaskId);
 
         return `<tr id="${escapeHtml(h.harvestingId)}">
           <td><strong>${escapeHtml(sourceLabel(h))}</strong><br><small>${escapeHtml(h.sourceId)}</small></td>
-          <td><span class="status-pill status-${key}">${escapeHtml(STATUSES[key][0])}</span></td>
+          <td><span class="status-pill" style="background:${color}">${escapeHtml(label)}</span></td>
           <td class="nowrap">${escapeHtml(formatDate(h.startMs))}</td>
           <td>${escapeHtml(endLabel(h))}</td>
-          <td class="nowrap">${key === 'interrupted'
-            ? '≤ ' + escapeHtml(formatDuration(h.endMs - h.startMs))
-            : escapeHtml(formatDuration(duration)) + (isOpen(h) ? ' so far' : '')}</td>
-          <td class="num">${formatCount(before)}</td>
-          <td class="num">${isOpen(h) || key === 'interrupted' ? '—' : formatCount(after)}${harvested}</td>
-          <td class="num">${change}</td>
+          <td class="nowrap">${escapeHtml(durationLabel(h))}</td>
+          <td class="num">${formatCount(h.recordsBefore)}</td>
+          <td class="num">${hasFinalCount(h) ? formatCount(h.recordsAfter) : '—'}${harvested}</td>
+          <td class="num">${changeCell(h)}</td>
           <td>${typeTags(h)}</td>
           <td>${escapeHtml(h.hostName || '')}</td>
           <td>${task}</td>
           <td>${chainLink(h.continuationOf, 'Continues', byId)}${chainLink(h.continuedBy, 'Continued by', byId)}${errors}</td>
+          <td>${isOpen(h) ? `<button type="button" class="danger remove" data-id="${escapeHtml(h.harvestingId)}" title="Remove this harvest from the statistics">Remove</button>` : ''}</td>
         </tr>`;
       }).join('');
+
+      table.querySelectorAll('button.remove').forEach(b => b.addEventListener('click', () => {
+        const h = byId[b.dataset.id];
+        removeHarvests([h]);
+      }));
 
       table.querySelectorAll('a.chain').forEach(a => a.addEventListener('click', e => {
         const row = document.getElementById(a.dataset.target);
@@ -601,20 +667,20 @@
       row.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    function renderGantt(harvests, windowInfo) {
-      const chartEl = document.getElementById('gantt-chart');
-      const empty = document.getElementById('gantt-empty');
+    function renderTimeline(harvests, windowInfo) {
+      const chartEl = el('timeline');
 
       if (!harvests.length || typeof Plotly === 'undefined') {
         if (typeof Plotly !== 'undefined') Plotly.purge(chartEl);
-        chartEl.style.height = '0px';
-        empty.hidden = false;
+        chartEl.hidden = true;
+        el('timeline-empty').hidden = false;
         return;
       }
 
-      empty.hidden = true;
+      chartEl.hidden = false;
+      el('timeline-empty').hidden = true;
 
-      // one row per source, sorted by label
+      // one row per source, sorted by label (top to bottom)
       const sources = new Map();
       harvests.forEach(h => sources.set(h.sourceId, sourceLabel(h)));
       const sourceIds = Array.from(sources.keys()).sort((a, b) => sources.get(a).localeCompare(sources.get(b)));
@@ -640,20 +706,20 @@
             `Status: ${label}<br>` +
             `Start: ${formatDate(h.startMs)}<br>` +
             `End: ${escapeHtml(endLabel(h))}<br>` +
-            `Records: ${formatCount(h.recordsBefore)} → ${isOpen(h) || key === 'interrupted' ? '…' : formatCount(h.recordsAfter)}<br>` +
+            `Duration: ${escapeHtml(durationLabel(h))}<br>` +
+            `Records: ${formatCount(h.recordsBefore)} → ${hasFinalCount(h) ? formatCount(h.recordsAfter) : '…'}<br>` +
             `Host: ${escapeHtml(h.hostName || 'n/a')}` +
-            (h.continuationOf ? `<br>Continues an interrupted harvesting (${escapeHtml(h.continuation || '')})` : '')),
+            (h.continuationOf ? `<br>Continues an interrupted harvest (${escapeHtml((h.continuation || '').toLowerCase())})` : '')),
           hoverinfo: 'text',
           showlegend: false
         };
       }).filter(t => t.y.length);
 
-      const height = Math.max(200, sourceIds.length * 26 + 90);
-      chartEl.style.height = height + 'px';
+      const height = Math.max(180, sourceIds.length * 26 + 80);
 
-      Plotly.newPlot(chartEl, traces, {
+      Plotly.react(chartEl, traces, {
         barmode: 'overlay',
-        margin: { l: 240, r: 24, t: 16, b: 48 },
+        margin: { l: 240, r: 24, t: 8, b: 48 },
         height,
         xaxis: {
           type: 'date',
@@ -670,9 +736,10 @@
         },
         plot_bgcolor: '#fafafa',
         paper_bgcolor: '#ffffff'
-      }, { responsive: true, displayModeBar: true });
+      }, { responsive: true, displaylogo: false });
 
-      // clicking a bar highlights the execution in the table
+      // clicking a bar highlights the harvest in the table
+      chartEl.removeAllListeners && chartEl.removeAllListeners('plotly_click');
       chartEl.on('plotly_click', data => {
         const id = data.points && data.points[0] && data.points[0].customdata;
         const row = id ? document.getElementById(id) : null;
@@ -680,101 +747,177 @@
       });
     }
 
-    function render() {
-      if (!lastPayload) return;
-      const harvests = lastPayload.harvests || [];
-      const byId = {};
-      harvests.forEach(h => { byId[h.harvestingId] = h; });
-      const visible = filteredHarvests(harvests);
-      renderSummary(lastPayload);
-      renderTable(visible, byId);
-      renderGantt(visible, lastPayload.window);
-    }
-
-    function scheduleRefresh() {
-      if (refreshTimer) {
-        clearTimeout(refreshTimer);
-        refreshTimer = null;
-      }
-      const running = lastPayload && lastPayload.summary ? lastPayload.summary.running : 0;
-      if (document.getElementById('autoRefresh').checked && running > 0) {
-        refreshTimer = setTimeout(() => loadData(false), 60000);
-      }
-    }
-
     // ------------------------------------------------------------
     // loading
     // ------------------------------------------------------------
 
-    async function loadData(showLoading) {
-      const url = API_BASE + '?' + getApiParams().toString();
+    function showError(message) {
+      el('loading').hidden = true;
+      el('content').hidden = true;
+      el('error-box').hidden = false;
+      el('error-box').textContent = message;
+    }
 
-      if (showLoading !== false) {
-        document.getElementById('loading').hidden = false;
-        document.getElementById('content').hidden = true;
+    function showInfo(message) {
+      el('info-box').hidden = !message;
+      el('info-box').textContent = message || '';
+    }
+
+    function searchBody() {
+      const body = {};
+      getParams().forEach((value, key) => { body[key] = key === 'hours' ? Number(value) : value; });
+      return body;
+    }
+
+    async function loadData() {
+      const credentials = getCredentials();
+      if (!credentials) {
+        showLogin();
+        return;
       }
-      document.getElementById('error-box').hidden = true;
-      document.getElementById('api-url').textContent = url;
+      showMain(credentials);
+
+      const invalid = validate();
+      if (invalid) {
+        showError(invalid);
+        return;
+      }
+
+      el('loading').hidden = false;
+      el('content').hidden = true;
+      el('error-box').hidden = true;
 
       try {
-        const response = await fetch(url);
-        const payload = await response.json();
-
-        if (!response.ok || payload.status === 'error') {
-          throw new Error(payload.message || ('HTTP ' + response.status));
-        }
+        const payload = await postJson(API_BASE, searchBody());
+        if (!payload) return;
 
         lastPayload = payload;
 
-        document.getElementById('loading').hidden = true;
-        document.getElementById('content').hidden = false;
-        document.getElementById('raw-json').textContent = JSON.stringify(payload, null, 2);
-        document.getElementById('timing-info').textContent = payload.timing
-          ? `Server timing (ms): total=${payload.timing.totalMs}, search=${payload.timing.searchMs}` : '';
+        const harvests = payload.harvests || [];
+        const byId = {};
+        harvests.forEach(h => { byId[h.harvestingId] = h; });
 
-        render();
-        scheduleRefresh();
+        el('loading').hidden = true;
+        el('content').hidden = false;
+
+        renderSummary(payload);
+        renderRemoveStale(harvests);
+        renderTable(harvests, byId);
+        renderTimeline(harvests, payload.window);
 
       } catch (err) {
-        console.error('[harvest-status] FAILED:', err);
-        document.getElementById('loading').hidden = true;
-        document.getElementById('content').hidden = true;
-        const box = document.getElementById('error-box');
-        box.hidden = false;
-        box.textContent = 'Failed to load harvesting status: ' + err.message;
+        console.error('[harvest-status]', err);
+        showError('Unable to load the harvests: ' + err.message);
       }
     }
 
-    document.getElementById('controls-form').addEventListener('submit', e => {
+    // ------------------------------------------------------------
+    // removal of the harvests still marked as running
+    // ------------------------------------------------------------
+
+    function renderRemoveStale(harvests) {
+      const stale = harvests.filter(h => h.statusKey === 'stale');
+      const button = el('remove-stale');
+      button.hidden = !stale.length;
+      button.textContent = `Remove ${stale.length} stale harvest${stale.length === 1 ? '' : 's'}`;
+      button.onclick = () => removeHarvests(stale);
+    }
+
+    async function removeHarvests(harvests) {
+      if (!harvests.length) return;
+
+      const running = harvests.filter(h => h.statusKey === 'running').length;
+      const what = harvests.length === 1
+        ? `the harvest of ${sourceLabel(harvests[0])} started on ${formatDate(harvests[0].startMs)}`
+        : `${harvests.length} harvests`;
+      const warning = running
+        ? '\n\nThe harvest started less than ' + lastPayload.window.staleHours + ' hours ago and may still be running: ' +
+          'in that case it will reappear with its final result when it ends.'
+        : '';
+
+      if (!confirm(`Remove ${what} from the harvesting statistics?${warning}\n\nThis cannot be undone.`)) return;
+
+      try {
+        const payload = await postJson(API_BASE + '/delete', { harvestingIds: harvests.map(h => h.harvestingId) });
+        if (!payload) return;
+        await loadData();
+        showInfo(`${payload.deleted} harvest${payload.deleted === 1 ? '' : 's'} removed.` +
+          (payload.deleted < payload.requested ? ` ${payload.requested - payload.deleted} not removed, since meanwhile they ended.` : ''));
+      } catch (err) {
+        console.error('[harvest-status]', err);
+        showError('Unable to remove the harvests: ' + err.message);
+      }
+    }
+
+    // ------------------------------------------------------------
+    // login
+    // ------------------------------------------------------------
+
+    el('login-form').addEventListener('submit', async e => {
       e.preventDefault();
-      updateUrlFromForm();
-      loadData(true);
+      const email = el('login-email').value.trim();
+      const apiKey = el('login-apikey').value.trim();
+      if (!email || !apiKey) {
+        showLogin('Enter your e-mail and API key.');
+        return;
+      }
+
+      el('login-submit').disabled = true;
+      try {
+        const response = await fetch(LOGIN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, apiKey })
+        });
+        let data = {};
+        try { data = await response.json(); } catch (ex) { }
+
+        if (!data.success) {
+          showLogin(data.message || 'Invalid credentials.');
+          return;
+        }
+        if (!data.admin) {
+          showLogin('The account ' + email + ' is not an administrator.');
+          return;
+        }
+
+        storageSet('authToken', data.apiKey);
+        storageSet('userEmail', data.email);
+        storageSet('isAdmin', 'true');
+        el('login-apikey').value = '';
+        showInfo('');
+        loadData();
+
+      } catch (err) {
+        showLogin('Login failed: ' + err.message);
+      } finally {
+        el('login-submit').disabled = false;
+      }
     });
 
-    // client-side filters don't need a reload
-    ['filter', 'problemsOnly'].forEach(id => {
-      const el = document.getElementById(id);
-      el.addEventListener(el.type === 'checkbox' ? 'change' : 'input', () => {
-        updateUrlFromForm();
-        render();
-      });
+    el('logout').addEventListener('click', () => {
+      clearCredentials();
+      lastPayload = null;
+      showInfo('');
+      showLogin();
     });
 
-    document.getElementById('autoRefresh').addEventListener('change', () => {
-      updateUrlFromForm();
-      scheduleRefresh();
+    el('hours').addEventListener('change', toggleCustomRange);
+
+    el('controls-form').addEventListener('submit', e => {
+      e.preventDefault();
+      updateUrl();
+      showInfo('');
+      loadData();
     });
 
-    document.getElementById('toggle-debug').addEventListener('click', () => {
-      const card = document.getElementById('debug-card');
-      const visible = !card.hidden;
-      card.hidden = visible;
-      document.getElementById('toggle-debug').textContent = visible ? 'Show raw API response' : 'Hide raw API response';
+    el('reload').addEventListener('click', () => {
+      showInfo('');
+      loadData();
     });
 
-    renderLegend();
     syncFormFromUrl();
-    loadData(true);
+    loadData();
   </script>
 </body>
 </html>

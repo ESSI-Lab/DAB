@@ -871,72 +871,13 @@ public class SupportService {
 	}
     }
 
-    @SuppressWarnings("rawtypes")
+    /**
+     * @param request
+     * @return
+     */
     private LoginResponse getLoginResponse(LoginRequest request) {
 
-	try {
-
-	    UserFinder uf = UserFinder.newInstance();
-	    List<GSUser> users = uf.getUsers(false);
-
-	    for (GSUser user : users) {
-
-		String firstName = null;
-		String email = null;
-		String lastName = null;
-
-		List<GSProperty> properties = user.getProperties();
-
-		for (GSProperty<?> prop : properties) {
-		    if (prop.getName().equals("firstName")) {
-			firstName = prop.getValue().toString();
-		    }
-		    if (prop.getName().equals("lastName")) {
-			firstName = prop.getValue().toString();
-		    }
-		    if (prop.getName().equals("email")) {
-			email = prop.getValue().toString();
-		    }
-		}
-
-		if (request.getApiKey().equals(user.getUri()) && request.getEmail().equals(email)) {
-
-		    LoginResponse response = new LoginResponse(//
-			    true, //
-			    "Login successful", //
-			    user.getStringPropertyValue("firstName").get(), //
-			    user.getStringPropertyValue("lastName").get(), //
-			    request.getEmail(), //
-			    request.getApiKey());
-
-		    Optional<String> perm = user.getStringPropertyValue("permissions");
-		    if (perm.isPresent()) {
-		    response.setPermissions(perm.get());
-		    }
-		    
-		    response.setUser(user);
-
-		    List<String> adminUsers = ConfigurationWrapper.getAdminUsers();
-
-		    if (adminUsers != null) {
-			for (String adminUser : adminUsers) {
-			    if (user.getUri().equals(adminUser) || request.getEmail().equals(adminUser)) {
-				response.setAdmin(true);
-			    }
-			}
-		    }
-
-		    return response;
-		}
-	    }
-	    LoginResponse response = new LoginResponse(false, "Invalid credentials", null, null, null, null);
-	    return response;
-
-	} catch (Exception ex) {
-	    GSLoggerFactory.getLogger(getClass()).error(ex.getMessage(), ex);
-	    LoginResponse resp = new LoginResponse(false, "Server error: " + ex.getMessage(), null, null, null, null);
-	    return resp;
-	}
+	return UserLogin.login(request);
     }
 
     @SuppressWarnings("rawtypes")

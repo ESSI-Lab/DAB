@@ -126,13 +126,11 @@ public class ElasticsearchHarvestingPublisher {
 
 	THREAD_POOL.execute(() -> {
 
-	    ElasticsearchClient client = null;
-
 	    try {
 
 		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).info("{} STARTED", description);
 
-		client = database.get().createClient();
+		ElasticsearchClient client = database.get().createClient();
 		client.init(HARVESTS_INDEX);
 
 		action.accept(client);
@@ -143,37 +141,20 @@ public class ElasticsearchHarvestingPublisher {
 
 		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).error("{} failed: {}", description, ex.getMessage(),
 			ex);
-
-	    } finally {
-
-		close(client);
 	    }
 	});
     }
 
     /**
-     * Creates a client to the "DAB statistics gathering" database, if configured. The caller must close the client
+     * Creates a client to the "DAB statistics gathering" database, if configured.<br>
+     * <b>The client must not be closed</b>: the underlying connection is cached by {@link ElasticsearchClient} and
+     * shared with all the other clients to the same endpoint (e.g. the requests statistics publisher)
      *
      * @return
      */
     public static Optional<ElasticsearchClient> createClient() {
 
 	return getStatisticsDatabase().map(StatisticsDatabase::createClient);
-    }
-
-    /**
-     * @param client
-     */
-    public static void close(ElasticsearchClient client) {
-
-	if (client != null) {
-
-	    try {
-		client.close();
-	    } catch (Exception ex) {
-		GSLoggerFactory.getLogger(ElasticsearchHarvestingPublisher.class).warn("Unable to close client: {}", ex.getMessage());
-	    }
-	}
     }
 
     /**

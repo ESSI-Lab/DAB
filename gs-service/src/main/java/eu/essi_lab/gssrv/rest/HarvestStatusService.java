@@ -23,12 +23,14 @@ package eu.essi_lab.gssrv.rest;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.opensearch.client.ResponseException;
 import org.slf4j.Logger;
 
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -37,24 +39,29 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchHarvestingPublisher;
 import jakarta.jws.WebService;
-import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.Status;
 
 /**
  * Provides the harvesting executions overlapping a time window, read from the {@code {dbName}-harvests} index of the "DAB
  * statistics gathering" database (see {@link ElasticsearchHarvestingPublisher}).<br>
  * Each execution is returned with a status key:
  * <ul>
- * <li><code>running</code>: result RUNNING, started less than <code>staleHours</code> ago</li>
- * <li><code>stale</code>: result RUNNING, started more than <code>staleHours</code> ago; most likely the process died and
+ * <li><code>running</code>: result RUNNING, started less than {@value #STALE_HOURS} hours ago</li>
+ * <li><code>stale</code>: result RUNNING, started more than {@value #STALE_HOURS} hours ago; most likely the process died and
  * the harvesting has not been continued yet</li>
  * <li><code>interrupted</code>: the process died and the harvesting has been continued by another execution</li>
  * <li><code>completed</code>, <code>consolidated</code>, <code>failed</code>, <code>canceled</code>: final results</li>
  * </ul>
+ * The optional <code>source</code> parameter filters the executions by source: it matches (case insensitive) the source
+ * identifiers containing it, and the source labels containing words starting with it.<br>
+ * All the operations are restricted to the DAB administrators: the credentials (e-mail and API key) are sent in the
+ * request body, so they never appear in URLs and access logs.
  *
  * @author boldrini
  */
@@ -65,7 +72,7 @@ public class HarvestStatusService {
     private static final Logger LOGGER = GSLoggerFactory.getLogger(HarvestStatusService.class);
 
     private static final long DEFAULT_HOURS = 24;
-    private static final long DEFAULT_STALE_HOURS = 24;
+    private static final long STALE_HOURS = 24;
 
     /**
      * Maximum number of returned executions (default OpenSearch max result window)
@@ -75,22 +82,135 @@ public class HarvestStatusService {
     /**
      * Status keys, in the order used for the summary
      */
+    /**
+     * Maximum number of executions deleted with a single request
+     */
+    private static final int MAX_DELETIONS = 1000;
+
     private static final String[] STATUS_KEYS = { "running", "stale", "interrupted", "completed", "consolidated", "failed",
 	    "canceled", "unknown" };
 
-    @GET
+    /**
+     * @param request
+     * @return the executions overlapping the requested time window
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/harvest-status")
-    public Response harvestStatus(//
-	    @QueryParam("hours") Long hoursParam, //
-	    @QueryParam("from") String fromParam, //
-	    @QueryParam("to") String toParam, //
-	    @QueryParam("sourceId") String sourceIdParam, //
-	    @QueryParam("staleHours") Long staleHoursParam) {
+    public Response harvestStatus(HarvestStatusRequest request) {
+
+	Optional<Response> denied = checkAdmin(request);
+
+	if (denied.isPresent()) {
+
+	    return denied.get();
+	}
+
+	return search(request.getHours(), request.getFrom(), request.getTo(), request.getSource());
+    }
+
+    /**
+     * Deletes the given executions, provided that they are still marked as running: they are the executions whose
+     * process died without being continued, or whose end has not been recorded. Executions with a final result are never
+     * deleted
+     *
+     * @param request
+     * @return the number of deleted executions
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/harvest-status/delete")
+    public Response deleteHarvests(HarvestDeleteRequest request) {
+
+	Optional<Response> denied = checkAdmin(request);
+
+	if (denied.isPresent()) {
+
+	    return denied.get();
+	}
+
+	List<String> ids = request.getHarvestingIds() == null ? List.of()
+		: request.getHarvestingIds().stream().filter(id -> id != null && !id.isBlank()).distinct().toList();
+
+	if (ids.isEmpty() || ids.size() > MAX_DELETIONS) {
+
+	    return Response.status(Status.BAD_REQUEST)
+		    .entity(errorResponse("Between 1 and " + MAX_DELETIONS + " harvesting identifiers are required").toString()).build();
+	}
+
+	Optional<ElasticsearchClient> client = ElasticsearchHarvestingPublisher.createClient();
+
+	if (client.isEmpty()) {
+
+	    return Response.serverError()
+		    .entity(errorResponse("Harvesting statistics not available: the DAB statistics gathering is disabled").toString()).build();
+	}
+
+	JSONArray filter = new JSONArray();
+	filter.put(new JSONObject().put("ids", new JSONObject().put("values", new JSONArray(ids))));
+	filter.put(new JSONObject().put("term", new JSONObject().put("result", "RUNNING")));
+
+	JSONObject query = new JSONObject().put("bool", new JSONObject().put("filter", filter));
+
+	try {
+
+	    long deleted = client.get().deleteByQuery(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, query);
+
+	    LOGGER.warn("harvest-status: {} deleted {} of the {} requested running harvests: {}", request.getEmail(), deleted, ids.size(),
+		    ids);
+
+	    JSONObject output = new JSONObject();
+	    output.put("status", "success");
+	    output.put("requested", ids.size());
+	    output.put("deleted", deleted);
+
+	    return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+
+	} catch (Exception ex) {
+
+	    LOGGER.error("harvest-status deletion FAILED: {}", ex.getMessage(), ex);
+
+	    return Response.serverError().entity(errorResponse("Deletion failed: " + ex.getMessage()).toString()).build();
+	}
+    }
+
+    /**
+     * @param request
+     * @return an error response if the request credentials are not valid, or don't belong to an administrator
+     */
+    private Optional<Response> checkAdmin(LoginRequest request) {
+
+	LoginResponse login = UserLogin.login(request);
+
+	if (!login.isSuccess()) {
+
+	    return Optional.of(Response.status(Status.UNAUTHORIZED).entity(errorResponse("Invalid credentials").toString())
+		    .type(MediaType.APPLICATION_JSON).build());
+	}
+
+	if (!login.isAdmin()) {
+
+	    LOGGER.warn("harvest-status: access denied to non administrator {}", request.getEmail());
+
+	    return Optional.of(Response.status(Status.FORBIDDEN).entity(errorResponse("Administrator access required").toString())
+		    .type(MediaType.APPLICATION_JSON).build());
+	}
+
+	return Optional.empty();
+    }
+
+    /**
+     * @param hoursParam
+     * @param fromParam
+     * @param toParam
+     * @param sourceParam
+     * @return
+     */
+    private Response search(Long hoursParam, String fromParam, String toParam, String sourceParam) {
 
 	long requestStartMs = System.currentTimeMillis();
-
-	ElasticsearchClient client = null;
 
 	try {
 
@@ -116,8 +236,6 @@ public class HarvestStatusService {
 		}
 	    }
 
-	    long staleHours = staleHoursParam != null && staleHoursParam > 0 ? staleHoursParam : DEFAULT_STALE_HOURS;
-
 	    JSONObject output = new JSONObject();
 
 	    JSONObject window = new JSONObject();
@@ -126,7 +244,7 @@ public class HarvestStatusService {
 	    window.put("endMs", windowEndMs);
 	    window.put("startIso", ISO8601DateTimeUtils.getISO8601DateTime(new Date(windowStartMs)));
 	    window.put("endIso", ISO8601DateTimeUtils.getISO8601DateTime(new Date(windowEndMs)));
-	    window.put("staleHours", staleHours);
+	    window.put("staleHours", STALE_HOURS);
 	    output.put("window", window);
 
 	    //
@@ -141,24 +259,41 @@ public class HarvestStatusService {
 			MediaType.APPLICATION_JSON).build();
 	    }
 
-	    client = optClient.get();
+	    ElasticsearchClient client = optClient.get();
 
 	    JSONObject response;
 
 	    long searchStartMs = System.currentTimeMillis();
 
+	    JSONObject query = buildQuery(window.getString("startIso"), window.getString("endIso"), sourceParam);
+
+	    LOGGER.info("harvest-status searching index {}-{}: {}", client.getDbName(), ElasticsearchHarvestingPublisher.HARVESTS_INDEX,
+		    query);
+
 	    try {
 
-		response = client.search(ElasticsearchHarvestingPublisher.HARVESTS_INDEX,
-			buildQuery(window.getString("startIso"), window.getString("endIso"), sourceIdParam));
+		response = client.search(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, query);
 
-	    } catch (Exception ex) {
+	    } catch (ResponseException ex) {
 
-		// most likely the index does not exist yet, since no harvesting ended after the statistics were enabled
-		LOGGER.warn("harvest-status search failed: {}", ex.getMessage());
+		if (ex.getResponse().getStatusLine().getStatusCode() != 404) {
+
+		    LOGGER.error("harvest-status search failed: {}", ex.getMessage(), ex);
+
+		    return Response.serverError().entity(errorResponse("Search of the harvests index failed: " + ex.getMessage()).toString())
+			    .build();
+		}
+
+		// the index does not exist yet, since no harvesting started after the statistics were enabled
+		LOGGER.warn("harvest-status: index {}-{} not found", client.getDbName(), ElasticsearchHarvestingPublisher.HARVESTS_INDEX);
 
 		response = new JSONObject().put("hits", new JSONObject().put("hits", new JSONArray()));
 	    }
+
+	    LOGGER.info("harvest-status found {} harvests",
+		    response.getJSONObject("hits").optJSONObject("total") != null
+			    ? response.getJSONObject("hits").getJSONObject("total").opt("value")
+			    : response.getJSONObject("hits").getJSONArray("hits").length());
 
 	    long searchMs = System.currentTimeMillis() - searchStartMs;
 
@@ -178,7 +313,7 @@ public class HarvestStatusService {
 
 	    for (int i = 0; i < hitsArray.length(); i++) {
 
-		JSONObject harvest = toHarvest(hitsArray.getJSONObject(i).getJSONObject("_source"), nowMs, staleHours);
+		JSONObject harvest = toHarvest(hitsArray.getJSONObject(i).getJSONObject("_source"), nowMs);
 
 		counts.merge(harvest.getString("statusKey"), 1, Integer::sum);
 
@@ -211,10 +346,6 @@ public class HarvestStatusService {
 	    LOGGER.error("harvest-status FAILED: {}", e.getMessage(), e);
 
 	    return Response.serverError().entity(errorResponse(e.getMessage()).toString()).build();
-
-	} finally {
-
-	    ElasticsearchHarvestingPublisher.close(client);
 	}
     }
 
@@ -224,10 +355,10 @@ public class HarvestStatusService {
      *
      * @param startIso
      * @param endIso
-     * @param sourceId
+     * @param source optional source filter
      * @return
      */
-    private JSONObject buildQuery(String startIso, String endIso, String sourceId) {
+    private JSONObject buildQuery(String startIso, String endIso, String source) {
 
 	JSONArray should = new JSONArray();
 	should.put(range("endDate", "gte", startIso));
@@ -238,9 +369,9 @@ public class HarvestStatusService {
 	filter.put(range("startDate", "lte", endIso));
 	filter.put(new JSONObject().put("bool", new JSONObject().put("should", should).put("minimum_should_match", 1)));
 
-	if (sourceId != null && !sourceId.isBlank()) {
+	if (source != null && !source.isBlank()) {
 
-	    filter.put(new JSONObject().put("term", new JSONObject().put("sourceId", sourceId.trim())));
+	    filter.put(sourceFilter(source.trim()));
 	}
 
 	JSONObject body = new JSONObject();
@@ -250,6 +381,24 @@ public class HarvestStatusService {
 	body.put("query", new JSONObject().put("bool", new JSONObject().put("filter", filter)));
 
 	return body;
+    }
+
+    /**
+     * @param source
+     * @return a filter matching the source identifiers containing <code>source</code>, or the source labels with words
+     *         starting with <code>source</code> (case insensitive)
+     */
+    private JSONObject sourceFilter(String source) {
+
+	String escaped = source.replace("\\", "\\\\").replace("*", "\\*").replace("?", "\\?");
+
+	JSONObject wildcard = new JSONObject().put("value", "*" + escaped + "*").put("case_insensitive", true);
+
+	JSONArray should = new JSONArray();
+	should.put(new JSONObject().put("wildcard", new JSONObject().put("sourceId", wildcard)));
+	should.put(new JSONObject().put("match_phrase_prefix", new JSONObject().put("sourceLabel", source)));
+
+	return new JSONObject().put("bool", new JSONObject().put("should", should).put("minimum_should_match", 1));
     }
 
     /**
@@ -266,11 +415,10 @@ public class HarvestStatusService {
     /**
      * @param doc
      * @param nowMs
-     * @param staleHours
      * @return the given document with the computed fields <code>statusKey</code>, <code>startMs</code>,
      *         <code>endMs</code> and <code>awsTaskLogsUrl</code>
      */
-    private JSONObject toHarvest(JSONObject doc, long nowMs, long staleHours) {
+    private JSONObject toHarvest(JSONObject doc, long nowMs) {
 
 	String result = doc.optString("result", "");
 
@@ -281,7 +429,7 @@ public class HarvestStatusService {
 
 	switch (result) {
 	case "RUNNING" -> {
-	    statusKey = nowMs - startMs > TimeUnit.HOURS.toMillis(staleHours) ? "stale" : "running";
+	    statusKey = nowMs - startMs > TimeUnit.HOURS.toMillis(STALE_HOURS) ? "stale" : "running";
 	    endMs = Optional.of(nowMs);
 	}
 	case "INTERRUPTED" -> {

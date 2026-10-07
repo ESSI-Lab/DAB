@@ -1236,6 +1236,30 @@ public class ElasticsearchClient {
     }
 
     /**
+     * Deletes the documents of the <code>{dbName}-{index}</code> index matching the given query. The index is refreshed
+     * after the deletion, so the deleted documents are immediately excluded from the searches
+     *
+     * @param index
+     * @param query the query (the value of the <code>query</code> field of the request body)
+     * @return the number of deleted documents
+     * @throws IOException if the request fails
+     */
+    public long deleteByQuery(String index, JSONObject query) throws IOException {
+
+	if (dbName != null) {
+	    index = dbName + "-" + index;
+	}
+
+	Request request = new Request("POST", "/" + index + "/_delete_by_query");
+	request.addParameter("refresh", "true");
+	request.setEntity(new StringEntity(new JSONObject().put("query", query).toString(), ContentType.APPLICATION_JSON));
+
+	Response response = client.getLowLevelClient().performRequest(request);
+
+	return new JSONObject(EntityUtils.toString(response.getEntity())).optLong("deleted", 0);
+    }
+
+    /**
      * Partially updates the document with the given id, adding or replacing the given fields, only if the document field
      * <code>conditionField</code> has value <code>conditionValue</code>. Otherwise, or if the document does not exist, nothing
      * is done
