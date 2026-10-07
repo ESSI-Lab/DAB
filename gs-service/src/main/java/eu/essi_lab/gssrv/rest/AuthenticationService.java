@@ -26,6 +26,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 
 import jakarta.jws.WebService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -244,15 +245,7 @@ AuthenticationService {
 		redirect = buildLogoutRedirectURL(httpRequest);
 	    }
 
-	    if(!redirect.startsWith("http://") && !redirect.startsWith("https://")) {
-
-		throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
-	    }
-
-	    if(!redirect.endsWith("gs-service/configuration/")) {
-
-		throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
-	    }
+	    checkClientURL(redirect);
 
 	    httpResponse.sendRedirect(redirect);
 
@@ -451,19 +444,35 @@ AuthenticationService {
 
 	httpResponse.setHeader("Set-Cookie", TokenProvider.USER_COOKIE_NAME + "=" + tokenProvider.getToken(token) + ";Path=/");
 
-	if(!redirect.startsWith("http://") && !redirect.startsWith("https://")) {
-
-	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
-	}
-
-	if(!redirect.endsWith("gs-service/configuration/")) {
-
-	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
-	}
+	checkClientURL(redirect);
 
 	httpResponse.sendRedirect(redirect);
 
 	return Response.ok().build();
+    }
+
+    /**
+     * The pages where the user can be redirected after the login and the logout
+     */
+    private static final List<String> CLIENT_PAGES = List.of(//
+	    "gs-service/configuration/", //
+	    "gs-service/harvesting/status.html");
+
+    /**
+     * @param redirect
+     * @throws IllegalArgumentException if <code>redirect</code> is not an allowed client page
+     */
+    private void checkClientURL(String redirect) {
+
+	if (!redirect.startsWith("http://") && !redirect.startsWith("https://")) {
+
+	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	}
+
+	if (CLIENT_PAGES.stream().noneMatch(redirect::endsWith)) {
+
+	    throw new IllegalArgumentException("Invalid redirect URL: " + redirect);
+	}
     }
 
     /**

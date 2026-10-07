@@ -22,12 +22,12 @@ package eu.essi_lab.gssrv.rest;
  */
 
 /**
- * Request of the harvesting status: the administrator credentials, the time window (the last <code>hours</code>, or the
+ * Request of the harvesting status: the time window (the last <code>hours</code>, or the
  * <code>from</code> - <code>to</code> range, in ISO8601 format) and an optional source filter
  *
  * @author boldrini
  */
-public class HarvestStatusRequest extends LoginRequest {
+public class HarvestStatusRequest {
 
     private Long hours;
     private String from;

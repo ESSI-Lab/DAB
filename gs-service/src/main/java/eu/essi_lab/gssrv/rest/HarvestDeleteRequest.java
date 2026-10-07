@@ -25,12 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Request of deletion of harvesting executions from the harvesting statistics: the administrator credentials and the
- * identifiers of the executions to delete
+ * Request of deletion of harvesting executions from the harvesting statistics: the identifiers of the executions to
+ * delete
  *
  * @author boldrini
  */
-public class HarvestDeleteRequest extends LoginRequest {
+public class HarvestDeleteRequest {
 
     private List<String> harvestingIds = new ArrayList<>();
 

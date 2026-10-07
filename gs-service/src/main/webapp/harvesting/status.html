@@ -15,7 +15,6 @@
     }
 
     .page-container {
-      max-width: 1280px;
       margin: 0 auto;
       padding: 24px 16px 32px;
     }
@@ -144,6 +143,11 @@
 
     td.num { text-align: right; white-space: nowrap; }
     td.nowrap { white-space: nowrap; }
+    td.wrap { overflow-wrap: anywhere; }
+    td small, td .sub { color: #666; font-size: 0.85em; }
+    td .sub { display: block; margin-top: 3px; }
+    td .id { overflow-wrap: anywhere; }
+    td.actions { width: 1%; }
 
     tr.highlight td { background: #fff7d6; }
 
@@ -171,7 +175,7 @@
     .delta-pos { color: #15803d; }
     .delta-neg { color: #b91c1c; }
 
-    .errors { color: #b91c1c; font-size: 0.85em; max-width: 360px; }
+    .errors { color: #b91c1c; font-size: 0.85em; }
 
     .empty-state, .loading, .error-box {
       padding: 24px;
@@ -249,20 +253,13 @@
       </div>
     </div>
 
-    <form class="login-card" id="login-form" hidden>
+    <div class="login-card" id="login-card" hidden>
       <h2>Administrator login</h2>
-      <p>The harvesting status is available to the DAB administrators only.</p>
+      <p>The harvesting status is available to the DAB administrators only. Log in with the same account you use for the configurator.</p>
       <p class="login-error" id="login-error" hidden></p>
-      <div class="control-group">
-        <label for="login-email">E-mail</label>
-        <input type="email" id="login-email" autocomplete="username" required>
-      </div>
-      <div class="control-group">
-        <label for="login-apikey">API key</label>
-        <input type="password" id="login-apikey" autocomplete="current-password" required>
-      </div>
-      <button type="submit" id="login-submit">Log in</button>
-    </form>
+      <button type="button" id="login">Log in</button>
+      <button type="button" class="secondary" id="switch-account" hidden>Use another account</button>
+    </div>
 
     <div id="main" hidden>
     <p class="window-range" id="window-range"></p>
@@ -327,13 +324,8 @@
                 <th>Status</th>
                 <th>Start</th>
                 <th>End</th>
-                <th>Duration</th>
-                <th>Records before</th>
-                <th>Records after</th>
-                <th>Change</th>
-                <th>Type</th>
+                <th style="text-align:right">Records</th>
                 <th>Host</th>
-                <th>ECS task</th>
                 <th>Details</th>
                 <th></th>
               </tr>
@@ -348,72 +340,6 @@
 
   <script>
     const API_BASE = '../services/support/harvest-status';
-    const LOGIN_URL = '../services/support/auth/login';
-
-    let lastPayload = null;
-
-    // ------------------------------------------------------------
-    // credentials: shared with the portal (same origin, same keys)
-    // ------------------------------------------------------------
-
-    function storageGet(key) {
-      try { return localStorage.getItem(key); } catch (e) { return null; }
-    }
-
-    function storageSet(key, value) {
-      try { value == null ? localStorage.removeItem(key) : localStorage.setItem(key, value); } catch (e) { }
-    }
-
-    function getCredentials() {
-      const email = storageGet('userEmail');
-      const apiKey = storageGet('authToken');
-      return email && apiKey ? { email, apiKey } : null;
-    }
-
-    function clearCredentials() {
-      ['authToken', 'userEmail', 'isAdmin', 'userPermissions'].forEach(k => storageSet(k, null));
-    }
-
-    function showLogin(message) {
-      el('main').hidden = true;
-      el('user-info').hidden = true;
-      el('login-form').hidden = false;
-      el('login-error').hidden = !message;
-      el('login-error').textContent = message || '';
-      const credentials = getCredentials();
-      if (credentials && !el('login-email').value) el('login-email').value = credentials.email;
-    }
-
-    function showMain(credentials) {
-      el('login-form').hidden = true;
-      el('main').hidden = false;
-      el('user-info').hidden = false;
-      el('user-email').textContent = credentials.email;
-    }
-
-    async function postJson(url, body) {
-      const credentials = getCredentials();
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.assign({ email: credentials.email, apiKey: credentials.apiKey }, body))
-      });
-      let payload = {};
-      try { payload = await response.json(); } catch (e) { }
-      if (response.status === 401) {
-        clearCredentials();
-        showLogin('Your session is no longer valid. Log in again.');
-        return null;
-      }
-      if (response.status === 403) {
-        showLogin('The account ' + credentials.email + ' is not an administrator.');
-        return null;
-      }
-      if (!response.ok || payload.status === 'error') {
-        throw new Error(payload.message || ('HTTP ' + response.status));
-      }
-      return payload;
-    }
 
     // status key -> [label, color, hatched]; hatched bars have an unknown end
     const STATUSES = {
@@ -426,6 +352,75 @@
       canceled: ['Canceled', '#64748b', false],
       unknown: ['Unknown', '#94a3b8', false]
     };
+
+    let lastPayload = null;
+
+    // ------------------------------------------------------------
+    // OAuth login, shared with the configurator (same session cookie)
+    // ------------------------------------------------------------
+
+    const AUTH_BASE = '../auth/user';
+    const SEARCH_KEY = 'harvestStatusSearch';
+
+    // the page address the OAuth provider returns to (the query string is kept in the session storage)
+    function pageUrl() {
+      return window.location.origin + window.location.pathname;
+    }
+
+    function sessionGet(key) {
+      try { return sessionStorage.getItem(key); } catch (e) { return null; }
+    }
+
+    function sessionSet(key, value) {
+      try { value == null ? sessionStorage.removeItem(key) : sessionStorage.setItem(key, value); } catch (e) { }
+    }
+
+    function redirectToAuth(action, provider) {
+      sessionSet(SEARCH_KEY, window.location.search);
+      window.location.href = `${AUTH_BASE}/${action}${provider ? '/' + encodeURIComponent(provider) : ''}?url=${encodeURIComponent(pageUrl())}`;
+    }
+
+    function showLogin(message, provider, loggedIn) {
+      el('main').hidden = true;
+      el('user-info').hidden = true;
+      el('login-card').hidden = false;
+      el('login-error').hidden = !message;
+      el('login-error').textContent = message || '';
+      el('login').hidden = loggedIn;
+      el('login').onclick = () => redirectToAuth('login', provider);
+      el('switch-account').hidden = !loggedIn;
+    }
+
+    function showMain(user) {
+      el('login-card').hidden = true;
+      el('main').hidden = false;
+      el('user-info').hidden = !user;
+      el('user-email').textContent = user || '';
+    }
+
+    // returns null when the user must log in
+    async function postJson(url, body) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify(body)
+      });
+      let payload = {};
+      try { payload = await response.json(); } catch (e) { }
+      if (response.status === 401) {
+        showLogin(null, payload.provider, false);
+        return null;
+      }
+      if (response.status === 403) {
+        showLogin((payload.message || 'Administrator access required') + '.', payload.provider, true);
+        return null;
+      }
+      if (!response.ok || payload.status === 'error') {
+        throw new Error(payload.message || ('HTTP ' + response.status));
+      }
+      return payload;
+    }
 
     // ------------------------------------------------------------
     // form and URL
@@ -447,7 +442,7 @@
       return m ? m[1] : '';
     }
 
-    // the search parameters, also kept in the page URL (credentials excluded)
+    // the search parameters, also kept in the page URL
     function getParams() {
       const params = new URLSearchParams();
       if (isCustom()) {
@@ -469,6 +464,12 @@
     }
 
     function syncFormFromUrl() {
+      // restores the search saved before the login redirect
+      const saved = sessionGet(SEARCH_KEY);
+      sessionSet(SEARCH_KEY, null);
+      if (!window.location.search && saved) {
+        history.replaceState(null, '', saved);
+      }
       const p = new URLSearchParams(window.location.search);
       if (p.has('from') && p.has('to')) {
         el('hours').value = 'custom';
@@ -513,6 +514,18 @@
 
     function sourceLabel(h) {
       return h.sourceLabel || h.sourceId || '';
+    }
+
+    // source names, case insensitive, with numbers in natural order (e.g. "Station 2" before "Station 10")
+    const NAME_COLLATOR = new Intl.Collator(undefined, { sensitivity: 'base', numeric: true });
+
+    function compareSources(a, b) {
+      return NAME_COLLATOR.compare(sourceLabel(a), sourceLabel(b)) || NAME_COLLATOR.compare(a.sourceId, b.sourceId);
+    }
+
+    // by source name, then the most recent harvest first
+    function compareHarvests(a, b) {
+      return compareSources(a, b) || b.startMs - a.startMs;
     }
 
     function formatDate(ms) {
@@ -600,10 +613,10 @@
 
     function changeCell(h) {
       if (!hasFinalCount(h) || h.recordsBefore == null || h.recordsAfter == null || h.recordsBefore < 0 || h.recordsAfter < 0) {
-        return '—';
+        return '';
       }
       const delta = h.recordsAfter - h.recordsBefore;
-      if (delta === 0) return '0';
+      if (delta === 0) return 'no change';
       return `<span class="${delta > 0 ? 'delta-pos' : 'delta-neg'}">${delta > 0 ? '+' : ''}${delta.toLocaleString()}</span>`;
     }
 
@@ -619,12 +632,12 @@
       el('table-empty').hidden = true;
       table.hidden = false;
 
-      const rows = harvests.slice().sort((a, b) => b.startMs - a.startMs);
+      const rows = harvests.slice().sort(compareHarvests);
 
       table.querySelector('tbody').innerHTML = rows.map(h => {
         const key = statusOf(h);
         const [label, color] = STATUSES[key];
-        const harvested = h.harvestedRecords != null ? `<div><small>harvested ${formatCount(h.harvestedRecords)}</small></div>` : '';
+        const harvested = h.harvestedRecords != null ? `<span class="sub">harvested ${formatCount(h.harvestedRecords)}</span>` : '';
         const errors = (h.errors || []).length
           ? `<div class="errors">${h.errors.slice(0, 3).map(escapeHtml).join('<br>')}${h.errors.length > 3 ? '<br>…' : ''}</div>` : '';
         const task = !h.awsTaskId ? '' : h.awsTaskLogsUrl
@@ -632,19 +645,15 @@
           : escapeHtml(h.awsTaskId);
 
         return `<tr id="${escapeHtml(h.harvestingId)}">
-          <td><strong>${escapeHtml(sourceLabel(h))}</strong><br><small>${escapeHtml(h.sourceId)}</small></td>
-          <td><span class="status-pill" style="background:${color}">${escapeHtml(label)}</span></td>
+          <td><strong>${escapeHtml(sourceLabel(h))}</strong><span class="sub id">${escapeHtml(h.sourceId)}</span></td>
+          <td><span class="status-pill" style="background:${color}">${escapeHtml(label)}</span><span class="sub">${typeTags(h)}</span></td>
           <td class="nowrap">${escapeHtml(formatDate(h.startMs))}</td>
-          <td>${escapeHtml(endLabel(h))}</td>
-          <td class="nowrap">${escapeHtml(durationLabel(h))}</td>
-          <td class="num">${formatCount(h.recordsBefore)}</td>
-          <td class="num">${hasFinalCount(h) ? formatCount(h.recordsAfter) : '—'}${harvested}</td>
-          <td class="num">${changeCell(h)}</td>
-          <td>${typeTags(h)}</td>
-          <td>${escapeHtml(h.hostName || '')}</td>
-          <td>${task}</td>
-          <td>${chainLink(h.continuationOf, 'Continues', byId)}${chainLink(h.continuedBy, 'Continued by', byId)}${errors}</td>
-          <td>${isOpen(h) ? `<button type="button" class="danger remove" data-id="${escapeHtml(h.harvestingId)}" title="Remove this harvest from the statistics">Remove</button>` : ''}</td>
+          <td>${escapeHtml(endLabel(h))}<span class="sub">${escapeHtml(durationLabel(h))}</span></td>
+          <td class="num">${formatCount(h.recordsBefore)} → ${hasFinalCount(h) ? formatCount(h.recordsAfter) : '…'}
+            <span class="sub">${changeCell(h)}</span>${harvested}</td>
+          <td class="wrap">${escapeHtml(h.hostName || '')}${task ? `<span class="sub">ECS ${task}</span>` : ''}</td>
+          <td class="wrap">${chainLink(h.continuationOf, 'Continues', byId)}${chainLink(h.continuedBy, 'Continued by', byId)}${errors}</td>
+          <td class="actions">${isOpen(h) ? `<button type="button" class="danger remove" data-id="${escapeHtml(h.harvestingId)}" title="Remove this harvest from the statistics">Remove</button>` : ''}</td>
         </tr>`;
       }).join('');
 
@@ -680,10 +689,10 @@
       chartEl.hidden = false;
       el('timeline-empty').hidden = true;
 
-      // one row per source, sorted by label (top to bottom)
+      // one row per source, sorted by name (top to bottom), as in the table
       const sources = new Map();
-      harvests.forEach(h => sources.set(h.sourceId, sourceLabel(h)));
-      const sourceIds = Array.from(sources.keys()).sort((a, b) => sources.get(a).localeCompare(sources.get(b)));
+      harvests.slice().sort(compareHarvests).forEach(h => { if (!sources.has(h.sourceId)) sources.set(h.sourceId, sourceLabel(h)); });
+      const sourceIds = Array.from(sources.keys());
 
       // one trace per status, so colors and patterns are consistent
       const traces = Object.entries(STATUSES).map(([key, [label, color, hatched]]) => {
@@ -752,6 +761,8 @@
     // ------------------------------------------------------------
 
     function showError(message) {
+      el('login-card').hidden = true;
+      el('main').hidden = false;
       el('loading').hidden = true;
       el('content').hidden = true;
       el('error-box').hidden = false;
@@ -770,19 +781,14 @@
     }
 
     async function loadData() {
-      const credentials = getCredentials();
-      if (!credentials) {
-        showLogin();
-        return;
-      }
-      showMain(credentials);
-
       const invalid = validate();
       if (invalid) {
         showError(invalid);
         return;
       }
 
+      el('login-card').hidden = true;
+      el('main').hidden = false;
       el('loading').hidden = false;
       el('content').hidden = true;
       el('error-box').hidden = true;
@@ -792,6 +798,7 @@
         if (!payload) return;
 
         lastPayload = payload;
+        showMain(payload.user);
 
         const harvests = payload.harvests || [];
         const byId = {};
@@ -850,57 +857,11 @@
     }
 
     // ------------------------------------------------------------
-    // login
+    // logout (also from the configurator, since the session is shared)
     // ------------------------------------------------------------
 
-    el('login-form').addEventListener('submit', async e => {
-      e.preventDefault();
-      const email = el('login-email').value.trim();
-      const apiKey = el('login-apikey').value.trim();
-      if (!email || !apiKey) {
-        showLogin('Enter your e-mail and API key.');
-        return;
-      }
-
-      el('login-submit').disabled = true;
-      try {
-        const response = await fetch(LOGIN_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, apiKey })
-        });
-        let data = {};
-        try { data = await response.json(); } catch (ex) { }
-
-        if (!data.success) {
-          showLogin(data.message || 'Invalid credentials.');
-          return;
-        }
-        if (!data.admin) {
-          showLogin('The account ' + email + ' is not an administrator.');
-          return;
-        }
-
-        storageSet('authToken', data.apiKey);
-        storageSet('userEmail', data.email);
-        storageSet('isAdmin', 'true');
-        el('login-apikey').value = '';
-        showInfo('');
-        loadData();
-
-      } catch (err) {
-        showLogin('Login failed: ' + err.message);
-      } finally {
-        el('login-submit').disabled = false;
-      }
-    });
-
-    el('logout').addEventListener('click', () => {
-      clearCredentials();
-      lastPayload = null;
-      showInfo('');
-      showLogin();
-    });
+    el('logout').addEventListener('click', () => redirectToAuth('logout'));
+    el('switch-account').addEventListener('click', () => redirectToAuth('logout'));
 
     el('hours').addEventListener('change', toggleCustomRange);
 

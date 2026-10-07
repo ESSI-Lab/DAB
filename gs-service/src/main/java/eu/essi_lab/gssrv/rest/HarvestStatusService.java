@@ -33,16 +33,20 @@ import org.json.JSONObject;
 import org.opensearch.client.ResponseException;
 import org.slf4j.Logger;
 
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.gssrv.conf.AdminAuthorization;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.HostNamePropertyUtils;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchHarvestingPublisher;
 import jakarta.jws.WebService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
@@ -60,8 +64,9 @@ import jakarta.ws.rs.core.Response.Status;
  * </ul>
  * The optional <code>source</code> parameter filters the executions by source: it matches (case insensitive) the source
  * identifiers containing it, and the source labels containing words starting with it.<br>
- * All the operations are restricted to the DAB administrators: the credentials (e-mail and API key) are sent in the
- * request body, so they never appear in URLs and access logs.
+ * All the operations are restricted to the DAB administrators, authorized with the same rule of the configurator (see
+ * {@link AdminAuthorization}): the user must be logged in with the configured OAuth 2.0 provider. When the user is not
+ * logged in, the response (status 401) provides the <code>provider</code> to use for the login.
  *
  * @author boldrini
  */
@@ -98,16 +103,17 @@ public class HarvestStatusService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/harvest-status")
-    public Response harvestStatus(HarvestStatusRequest request) {
+    public Response harvestStatus(@Context HttpServletRequest httpRequest, HarvestStatusRequest request) {
 
-	Optional<Response> denied = checkAdmin(request);
+	Optional<Response> denied = checkAdmin(httpRequest);
 
 	if (denied.isPresent()) {
 
 	    return denied.get();
 	}
 
-	return search(request.getHours(), request.getFrom(), request.getTo(), request.getSource());
+	return search(request.getHours(), request.getFrom(), request.getTo(), request.getSource(),
+		AdminAuthorization.findEmail(httpRequest).orElse(null));
     }
 
     /**
@@ -122,9 +128,9 @@ public class HarvestStatusService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/harvest-status/delete")
-    public Response deleteHarvests(HarvestDeleteRequest request) {
+    public Response deleteHarvests(@Context HttpServletRequest httpRequest, HarvestDeleteRequest request) {
 
-	Optional<Response> denied = checkAdmin(request);
+	Optional<Response> denied = checkAdmin(httpRequest);
 
 	if (denied.isPresent()) {
 
@@ -158,8 +164,8 @@ public class HarvestStatusService {
 
 	    long deleted = client.get().deleteByQuery(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, query);
 
-	    LOGGER.warn("harvest-status: {} deleted {} of the {} requested running harvests: {}", request.getEmail(), deleted, ids.size(),
-		    ids);
+	    LOGGER.warn("harvest-status: {} deleted {} of the {} requested running harvests: {}",
+		    AdminAuthorization.findEmail(httpRequest).orElse("administrator"), deleted, ids.size(), ids);
 
 	    JSONObject output = new JSONObject();
 	    output.put("status", "success");
@@ -177,28 +183,39 @@ public class HarvestStatusService {
     }
 
     /**
-     * @param request
-     * @return an error response if the request credentials are not valid, or don't belong to an administrator
+     * @param httpRequest
+     * @return an error response if the user is not logged in (401), or is not an administrator (403)
      */
-    private Optional<Response> checkAdmin(LoginRequest request) {
+    private Optional<Response> checkAdmin(HttpServletRequest httpRequest) {
 
-	LoginResponse login = UserLogin.login(request);
+	switch (AdminAuthorization.check(httpRequest)) {
+	case AUTHORIZED:
+	    return Optional.empty();
 
-	if (!login.isSuccess()) {
+	case NOT_AUTHENTICATED: {
 
-	    return Optional.of(Response.status(Status.UNAUTHORIZED).entity(errorResponse("Invalid credentials").toString())
-		    .type(MediaType.APPLICATION_JSON).build());
+	    JSONObject error = errorResponse("Login required");
+	    error.put("provider", ConfigurationWrapper.getOAuthSetting().getSelectedProvider().getProviderName());
+
+	    return Optional.of(Response.status(Status.UNAUTHORIZED).entity(error.toString()).type(MediaType.APPLICATION_JSON).build());
 	}
 
-	if (!login.isAdmin()) {
+	case NOT_ADMIN: {
 
-	    LOGGER.warn("harvest-status: access denied to non administrator {}", request.getEmail());
+	    String email = AdminAuthorization.findEmail(httpRequest).orElse("");
 
-	    return Optional.of(Response.status(Status.FORBIDDEN).entity(errorResponse("Administrator access required").toString())
-		    .type(MediaType.APPLICATION_JSON).build());
+	    LOGGER.warn("harvest-status: access denied to non administrator {}", email);
+
+	    JSONObject error = errorResponse("The account " + email + " is not an administrator");
+	    error.put("provider", ConfigurationWrapper.getOAuthSetting().getSelectedProvider().getProviderName());
+
+	    return Optional.of(Response.status(Status.FORBIDDEN).entity(error.toString()).type(MediaType.APPLICATION_JSON).build());
 	}
 
-	return Optional.empty();
+	default:
+	    return Optional.of(Response.serverError().entity(errorResponse("Unable to identify the user").toString())
+		    .type(MediaType.APPLICATION_JSON).build());
+	}
     }
 
     /**
@@ -206,9 +223,10 @@ public class HarvestStatusService {
      * @param fromParam
      * @param toParam
      * @param sourceParam
+     * @param user the e-mail of the logged administrator, if any
      * @return
      */
-    private Response search(Long hoursParam, String fromParam, String toParam, String sourceParam) {
+    private Response search(Long hoursParam, String fromParam, String toParam, String sourceParam, String user) {
 
 	long requestStartMs = System.currentTimeMillis();
 
@@ -329,6 +347,7 @@ public class HarvestStatusService {
 	    counts.forEach(summary::put);
 
 	    output.put("status", "success");
+	    output.put("user", user);
 	    output.put("summary", summary);
 	    output.put("harvests", harvests);
 
