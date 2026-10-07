@@ -30,11 +30,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
@@ -190,6 +192,25 @@ class SourceCollectionCreator {
 	    }
 	}
 
+	// license URIs of the children, sorted to keep the generated record (and its integrity checksum) stable
+	Optional<ComputationResult> licenses = responseItem.getFrequency(MetadataElement.USE_LEGAL_CONSTRAINTS_URI);
+	if (licenses.isPresent()) {
+	    TreeSet<String> uris = new TreeSet<>();
+	    for (TermFrequencyItem item : licenses.get().getFrequencyItems()) {
+		String uri = item.getTerm();
+		if (uri != null && !uri.isBlank()) {
+		    uris.add(uri.trim());
+		}
+	    }
+	    if (!uris.isEmpty()) {
+		LegalConstraints legalConstraints = new LegalConstraints();
+		for (String uri : uris) {
+		    legalConstraints.addOtherConstraints(uri, uri);
+		}
+		coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
+	    }
+	}
+
 	List<ComputationResult> count = responseItem.getCountDistinct();
 	ComputationResult attributes = count.get(0);
 	ComputationResult platforms = count.get(1);
@@ -334,7 +355,7 @@ class SourceCollectionCreator {
 
 	statisticsMessage.computeTempExtentUnion();
 
-	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME));
+	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME, MetadataElement.USE_LEGAL_CONSTRAINTS_URI));
 	// computes count distinct of 2 queryables
 	statisticsMessage.countDistinct(//
 		Arrays.asList(//

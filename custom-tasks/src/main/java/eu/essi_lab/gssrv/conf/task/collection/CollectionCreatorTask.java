@@ -1,5 +1,6 @@
 package eu.essi_lab.gssrv.conf.task.collection;
 
+import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 
 /*-
@@ -29,7 +30,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 import org.w3c.dom.Document;
 
@@ -207,9 +207,6 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	    Optional<String> topic = dataset.getExtensionHandler().getWISTopicHierarchy();
 	    if (topic.isPresent()) {
-		JSONObject feature = WISUtils.mapFeature(dataset);
-		String wmcp = feature.toString(3);
-
 		IndexedElementsWriter.write(dataset);
 		Document asDocument = dataset.asDocument(true);
 		String key = dataset.getOriginalId().get();
@@ -226,15 +223,19 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		GeographicBoundingBox bbox = dataset.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
 		String dataId = fileIdentifier;
 
-		String url = hostname + "/gs-service/services/essi/view/" + view.getId() + "/oapi/collections/discovery-metadata/items/"
-			+ fileIdentifier;
-		// String url = hostname + "/gs-service/services/essi/view/" + view.getId() + "/wis-metadata/" +
-		// fileIdentifier;
+		String url = WISUtils.getRecordUrl(WISUtils.getServiceUrl(view.getId()), fileIdentifier);
+
+		// the WCMP2 record is encoded from the stored document, the same way the item endpoint serves it, so that
+		// the integrity checksum matches the content available at the canonical link
+		String wcmp2 = WISUtils.getWCMP2Record(GSResource.create(asDocument), view.getId());
+
 		Link link = new Link("canonical", "application/geo+json", url);
+		link.setLength(wcmp2.getBytes(StandardCharsets.UTF_8).length);
 		WISNotificationMessage wnm = new WISNotificationMessage(wnmId, bbox, dataId, link, generatedBy);
+		wnm.setIntegrity(wcmp2);
 		System.out.println(topic.get());
 		System.out.println(wnm.getJSONObject().toString(3));
-		System.out.println(wmcp);
+		System.out.println(wcmp2);
 		if (client == null) {
 		    GSLoggerFactory.getLogger(getClass()).info("MQTT broker not configured");
 		} else {

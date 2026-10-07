@@ -26,6 +26,10 @@ import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.profiler.wis.*;
 import org.json.*;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Date;
 
 class WISNotificationMessage {
@@ -42,7 +46,37 @@ class WISNotificationMessage {
 	setPublicationTime(new Date());
 	json.put("generated_by", generatedBy);
 	setDataId(dataId);
+	setDatetime(null);
+	setBBOX(bbox);
 	addLink(link);
+    }
+
+    /**
+     * Sets the <code>datetime</code> property (required, but may be null, e.g. for discovery metadata)
+     * 
+     * @param date
+     */
+    public void setDatetime(Date date) {
+	setProperty("datetime", date == null ? JSONObject.NULL : ISO8601DateTimeUtils.getISO8601DateTime(date));
+    }
+
+    /**
+     * Sets the <code>integrity</code> property as the base64 encoded SHA-512 checksum of the given content, that
+     * must be identical to the one served at the canonical link
+     * 
+     * @param content
+     */
+    public void setIntegrity(String content) {
+	try {
+	    byte[] digest = MessageDigest.getInstance("SHA-512").digest(content.getBytes(StandardCharsets.UTF_8));
+	    JSONObject integrity = new JSONObject();
+	    integrity.put("method", "sha512");
+	    integrity.put("value", Base64.getEncoder().encodeToString(digest));
+	    setProperty("integrity", integrity);
+	} catch (NoSuchAlgorithmException e) {
+	    // SHA-512 is always available in Java SE
+	    throw new IllegalStateException(e);
+	}
     }
 
     public void addLink(Link link) {
@@ -63,6 +97,10 @@ class WISNotificationMessage {
     }
 
     public void setPropertyString(String property, String value) {
+	setProperty(property, value);
+    }
+
+    private void setProperty(String property, Object value) {
 	if (!json.has("properties")) {
 	    json.put("properties", new JSONObject());
 	}
@@ -74,7 +112,16 @@ class WISNotificationMessage {
 	json.put("id", id);
     }
 
+    /**
+     * Sets the (required) geometry from the given bounding box, or null if the bounding box is missing or incomplete
+     * 
+     * @param bbox
+     */
     public void setBBOX(GeographicBoundingBox bbox) {
+	if (bbox == null || bbox.getWest() == null || bbox.getEast() == null || bbox.getSouth() == null || bbox.getNorth() == null) {
+	    json.put("geometry", JSONObject.NULL);
+	    return;
+	}
 	Double w = bbox.getWest();
 	Double e = bbox.getEast();
 	Double s = bbox.getSouth();

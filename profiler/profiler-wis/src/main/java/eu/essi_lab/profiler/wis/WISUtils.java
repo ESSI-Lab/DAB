@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.wis;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import jakarta.ws.rs.core.UriInfo;
@@ -45,7 +47,10 @@ import org.json.JSONObject;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.ISOMetadata;
+import eu.essi_lab.iso.datamodel.classes.Identification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -58,6 +63,7 @@ import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -465,6 +471,7 @@ public class WISUtils {
 	    WISUtils.addLink(feature, "application/xml", "service", "INA SIyAH - Servicio web de datos WaterML",
 		    "https://alerta.ina.gob.ar/wml/");
 	}
+	addLicenseLinks(feature, resource);
 	// properties.put("rights", "WHOS Terms of Use");
 	properties.put("title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
 	properties.put("type", "dataset");
@@ -506,23 +513,179 @@ public class WISUtils {
 	return resultSet;
     }
 
+    /**
+     * Adds the canonical link to features mapped without a view (see {@link #mapFeature(GSResource, String)} for the
+     * view case)
+     * 
+     * @param features
+     * @param webRequest
+     */
     public static void enrichFeaturesWithLinks(JSONArray features, WebRequest webRequest) {
+
+	String url = getUrl(webRequest);
+
 	for (int i = 0; i < features.length(); i++) {
 	    JSONObject feature = features.getJSONObject(i);
 	    String id = feature.getString("id");
+	    WISUtils.addLink(feature, "application/json", "canonical", id, getRecordUrl(url, id));
+	}
+    }
 
-	    // the base URL, e.g.:
-	    // http://localhost:9090/gs-service/services/essi/view/whos/oapi
-	    SimpleEntry<String, String> sourceParameter = WISUtils.extractSourceAndParameter(id);
-	    String sourceId = sourceParameter.getKey();
-	    String parameterURI = sourceParameter.getValue();
+    /**
+     * Maps the given resource to a WCMP2 record of the given view, with the canonical and the data access links.<br>
+     * Links are based on the configured WIS hostname rather than on the request URL, so that the served records are
+     * byte-identical to the ones hashed in the WIS2 notification messages
+     * 
+     * @param resource
+     * @param viewId
+     * @return
+     * @throws GSException
+     */
+    public static JSONObject mapFeature(GSResource resource, String viewId) throws GSException {
 
-	    String view = WISUtils.getWHOSView(sourceId, parameterURI);
-	    String url = WISUtils.getUrl(webRequest);
-	    // url = url.replace("/view/whos/", "/view/" + view + "/");
-	    WISUtils.addLink(feature, "application/json", "canonical", id, url + "/collections/discovery-metadata/items/" + id);
-	    // WISUtils.addLink(links, "application/json", "collection", id, url + "/collections/" + id);
+	JSONObject feature = mapFeature(resource);
+
+	String id = feature.getString("id");
+	WISUtils.addLink(feature, "application/json", "canonical", id, getRecordUrl(getServiceUrl(viewId), id));
+
+	addDataAccessLinks(feature, resource.getSource(), viewId);
+
+	return feature;
+    }
+
+    /**
+     * Adds the links to the DAB OM API, providing access to the stations and the time series of the given source
+     * 
+     * @param feature
+     * @param source
+     * @param viewId
+     */
+    private static void addDataAccessLinks(JSONObject feature, GSSource source, String viewId) {
+
+	if (source == null) {
+	    return;
 	}
 
+	String label = source.getLabel() != null ? source.getLabel() : source.getUniqueIdentifier();
+	String omApi = getViewUrl(viewId) + "/om-api";
+	String provider = "?provider=" + URLEncoder.encode(source.getUniqueIdentifier(), StandardCharsets.UTF_8);
+
+	WISUtils.addLink(feature, "application/json", "data", "Stations of " + label + " (DAB OM API)",
+		omApi + "/features" + provider);
+	addTokenSecurity(feature);
+
+	WISUtils.addLink(feature, "application/json", "data", "Time series of " + label + " (DAB OM API)",
+		omApi + "/observations" + provider);
+	addTokenSecurity(feature);
+
+	WISUtils.addLink(feature, "text/html", "service-doc", "DAB OM API documentation", getHostname() + "/gs-service/om-api/whos.html");
+    }
+
+    /**
+     * Adds a <code>license</code> link for each license URI found in the legal constraints of the given resource (for
+     * source collections, the license URIs aggregated from their children), sorted by URI and skipping the ones already
+     * linked
+     * 
+     * @param feature
+     * @param resource
+     */
+    private static void addLicenseLinks(JSONObject feature, GSResource resource) {
+
+	// href -> title
+	TreeMap<String, String> licenses = new TreeMap<>();
+
+	for (Identification identification : resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getIdentifications()) {
+
+	    Iterator<LegalConstraints> constraints = identification.getLegalConstraints();
+	    while (constraints.hasNext()) {
+		for (CharacterStringPropertyType other : constraints.next().getElementType().getOtherConstraints()) {
+		    String href = ISOMetadata.getHREFStringFromCharacterString(other);
+		    if (href != null && !href.isBlank()) {
+			String title = ISOMetadata.getStringFromCharacterString(other);
+			licenses.putIfAbsent(href.trim(), title != null && !title.isBlank() ? title : href.trim());
+		    }
+		}
+	    }
+	}
+
+	if (feature.has("links")) {
+	    JSONArray links = feature.getJSONArray("links");
+	    for (int i = 0; i < links.length(); i++) {
+		licenses.remove(links.getJSONObject(i).optString("href"));
+	    }
+	}
+
+	licenses.forEach((href, title) -> WISUtils.addLink(feature, "text/html", "license", title, href));
+    }
+
+    /**
+     * Contact to request the token needed by the DAB OM API
+     */
+    public static final String TOKEN_REQUEST_CONTACT = "whos@wmo.int";
+
+    /**
+     * Adds to the last link of the given feature the description of the token based access control of the DAB OM API
+     * (an OpenAPI API key security scheme, the token is accepted as <code>token</code> query parameter)
+     * 
+     * @param feature
+     */
+    private static void addTokenSecurity(JSONObject feature) {
+
+	JSONArray links = feature.getJSONArray("links");
+	JSONObject link = links.getJSONObject(links.length() - 1);
+
+	JSONObject scheme = new JSONObject();
+	scheme.put("type", "apiKey");
+	scheme.put("in", "query");
+	scheme.put("name", "token");
+	scheme.put("description",
+		"Access requires a WHOS token, to be provided as 'token' query parameter. To request a token, please contact the WHOS Secretariat at "
+			+ TOKEN_REQUEST_CONTACT);
+
+	JSONObject security = new JSONObject();
+	security.put("default", scheme);
+	link.put("security", security);
+    }
+
+    /**
+     * @param viewId
+     * @return the public base URL of the given view, based on the configured WIS hostname
+     */
+    public static String getViewUrl(String viewId) {
+
+	return getHostname() + "/gs-service/services/essi/view/" + viewId;
+    }
+
+    /**
+     * @param viewId
+     * @return the public OGC API base URL of the given view, based on the configured WIS hostname
+     */
+    public static String getServiceUrl(String viewId) {
+
+	return getViewUrl(viewId) + "/" + new WISProfilerSetting().getServicePath();
+    }
+
+    /**
+     * @param serviceUrl
+     * @param id
+     * @return the URL of the WCMP2 record with the given identifier
+     */
+    public static String getRecordUrl(String serviceUrl, String id) {
+
+	return serviceUrl + "/collections/discovery-metadata/items/" + id;
+    }
+
+    /**
+     * Encodes the given resource as a WCMP2 record, exactly as served by the discovery-metadata item endpoint of the
+     * given view
+     *
+     * @param resource
+     * @param viewId
+     * @return
+     * @throws GSException
+     */
+    public static String getWCMP2Record(GSResource resource, String viewId) throws GSException {
+
+	return mapFeature(resource, viewId).toString();
     }
 }
