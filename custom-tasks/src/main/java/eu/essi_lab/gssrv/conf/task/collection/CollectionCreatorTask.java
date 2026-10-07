@@ -64,7 +64,7 @@ import eu.essi_lab.profiler.wis.WISUtils;
 public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
     public enum CollectionCreatorTaskOptions implements OptionsKey {
-	HOSTNAME, SOURCE_ID, VIEW_ID;
+	HOSTNAME, SOURCE_ID, VIEW_ID, CENTRE_ID;
     }
 
     @Override
@@ -88,7 +88,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	String hostname = taskOptions.get().get(CollectionCreatorTaskOptions.HOSTNAME);
 	if (hostname == null) {
 	    GSLoggerFactory.getLogger(getClass()).info("No hostname option specified, using default");
-	    hostname = "https://whos.geodab.eu";
+	    hostname = "https://production.whos-dab.eu";
 	}
 
 	String sourceId = taskOptions.get().get(CollectionCreatorTaskOptions.SOURCE_ID);
@@ -108,9 +108,13 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    GSLoggerFactory.getLogger(getClass()).error("View not found");
 	    return;
 	}
-	String[] splits = sourceId.split(";");
+	String centreId = taskOptions.get().get(CollectionCreatorTaskOptions.CENTRE_ID);
+	if (centreId == null) {
+	    GSLoggerFactory.getLogger(getClass()).info("No centre id option specified, using default");
+	    centreId = SourceCollectionCreator.DEFAULT_CENTRE_ID;
+	}
 
-	https: // whos.geodab.eu
+	String[] splits = sourceId.split(";");
 
 	for (String split : splits) {
 
@@ -126,7 +130,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	    } else {
 
-		run(hostname, targetSource.get().getUniqueIdentifier(), view.get());
+		run(hostname, centreId, targetSource.get().getUniqueIdentifier(), view.get());
 	    }
 	}
 
@@ -172,22 +176,22 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String hostname, String sourceId, View view) throws Exception {
+    public void run(String hostname, String centreId, String sourceId, View view) throws Exception {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
-	run(hostname, sourceId, databaseURI, view);
+	run(hostname, centreId, sourceId, databaseURI, view);
     }
 
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String hostname, String sourceId, StorageInfo databaseURI, View view) throws Exception {
+    public void run(String hostname, String centreId, String sourceId, StorageInfo databaseURI, View view) throws Exception {
 
 	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	DatabaseFolder folder = sourceStorage.getDataFolder(sourceId, true).get();
 
-	List<DatasetCollection> datasets = new SourceCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
+	List<DatasetCollection> datasets = new SourceCollectionCreator(centreId).getCollections(sourceId, view.getSourceDeployment());
 
 	// List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId,
 	// view.getSourceDeployment());

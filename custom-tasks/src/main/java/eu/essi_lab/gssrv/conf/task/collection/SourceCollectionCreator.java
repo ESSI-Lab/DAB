@@ -68,6 +68,18 @@ import eu.essi_lab.request.executor.*;
 
 class SourceCollectionCreator {
 
+    public static final String DEFAULT_CENTRE_ID = "it-cnr-itiam-whos-dab";
+
+    protected final String centreId;
+
+    public SourceCollectionCreator() {
+	this(DEFAULT_CENTRE_ID);
+    }
+
+    public SourceCollectionCreator(String centreId) {
+	this.centreId = centreId;
+    }
+
     public List<DatasetCollection> getCollections(String sourceId, String sourceDeployments) throws GSException {
 
 	GSSource source = ConfigurationWrapper.getSource(sourceId);
@@ -117,7 +129,7 @@ class SourceCollectionCreator {
 	}
 	// GET Country!
 	String topic = "origin/a/wis2/" + //
-		"it-cnr-iia"
+		centreId
 		// country + "-" + sourceAcronym //
 		+ "/metadata"; // only at this level
 	// core/hydrology" + getAdditionalLevels(groupBy);
@@ -295,7 +307,7 @@ class SourceCollectionCreator {
     }
 
     protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
-	return "urn:wmo:md:it-cnr-iia:" + sourceIdentifier ;
+	return "urn:wmo:md:" + centreId + ":" + sourceIdentifier;
     }
 
     protected List<ResponseItem> getStatistics(String sourceId, Queryable queryable) throws GSException {

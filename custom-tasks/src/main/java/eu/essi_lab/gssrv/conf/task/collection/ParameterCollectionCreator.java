@@ -40,7 +40,7 @@ class ParameterCollectionCreator extends SourceCollectionCreator {
 	if (parameterURI != null && parameterURI.contains("/")) {
 	    parameter = ":" + parameterURI.substring(parameterURI.lastIndexOf("/") + 1);
 	}
-	return "urn:wmo:md:it-cnr-iia:" + sourceIdentifier + parameter;
+	return "urn:wmo:md:" + centreId + ":" + sourceIdentifier + parameter;
     }
 
     protected String getAdditionalLevels(String parameterURI) {
