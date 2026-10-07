@@ -367,4 +367,12 @@ public class HarvestingReportsHandler {
 	enabled = true;
     }
 
+    /**
+     * @return <code>true</code> if the harvesting report e-mails are enabled
+     */
+    public static boolean isEnabled() {
+
+	return enabled;
+    }
+
 }
