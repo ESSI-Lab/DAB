@@ -64,16 +64,15 @@ import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.profiler.wis.WISUtils;
 import eu.essi_lab.request.executor.*;
 
 class SourceCollectionCreator {
 
-    public static final String DEFAULT_CENTRE_ID = "it-cnr-itiam-whos-dab";
-
     protected final String centreId;
 
     public SourceCollectionCreator() {
-	this(DEFAULT_CENTRE_ID);
+	this(WISUtils.getCentreId());
     }
 
     public SourceCollectionCreator(String centreId) {

@@ -43,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
@@ -307,6 +308,53 @@ public class WISUtils {
 	return features;
     }
 
+    public static final String DEFAULT_PUBLISHER = "CNR-ITIAm";
+    public static final String DEFAULT_HOSTNAME = "https://production.whos-dab.eu";
+    public static final String DEFAULT_CENTRE_ID = "it-cnr-itiam-whos-dab";
+    public static final String DEFAULT_GENERATED_BY = "WHOS DAB";
+
+    /**
+     * @return the organization added as publisher to the WIS2 metadata records
+     */
+    public static String getPublisher() {
+
+	return getWISOption(KeyValueOptionKeys.WIS_PUBLISHER, DEFAULT_PUBLISHER);
+    }
+
+    /**
+     * @return the base URL of the links in the WIS2 notification messages
+     */
+    public static String getHostname() {
+
+	return getWISOption(KeyValueOptionKeys.WIS_HOSTNAME, DEFAULT_HOSTNAME);
+    }
+
+    /**
+     * @return the WIS2 centre id, used in topics and metadata identifiers
+     */
+    public static String getCentreId() {
+
+	return getWISOption(KeyValueOptionKeys.WIS_CENTRE_ID, DEFAULT_CENTRE_ID);
+    }
+
+    /**
+     * @return the generated_by value of the WIS2 notification messages
+     */
+    public static String getGeneratedBy() {
+
+	return getWISOption(KeyValueOptionKeys.WIS_GENERATED_BY, DEFAULT_GENERATED_BY);
+    }
+
+    /**
+     * @return the value of the given system settings key-value option, or <code>defaultValue</code> if missing
+     */
+    private static String getWISOption(KeyValueOptionKeys key, String defaultValue) {
+
+	return ConfigurationWrapper.getSystemSettings().getKeyValueOptions().//
+		map(p -> p.getProperty(key.getLabel())).//
+		orElse(defaultValue);
+    }
+
     public static JSONObject mapFeature(GSResource resource) throws GSException {
 
 	JSONObject feature = new JSONObject();
@@ -404,7 +452,7 @@ public class WISUtils {
 	    contacts.put(contact);
 	}
 	JSONObject cnr = new JSONObject();
-	cnr.put("organization", "CNR-IIA");
+	cnr.put("organization", getPublisher());
 	JSONArray cnrRoles = new JSONArray();
 	cnrRoles.put("publisher");
 	cnr.put("roles", cnrRoles);

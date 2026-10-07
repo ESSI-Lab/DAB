@@ -84,6 +84,14 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	MQTT_BROKER_PWD("mqttBrokerPwd"), //
 
 	/**
+	 * WIS2 publishing
+	 */
+	WIS_PUBLISHER("wisPublisher"), // organization added as publisher to the WIS2 metadata records
+	WIS_HOSTNAME("wisHostname"), // base URL of the links in the WIS2 notification messages
+	WIS_CENTRE_ID("wisCentreId"), // WIS2 centre id, used in topics and metadata identifiers
+	WIS_GENERATED_BY("wisGeneratedBy"), // generated_by value of the WIS2 notification messages
+
+	/**
 	 * Kafka broker
 	 */
 	KAFKA_BROKER_HOST("kafkaBrokerHost"), //

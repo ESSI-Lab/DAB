@@ -32,7 +32,7 @@ class WISNotificationMessage {
 
     private JSONObject json = null;
 
-    public WISNotificationMessage(String id, GeographicBoundingBox bbox, String dataId, Link link) {
+    public WISNotificationMessage(String id, GeographicBoundingBox bbox, String dataId, Link link, String generatedBy) {
 	json = new JSONObject();
 	JSONArray conformsArray = new JSONArray();
 	conformsArray.put("http://wis.wmo.int/spec/wnm/1/conf/core");
@@ -40,7 +40,7 @@ class WISNotificationMessage {
 	json.put("type", "Feature");
 	setID(id);
 	setPublicationTime(new Date());
-	json.put("generated_by", "WHOS DAB");
+	json.put("generated_by", generatedBy);
 	setDataId(dataId);
 	addLink(link);
     }

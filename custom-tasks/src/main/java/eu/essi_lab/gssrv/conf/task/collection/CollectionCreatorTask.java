@@ -64,7 +64,7 @@ import eu.essi_lab.profiler.wis.WISUtils;
 public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
     public enum CollectionCreatorTaskOptions implements OptionsKey {
-	HOSTNAME, SOURCE_ID, VIEW_ID, CENTRE_ID;
+	SOURCE_ID, VIEW_ID;
     }
 
     @Override
@@ -85,12 +85,6 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	}
 
-	String hostname = taskOptions.get().get(CollectionCreatorTaskOptions.HOSTNAME);
-	if (hostname == null) {
-	    GSLoggerFactory.getLogger(getClass()).info("No hostname option specified, using default");
-	    hostname = "https://production.whos-dab.eu";
-	}
-
 	String sourceId = taskOptions.get().get(CollectionCreatorTaskOptions.SOURCE_ID);
 	if (sourceId == null) {
 	    GSLoggerFactory.getLogger(getClass()).error("No source id option specified");
@@ -108,11 +102,9 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    GSLoggerFactory.getLogger(getClass()).error("View not found");
 	    return;
 	}
-	String centreId = taskOptions.get().get(CollectionCreatorTaskOptions.CENTRE_ID);
-	if (centreId == null) {
-	    GSLoggerFactory.getLogger(getClass()).info("No centre id option specified, using default");
-	    centreId = SourceCollectionCreator.DEFAULT_CENTRE_ID;
-	}
+	String hostname = WISUtils.getHostname();
+	String centreId = WISUtils.getCentreId();
+	String generatedBy = WISUtils.getGeneratedBy();
 
 	String[] splits = sourceId.split(";");
 
@@ -130,7 +122,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	    } else {
 
-		run(hostname, centreId, targetSource.get().getUniqueIdentifier(), view.get());
+		run(hostname, centreId, generatedBy, targetSource.get().getUniqueIdentifier(), view.get());
 	    }
 	}
 
@@ -176,16 +168,16 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String hostname, String centreId, String sourceId, View view) throws Exception {
+    public void run(String hostname, String centreId, String generatedBy, String sourceId, View view) throws Exception {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
-	run(hostname, centreId, sourceId, databaseURI, view);
+	run(hostname, centreId, generatedBy, sourceId, databaseURI, view);
     }
 
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String hostname, String centreId, String sourceId, StorageInfo databaseURI, View view) throws Exception {
+    public void run(String hostname, String centreId, String generatedBy, String sourceId, StorageInfo databaseURI, View view) throws Exception {
 
 	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
@@ -239,7 +231,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		// String url = hostname + "/gs-service/services/essi/view/" + view.getId() + "/wis-metadata/" +
 		// fileIdentifier;
 		Link link = new Link("canonical", "application/geo+json", url);
-		WISNotificationMessage wnm = new WISNotificationMessage(wnmId, bbox, dataId, link);
+		WISNotificationMessage wnm = new WISNotificationMessage(wnmId, bbox, dataId, link, generatedBy);
 		System.out.println(topic.get());
 		System.out.println(wnm.getJSONObject().toString(3));
 		System.out.println(wmcp);
