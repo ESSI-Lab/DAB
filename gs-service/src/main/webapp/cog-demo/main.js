@@ -16,11 +16,17 @@ import GeoTIFF from 'ol/source/GeoTIFF.js';
    - style: Openlayers
    ========================================================= */
 
+// NoData (-9999, ocean mask): OpenLayers writes 0 in band 1 for NoData pixels and adds an alpha band (band 2: 0 = NoData, 255 = data).
+// A custom 'case' style ignores that alpha band, so every style must test it first. createSource() always sets nodata,
+// so band 2 exists even for files without NoData metadata.
+const NODATA_VALUE = -9999;
+const NODATA_CASE = ['<', ['band', 2], 128];
 
 const temperatureStyle = {
   color: [
     'case',
 
+    NODATA_CASE, 'transparent',
     ['<=', ['band', 1], -20], '#313695',
     ['<=', ['band', 1], -13], '#4575b4',
     ['<=', ['band', 1], -6],  '#74add1',
@@ -40,6 +46,7 @@ const temperatureStyle = {
 const shiweStyle = {
   color: [
     'case',
+        NODATA_CASE, 'transparent',
         ['<', ['band', 1], 0.5], '#006837',
         ['<', ['band', 1], 1.0], '#31a354',
         ['<', ['band', 1], 1.5], '#78c679',
@@ -58,6 +65,7 @@ const humidityStyle = {
   color: [
     'case',
 
+    NODATA_CASE, 'transparent',
     ['<', ['band', 1], 0], 'transparent',
     ['<=', ['band', 1], 10], '#ffffcc',  // 0–10%
     ['<=', ['band', 1], 20], '#ffeda0',  // 10–20%
@@ -77,6 +85,7 @@ const humidityStyle = {
 const utciStyle = {
   color: [
     'case',
+        NODATA_CASE, 'transparent',
         ['<', ['band', 1], -40.0], '#000066', // Extreme cold stress (Dark Blue)
         ['<', ['band', 1], -27.0], '#0000ff', // Very strong cold stress (Blue)
         ['<', ['band', 1], -13.0], '#007fff', // Strong cold stress (Light Blue)
@@ -165,28 +174,28 @@ const legends = {
 
 const variables = {
   shiwe: {
-    folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/shiwe/',
+    folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/shiwe/',
     filePrefix: 'shiwe',
     visible: true,
     style: shiweStyle
   },
 
   '2t': {
-    folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/2t/',
+    folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2t/',
     filePrefix: '2t', //
     visible: false,
     style: temperatureStyle
   },
 
     utci: {
-      folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/utci/',
+      folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/utci/',
       filePrefix: 'utci', //
       visible: false,
       style: utciStyle
     },
 
     '2r': {
-          folderUrl: 'https://s3.us-east-1.amazonaws.com/trigger/2r/',
+          folderUrl: 'https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/2r/',
           filePrefix: '2r', //
           visible: false,
           style: humidityStyle
@@ -277,7 +286,7 @@ function buildMasterTimeline() {
 
 function createSource(url) {
   return new GeoTIFF({
-    sources: [{ url }],
+    sources: [{ url, nodata: NODATA_VALUE }],
     normalize: false
   });
 }
