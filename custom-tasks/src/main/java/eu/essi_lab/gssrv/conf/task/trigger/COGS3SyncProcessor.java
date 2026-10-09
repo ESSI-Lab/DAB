@@ -214,9 +214,11 @@ public class COGS3SyncProcessor {
 		    "-tr", "10000", "10000",
 		    "-tap"));
 
-	    // Ocean mask: pixels outside the land polygons become NoData (transparent in the OpenLayers client)
+	    // Ocean mask: pixels outside the land polygons become NoData (transparent in the OpenLayers client).
+	    // CUTLINE_ALL_TOUCHED keeps every pixel touching land, so the coastline is never left uncovered
 	    if (landMask != null) {
-		warpCmd.addAll(List.of("-cutline", landMask.toAbsolutePath().toString(), "-dstnodata", NODATA_VALUE));
+		warpCmd.addAll(List.of("-cutline", landMask.toAbsolutePath().toString(), "-wo", "CUTLINE_ALL_TOUCHED=TRUE", "-dstnodata",
+			NODATA_VALUE));
 	    }
 
 	    warpCmd.addAll(List.of(
