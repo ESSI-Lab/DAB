@@ -140,7 +140,13 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    } else {
 
 		MQTTBrokerSetting mqtt = broker.get();
+		String endpoint = mqtt.getHost().get() + ":" + mqtt.getPort().get();
+
+		GSLoggerFactory.getLogger(getClass()).info("Connecting to WIS2 MQTT broker {} as user {}", endpoint, mqtt.getUser().get());
+
 		client = new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get());
+
+		GSLoggerFactory.getLogger(getClass()).info("Connected to WIS2 MQTT broker {}", endpoint);
 	    }
 
 	} catch (Exception e) {

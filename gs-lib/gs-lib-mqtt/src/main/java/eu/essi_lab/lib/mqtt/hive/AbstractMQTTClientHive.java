@@ -22,15 +22,25 @@ package eu.essi_lab.lib.mqtt.hive;
  */
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
+import com.hivemq.client.mqtt.mqtt3.message.connect.connack.Mqtt3ConnAck;
 
 /**
  * @author Fabrizio
  */
 public abstract class AbstractMQTTClientHive {
+
+    /**
+     * Maximum time to wait for the connection of a blocking client. With automatic reconnect enabled, the HiveMQ client keeps retrying
+     * forever when the broker is unreachable, refuses the credentials or fails the TLS handshake, so the connection must be bounded
+     */
+    public static final int DEFAULT_CONNECT_TIMEOUT_SECONDS = 30;
 
     protected String clientId;
     protected String user;
@@ -145,9 +155,13 @@ public abstract class AbstractMQTTClientHive {
 
 	} else {
 
+	    Mqtt3AsyncClient asyncView = getBlockingClient().toAsync();
+
+	    CompletableFuture<Mqtt3ConnAck> future;
+
 	    if (user != null && password != null) {
 
-		getBlockingClient().connectWith()//
+		future = asyncView.connectWith()//
 			.simpleAuth()//
 			.username(user)//
 			.password(password.getBytes())//
@@ -155,7 +169,22 @@ public abstract class AbstractMQTTClientHive {
 			.send();
 	    } else {
 
-		getBlockingClient().connect();
+		future = asyncView.connect();
+	    }
+
+	    try {
+
+		future.get(DEFAULT_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+
+	    } catch (TimeoutException ex) {
+
+		future.cancel(true);
+
+		// stops the automatic reconnect attempts
+		asyncView.disconnect();
+
+		throw new Exception("Unable to connect to MQTT broker " + hostName + ":" + port + " within " + DEFAULT_CONNECT_TIMEOUT_SECONDS
+			+ " seconds", ex);
 	    }
 	}
     }
