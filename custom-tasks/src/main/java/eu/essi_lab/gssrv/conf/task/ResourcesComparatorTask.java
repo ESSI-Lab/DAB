@@ -670,25 +670,23 @@ public class ResourcesComparatorTask extends AbstractEmbeddedTask {
 
 	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
 
+	    Optional<MQTTBrokerSetting> mqttBroker = systemSettings.getDabMqttBroker();
+
+	    if (mqttBroker.isPresent()) {
+
+		GSLoggerFactory.getLogger(getClass()).info("MQTT client created");
+
+		MQTTBrokerSetting mqtt = mqttBroker.get();
+
+		return Optional.of(new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(),
+			mqtt.getPassword().get()));
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).warn("DAB activity MQTT broker not configured");
+
 	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
 
 	    if (keyValueOption.isPresent()) {
-
-		String mqttHost = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
-		String mqttPort = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
-		String mqttUser = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
-		String mqttPwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
-
-		if (mqttHost == null || mqttPort == null || mqttUser == null || mqttPwd == null) {
-
-		    GSLoggerFactory.getLogger(getClass()).warn("MQTT options not found!");
-
-		} else {
-
-		    GSLoggerFactory.getLogger(getClass()).info("MQTT client created");
-
-		    return Optional.of(new MQTTPublisherHive(mqttHost, Integer.parseInt(mqttPort), mqttUser, mqttPwd));
-		}
 
 		String kafkaHost = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_HOST.getLabel());
 		String kafkaPort = keyValueOption.get().getProperty(KeyValueOptionKeys.KAFKA_BROKER_PORT.getLabel());

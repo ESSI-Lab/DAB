@@ -27,21 +27,19 @@ import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.quartz.JobExecutionContext;
 import org.w3c.dom.Document;
 
-import eu.essi_lab.access.augmenter.DataCacheAugmenter;
+import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
@@ -130,36 +128,24 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
     }
 
     private void initializeClient() throws Exception {
+
 	try {
 
-	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+	    Optional<MQTTBrokerSetting> broker = ConfigurationWrapper.getSystemSettings().getWis2MqttBroker();
 
-	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+	    if (broker.isEmpty()) {
 
-	    if (keyValueOption.isPresent()) {
+		GSLoggerFactory.getLogger(getClass()).error("WIS2 MQTT broker not configured");
 
-		String host = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
-		String port = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
-		String user = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
-		String pwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
-
-		if (host == null || port == null || user == null || pwd == null) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
-
-		} else {
-
-		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
-		}
 	    } else {
 
-		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
-
+		MQTTBrokerSetting mqtt = broker.get();
+		client = new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get());
 	    }
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    throw e;
 	}
 
@@ -237,7 +223,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		System.out.println(wnm.getJSONObject().toString(3));
 		System.out.println(wcmp2);
 		if (client == null) {
-		    GSLoggerFactory.getLogger(getClass()).info("MQTT broker not configured");
+		    GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
 		} else {
 		    try {
 			client.publish(topic.get(), wnm.getJSONObject().toString(3), true);

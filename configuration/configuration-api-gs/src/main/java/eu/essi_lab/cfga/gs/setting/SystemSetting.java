@@ -11,6 +11,7 @@ import eu.essi_lab.lib.utils.*;
 import org.json.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /*-
  * #%L
@@ -48,6 +49,8 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     private static final String WMS_CACHE_SETTING_ID = "wmsCacheSetting";
     private static final String USERS_DATABASE_SETTING_ID = "usersDatabase";
     private static final String SECONDARY_USERS_DATABASE_SETTING_ID = "secUsersDatabase";
+    private static final String WIS2_MQTT_BROKER_SETTING_ID = "wis2MqttBroker";
+    private static final String DAB_MQTT_BROKER_SETTING_ID = "dabMqttBroker";
 
     /**
      * @author Fabrizio
@@ -76,7 +79,7 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	ADMIN_USERS("adminUsers"), //
 
 	/**
-	 * MQTT broker
+	 * Legacy MQTT broker. When both broker settings below are still empty, these values are copied into each of them.
 	 */
 	MQTT_BROKER_HOST("mqttBrokerHost"), //
 	MQTT_BROKER_PORT("mqttBrokerPort"), //
@@ -345,9 +348,37 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	addSetting(secUsersDbSetting);
 
 	//
+	// MQTT brokers
+	//
+
+	addSetting(createMqttBrokerSetting(WIS2_MQTT_BROKER_SETTING_ID, "WIS2 MQTT broker",
+		"Broker used by the collection creator task and the data cache augmenter to publish WIS2 notifications and observations"));
+
+	addSetting(createMqttBrokerSetting(DAB_MQTT_BROKER_SETTING_ID, "DAB activity MQTT broker",
+		"Broker used by the resources comparator task and the harvesting notifier to publish harvesting activity"));
+
+	setAfterCleanFunction(new SystemSettingAfterCleanFunction());
+
+	//
 	// set the validator
 	//
 	setValidator(new SystemSettingValidator());
+    }
+
+    /**
+     * @param identifier
+     * @param name
+     * @param description
+     * @return
+     */
+    private static MQTTBrokerSetting createMqttBrokerSetting(String identifier, String name, String description) {
+
+	MQTTBrokerSetting setting = new MQTTBrokerSetting();
+	setting.setIdentifier(identifier);
+	setting.setName(name);
+	setting.setDescription(description);
+
+	return setting;
     }
 
     /**
@@ -374,6 +405,10 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 
 	    usersSetting.ifPresent(s -> error |= check(s));
 
+	    checkMqttBroker(sysSetting, WIS2_MQTT_BROKER_SETTING_ID);
+
+	    checkMqttBroker(sysSetting, DAB_MQTT_BROKER_SETTING_ID);
+
 	    ValidationResponse response = new ValidationResponse();
 
 	    if (error) {
@@ -383,6 +418,15 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	    }
 
 	    return response;
+	}
+
+	/**
+	 * @param sysSetting
+	 * @param settingId
+	 */
+	private void checkMqttBroker(SystemSetting sysSetting, String settingId) {
+
+	    sysSetting.getSetting(settingId, MQTTBrokerSetting.class).filter(Setting::isEnabled).ifPresent(s -> error |= check(s));
 	}
 
 	/**
@@ -628,6 +672,238 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
 	}
 
 	return Optional.empty();
+    }
+
+    //
+    // MQTT brokers
+    //
+
+    /**
+     * Copies the legacy {@code mqttBroker*} key-value options into the WIS2 and DAB activity broker settings when those settings exist and
+     * their host is still empty. Once both brokers are configured, the legacy keys are removed.
+     */
+    public void migrateLegacyMqttBrokers() {
+
+	Optional<String> host = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_HOST);
+	Optional<String> portValue = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_PORT);
+	Optional<String> user = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_USER);
+	Optional<String> password = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_PWD);
+
+	if (host.isEmpty() || portValue.isEmpty() || user.isEmpty() || password.isEmpty()) {
+
+	    return;
+	}
+
+	int port;
+
+	try {
+
+	    port = Integer.parseInt(portValue.get().trim());
+
+	} catch (NumberFormatException ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Legacy MQTT broker port is not a number: {}", portValue.get());
+
+	    return;
+	}
+
+	boolean wis2Ready = fillMqttBrokerIfEmpty(WIS2_MQTT_BROKER_SETTING_ID, host.get(), port, user.get(), password.get());
+	boolean dabReady = fillMqttBrokerIfEmpty(DAB_MQTT_BROKER_SETTING_ID, host.get(), port, user.get(), password.get());
+
+	if (wis2Ready && dabReady) {
+
+	    removeLegacyMqttKeys();
+	}
+    }
+
+    /**
+     * @return the WIS2 broker when it is enabled and complete. When the setting is missing from a configuration saved before the two
+     *         brokers existed, the legacy key-value options are used
+     */
+    public Optional<MQTTBrokerSetting> getWis2MqttBroker() {
+
+	return resolveMqttBroker(WIS2_MQTT_BROKER_SETTING_ID);
+    }
+
+    /**
+     * @return the DAB activity broker when it is enabled and complete. When the setting is missing from a configuration saved before the
+     *         two brokers existed, the legacy key-value options are used
+     */
+    public Optional<MQTTBrokerSetting> getDabMqttBroker() {
+
+	return resolveMqttBroker(DAB_MQTT_BROKER_SETTING_ID);
+    }
+
+    /**
+     * @param settingId
+     * @return
+     */
+    private Optional<MQTTBrokerSetting> resolveMqttBroker(String settingId) {
+
+	migrateLegacyMqttBrokers();
+
+	Optional<MQTTBrokerSetting> setting = getSetting(settingId, MQTTBrokerSetting.class);
+
+	if (setting.isPresent()) {
+
+	    MQTTBrokerSetting broker = setting.get();
+
+	    if (broker.isEnabled() && broker.isComplete()) {
+
+		return Optional.of(broker);
+	    }
+
+	    return Optional.empty();
+	}
+
+	return legacyMqttBroker();
+    }
+
+    /**
+     * @param settingId
+     * @param host
+     * @param port
+     * @param user
+     * @param password
+     * @return {@code true} when the broker setting exists and is complete
+     */
+    private boolean fillMqttBrokerIfEmpty(String settingId, String host, int port, String user, String password) {
+
+	Optional<MQTTBrokerSetting> optional = getSetting(settingId, MQTTBrokerSetting.class);
+
+	if (optional.isEmpty()) {
+
+	    return false;
+	}
+
+	MQTTBrokerSetting broker = optional.get();
+
+	if (broker.getHost().isPresent()) {
+
+	    return broker.isComplete();
+	}
+
+	broker.setEnabled(true);
+	broker.setHost(host);
+	broker.setPort(port);
+	broker.setUser(user);
+	broker.setPassword(password);
+
+	return broker.isComplete();
+    }
+
+    /**
+     * @return
+     */
+    private Optional<MQTTBrokerSetting> legacyMqttBroker() {
+
+	Optional<String> host = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_HOST);
+	Optional<String> portValue = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_PORT);
+	Optional<String> user = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_USER);
+	Optional<String> password = readKeyValue(KeyValueOptionKeys.MQTT_BROKER_PWD);
+
+	if (host.isEmpty() || portValue.isEmpty() || user.isEmpty() || password.isEmpty()) {
+
+	    return Optional.empty();
+	}
+
+	int port;
+
+	try {
+
+	    port = Integer.parseInt(portValue.get().trim());
+
+	} catch (NumberFormatException ex) {
+
+	    return Optional.empty();
+	}
+
+	MQTTBrokerSetting broker = new MQTTBrokerSetting();
+	broker.setEnabled(true);
+	broker.setHost(host.get());
+	broker.setPort(port);
+	broker.setUser(user.get());
+	broker.setPassword(password.get());
+
+	return Optional.of(broker);
+    }
+
+    /**
+     * 
+     */
+    private void removeLegacyMqttKeys() {
+
+	Optional<Option<String>> option = getOption(KEY_VALUE_OPTION_KEY, String.class);
+
+	if (option.isEmpty()) {
+
+	    return;
+	}
+
+	String value = option.get().getOptionalValue().orElse("");
+
+	String updated = Arrays.stream(value.split("\\R", -1)).filter(line -> !isLegacyMqttKey(line)).collect(Collectors.joining("\n"))
+		.trim();
+
+	option.get().setValue(updated);
+    }
+
+    /**
+     * @param line
+     * @return
+     */
+    private static boolean isLegacyMqttKey(String line) {
+
+	String trimmed = line.trim();
+
+	int separator = indexOfKeySeparator(trimmed);
+
+	if (separator < 0) {
+
+	    return false;
+	}
+
+	String key = trimmed.substring(0, separator).trim();
+
+	return key.equals(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel()) || key.equals(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel())
+		|| key.equals(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel())
+		|| key.equals(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
+    }
+
+    /**
+     * @param line
+     * @return
+     */
+    private static int indexOfKeySeparator(String line) {
+
+	int equals = line.indexOf('=');
+	int colon = line.indexOf(':');
+
+	if (equals < 0) {
+
+	    return colon;
+	}
+
+	if (colon < 0) {
+
+	    return equals;
+	}
+
+	return Math.min(equals, colon);
+    }
+
+    /**
+     * @author Fabrizio
+     */
+    public static class SystemSettingAfterCleanFunction implements AfterCleanFunction {
+
+	@Override
+	public void afterClean(Setting setting) {
+
+	    SystemSetting systemSetting = SettingUtils.downCast(setting, SystemSetting.class);
+
+	    systemSetting.migrateLegacyMqttBrokers();
+	}
     }
 
     /**
