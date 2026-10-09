@@ -636,6 +636,18 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-ch-slf</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-us-nrcs-awdb</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-ch-existenz-bafu</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
