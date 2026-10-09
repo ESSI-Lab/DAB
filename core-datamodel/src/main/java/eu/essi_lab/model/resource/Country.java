@@ -94,6 +94,7 @@ public enum Country {
     GERMANY("Germany", "the Federal Republic of Germany", "DEU", "DE", "276"),
     GHANA("Ghana", "the Republic of Ghana", "GHA", "GH", "288"),
     GREECE("Greece", "the Hellenic Republic", "GRC", "GR", "300"),
+    GREENLAND("Greenland", "Greenland", "GRL", "GL", "304"),
     GRENADA("Grenada", "Grenada", "GRD", "GD", "308"),
     GUATEMALA("Guatemala", "the Republic of Guatemala", "GTM", "GT", "320"),
     GUINEA("Guinea", "the Republic of Guinea", "GIN", "GN", "324"),
