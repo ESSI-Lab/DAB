@@ -202,7 +202,8 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		IndexedElementsWriter.write(dataset);
 		Document asDocument = dataset.asDocument(true);
 		String key = dataset.getOriginalId().get();
-		if (folder.exists(key)) {
+		boolean alreadyPublished = folder.exists(key);
+		if (alreadyPublished) {
 		    toDelete.remove(key);
 		    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 		} else {
@@ -221,7 +222,8 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		// the integrity checksum matches the content available at the canonical link
 		String wcmp2 = WISUtils.getWCMP2Record(GSResource.create(asDocument), view.getId());
 
-		Link link = new Link("canonical", "application/geo+json", url);
+		// WIS2 GDC: "canonical" for a new record, "update" to have an already published record reingested
+		Link link = new Link(alreadyPublished ? "update" : "canonical", "application/geo+json", url);
 		link.setLength(wcmp2.getBytes(StandardCharsets.UTF_8).length);
 		WISNotificationMessage wnm = new WISNotificationMessage(wnmId, bbox, dataId, link, generatedBy);
 		wnm.setIntegrity(wcmp2);
