@@ -61,6 +61,7 @@ import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.web.WebRequest;
 import eu.essi_lab.model.GSSource;
@@ -482,6 +483,19 @@ public class WISUtils {
     }
 
     public static ResultSet<GSResource> getMetadataItems(String metadataIdentifier, Optional<String> optionalView) throws GSException {
+
+	return getMetadataItems(metadataIdentifier, optionalView, Optional.empty());
+    }
+
+    /**
+     * @param metadataIdentifier
+     * @param optionalView
+     * @param optionalSourceId if present, only the items of this source are returned
+     * @return
+     * @throws GSException
+     */
+    public static ResultSet<GSResource> getMetadataItems(String metadataIdentifier, Optional<String> optionalView,
+	    Optional<String> optionalSourceId) throws GSException {
 	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
 	DiscoveryExecutor executor = loader.iterator().next();
 
@@ -503,11 +517,16 @@ public class WISUtils {
 	    viewId = optionalView.get();
 	    WebRequestTransformer.setView(viewId, uri, discoveryMessage);
 	}
+	Bond userBond;
 	if (metadataIdentifier != null) {
-	    discoveryMessage.setUserBond(BondFactory.createOriginalIdentifierBond(metadataIdentifier));
+	    userBond = BondFactory.createOriginalIdentifierBond(metadataIdentifier);
 	} else {
-	    discoveryMessage.setUserBond(BondFactory.createExistsSimpleValueBond(MetadataElement.WIS_TOPIC_HIERARCHY));
+	    userBond = BondFactory.createExistsSimpleValueBond(MetadataElement.WIS_TOPIC_HIERARCHY);
 	}
+	if (optionalSourceId.isPresent()) {
+	    userBond = BondFactory.createAndBond(userBond, BondFactory.createSourceIdentifierBond(optionalSourceId.get()));
+	}
+	discoveryMessage.setUserBond(userBond);
 
 	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 	return resultSet;

@@ -24,7 +24,7 @@ import java.util.EnumMap;
  * #L%
  */
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -188,11 +188,15 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    System.out.println(dataset.getHarmonizedMetadata().getCoreMetadata().getTitle());
 	}
 
+	// the records of this source currently published, keyed as in the folder; those not generated again are deleted
 	Optional<String> optionalView = Optional.of(view.getId());
-	ResultSet<GSResource> resultSet = WISUtils.getMetadataItems(null, optionalView);
-	HashSet<String> toDelete = new HashSet<>();
+	ResultSet<GSResource> resultSet = WISUtils.getMetadataItems(null, optionalView, Optional.of(sourceId));
+	HashMap<String, GSResource> toDelete = new HashMap<>();
 	for (GSResource result : resultSet.getResultsList()) {
-	    toDelete.add(result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getFileIdentifier());
+	    Optional<String> originalId = result.getOriginalId();
+	    if (originalId.isPresent()) {
+		toDelete.put(originalId.get(), result);
+	    }
 	}
 
 	for (DatasetCollection dataset : datasets) {
@@ -203,8 +207,8 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		Document asDocument = dataset.asDocument(true);
 		String key = dataset.getOriginalId().get();
 		boolean alreadyPublished = folder.exists(key);
+		toDelete.remove(key);
 		if (alreadyPublished) {
-		    toDelete.remove(key);
 		    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 		} else {
 		    folder.store(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
@@ -230,40 +234,76 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		System.out.println(topic.get());
 		System.out.println(wnm.getJSONObject().toString(3));
 		System.out.println(wcmp2);
-		if (client == null) {
-		    GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
-		} else {
-		    try {
-			client.publish(topic.get(), wnm.getJSONObject().toString(3), true);
-		    } catch (Exception e) {
-			GSLoggerFactory.getLogger(getClass()).error(e);
-			// reinitialize the client
-			if (client != null) {
-			    try {
-				client.disconnect();
-			    } catch (Exception e2) {
-				GSLoggerFactory.getLogger(getClass()).error(e2);
-			    }
-			    client = null;
-			}
-			try {
-			    initializeClient();
-			} catch (Exception e3) {
-			    GSLoggerFactory.getLogger(getClass()).error(e3);
-			}
-
-		    }
-		}
+		publish(topic.get(), wnm);
 
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).error("Topic not present!");
 	    }
 
 	}
-	for (String tod : toDelete) {
-	    folder.remove(tod);
+	for (String key : toDelete.keySet()) {
+
+	    GSResource deleted = toDelete.get(key);
+
+	    if (!folder.remove(key)) {
+		GSLoggerFactory.getLogger(getClass()).warn("Unable to remove collection {}", key);
+		continue;
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Removed collection {}", key);
+
+	    // send WIS deletion notification message
+	    Optional<String> topic = deleted.getExtensionHandler().getWISTopicHierarchy();
+	    if (topic.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).error("Topic not present for removed collection {}", key);
+		continue;
+	    }
+
+	    String fileIdentifier = deleted.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
+	    GeographicBoundingBox bbox = deleted.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+	    String url = WISUtils.getRecordUrl(WISUtils.getServiceUrl(view.getId()), fileIdentifier);
+
+	    Link link = new Link("deletion", "application/geo+json", url);
+	    WISNotificationMessage wnm = new WISNotificationMessage(UUID.randomUUID().toString(), bbox, fileIdentifier, link, generatedBy);
+	    System.out.println(topic.get());
+	    System.out.println(wnm.getJSONObject().toString(3));
+
+	    publish(topic.get(), wnm);
+	}
+    }
+
+    /**
+     * Publishes the given notification message to the WIS2 MQTT broker, reinitializing the client in case of error
+     * 
+     * @param topic
+     * @param wnm
+     */
+    private void publish(String topic, WISNotificationMessage wnm) {
+
+	if (client == null) {
+	    GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
+	    return;
 	}
 
+	try {
+	    client.publish(topic, wnm.getJSONObject().toString(3), true);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    // reinitialize the client
+	    if (client != null) {
+		try {
+		    client.disconnect();
+		} catch (Exception e2) {
+		    GSLoggerFactory.getLogger(getClass()).error(e2);
+		}
+		client = null;
+	    }
+	    try {
+		initializeClient();
+	    } catch (Exception e3) {
+		GSLoggerFactory.getLogger(getClass()).error(e3);
+	    }
+	}
     }
 
     private static MQTTPublisherHive client;
