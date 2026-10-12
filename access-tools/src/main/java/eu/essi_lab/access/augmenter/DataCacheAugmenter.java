@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +59,7 @@ import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
@@ -107,29 +106,16 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	if (client == null) {
 	    try {
 
-		SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+		Optional<MQTTBrokerSetting> broker = ConfigurationWrapper.getSystemSettings().getWis2MqttBroker();
 
-		Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+		if (broker.isEmpty()) {
 
-		if (keyValueOption.isPresent()) {
+		    GSLoggerFactory.getLogger(getClass()).error("WIS2 MQTT broker not configured");
 
-		    String host = keyValueOption.get().getProperty("mqttBrokerHost");
-		    String port = keyValueOption.get().getProperty("mqttBrokerPort");
-		    String user = keyValueOption.get().getProperty("mqttBrokerUser");
-		    String pwd = keyValueOption.get().getProperty("mqttBrokerPwd");
-
-		    if (host == null || port == null || user == null || pwd == null) {
-
-			GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
-
-		    } else {
-
-			client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
-		    }
 		} else {
 
-		    GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
-
+		    MQTTBrokerSetting mqtt = broker.get();
+		    client = new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get());
 		}
 
 	    } catch (Exception e) {
@@ -496,7 +482,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		    json.put("links", linksArray);
 		    String msg = json.toString();
 		    if (client == null) {
-			GSLoggerFactory.getLogger(getClass()).info("MQTT broker not configured");
+			GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
 		    } else {
 			client.publish(topic, msg, true);
 		    }

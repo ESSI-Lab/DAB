@@ -23,7 +23,6 @@ package eu.essi_lab.harvester;
 
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.*;
 import eu.essi_lab.lib.mqtt.hive.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
@@ -489,25 +488,17 @@ public class HarvestingNotifier {
 
 	SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
 
-	Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+	Optional<MQTTBrokerSetting> broker = systemSettings.getDabMqttBroker();
 
-	if (keyValueOption.isEmpty()) {
+	if (broker.isEmpty()) {
 
-	    return Optional.empty();
-	}
-
-	String mqttHost = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
-	String mqttPort = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
-	String mqttUser = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
-	String mqttPwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
-
-	if (mqttHost == null || mqttPort == null || mqttUser == null || mqttPwd == null) {
-
-	    GSLoggerFactory.getLogger(getClass()).debug("MQTT options not found, harvesting notification not sent");
+	    GSLoggerFactory.getLogger(getClass()).debug("DAB activity MQTT broker not configured, harvesting notification not sent");
 
 	    return Optional.empty();
 	}
 
-	return Optional.of(new MQTTPublisherHive(mqttHost, Integer.parseInt(mqttPort), mqttUser, mqttPwd));
+	MQTTBrokerSetting mqtt = broker.get();
+
+	return Optional.of(new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get()));
     }
 }

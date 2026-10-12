@@ -64,6 +64,9 @@ public enum NetProtocolWrapper {
     KISTERS(new KISTERSProtocol()),//
     UK_HYDROLOGY(new UKHydrologyProtocol()),//
     PEGELONLINE(new PegelonlineProtocol()),//
+    SLF(new SLFMeasurementProtocol()),//
+    NRCS_AWDB(new NRCSAWDBProtocol()),//
+    PROMICE(new PROMICEProtocol()),//
     CH_EXISTENZ_BAFU(new CHExistenzBafuProtocol()),//
     NASAGSFCOZONE(new NASAGSFCOZONEProtocol()),//
     NCML(new NCMLProtocol()),//
