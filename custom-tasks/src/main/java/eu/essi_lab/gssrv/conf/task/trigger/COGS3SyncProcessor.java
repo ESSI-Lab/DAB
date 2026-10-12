@@ -59,6 +59,12 @@ public class COGS3SyncProcessor {
 
     private static final String TARGET_EPSG = "EPSG:3857";
 
+    // Natural Earth 1:50m land polygons clipped to the TRIGGER domain (35W-55E, 20N-80N): pixels outside are set to NoData
+    private static final String LAND_MASK_RESOURCE = "trigger/land_mask.geojson";
+    private static final String NODATA_VALUE = "-9999";
+
+    private Path landMask;
+
     public COGS3SyncProcessor(S3TransferWrapper s3, String bucketName, String[] variables, String sourceURL) {
 	this.s3 = s3;
 	this.bucketName = bucketName;
@@ -83,6 +89,8 @@ public class COGS3SyncProcessor {
 	GSLoggerFactory.getLogger(getClass()).info("Working dir: " + tempWorkDir);
 
 	try {
+
+	    landMask = extractLandMask(tempWorkDir);
 
 	    URL listURL = URI.create(sourceURL).toURL();
 	    String user = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
@@ -122,6 +130,23 @@ public class COGS3SyncProcessor {
 
 	    cleanup(tempWorkDir);
 	    variableFilesMap = new HashMap<>();
+	    landMask = null;
+	}
+    }
+
+    private Path extractLandMask(Path workDir) {
+	try (InputStream in = getClass().getClassLoader().getResourceAsStream(LAND_MASK_RESOURCE)) {
+	    if (in == null) {
+		GSLoggerFactory.getLogger(getClass()).warn("Land mask resource not found, ocean will not be masked: " + LAND_MASK_RESOURCE);
+		return null;
+	    }
+	    Path out = workDir.resolve("land_mask.geojson");
+	    Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING);
+	    GSLoggerFactory.getLogger(getClass()).info("Land mask ready: " + out);
+	    return out;
+	} catch (IOException e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract land mask, ocean will not be masked: " + e.getMessage());
+	    return null;
 	}
     }
 
@@ -180,14 +205,23 @@ public class COGS3SyncProcessor {
 
 	try {
 
-	    ProcessBuilder pb = new ProcessBuilder(
+	    List<String> warpCmd = new ArrayList<>(List.of(
 		    "gdalwarp",
 		    "-s_srs", "EPSG:4326",
 		    "-t_srs", "EPSG:3857",
 		    "-r", "cubic",
 		    "-ot", "Float32",
 		    "-tr", "10000", "10000",
-		    "-tap",
+		    "-tap"));
+
+	    // Ocean mask: pixels outside the land polygons become NoData (transparent in the OpenLayers client).
+	    // CUTLINE_ALL_TOUCHED keeps every pixel touching land, so the coastline is never left uncovered
+	    if (landMask != null) {
+		warpCmd.addAll(List.of("-cutline", landMask.toAbsolutePath().toString(), "-wo", "CUTLINE_ALL_TOUCHED=TRUE", "-dstnodata",
+			NODATA_VALUE));
+	    }
+
+	    warpCmd.addAll(List.of(
 		    "-of", "COG",
 		    "-co", "COMPRESS=DEFLATE",
 		    "-co", "PREDICTOR=2",
@@ -195,7 +229,9 @@ public class COGS3SyncProcessor {
 		    "-co", "OVERVIEWS=IGNORE_EXISTING",
 		    "-co", "RESAMPLING=CUBIC",
 		    input.toAbsolutePath().toString(),
-		    temp.toAbsolutePath().toString());
+		    temp.toAbsolutePath().toString()));
+
+	    ProcessBuilder pb = new ProcessBuilder(warpCmd);
 
 	    GSLoggerFactory.getLogger(getClass()).info("Running GDALWARP: " + String.join(" ", pb.command()));
 
