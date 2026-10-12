@@ -26,12 +26,15 @@ import java.util.Date;
 
 import org.json.JSONObject;
 
+import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.Citation;
+import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
@@ -104,6 +107,7 @@ public class PROMICEMapper extends AbstractResourceMapper {
 	ResponsibleParty publisher = new ResponsibleParty();
 	publisher.setOrganisationName(institution);
 	publisher.setRoleCode("pointOfContact");
+	publisher.setContactInfo(createContact(site.optString("publisher_email", null), site.optString("publisher_url", null)));
 	dataId.addPointOfContact(publisher);
 
 	if (site.has("creator_name")) {
@@ -111,6 +115,7 @@ public class PROMICEMapper extends AbstractResourceMapper {
 	    creator.setIndividualName(site.getString("creator_name"));
 	    creator.setOrganisationName(institution);
 	    creator.setRoleCode("author");
+	    creator.setContactInfo(createContact(site.optString("creator_email", null), site.optString("creator_url", null)));
 	    dataId.addPointOfContact(creator);
 	}
 
@@ -190,6 +195,31 @@ public class PROMICEMapper extends AbstractResourceMapper {
 		"download");
 
 	return dataset;
+    }
+
+    /**
+     * @param email the ACDD creator or publisher email, may be null
+     * @param url the ACDD creator or publisher URL, may be null
+     * @return
+     */
+    static Contact createContact(String email, String url) {
+
+	Contact contact = new Contact();
+
+	if (email != null && !email.isEmpty()) {
+	    Address address = new Address();
+	    address.addElectronicMailAddress(email);
+	    contact.setAddress(address);
+	}
+
+	if (url != null && !url.isEmpty()) {
+	    Online online = new Online();
+	    online.setLinkage(url);
+	    online.setFunctionCode("information");
+	    contact.setOnline(online);
+	}
+
+	return contact;
     }
 
     /**

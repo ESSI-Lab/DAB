@@ -1,5 +1,6 @@
 package eu.essi_lab.accessor.chslf;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import org.junit.Test;
 
 import eu.essi_lab.iso.datamodel.classes.Online;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
@@ -50,6 +52,10 @@ public class SLFHarvestExternalTestIT {
 	}
 
 	assertTrue(count > 0);
+
+	// the point of contact has the organization web site
+	ResponsibleParty contact = first.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty().get(0);
+	assertEquals("https://www.slf.ch/en/", contact.getContact().getOnline().getLinkage());
 
 	Online online = first.getHarmonizedMetadata().getCoreMetadata().getOnline();
 	// during harvesting the identifier is assigned by the identifier decorator

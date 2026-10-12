@@ -175,6 +175,8 @@ public class SupportService {
 	List<Queryable> freqs = new ArrayList<>();
 	freqs.add(MetadataElement.ORGANIZATION);
 	freqs.add(MetadataElement.ATTRIBUTE_TITLE);
+	freqs.add(MetadataElement.USE_LEGAL_CONSTRAINTS);
+	freqs.add(MetadataElement.USE_LEGAL_CONSTRAINTS_URI);
 	statisticsMessage.computeFrequency(freqs, 1000);
 	List<Queryable> distArray = new ArrayList<>();
 	distArray.add(MetadataElement.ATTRIBUTE_TITLE);
@@ -211,6 +213,9 @@ public class SupportService {
 
 	    JSONArray frequencies = toJSON(responseItem.getFrequency(MetadataElement.ATTRIBUTE_TITLE));
 	    stat.put("attribute-stats", frequencies);
+
+	    stat.put("license-stats", toJSON(responseItem.getFrequency(MetadataElement.USE_LEGAL_CONSTRAINTS)));
+	    stat.put("license-uri-stats", toJSON(responseItem.getFrequency(MetadataElement.USE_LEGAL_CONSTRAINTS_URI)));
 
 	    stat.put("site-count", responseItem.getCountDistinct(MetadataElement.UNIQUE_PLATFORM_IDENTIFIER).get().getValue());
 	    stat.put("unique-attribute-count", responseItem.getCountDistinct(MetadataElement.UNIQUE_ATTRIBUTE_IDENTIFIER).get().getValue());

@@ -76,6 +76,11 @@ public class TermFrequencyItem {
 
 	    this.decodedTerm = URLDecoder.decode(term, StandardCharsets.UTF_8);
 
+	} catch (IllegalArgumentException e) {
+
+	    // term is not URL-encoded (e.g. contains a literal '%'), keep it as is
+	    this.decodedTerm = term;
+
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).warn("Can't decode {}", term, e);

@@ -26,11 +26,13 @@ import java.math.BigDecimal;
 import org.json.JSONObject;
 
 import eu.essi_lab.iso.datamodel.classes.Citation;
+import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
@@ -58,6 +60,8 @@ public class SLFMapper extends AbstractResourceMapper {
     private static final String SLF_ORGANIZATION = "WSL Institute for Snow and Avalanche Research SLF";
 
     private static final String SLF_LICENSE = "Creative Commons Attribution 4.0 International (CC BY 4.0) - SLF Data Service Terms of Use: https://www.slf.ch/en/services-and-products/slf-data-service";
+
+    private static final String SLF_WEBSITE = "https://www.slf.ch/en/";
 
     @Override
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
@@ -92,6 +96,14 @@ public class SLFMapper extends AbstractResourceMapper {
 	ResponsibleParty party = new ResponsibleParty();
 	party.setOrganisationName(SLF_ORGANIZATION);
 	party.setRoleCode("pointOfContact");
+
+	Online website = new Online();
+	website.setLinkage(SLF_WEBSITE);
+	website.setFunctionCode("information");
+	Contact contact = new Contact();
+	contact.setOnline(website);
+	party.setContactInfo(contact);
+
 	dataId.addPointOfContact(party);
 
 	LegalConstraints constraints = new LegalConstraints();

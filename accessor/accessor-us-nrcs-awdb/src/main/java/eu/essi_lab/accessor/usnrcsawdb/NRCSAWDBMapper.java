@@ -28,11 +28,13 @@ import java.util.Optional;
 import org.json.JSONObject;
 
 import eu.essi_lab.iso.datamodel.classes.Citation;
+import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
 import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
@@ -62,6 +64,8 @@ public class NRCSAWDBMapper extends AbstractResourceMapper {
     private static final String NRCS_ORGANIZATION = "USDA Natural Resources Conservation Service (NRCS), National Water and Climate Center";
 
     private static final String NRCS_LICENSE = "Public domain (U.S. Government work). Please cite: USDA Natural Resources Conservation Service, National Water and Climate Center";
+
+    private static final String NRCS_WEBSITE = "https://www.nrcs.usda.gov/programs-initiatives/sswsf-snow-survey-and-water-supply-forecasting-program/national-water-and";
 
     private static final double FEET_TO_METERS = 0.3048;
 
@@ -115,6 +119,14 @@ public class NRCSAWDBMapper extends AbstractResourceMapper {
 	ResponsibleParty party = new ResponsibleParty();
 	party.setOrganisationName(NRCS_ORGANIZATION);
 	party.setRoleCode("pointOfContact");
+
+	Online website = new Online();
+	website.setLinkage(NRCS_WEBSITE);
+	website.setFunctionCode("information");
+	Contact contact = new Contact();
+	contact.setOnline(website);
+	party.setContactInfo(contact);
+
 	dataId.addPointOfContact(party);
 
 	String operator = object.optString(NRCSAWDBClient.STATION_OPERATOR, null);
