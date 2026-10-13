@@ -961,6 +961,15 @@ public class DABStarter implements ConfigurationChangeListener {
 		    System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
 		    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
 
+		    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		    tmf.init(mergedKS); // contains both the JVM default and the custom certificates
+
+		    SSLContext sslContext = SSLContext.getInstance("TLS");
+		    sslContext.init(null, tmf.getTrustManagers(), null);
+
+		    SSLContext.setDefault(sslContext);
+		    HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+
 		    GSLoggerFactory.getLogger(getClass()).info("Using merged trust store at {}", mergedTrustStore.getAbsolutePath());
 
 		    FileUtils.printTrustStoreCertificates(mergedTrustStore, trustStorePwd.get());
