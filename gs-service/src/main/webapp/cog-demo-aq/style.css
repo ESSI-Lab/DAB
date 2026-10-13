@@ -1,0 +1,93 @@
+body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: sans-serif; }
+
+#map { width: 100%; height: 100%; }
+
+/* UI Panel Container */
+#ui-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    width: 300px;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+.panel-title { font-size: 15px; font-weight: bold; color: #222; margin-bottom: 12px; }
+
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.field-inline { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+.field-label { font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; }
+
+.field select {
+    padding: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+}
+
+.run-label { font-size: 12px; color: #555; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+
+#timeMain { font-weight: bold; margin-bottom: 8px; font-size: 14px; color: #222; }
+#forecastSlider { width: 100%; cursor: pointer; margin-bottom: 10px; }
+#opacitySlider { flex-grow: 1; cursor: pointer; }
+
+.media-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 8px;
+}
+
+.media-controls button {
+    padding: 6px 10px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    flex-grow: 1;
+}
+
+.media-controls button:hover { background: #f5f5f5; }
+.media-controls button:active { background: #e5e5e5; }
+
+.media-controls select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.pixel-value {
+    font-size: 12px;
+    color: #333;
+    background: #f5f5f5;
+    border-radius: 4px;
+    padding: 6px 8px;
+    min-height: 16px;
+}
+
+/* Legend Styling */
+.legend-subtitle {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 8px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 4px;
+}
+#legend { margin-top: 10px; }
+.legend-item { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 12px; color: #333; }
+.legend-color { width: 18px; height: 14px; border: 1px solid #bbb; border-radius: 2px; flex-shrink: 0; }
+.legend-note { font-size: 10px; color: #888; margin-top: 6px; }
