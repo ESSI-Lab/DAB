@@ -171,10 +171,10 @@ public class BNHSConnector extends HarvestedQueryConnector<BNHSConnectorSetting>
 		    }
 
 		    // CANADA
-		} else if (realtimeLink.contains("http://dd.weather.gc.ca/hydrometric/") || //
+		} else if ((realtimeLink.contains("dd.weather.gc.ca/") && realtimeLink.contains("/hydrometric/")) || //
 			realtimeLink.contains("https://wateroffice.ec.gc.ca/report/real_time_e.html") || //
 			institute.equals("Water Survey of Canada")) {
-		    realtimeLink = "http://dd.weather.gc.ca/hydrometric/csv/";
+		    realtimeLink = CANADAMSCConnector.TODAY_HYDROMETRIC_URL + "csv/";
 		    connector = new CANADAMSCConnector();
 		    mapper = new CANADAMSCMapper();
 

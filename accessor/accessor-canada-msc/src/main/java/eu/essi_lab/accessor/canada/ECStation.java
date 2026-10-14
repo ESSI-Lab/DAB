@@ -376,7 +376,7 @@ public class ECStation {
     public static void main(String[] args) {
 	Downloader downloader = new Downloader();
 	Optional<HttpResponse<InputStream>> response = downloader
-		.downloadOptionalResponse("http://dd.weather.gc.ca/hydrometric/csv/BC/daily/BC_08HD018_daily_hydrometric.csv");
+		.downloadOptionalResponse("https://dd.weather.gc.ca/today/hydrometric/csv/BC/daily/BC_08HD018_daily_hydrometric.csv");
 	String cl = "";
 	if (response.isPresent()) {
 	    HttpHeaders header = response.get().headers();
