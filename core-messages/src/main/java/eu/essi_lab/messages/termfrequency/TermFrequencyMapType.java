@@ -137,6 +137,10 @@ public class TermFrequencyMapType {
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     private final ArrayList<TermFrequencyItem> aggregationDuration;
 
+    @XmlElementWrapper(name = MetadataElement.COUNTRY_ISO3_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
+    private final ArrayList<TermFrequencyItem> country;
+
     @XmlElementWrapper(name = ResourceProperty.SSC_SCORE_EL_NAME, namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     @XmlElement(name = "result", namespace = NameSpace.GS_DATA_MODEL_SCHEMA_URI)
     // this is required due to a possible bug of Jackson mapper
@@ -170,6 +174,7 @@ public class TermFrequencyMapType {
 	intendedObservationSpacing = new ArrayList<>();
 	timeInterpolation = new ArrayList<>();
 	aggregationDuration = new ArrayList<>();
+	country = new ArrayList<>();
     }
 
     @XmlTransient
@@ -220,6 +225,11 @@ public class TermFrequencyMapType {
     @XmlTransient
     public ArrayList<TermFrequencyItem> getAggregationDuration() {
 	return aggregationDuration;
+    }
+
+    @XmlTransient
+    public ArrayList<TermFrequencyItem> getCountry() {
+	return country;
     }
 
     @XmlTransient

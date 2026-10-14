@@ -1095,6 +1095,7 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
         		object.platformTitle || 
         		object.intendedObservationSpacing ||
         		object.timeInterpolation ||
+        		object.country ||
         		object.aggregationDuration ||
         		object.attributeTitle 
         		
@@ -1142,6 +1143,7 @@ GIAPI.DAB = function(dabEndpoint, viewId, servicePath, cswPath, openSearchPath) 
                 constraints.organisationName || 
                 constraints.intendedObservationSpacing ||
                 constraints.timeInterpolation ||
+                constraints.country ||
                 constraints.aggregationDuration ||
                 constraints.attributeTitle ||
                 // include observedPropertyURI so TF selections on observed properties

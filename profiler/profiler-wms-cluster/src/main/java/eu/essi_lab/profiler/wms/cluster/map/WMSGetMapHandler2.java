@@ -1092,6 +1092,15 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    timeInterpolation.get()));
 	}
 
+	Optional<String> country = parser.getOptionalValue("country");
+	if (country.isPresent() && !country.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.COUNTRY_ISO3, //
+		    country.get()));
+	}
+
 	Optional<String> aggregationDuration = parser.getOptionalValue("aggregationDuration");
 	if (aggregationDuration.isPresent() && !aggregationDuration.get().equals(KeyValueParser.UNDEFINED)) {
 

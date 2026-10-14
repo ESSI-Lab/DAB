@@ -424,6 +424,18 @@ public abstract class OSParameters {
 	}
     };
 
+    public static final OSParameter COUNTRY = new OSParameter("country", "string", null, "{gs:country}") {
+	@Override
+	public Optional<Bond> asBond(String value, String... relatedValues) {
+
+	    if (value == null || value.isEmpty()) {
+		return Optional.empty();
+	    }
+
+	    return createEqualBond(value, MetadataElement.COUNTRY_ISO3);
+	}
+    };
+
     /**
      *
      */

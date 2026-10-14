@@ -296,6 +296,7 @@
 	"tf-intendedObservationSpacing" : "Intended observation spacing",
 	"tf-timeInterpolation" : "Time interpolation",
 	"tf-aggregationDuration" : "Aggregation duration",
+	"tf-country" : "Country",
 	"tf-observedPropertyURI" : "Observed property URI",
 	"tf-attributeId" : "Attribute identifier",
 	"tf-instrumentId" : "Instrument identifier",
