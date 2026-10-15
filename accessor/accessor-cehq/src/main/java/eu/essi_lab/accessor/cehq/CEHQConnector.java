@@ -82,9 +82,10 @@ public class CEHQConnector extends StationConnector<CEHQConnectorSetting> {
 
     @Override
     public ListRecordsResponse<OriginalMetadata> listTimeseries(String stationId) throws GSException {
-	ListRecordsRequest request = new ListRecordsRequest();
-	request.setResumptionToken(stationId);
-	return listRecords(request);
+	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
+	init();
+	addStationRecords(stationId, ret);
+	return ret;
     }
 
     @Override
@@ -118,7 +119,30 @@ public class CEHQConnector extends StationConnector<CEHQConnectorSetting> {
 	    }
 	}
 
-	String stationId = identifiers.get(index);
+	// stations without instantaneous data (e.g. many closed ones) produce no records, so they are skipped to avoid
+	// returning empty pages
+	while (true) {
+	    addStationRecords(identifiers.get(index), ret);
+	    if (!ret.getRecordsAsList().isEmpty() || index >= identifiers.size() - 1) {
+		break;
+	    }
+	    index++;
+	}
+
+	Optional<Integer> mr = getSetting().getMaxRecords();
+	boolean maxNumberReached = false;
+	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && index > mr.get() - 1) {
+	    // max record set
+	    maxNumberReached = true;
+	}
+	if (!maxNumberReached && // max records set by user not reached
+		index < (identifiers.size() - 1)) { // not last record
+	    ret.setResumptionToken(identifiers.get(index + 1));
+	}
+	return ret;
+    }
+
+    private void addStationRecords(String stationId, ListRecordsResponse<OriginalMetadata> ret) {
 	Map<CEHQProperty, String> properties;
 	Map<CEHQVariable, SimpleEntry<Date, Date>> temporalExtents;
 
@@ -128,13 +152,12 @@ public class CEHQConnector extends StationConnector<CEHQConnectorSetting> {
 	    temporalExtents = client.getTimeSeriesTemporalExtent(stationId);
 
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    throw GSException.createException(//
-		    getClass(), //
-		    ErrorInfo.ERRORTYPE_INTERNAL, //
-		    ErrorInfo.SEVERITY_ERROR, //
-		    CEHQ_CONNECTOR_ERROR, //
-		    e);
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to read station {}, skipping", stationId, e);
+	    return;
+	}
+	if (temporalExtents.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).info("No instantaneous data for station {}, skipping", stationId);
+	    return;
 	}
 	for (Entry<CEHQVariable, SimpleEntry<Date, Date>> temporalExtent : temporalExtents.entrySet()) {
 	    CEHQVariable var = temporalExtent.getKey();
@@ -222,18 +245,6 @@ public class CEHQConnector extends StationConnector<CEHQConnectorSetting> {
 	    }
 
 	}
-
-	Optional<Integer> mr = getSetting().getMaxRecords();
-	boolean maxNumberReached = false;
-	if (!getSetting().isMaxRecordsUnlimited() && mr.isPresent() && index > mr.get() - 1) {
-	    // max record set
-	    maxNumberReached = true;
-	}
-	if (!maxNumberReached && // max records set by user not reached
-		index < (identifiers.size() - 1)) { // not last record
-	    ret.setResumptionToken(identifiers.get(index + 1));
-	}
-	return ret;
     }
 
     private void init() {

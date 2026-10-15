@@ -14,6 +14,7 @@ import org.junit.Test;
 
 import eu.essi_lab.accessor.thredds.THREDDSDataset;
 import eu.essi_lab.iso.datamodel.classes.Online;
+import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
@@ -58,6 +59,11 @@ public class PROMICEHarvestExternalTestIT {
 
 	assertTrue(count > 5);
 	assertNotNull(airTemperature);
+
+	// the point of contact has the organization web site and email
+	ResponsibleParty contact = airTemperature.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getPointOfContactParty().get(0);
+	assertEquals("https://promice.dk", contact.getContact().getOnline().getLinkage());
+	assertEquals("info@promice.dk", contact.getContact().getAddress().getElectronicMailAddress());
 
 	Online online = airTemperature.getHarmonizedMetadata().getCoreMetadata().getOnline();
 	// during harvesting the identifier is assigned by the identifier decorator

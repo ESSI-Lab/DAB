@@ -52,7 +52,7 @@ public class CanadaMSCConnectorWriter {
 
 		// source.setLabel("WOF");
 
-		source.setEndpoint("http://dd.weather.gc.ca/hydrometric/");
+		source.setEndpoint("https://dd.weather.gc.ca/today/hydrometric/");
 		source.setUniqueIdentifier("wof");
 		source.setLabel("WOF");
 

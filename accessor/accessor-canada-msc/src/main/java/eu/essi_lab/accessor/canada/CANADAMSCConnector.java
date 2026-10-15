@@ -75,6 +75,11 @@ public class CANADAMSCConnector extends StationConnector<CANADAMSCConnectorSetti
 
     private static final int DEFAULT_PAGE_SIZE = 50;
 
+    /**
+     * 
+     */
+    public static final String TODAY_HYDROMETRIC_URL = "https://dd.weather.gc.ca/today/hydrometric/";
+
     private WebConnector webConnector;
 
     /**
@@ -232,7 +237,24 @@ public class CANADAMSCConnector extends StationConnector<CANADAMSCConnectorSetti
 	if (ret.endsWith("csv/")) {
 	    ret = ret.replace("csv/", "");
 	}
-	return ret;
+	return normalizeEndpoint(ret);
+    }
+
+    /**
+     * Datamart moved the hydrometric data from http://dd.weather.gc.ca/hydrometric/ to dated folders
+     * (YYYYMMDD/WXO-DD/hydrometric/), kept for about 30 days. The today/hydrometric/ path is the stable alias of the
+     * latest one, so old and dated endpoints are normalized to it
+     * 
+     * @param url
+     * @return
+     */
+    public static String normalizeEndpoint(String url) {
+
+	if (url == null) {
+	    return null;
+	}
+
+	return url.replaceFirst("^https?://dd\\.weather\\.gc\\.ca/(\\d{8}/WXO-DD/|today/)?hydrometric/", TODAY_HYDROMETRIC_URL);
     }
 
     /**
@@ -645,13 +667,13 @@ public class CANADAMSCConnector extends StationConnector<CANADAMSCConnectorSetti
 
     @Override
     public boolean supports(GSSource source) {
-	String baseEndpoint = source.getEndpoint();
+	String baseEndpoint = normalizeEndpoint(source.getEndpoint());
 
 	try {
 
 	    List<String> urls = getWebConnector().getHrefs(baseEndpoint, null);
 
-	    if (urls.size() > 0 && urls.contains("http://dd.weather.gc.ca/hydrometric/doc/"))
+	    if (urls.size() > 0 && urls.stream().anyMatch(u -> u.contains("dd.weather.gc.ca") && u.endsWith("/hydrometric/doc/")))
 		return true;
 
 	} catch (Exception e) {

@@ -321,6 +321,7 @@
   "tf-intendedObservationSpacing": "Risoluzione temporale",
   "tf-timeInterpolation": "Interpolazione temporale",
   "tf-aggregationDuration": "Durata di aggregazione",
+  "tf-country": "Paese",
   "tf-observedPropertyURI": "Proprietà osservata - URI",
 
   "tf-attributeId": "Identificativo parametro",
