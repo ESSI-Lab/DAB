@@ -29,3 +29,4 @@ eu.essi_lab.gssrv.conf.task.SourceConnectivityTestTask
 eu.essi_lab.gssrv.conf.task.ViewHarvestSchedulerTask
 eu.essi_lab.gssrv.conf.task.trigger.COGS3Task
 eu.essi_lab.gssrv.conf.task.trigger.airquality.CAMSAirQualityTask
+eu.essi_lab.gssrv.conf.task.trigger.cimaforecast.CIMAForecastTask
