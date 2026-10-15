@@ -235,6 +235,7 @@ export const GIAPI = {
 		var intendedObservationSpacing = '';
 		var aggregationDuration = '';
 		var timeInterpolation = '';
+		var country = '';
 		var attrURI = '';
 		var orgName = '';
 	 
@@ -313,6 +314,11 @@ export const GIAPI = {
 				if (key === 'timeInterpolation') {
 					timeInterpolation = val;
 					continue;
+				}
+
+				if (key === 'country') {
+					country = val;
+					continue;
 				}					 
 									
 				if (key === 'observedPropertyURI') {
@@ -348,6 +354,7 @@ export const GIAPI = {
 		intendedObservationSpacing = options && options.termFrequency && GIAPI.readConstraint(constraints, 'intendedObservationSpacing') || intendedObservationSpacing;
 		aggregationDuration = options && options.termFrequency && GIAPI.readConstraint(constraints, 'aggregationDuration') || aggregationDuration;
 		timeInterpolation = options && options.termFrequency && GIAPI.readConstraint(constraints, 'timeInterpolation') || timeInterpolation;
+		country = options && options.termFrequency && GIAPI.readConstraint(constraints, 'country') || country;
 		attrURI = options && options.termFrequency && GIAPI.readConstraint(constraints, 'observedPropertyURI') || attrURI;
 		orgName = options && options.termFrequency && GIAPI.readConstraint(constraints, 'organisationName') || orgName;
 		 	 
@@ -475,6 +482,7 @@ export const GIAPI = {
 		httpGet += intendedObservationSpacing ? 'intendedObservationSpacing=' + intendedObservationSpacing + '&' : '';
 		httpGet += aggregationDuration ? 'aggregationDuration=' + aggregationDuration + '&' : '';
 		httpGet += timeInterpolation ? 'timeInterpolation=' + timeInterpolation + '&' : '';
+		httpGet += country ? 'country=' + country + '&' : '';
 		httpGet += attrURI ? 'observedPropertyURI=' + attrURI + '&' : '';
 		httpGet += orgName ? 'organisationName=' + orgName + '&' : '';
 

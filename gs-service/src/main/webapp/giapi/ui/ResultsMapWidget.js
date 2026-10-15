@@ -502,6 +502,12 @@ GIAPI.ResultsMapWidget = function(id, latitude, longitude, options) {
 
 		}
 
+		if (constraints.country) {
+			var value = constraints.country;
+			query += 'country=' + value + '&';
+
+		}
+
 		if (constraints.intendedObservationSpacing) {
 			var value = constraints.intendedObservationSpacing;
 			query += 'intendedObservationSpacing=' + value + '&';

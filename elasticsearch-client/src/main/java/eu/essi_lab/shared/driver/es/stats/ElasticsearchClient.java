@@ -1213,6 +1213,97 @@ public class ElasticsearchClient {
 
     String updateScript = "if (ctx._source.DISCOVERY_MESSAGE_PAGE_SIZE != null && ctx._source.MESSAGE_TYPE == null) { ctx._source.MESSAGE_TYPE = 'DiscoveryMessage' }";
 
+    /**
+     * Executes the given search request body on the <code>{dbName}-{index}</code> index
+     *
+     * @param index
+     * @param body the search request body (query, sort, size, ...)
+     * @return the search response
+     * @throws IOException if the request fails (e.g. the index does not exist)
+     */
+    public JSONObject search(String index, JSONObject body) throws IOException {
+
+	if (dbName != null) {
+	    index = dbName + "-" + index;
+	}
+
+	Request request = new Request("POST", "/" + index + "/_search");
+	request.setEntity(new StringEntity(body.toString(), ContentType.APPLICATION_JSON));
+
+	Response response = client.getLowLevelClient().performRequest(request);
+
+	return new JSONObject(EntityUtils.toString(response.getEntity()));
+    }
+
+    /**
+     * Deletes the documents of the <code>{dbName}-{index}</code> index matching the given query. The index is refreshed
+     * after the deletion, so the deleted documents are immediately excluded from the searches
+     *
+     * @param index
+     * @param query the query (the value of the <code>query</code> field of the request body)
+     * @return the number of deleted documents
+     * @throws IOException if the request fails
+     */
+    public long deleteByQuery(String index, JSONObject query) throws IOException {
+
+	if (dbName != null) {
+	    index = dbName + "-" + index;
+	}
+
+	Request request = new Request("POST", "/" + index + "/_delete_by_query");
+	request.addParameter("refresh", "true");
+	request.setEntity(new StringEntity(new JSONObject().put("query", query).toString(), ContentType.APPLICATION_JSON));
+
+	Response response = client.getLowLevelClient().performRequest(request);
+
+	return new JSONObject(EntityUtils.toString(response.getEntity())).optLong("deleted", 0);
+    }
+
+    /**
+     * Partially updates the document with the given id, adding or replacing the given fields, only if the document field
+     * <code>conditionField</code> has value <code>conditionValue</code>. Otherwise, or if the document does not exist, nothing
+     * is done
+     *
+     * @param index
+     * @param id
+     * @param fields
+     * @param conditionField
+     * @param conditionValue
+     * @return <code>true</code> if the document has been updated
+     */
+    public boolean conditionalUpdate(String index, String id, JSONObject fields, String conditionField, String conditionValue) {
+
+	if (dbName != null) {
+	    index = dbName + "-" + index;
+	}
+
+	String script = "if (ctx._source[params.field] == params.value) { ctx._source.putAll(params.fields) } else { ctx.op = 'noop' }";
+
+	Map<String, Object> parameters = new HashMap<>();
+	parameters.put("field", conditionField);
+	parameters.put("value", conditionValue);
+	parameters.put("fields", fields.toMap());
+
+	UpdateRequest request = new UpdateRequest(index, id);
+	request.script(new Script(ScriptType.INLINE, "painless", script, parameters));
+
+	try {
+
+	    UpdateResponse response = client.update(request, RequestOptions.DEFAULT);
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Elasticsearch conditional update of {} result: {}", id, response.getResult());
+
+	    return response.getResult() == DocWriteResponse.Result.UPDATED;
+
+	} catch (Exception e) {
+
+	    // e.g. document not found
+	    GSLoggerFactory.getLogger(getClass()).warn("Elasticsearch conditional update of {} failed: {}", id, e.getMessage());
+	}
+
+	return false;
+    }
+
     public void updateMessageType(String index) {
 	if (dbName != null) {
 	    index = dbName + "-" + index;

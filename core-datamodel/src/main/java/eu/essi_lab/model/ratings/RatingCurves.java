@@ -152,16 +152,21 @@ public class RatingCurves {
 	    xml.append("    <rgs:ConversionPeriod>\n");
 	    
 	    // Period start
+	    LocalDate beginDate = curve.getBeginDate() != null ? curve.getBeginDate() : LocalDate.now();
 	    xml.append("      <rgs:periodStart>\n");
 	    xml.append("        <gml:TimeInstant gml:id=\"ti-start-").append(curveIndex).append("\">\n");
-	    xml.append("          <gml:timePosition>").append(curve.getBeginDate().format(dateFormatter)).append("</gml:timePosition>\n");
+	    xml.append("          <gml:timePosition>").append(beginDate.format(dateFormatter)).append("</gml:timePosition>\n");
 	    xml.append("        </gml:TimeInstant>\n");
 	    xml.append("      </rgs:periodStart>\n");
 	    
-	    // Period end
+	    // Period end (open-ended when not specified)
 	    xml.append("      <rgs:periodEnd>\n");
 	    xml.append("        <gml:TimeInstant gml:id=\"ti-end-").append(curveIndex).append("\">\n");
-	    xml.append("          <gml:timePosition>").append(curve.getEndDate().format(dateFormatter)).append("</gml:timePosition>\n");
+	    if (curve.getEndDate() != null) {
+		xml.append("          <gml:timePosition>").append(curve.getEndDate().format(dateFormatter)).append("</gml:timePosition>\n");
+	    } else {
+		xml.append("          <gml:timePosition indeterminatePosition=\"now\">now</gml:timePosition>\n");
+	    }
 	    xml.append("        </gml:TimeInstant>\n");
 	    xml.append("      </rgs:periodEnd>\n");
 	    

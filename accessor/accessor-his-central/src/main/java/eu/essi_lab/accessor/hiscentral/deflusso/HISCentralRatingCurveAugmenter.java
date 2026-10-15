@@ -21,6 +21,7 @@ package eu.essi_lab.accessor.hiscentral.deflusso;
  * #L%
  */
 
+import java.util.Collections;
 import java.util.Optional;
 
 import eu.essi_lab.api.database.DatabaseFinder;
@@ -28,25 +29,31 @@ import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
+import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.classes.MIPlatform;
+import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
+import eu.essi_lab.messages.ResourceSelector;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.bond.LogicalBond;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.OriginalMetadata;
+import eu.essi_lab.ommdk.AbstractResourceMapper;
 
 /**
  * After harvesting a rating curve from SharePoint, looks up the corresponding HIS-Central station metadata in the
  * broker database (matching {@code sourceId} + {@code platformIdentifier}) and enriches the resource with the
- * station's unique platform id, bounding box and regional source id.
+ * station's unique platform id, platform identifier, platform title, bounding box and regional source id.
  *
  * @author boldrini
  */
@@ -79,6 +86,12 @@ public class HISCentralRatingCurveAugmenter extends ResourceAugmenter<AugmenterS
 
             GSLoggerFactory.getLogger(getClass()).info("Augmenting rating curve source={} station={}", sourceId, stationId);
 
+            GSSource lookupSource = ConfigurationWrapper.getSource(sourceId);
+            if (lookupSource == null) {
+                GSLoggerFactory.getLogger(getClass()).warn("Unknown source id {}, skipping rating curve augmentation", sourceId);
+                return Optional.of(resource);
+            }
+
             DatabaseFinder finder = DatabaseProviderFactory.getFinder(ConfigurationWrapper.getStorageInfo());
 
             Bond sourceBond = BondFactory.createSourceIdentifierBond(sourceId);
@@ -87,12 +100,18 @@ public class HISCentralRatingCurveAugmenter extends ResourceAugmenter<AugmenterS
             LogicalBond andBond = BondFactory.createAndBond(sourceBond, platformBond);
 
             DiscoveryMessage message = new DiscoveryMessage();
+            message.setSources(Collections.singletonList(lookupSource));
             message.setPermittedBond(andBond);
             message.setNormalizedBond(andBond);
             message.setUserBond(andBond);
             message.setPage(new Page(1, 1));
             message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
-            message.setExcludeResourceBinary(true);
+            // Core metadata (including bbox) lives in the GS resource binary, not in index fields.
+            message.setExcludeResourceBinary(false);
+
+            ResourceSelector selector = message.getResourceSelector();
+            selector.setIncludeOriginal(false);
+            selector.setSubset(ResourceSelector.ResourceSubset.SOURCE_CORE);
 
             ResultSet<GSResource> resultSet = finder.discover(message);
 
@@ -102,7 +121,7 @@ public class HISCentralRatingCurveAugmenter extends ResourceAugmenter<AugmenterS
                 return Optional.of(resource);
             }
 
-            augmentFromMatch(resource, resultSet.getResultsList().get(0), sourceId);
+            augmentFromMatch(resource, resultSet.getResultsList().get(0), sourceId, stationId);
 
             GSLoggerFactory.getLogger(getClass()).info("Rating curve augmentation completed for source={} station={}", sourceId,
                     stationId);
@@ -115,23 +134,102 @@ public class HISCentralRatingCurveAugmenter extends ResourceAugmenter<AugmenterS
         return Optional.of(resource);
     }
 
-    private void augmentFromMatch(GSResource resource, GSResource matched, String sourceId) {
-
-        matched.getExtensionHandler().getUniquePlatformIdentifier()
-                .ifPresent(id -> resource.getExtensionHandler().setUniquePlatformIdentifier(id));
+    private void augmentFromMatch(GSResource resource, GSResource matched, String sourceId, String stationId) {
 
         GeographicBoundingBox boundingBox = matched.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
-        if (boundingBox != null) {
+        if (boundingBox != null && boundingBox.getNorth() != null && boundingBox.getEast() != null) {
             resource.getHarmonizedMetadata().getCoreMetadata().addBoundingBox(//
                     boundingBox.getBigDecimalNorth(), //
                     boundingBox.getBigDecimalWest(), //
                     boundingBox.getBigDecimalSouth(), //
                     boundingBox.getBigDecimalEast());
+        } else {
+            GSLoggerFactory.getLogger(getClass()).warn(
+                    "Matched station source={} platform={} has no core metadata bounding box", sourceId, stationId);
         }
 
         if (matched.getSource() != null && matched.getSource().getUniqueIdentifier() != null) {
             resource.setSource(matched.getSource());
         }
+
+        copyPlatformMetadata(resource, matched);
+        syncUniquePlatformIdentifier(resource, stationId);
+    }
+
+    private void copyPlatformMetadata(GSResource resource, GSResource matched) {
+
+        MIPlatform matchedPlatform = getFirstPlatform(matched);
+        if (matchedPlatform == null) {
+            return;
+        }
+
+        MIPlatform platform = getOrCreatePlatform(resource);
+
+        String platformId = matchedPlatform.getMDIdentifierCode();
+        if (platformId != null && !platformId.isEmpty()) {
+            platform.setMDIdentifierCode(platformId);
+        }
+
+        String description = matchedPlatform.getDescription();
+        if (description != null && !description.isEmpty()) {
+            platform.setDescription(description);
+        }
+
+        Citation matchedCitation = matchedPlatform.getCitation();
+        if (matchedCitation != null) {
+            String title = matchedCitation.getTitle();
+            if (title != null && !title.isEmpty()) {
+                Citation citation = platform.getCitation();
+                if (citation == null) {
+                    citation = new Citation();
+                    platform.setCitation(citation);
+                }
+                citation.setTitle(title);
+            }
+        }
+    }
+
+    /**
+     * Aligns {@link eu.essi_lab.model.resource.MetadataElement#UNIQUE_PLATFORM_IDENTIFIER} with the regional source and
+     * platform id, same as {@link AbstractResourceMapper#handleUniqueIdentifiers}.
+     */
+    private void syncUniquePlatformIdentifier(GSResource resource, String stationId) {
+
+        if (resource.getSource() == null || resource.getSource().getUniqueIdentifier() == null) {
+            return;
+        }
+
+        String platformId = stationId;
+        MIPlatform platform = getFirstPlatform(resource);
+        if (platform != null) {
+            String mdIdentifierCode = platform.getMDIdentifierCode();
+            if (mdIdentifierCode != null && !mdIdentifierCode.isEmpty()) {
+                platformId = mdIdentifierCode;
+            }
+        }
+
+        resource.getExtensionHandler().setUniquePlatformIdentifier(
+                AbstractResourceMapper.generateCode(resource.getSource().getUniqueIdentifier(), platformId));
+    }
+
+    private static MIPlatform getFirstPlatform(GSResource resource) {
+
+        MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+        if (miMetadata == null) {
+            return null;
+        }
+        return miMetadata.getMIPlatform();
+    }
+
+    private static MIPlatform getOrCreatePlatform(GSResource resource) {
+
+        MIPlatform platform = getFirstPlatform(resource);
+        if (platform != null) {
+            return platform;
+        }
+        platform = new MIPlatform();
+        resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().addMIPlatform(platform);
+        return platform;
     }
 
     @Override

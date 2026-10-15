@@ -111,4 +111,9 @@ public class Citation extends ISOMetadata<CICitationType> {
     public void setOtherCitationDetails(String fullCitation) {
 		getElementType().setOtherCitationDetails(ISOMetadata.createCharacterStringPropertyType(fullCitation));
     }
+
+    public String getOtherCitationDetails() {
+
+	return getStringFromCharacterString(getElementType().getOtherCitationDetails());
+    }
 }

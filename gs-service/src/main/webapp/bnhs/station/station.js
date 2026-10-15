@@ -478,6 +478,88 @@ var formatGeoCoordinate = function(value) {
 	return parseFloat(num.toFixed(4));
 }
 
+var isDoiIdentifier = function(identifier) {
+	if (!identifier || typeof identifier !== 'string') {
+		return false;
+	}
+	var trimmed = identifier.trim();
+	var lower = trimmed.toLowerCase();
+	return trimmed.indexOf('10.') === 0 || lower.indexOf('doi:') === 0 || lower.indexOf('doi.org') >= 0;
+};
+
+var normalizeDoiValue = function(identifier) {
+	if (!isDoiIdentifier(identifier)) {
+		return null;
+	}
+	var trimmed = identifier.trim();
+	var lower = trimmed.toLowerCase();
+	if (lower.indexOf('doi:') === 0) {
+		trimmed = trimmed.substring(4).trim();
+	} else {
+		var doiOrgIndex = lower.indexOf('doi.org/');
+		if (doiOrgIndex >= 0) {
+			trimmed = trimmed.substring(doiOrgIndex + 'doi.org/'.length).trim();
+		}
+	}
+	var queryIndex = trimmed.indexOf('?');
+	if (queryIndex >= 0) {
+		trimmed = trimmed.substring(0, queryIndex);
+	}
+	trimmed = trimmed.replace(/\/+$/, '');
+	return trimmed.indexOf('10.') === 0 ? trimmed : null;
+};
+
+var buildDoiUrl = function(identifier) {
+	var bareDoi = normalizeDoiValue(identifier);
+	if (!bareDoi) {
+		return null;
+	}
+	return 'https://doi.org/' + bareDoi;
+};
+
+var escapeHtml = function(text) {
+	return ('' + text)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
+};
+
+var isHttpsUrl = function(value) {
+	if (!value || typeof value !== 'string') {
+		return false;
+	}
+	return value.trim().toLowerCase().indexOf('https://') === 0;
+};
+
+var metadataExternalLinkStyle = "color:blue;text-decoration:underline;";
+
+var formatMetadataExternalLink = function(url) {
+	var trimmed = url.trim();
+	var safeHref = escapeHtml(trimmed);
+	return "<a target='_blank' rel='noopener noreferrer' style='" + metadataExternalLinkStyle + "' href='" + safeHref + "'>" + safeHref + "</a>";
+};
+
+var formatMetadataCellValue = function(value) {
+	if (value == null || value === '') {
+		return '';
+	}
+	var str = ('' + value).trim();
+	if (isHttpsUrl(str)) {
+		return formatMetadataExternalLink(str);
+	}
+	if (str.indexOf('; ') >= 0) {
+		return str.split('; ').map(function(part) {
+			part = part.trim();
+			if (isHttpsUrl(part)) {
+				return formatMetadataExternalLink(part);
+			}
+			return escapeHtml(part);
+		}).join('; ');
+	}
+	return escapeHtml(str);
+};
+
 // Get attribute label with language support (uses attribute_label_it for Italian, attribute_label otherwise)
 var getAttributeLabel = function(data, i) {
 	var currentLang = lang();
@@ -589,6 +671,22 @@ var createDataTable = function(data, i) {
 	interpolationType = getInterpolationTypeLabel(data, i);
 	if (!(typeof interpolationType === 'undefined' || interpolationType === "")) {
 		items.push("<tr><td>" + t('interpolation_type') + "</td><td>" + interpolationType + "</td></tr>");
+	}
+
+	var doi = findValue(data, i, 'doi');
+	var doiUrl = doi ? buildDoiUrl(doi) : null;
+	if (doiUrl) {
+		items.push("<tr><td>" + t('doi') + "</td><td><a target='_blank' rel='noopener noreferrer' style='color:blue;text-decoration:underline;' href='" + doiUrl + "'>" + doiUrl + "</a></td></tr>");
+	}
+
+	var citationDetails = findValue(data, i, 'citation_details');
+	if (citationDetails) {
+		items.push("<tr><td>" + t('citation_details') + "</td><td>" + formatMetadataCellValue(citationDetails) + "</td></tr>");
+	}
+
+	var useLicense = findValue(data, i, 'use_license');
+	if (useLicense) {
+		items.push("<tr><td>" + t('use_license') + "</td><td>" + formatMetadataCellValue(useLicense) + "</td></tr>");
 	}
 
 
@@ -1183,6 +1281,77 @@ var updateQualifiersBox = function(seriesIndex, points) {
 	}
 };
 
+// Update variable qualifier value spans for a hovered plot point
+var updateVariableQualifierSpans = function(seriesIndex, plotPointIndex) {
+	var plotMeta = plots[seriesIndex];
+	if (!plotMeta || !plotMeta.variableQualifiers) {
+		return;
+	}
+	var sourcePointIndex = plotPointIndex;
+	if (plotMeta.plottedPointIndices && plotMeta.plottedPointIndices.length) {
+		if (plotPointIndex < 0 || plotPointIndex >= plotMeta.plottedPointIndices.length) {
+			return;
+		}
+		sourcePointIndex = plotMeta.plottedPointIndices[plotPointIndex];
+	}
+	var seriesMeta = plotMeta.variableQualifiers;
+	for (var vKey in seriesMeta) {
+		if (!Object.prototype.hasOwnProperty.call(seriesMeta, vKey)) {
+			continue;
+		}
+		var vals = seriesMeta[vKey];
+		var term = (vals && typeof vals[sourcePointIndex] !== 'undefined' && vals[sourcePointIndex] !== null) ?
+			vals[sourcePointIndex] : "";
+		var span = document.getElementById("qual-var_" + seriesIndex + "_" + vKey);
+		if (!span) {
+			continue;
+		}
+		if (term === "") {
+			span.textContent = t('no_data_available');
+		} else {
+			span.textContent = term;
+		}
+	}
+};
+
+// Reset variable qualifier spans to the hover placeholder
+var resetVariableQualifierSpans = function(seriesIndex) {
+	var plotMeta = plots[seriesIndex];
+	if (!plotMeta || !plotMeta.variableQualifiers) {
+		return;
+	}
+	var placeholder = t('hover_to_display');
+	for (var vKey in plotMeta.variableQualifiers) {
+		if (!Object.prototype.hasOwnProperty.call(plotMeta.variableQualifiers, vKey)) {
+			continue;
+		}
+		var span = document.getElementById("qual-var_" + seriesIndex + "_" + vKey);
+		if (span) {
+			span.textContent = placeholder;
+		}
+	}
+};
+
+// Bind Plotly hover handlers after the graph is fully rendered
+var bindQualifiersHoverHandlers = function(plotElement, seriesIndex) {
+	if (!plotElement || typeof plotElement.on !== 'function') {
+		return;
+	}
+	if (typeof plotElement.removeAllListeners === 'function') {
+		plotElement.removeAllListeners('plotly_hover');
+		plotElement.removeAllListeners('plotly_unhover');
+	}
+	plotElement.on('plotly_hover', function(eventData) {
+		if (!eventData || !eventData.points || !eventData.points.length) {
+			return;
+		}
+		updateVariableQualifierSpans(seriesIndex, eventData.points[0].pointIndex);
+	});
+	plotElement.on('plotly_unhover', function() {
+		resetVariableQualifierSpans(seriesIndex);
+	});
+};
+
 // Create / update a time series plot in the given div using Plotly and OM JSON
 var createPlot = function(data, i) {
 
@@ -1248,10 +1417,12 @@ var createPlot = function(data, i) {
 		var times = [];
 		var values = [];
 		var qualityFlags = [];
+		var plottedPointIndices = [];
 		for (var p = 0; p < points.length; p++) {
 			var pt = points[p];
 			// Skip missing data values (-9999)
 			if (pt.time && pt.time.instant != null && typeof pt.value !== 'undefined' && pt.value !== null && pt.value !== -9999) {
+				plottedPointIndices.push(p);
 				times.push(pt.time.instant);
 				values.push(pt.value);
 				
@@ -1271,6 +1442,11 @@ var createPlot = function(data, i) {
 				qualityFlags.push(qualityFlag);
 			}
 		}
+
+		if (!plots[i]) {
+			plots[i] = {};
+		}
+		plots[i].plottedPointIndices = plottedPointIndices;
 
 		if (times.length === 0) {
 			$container.html('<div style="padding: 20px; text-align: center;">' + t('no_data_available') + '</div>');
@@ -1364,57 +1540,15 @@ var createPlot = function(data, i) {
 			return;
 		}
 
-		Plotly.newPlot(containerId, [trace], layout, config);
-
-		// Attach hover handler once to update variable qualifier values
-		if (!plotElement._qualifiersHoverBound) {
-			plotElement._qualifiersHoverBound = true;
-			plotElement.on('plotly_hover', function(eventData) {
-				if (!eventData || !eventData.points || !eventData.points.length) {
-					return;
-				}
-				var pointIndex = eventData.points[0].pointIndex;
-				var seriesMeta = plots[i] && plots[i].variableQualifiers;
-				if (!seriesMeta) {
-					return;
-				}
-				for (var vKey in seriesMeta) {
-					if (!Object.prototype.hasOwnProperty.call(seriesMeta, vKey)) {
-						continue;
-					}
-					var vals = seriesMeta[vKey];
-					var term = (vals && typeof vals[pointIndex] !== 'undefined' && vals[pointIndex] !== null) ?
-						vals[pointIndex] : "";
-					var spanId = "qual-var_" + i + "_" + vKey;
-					var $span = $("#" + spanId);
-					if ($span.length) {
-						if (term === "") {
-							var placeholder = t('no_data_available');
-							$span.text(placeholder);
-						} else {
-							$span.text(term);
-						}
-					}
-				}
+		// Bind hover handlers only after Plotly finishes rendering; newPlot is async
+		// and attaching synchronously can lose listeners when the graph is purged.
+		var plotPromise = Plotly.newPlot(containerId, [trace], layout, config);
+		if (plotPromise && typeof plotPromise.then === 'function') {
+			plotPromise.then(function() {
+				bindQualifiersHoverHandlers(plotElement, i);
 			});
-
-			plotElement.on('plotly_unhover', function() {
-				var seriesMeta = plots[i] && plots[i].variableQualifiers;
-				if (!seriesMeta) {
-					return;
-				}
-				for (var vKey in seriesMeta) {
-					if (!Object.prototype.hasOwnProperty.call(seriesMeta, vKey)) {
-						continue;
-					}
-					var spanId = "qual-var_" + i + "_" + vKey;
-					var $span = $("#" + spanId);
-					if ($span.length) {
-						var placeholder = t('hover_to_display');
-						$span.text(placeholder);
-					}
-				}
-			});
+		} else {
+			bindQualifiersHoverHandlers(plotElement, i);
 		}
 	};
 
@@ -1560,7 +1694,7 @@ var createTempExtentTable = function(data, i) {
 
 		// Clear existing plot content to avoid stacking multiple renders
 		$("#plot_" + plotId).empty();
-		plots[plotId] = createPlot(data, plotId);
+		createPlot(data, plotId);
 	});
 
 	$("#time-button-2m_" + i).click(function(event) {

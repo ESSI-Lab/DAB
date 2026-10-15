@@ -24,6 +24,8 @@ package eu.essi_lab.accessor.datastream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONArray;
@@ -182,31 +184,13 @@ public class DataStreamMapper extends FileIdentifierMapper {
 		mi.getDataIdentification().addLegalConstraints(lc);
 	    }
 
-	    //
-	    // Responsible party (data collection/upload organization and steward email)
-	    //
-	    String org = md.optString("DataCollectionOrganization", null);
-	    if (org == null || org.isEmpty()) {
-		org = md.optString("DataUploadOrganization", null);
-	    }
-	    String stewardEmail = md.optString("DataStewardEmail", null);
-
-	    if ((org != null && !org.isEmpty()) || (stewardEmail != null && !stewardEmail.isEmpty())) {
-		ResponsibleParty party = new ResponsibleParty();
-		party.setRoleCode("owner");
-		if (org != null && !org.isEmpty()) {
-		    party.setOrganisationName(org);
-		}
-		if (stewardEmail != null && !stewardEmail.isEmpty()) {
-		    Contact contact = new Contact();
-		    Address address = new Address();
-		    address.addElectronicMailAddress(stewardEmail);
-		    contact.setAddress(address);
-		    party.setContactInfo(contact);
-		}
-		mi.getDataIdentification().addCitationResponsibleParty(party);
-	    }
+	    addOrganizationAndSteward(md, mi, collection);
 	}
+
+	//
+	// Temporal extent from dataset-level Metadata TemporalExtent
+	//
+	addTemporalExtentFromMetadata(md, mi);
 
 	//
 	// Reference system (WGS84, as used by DataStream Locations)
@@ -286,6 +270,21 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	mi.getDataIdentification().setAbstract(title);
 
 	//
+	// DOI as identifier / citation (same as collection-level mapping)
+	//
+	if (doi != null) {
+	    mi.getDataIdentification().setResourceIdentifier(doi);
+	    Citation citation = new Citation();
+	    citation.setTitle(title);
+	    citation.addIdentifier(doi);
+	    String fullCitation = md != null ? md.optString("Citation", null) : null;
+	    if (fullCitation != null && !fullCitation.isEmpty()) {
+		citation.setOtherCitationDetails(fullCitation);
+	    }
+	    mi.getDataIdentification().setCitation(citation);
+	}
+
+	//
 	// Keywords: dataset name, characteristic, location type
 	//
 	if (datasetName != null && !datasetName.isEmpty()) {
@@ -341,28 +340,7 @@ public class DataStreamMapper extends FileIdentifierMapper {
 		mi.getDataIdentification().addLegalConstraints(lc);
 	    }
 
-	    // Organisations and steward email
-	    String org = md.optString("DataCollectionOrganization", null);
-	    if (org == null || org.isEmpty()) {
-		org = md.optString("DataUploadOrganization", null);
-	    }
-	    String stewardEmail = md.optString("DataStewardEmail", null);
-
-	    if ((org != null && !org.isEmpty()) || (stewardEmail != null && !stewardEmail.isEmpty())) {
-		ResponsibleParty party = new ResponsibleParty();
-		party.setRoleCode("owner");
-		if (org != null && !org.isEmpty()) {
-		    party.setOrganisationName(org);
-		}
-		if (stewardEmail != null && !stewardEmail.isEmpty()) {
-		    Contact contact = new Contact();
-		    Address address = new Address();
-		    address.addElectronicMailAddress(stewardEmail);
-		    contact.setAddress(address);
-		    party.setContactInfo(contact);
-		}
-		mi.getDataIdentification().addCitationResponsibleParty(party);
-	    }
+	    addOrganizationAndSteward(md, mi, dataset);
 	}
 
 	//
@@ -417,14 +395,21 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	}
 
 	//
-	// Temporal extent: when available, use the first/last observation dates
-	// computed at connector level; otherwise fall back to a placeholder extent to
-	// mark it as a time series.
+	// Temporal extent: dataset-level TemporalExtent propagated by the connector,
+	// or parsed directly from embedded metadata when present.
 	//
 	String firstObsDate = json.optString("firstObservationDate", null);
 	String firstObsTime = json.optString("firstObservationTime", null);
 	String lastObsDate = json.optString("lastObservationDate", null);
 	String lastObsTime = json.optString("lastObservationTime", null);
+
+	if ((firstObsDate == null || firstObsDate.isEmpty()) && (lastObsDate == null || lastObsDate.isEmpty()) && md != null) {
+	    DataStreamClient.TemporalExtentDates extent = DataStreamClient.parseTemporalExtent(md);
+	    if (extent != null) {
+		firstObsDate = extent.beginDate;
+		lastObsDate = extent.endDate;
+	    }
+	}
 
 	TemporalExtent tempExtent = new TemporalExtent();
 	if (firstObsDate != null && !firstObsDate.isEmpty()) {
@@ -441,8 +426,10 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	    }
 	    tempExtent.setEndPosition(end);
 	}
-	mi.getDataIdentification().addTemporalExtent(tempExtent);
-	setIndeterminatePosition(dataset);
+	if (tempExtent.getBeginPosition() != null || tempExtent.getEndPosition() != null) {
+	    mi.getDataIdentification().addTemporalExtent(tempExtent);
+	    setIndeterminatePosition(dataset);
+	}
 	//
 	// Reference system (WGS84)
 	//
@@ -515,6 +502,94 @@ public class DataStreamMapper extends FileIdentifierMapper {
 	mi.setLanguage("English");
 	mi.setCharacterSetCode("utf8");
 	mi.addHierarchyLevelScopeCodeListValue("dataset");
+    }
+
+    private static List<String> splitOrganizations(String organizations) {
+
+	List<String> names = new ArrayList<>();
+	if (organizations == null || organizations.isEmpty()) {
+	    return names;
+	}
+	for (String part : organizations.split(";")) {
+	    String name = part.trim();
+	    if (!name.isEmpty()) {
+		names.add(name);
+	    }
+	}
+	return names;
+    }
+
+    private static Contact contactWithStewardEmail(String stewardEmail) {
+
+	Contact contact = new Contact();
+	Address address = new Address();
+	address.addElectronicMailAddress(stewardEmail);
+	contact.setAddress(address);
+	return contact;
+    }
+
+    private static void addOrganizationAndSteward(JSONObject md, MIMetadata mi, GSResource resource) {
+
+	if (md == null) {
+	    return;
+	}
+
+	List<String> originators = splitOrganizations(md.optString("DataCollectionOrganization", null));
+	List<String> publishers = splitOrganizations(md.optString("DataUploadOrganization", null));
+	String stewardEmail = md.optString("DataStewardEmail", null);
+	boolean hasStewardEmail = stewardEmail != null && !stewardEmail.isEmpty();
+
+	if (originators.isEmpty() && publishers.isEmpty() && !hasStewardEmail) {
+	    return;
+	}
+
+	ExtensionHandler handler = resource.getExtensionHandler();
+	boolean stewardAssigned = false;
+
+	for (String org : originators) {
+	    handler.addOriginatorOrganisationDescription(org);
+	    ResponsibleParty party = new ResponsibleParty();
+	    party.setRoleCode("originator");
+	    party.setOrganisationName(org);
+	    if (hasStewardEmail && !stewardAssigned) {
+		party.setContactInfo(contactWithStewardEmail(stewardEmail));
+		stewardAssigned = true;
+	    }
+	    mi.getDataIdentification().addCitationResponsibleParty(party);
+	}
+
+	for (String org : publishers) {
+	    ResponsibleParty party = new ResponsibleParty();
+	    party.setRoleCode("publisher");
+	    party.setOrganisationName(org);
+	    if (hasStewardEmail && !stewardAssigned) {
+		party.setContactInfo(contactWithStewardEmail(stewardEmail));
+		stewardAssigned = true;
+	    }
+	    mi.getDataIdentification().addCitationResponsibleParty(party);
+	}
+
+	if (hasStewardEmail && !stewardAssigned) {
+	    ResponsibleParty party = new ResponsibleParty();
+	    party.setRoleCode("owner");
+	    party.setContactInfo(contactWithStewardEmail(stewardEmail));
+	    mi.getDataIdentification().addCitationResponsibleParty(party);
+	}
+    }
+
+    private static void addTemporalExtentFromMetadata(JSONObject md, MIMetadata mi) {
+	DataStreamClient.TemporalExtentDates extent = DataStreamClient.parseTemporalExtent(md);
+	if (extent == null) {
+	    return;
+	}
+	TemporalExtent tempExtent = new TemporalExtent();
+	if (extent.beginDate != null) {
+	    tempExtent.setBeginPosition(extent.beginDate);
+	}
+	if (extent.endDate != null) {
+	    tempExtent.setEndPosition(extent.endDate);
+	}
+	mi.getDataIdentification().addTemporalExtent(tempExtent);
     }
 }
 

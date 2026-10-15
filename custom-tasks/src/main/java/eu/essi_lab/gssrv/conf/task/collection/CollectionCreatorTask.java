@@ -1,5 +1,6 @@
 package eu.essi_lab.gssrv.conf.task.collection;
 
+import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 
 /*-
@@ -23,25 +24,22 @@ import java.util.EnumMap;
  * #L%
  */
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
 
-import org.json.JSONObject;
 import org.quartz.JobExecutionContext;
 import org.w3c.dom.Document;
 
-import eu.essi_lab.access.augmenter.DataCacheAugmenter;
+import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.DatabaseFolder;
 import eu.essi_lab.api.database.DatabaseFolder.EntryType;
 import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.SystemSetting;
-import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
@@ -64,7 +62,7 @@ import eu.essi_lab.profiler.wis.WISUtils;
 public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
     public enum CollectionCreatorTaskOptions implements OptionsKey {
-	HOSTNAME, SOURCE_ID, VIEW_ID;
+	SOURCE_ID, VIEW_ID;
     }
 
     @Override
@@ -85,12 +83,6 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	}
 
-	String hostname = taskOptions.get().get(CollectionCreatorTaskOptions.HOSTNAME);
-	if (hostname == null) {
-	    GSLoggerFactory.getLogger(getClass()).info("No hostname option specified, using default");
-	    hostname = "https://whos.geodab.eu";
-	}
-
 	String sourceId = taskOptions.get().get(CollectionCreatorTaskOptions.SOURCE_ID);
 	if (sourceId == null) {
 	    GSLoggerFactory.getLogger(getClass()).error("No source id option specified");
@@ -108,9 +100,11 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    GSLoggerFactory.getLogger(getClass()).error("View not found");
 	    return;
 	}
-	String[] splits = sourceId.split(";");
+	String hostname = WISUtils.getHostname();
+	String centreId = WISUtils.getCentreId();
+	String generatedBy = WISUtils.getGeneratedBy();
 
-	https: // whos.geodab.eu
+	String[] splits = sourceId.split(";");
 
 	for (String split : splits) {
 
@@ -126,7 +120,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	    } else {
 
-		run(hostname, targetSource.get().getUniqueIdentifier(), view.get());
+		run(hostname, centreId, generatedBy, targetSource.get().getUniqueIdentifier(), view.get());
 	    }
 	}
 
@@ -134,36 +128,30 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
     }
 
     private void initializeClient() throws Exception {
+
 	try {
 
-	    SystemSetting systemSettings = ConfigurationWrapper.getSystemSettings();
+	    Optional<MQTTBrokerSetting> broker = ConfigurationWrapper.getSystemSettings().getWis2MqttBroker();
 
-	    Optional<Properties> keyValueOption = systemSettings.getKeyValueOptions();
+	    if (broker.isEmpty()) {
 
-	    if (keyValueOption.isPresent()) {
+		GSLoggerFactory.getLogger(getClass()).error("WIS2 MQTT broker not configured");
 
-		String host = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel());
-		String port = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel());
-		String user = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_USER.getLabel());
-		String pwd = keyValueOption.get().getProperty(KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel());
-
-		if (host == null || port == null || user == null || pwd == null) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("MQTT options not found!");
-
-		} else {
-
-		    client = new MQTTPublisherHive(host, Integer.valueOf(port), user, pwd);
-		}
 	    } else {
 
-		GSLoggerFactory.getLogger(getClass()).error("Key-value pair options not found!");
+		MQTTBrokerSetting mqtt = broker.get();
+		String endpoint = mqtt.getHost().get() + ":" + mqtt.getPort().get();
 
+		GSLoggerFactory.getLogger(getClass()).info("Connecting to WIS2 MQTT broker {} as user {}", endpoint, mqtt.getUser().get());
+
+		client = new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get());
+
+		GSLoggerFactory.getLogger(getClass()).info("Connected to WIS2 MQTT broker {}", endpoint);
 	    }
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
+	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    throw e;
 	}
 
@@ -172,22 +160,22 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String hostname, String sourceId, View view) throws Exception {
+    public void run(String hostname, String centreId, String generatedBy, String sourceId, View view) throws Exception {
 
 	StorageInfo databaseURI = ConfigurationWrapper.getStorageInfo();
-	run(hostname, sourceId, databaseURI, view);
+	run(hostname, centreId, generatedBy, sourceId, databaseURI, view);
     }
 
     /**
      * @param targetSourceIdentifier
      */
-    public void run(String hostname, String sourceId, StorageInfo databaseURI, View view) throws Exception {
+    public void run(String hostname, String centreId, String generatedBy, String sourceId, StorageInfo databaseURI, View view) throws Exception {
 
 	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	DatabaseFolder folder = sourceStorage.getDataFolder(sourceId, true).get();
 
-	List<DatasetCollection> datasets = new SourceCollectionCreator().getCollections(sourceId, view.getSourceDeployment());
+	List<DatasetCollection> datasets = new SourceCollectionCreator(centreId).getCollections(sourceId, view.getSourceDeployment());
 
 	// List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId,
 	// view.getSourceDeployment());
@@ -200,25 +188,27 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    System.out.println(dataset.getHarmonizedMetadata().getCoreMetadata().getTitle());
 	}
 
+	// the records of this source currently published, keyed as in the folder; those not generated again are deleted
 	Optional<String> optionalView = Optional.of(view.getId());
-	ResultSet<GSResource> resultSet = WISUtils.getMetadataItems(null, optionalView);
-	HashSet<String> toDelete = new HashSet<>();
+	ResultSet<GSResource> resultSet = WISUtils.getMetadataItems(null, optionalView, Optional.of(sourceId));
+	HashMap<String, GSResource> toDelete = new HashMap<>();
 	for (GSResource result : resultSet.getResultsList()) {
-	    toDelete.add(result.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getFileIdentifier());
+	    Optional<String> originalId = result.getOriginalId();
+	    if (originalId.isPresent()) {
+		toDelete.put(originalId.get(), result);
+	    }
 	}
 
 	for (DatasetCollection dataset : datasets) {
 
 	    Optional<String> topic = dataset.getExtensionHandler().getWISTopicHierarchy();
 	    if (topic.isPresent()) {
-		JSONObject feature = WISUtils.mapFeature(dataset);
-		String wmcp = feature.toString(3);
-
 		IndexedElementsWriter.write(dataset);
 		Document asDocument = dataset.asDocument(true);
 		String key = dataset.getOriginalId().get();
-		if (folder.exists(key)) {
-		    toDelete.remove(key);
+		boolean alreadyPublished = folder.exists(key);
+		toDelete.remove(key);
+		if (alreadyPublished) {
 		    folder.replace(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
 		} else {
 		    folder.store(key, FolderEntry.of(asDocument), EntryType.GS_RESOURCE);
@@ -230,49 +220,90 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		GeographicBoundingBox bbox = dataset.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
 		String dataId = fileIdentifier;
 
-		String url = hostname + "/gs-service/services/essi/view/" + view.getId() + "/oapi/collections/discovery-metadata/items/"
-			+ fileIdentifier;
-		// String url = hostname + "/gs-service/services/essi/view/" + view.getId() + "/wis-metadata/" +
-		// fileIdentifier;
-		Link link = new Link("canonical", "application/geo+json", url);
-		WISNotificationMessage wnm = new WISNotificationMessage(wnmId, bbox, dataId, link);
+		String url = WISUtils.getRecordUrl(WISUtils.getServiceUrl(view.getId()), fileIdentifier);
+
+		// the WCMP2 record is encoded from the stored document, the same way the item endpoint serves it, so that
+		// the integrity checksum matches the content available at the canonical link
+		String wcmp2 = WISUtils.getWCMP2Record(GSResource.create(asDocument), view.getId());
+
+		// WIS2 GDC: "canonical" for a new record, "update" to have an already published record reingested
+		Link link = new Link(alreadyPublished ? "update" : "canonical", "application/geo+json", url);
+		link.setLength(wcmp2.getBytes(StandardCharsets.UTF_8).length);
+		WISNotificationMessage wnm = new WISNotificationMessage(wnmId, bbox, dataId, link, generatedBy);
+		wnm.setIntegrity(wcmp2);
 		System.out.println(topic.get());
 		System.out.println(wnm.getJSONObject().toString(3));
-		System.out.println(wmcp);
-		if (client == null) {
-		    GSLoggerFactory.getLogger(getClass()).info("MQTT broker not configured");
-		} else {
-		    try {
-			client.publish(topic.get(), wnm.getJSONObject().toString(3), true);
-		    } catch (Exception e) {
-			GSLoggerFactory.getLogger(getClass()).error(e);
-			// reinitialize the client
-			if (client != null) {
-			    try {
-				client.disconnect();
-			    } catch (Exception e2) {
-				GSLoggerFactory.getLogger(getClass()).error(e2);
-			    }
-			    client = null;
-			}
-			try {
-			    initializeClient();
-			} catch (Exception e3) {
-			    GSLoggerFactory.getLogger(getClass()).error(e3);
-			}
-
-		    }
-		}
+		System.out.println(wcmp2);
+		publish(topic.get(), wnm);
 
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).error("Topic not present!");
 	    }
 
 	}
-	for (String tod : toDelete) {
-	    folder.remove(tod);
+	for (String key : toDelete.keySet()) {
+
+	    GSResource deleted = toDelete.get(key);
+
+	    if (!folder.remove(key)) {
+		GSLoggerFactory.getLogger(getClass()).warn("Unable to remove collection {}", key);
+		continue;
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Removed collection {}", key);
+
+	    // send WIS deletion notification message
+	    Optional<String> topic = deleted.getExtensionHandler().getWISTopicHierarchy();
+	    if (topic.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).error("Topic not present for removed collection {}", key);
+		continue;
+	    }
+
+	    String fileIdentifier = deleted.getHarmonizedMetadata().getCoreMetadata().getIdentifier();
+	    GeographicBoundingBox bbox = deleted.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+	    String url = WISUtils.getRecordUrl(WISUtils.getServiceUrl(view.getId()), fileIdentifier);
+
+	    Link link = new Link("deletion", "application/geo+json", url);
+	    WISNotificationMessage wnm = new WISNotificationMessage(UUID.randomUUID().toString(), bbox, fileIdentifier, link, generatedBy);
+	    System.out.println(topic.get());
+	    System.out.println(wnm.getJSONObject().toString(3));
+
+	    publish(topic.get(), wnm);
+	}
+    }
+
+    /**
+     * Publishes the given notification message to the WIS2 MQTT broker, reinitializing the client in case of error
+     * 
+     * @param topic
+     * @param wnm
+     */
+    private void publish(String topic, WISNotificationMessage wnm) {
+
+	if (client == null) {
+	    GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
+	    return;
 	}
 
+	try {
+	    client.publish(topic, wnm.getJSONObject().toString(3), true);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    // reinitialize the client
+	    if (client != null) {
+		try {
+		    client.disconnect();
+		} catch (Exception e2) {
+		    GSLoggerFactory.getLogger(getClass()).error(e2);
+		}
+		client = null;
+	    }
+	    try {
+		initializeClient();
+	    } catch (Exception e3) {
+		GSLoggerFactory.getLogger(getClass()).error(e3);
+	    }
+	}
     }
 
     private static MQTTPublisherHive client;

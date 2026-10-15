@@ -62,7 +62,7 @@ public class HISCentralEmiliaAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralEmiliaConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralEmiliaConnector.BASE_URL);
+	gsSourceSetting.setSourceEndpoint("https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl");
 
 	GSSource accessorSource = accessor.getSource();
 
@@ -121,7 +121,7 @@ public class HISCentralEmiliaAccessorExternalTestIT {
 	Assert.assertEquals(HISCentralEmiliaConnectorSetting.class, harvestedConnectorSetting.getClass());
 
 	GSSourceSetting gsSourceSetting = accessorSetting.getGSSourceSetting();
-	gsSourceSetting.setSourceEndpoint(HISCentralEmiliaConnector.BASE_URL);
+	gsSourceSetting.setSourceEndpoint("https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl");
 
 	GSSource accessorSource = accessor.getSource();
 
@@ -146,7 +146,7 @@ public class HISCentralEmiliaAccessorExternalTestIT {
 	//
 
 	Downloader d = new Downloader();
-	Optional<String> result = d.downloadOptionalString(HISCentralEmiliaConnector.BASE_URL);
+	Optional<String> result = d.downloadOptionalString("https://dati-simc.arpae.it/opendata/osservati/meteo/realtime/realtime.jsonl");
 	
 	Map<String, Integer> map = new HashMap<String, Integer>();
 	Map<Integer, Integer> timeRangeMap = new HashMap<Integer, Integer>();

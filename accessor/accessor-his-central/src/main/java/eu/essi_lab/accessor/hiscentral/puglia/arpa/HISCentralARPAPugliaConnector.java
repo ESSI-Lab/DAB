@@ -92,8 +92,6 @@ public class HISCentralARPAPugliaConnector extends HarvestedQueryConnector<HISCe
 
     static final String STATIONS_URL = "Stations";
 
-    public static final String BASE_URL = "https://cloud.arpa.puglia.it/QualitaAria";
-
     private static final int STEP = 10;
 
     private JSONObject allStation;

@@ -238,8 +238,6 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    hexacode = "#CC99FF";
 	    break;
 	case "ita-sir-emilia-romagna":
-	    hexacode = "#00CCFF";
-	    break;
 	case "ita-sir-emilia-romagna-simc":
 	    hexacode = "#3333FF";
 	    break;
@@ -1092,6 +1090,15 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    BondOperator.EQUAL, //
 		    MetadataElement.TIME_INTERPOLATION, //
 		    timeInterpolation.get()));
+	}
+
+	Optional<String> country = parser.getOptionalValue("country");
+	if (country.isPresent() && !country.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.COUNTRY_ISO3, //
+		    country.get()));
 	}
 
 	Optional<String> aggregationDuration = parser.getOptionalValue("aggregationDuration");

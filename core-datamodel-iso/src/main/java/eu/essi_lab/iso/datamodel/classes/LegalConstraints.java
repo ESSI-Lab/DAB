@@ -67,6 +67,10 @@ public class LegalConstraints extends ISOMetadata<MDLegalConstraintsType> {
 	type.getUseLimitation().add(createCharacterStringPropertyType(useLimitation));
     }
 
+    public void addUseLimitation(String href, String useLimitation) {
+	type.getUseLimitation().add(createAnchorPropertyType(href, useLimitation));
+    }
+
     /**
      * @XPathDirective(target = ".//gmd:useLimitation/gco:CharacterString")
      * @return

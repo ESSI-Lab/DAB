@@ -690,7 +690,7 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	     */
 	    record.setDeploymentValidPeriod(beginPosition, endPosition);
 
-	    record.setVerticalDistanceOfSensor("m", 0.0,"unknown");
+	    record.setVerticalDistanceOfSensor("m", 0.0,"localGround");
 
 	    /*
 	     * SET setStationOrPlatformDateEstablished
@@ -859,64 +859,17 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 
 	    Optional<String> riverBasin = extensionHandler.getRiverBasin();
 
-	    Optional<String> optionalVariableCode = extensionHandler.getObservedPropertyURI();
-	    String code = null;
-	    HashSet<String> uris = new HashSet<>();
-	    if (optionalVariableCode.isPresent()) { // http://hydro.geodab.eu/hydro-ontology/concept/33 -> null
-		// value
-		List<SKOSConcept> concepts = ontology.findConcepts(optionalVariableCode.get(), true, false);
-		for (SKOSConcept concept : concepts) {
-		    if (concept != null) {
-			GSLoggerFactory.getLogger(getClass()).info("CONCEPT URI: " + concept.getURI());
-			uris.add(concept.getURI());
-		    }
-		}
-	    }
-
 	    /*
 	     * WMO OBSERVED PROPERTIES:
 	     * https://codes.wmo.int/wmdr/_ObservedVariableAtmosphere
 	     * https://codes.wmo.int/wmdr/_ObservedVariableTerrestrial
 	     * https://codes.wmo.int/wmdr/_ObservedVariableOcean
 	     */
-	    // TODO: implement code depending on variable
-	    for (String s : uris) {
-		if (s.contains("codes.wmo.int")) {
-		    code = s;
-		    break;
-		}
-
-	    }
-
-	    if (code != null) {
-		if(code.contains("12166")) {
-		    code = "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/224";
-		}
-		    
+	    String code = resolveObservedVariableCode(resource, ontology);
+	    if (code != null && !"unknown".equals(code)) {
 		record.setObservedVariable(name, code);
 	    } else {
-		// TODO found another way to add the relative code
-		// record.setObservedVariable(name,
-		// code);//http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171
-		// record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/213");
-
-		if (name.toLowerCase().contains("precipitation")) {
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210");
-		} else if (name.toLowerCase().contains("height") || name.toLowerCase().contains("level")) {
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172");
-		} else if (name.toLowerCase().contains("discharge")) {
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
-		} else if (name.toLowerCase().contains("temperature")) {
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/224");
-		    //record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12166");
-		} else if (name.toLowerCase().contains("humidity")) {
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249");
-		} else if (name.toLowerCase().contains("pressure")) {
-		    record.setObservedVariable(name, "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/216");
-		}
-
 		GSLoggerFactory.getLogger(getClass()).error("NO VALID OBSERVED PROPERTIES CODE!!!");
-
 	    }
 
 	    // resultTime seems to be mandatory for OSCAR
@@ -941,86 +894,90 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	}
     }
 
+    /**
+     * Aggregates series of one station into OSCAR-meaningful capabilities:
+     * one observation/deployment per (observed variable + temporal reporting interval).
+     */
     public String mapStations(List<GSResource> resources, String identifier) throws GSException {
 
 	try {
 
-	    String[] splittedString = identifier.split("/");
-	    String stationId = splittedString[splittedString.length - 1];
+	    HydroOntology ontology = new WHOSOntology();
 
 	    String minDate = null;
 	    String maxDate = null;
 	    Date in = null;
 	    Date end = null;
 
-	    String title = null;
-	    Set<String> setTitle = new HashSet<String>();
-	    Element wigosElem = null;
-	    List<Node> observationList = new ArrayList<Node>();
-	    int k = 0;
+	    Map<String, CapabilityAggregate> aggregates = new LinkedHashMap<>();
+
 	    for (GSResource resource : resources) {
 		MIMetadata iso = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
-		String t = iso.getDataIdentification().getCitationTitle();
-		GSLoggerFactory.getLogger(getClass()).info("TITLE: " + t);
 		String beginPosition = iso.getDataIdentification().getTemporalExtent().getBeginPosition();
 		String endPosition = iso.getDataIdentification().getTemporalExtent().getEndPosition();
 		Optional<Date> startDate = ISO8601DateTimeUtils.parseISO8601ToDate(beginPosition);
 		Optional<Date> endDate = ISO8601DateTimeUtils.parseISO8601ToDate(endPosition);
-		if (startDate.isPresent()) {
 
-		    if (minDate == null) {
+		if (startDate.isPresent()) {
+		    if (minDate == null || startDate.get().before(in)) {
 			minDate = beginPosition;
 			in = startDate.get();
-		    } else {
-
-			if (startDate.get().before(in)) {
-			    minDate = beginPosition;
-			    in = startDate.get();
-			}
-
 		    }
 		}
 		if (endDate.isPresent()) {
-
-		    if (maxDate == null) {
+		    if (maxDate == null || endDate.get().after(end)) {
 			maxDate = endPosition;
 			end = endDate.get();
-		    } else {
-
-			if (endDate.get().after(end)) {
-			    maxDate = endPosition;
-			    end = endDate.get();
-			}
-
 		    }
 		}
-		if (!setTitle.contains(t)) {
-		    setTitle.add(t);
-		    Element element = map(null, resource);
-		    if(element == null) {
-			return null;
-		    }
-		    if (k == 0) {
-			wigosElem = element;
-			k++;
-		    } else {
-			String doc1 = XMLDocumentReader.asString(element);
-			doc1 = doc1.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-			XMLDocumentReader xdoc = new XMLDocumentReader(doc1);
-			Node node = xdoc.evaluateNode("//*:ObservingFacility/*:observation");
+
+		String key = buildCapabilityKey(resource, ontology);
+		aggregates.computeIfAbsent(key, CapabilityAggregate::new).add(resource, beginPosition, endPosition,
+			startDate.orElse(null), endDate.orElse(null));
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Station {}: {} series aggregated into {} capabilities", identifier,
+		    resources.size(), aggregates.size());
+
+	    Element wigosElem = null;
+	    List<Node> observationList = new ArrayList<>();
+	    int k = 0;
+
+	    for (CapabilityAggregate agg : aggregates.values()) {
+		GSResource representative = agg.getRepresentative();
+		if (representative == null) {
+		    continue;
+		}
+		GSLoggerFactory.getLogger(getClass()).info("Capability {}: {} series -> 1 observation", agg.key, agg.seriesCount);
+
+		Element element = map(null, representative);
+		if (element == null) {
+		    return null;
+		}
+		element = patchCapabilityElement(element, agg.minDate, agg.maxDate);
+
+		if (k == 0) {
+		    wigosElem = element;
+		    k++;
+		} else {
+		    String doc1 = XMLDocumentReader.asString(element);
+		    doc1 = doc1.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+		    XMLDocumentReader xdoc = new XMLDocumentReader(doc1);
+		    Node node = xdoc.evaluateNode("//*:ObservingFacility/*:observation");
+		    if (node != null) {
 			observationList.add(node);
 		    }
-
-		} else {
-		    GSLoggerFactory.getLogger(getClass()).info("DUPLICATED FOUND!!!");
-		    continue;
 		}
 	    }
 
+	    if (wigosElem == null) {
+		return null;
+	    }
+
 	    String doc1 = XMLDocumentReader.asString(wigosElem);
+	    doc1 = doc1.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
 
 	    XMLDocumentReader xmlRequest = new XMLDocumentReader(doc1);
-
 	    XMLDocumentWriter writer = new XMLDocumentWriter(xmlRequest);
 
 	    writer.setText("//*:ResponsibleParty/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
@@ -1030,34 +987,149 @@ public class WIGOS_MAPPER extends DiscoveryResultSetMapper<Element> {
 	    writer.setText("//*:Territory/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
 
 	    if (end != null) {
-		// Calendar now = Calendar.getInstance();
 		Calendar oneYearAgo = Calendar.getInstance();
 		oneYearAgo.add(Calendar.MONTH, -12);
 		if (end.before(oneYearAgo.getTime())) {
 		    writer.setText("//*:ReportingStatus/*:reportingStatus/@*:href", "http://codes.wmo.int/wmdr/ReportingStatus/unknown");
 		    GSLoggerFactory.getLogger(getClass()).info("NOT OPERATIONAL");
-
 		}
-
 	    }
 	    for (Node n : observationList) {
-		String xpath = "//*:ObservingFacility";
-		writer.addNode(xpath, n);
+		writer.addNode("//*:ObservingFacility", n);
 	    }
-	    // Document doc = WIGOSMetadata.getBuilder().newDocument();
-	    // ObjectFactory of = new ObjectFactory();
-	    // WIGOSMetadata.getMarshaller().marshal(of.createWIGOSMetadataRecord(record.getRecord()), doc);
-	    // Element ret = doc.getDocumentElement();
-	    // DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	    // factory.setNamespaceAware(true);
-	    // DocumentBuilder builder = factory.newDocumentBuilder();
-	    // Document doc = builder.parse(new ByteArrayInputStream(xmlRequest.asString().getBytes("UTF-8")));
 	    return xmlRequest.asString();
 
-	    // return (Element) xmlRequest.asString()
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    return null;
+	}
+    }
+
+    private String buildCapabilityKey(GSResource resource, HydroOntology ontology) {
+	String code = resolveObservedVariableCode(resource, ontology);
+	String interval = resolveTemporalReportingInterval(resource);
+	return code + "|" + interval;
+    }
+
+    private String resolveTemporalReportingInterval(GSResource resource) {
+	return resource.getExtensionHandler().getTimeResolutionDuration8601().orElse("PT1H");
+    }
+
+    /**
+     * Resolves WMO observed-variable URI used for OSCAR aggregation and mapping.
+     */
+    String resolveObservedVariableCode(GSResource resource, HydroOntology ontology) {
+
+	MIMetadata iso = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	ExtensionHandler extensionHandler = resource.getExtensionHandler();
+
+	String name = null;
+	CoverageDescription coverageDescrp = iso.getCoverageDescription();
+	if (coverageDescrp != null) {
+	    name = coverageDescrp.getAttributeTitle();
+	}
+	if (name == null) {
+	    name = "";
+	}
+
+	Optional<String> optionalVariableCode = extensionHandler.getObservedPropertyURI();
+	String code = null;
+	Set<String> uris = new HashSet<>();
+	if (optionalVariableCode.isPresent() && ontology != null) {
+	    List<SKOSConcept> concepts = ontology.findConcepts(optionalVariableCode.get(), true, false);
+	    for (SKOSConcept concept : concepts) {
+		if (concept != null) {
+		    uris.add(concept.getURI());
+		}
+	    }
+	}
+	for (String s : uris) {
+	    if (s != null && s.contains("codes.wmo.int")) {
+		code = s;
+		break;
+	    }
+	}
+	if (code != null && code.contains("12166")) {
+	    code = "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/224";
+	}
+	if (code != null) {
+	    return code;
+	}
+
+	String lower = name.toLowerCase();
+	if (lower.contains("precipitation")) {
+	    return "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/210";
+	} else if (lower.contains("height") || lower.contains("level")) {
+	    return "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/172";
+	} else if (lower.contains("discharge")) {
+	    return "http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171";
+	} else if (lower.contains("temperature")) {
+	    return "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/224";
+	} else if (lower.contains("humidity")) {
+	    return "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/12249";
+	} else if (lower.contains("pressure")) {
+	    return "http://codes.wmo.int/wmdr/ObservedVariableAtmosphere/216";
+	}
+	return "unknown";
+    }
+
+    private Element patchCapabilityElement(Element element, String minDate, String maxDate) throws Exception {
+
+	String doc1 = XMLDocumentReader.asString(element);
+	doc1 = doc1.replaceAll("&lt;", "<").replaceAll("&gt;", ">");
+	XMLDocumentReader xmlRequest = new XMLDocumentReader(doc1);
+	XMLDocumentWriter writer = new XMLDocumentWriter(xmlRequest);
+
+	if (minDate != null) {
+	    writer.setText("//*:observation//*:phenomenonTime/*:TimePeriod/*:beginPosition", minDate);
+	    writer.setText("//*:Deployment/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
+	    writer.setText("//*:DataGeneration/*:validPeriod/*:TimePeriod/*:beginPosition", minDate);
+	}
+	if (maxDate != null) {
+	    writer.setText("//*:observation//*:phenomenonTime/*:TimePeriod/*:endPosition", maxDate);
+	    writer.setText("//*:Deployment/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
+	    writer.setText("//*:DataGeneration/*:validPeriod/*:TimePeriod/*:endPosition", maxDate);
+	}
+
+	return xmlRequest.getDocument().getDocumentElement();
+    }
+
+    /**
+     * Holds series that share the same OSCAR observing capability key.
+     */
+    private static class CapabilityAggregate {
+
+	private final String key;
+	private String minDate;
+	private String maxDate;
+	private Date min;
+	private Date max;
+	private GSResource representative;
+	private int seriesCount;
+
+	private CapabilityAggregate(String key) {
+	    this.key = key;
+	}
+
+	private void add(GSResource resource, String beginPosition, String endPosition, Date startDate, Date endDate) {
+
+	    seriesCount++;
+
+	    if (startDate != null && (min == null || startDate.before(min))) {
+		min = startDate;
+		minDate = beginPosition;
+	    }
+	    if (endDate != null && (max == null || endDate.after(max))) {
+		max = endDate;
+		maxDate = endPosition;
+		representative = resource;
+	    } else if (representative == null) {
+		representative = resource;
+	    }
+	}
+
+	private GSResource getRepresentative() {
+	    return representative;
 	}
     }
 

@@ -210,7 +210,6 @@ public class HISCentralSardegnaScaleDeflussoDownloader extends WMLDataDownloader
 	boolean ret = (online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().contains(HISCentralSardegnaConnector.BASE_URL) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_SARDEGNA_SCALE_DEFLUSSO_NS_URI));
 

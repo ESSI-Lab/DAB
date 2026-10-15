@@ -102,7 +102,7 @@ public class HISCentralToscanaDownloader extends WMLDataDownloader {
     @Override
     public boolean canDownload() {
 
-	return (online.getLinkage().contains("www.sir.toscana.it") && online.getProtocol() != null
+	return (online.getLinkage() != null && online.getProtocol() != null
 		&& online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_TOSCANA_NS_URI));
 
     }

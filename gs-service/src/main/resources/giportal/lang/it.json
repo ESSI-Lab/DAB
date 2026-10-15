@@ -9,6 +9,8 @@
   "bbox": "Bounding box (O,S,E,N)",
   "altitude": "Altitudine (min/max)",
   "involved_organizations": "Enti gestori",
+  "responsible_organizations": "Enti responsabili",
+  "license": "Licenza",
   "sample_platforms": "Piattaforme d'esempio",
   "monitoring_point": "Punto di monitoraggio",
   "latitude": "Latitudine",

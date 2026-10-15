@@ -167,41 +167,18 @@ public class GSConfigurationView extends ConfigurationView {
     @Override
     protected boolean isAuthorized() {
 
-	if (JVMOption.isEnabled(JVMOption.SKIP_CONFIG_AUTHORIZATION)) {
-
-	    return true;
-	}
-
 	VaadinRequest request = VaadinService.getCurrentRequest();
 
 	HttpServletRequest httpServletRequest = ((VaadinServletRequest) request).getHttpServletRequest();
 
 	String requestURL = httpServletRequest.getRequestURL().toString();
 
-	GSUser user;
-
-	try {
-	    user = UserFinder.findCurrentUser(httpServletRequest);
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    return false;
-	}
-
-	String userId = user.getIdentifier();
-
-	//
-	// this is required to allow all ESSI-Lab users with no registered OAuth 2.0 Client IDs
-	//
-	if (userId.contains(GSUser.ESSI_LAB_DOMAIN)) {
-
+	switch (AdminAuthorization.check(httpServletRequest)) {
+	case AUTHORIZED:
 	    return true;
-	}
-
-	Optional<String> adminId = ConfigurationWrapper.readAdminIdentifier();
-
-	if (adminId.isEmpty() || !adminId.get().equals(userId)) {
+	case ERROR:
+	    return false;
+	default:
 
 	    LoginDialog dialog = new LoginDialog(requestURL);
 
@@ -209,8 +186,6 @@ public class GSConfigurationView extends ConfigurationView {
 
 	    return false;
 	}
-
-	return true;
     }
 
     /**

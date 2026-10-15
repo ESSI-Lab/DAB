@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 import eu.essi_lab.access.DataDownloader;
 import eu.essi_lab.access.wml.TimeSeriesTemplate;
 import eu.essi_lab.access.wml.WMLDataDownloader;
-import eu.essi_lab.accessor.trigger.TRIGGERConnector.TRIGGER_VARIABLES;
 import eu.essi_lab.iso.datamodel.classes.BoundingPolygon;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
@@ -58,6 +57,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import eu.essi_lab.accessor.trigger.AggregatedTRIGGERConnector.AGGREGATED_TRIGGER_VARIABLES;
@@ -250,44 +250,35 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 	    File tempFile;
 	    boolean isTemperature = false;
 	    AGGREGATED_TRIGGER_VARIABLES var = AGGREGATED_TRIGGER_VARIABLES.decode(varId);
+	    if (var == null) {
+		throw new IllegalStateException("Unknown TRIGGER aggregated variable: " + varId);
+	    }
 	    String units = var.getUnits();
 	    if (units.contains("°C")) {
 		units = units.replace("°C", "K");
 		isTemperature = true;
 	    }
 
-	    Set<Long> timeSet = new HashSet<>();
+	    // the linkage built by AggregatedTRIGGERMapper is "<BASE_URL><table>?where=userId=<id>"
+	    String userId = online.getLinkage().split("where=userId=")[1];
+	    String gpsLinkage = AggregatedTRIGGERConnector.BASE_URL + "gps_daily?where=userId=" + userId + "&limit=100000";
 
-	    /**
-	     * TODO: CHECK IF POSSIBLE TO SEE GPS TRACE
-	     */
-	    String deviceId = online.getLinkage().split("deviceId=")[1];
-	    String linkage = AggregatedTRIGGERConnector.BASE_URL + "gps/?" + "deviceId=" + deviceId;
+	    List<JSONObject> gpsResult = getData(gpsLinkage);
 
-	    List<JSONObject> gpsResult = getData(linkage);
-	    Set<Long> gpsTimes = new HashSet<>();
-
-	    Map<Long, TRIGGERTimePosition> posMap = new HashMap<Long, TRIGGERTimePosition>();
+	    // aggregated tables carry one row per day (a "date" field, no hour/minute/second), so the trajectory
+	    // is correlated day-by-day rather than by exact timestamp
+	    Map<String, TRIGGERTimePosition> posMap = new HashMap<String, TRIGGERTimePosition>();
 	    for (JSONObject jO : gpsResult) {
-		int year = jO.optInt("year");
-		int month = jO.optInt("month");
-		int day = jO.optInt("day");
-		int hour = jO.optInt("hour");
-		int minute = jO.optInt("minute");
-		int second = jO.optInt("second");
-
-		Date parsed = convertToDate(year, month, day, hour, minute, second, null);
-		if (gpsTimes.contains(parsed.getTime())) {
+		String dateString = jO.optString("date", null);
+		if (dateString == null) {
 		    continue;
-		} else {
-		    gpsTimes.add(parsed.getTime());
 		}
-		Double lon = jO.optDouble("longitude");
-		Double lat = jO.optDouble("latitude");
-		LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, second);
+		Double lon = jO.optDouble("longitude_mean");
+		Double lat = jO.optDouble("latitude_mean");
+		LocalDate date = LocalDate.parse(dateString);
+		LocalDateTime dateTime = date.atStartOfDay();
 		TRIGGERTimePosition tp = new TRIGGERTimePosition(lon, lat, dateTime);
-		posMap.put(parsed.getTime(), tp);
-
+		posMap.put(dateString, tp);
 	    }
 
 	    tempFile = File.createTempFile(getClass().getSimpleName(), ".nc");
@@ -307,29 +298,20 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 
 	    for (JSONObject obj : ret) {
 
-		// CASTING
+		String dateString = obj.optString("date", null);
+		if (dateString == null) {
+		    continue;
+		}
 
-		int year = obj.optInt("year");
-		int month = obj.optInt("month");
-		int day = obj.optInt("day");
-		int hour = obj.optInt("hour");
-		int minute = obj.optInt("minute");
-		int second = obj.optInt("second");
+		LocalDate date = LocalDate.parse(dateString);
+		Date parsed = convertToDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth(), 0, 0, 0, null);
 
-		Date parsed = convertToDate(year, month, day, hour, minute, second, null);
-
-		TRIGGERTimePosition timePosition = posMap.get(parsed.getTime());
+		TRIGGERTimePosition timePosition = posMap.get(dateString);
 		if (timePosition != null) {
 		    Double lat = timePosition.getLatitude();
 		    Double lon = timePosition.getLongitude();
 
-		    // String time = obj.optString("time");
-		    // Date initialDateTime = ISO8601DateTimeUtils.parseISO8601(time);
-		    // // BigDecimal timeOffset = new BigDecimal(timeOffsetString);
-		    // Date observationDateTime = initialDateTime;//
-		    // PolytopeMeteoTrackerMapper.updateDateTime(initialDateTime,
-		    // // timeOffset);
-		    BigDecimal value = obj.optBigDecimal(varId, null);
+		    BigDecimal value = obj.optBigDecimal(var.getJsonField(), null);
 
 		    if (value != null) {
 
@@ -338,19 +320,6 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 			    BigDecimal kelvin = new BigDecimal("273.15");
 			    value = value.add(kelvin);
 			}
-
-			// Integer microsecond = (online.getLinkage().contains("ecg/?") ||
-			// online.getLinkage().contains("ppg/?"))
-			// ? obj.optInt("microsecond")
-			// : null;
-			//
-			// Date parsed = convertToDate(year, month, day, hour, minute, second, microsecond);
-			//
-			// if(timeSet.contains(parsed.getTime())){
-			// continue;
-			// }else {
-			// timeSet.add(parsed.getTime());
-			// }
 
 			value = value.setScale(2, BigDecimal.ROUND_FLOOR);
 			int valueInteger = value.multiply(new BigDecimal(100)).intValue();
@@ -405,43 +374,64 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 		"TRIGGER ERROR");
     }
 
+    /**
+     * The TRIGGER API does not use conventional HTTP status codes for an invalid/expired token: it replies with
+     * <code>201</code> and a plain-text body containing this marker instead of 401/403.
+     */
+    private static final String INVALID_TOKEN_MARKER = "invalid token provided";
+
     private List<JSONObject> getData(String linkage) throws Exception {
 
 	ArrayList<JSONObject> out = Lists.newArrayList();
 
-	if (TRIGGERConnector.TRIGGER_TOKEN == null) {
-	    TRIGGERConnector.TRIGGER_TOKEN = TRIGGERConnector.getBearerToken();
+	if (AggregatedTRIGGERConnector.TRIGGER_TOKEN == null) {
+	    AggregatedTRIGGERConnector.TRIGGER_TOKEN = AggregatedTRIGGERConnector.getBearerToken();
 	}
 
-	// HttpGet get = new HttpGet(linkage.trim());
-	// get.addHeader("token", TRIGGERConnector.TRIGGER_TOKEN);
 
-	InputStream stream = null;
+	String body;
 
-	HttpResponse<InputStream> triggerResponse = null;
 
 	try {
-	    triggerResponse = new Downloader().downloadResponse(//
+	    HttpResponse<InputStream> triggerResponse = new Downloader().downloadResponse(//
 		    linkage.trim(), //
-		    HttpHeaderUtils.build("token", TRIGGERConnector.TRIGGER_TOKEN));
+		    HttpHeaderUtils.build("token", AggregatedTRIGGERConnector.TRIGGER_TOKEN));
 
 	    int statusCode = triggerResponse.statusCode();
+	    body = readBody(triggerResponse);
 
-	    if (statusCode > 400 || statusCode == 201) {
-		// token expired - refresh token
-		TRIGGERConnector.TRIGGER_TOKEN = TRIGGERConnector.getBearerToken();
 
-		triggerResponse = new Downloader().downloadResponse(//
-			linkage.trim(), HttpHeaderUtils.build("token", TRIGGERConnector.TRIGGER_TOKEN));
+	    if (statusCode >= 500) {
+		// a server-side failure: retrying with a fresh token won't help, so don't bother
+		GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).error(
+			"TRIGGER aggregated API returned HTTP {} for {} - service appears unavailable, skipping", statusCode, linkage);
+		return out;
 	    }
 
-	    stream = triggerResponse.body();
-	    GSLoggerFactory.getLogger(TRIGGERConnector.class).info("Got " + linkage);
+	    if (body != null && body.toLowerCase().contains(INVALID_TOKEN_MARKER)) {
+		// token expired/invalid - refresh and retry once
+		AggregatedTRIGGERConnector.TRIGGER_TOKEN = AggregatedTRIGGERConnector.getBearerToken();
+
+		triggerResponse = new Downloader().downloadResponse(//
+			linkage.trim(), HttpHeaderUtils.build("token", AggregatedTRIGGERConnector.TRIGGER_TOKEN));
+
+		if (triggerResponse.statusCode() >= 500) {
+		    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).error(
+			    "TRIGGER aggregated API returned HTTP {} for {} - service appears unavailable, skipping",
+			    triggerResponse.statusCode(), linkage);
+		    return out;
+		}
+
+		body = readBody(triggerResponse);
+	    }
+
+
+	    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).info("Got " + linkage);
 
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(TRIGGERConnector.class).error("Unable to retrieve " + linkage);
+	    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).error("Unable to retrieve " + linkage);
 	    throw GSException.createException(//
-		    TRIGGERConnector.class, //
+		    AggregatedTRIGGERConnector.class, //
 		    "Unable to retrieve " + linkage + " after several tries", //
 		    null, //
 		    ErrorInfo.ERRORTYPE_SERVICE, //
@@ -449,27 +439,31 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 		    AGGREGATED_TRIGGER_DOWNLOADER_ERROR);
 	}
 
-	if (stream != null) {
+	if (body != null) {
 
-	    ClonableInputStream clone = new ClonableInputStream(stream);
-
-	    String res = IOStreamUtils.asUTF8String(clone.clone());
-
-	    if (res.toLowerCase().contains("invalid token provided")) {
-		return getData(linkage);
-	    }
-
-	    JSONArray array = new JSONArray(IOStreamUtils.asUTF8String(clone.clone()));
+	    JSONArray array = new JSONArray(body);
 
 	    for (int i = 0; i < array.length(); i++) {
 
 		JSONObject object = array.getJSONObject(i);
 		out.add(object);
 	    }
-	    stream.close();
 	}
 
 	return out;
+    }
+
+    private static String readBody(HttpResponse<InputStream> response) throws Exception {
+
+	InputStream stream = response.body();
+	if (stream == null) {
+	    return null;
+	}
+
+	ClonableInputStream clone = new ClonableInputStream(stream);
+	String body = IOStreamUtils.asUTF8String(clone.clone());
+	stream.close();
+	return body;
     }
 
     public Date convertToDate(int year, int month, int day, int hour, int minute, int second, Integer microseconds) {
@@ -505,9 +499,5 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 	}
 
 	return DataDescriptor.TIME_DIMENSION_NAME.equalsIgnoreCase(dimensionName);
-    }
-
-    public static void main(String[] args) {
-
     }
 }

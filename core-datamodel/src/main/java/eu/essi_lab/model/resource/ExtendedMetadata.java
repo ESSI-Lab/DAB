@@ -142,6 +142,16 @@ public class ExtendedMetadata {
 
 	init();
 
+	Node[] nodes = xmlDocReader.evaluateNodes("//" + prefix + ":" + elementName);
+	if (nodes.length > 0) {
+	    nodes[0].setTextContent(textContent);
+	    for (int i = 1; i < nodes.length; i++) {
+		nodes[i].getParentNode().removeChild(nodes[i]);
+	    }
+	    extension = document.getDocumentElement();
+	    return;
+	}
+
 	Element element = document.createElementNS(nameSpaceURI, prefix + ":" + elementName);
 	if (textContent != null) {
 	    element.setTextContent(textContent);

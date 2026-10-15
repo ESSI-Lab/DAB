@@ -586,6 +586,16 @@ public final class IndexedMetadataElements extends IndexedElementsGroup {
 	}
     };
 
+    public static final IndexedMetadataElement DOI = new IndexedMetadataElement(MetadataElement.DOI) {
+	@Override
+	public void defineValues(GSResource resource) {
+
+	    for (String doi : DoiUtils.extractDois(resource)) {
+		addValue(doi);
+	    }
+	}
+    };
+
     public static final IndexedMetadataElement RESOURCE_LANGUAGE = new IndexedMetadataElement(MetadataElement.RESOURCE_LANGUAGE) {
 	@Override
 	public void defineValues(GSResource resource) {

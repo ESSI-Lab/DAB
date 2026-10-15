@@ -242,9 +242,14 @@ public class WML_1_1Mapper extends OriginalIdentifierMapper {
 		    onlineGetSite = hisServerEndpoint.endsWith("/") ? hisServerEndpoint + "GetSiteInfo?site=" + siteInfo.getSiteCode()
 			    : hisServerEndpoint + "/GetSiteInfo?site=" + siteInfo.getSiteCode();
 		}
-		if (siteInfo.getDataPolicy() != null) {
+		String dataPolicy = siteInfo.getDataPolicy();
+		if (dataPolicy != null && !dataPolicy.isEmpty()) {
 		    LegalConstraints rc = new LegalConstraints();
-		    rc.addUseLimitation(siteInfo.getDataPolicy());
+		    if ("core".equals(dataPolicy)) {
+			rc.addUseLimitation("http://codes.wmo.int/wmdr/DataPolicy/core", dataPolicy);
+		    } else {
+			rc.addUseLimitation(dataPolicy);
+		    }
 		    coreMetadata.getDataIdentification().addLegalConstraints(rc);
 		}
 	    } else {

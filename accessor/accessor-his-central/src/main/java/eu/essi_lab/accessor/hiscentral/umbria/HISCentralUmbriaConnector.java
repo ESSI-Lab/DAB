@@ -83,9 +83,6 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 
     public static final List<String> timeList = Arrays.asList("0-24", "9-9", "NA");
 
-    public static final String BASE_URL = "https://dati.regione.umbria.it/api/3/action/datastore_search";
-    public static final String BASE_SQL_URL = "https://dati.regione.umbria.it/api/3/action/datastore_search_sql";
-
     private static final String METADATA_FULL = "floats/";
 
     private Map<String, JSONObject> stationsMap;
@@ -200,6 +197,26 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 	return endpoint.contains("dati.regione.umbria.it");
     }
 
+    /**
+     * Maps the configured {@code datastore_search} endpoint to the SQL search endpoint.
+     */
+    public static String sqlUrlFromEndpoint(String endpoint) {
+
+	if (endpoint == null) {
+	    return null;
+	}
+	if (endpoint.contains("datastore_search_sql")) {
+	    return endpoint;
+	}
+	if (endpoint.endsWith("datastore_search")) {
+	    return endpoint + "_sql";
+	}
+	if (endpoint.contains("datastore_search")) {
+	    return endpoint.replace("datastore_search", "datastore_search_sql");
+	}
+	return endpoint.endsWith("/") ? endpoint + "datastore_search_sql" : endpoint + "/datastore_search_sql";
+    }
+
     @Override
     public ListRecordsResponse<OriginalMetadata> listRecords(ListRecordsRequest request) throws GSException {
 	ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<>();
@@ -245,7 +262,7 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 			if (stationsMap.containsKey(stationId)) {
 			    JSONObject stationDescription = stationsMap.get(stationId);
 
-			    Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> resMap = postData(sensorObj, SORT_ORDER.ASC, null);
+			    Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> resMap = postData(getSourceURL(), sensorObj, SORT_ORDER.ASC, null);
 
 			    for (Map.Entry<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> entry : resMap.entrySet()) {
 
@@ -296,7 +313,7 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 	return ret;
     }
 
-    public static Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> postData(JSONObject sensorObj, SORT_ORDER sort_order, String resourceIdentifier) {
+    public static Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> postData(String endpoint, JSONObject sensorObj, SORT_ORDER sort_order, String resourceIdentifier) {
 
 	Map<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo> ret = new HashMap<UMBRIA_Variable, HISCentralUmbriaMeasurementInfo>();
 
@@ -334,7 +351,7 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 		    //Optional<JSONObject> response = executePost(payload);
 
 		    Optional<JSONObject> response =
-			    executePostWithRetry(payload, fallback);
+			    executePostWithRetry(endpoint, payload, fallback);
 
 		    if (response.isEmpty()) {
 			continue;
@@ -481,9 +498,9 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 
     }
 
-    private static Optional<JSONObject> executePostWithRetry(JSONObject payload, JSONObject fallbackPayload) {
+    private static Optional<JSONObject> executePostWithRetry(String endpoint, JSONObject payload, JSONObject fallbackPayload) {
 
-	Optional<JSONObject> response = executePost(payload);
+	Optional<JSONObject> response = executePost(endpoint, payload);
 
 	if (response.isPresent()) {
 	    return response;
@@ -491,7 +508,7 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 
 	GSLoggerFactory.getLogger(HISCentralUmbriaConnector.class).debug("Retrying without time filter...");
 
-	return executePost(fallbackPayload);
+	return executePost(endpoint, fallbackPayload);
     }
 
     private static Optional<String> extractDate(JSONObject jsonObject) {
@@ -513,11 +530,11 @@ public class HISCentralUmbriaConnector extends HarvestedQueryConnector<HISCentra
 	return Optional.ofNullable(date);
     }
 
-    private static Optional<JSONObject> executePost(JSONObject payload) {
+    private static Optional<JSONObject> executePost(String endpoint, JSONObject payload) {
 	try {
 	    HttpRequest request = HttpRequestUtils.build(
 		    MethodWithBody.POST,
-		    BASE_URL,
+		    endpoint,
 		    payload.toString(),
 		    HttpHeaderUtils.build(Map.of("Content-Type", "application/json"))
 	    );

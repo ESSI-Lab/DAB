@@ -68,10 +68,6 @@ public class HISCentralLazioConnector extends HarvestedQueryConnector<HISCentral
      */
     static final String SENSOR_URL = "elements?";
 
-//    public static final String BASE_URL = "http://rlazio.dynalias.org/datascape/v1/";
-//
-//    public static final String TOKEN_URL = "http://rlazio.dynalias.org/datascape/connect/token";
-
     private static final String HIS_CENTRAL_LAZIO_CONNECTOR_DOWNLOAD_ERROR = "HIS_CENTRAL_LAZIO_CONNECTOR_DOWNLOAD_ERROR";
 
     /**

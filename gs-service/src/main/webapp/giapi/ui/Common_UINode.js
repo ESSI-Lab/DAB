@@ -133,6 +133,225 @@ GIAPI.Common_UINode = function(options) {
 	};
 
 	/**
+	 * @param {String} identifier
+	 * @return {Boolean}
+	 */
+	GIAPI.Common_UINode.isDoiIdentifier = function(identifier) {
+
+		if (!identifier || typeof identifier !== 'string') {
+			return false;
+		}
+
+		var trimmed = identifier.trim();
+		var lower = trimmed.toLowerCase();
+
+		return trimmed.indexOf('10.') === 0 || lower.indexOf('doi:') === 0 || lower.indexOf('doi.org') >= 0;
+	};
+
+	/**
+	 * @param {String} identifier
+	 * @return {String|null}
+	 */
+	GIAPI.Common_UINode.normalizeDoiValue = function(identifier) {
+
+		if (!GIAPI.Common_UINode.isDoiIdentifier(identifier)) {
+			return null;
+		}
+
+		var trimmed = identifier.trim();
+		var lower = trimmed.toLowerCase();
+
+		if (lower.indexOf('doi:') === 0) {
+			trimmed = trimmed.substring(4).trim();
+		} else {
+			var doiOrgIndex = lower.indexOf('doi.org/');
+			if (doiOrgIndex >= 0) {
+				trimmed = trimmed.substring(doiOrgIndex + 'doi.org/'.length).trim();
+			}
+		}
+
+		var queryIndex = trimmed.indexOf('?');
+		if (queryIndex >= 0) {
+			trimmed = trimmed.substring(0, queryIndex);
+		}
+
+		trimmed = trimmed.replace(/\/+$/, '');
+
+		return trimmed.indexOf('10.') === 0 ? trimmed : null;
+	};
+
+	/**
+	 * @param {String} doi bare DOI (e.g. 10.1594/PANGAEA.66871)
+	 * @return {String|null}
+	 */
+	GIAPI.Common_UINode.buildDoiUrl = function(doi) {
+
+		var bareDoi = GIAPI.Common_UINode.normalizeDoiValue(doi) || doi;
+		if (!bareDoi || bareDoi.indexOf('10.') !== 0) {
+			return null;
+		}
+
+		return 'https://doi.org/' + bareDoi;
+	};
+
+	/**
+	 * @param {Report} report
+	 * @return {String[]}
+	 */
+	GIAPI.Common_UINode.extractReportDois = function(report) {
+
+		var dois = [];
+		var seen = {};
+
+		function addDoi(value) {
+
+			var normalized = GIAPI.Common_UINode.normalizeDoiValue(value);
+			if (normalized && !seen[normalized]) {
+				seen[normalized] = true;
+				dois.push(normalized);
+			}
+		}
+
+		if (!report) {
+			return dois;
+		}
+
+		if (report.doi) {
+			if (Array.isArray(report.doi)) {
+				report.doi.forEach(addDoi);
+			} else {
+				addDoi(report.doi);
+			}
+		}
+
+		if (report.dataIdentifiers && report.dataIdentifiers.length) {
+			report.dataIdentifiers.forEach(addDoi);
+		}
+
+		if (report.online && report.online.length) {
+			report.online.forEach(function(link) {
+				if (link && link.url) {
+					addDoi(link.url);
+				}
+			});
+		}
+
+		return dois;
+	};
+
+	/**
+	 * @static
+	 * @param {Report} report
+	 * @return {String}
+	 */
+	GIAPI.Common_UINode.doiRow = function(report) {
+
+		var dois = GIAPI.Common_UINode.extractReportDois(report);
+		if (!dois.length) {
+			return '';
+		}
+
+		var doiLabel = typeof __t === 'function' ? __t('result_doi') : 'DOI';
+		if (doiLabel === 'result_doi') {
+			doiLabel = 'DOI';
+		}
+
+		var out = '<tr><td class="common-ui-node-report-content-table-left-td"><label class="common-ui-node-report-content-table-left">' + doiLabel + '</td>';
+		out += '<td class="common-ui-node-report-content-table-right-td">';
+
+		for (var i = 0; i < dois.length; i++) {
+			var doiUrl = GIAPI.Common_UINode.buildDoiUrl(dois[i]);
+			if (!doiUrl) {
+				continue;
+			}
+			out += '<a target="_blank" rel="noopener noreferrer" class="dont-break-out common-ui-node-report-content-table-right" style="color:blue;cursor:pointer;text-decoration:underline;" href="' + doiUrl + '" title="' + doiUrl + '">' + doiUrl + '</a>';
+			if (i < dois.length - 1) {
+				out += '<br>';
+			}
+		}
+
+		out += '</td></tr>';
+
+		return out;
+	};
+
+	GIAPI.Common_UINode.escapeHtml = function(text) {
+		return ('' + text)
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/"/g, '&quot;');
+	};
+
+	GIAPI.Common_UINode.isHttpsUrl = function(value) {
+		if (!value || typeof value !== 'string') {
+			return false;
+		}
+		return value.trim().toLowerCase().indexOf('https://') === 0;
+	};
+
+	GIAPI.Common_UINode.formatReportMetadataValue = function(value) {
+		if (value == null || value === '') {
+			return '';
+		}
+		var str = ('' + value).trim();
+		var linkStyle = 'color:blue;cursor:pointer;text-decoration:underline;';
+		if (GIAPI.Common_UINode.isHttpsUrl(str)) {
+			var safeHref = GIAPI.Common_UINode.escapeHtml(str);
+			return '<a target="_blank" rel="noopener noreferrer" class="dont-break-out" style="' + linkStyle + '" href="' + safeHref + '" title="' + safeHref + '">' + safeHref + '</a>';
+		}
+		if (str.indexOf('; ') >= 0) {
+			return str.split('; ').map(function(part) {
+				part = part.trim();
+				if (GIAPI.Common_UINode.isHttpsUrl(part)) {
+					var href = GIAPI.Common_UINode.escapeHtml(part);
+					return '<a target="_blank" rel="noopener noreferrer" class="dont-break-out" style="' + linkStyle + '" href="' + href + '" title="' + href + '">' + href + '</a>';
+				}
+				return GIAPI.Common_UINode.escapeHtml(part);
+			}).join('; ');
+		}
+		return GIAPI.Common_UINode.escapeHtml(str);
+	};
+
+	GIAPI.Common_UINode.reportMetadataArrayRow = function(report, fieldName, labelKey, defaultLabel) {
+
+		var raw = report[fieldName];
+		var values = [];
+		if (Array.isArray(raw)) {
+			values = raw;
+		} else if (raw) {
+			values = [raw];
+		}
+		if (!values.length) {
+			return '';
+		}
+
+		var label = typeof __t === 'function' ? __t(labelKey) : defaultLabel;
+		if (label === labelKey) {
+			label = defaultLabel;
+		}
+
+		var out = '<tr><td class="common-ui-node-report-content-table-left-td"><label class="common-ui-node-report-content-table-left">' + label + '</td>';
+		out += '<td class="common-ui-node-report-content-table-right-td">';
+
+		for (var i = 0; i < values.length; i++) {
+			out += '<label class="common-ui-node-report-content-table-right dont-break-out">' + GIAPI.Common_UINode.formatReportMetadataValue(values[i]) + '</label><br>';
+		}
+
+		out += '</td></tr>';
+
+		return out;
+	};
+
+	GIAPI.Common_UINode.citationRow = function(report) {
+		return GIAPI.Common_UINode.reportMetadataArrayRow(report, 'citation_details', 'result_citation', 'Citation');
+	};
+
+	GIAPI.Common_UINode.useLicenseRow = function(report) {
+		return GIAPI.Common_UINode.reportMetadataArrayRow(report, 'use_license', 'result_license', 'License');
+	};
+
+	/**
 	 * 
 	 */
 	GIAPI.Common_UINode.createdRow = function(report) {
@@ -1060,6 +1279,10 @@ GIAPI.Common_UINode = function(options) {
 			}
 			content += '</td></tr>';
 		}
+
+		content += GIAPI.Common_UINode.doiRow(report);
+		content += GIAPI.Common_UINode.citationRow(report);
+		content += GIAPI.Common_UINode.useLicenseRow(report);
 
 		// content
 		if (report.content && report.content.length) {

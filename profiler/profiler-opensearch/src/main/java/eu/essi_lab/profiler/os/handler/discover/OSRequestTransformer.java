@@ -686,6 +686,7 @@ public class OSRequestTransformer extends DiscoveryRequestTransformer {
 	    case "intendedObservationSpacing" -> list.add(MetadataElement.TIME_RESOLUTION_DURATION_8601);
 	    case "aggregationDuration" -> list.add(MetadataElement.TIME_AGGREGATION_DURATION_8601);
 	    case "timeInterpolation" -> list.add(MetadataElement.TIME_INTERPOLATION);
+	    case "country" -> list.add(MetadataElement.COUNTRY_ISO3);
 	    case "orgName" -> list.add(MetadataElement.ORGANISATION_NAME);
 	    case "origOrgDesc" -> list.add(MetadataElement.ORIGINATOR_ORGANISATION_DESCRIPTION);
 	    case "themeCategory" -> list.add(MetadataElement.THEME_CATEGORY);

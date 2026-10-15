@@ -9,6 +9,8 @@
 "bbox":"Bounding box (W,S,E,N)",
 "altitude": "Altitude (min/max)",
 "involved_organizations": "Involved organizations",
+  "responsible_organizations": "Responsible organizations",
+  "license": "License",
 "sample_platforms": "Sample platforms",
 "monitoring_point":"Monitoring point",
 "latitude": "Latitude",

@@ -113,8 +113,17 @@ public class WISDiscoveryMetadataHandler extends DefaultRequestHandler {
 		ResultSet<GSResource> resultSet = WISUtils.getMetadataItems(itemIdentifier, optionalView);
 		List<GSResource> resources = resultSet.getResultsList();
 
-		JSONArray features = WISUtils.mapFeatures(resources);
-		WISUtils.enrichFeaturesWithLinks(features, webRequest);
+		JSONArray features;
+		if (optionalView.isPresent()) {
+		    // same encoding used to compute the integrity of the WIS2 notification messages
+		    features = new JSONArray();
+		    for (GSResource resource : resources) {
+			features.put(WISUtils.mapFeature(resource, optionalView.get()));
+		    }
+		} else {
+		    features = WISUtils.mapFeatures(resources);
+		    WISUtils.enrichFeaturesWithLinks(features, webRequest);
+		}
 
 		if (json != null) {
 		    json.put("features", features);

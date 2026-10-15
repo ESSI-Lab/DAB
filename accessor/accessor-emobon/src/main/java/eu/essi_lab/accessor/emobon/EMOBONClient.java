@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
@@ -49,12 +50,13 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
  */
 public class EMOBONClient {
 
-	private String DCAT_NS = "http://www.w3.org/ns/dcat#";
-	private String DATASET_LOCALNAME = "dataset";
+	private static final String DCTERMS_NS = "http://purl.org/dc/terms/";
+	private static final String CONFORMS_TO_LOCALNAME = "conformsTo";
+	private static final String OBSERVATORY_PROFILE = "https://data.emobon.embrc.eu/observatory-profile/latest";
 
 	private String endpoint = "";
 
-	private static String DEFAULT_ENDPOINT = "https://data.emobon.embrc.eu/metadata.ttl";
+	private static String DEFAULT_ENDPOINT = "https://data.emobon.embrc.eu/dump-dset-catalogue-docker/emobon-dcat-combined.ttl";
 
 	private Logger logger = GSLoggerFactory.getLogger(getClass());
 	
@@ -88,35 +90,33 @@ public class EMOBONClient {
 			// Load data from a Turtle file into the model
 			mainModel = FileManager.get().readModel(mainModel, tempFile.getAbsolutePath());
 
-			// Iterate over the statements in the model and extract dataset URIs
-			StmtIterator iter = mainModel.listStatements();
-			while (iter.hasNext()) {
-				Statement statement = iter.nextStatement();
-				Property predicate = statement.getPredicate();
-				RDFNode object = statement.getObject();
-				if (isDataset(predicate)) {
-					Resource datasetResource = object.asResource();
-					String datasetURI = datasetResource.getURI();
-					// Only add observatory crates, skip profile datasets
-					if (datasetURI != null && datasetURI.contains("observatory-") && datasetURI.endsWith("-crate/")) {
-						// Store the actual URI as it appears in the model
-						datasetURIs.add(datasetURI);
-						datasetResources.add(datasetResource);
-					}
-				}
-			}
+			discoverObservatoryCrates();
 			tempFile.delete();
 		}
 	}
 
-	private boolean isDataset(Property predicate) {
-		String ns = predicate.getNameSpace();
-		String localname = predicate.getLocalName();
-		return ns.equals(DCAT_NS) && localname.equals(DATASET_LOCALNAME);
+	private void discoverObservatoryCrates() {
+		TreeSet<String> observatoryCrateURIs = discoverFromObservatoryDatasets();
+		datasetURIs.addAll(observatoryCrateURIs);
+		logger.info("Found {} EMOBON observatory datasets", datasetURIs.size());
+	}
+
+	private TreeSet<String> discoverFromObservatoryDatasets() {
+		TreeSet<String> observatoryCrateURIs = new TreeSet<>();
+		Property conformsTo = mainModel.createProperty(DCTERMS_NS, CONFORMS_TO_LOCALNAME);
+		Resource observatoryProfile = mainModel.createResource(OBSERVATORY_PROFILE);
+		StmtIterator iter = mainModel.listStatements(null, conformsTo, observatoryProfile);
+		while (iter.hasNext()) {
+			Resource subject = iter.nextStatement().getSubject();
+			if (subject != null && subject.getURI() != null) {
+				observatoryCrateURIs.add(subject.getURI());
+			}
+		}
+		iter.close();
+		return observatoryCrateURIs;
 	}
 
 	private List<String> datasetURIs = new ArrayList<>();
-	private List<Resource> datasetResources = new ArrayList<>();
 
 	public List<String> getDatasetURIs() {
 		return datasetURIs;

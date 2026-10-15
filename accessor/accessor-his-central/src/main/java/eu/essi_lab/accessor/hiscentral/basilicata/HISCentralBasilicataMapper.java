@@ -354,7 +354,10 @@ public class HISCentralBasilicataMapper extends FileIdentifierMapper {
 	    tempExtenBegin = tempExtenBegin.substring(0, tempExtenBegin.indexOf("+"));
 	}
 
-	String linkage = HISCentralBasilicataConnector.BASE_URL + "data/" + timeSeriesId + "?from=" + tempExtenBegin
+	String url =dataset.getSource().getEndpoint();
+
+	String linkage = !url.endsWith("/") ? url + "/data/" + timeSeriesId + "?from=" + tempExtenBegin
+		+ "&type=Plausible&part=IsoTime&part=Value&part=Quality&part=QualityDescr&timing=Original&elab=None" : url + "data/" + timeSeriesId + "?from=" + tempExtenBegin
 		+ "&type=Plausible&part=IsoTime&part=Value&part=Quality&part=QualityDescr&timing=Original&elab=None";
 
 	Online online = new Online();

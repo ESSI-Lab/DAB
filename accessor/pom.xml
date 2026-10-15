@@ -104,6 +104,9 @@
 		<module>accessor-kisters</module>
 		<module>accessor-uk-hydrology</module>
 		<module>accessor-de-pegelonline</module>
+		<module>accessor-ch-slf</module>
+		<module>accessor-us-nrcs-awdb</module>
+		<module>accessor-geus-promice</module>
 		<module>accessor-ch-existenz-bafu</module>
 		<module>accessor-worldcereal</module>
 		<module>accessor-seanoe</module>
@@ -116,6 +119,7 @@
 		<module>accessor-agrostac</module>
 		<module>accessor-oai-pmh-wrapper</module>
 		<module>accessor-datastream</module>
+		<module>accessor-datalakes</module>
 	</modules>
 
 	<dependencies>

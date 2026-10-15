@@ -30,11 +30,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
@@ -64,9 +66,20 @@ import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.profiler.wis.WISUtils;
 import eu.essi_lab.request.executor.*;
 
 class SourceCollectionCreator {
+
+    protected final String centreId;
+
+    public SourceCollectionCreator() {
+	this(WISUtils.getCentreId());
+    }
+
+    public SourceCollectionCreator(String centreId) {
+	this.centreId = centreId;
+    }
 
     public List<DatasetCollection> getCollections(String sourceId, String sourceDeployments) throws GSException {
 
@@ -117,7 +130,7 @@ class SourceCollectionCreator {
 	}
 	// GET Country!
 	String topic = "origin/a/wis2/" + //
-		"it-cnr-iia"
+		centreId
 		// country + "-" + sourceAcronym //
 		+ "/metadata"; // only at this level
 	// core/hydrology" + getAdditionalLevels(groupBy);
@@ -176,6 +189,25 @@ class SourceCollectionCreator {
 		    party.setOrganisationName(org);
 		    coreMetadata.getDataIdentification().addPointOfContact(party);
 		}
+	    }
+	}
+
+	// license URIs of the children, sorted to keep the generated record (and its integrity checksum) stable
+	Optional<ComputationResult> licenses = responseItem.getFrequency(MetadataElement.USE_LEGAL_CONSTRAINTS_URI);
+	if (licenses.isPresent()) {
+	    TreeSet<String> uris = new TreeSet<>();
+	    for (TermFrequencyItem item : licenses.get().getFrequencyItems()) {
+		String uri = item.getTerm();
+		if (uri != null && !uri.isBlank()) {
+		    uris.add(uri.trim());
+		}
+	    }
+	    if (!uris.isEmpty()) {
+		LegalConstraints legalConstraints = new LegalConstraints();
+		for (String uri : uris) {
+		    legalConstraints.addOtherConstraints(uri, uri);
+		}
+		coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
 	    }
 	}
 
@@ -295,7 +327,7 @@ class SourceCollectionCreator {
     }
 
     protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
-	return "urn:wmo:md:it-cnr-iia:" + sourceIdentifier ;
+	return "urn:wmo:md:" + centreId + ":" + sourceIdentifier;
     }
 
     protected List<ResponseItem> getStatistics(String sourceId, Queryable queryable) throws GSException {
@@ -323,7 +355,7 @@ class SourceCollectionCreator {
 
 	statisticsMessage.computeTempExtentUnion();
 
-	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME));
+	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME, MetadataElement.USE_LEGAL_CONSTRAINTS_URI));
 	// computes count distinct of 2 queryables
 	statisticsMessage.countDistinct(//
 		Arrays.asList(//
