@@ -97,6 +97,9 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     private static final String TRIGGER_WAF_PASSWORD = "triggerWAFPassword";
     private static final String TRIGGER_WAF_USER = "triggerWAFUser";
 
+    private static final String CIMA_WRF_PASSWORD = "cimaWrfPassword";
+    private static final String CIMA_WRF_USER = "cimaWrfUser";
+
     private static final String OSCAR_PASSWORD = "OscarPassword";
     private static final String OSCAR_USER = "OscarUser";
 
@@ -700,6 +703,31 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 		    get().//
 		    withKey(TRIGGER_WAF_PASSWORD).//
 		    withLabel("The password used by TRIGGER WAF connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(password);
+
+	}
+
+	// CIMA WRF forecasts (TRIGGER)
+	{
+
+	    Option<String> user = StringOptionBuilder.//
+		    get().//
+		    withKey(CIMA_WRF_USER).//
+		    withLabel("The username used to download the CIMA WRF forecasts").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(user);
+
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(CIMA_WRF_PASSWORD).//
+		    withLabel("The password used to download the CIMA WRF forecasts").//
 		    required().//
 		    cannotBeDisabled().//
 		    build();
@@ -1571,6 +1599,38 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     public Optional<String> getTriggerWAFPassword() {
 
 	return getOption(TRIGGER_WAF_PASSWORD, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param user
+     */
+    public void setCimaWrfUser(String user) {
+
+	getOption(CIMA_WRF_USER, String.class).get().setValue(user);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getCimaWrfUser() {
+
+	return getOption(CIMA_WRF_USER, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param password
+     */
+    public void setCimaWrfPassword(String password) {
+
+	getOption(CIMA_WRF_PASSWORD, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getCimaWrfPassword() {
+
+	return getOption(CIMA_WRF_PASSWORD, String.class).get().getOptionalValue();
     }
 
 }

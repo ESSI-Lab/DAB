@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>TRIGGER - CAMS Air Quality Forecast</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.9.0/ol.css">
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+        {
+          "imports": {
+            "ol": "https://esm.sh/ol@10.9.0",
+            "ol/": "https://esm.sh/ol@10.9.0/"
+          }
+        }
+    </script>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div id="ui-panel">
+    <div class="panel-title">Air Quality Forecast</div>
+
+    <div class="field">
+        <span class="field-label">Pollutant:</span>
+        <select id="pollutantSelector">
+            <option value="pm25">PM2.5</option>
+            <option value="pm10">PM10</option>
+            <option value="no2">NO₂ (Nitrogen Dioxide)</option>
+            <option value="o3">O₃ (Ozone)</option>
+            <option value="so2">SO₂ (Sulphur Dioxide)</option>
+        </select>
+    </div>
+
+    <div id="runLabel" class="run-label">Loading forecast...</div>
+
+    <div id="timeMain">-</div>
+    <input type="range" id="forecastSlider" min="0" max="0" value="0" step="1">
+
+    <div class="media-controls">
+        <button id="prevBtn" title="Previous hour">&#9664;</button>
+        <button id="playBtn" title="Play / pause">&#9654; Play</button>
+        <button id="nextBtn" title="Next hour">&#9654;</button>
+        <select id="speedSelector" title="Animation speed">
+            <option value="2000">0.5x</option>
+            <option value="1000" selected>1x</option>
+            <option value="500">2x</option>
+        </select>
+    </div>
+
+    <div class="field-inline">
+        <span class="field-label">Opacity:</span>
+        <input type="range" id="opacitySlider" min="0" max="100" value="75">
+    </div>
+
+    <div id="pixelValue" class="pixel-value">Move the mouse over the map to read the concentration</div>
+
+    <div id="legendTitle" class="legend-subtitle">-</div>
+    <div id="legend"></div>
+    <div class="legend-note">Classes of the European Air Quality Index (EEA)</div>
+</div>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>
