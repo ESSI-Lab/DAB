@@ -22,7 +22,7 @@ const ATTRIBUTION = 'Generated using Copernicus Atmosphere Monitoring Service in
 const CONFIG = {
   pm25: {
     title: "PM2.5 (Particulate Matter < 2.5 µm)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CAMS/pm25/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CAMS/pm25/index.json",
     style: {
       color: [
         'case',
@@ -46,7 +46,7 @@ const CONFIG = {
   },
   pm10: {
     title: "PM10 (Particulate Matter < 10 µm)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CAMS/pm10/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CAMS/pm10/index.json",
     style: {
       color: [
         'case',
@@ -70,7 +70,7 @@ const CONFIG = {
   },
   no2: {
     title: "NO₂ (Nitrogen Dioxide)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CAMS/no2/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CAMS/no2/index.json",
     style: {
       color: [
         'case',
@@ -94,7 +94,7 @@ const CONFIG = {
   },
   o3: {
     title: "O₃ (Ozone)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CAMS/o3/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CAMS/o3/index.json",
     style: {
       color: [
         'case',
@@ -118,7 +118,7 @@ const CONFIG = {
   },
   so2: {
     title: "SO₂ (Sulphur Dioxide)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CAMS/so2/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CAMS/so2/index.json",
     style: {
       color: [
         'case',
