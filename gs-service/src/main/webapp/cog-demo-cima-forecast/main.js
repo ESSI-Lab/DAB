@@ -19,7 +19,7 @@ const ATTRIBUTION = 'CIMA Research Foundation - WRF operational forecast';
 const CONFIG = {
   utci: {
     title: "Universal Thermal Climate Index (UTCI)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/utci/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/utci/index.json",
     style: {
       color: [
         'case',
@@ -51,7 +51,7 @@ const CONFIG = {
   },
   at: {
     title: "Apparent Temperature (AT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/at/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/at/index.json",
     style: {
       color: [
         'case',
@@ -73,7 +73,7 @@ const CONFIG = {
   },
   wbgt: {
     title: "Wet Bulb Globe Temperature (WBGT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/wbgt/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/wbgt/index.json",
     style: {
       color: [
         'case',
@@ -95,7 +95,7 @@ const CONFIG = {
   },
   wct: {
     title: "Wind Chill Temperature (WCT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/wct/index.json",
     style: {
       color: [
         'case',
