@@ -25,6 +25,8 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.gssrv.conf.task.trigger.TaskReport;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.gssrv.conf.task.trigger.cimaforecast.CIMAForecastProcessor.DownloadMode;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -64,25 +66,27 @@ public class CIMAForecastTask extends AbstractCustomTask {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
+	Instant start = Instant.now();
 	log(status, "CIMAForecastTask STARTED");
+	TaskReport report = TaskReport.of(status);
 
 	Optional<EnumMap<CIMAForecastTaskOptions, String>> taskOptions = readTaskOptions(context, CIMAForecastTaskOptions.class);
 	if (taskOptions.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("No options specified");
+	    cancel(status, report, "No options specified");
 	    return;
 	}
 	EnumMap<CIMAForecastTaskOptions, String> options = taskOptions.get();
 
 	String bucketName = options.get(CIMAForecastTaskOptions.BUCKET_NAME);
 	if (bucketName == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("No bucket name option specified");
+	    cancel(status, report, "No bucket name option specified");
 	    return;
 	}
 
 	Optional<String> user = ConfigurationWrapper.getCredentialsSetting().getCimaWrfUser();
 	Optional<String> password = ConfigurationWrapper.getCredentialsSetting().getCimaWrfPassword();
 	if (user.isEmpty() || password.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("CIMA WRF credentials (cimaWrfUser, cimaWrfPassword) not configured");
+	    cancel(status, report, "CIMA WRF credentials (cimaWrfUser, cimaWrfPassword) not configured");
 	    return;
 	}
 
@@ -91,13 +95,13 @@ public class CIMAForecastTask extends AbstractCustomTask {
 		.filter(CIMAForecastProcessor.INDICES::contains).toList() //
 		: CIMAForecastProcessor.INDICES;
 	if (indices.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("No valid index specified");
+	    cancel(status, report, "No valid index specified");
 	    return;
 	}
 
 	Optional<S3TransferWrapper> manager = getS3TransferManager();
 	if (manager.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("S3 manager not present");
+	    cancel(status, report, "S3 manager not present");
 	    return;
 	}
 
@@ -125,9 +129,29 @@ public class CIMAForecastTask extends AbstractCustomTask {
 	    processor.setDownloadMode(DownloadMode.valueOf(options.get(CIMAForecastTaskOptions.DOWNLOAD_MODE).toUpperCase()));
 	}
 
-	processor.execute();
+	processor.setReport(report);
 
-	log(status, "CIMAForecastTask ENDED");
+	// The exception is not rethrown, otherwise the summary e-mail is not sent: the ERROR phase is kept by the scheduler
+	try {
+	    processor.execute();
+	    status.setPhase(JobPhase.COMPLETED);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("CIMAForecastTask failed: " + e.getMessage(), e);
+	    report.error("Task failed: " + TaskReport.message(e));
+	    status.setErrorPhase();
+	}
+
+	log(status, "CIMAForecastTask ENDED (duration " + TaskReport.elapsed(start) + ")");
+    }
+
+    /**
+     * Invalid configuration: the task is not executed
+     */
+    private void cancel(SchedulerJobStatus status, TaskReport report, String message) {
+
+	GSLoggerFactory.getLogger(getClass()).error(message);
+	report.error(message);
+	status.setPhase(JobPhase.CANCELED);
     }
 
     @Override

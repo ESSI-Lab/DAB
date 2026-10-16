@@ -23,6 +23,7 @@ package eu.essi_lab.gssrv.conf.task.trigger.airquality;
 
 import eu.essi_lab.gssrv.conf.task.trigger.Legend;
 import eu.essi_lab.gssrv.conf.task.trigger.LegendItem;
+import eu.essi_lab.gssrv.conf.task.trigger.TaskReport;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.json.JSONArray;
@@ -106,6 +107,7 @@ public class CAMSAirQualityProcessor {
     private Path outputDir;
     private boolean maskSea;
     private Path landMask;
+    private TaskReport report = TaskReport.NONE;
 
     /**
      * @param ads the ADS client
@@ -151,6 +153,13 @@ public class CAMSAirQualityProcessor {
 	this.maskSea = maskSea;
     }
 
+    /**
+     * Summary of the execution, written in the task status
+     */
+    public void setReport(TaskReport report) {
+	this.report = report;
+    }
+
     public void execute() throws Exception {
 
 	LocalDate run = runDate != null ? runDate : latestRunDate();
@@ -170,6 +179,10 @@ public class CAMSAirQualityProcessor {
 	GSLoggerFactory.getLogger(getClass()).info("Working dir: " + workDir);
 	GSLoggerFactory.getLogger(getClass()).info("Sea masked: " + maskSea);
 
+	report.info("Run " + runInstant + ", lead hours 0-" + maxLeadHour + ", pollutants "
+		+ String.join(", ", pollutants.stream().map(CAMSPollutant::getKey).toList())
+		+ (area != null ? ", area N,W,S,E " + Arrays.toString(area) : "") + ", sea " + (maskSea ? "masked" : "not masked"));
+
 	try {
 
 	    if (maskSea) {
@@ -183,11 +196,13 @@ public class CAMSAirQualityProcessor {
 		    jobs.put(pollutant, ads.submit(DATASET, buildRequest(pollutant, run)));
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error("Unable to submit ADS request for " + pollutant.getKey() + ": " + e.getMessage());
+		    report.error(pollutant.getKey() + ": unable to submit the ADS request: " + TaskReport.message(e));
 		}
 	    }
 
 	    // 2. Download, conversion to COG, index and legend generation
-	    List<CAMSPollutant> completed = new ArrayList<>();
+	    Map<CAMSPollutant, List<JSONObject>> completed = new LinkedHashMap<>();
+	    Map<CAMSPollutant, Long> downloadedBytes = new HashMap<>();
 	    for (Map.Entry<CAMSPollutant, String> job : jobs.entrySet()) {
 
 		CAMSPollutant pollutant = job.getKey();
@@ -199,12 +214,14 @@ public class CAMSAirQualityProcessor {
 
 		    Path downloaded = downloadDir.resolve(pollutant.getKey() + "_" + run + ".download");
 		    ads.waitAndDownload(job.getValue(), downloaded);
+		    downloadedBytes.put(pollutant, Files.size(downloaded));
 
 		    List<Path> ncFiles = extractNetCDF(downloaded, downloadDir);
 		    List<JSONObject> files = convertToCOGs(ncFiles, pollutant, runInstant, pollutantDir);
 
 		    if (files.isEmpty()) {
 			GSLoggerFactory.getLogger(getClass()).warn("No COG generated for " + pollutant.getKey());
+			report.warn(pollutant.getKey() + ": no COG generated, the published products are kept");
 			continue;
 		    }
 
@@ -215,21 +232,31 @@ public class CAMSAirQualityProcessor {
 			cleanup(downloadDir);
 		    }
 
-		    completed.add(pollutant);
+		    completed.put(pollutant, files);
 
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error("Error processing " + pollutant.getKey() + ": " + e.getMessage(), e);
+		    report.error(pollutant.getKey() + ": " + TaskReport.message(e) + " - the published products are kept");
 		}
 	    }
 
 	    // 3. S3 publication
-	    if (s3 != null) {
-		for (CAMSPollutant pollutant : completed) {
-		    syncToS3(workDir.resolve(pollutant.getKey()), prefix + pollutant.getKey() + "/");
+	    for (Map.Entry<CAMSPollutant, List<JSONObject>> entry : completed.entrySet()) {
+
+		CAMSPollutant pollutant = entry.getKey();
+		List<JSONObject> files = entry.getValue();
+		String summary = pollutant.getKey() + ": downloaded " + downloadedBytes.get(pollutant) / (1024 * 1024) + " MB, " + files.size()
+			+ " COGs, " + files.getFirst().getString("time") + " -> " + files.getLast().getString("time");
+
+		if (s3 != null) {
+		    SyncResult result = syncToS3(workDir.resolve(pollutant.getKey()), prefix + pollutant.getKey() + "/");
+		    summary += ", uploaded " + result.uploaded() + ", removed " + result.removed() + " of the previous run";
 		}
+		report.info(summary);
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("=== CAMS air quality COMPLETED: " + completed.size() + "/" + pollutants.size() + " pollutants ===");
+	    report.info("Published " + completed.size() + "/" + pollutants.size() + " pollutants");
 
 	    if (completed.isEmpty()) {
 		throw new IOException("No pollutant has been processed");
@@ -283,6 +310,7 @@ public class CAMSAirQualityProcessor {
 	try (InputStream in = getClass().getClassLoader().getResourceAsStream(LAND_MASK_RESOURCE)) {
 	    if (in == null) {
 		GSLoggerFactory.getLogger(getClass()).warn("Land mask resource not found, sea will not be masked: " + LAND_MASK_RESOURCE);
+		report.warn("Land mask resource not found, sea not masked");
 		return null;
 	    }
 	    Path out = workDir.resolve("land_mask.geojson");
@@ -291,6 +319,7 @@ public class CAMSAirQualityProcessor {
 	    return out;
 	} catch (IOException e) {
 	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract land mask, sea will not be masked: " + e.getMessage());
+	    report.warn("Unable to extract land mask, sea not masked: " + TaskReport.message(e));
 	    return null;
 	}
     }
@@ -643,7 +672,7 @@ public class CAMSAirQualityProcessor {
      * Uploads the new run and then removes the objects of the previous run, so that the client never finds an empty folder. The
      * index.json is uploaded last since it references the new COGs
      */
-    private void syncToS3(Path pollutantDir, String keyPrefix) throws IOException {
+    private SyncResult syncToS3(Path pollutantDir, String keyPrefix) throws IOException {
 
 	GSLoggerFactory.getLogger(getClass()).info("Uploading " + pollutantDir + " to " + bucketName + "/" + keyPrefix);
 
@@ -687,6 +716,13 @@ public class CAMSAirQualityProcessor {
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Uploaded " + uploaded.size() + " files to " + keyPrefix);
+	return new SyncResult(uploaded.size(), stale.size());
+    }
+
+    /**
+     * Number of objects uploaded and of objects of the previous run removed by {@link #syncToS3(Path, String)}
+     */
+    private record SyncResult(int uploaded, int removed) {
     }
 
     private String runProcess(List<String> command) throws Exception {

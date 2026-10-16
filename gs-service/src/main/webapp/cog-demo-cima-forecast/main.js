@@ -19,7 +19,7 @@ const ATTRIBUTION = 'CIMA Research Foundation - WRF operational forecast';
 const CONFIG = {
   utci: {
     title: "Universal Thermal Climate Index (UTCI)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/utci/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/utci/index.json",
     style: {
       color: [
         'case',
@@ -51,7 +51,7 @@ const CONFIG = {
   },
   at: {
     title: "Apparent Temperature (AT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/at/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/at/index.json",
     style: {
       color: [
         'case',
@@ -73,7 +73,7 @@ const CONFIG = {
   },
   wbgt: {
     title: "Wet Bulb Globe Temperature (WBGT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/wbgt/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/wbgt/index.json",
     style: {
       color: [
         'case',
@@ -95,7 +95,7 @@ const CONFIG = {
   },
   wct: {
     title: "Wind Chill Temperature (WCT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/forecast/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/forecast/wct/index.json",
     style: {
       color: [
         'case',
@@ -129,6 +129,14 @@ let playTimer = null;
 const geoTiffCache = new Map();
 const MAX_CACHE_SIZE = 48;
 
+// While the slider is dragged the hour is loaded only when it stops: a source for every 'input' event starts dozens
+// of parallel Range requests, and the browser rejects some of them
+const SLIDER_DEBOUNCE_MS = 150;
+const RETRY_DELAY_MS = 1000;
+let sliderTimer = null;
+// Time of the hour already retried after a load error (one retry per hour)
+let retriedTime = null;
+
 // DOM Selectors
 const indexSelector = document.getElementById('indexSelector');
 const runLabel = document.getElementById('runLabel');
@@ -157,36 +165,60 @@ async function loadIndicator(variableKey) {
     activeVariable = variableKey;
     runLabel.textContent = "Loading forecast...";
 
-    const response = await fetch(CONFIG[variableKey].url, { cache: 'no-cache' });
-    const data = await response.json();
-
-    // The COGs are in the same folder of the index.json
-    const folder = CONFIG[variableKey].url.replace('index.json', '');
-    timeline = data.files
-      .map(file => ({ time: file.time, leadTimeHour: file.leadTimeHour, url: folder + file.filename }))
-      .sort((a, b) => new Date(a.time) - new Date(b.time));
-
-    forecastRun = data.forecastReferenceTime;
-    runLabel.textContent = `Forecast run: ${formatDate(forecastRun)} (CIMA WRF)`;
+    retriedTime = null;
+    const data = await fetchIndex(variableKey);
+    if (activeVariable !== variableKey) return;
+    setTimeline(variableKey, data);
 
     mapLayer.setStyle(CONFIG[variableKey].style);
     legendTitle.textContent = CONFIG[variableKey].title;
     buildLegend(variableKey);
 
-    slider.max = timeline.length - 1;
-    updateMap(findClosestToNow());
+    updateMap(findClosestTo(Date.now()));
   } catch (e) {
     runLabel.textContent = `Error loading indicator: ${variableKey}`;
     console.error(e);
   }
 }
 
-// Open the map on the forecast hour closest to the current time
-function findClosestToNow() {
-  const now = Date.now();
+async function fetchIndex(variableKey) {
+  const response = await fetch(CONFIG[variableKey].url, { cache: 'no-cache' });
+  if (!response.ok) throw new Error(`HTTP ${response.status} loading ${CONFIG[variableKey].url}`);
+  return response.json();
+}
+
+function setTimeline(variableKey, data) {
+  // The COGs are in the same folder of the index.json
+  const folder = CONFIG[variableKey].url.replace('index.json', '');
+  timeline = data.files
+    .map(file => ({ time: file.time, leadTimeHour: file.leadTimeHour, url: folder + file.filename }))
+    .sort((a, b) => new Date(a.time) - new Date(b.time));
+
+  forecastRun = data.forecastReferenceTime;
+  runLabel.textContent = `Forecast run: ${formatDate(forecastRun)} (CIMA WRF)`;
+  slider.max = timeline.length - 1;
+}
+
+// The task may publish a new run while the page is open, deleting the hours of the old one: reload the index.json and,
+// if the run has changed, rebuild the timeline keeping the selected time
+async function refreshRun(variableKey) {
+  try {
+    const data = await fetchIndex(variableKey);
+    if (activeVariable !== variableKey || data.forecastReferenceTime === forecastRun) return;
+    const selectedTime = new Date(timeline[currentIndex].time).getTime();
+    setTimeline(variableKey, data);
+    geoTiffCache.clear();
+    currentIndex = findClosestTo(selectedTime);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// Index of the forecast hour closest to the given time (the map opens on the hour closest to the current time)
+function findClosestTo(time) {
   let closest = 0;
   timeline.forEach((file, index) => {
-    if (Math.abs(new Date(file.time) - now) < Math.abs(new Date(timeline[closest].time) - now)) {
+    if (Math.abs(new Date(file.time) - time) < Math.abs(new Date(timeline[closest].time) - time)) {
       closest = index;
     }
   });
@@ -198,9 +230,10 @@ function updateMap(index) {
   currentIndex = index;
   const file = timeline[index];
 
+  if (file.time !== retriedTime) retriedTime = null;
+
   mapLayer.setSource(getOrCreateSource(file.url));
-  slider.value = index;
-  timeLabel.textContent = `${formatDate(file.time)} (+${file.leadTimeHour}h)`;
+  showTime(index);
 
   // Prepare the next hour in advance, so that the animation does not flicker
   if (timeline[index + 1]) {
@@ -216,9 +249,40 @@ function getOrCreateSource(fileUrl) {
     transition: 0,
     attributions: ATTRIBUTION
   });
+  // A failed source must not stay in the cache, otherwise its hour stays empty until the page is reloaded
+  source.on('change', () => {
+    if (source.getState() !== 'error') return;
+    if (geoTiffCache.get(fileUrl) === source) geoTiffCache.delete(fileUrl);
+    if (mapLayer.getSource() === source) handleLoadError(source);
+  });
   if (geoTiffCache.size >= MAX_CACHE_SIZE) geoTiffCache.delete(geoTiffCache.keys().next().value);
   geoTiffCache.set(fileUrl, source);
   return source;
+}
+
+function showTime(index) {
+  const file = timeline[index];
+  slider.value = index;
+  timeLabel.textContent = `${formatDate(file.time)} (+${file.leadTimeHour}h)`;
+}
+
+// The hour shown failed to load: check whether a new run has been published, then retry once
+async function handleLoadError(source) {
+  const variableKey = activeVariable;
+  const file = timeline[currentIndex];
+  const retry = retriedTime !== file.time;
+  const message = retry ? 'Unable to load this hour – retrying' : 'Unable to load this hour';
+  timeLabel.textContent = `${formatDate(file.time)} (+${file.leadTimeHour}h) – ${message}`;
+  pixelValue.textContent = message;
+  if (!retry) return;
+  retriedTime = file.time;
+
+  await refreshRun(variableKey);
+  setTimeout(() => {
+    // Retry only if the user is still on the failed hour
+    if (activeVariable !== variableKey || mapLayer.getSource() !== source) return;
+    updateMap(currentIndex);
+  }, RETRY_DELAY_MS);
 }
 
 function buildLegend(variableKey) {
@@ -248,6 +312,7 @@ function startAnimation() {
 
 function stopAnimation() {
   clearInterval(playTimer);
+  clearTimeout(sliderTimer);
   playTimer = null;
   playBtn.innerHTML = '&#9654; Play';
 }
@@ -257,8 +322,16 @@ indexSelector.addEventListener('change', (e) => {
   loadIndicator(e.target.value);
 });
 
+// While dragging only the label follows the slider: the hour is loaded when the slider stops or is released
 slider.addEventListener('input', (e) => {
   stopAnimation();
+  const index = parseInt(e.target.value, 10);
+  showTime(index);
+  sliderTimer = setTimeout(() => updateMap(index), SLIDER_DEBOUNCE_MS);
+});
+
+slider.addEventListener('change', (e) => {
+  clearTimeout(sliderTimer);
   updateMap(parseInt(e.target.value, 10));
 });
 
