@@ -24,6 +24,7 @@ package eu.essi_lab.gssrv.conf.task.trigger.cimaforecast;
 import eu.essi_lab.gssrv.conf.task.trigger.Legend;
 import eu.essi_lab.gssrv.conf.task.trigger.LegendFactory;
 import eu.essi_lab.gssrv.conf.task.trigger.LegendItem;
+import eu.essi_lab.gssrv.conf.task.trigger.TaskReport;
 import eu.essi_lab.lib.net.downloader.Downloader;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils;
 import eu.essi_lab.lib.net.downloader.HttpRequestUtils.MethodNoBody;
@@ -123,6 +124,7 @@ public class CIMAForecastProcessor {
     private DownloadMode downloadMode = DownloadMode.REMOTE;
     private Path outputDir;
     private Path landMask;
+    private TaskReport report = TaskReport.NONE;
 
     /**
      * @param user the CIMA WRF repository user
@@ -179,6 +181,13 @@ public class CIMAForecastProcessor {
     }
 
     /**
+     * Summary of the execution, written in the task status
+     */
+    public void setReport(TaskReport report) {
+	this.report = report;
+    }
+
+    /**
      * @return the most recent run expected to be published on the CIMA server at the given time
      */
     public static Instant latestRun(Instant now) {
@@ -214,10 +223,14 @@ public class CIMAForecastProcessor {
 	GSLoggerFactory.getLogger(getClass()).info("Run: " + runInstant + ", lead hours 0-" + maxLeadHour + ", indices: " + indices);
 	GSLoggerFactory.getLogger(getClass()).info("Source: " + url);
 
+	report.info("Run " + runInstant + ", lead hours 0-" + maxLeadHour + ", indices " + String.join(", ", indices) + ", sea "
+		+ (maskSea ? "masked" : "not masked"));
+
 	// 1. If the run is not published yet, the previous products are kept
 	int status = head(url);
 	if (status != 200) {
 	    GSLoggerFactory.getLogger(getClass()).warn("Run not available (HTTP " + status + "), the published products are kept: " + url);
+	    report.warn("Run not available (HTTP " + status + "), the published products are kept: " + url);
 	    return;
 	}
 
@@ -243,23 +256,27 @@ public class CIMAForecastProcessor {
 		try {
 		    source = "/vsicurl/" + url;
 		    grid = readGrid(source);
+		    report.info("Source: remote reading of " + url);
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).warn("Remote reading failed, downloading the whole file: " + e.getMessage());
+		    report.warn("Remote reading failed, downloading the whole file: " + TaskReport.message(e));
 		    source = null;
 		}
 	    }
 
 	    if (source == null) {
 		Path nc = workDir.resolve("download").resolve(url.substring(url.lastIndexOf('/') + 1));
-		download(url, nc);
+		long bytes = download(url, nc);
+		report.info("Source: downloaded " + url + " (" + bytes / (1024 * 1024) + " MB)");
 		source = nc.toAbsolutePath().toString();
 		grid = readGrid(source);
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("Grid: " + grid);
+	    report.info("Grid: " + grid.times().size() + " times from " + grid.times().getFirst());
 
 	    // 3. Conversion: an index is published only if all its hours are converted
-	    List<String> completed = new ArrayList<>();
+	    Map<String, List<JSONObject>> completed = new LinkedHashMap<>();
 	    for (String index : indices) {
 
 		Path indexDir = workDir.resolve(index);
@@ -271,23 +288,33 @@ public class CIMAForecastProcessor {
 		    writeLegend(indexDir, index);
 		    writeIndex(indexDir, index, runInstant, files);
 
-		    completed.add(index);
+		    completed.put(index, files);
 
 		} catch (Exception e) {
 		    GSLoggerFactory.getLogger(getClass()).error("Error processing " + index + ", the published products are kept: " + e.getMessage(),
 			    e);
+		    report.error(index + ": " + TaskReport.message(e) + " - the published products are kept");
 		    cleanup(indexDir);
 		}
 	    }
 
 	    // 4. S3 publication
-	    if (s3 != null) {
-		for (String index : completed) {
-		    syncToS3(workDir.resolve(index), prefix + index + "/");
+	    for (Map.Entry<String, List<JSONObject>> entry : completed.entrySet()) {
+
+		String index = entry.getKey();
+		List<JSONObject> files = entry.getValue();
+		String summary = index + ": " + files.size() + " COGs, " + files.getFirst().getString("time") + " -> "
+			+ files.getLast().getString("time");
+
+		if (s3 != null) {
+		    SyncResult result = syncToS3(workDir.resolve(index), prefix + index + "/");
+		    summary += ", uploaded " + result.uploaded() + ", removed " + result.removed() + " of the previous run";
 		}
+		report.info(summary);
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("=== CIMA WRF forecast COMPLETED: " + completed.size() + "/" + indices.size() + " indices ===");
+	    report.info("Published " + completed.size() + "/" + indices.size() + " indices");
 
 	    if (completed.isEmpty()) {
 		throw new IOException("No index has been processed");
@@ -516,7 +543,10 @@ public class CIMAForecastProcessor {
 	return response.statusCode();
     }
 
-    private void download(String url, Path target) throws Exception {
+    /**
+     * @return the size of the downloaded file
+     */
+    private long download(String url, Path target) throws Exception {
 
 	GSLoggerFactory.getLogger(getClass()).info("Downloading " + url);
 	Files.createDirectories(target.getParent());
@@ -532,7 +562,9 @@ public class CIMAForecastProcessor {
 	    Files.copy(body, target, StandardCopyOption.REPLACE_EXISTING);
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Downloaded " + Files.size(target) + " bytes");
+	long bytes = Files.size(target);
+	GSLoggerFactory.getLogger(getClass()).info("Downloaded " + bytes + " bytes");
+	return bytes;
     }
 
     private Downloader newDownloader() {
@@ -557,6 +589,7 @@ public class CIMAForecastProcessor {
 	try (InputStream in = getClass().getClassLoader().getResourceAsStream(LAND_MASK_RESOURCE)) {
 	    if (in == null) {
 		GSLoggerFactory.getLogger(getClass()).warn("Land mask resource not found, sea will not be masked: " + LAND_MASK_RESOURCE);
+		report.warn("Land mask resource not found, sea not masked");
 		return null;
 	    }
 	    Path out = workDir.resolve("land_mask.geojson");
@@ -564,6 +597,7 @@ public class CIMAForecastProcessor {
 	    return out;
 	} catch (IOException e) {
 	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract land mask, sea will not be masked: " + e.getMessage());
+	    report.warn("Unable to extract land mask, sea not masked: " + TaskReport.message(e));
 	    return null;
 	}
     }
@@ -642,7 +676,7 @@ public class CIMAForecastProcessor {
      * Uploads the new run and then removes the objects of the previous run, so that the client never finds an empty folder. The
      * index.json is uploaded last since it references the new COGs
      */
-    private void syncToS3(Path indexDir, String keyPrefix) throws IOException {
+    private SyncResult syncToS3(Path indexDir, String keyPrefix) throws IOException {
 
 	GSLoggerFactory.getLogger(getClass()).info("Uploading " + indexDir + " to " + bucketName + "/" + keyPrefix);
 
@@ -686,6 +720,13 @@ public class CIMAForecastProcessor {
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Uploaded " + uploaded.size() + " files to " + keyPrefix);
+	return new SyncResult(uploaded.size(), stale.size());
+    }
+
+    /**
+     * Number of objects uploaded and of objects of the previous run removed by {@link #syncToS3(Path, String)}
+     */
+    private record SyncResult(int uploaded, int removed) {
     }
 
     /**

@@ -65,11 +65,24 @@ public class COGS3SyncProcessor {
 
     private Path landMask;
 
+    // Errors on single files written in the report: with a broken source there may be hundreds
+    private static final int MAX_REPORTED_ERRORS = 10;
+
+    private TaskReport report = TaskReport.NONE;
+    private int failedFiles;
+
     public COGS3SyncProcessor(S3TransferWrapper s3, String bucketName, String[] variables, String sourceURL) {
 	this.s3 = s3;
 	this.bucketName = bucketName;
 	this.variables = variables;
 	this.sourceURL = sourceURL;
+    }
+
+    /**
+     * Summary of the execution, written in the task status
+     */
+    public void setReport(TaskReport report) {
+	this.report = report;
     }
 
     public void execute() throws Exception {
@@ -87,6 +100,8 @@ public class COGS3SyncProcessor {
 	GSLoggerFactory.getLogger(getClass()).info("Bucket: " + bucketName);
 	GSLoggerFactory.getLogger(getClass()).info("Variables: " + Arrays.toString(variables));
 	GSLoggerFactory.getLogger(getClass()).info("Working dir: " + tempWorkDir);
+
+	report.info("Source " + sourceURL + ", bucket " + bucketName + ", variables " + String.join(", ", variables));
 
 	try {
 
@@ -108,11 +123,18 @@ public class COGS3SyncProcessor {
 	    List<URL> filteredURLs = filterURLs(tiffUrls);
 
 	    GSLoggerFactory.getLogger(getClass()).info("File to analyze: " + filteredURLs.size());
+	    report.info("Files found: " + allFiles.size() + ", GeoTIFF: " + tiffUrls.size() + ", selected: " + filteredURLs.size());
 
 	    // 2. Download & Process
 	    Downloader downloader = new Downloader();
 	    for (URL url : filteredURLs) {
 		processSingleFile(url, tempWorkDir, downloader, user, pass);
+	    }
+
+	    report.info("Converted " + (filteredURLs.size() - failedFiles) + "/" + filteredURLs.size() + " files" //
+		    + (failedFiles > 0 ? ", " + failedFiles + " errors" : ""));
+	    if (failedFiles > MAX_REPORTED_ERRORS) {
+		report.error("... and " + (failedFiles - MAX_REPORTED_ERRORS) + " more errors, see the GS log");
 	    }
 
 	    // 2. Index Generation
@@ -131,6 +153,7 @@ public class COGS3SyncProcessor {
 	    cleanup(tempWorkDir);
 	    variableFilesMap = new HashMap<>();
 	    landMask = null;
+	    failedFiles = 0;
 	}
     }
 
@@ -138,6 +161,7 @@ public class COGS3SyncProcessor {
 	try (InputStream in = getClass().getClassLoader().getResourceAsStream(LAND_MASK_RESOURCE)) {
 	    if (in == null) {
 		GSLoggerFactory.getLogger(getClass()).warn("Land mask resource not found, ocean will not be masked: " + LAND_MASK_RESOURCE);
+		report.warn("Land mask resource not found, ocean not masked");
 		return null;
 	    }
 	    Path out = workDir.resolve("land_mask.geojson");
@@ -146,6 +170,7 @@ public class COGS3SyncProcessor {
 	    return out;
 	} catch (IOException e) {
 	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract land mask, ocean will not be masked: " + e.getMessage());
+	    report.warn("Unable to extract land mask, ocean not masked: " + TaskReport.message(e));
 	    return null;
 	}
     }
@@ -196,6 +221,9 @@ public class COGS3SyncProcessor {
 
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Error on " + originalName + ": " + e.getMessage());
+	    if (++failedFiles <= MAX_REPORTED_ERRORS) {
+		report.error(originalName + ": " + TaskReport.message(e));
+	    }
 	}
     }
 
@@ -596,6 +624,13 @@ public class COGS3SyncProcessor {
     private void syncToS3(Path workingDir) {
 	s3.setACLPublicRead(true);
 	for (String var : variables) {
+	    // Without new COGs the published files are kept: they would be deleted and the missing directory would stop the sync
+	    List<String> files = variableFilesMap.getOrDefault(var, List.of());
+	    if (files.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).warn("No COG produced for variable " + var + ", the published files are kept");
+		report.warn(var + ": no COG produced, the published files are kept");
+		continue;
+	    }
 	    GSLoggerFactory.getLogger(getClass()).info("Uploading variable: " + var);
 	    String prefix = var + "/";
 	    Path varDir = workingDir.resolve(var);
@@ -606,6 +641,7 @@ public class COGS3SyncProcessor {
 		existing.forEach(o -> keys.add(o.key()));
 		s3.deleteObjects(bucketName, keys);
 	    }
+	    int uploaded = 0;
 	    // Upload files in the var directories
 	    try (DirectoryStream<Path> stream = Files.newDirectoryStream(varDir)) {
 		for (Path localFile : stream) {
@@ -626,14 +662,17 @@ public class COGS3SyncProcessor {
 			GSLoggerFactory.getLogger(getClass()).info("  - Loading: " + s3Key);
 
 			s3.uploadFile(localFile.toAbsolutePath().toString(), bucketName, s3Key, contentType);
+			uploaded++;
 		    }
 		}
 	    } catch (IOException e) {
-		GSLoggerFactory.getLogger(getClass()).info("Error S3 for variable " + var);
+		GSLoggerFactory.getLogger(getClass()).error("Error S3 for variable " + var + ": " + e.getMessage());
 		throw new RuntimeException(e);
 	    }
 
 	    GSLoggerFactory.getLogger(getClass()).info("Completed upload for: " + var);
+	    report.info(var + ": " + files.size() + " COGs, " + formatIsoTime(files.getFirst()) + " -> " + formatIsoTime(files.getLast())
+		    + ", removed " + existing.size() + ", uploaded " + uploaded);
 
 	}
     }

@@ -24,10 +24,13 @@ package eu.essi_lab.gssrv.conf.task.trigger.airquality;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.gssrv.conf.task.trigger.TaskReport;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.quartz.JobExecutionContext;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -59,24 +62,26 @@ public class CAMSAirQualityTask extends AbstractCustomTask {
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
 
+	Instant start = Instant.now();
 	log(status, "CAMSAirQualityTask STARTED");
+	TaskReport report = TaskReport.of(status);
 
 	Optional<EnumMap<CAMSAirQualityTaskOptions, String>> taskOptions = readTaskOptions(context, CAMSAirQualityTaskOptions.class);
 	if (taskOptions.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("No options specified");
+	    cancel(status, report, "No options specified");
 	    return;
 	}
 	EnumMap<CAMSAirQualityTaskOptions, String> options = taskOptions.get();
 
 	String bucketName = options.get(CAMSAirQualityTaskOptions.BUCKET_NAME);
 	if (bucketName == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("No bucket name option specified");
+	    cancel(status, report, "No bucket name option specified");
 	    return;
 	}
 
 	String adsKey = Optional.ofNullable(options.get(CAMSAirQualityTaskOptions.ADS_KEY)).orElse(System.getenv("ADS_KEY"));
 	if (adsKey == null || adsKey.isBlank()) {
-	    GSLoggerFactory.getLogger(getClass()).error("No ADS key specified (ADS_KEY option or environment variable)");
+	    cancel(status, report, "No ADS key specified (ADS_KEY option or environment variable)");
 	    return;
 	}
 
@@ -87,7 +92,7 @@ public class CAMSAirQualityTask extends AbstractCustomTask {
 		? CAMSAirQualityProcessor.parsePollutants(options.get(CAMSAirQualityTaskOptions.POLLUTANTS))
 		: List.of(CAMSPollutant.values());
 	if (pollutants.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("No valid pollutant specified");
+	    cancel(status, report, "No valid pollutant specified");
 	    return;
 	}
 
@@ -101,7 +106,7 @@ public class CAMSAirQualityTask extends AbstractCustomTask {
 
 	Optional<S3TransferWrapper> manager = getS3TransferManager();
 	if (manager.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("S3 manager not present");
+	    cancel(status, report, "S3 manager not present");
 	    return;
 	}
 
@@ -115,9 +120,29 @@ public class CAMSAirQualityTask extends AbstractCustomTask {
 
 	processor.setMaskSea(Boolean.parseBoolean(options.get(CAMSAirQualityTaskOptions.MASK_SEA)));
 
-	processor.execute();
+	processor.setReport(report);
 
-	log(status, "CAMSAirQualityTask ENDED");
+	// The exception is not rethrown, otherwise the summary e-mail is not sent: the ERROR phase is kept by the scheduler
+	try {
+	    processor.execute();
+	    status.setPhase(JobPhase.COMPLETED);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("CAMSAirQualityTask failed: " + e.getMessage(), e);
+	    report.error("Task failed: " + TaskReport.message(e));
+	    status.setErrorPhase();
+	}
+
+	log(status, "CAMSAirQualityTask ENDED (duration " + TaskReport.elapsed(start) + ")");
+    }
+
+    /**
+     * Invalid configuration: the task is not executed
+     */
+    private void cancel(SchedulerJobStatus status, TaskReport report, String message) {
+
+	GSLoggerFactory.getLogger(getClass()).error(message);
+	report.error(message);
+	status.setPhase(JobPhase.CANCELED);
     }
 
     @Override
