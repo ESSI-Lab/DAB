@@ -31,7 +31,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Date;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
@@ -75,7 +77,12 @@ import eu.essi_lab.profiler.om.OMHandler;
 public class BasicDataHarvesterTask extends AbstractCustomTask {
 
     public enum DataHarvesterTaskOptions implements OptionsKey {
-	SOURCE_ID, MAX_RECORDS, VIEW_ID, TOKEN, OBSERVATION_ID;
+	SOURCE_ID, MAX_RECORDS, VIEW_ID, TOKEN, OBSERVATION_ID,
+	/**
+	 * Comma separated list of observed property URIs. If present, only observations having one of these observed
+	 * property URIs are harvested
+	 */
+	OBSERVED_PROPERTY_URIS;
     }
 
     private static final String OM_API_BASE = "http://localhost:9090/gs-service/services/essi/token/";
@@ -143,6 +150,11 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 	String observationId = taskOptions.get().get(DataHarvesterTaskOptions.OBSERVATION_ID);
 
+	Set<String> observedPropertyURIs = parseList(taskOptions.get().get(DataHarvesterTaskOptions.OBSERVED_PROPERTY_URIS));
+	if (!observedPropertyURIs.isEmpty()) {
+	    GSLoggerFactory.getLogger(getClass()).info("Harvesting only observed property URIs: {}", observedPropertyURIs);
+	}
+
 	// INIT CACHE CONNECTOR
 
 	DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
@@ -164,7 +176,8 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 	try {
 
-	    canceled = harvest(context, dataCacheConnector, tempDirFile, token, viewId, sourceId, observationId, maxRecords, stats);
+	    canceled = harvest(context, dataCacheConnector, tempDirFile, token, viewId, sourceId, observationId, observedPropertyURIs,
+		    maxRecords, stats);
 
 	} finally {
 
@@ -194,7 +207,8 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
      * @return true if the job has been canceled
      */
     private boolean harvest(JobExecutionContext context, DataCacheConnector dataCacheConnector, File tempDirFile, String token,
-	    String viewId, String sourceId, String observationId, Integer maxRecords, HarvestStats stats) throws Exception {
+	    String viewId, String sourceId, String observationId, Set<String> observedPropertyURIs, Integer maxRecords,
+	    HarvestStats stats) throws Exception {
 
 	OMHandler omHandler = new OMHandler();
 
@@ -284,6 +298,11 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 
 		JSONObject member = members.getJSONObject(i);
 
+		if (!observedPropertyURIs.isEmpty() && !observedPropertyURIs.contains(getObservedPropertyURI(member))) {
+		    stats.skipped++;
+		    continue;
+		}
+
 		harvestObservation(omHandler, dataCacheConnector, tempDirFile, token, viewId, sourceId, member, stats);
 
 		if (maxRecords != null && stats.recordsDone >= maxRecords) {
@@ -345,10 +364,7 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	JSONObject observedPropertyObject = member.optJSONObject("observedProperty");
 	if (observedPropertyObject != null) {
 	    observedProperty = observedPropertyObject.optString("title", null);
-	    observedPropertyURI = observedPropertyObject.optString("href", null);
-	    if (observedPropertyURI != null && observedPropertyURI.isBlank()) {
-		observedPropertyURI = null;
-	    }
+	    observedPropertyURI = getObservedPropertyURI(member);
 	}
 	JSONObject feature = member.optJSONObject("featureOfInterest");
 	if (feature != null) {
@@ -615,6 +631,38 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	return hourlyRecords.size();
     }
 
+    /**
+     * @return the observed property URI of the given OM observation, or null if missing
+     */
+    private static String getObservedPropertyURI(JSONObject member) {
+
+	JSONObject observedPropertyObject = member.optJSONObject("observedProperty");
+	if (observedPropertyObject == null) {
+	    return null;
+	}
+	String uri = observedPropertyObject.optString("href", null);
+	if (uri == null || uri.isBlank()) {
+	    return null;
+	}
+	return uri.trim();
+    }
+
+    /**
+     * @return the non empty, trimmed items of the given comma separated list
+     */
+    private static Set<String> parseList(String list) {
+
+	Set<String> ret = new HashSet<>();
+	if (list != null) {
+	    for (String item : list.split(",")) {
+		if (!item.isBlank()) {
+		    ret.add(item.trim());
+		}
+	    }
+	}
+	return ret;
+    }
+
     private static class HarvestStats {
 
 	int totalRecords;
@@ -622,12 +670,14 @@ public class BasicDataHarvesterTask extends AbstractCustomTask {
 	int errors;
 	int majorErrors;
 	int invalidValues;
+	int skipped;
 
 	@Override
 	public String toString() {
 
 	    return "Records seen: " + totalRecords + " Records inserted: " + recordsDone + " Errors: " + errors + " Major errors: "
-		    + majorErrors + " Invalid values skipped: " + invalidValues;
+		    + majorErrors + " Invalid values skipped: " + invalidValues
+		    + " Records skipped (observed property filter): " + skipped;
 	}
     }
 }

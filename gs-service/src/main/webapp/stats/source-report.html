@@ -25,9 +25,8 @@
         th {
             background-color: #f4f4f4;
         }
-        td.uri {
-            word-break: break-all;
-            font-size: 13px;
+        td.concept {
+            overflow-wrap: anywhere;
         }
         td.number {
             text-align: right;
@@ -104,7 +103,7 @@
         <thead>
             <tr>
                 <th>Observed property</th>
-                <th>Observed property URI</th>
+                <th>Observed property concept</th>
                 <th>Datasets in metadata</th>
                 <th>Datasets in cache</th>
                 <th>Cache coverage</th>
@@ -196,13 +195,13 @@
             properties.forEach(property => {
                 const coverage = property.datasetsInDatabase > 0 ? (property.datasetsInCache / property.datasetsInDatabase) * 100 : NaN;
                 const days = daysSince(property.newestObservation);
-                const uris = Array.isArray(property.uris) ? property.uris : [];
+                const concepts = Array.isArray(property.concepts) ? property.concepts : [];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${property.name ? escapeHtml(property.name) : '<em>(not specified)</em>'}</td>
-                    <td class="uri">${uris.length === 0 ? '-' : uris.map(uri => /^https?:\/\//i.test(uri)
-                        ? `<a href="${escapeHtml(uri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(uri)}</a>`
-                        : escapeHtml(uri)).join('<br>')}</td>
+                    <td class="concept">${concepts.length === 0 ? '-' : concepts.map(concept => /^https?:\/\//i.test(concept.uri)
+                        ? `<a href="${escapeHtml(concept.uri)}" title="${escapeHtml(concept.uri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(concept.label || concept.uri)}</a>`
+                        : `<span title="${escapeHtml(concept.uri)}">${escapeHtml(concept.label || concept.uri)}</span>`).join('<br>')}</td>
                     <td class="number">${formatNumber(property.datasetsInDatabase)}</td>
                     <td class="number">${formatNumber(property.datasetsInCache)}</td>
                     <td>${isNaN(coverage) ? '-' : `

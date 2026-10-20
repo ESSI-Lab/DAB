@@ -81,7 +81,14 @@ public abstract class DataCacheConnector {
 	deleteBefore(date, sourceIdentifier, null);
     }
 
-    public abstract void deleteBefore(Date date, String sourceIdentifier, String dataIdentifier) throws Exception;
+    /**
+     * @param date
+     * @param sourceIdentifier
+     * @param dataIdentifier
+     * @return the number of deleted records
+     * @throws Exception
+     */
+    public abstract long deleteBefore(Date date, String sourceIdentifier, String dataIdentifier) throws Exception;
 
     /**
      * Removes all records before the given date from active stations and unknown type stations

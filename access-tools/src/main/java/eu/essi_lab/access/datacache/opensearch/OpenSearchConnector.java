@@ -815,7 +815,7 @@ public class OpenSearchConnector extends DataCacheConnector {
     }
 
     @Override
-    public void deleteBefore(Date date, String sourceIdentifier, String dataIdentifier) throws Exception {
+    public long deleteBefore(Date date, String sourceIdentifier, String dataIdentifier) throws Exception {
 	GSLoggerFactory.getLogger(getClass()).info("Deleting records from source: {} data record: {}", sourceIdentifier, dataIdentifier);
 	org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder dqrb = new org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder();
 	dqrb = dqrb.index(DataCacheIndex.VALUES.getIndex(databaseName));
@@ -842,6 +842,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	long deleted = response.deleted();
 	GSLoggerFactory.getLogger(getClass()).info("Deleted records: {}", deleted);
 
+	return deleted;
     }
 
     @Override

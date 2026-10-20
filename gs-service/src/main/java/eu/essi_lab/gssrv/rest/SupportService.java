@@ -31,6 +31,15 @@ import eu.essi_lab.harvester.HarvestingNotifier.HarvestingResult;
 import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.lib.odip.*;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.*;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting;
+import eu.essi_lab.lib.skos.SKOSClient;
+import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
+import eu.essi_lab.lib.skos.SKOSConcept;
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.messages.RequestMessage.*;
@@ -61,6 +70,7 @@ import org.owasp.encoder.*;
 import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.Map.*;
 
 @WebService
@@ -71,6 +81,16 @@ import java.util.Map.*;
 public class SupportService {
 
     private static final int HARVESTING_HISTORY_SIZE = 20;
+
+    /**
+     * Labels of the observed property concepts, resolved from the enabled ontologies
+     */
+    private static final ExpiringCache<String> CONCEPT_LABELS_CACHE = new ExpiringCache<>();
+
+    static {
+	CONCEPT_LABELS_CACHE.setDuration(TimeUnit.MINUTES.toMillis(30));
+	CONCEPT_LABELS_CACHE.setMaxSize(5000);
+    }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
@@ -570,6 +590,13 @@ public class SupportService {
 	Set<String> properties = new TreeSet<>(datasetsInDatabase.keySet());
 	properties.addAll(cacheStats.keySet());
 
+	// concept labels resolved during this request, from the enabled ontologies
+	Map<String, String> conceptLabels = new HashMap<>();
+	List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()//
+		.filter(o -> o.getOntologyAvailability() == OntologySetting.Availability.ENABLED)//
+		.map(OntologySetting::getOntologyEndpoint)//
+		.toList();
+
 	JSONArray propertiesArray = new JSONArray();
 	for (String property : properties) {
 	    JSONObject jsonProperty = new JSONObject();
@@ -581,7 +608,14 @@ public class SupportService {
 	    if (stats != null) {
 		propertyURIs.addAll(stats.getObservedPropertyURIs());
 	    }
-	    jsonProperty.put("uris", new JSONArray(propertyURIs));
+	    JSONArray concepts = new JSONArray();
+	    for (String uri : propertyURIs) {
+		JSONObject concept = new JSONObject();
+		concept.put("uri", uri);
+		concept.put("label", conceptLabels.computeIfAbsent(uri, u -> getConceptLabel(u, ontologyUrls)));
+		concepts.put(concept);
+	    }
+	    jsonProperty.put("concepts", concepts);
 	    if (stats != null) {
 		jsonProperty.put("datasetsInCache", stats.getUniqueDatasetCount());
 		jsonProperty.put("valuesInCache", stats.getRecordCount());
@@ -605,6 +639,55 @@ public class SupportService {
 	output.put("harvestings", getHarvestingHistory(sourceId));
 	output.put("status", "success");
 	return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+    }
+
+    /**
+     * Resolves the English preferred label of an observed property concept from the ontologies registered and enabled in
+     * the configuration (semantic settings). The label of the URIs not found, or of all the URIs if no ontology is
+     * enabled, is the URI itself
+     *
+     * @param uri
+     * @param ontologyUrls the SPARQL endpoints of the enabled ontologies
+     * @return
+     */
+    private String getConceptLabel(String uri, List<String> ontologyUrls) {
+
+	String label = CONCEPT_LABELS_CACHE.get(uri);
+	if (label != null) {
+	    return label;
+	}
+	if (ontologyUrls.isEmpty()) {
+	    return uri;
+	}
+
+	label = uri;
+	try {
+	    SKOSClient client = new SKOSClient();
+	    client.setOntologyUrls(ontologyUrls);
+	    client.setSearchValue(SearchTarget.CONCEPTS, uri);
+	    client.setSearchLangs(List.of("en"));
+	    client.setSourceLangs(List.of("en"));
+	    client.setExpansionLevel(ExpansionLevel.NONE);
+	    client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1));
+
+	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	    expander.setExcludeNoPrefConcepts(false);
+	    expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+	    client.setExpander(expander);
+
+	    SKOSResponse response = client.search();
+	    for (SKOSConcept concept : response.getResults()) {
+		if (uri.equals(concept.getConceptURI()) && concept.getPref().isPresent() && !concept.getPref().get().isBlank()) {
+		    label = concept.getPref().get();
+		    break;
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to resolve the label of concept {}: {}", uri, e.getMessage());
+	}
+
+	CONCEPT_LABELS_CACHE.put(uri, label);
+	return label;
     }
 
     /**

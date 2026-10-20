@@ -5,6 +5,7 @@ eu.essi_lab.gssrv.conf.task.StatisticsTask
 eu.essi_lab.gssrv.conf.task.GEOSSAccessedSourceTask
 eu.essi_lab.gssrv.conf.task.DataHarvesterTask
 eu.essi_lab.gssrv.conf.task.BasicDataHarvesterTask
+eu.essi_lab.gssrv.conf.task.DataCacheSourceRemovalTask
 eu.essi_lab.gssrv.conf.task.ErrorLogsPublisherTask
 eu.essi_lab.gssrv.conf.task.PrivateIdEncoderTask
 eu.essi_lab.gssrv.conf.task.SchedulerJobDataChecker
