@@ -102,6 +102,13 @@ public abstract class DataCacheConnector {
     
 	public abstract Map<String, SourceCacheStats> getCacheStatsPerSource(List<String> selectedSourceIds) throws IOException;
 
+    /**
+     * @param sourceId
+     * @return the cache statistics of the given source, per observed property
+     * @throws IOException
+     */
+    public abstract Map<String, PropertyCacheStats> getCacheStatsPerObservedProperty(String sourceId) throws IOException;
+
     public abstract Date getFirstDate(String dataIdentifier) throws Exception;
 
     public abstract Date getLastDate(String dataIdentifier) throws Exception;

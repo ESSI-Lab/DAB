@@ -286,7 +286,9 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	}
 
 	try {
-	    client.publish(topic, wnm.getJSONObject().toString(3), true);
+	    // not retained: a retained message would be redelivered (e.g. on broker reconnections) after the record has
+	    // been regenerated, and its integrity would no longer match the content served at the link
+	    client.publish(topic, wnm.getJSONObject().toString(3), false);
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    // reinitialize the client

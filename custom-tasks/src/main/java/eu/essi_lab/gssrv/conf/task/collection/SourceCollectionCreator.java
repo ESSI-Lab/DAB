@@ -23,6 +23,7 @@ package eu.essi_lab.gssrv.conf.task.collection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -266,7 +267,12 @@ class SourceCollectionCreator {
 	WHOSOntology ontology = new WHOSOntology();
 	miMetadata.getDataIdentification().addKeyword("DAB");
 
-	for (PropertyResult property : observedProperties) {
+	// sorted, so that keywords and abstract (and the integrity checksum of the WIS2 notification) are stable among runs
+	List<PropertyResult> sortedProperties = new ArrayList<>(observedProperties);
+	sortedProperties.sort(Comparator.comparing(PropertyResult::getName, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(PropertyResult::getUri, Comparator.nullsLast(Comparator.naturalOrder())));
+
+	for (PropertyResult property : sortedProperties) {
 	    if (property.getUri() != null) {
 		if (!propertyURIs.contains(property.getUri())) {
 		    List<SKOSConcept> concepts = ontology.findConcepts(property.getUri(), true, false);
@@ -403,6 +409,11 @@ class SourceCollectionCreator {
 		}
 	    }
 	    return false;
+	}
+
+	@Override
+	public int hashCode() {
+	    return Objects.hash(getName(), getUri());
 	}
 
     }

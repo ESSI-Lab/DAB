@@ -2386,6 +2386,14 @@ function initializeLogin(config) {
 			});
 		}
 
+		// Data report button click handler (admin only)
+		if (isAdmin) {
+			document.getElementById('dataReportBtn').addEventListener('click', function() {
+				userMenu.style.display = 'none';
+				window.open('../stats/data-report.html?viewId=' + encodeURIComponent(view), '_blank', 'noopener,noreferrer');
+			});
+		}
+
 		// Logout menu button click handler
 		document.getElementById('logoutMenuBtn').addEventListener('click', function() {
 			localStorage.removeItem('authToken');

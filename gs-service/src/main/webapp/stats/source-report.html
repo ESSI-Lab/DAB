@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Source Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+        #propertiesTableContainer, #harvestingTableContainer {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        td.uri {
+            word-break: break-all;
+            font-size: 13px;
+        }
+        td.number {
+            text-align: right;
+        }
+        .coverage {
+            position: relative;
+            min-width: 120px;
+            height: 20px;
+            background-color: #eee;
+            border-radius: 3px;
+        }
+        .coverage-bar {
+            height: 100%;
+            background-color: #7aa6d8;
+            border-radius: 3px;
+        }
+        .coverage-label {
+            position: absolute;
+            inset: 0;
+            text-align: center;
+            line-height: 20px;
+            font-size: 13px;
+        }
+        .age-green { background-color: #c8e6c9; }
+        .age-yellow { background-color: #fff3b0; }
+        .age-red { background-color: #f8c4c4; }
+        .result-COMPLETED, .result-CONSOLIDATED_FOLDER_SURVIVED { background-color: #c8e6c9; }
+        .result-RUNNING { background-color: #cfe3fa; }
+        .result-INTERRUPTED, .result-CANCELED { background-color: #fff3b0; }
+        .result-FAILED { background-color: #f8c4c4; }
+        #loadingMessage {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            color: #2c3e50;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 15px;
+            border: 4px solid #ddd;
+            border-top-color: #2c3e50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingMessage">
+    <div class="spinner"></div>
+    <div>Loading source report, please wait...</div>
+</div>
+
+<p><a id="backLink" href="#">&larr; Back to the data report</a></p>
+
+<h1 id="sourceName">Source report</h1>
+<p id="sourceId"></p>
+
+<h2>Observed properties</h2>
+<p>For each observed property, the table compares the datasets in the metadata database with the datasets available in the data cache. The latest observation is the time of the most recent cached value.</p>
+<p id="overall"></p>
+<div id="propertiesTableContainer">
+    <table id="propertiesTable">
+        <thead>
+            <tr>
+                <th>Observed property</th>
+                <th>Observed property URI</th>
+                <th>Datasets in metadata</th>
+                <th>Datasets in cache</th>
+                <th>Cache coverage</th>
+                <th>Values in cache</th>
+                <th>Latest observation</th>
+                <th>Days since latest observation</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<h2>Harvesting history</h2>
+<p>The last metadata harvestings of the source, as recorded in the harvesting statistics.</p>
+<div id="harvestingTableContainer">
+    <table id="harvestingTable">
+        <thead>
+            <tr>
+                <th>Start</th>
+                <th>End</th>
+                <th>Result</th>
+                <th>Duration</th>
+                <th>Strategy</th>
+                <th>Harvested records</th>
+                <th>Records before</th>
+                <th>Records after</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get('viewId') || 'default-view-id';
+    const sourceId = urlParams.get('sourceId') || '';
+
+    document.getElementById('backLink').href = 'data-report.html?viewId=' + encodeURIComponent(viewId);
+
+    const escapeHtml = value => String(value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const formatDate = value => {
+        const date = new Date(value);
+        return isNaN(date) ? '-' : date.toISOString().replace('T', ' ').substring(0, 16);
+    };
+
+    const daysSince = value => {
+        const date = new Date(value);
+        return isNaN(date) ? NaN : Math.floor((Date.now() - date.getTime()) / 86400000);
+    };
+
+    const ageClass = days => isNaN(days) ? '' : days <= 14 ? 'age-green' : days <= 30 ? 'age-yellow' : 'age-red';
+
+    const formatDuration = millis => {
+        if (typeof millis !== 'number') return '-';
+        const totalMinutes = Math.round(millis / 60000);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    };
+
+    const formatNumber = value => typeof value === 'number' ? value.toLocaleString() : '-';
+
+    fetch(`/gs-service/services/support/source-data-stats?view=${encodeURIComponent(viewId)}&source=${encodeURIComponent(sourceId)}`)
+        .then(res => res.json())
+        .then(response => {
+            document.getElementById('loadingMessage').style.display = 'none';
+
+            if (response.status !== 'success') {
+                throw new Error(response.message || 'unexpected response');
+            }
+
+            document.title = 'Source Report - ' + response.name;
+            document.getElementById('sourceName').textContent = response.name;
+            document.getElementById('sourceId').innerHTML = 'Source identifier: <code>' + escapeHtml(response.id) + '</code>';
+
+            // TABLE: Observed properties
+            const properties = response.properties;
+            const totalInDatabase = properties.reduce((sum, p) => sum + p.datasetsInDatabase, 0);
+            const totalInCache = properties.reduce((sum, p) => sum + p.datasetsInCache, 0);
+            const totalCoverage = totalInDatabase > 0 ? (totalInCache / totalInDatabase) * 100 : 0;
+            document.getElementById('overall').innerHTML = `Observed properties: <strong>${properties.length}</strong>, `
+                + `datasets in metadata: <strong>${formatNumber(totalInDatabase)}</strong>, `
+                + `datasets in cache: <strong>${formatNumber(totalInCache)}</strong> (${totalCoverage.toFixed(2)}%)`;
+
+            const propertiesBody = document.querySelector('#propertiesTable tbody');
+            properties.forEach(property => {
+                const coverage = property.datasetsInDatabase > 0 ? (property.datasetsInCache / property.datasetsInDatabase) * 100 : NaN;
+                const days = daysSince(property.newestObservation);
+                const uris = Array.isArray(property.uris) ? property.uris : [];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${property.name ? escapeHtml(property.name) : '<em>(not specified)</em>'}</td>
+                    <td class="uri">${uris.length === 0 ? '-' : uris.map(uri => /^https?:\/\//i.test(uri)
+                        ? `<a href="${escapeHtml(uri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(uri)}</a>`
+                        : escapeHtml(uri)).join('<br>')}</td>
+                    <td class="number">${formatNumber(property.datasetsInDatabase)}</td>
+                    <td class="number">${formatNumber(property.datasetsInCache)}</td>
+                    <td>${isNaN(coverage) ? '-' : `
+                        <div class="coverage">
+                            <div class="coverage-bar" style="width: ${Math.min(coverage, 100)}%"></div>
+                            <div class="coverage-label">${coverage.toFixed(1)}%</div>
+                        </div>`}</td>
+                    <td class="number">${formatNumber(property.valuesInCache)}</td>
+                    <td>${formatDate(property.newestObservation)}</td>
+                    <td class="number ${ageClass(days)}">${isNaN(days) ? '-' : days}</td>
+                `;
+                propertiesBody.appendChild(tr);
+            });
+            if (properties.length === 0) {
+                propertiesBody.innerHTML = '<tr><td colspan="8">No observed properties found.</td></tr>';
+            }
+
+            // TABLE: Harvesting history
+            const harvestingBody = document.querySelector('#harvestingTable tbody');
+            response.harvestings.forEach(harvesting => {
+                const tr = document.createElement('tr');
+                const result = harvesting.result || '';
+                const errors = Array.isArray(harvesting.errors) ? harvesting.errors.join('\n') : '';
+                tr.innerHTML = `
+                    <td>${formatDate(harvesting.startDate)}</td>
+                    <td>${formatDate(harvesting.endDate)}</td>
+                    <td class="result-${escapeHtml(result)}" title="${escapeHtml(errors)}">${escapeHtml(result || '-')}${errors ? ' &#9888;' : ''}</td>
+                    <td>${formatDuration(harvesting.durationMillis)}</td>
+                    <td>${escapeHtml(harvesting.strategy || '-')}</td>
+                    <td class="number">${formatNumber(harvesting.harvestedRecords)}</td>
+                    <td class="number">${formatNumber(harvesting.recordsBefore)}</td>
+                    <td class="number">${formatNumber(harvesting.recordsAfter)}</td>
+                `;
+                harvestingBody.appendChild(tr);
+            });
+            if (response.harvestings.length === 0) {
+                harvestingBody.innerHTML = '<tr><td colspan="8">No harvesting recorded in the harvesting statistics.</td></tr>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('loadingMessage').style.display = 'none';
+            console.error("Error fetching source data:", error);
+            alert("Failed to load source data.");
+        });
+</script>
+
+</body>
+</html>

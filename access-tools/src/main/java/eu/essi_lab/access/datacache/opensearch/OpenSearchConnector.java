@@ -91,6 +91,7 @@ import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.Polygon4326;
 import eu.essi_lab.access.datacache.Response;
 import eu.essi_lab.access.datacache.ResponseListener;
+import eu.essi_lab.access.datacache.PropertyCacheStats;
 import eu.essi_lab.access.datacache.SourceCacheStats;
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StationsStatistics;
@@ -546,11 +547,25 @@ public class OpenSearchConnector extends DataCacheConnector {
 	return ret;
     }
 
+    /**
+     * Stops the periodic flush and retention jobs and releases the client. A bulk request already in progress is
+     * allowed to complete; records still in the buffers are NOT written, so callers should wait for
+     * {@link #countRecordsInDataBuffer()} to reach 0 before closing.
+     */
     public void close() throws Exception {
 	if (futureTask != null) {
-	    futureTask.cancel(true);
+	    futureTask.cancel(false);
 	}
 
+	scheduledExecutorService.shutdown();
+	if (!scheduledExecutorService.awaitTermination(2, TimeUnit.MINUTES)) {
+	    GSLoggerFactory.getLogger(getClass()).warn("OS connector executor did not terminate in time, forcing shutdown");
+	    scheduledExecutorService.shutdownNow();
+	}
+
+	if (client != null) {
+	    client._transport().close();
+	}
     }
 
     public boolean checkIndexExistence(String index) throws IOException {
@@ -872,6 +887,48 @@ public class OpenSearchConnector extends DataCacheConnector {
 		stats.setAverageAgeHours(java.time.Duration.between(Instant.ofEpochMilli((long) avg), Instant.now()).toHours());
 
 		statsMap.put(sourceId, stats);
+	    }
+	}
+
+	return statsMap;
+    }
+
+    @Override
+    public Map<String, PropertyCacheStats> getCacheStatsPerObservedProperty(String sourceId) throws IOException {
+	SearchResponse<Void> response = client.search(s -> s.index(DataCacheIndex.VALUES.getIndex(databaseName)).size(0)
+		.query(q -> q.term(t -> t.field(SOURCE_IDENTIFIER_PROPERTY + ".keyword").value(FieldValue.of(sourceId))))
+		.aggregations("properties",
+			a -> a.terms(t -> t.field("observedProperty.keyword").size(1000).missing(FieldValue.of("")))
+				.aggregations("unique_datasets", sa -> sa.cardinality(ca -> ca.field(DATA_IDENTIFIER_PROPERTY + ".keyword")))
+				.aggregations("newest_observation", sa -> sa.max(m -> m.field(DATE_PROPERTY)))
+				.aggregations("newest_insert", sa -> sa.max(m -> m.field("timestamp")))
+				.aggregations("uris", sa -> sa.terms(t -> t.field("observedPropertyURI.keyword").size(10)))),
+		Void.class);
+
+	Map<String, PropertyCacheStats> statsMap = new HashMap<>();
+	Aggregate propertiesAgg = response.aggregations().get("properties");
+
+	if (propertiesAgg.isSterms()) {
+	    for (StringTermsBucket bucket : propertiesAgg.sterms().buckets().array()) {
+		double newestObservation = bucket.aggregations().get("newest_observation").max().value();
+		double newestInsert = bucket.aggregations().get("newest_insert").max().value();
+
+		PropertyCacheStats stats = new PropertyCacheStats();
+		stats.setObservedProperty(bucket.key());
+		Aggregate urisAgg = bucket.aggregations().get("uris");
+		if (urisAgg != null && urisAgg.isSterms()) {
+		    stats.setObservedPropertyURIs(urisAgg.sterms().buckets().array().stream().map(StringTermsBucket::key).toList());
+		}
+		stats.setUniqueDatasetCount(bucket.aggregations().get("unique_datasets").cardinality().value());
+		stats.setRecordCount(bucket.docCount());
+		if (Double.isFinite(newestObservation)) {
+		    stats.setNewestObservation(new Date((long) newestObservation));
+		}
+		if (Double.isFinite(newestInsert)) {
+		    stats.setNewestInsert(new Date((long) newestInsert));
+		}
+
+		statsMap.put(bucket.key(), stats);
 	    }
 	}
 

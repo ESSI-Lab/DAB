@@ -27,6 +27,7 @@ import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.authorization.userfinder.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.gssrv.portal.*;
+import eu.essi_lab.harvester.HarvestingNotifier.HarvestingResult;
 import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.lib.odip.*;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.*;
@@ -46,6 +47,8 @@ import eu.essi_lab.model.resource.data.*;
 import eu.essi_lab.pdk.wrt.*;
 import eu.essi_lab.profiler.semantic.*;
 import eu.essi_lab.request.executor.*;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchHarvestingPublisher;
 import jakarta.jws.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -66,6 +69,8 @@ import java.util.Map.*;
  * @author Fabrizio
  */
 public class SupportService {
+
+    private static final int HARVESTING_HISTORY_SIZE = 20;
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
@@ -466,6 +471,8 @@ public class SupportService {
 	    return Response.serverError().entity(getJSONErrorResponse("error counting cached datasets").toString()).build();
 	}
 
+	Map<String, String> lastHarvestings = getLastHarvestings(sourceIdentifiers);
+
 	JSONArray sourcesArray = new JSONArray();
 
 	for (GSSource source : sources) {
@@ -479,15 +486,7 @@ public class SupportService {
 	    jsonSource.put("datasetsInDatabase", dbCount);
 	    SourceCacheStats sourceStats = stats.get(source.getUniqueIdentifier());
 
-	    try {
-		Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
-		SourceStorage storage = database.getStorage(source.getUniqueIdentifier());
-		HarvestingProperties harvestingProperties = storage.getHarvestingProperties();
-		String lastHarvesting = harvestingProperties.getEndHarvestingTimestamp();
-		jsonSource.put("lastHarvesting", lastHarvesting);
-	    } catch (Exception e) {
-		GSLoggerFactory.getLogger(getClass()).error(e);
-	    }
+	    jsonSource.put("lastHarvesting", lastHarvestings.get(source.getUniqueIdentifier()));
 
 	    if (sourceStats != null) {
 		Long cacheCount = sourceStats.getUniqueDatasetCount();
@@ -515,6 +514,251 @@ public class SupportService {
 
 	output.put("status", "success");
 	return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+    }
+
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/source-data-stats")
+    public Response sourceDataStats(//
+	    @QueryParam("view") String view, @QueryParam("source") String sourceId) { //
+
+	if (view == null || view.isEmpty() || sourceId == null || sourceId.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("view and source parameters must be specified").toString())
+		    .build();
+	}
+	View v;
+	try {
+	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
+	}
+	Optional<GSSource> source = ConfigurationWrapper.getViewSources(v).stream()
+		.filter(s -> s.getUniqueIdentifier().equals(sourceId)).findFirst();
+	if (source.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("source not found in view").toString()).build();
+	}
+
+	DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+	if (dataCacheConnector == null) {
+	    try {
+		dataCacheConnector = DataCacheConnectorFactory.newDefaultDataCacheConnector();
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+		return Response.serverError().entity(getJSONErrorResponse("error init data cache connector").toString()).build();
+	    }
+	}
+
+	Map<String, Long> datasetsInDatabase = new HashMap<>();
+	Map<String, Set<String>> uris = new HashMap<>();
+	try {
+	    getDatasetsPerObservedProperty(source.get(), view, datasetsInDatabase, uris);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse("error counting datasets").toString()).build();
+	}
+
+	Map<String, PropertyCacheStats> cacheStats;
+	try {
+	    cacheStats = dataCacheConnector.getCacheStatsPerObservedProperty(sourceId);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse("error counting cached datasets").toString()).build();
+	}
+
+	// union of the observed properties found in the metadata database and in the data cache
+	Set<String> properties = new TreeSet<>(datasetsInDatabase.keySet());
+	properties.addAll(cacheStats.keySet());
+
+	JSONArray propertiesArray = new JSONArray();
+	for (String property : properties) {
+	    JSONObject jsonProperty = new JSONObject();
+	    jsonProperty.put("name", property);
+	    jsonProperty.put("datasetsInDatabase", datasetsInDatabase.getOrDefault(property, 0l));
+	    PropertyCacheStats stats = cacheStats.get(property);
+	    // observed property URIs found in the metadata database and in the data cache
+	    Set<String> propertyURIs = new TreeSet<>(uris.getOrDefault(property, Set.of()));
+	    if (stats != null) {
+		propertyURIs.addAll(stats.getObservedPropertyURIs());
+	    }
+	    jsonProperty.put("uris", new JSONArray(propertyURIs));
+	    if (stats != null) {
+		jsonProperty.put("datasetsInCache", stats.getUniqueDatasetCount());
+		jsonProperty.put("valuesInCache", stats.getRecordCount());
+		if (stats.getNewestObservation() != null) {
+		    jsonProperty.put("newestObservation", ISO8601DateTimeUtils.getISO8601DateTime(stats.getNewestObservation()));
+		}
+		if (stats.getNewestInsert() != null) {
+		    jsonProperty.put("newestInsert", ISO8601DateTimeUtils.getISO8601DateTime(stats.getNewestInsert()));
+		}
+	    } else {
+		jsonProperty.put("datasetsInCache", 0);
+		jsonProperty.put("valuesInCache", 0);
+	    }
+	    propertiesArray.put(jsonProperty);
+	}
+
+	JSONObject output = new JSONObject();
+	output.put("name", source.get().getLabel());
+	output.put("id", sourceId);
+	output.put("properties", propertiesArray);
+	output.put("harvestings", getHarvestingHistory(sourceId));
+	output.put("status", "success");
+	return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+    }
+
+    /**
+     * Counts the datasets of the given source in the metadata database, per observed property (attribute title), and
+     * collects the observed property URIs of each one
+     *
+     * @param source
+     * @param view
+     * @param datasets filled with the number of datasets per observed property
+     * @param uris filled with the observed property URIs per observed property
+     * @throws Exception
+     */
+    private void getDatasetsPerObservedProperty(GSSource source, String view, Map<String, Long> datasets,
+	    Map<String, Set<String>> uris) throws Exception {
+
+	StatisticsMessage statisticsMessage = new StatisticsMessage();
+	statisticsMessage.setSources(Arrays.asList(source));
+	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+
+	WebRequestTransformer.setView(//
+		view, //
+		statisticsMessage.getDataBaseURI(), //
+		statisticsMessage);
+	statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(source.getUniqueIdentifier()));
+	statisticsMessage.groupBy(MetadataElement.ATTRIBUTE_TITLE);
+	Page page = new Page();
+	page.setStart(1);
+	page.setSize(1000);
+	statisticsMessage.setPage(page);
+	statisticsMessage.countDistinct(//
+		Arrays.asList(//
+			MetadataElement.ONLINE_ID//
+		));
+	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.OBSERVED_PROPERTY_URI), 10);
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
+
+	StatisticsResponse response = executor.compute(statisticsMessage);
+	for (ResponseItem responseItem : response.getItems()) {
+	    String property = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get() : "";
+	    String countString = responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue();
+	    datasets.put(property, Long.parseLong(countString));
+	    Optional<ComputationResult> frequency = responseItem.getFrequency(MetadataElement.OBSERVED_PROPERTY_URI);
+	    if (frequency.isPresent() && frequency.get().getValue() != null) {
+		Set<String> propertyURIs = new TreeSet<>();
+		for (TermFrequencyItem item : frequency.get().getFrequencyItems()) {
+		    if (item.getTerm() != null && !item.getTerm().isBlank()) {
+			propertyURIs.add(item.getTerm());
+		    }
+		}
+		uris.put(property, propertyURIs);
+	    }
+	}
+    }
+
+    /**
+     * @param sourceId
+     * @return the last harvesting executions of the given source, read from the harvesting statistics index (see
+     *         {@link ElasticsearchHarvestingPublisher}); empty if the statistics gathering is disabled or the index is not
+     *         available
+     */
+    private JSONArray getHarvestingHistory(String sourceId) {
+
+	JSONArray ret = new JSONArray();
+
+	Optional<ElasticsearchClient> client = ElasticsearchHarvestingPublisher.createClient();
+	if (client.isEmpty()) {
+	    return ret;
+	}
+
+	JSONArray fields = new JSONArray();
+	for (String field : new String[] { "startDate", "endDate", "result", "durationMillis", "harvestedRecords", "recordsBefore",
+		"recordsAfter", "strategy", "errors" }) {
+	    fields.put(field);
+	}
+
+	JSONObject body = new JSONObject();
+	body.put("size", HARVESTING_HISTORY_SIZE);
+	body.put("sort", new JSONArray().put(new JSONObject().put("startDate", "desc")));
+	body.put("_source", fields);
+	body.put("query", new JSONObject().put("term", new JSONObject().put("sourceId", sourceId)));
+
+	try {
+	    JSONArray hits = client.get().search(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, body).getJSONObject("hits")
+		    .getJSONArray("hits");
+	    for (int i = 0; i < hits.length(); i++) {
+		ret.put(hits.getJSONObject(i).getJSONObject("_source"));
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to read the harvesting history of source {}: {}", sourceId,
+		    e.getMessage());
+	}
+
+	return ret;
+    }
+
+    /**
+     * Reads the end date of the last successful harvesting of each source from the harvesting statistics index (see
+     * {@link ElasticsearchHarvestingPublisher}) with a single aggregation query
+     *
+     * @param sourceIdentifiers
+     * @return the last harvesting end date per source identifier; empty if the statistics gathering is disabled or the
+     *         index is not available
+     */
+    private Map<String, String> getLastHarvestings(List<String> sourceIdentifiers) {
+
+	Map<String, String> ret = new HashMap<>();
+
+	Optional<ElasticsearchClient> client = ElasticsearchHarvestingPublisher.createClient();
+	if (client.isEmpty() || sourceIdentifiers.isEmpty()) {
+	    return ret;
+	}
+
+	JSONArray filter = new JSONArray();
+	filter.put(new JSONObject().put("terms", new JSONObject().put("sourceId", new JSONArray(sourceIdentifiers))));
+	filter.put(new JSONObject().put("terms", new JSONObject().put("result", new JSONArray()//
+		.put(HarvestingResult.COMPLETED.name())//
+		.put(HarvestingResult.CONSOLIDATED_FOLDER_SURVIVED.name()))));
+	filter.put(new JSONObject().put("exists", new JSONObject().put("field", "endDate")));
+
+	JSONObject topHit = new JSONObject();
+	topHit.put("size", 1);
+	topHit.put("sort", new JSONArray().put(new JSONObject().put("endDate", "desc")));
+	topHit.put("_source", new JSONArray().put("endDate"));
+
+	JSONObject terms = new JSONObject();
+	terms.put("field", "sourceId");
+	terms.put("size", sourceIdentifiers.size());
+
+	JSONObject bySource = new JSONObject();
+	bySource.put("terms", terms);
+	bySource.put("aggs", new JSONObject().put("last", new JSONObject().put("top_hits", topHit)));
+
+	JSONObject body = new JSONObject();
+	body.put("size", 0);
+	body.put("query", new JSONObject().put("bool", new JSONObject().put("filter", filter)));
+	body.put("aggs", new JSONObject().put("bySource", bySource));
+
+	try {
+	    JSONObject response = client.get().search(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, body);
+	    JSONArray buckets = response.getJSONObject("aggregations").getJSONObject("bySource").getJSONArray("buckets");
+	    for (int i = 0; i < buckets.length(); i++) {
+		JSONObject bucket = buckets.getJSONObject(i);
+		JSONArray hits = bucket.getJSONObject("last").getJSONObject("hits").getJSONArray("hits");
+		if (!hits.isEmpty()) {
+		    ret.put(bucket.getString("key"), hits.getJSONObject(0).getJSONObject("_source").optString("endDate", null));
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to read the last harvestings from the harvesting statistics: {}",
+		    e.getMessage());
+	}
+
+	return ret;
     }
 
     private Map<String, Long> getDatasetsInDatabase(List<GSSource> sources, String view) throws Exception {
