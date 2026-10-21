@@ -48,6 +48,7 @@ public class StatisticsMessage extends QueryInitializerMessage {
     private static final String FREQUENCY = "FREQUENCY";
     private static final String FREQUENCY_MAX_ITEMS = "FREQUENCY_MAX_ITEMS";
     private static final String COUNT_DISTINCT = "COUNT_DISTINCT";
+    private static final String COUNT_DISTINCT_PRECISION_THRESHOLD = "COUNT_DISTINCT_PRECISION_THRESHOLD";
     private static final String GROUP_BY_QUERYABLE = "GROUP_BY_QUERYABLE";
     private static final String GROUP_BY_PERIOD = "GROUP_BY_PERIOD";
 
@@ -258,6 +259,26 @@ public class StatisticsMessage extends QueryInitializerMessage {
     public Optional<List<Queryable>> getCountDistinctTargets() {
 
 	return Optional.ofNullable(getPayload().get(COUNT_DISTINCT, List.class));
+    }
+
+    /**
+     * Sets the precision threshold of the count distinct computations, for the databases computing them with an
+     * approximate algorithm (e.g. the OpenSearch cardinality aggregation, whose default threshold is 3000): the counts
+     * below the threshold are expected to be close to exact. Higher thresholds require more memory
+     *
+     * @param threshold
+     */
+    public void setCountDistinctPrecisionThreshold(int threshold) {
+
+	getPayload().add(new GSProperty<>(COUNT_DISTINCT_PRECISION_THRESHOLD, threshold));
+    }
+
+    /**
+     * @return
+     */
+    public Optional<Integer> getCountDistinctPrecisionThreshold() {
+
+	return Optional.ofNullable(getPayload().get(COUNT_DISTINCT_PRECISION_THRESHOLD, Integer.class));
     }
 
     /**

@@ -72,7 +72,7 @@
 </div>
 
 <h2>Last Metadata Harvesting</h2>
-<p>The table below shows the date of the last successful harvesting per source, as recorded in the harvesting statistics.</p>
+<p>The table below shows the date of the last successful harvesting per source, as recorded in the harvesting statistics, and the number of datasets of the source in the metadata database.</p>
 <div id="harvestingTableContainer">
     <table id="harvestingTable">
         <thead>
@@ -80,6 +80,7 @@
                 <th>Source</th>
                 <th>Last Harvesting Date</th>
                 <th>Days Since Last Harvesting</th>
+                <th>Datasets</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -155,11 +156,11 @@
 
             // opens the detail page of the source at the given index
             const sourceUrl = index => `source-report.html?viewId=${encodeURIComponent(viewId)}&sourceId=${encodeURIComponent(sources[index].id)}`;
-            const sourceLink = (source, index) => `<a href="${sourceUrl(index)}">${source.name}</a>`;
+            const sourceLink = (source, index) => `<a href="${sourceUrl(index)}" target="_blank" rel="noopener">${source.name}</a>`;
             const clickOptions = {
                 onClick: (event, elements) => {
                     if (elements.length > 0) {
-                        window.location.href = sourceUrl(elements[0].index);
+                        window.open(sourceUrl(elements[0].index), '_blank', 'noopener');
                     }
                 },
                 onHover: (event, elements) => {
@@ -306,6 +307,7 @@
                     <td>${sourceLink(source, index)}</td>
                     <td>${isNaN(lastHarvest) ? '-' : lastHarvest.toISOString().split('T')[0]}</td>
                     <td class="${ageClass}">${isNaN(days) ? '-' : days}</td>
+                    <td style="text-align: right">${typeof source.datasetsInDatabase === 'number' ? source.datasetsInDatabase.toLocaleString() : '-'}</td>
                 `;
                 harvestingBody.appendChild(tr);
             });

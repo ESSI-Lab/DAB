@@ -111,10 +111,11 @@ public abstract class DataCacheConnector {
 
     /**
      * @param sourceId
-     * @return the cache statistics of the given source, per observed property
+     * @return the cache statistics of the given source, per observed property (pair of observed property URI and name;
+     *         a missing URI or name is an empty string)
      * @throws IOException
      */
-    public abstract Map<String, PropertyCacheStats> getCacheStatsPerObservedProperty(String sourceId) throws IOException;
+    public abstract List<PropertyCacheStats> getCacheStatsPerObservedProperty(String sourceId) throws IOException;
 
     public abstract Date getFirstDate(String dataIdentifier) throws Exception;
 

@@ -83,6 +83,12 @@ public class SupportService {
     private static final int HARVESTING_HISTORY_SIZE = 20;
 
     /**
+     * Precision threshold of the count distinct computations of the data reports: the maximum supported by OpenSearch, so
+     * that the dataset counts are close to exact up to 40000 datasets per group (the default threshold is 3000)
+     */
+    private static final int REPORT_PRECISION_THRESHOLD = 40000;
+
+    /**
      * Labels of the observed property concepts, resolved from the enabled ontologies
      */
     private static final ExpiringCache<String> CONCEPT_LABELS_CACHE = new ExpiringCache<>();
@@ -569,16 +575,57 @@ public class SupportService {
 	    }
 	}
 
-	Map<String, Long> datasetsInDatabase = new HashMap<>();
-	Map<String, Set<String>> uris = new HashMap<>();
+	// concept labels, resolved from the enabled ontologies
+	Map<String, String> conceptLabels = new HashMap<>();
+	List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()//
+		.filter(o -> o.getOntologyAvailability() == OntologySetting.Availability.ENABLED)//
+		.map(OntologySetting::getOntologyEndpoint)//
+		.toList();
+
+	// rows: one per observed property concept (URI), plus one per observed property name of the datasets without URI
+	Map<String, PropertyRow> rows = new HashMap<>();
+
+	// name (lower case) -> concept URI, used to match the cached values without URI
+	Map<String, String> uriByName = new HashMap<>();
+
 	try {
-	    getDatasetsPerObservedProperty(source.get(), view, datasetsInDatabase, uris);
+	    // datasets with URI, per concept
+	    for (ResponseItem item : getDatasetsGroupedBy(source.get(), view, MetadataElement.OBSERVED_PROPERTY_URI,
+		    MetadataElement.ATTRIBUTE_TITLE)) {
+		String uri = item.getGroupedBy().orElse("");
+		if (uri.isBlank()) {
+		    continue;
+		}
+		PropertyRow row = rows.computeIfAbsent("uri:" + uri, k -> new PropertyRow(uri, null));
+		row.datasetsInDatabase += getDistinctCount(item);
+		row.names.addAll(getFrequencyTerms(item, MetadataElement.ATTRIBUTE_TITLE));
+	    }
+	    // datasets without URI, per name
+	    for (ResponseItem item : getDatasetsGroupedBy(source.get(), view, MetadataElement.ATTRIBUTE_TITLE,
+		    MetadataElement.OBSERVED_PROPERTY_URI)) {
+		String name = item.getGroupedBy().orElse("");
+		if (getFrequencyTerms(item, MetadataElement.OBSERVED_PROPERTY_URI).isEmpty()) {
+		    PropertyRow row = rows.computeIfAbsent("name:" + name, k -> new PropertyRow(null, name));
+		    row.datasetsInDatabase += getDistinctCount(item);
+		    row.names.add(name);
+		}
+	    }
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error(e);
 	    return Response.serverError().entity(getJSONErrorResponse("error counting datasets").toString()).build();
 	}
 
-	Map<String, PropertyCacheStats> cacheStats;
+	for (PropertyRow row : rows.values()) {
+	    if (row.uri != null) {
+		String label = conceptLabels.computeIfAbsent(row.uri, u -> getConceptLabel(u, ontologyUrls));
+		uriByName.putIfAbsent(label.trim().toLowerCase(), row.uri);
+		for (String name : row.names) {
+		    uriByName.putIfAbsent(name.trim().toLowerCase(), row.uri);
+		}
+	    }
+	}
+
+	List<PropertyCacheStats> cacheStats;
 	try {
 	    cacheStats = dataCacheConnector.getCacheStatsPerObservedProperty(sourceId);
 	} catch (Exception e) {
@@ -586,48 +633,49 @@ public class SupportService {
 	    return Response.serverError().entity(getJSONErrorResponse("error counting cached datasets").toString()).build();
 	}
 
-	// union of the observed properties found in the metadata database and in the data cache
-	Set<String> properties = new TreeSet<>(datasetsInDatabase.keySet());
-	properties.addAll(cacheStats.keySet());
+	for (PropertyCacheStats stats : cacheStats) {
+	    String uri = stats.getObservedPropertyURI();
+	    String name = stats.getObservedProperty() == null ? "" : stats.getObservedProperty();
+	    if (uri == null || uri.isBlank()) {
+		// values cached before the URI was stored: the name is matched with the concept label or a metadata name
+		uri = uriByName.get(name.trim().toLowerCase());
+	    }
+	    String rowURI = uri;
+	    PropertyRow row = uri != null ? rows.computeIfAbsent("uri:" + uri, k -> new PropertyRow(rowURI, null))
+		    : rows.computeIfAbsent("name:" + name, k -> new PropertyRow(null, name));
+	    row.datasetsInCache += stats.getUniqueDatasetCount() == null ? 0 : stats.getUniqueDatasetCount();
+	    row.valuesInCache += stats.getRecordCount() == null ? 0 : stats.getRecordCount();
+	    row.newestObservation = max(row.newestObservation, stats.getNewestObservation());
+	    row.newestInsert = max(row.newestInsert, stats.getNewestInsert());
+	}
 
-	// concept labels resolved during this request, from the enabled ontologies
-	Map<String, String> conceptLabels = new HashMap<>();
-	List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()//
-		.filter(o -> o.getOntologyAvailability() == OntologySetting.Availability.ENABLED)//
-		.map(OntologySetting::getOntologyEndpoint)//
-		.toList();
+	List<PropertyRow> sortedRows = new ArrayList<>(rows.values());
+	for (PropertyRow row : sortedRows) {
+	    if (row.uri != null) {
+		row.name = conceptLabels.computeIfAbsent(row.uri, u -> getConceptLabel(u, ontologyUrls));
+	    }
+	}
+	sortedRows.sort(Comparator.comparing((PropertyRow r) -> r.name.toLowerCase()));
 
 	JSONArray propertiesArray = new JSONArray();
-	for (String property : properties) {
+	for (PropertyRow row : sortedRows) {
 	    JSONObject jsonProperty = new JSONObject();
-	    jsonProperty.put("name", property);
-	    jsonProperty.put("datasetsInDatabase", datasetsInDatabase.getOrDefault(property, 0l));
-	    PropertyCacheStats stats = cacheStats.get(property);
-	    // observed property URIs found in the metadata database and in the data cache
-	    Set<String> propertyURIs = new TreeSet<>(uris.getOrDefault(property, Set.of()));
-	    if (stats != null) {
-		propertyURIs.addAll(stats.getObservedPropertyURIs());
-	    }
-	    JSONArray concepts = new JSONArray();
-	    for (String uri : propertyURIs) {
+	    jsonProperty.put("name", row.name);
+	    if (row.uri != null) {
 		JSONObject concept = new JSONObject();
-		concept.put("uri", uri);
-		concept.put("label", conceptLabels.computeIfAbsent(uri, u -> getConceptLabel(u, ontologyUrls)));
-		concepts.put(concept);
+		concept.put("uri", row.uri);
+		concept.put("label", row.name);
+		jsonProperty.put("concept", concept);
 	    }
-	    jsonProperty.put("concepts", concepts);
-	    if (stats != null) {
-		jsonProperty.put("datasetsInCache", stats.getUniqueDatasetCount());
-		jsonProperty.put("valuesInCache", stats.getRecordCount());
-		if (stats.getNewestObservation() != null) {
-		    jsonProperty.put("newestObservation", ISO8601DateTimeUtils.getISO8601DateTime(stats.getNewestObservation()));
-		}
-		if (stats.getNewestInsert() != null) {
-		    jsonProperty.put("newestInsert", ISO8601DateTimeUtils.getISO8601DateTime(stats.getNewestInsert()));
-		}
-	    } else {
-		jsonProperty.put("datasetsInCache", 0);
-		jsonProperty.put("valuesInCache", 0);
+	    jsonProperty.put("names", new JSONArray(row.names));
+	    jsonProperty.put("datasetsInDatabase", row.datasetsInDatabase);
+	    jsonProperty.put("datasetsInCache", row.datasetsInCache);
+	    jsonProperty.put("valuesInCache", row.valuesInCache);
+	    if (row.newestObservation != null) {
+		jsonProperty.put("newestObservation", ISO8601DateTimeUtils.getISO8601DateTime(row.newestObservation));
+	    }
+	    if (row.newestInsert != null) {
+		jsonProperty.put("newestInsert", ISO8601DateTimeUtils.getISO8601DateTime(row.newestInsert));
 	    }
 	    propertiesArray.put(jsonProperty);
 	}
@@ -677,7 +725,8 @@ public class SupportService {
 
 	    SKOSResponse response = client.search();
 	    for (SKOSConcept concept : response.getResults()) {
-		if (uri.equals(concept.getConceptURI()) && concept.getPref().isPresent() && !concept.getPref().get().isBlank()) {
+		if (uri.equals(concept.getConceptURI()) && concept.getPref().isPresent() && !concept.getPref().get().isBlank()
+			&& !concept.getPref().get().equals(SKOSResponse.NONE_VALUE)) {
 		    label = concept.getPref().get();
 		    break;
 		}
@@ -691,17 +740,45 @@ public class SupportService {
     }
 
     /**
-     * Counts the datasets of the given source in the metadata database, per observed property (attribute title), and
-     * collects the observed property URIs of each one
+     * A row of the source report: an observed property concept, or an observed property name of datasets without concept
+     */
+    private static class PropertyRow {
+
+	private final String uri;
+	private String name;
+	private final Set<String> names = new TreeSet<>();
+	private long datasetsInDatabase;
+	private long datasetsInCache;
+	private long valuesInCache;
+	private java.util.Date newestObservation;
+	private java.util.Date newestInsert;
+
+	private PropertyRow(String uri, String name) {
+	    this.uri = uri;
+	    this.name = name;
+	}
+    }
+
+    private static java.util.Date max(java.util.Date d1, java.util.Date d2) {
+	if (d1 == null) {
+	    return d2;
+	}
+	return d2 == null || d1.after(d2) ? d1 : d2;
+    }
+
+    /**
+     * Counts the distinct datasets (online identifiers) of the given source in the metadata database, grouped by the given
+     * element, also computing the most frequent values of the frequency target
      *
      * @param source
      * @param view
-     * @param datasets filled with the number of datasets per observed property
-     * @param uris filled with the observed property URIs per observed property
+     * @param groupBy
+     * @param frequencyTarget
+     * @return
      * @throws Exception
      */
-    private void getDatasetsPerObservedProperty(GSSource source, String view, Map<String, Long> datasets,
-	    Map<String, Set<String>> uris) throws Exception {
+    private List<ResponseItem> getDatasetsGroupedBy(GSSource source, String view, MetadataElement groupBy,
+	    MetadataElement frequencyTarget) throws Exception {
 
 	StatisticsMessage statisticsMessage = new StatisticsMessage();
 	statisticsMessage.setSources(Arrays.asList(source));
@@ -712,7 +789,7 @@ public class SupportService {
 		statisticsMessage.getDataBaseURI(), //
 		statisticsMessage);
 	statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(source.getUniqueIdentifier()));
-	statisticsMessage.groupBy(MetadataElement.ATTRIBUTE_TITLE);
+	statisticsMessage.groupBy(groupBy);
 	Page page = new Page();
 	page.setStart(1);
 	page.setSize(1000);
@@ -721,26 +798,29 @@ public class SupportService {
 		Arrays.asList(//
 			MetadataElement.ONLINE_ID//
 		));
-	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.OBSERVED_PROPERTY_URI), 10);
+	statisticsMessage.setCountDistinctPrecisionThreshold(REPORT_PRECISION_THRESHOLD);
+	statisticsMessage.computeFrequency(Arrays.asList(frequencyTarget), 50);
 	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
 	StatisticsExecutor executor = loader.iterator().next();
 
-	StatisticsResponse response = executor.compute(statisticsMessage);
-	for (ResponseItem responseItem : response.getItems()) {
-	    String property = responseItem.getGroupedBy().isPresent() ? responseItem.getGroupedBy().get() : "";
-	    String countString = responseItem.getCountDistinct(MetadataElement.ONLINE_ID).get().getValue();
-	    datasets.put(property, Long.parseLong(countString));
-	    Optional<ComputationResult> frequency = responseItem.getFrequency(MetadataElement.OBSERVED_PROPERTY_URI);
-	    if (frequency.isPresent() && frequency.get().getValue() != null) {
-		Set<String> propertyURIs = new TreeSet<>();
-		for (TermFrequencyItem item : frequency.get().getFrequencyItems()) {
-		    if (item.getTerm() != null && !item.getTerm().isBlank()) {
-			propertyURIs.add(item.getTerm());
-		    }
+	return executor.compute(statisticsMessage).getItems();
+    }
+
+    private static long getDistinctCount(ResponseItem item) {
+	return item.getCountDistinct(MetadataElement.ONLINE_ID).map(c -> Long.parseLong(c.getValue())).orElse(0l);
+    }
+
+    private static Set<String> getFrequencyTerms(ResponseItem item, MetadataElement target) {
+	Set<String> ret = new TreeSet<>();
+	Optional<ComputationResult> frequency = item.getFrequency(target);
+	if (frequency.isPresent() && frequency.get().getValue() != null) {
+	    for (TermFrequencyItem frequencyItem : frequency.get().getFrequencyItems()) {
+		if (frequencyItem.getTerm() != null && !frequencyItem.getTerm().isBlank()) {
+		    ret.add(frequencyItem.getTerm());
 		}
-		uris.put(property, propertyURIs);
 	    }
 	}
+	return ret;
     }
 
     /**
@@ -864,6 +944,7 @@ public class SupportService {
 		Arrays.asList(//
 			MetadataElement.ONLINE_ID//
 		));
+	statisticsMessage.setCountDistinctPrecisionThreshold(REPORT_PRECISION_THRESHOLD);
 	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
 	StatisticsExecutor executor = loader.iterator().next();
 

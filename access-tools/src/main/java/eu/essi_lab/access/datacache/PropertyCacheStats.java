@@ -21,19 +21,17 @@ package eu.essi_lab.access.datacache;
  * #L%
  */
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Data cache statistics of the values of a source with a given observed property
+ * Data cache statistics of the values of a source with a given observed property (name and URI)
  * 
  * @author boldrini
  */
 public class PropertyCacheStats {
 
     private String observedProperty;
-    private List<String> observedPropertyURIs = new ArrayList<>();
+    private String observedPropertyURI;
     private Long uniqueDatasetCount;
     private Long recordCount;
     private Date newestObservation;
@@ -48,14 +46,14 @@ public class PropertyCacheStats {
     }
 
     /**
-     * @return the observed property URIs found in the values with this observed property
+     * @return the observed property URI, or an empty string if the values have no URI
      */
-    public List<String> getObservedPropertyURIs() {
-	return observedPropertyURIs;
+    public String getObservedPropertyURI() {
+	return observedPropertyURI;
     }
 
-    public void setObservedPropertyURIs(List<String> observedPropertyURIs) {
-	this.observedPropertyURIs = observedPropertyURIs;
+    public void setObservedPropertyURI(String observedPropertyURI) {
+	this.observedPropertyURI = observedPropertyURI;
     }
 
     public Long getUniqueDatasetCount() {

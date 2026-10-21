@@ -28,6 +28,10 @@
         td.concept {
             overflow-wrap: anywhere;
         }
+        .note {
+            color: #777;
+            font-size: 13px;
+        }
         td.number {
             text-align: right;
         }
@@ -90,20 +94,19 @@
     <div>Loading source report, please wait...</div>
 </div>
 
-<p><a id="backLink" href="#">&larr; Back to the data report</a></p>
 
 <h1 id="sourceName">Source report</h1>
 <p id="sourceId"></p>
 
 <h2>Observed properties</h2>
-<p>For each observed property, the table compares the datasets in the metadata database with the datasets available in the data cache. The latest observation is the time of the most recent cached value.</p>
+<p>For each observed property concept, the table compares the datasets in the metadata database with the datasets available in the data cache, listing the observed property names used by the metadata records of the concept. Datasets without concept are grouped by name. The latest observation is the time of the most recent cached value.</p>
 <p id="overall"></p>
 <div id="propertiesTableContainer">
     <table id="propertiesTable">
         <thead>
             <tr>
-                <th>Observed property</th>
                 <th>Observed property concept</th>
+                <th>Names in metadata</th>
                 <th>Datasets in metadata</th>
                 <th>Datasets in cache</th>
                 <th>Cache coverage</th>
@@ -141,7 +144,6 @@
     const viewId = urlParams.get('viewId') || 'default-view-id';
     const sourceId = urlParams.get('sourceId') || '';
 
-    document.getElementById('backLink').href = 'data-report.html?viewId=' + encodeURIComponent(viewId);
 
     const escapeHtml = value => String(value)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -195,13 +197,16 @@
             properties.forEach(property => {
                 const coverage = property.datasetsInDatabase > 0 ? (property.datasetsInCache / property.datasetsInDatabase) * 100 : NaN;
                 const days = daysSince(property.newestObservation);
-                const concepts = Array.isArray(property.concepts) ? property.concepts : [];
+                const concept = property.concept;
+                const names = Array.isArray(property.names) ? property.names : [];
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${property.name ? escapeHtml(property.name) : '<em>(not specified)</em>'}</td>
-                    <td class="concept">${concepts.length === 0 ? '-' : concepts.map(concept => /^https?:\/\//i.test(concept.uri)
-                        ? `<a href="${escapeHtml(concept.uri)}" title="${escapeHtml(concept.uri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(concept.label || concept.uri)}</a>`
-                        : `<span title="${escapeHtml(concept.uri)}">${escapeHtml(concept.label || concept.uri)}</span>`).join('<br>')}</td>
+                    <td class="concept">${!concept
+                        ? `${property.name ? escapeHtml(property.name) : '<em>(not specified)</em>'} <em class="note">(no concept)</em>`
+                        : /^https?:\/\//i.test(concept.uri)
+                            ? `<a href="${escapeHtml(concept.uri)}" title="${escapeHtml(concept.uri)}" target="_blank" rel="noopener noreferrer">${escapeHtml(concept.label || concept.uri)}</a>`
+                            : `<span title="${escapeHtml(concept.uri)}">${escapeHtml(concept.label || concept.uri)}</span>`}</td>
+                    <td>${names.length === 0 ? '-' : names.map(escapeHtml).join('<br>')}</td>
                     <td class="number">${formatNumber(property.datasetsInDatabase)}</td>
                     <td class="number">${formatNumber(property.datasetsInCache)}</td>
                     <td>${isNaN(coverage) ? '-' : `

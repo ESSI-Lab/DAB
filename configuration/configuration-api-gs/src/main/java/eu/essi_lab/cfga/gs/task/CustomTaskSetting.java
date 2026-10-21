@@ -369,6 +369,14 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     }
 
     /**
+     *
+     */
+    public void clearTaskOptions() {
+
+	getOption(TASK_OPTIONS_OPTION_KEY, String.class).get().clearValues();
+    }
+
+    /**
      * @return
      */
     public String getTaskDescription() {
@@ -415,6 +423,14 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
 	getOption(EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY, String.class).//
 		get().//
 		setValue(String.join(",", Arrays.asList(recipients)));
+    }
+
+    /**
+     *
+     */
+    public void clearEmailRecipients() {
+
+	getOption(EMAIL_RECIPIENTS_OPTIONS_OPTION_KEY, String.class).get().clearValues();
     }
 
     /**

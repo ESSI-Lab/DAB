@@ -108,6 +108,12 @@ import jakarta.json.stream.JsonParser;
  */
 public class OpenSearchConnector extends DataCacheConnector {
 
+    /**
+     * Precision threshold of the dataset counts of the cache statistics (used by the data reports): the maximum supported
+     * by OpenSearch, so that the counts are close to exact up to 40000 datasets per group (the default threshold is 3000)
+     */
+    private static final int REPORT_PRECISION_THRESHOLD = 40000;
+
     private static final String DATE_PROPERTY = "date";
     private static final String ACTIVE_PROPERTY = "active";
     private static final String DATA_IDENTIFIER_PROPERTY = "dataIdentifier";
@@ -241,9 +247,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	configure(FLUSH_INTERVAL_MS, DEFAULT_FLUSH_INTERVAL_MS.toString());
 
-	configure(CACHED_DAYS, DEFAULT_CACHED_DAYS.toString());
+	configure(CACHED_DAYS, DEFAULT_CACthHED_DAYS.toString());
 
-	scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+th	scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
 	    @Override
 	    public void run() {
@@ -859,7 +865,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 			.terms(tq -> tq.value(selectedSourceIds.stream().map(FieldValue::of).toList()))))
 		.aggregations("sources",
 			a -> a.terms(t -> t.field("sourceIdentifier.keyword").size(selectedSourceIds.size()))
-				.aggregations("unique_datasets", sa -> sa.cardinality(ca -> ca.field("dataIdentifier.keyword")))
+				.aggregations("unique_datasets", sa -> sa.cardinality(ca -> ca.field("dataIdentifier.keyword").precisionThreshold(REPORT_PRECISION_THRESHOLD)))
 				.aggregations("record_count", sa -> sa.valueCount(vc -> vc.field("sourceIdentifier.keyword")))
 				.aggregations("oldest_insert", sa -> sa.min(m -> m.field("timestamp")))
 				.aggregations("newest_insert", sa -> sa.max(m -> m.field("timestamp")))
@@ -895,45 +901,50 @@ public class OpenSearchConnector extends DataCacheConnector {
     }
 
     @Override
-    public Map<String, PropertyCacheStats> getCacheStatsPerObservedProperty(String sourceId) throws IOException {
+    public List<PropertyCacheStats> getCacheStatsPerObservedProperty(String sourceId) throws IOException {
 	SearchResponse<Void> response = client.search(s -> s.index(DataCacheIndex.VALUES.getIndex(databaseName)).size(0)
 		.query(q -> q.term(t -> t.field(SOURCE_IDENTIFIER_PROPERTY + ".keyword").value(FieldValue.of(sourceId))))
-		.aggregations("properties",
-			a -> a.terms(t -> t.field("observedProperty.keyword").size(1000).missing(FieldValue.of("")))
-				.aggregations("unique_datasets", sa -> sa.cardinality(ca -> ca.field(DATA_IDENTIFIER_PROPERTY + ".keyword")))
-				.aggregations("newest_observation", sa -> sa.max(m -> m.field(DATE_PROPERTY)))
-				.aggregations("newest_insert", sa -> sa.max(m -> m.field("timestamp")))
-				.aggregations("uris", sa -> sa.terms(t -> t.field("observedPropertyURI.keyword").size(10)))),
+		.aggregations("uris",
+			a -> a.terms(t -> t.field("observedPropertyURI.keyword").size(1000).missing(FieldValue.of("")))
+				.aggregations("names", na -> na
+					.terms(t -> t.field("observedProperty.keyword").size(1000).missing(FieldValue.of("")))
+					.aggregations("unique_datasets",
+						sa -> sa.cardinality(ca -> ca.field(DATA_IDENTIFIER_PROPERTY + ".keyword").precisionThreshold(REPORT_PRECISION_THRESHOLD)))
+					.aggregations("newest_observation", sa -> sa.max(m -> m.field(DATE_PROPERTY)))
+					.aggregations("newest_insert", sa -> sa.max(m -> m.field("timestamp"))))),
 		Void.class);
 
-	Map<String, PropertyCacheStats> statsMap = new HashMap<>();
-	Aggregate propertiesAgg = response.aggregations().get("properties");
+	List<PropertyCacheStats> ret = new ArrayList<>();
+	Aggregate urisAgg = response.aggregations().get("uris");
 
-	if (propertiesAgg.isSterms()) {
-	    for (StringTermsBucket bucket : propertiesAgg.sterms().buckets().array()) {
-		double newestObservation = bucket.aggregations().get("newest_observation").max().value();
-		double newestInsert = bucket.aggregations().get("newest_insert").max().value();
+	if (urisAgg.isSterms()) {
+	    for (StringTermsBucket uriBucket : urisAgg.sterms().buckets().array()) {
+		Aggregate namesAgg = uriBucket.aggregations().get("names");
+		if (!namesAgg.isSterms()) {
+		    continue;
+		}
+		for (StringTermsBucket bucket : namesAgg.sterms().buckets().array()) {
+		    double newestObservation = bucket.aggregations().get("newest_observation").max().value();
+		    double newestInsert = bucket.aggregations().get("newest_insert").max().value();
 
-		PropertyCacheStats stats = new PropertyCacheStats();
-		stats.setObservedProperty(bucket.key());
-		Aggregate urisAgg = bucket.aggregations().get("uris");
-		if (urisAgg != null && urisAgg.isSterms()) {
-		    stats.setObservedPropertyURIs(urisAgg.sterms().buckets().array().stream().map(StringTermsBucket::key).toList());
-		}
-		stats.setUniqueDatasetCount(bucket.aggregations().get("unique_datasets").cardinality().value());
-		stats.setRecordCount(bucket.docCount());
-		if (Double.isFinite(newestObservation)) {
-		    stats.setNewestObservation(new Date((long) newestObservation));
-		}
-		if (Double.isFinite(newestInsert)) {
-		    stats.setNewestInsert(new Date((long) newestInsert));
-		}
+		    PropertyCacheStats stats = new PropertyCacheStats();
+		    stats.setObservedPropertyURI(uriBucket.key());
+		    stats.setObservedProperty(bucket.key());
+		    stats.setUniqueDatasetCount(bucket.aggregations().get("unique_datasets").cardinality().value());
+		    stats.setRecordCount(bucket.docCount());
+		    if (Double.isFinite(newestObservation)) {
+			stats.setNewestObservation(new Date((long) newestObservation));
+		    }
+		    if (Double.isFinite(newestInsert)) {
+			stats.setNewestInsert(new Date((long) newestInsert));
+		    }
 
-		statsMap.put(bucket.key(), stats);
+		    ret.add(stats);
+		}
 	    }
 	}
 
-	return statsMap;
+	return ret;
     }
 
     @Override
