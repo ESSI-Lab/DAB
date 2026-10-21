@@ -247,9 +247,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	configure(FLUSH_INTERVAL_MS, DEFAULT_FLUSH_INTERVAL_MS.toString());
 
-	configure(CACHED_DAYS, DEFAULT_CACthHED_DAYS.toString());
+	configure(CACHED_DAYS, DEFAULT_CACHED_DAYS.toString());
 
-th	scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+	scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
 	    @Override
 	    public void run() {
