@@ -55,6 +55,7 @@ import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.augmenter.ResourceAugmenter;
@@ -100,10 +101,32 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
     private static final String DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR = "DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR";
     private static final int MAX_RETRY = 10;
 
+    private boolean waitForResults = true;
+
+    private boolean publishMQTT = false;
+
+    /**
+     * @param publishMQTT if true, each new value is also published to the WIS2 MQTT broker, if configured. Default: false
+     */
+    public void setPublishMQTT(boolean publishMQTT) {
+
+	this.publishMQTT = publishMQTT;
+    }
+
+    /**
+     * @param waitForResults if true (default), when no results are found the retrieval is repeated every 5 minutes, up
+     *        to {@link #MAX_RETRY} times. Disabling it is useful when filling the cache of many resources, where missing
+     *        recent data is not an exceptional case
+     */
+    public void setWaitForResults(boolean waitForResults) {
+
+	this.waitForResults = waitForResults;
+    }
+
     @Override
     public Optional<GSResource> augment(GSResource resource) throws GSException {
 
-	if (client == null) {
+	if (publishMQTT && client == null) {
 	    try {
 
 		Optional<MQTTBrokerSetting> broker = ConfigurationWrapper.getSystemSettings().getWis2MqttBroker();
@@ -319,7 +342,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	    boolean effectiveCheck = false;
 	    int attempts = 1;
 
-	    while (results.isEmpty() && attempts < MAX_RETRY) {
+	    while (waitForResults && results.isEmpty() && attempts < MAX_RETRY) {
 
 		GSLoggerFactory.getLogger(getClass()).warn(
 			"[DATA-CACHE] Waiting source {} online id {} every 5 minutes for results from: {} now: {}",
@@ -359,132 +382,145 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	    }
 	    TimeSeriesType series = trt.getTimeSeries().get(0);
 	    List<ValueSingleVariable> values = series.getValues().get(0).getValue();
+	    SeriesMetadata metadata = getSeriesMetadata(resource);
+	    Double noDataValue = series.getVariable() != null ? series.getVariable().getNoDataValue() : null;
 	    for (ValueSingleVariable wmlValue : values) {
 		Date date = wmlValue.getDateTimeUTC().toGregorianCalendar(TimeZone.getTimeZone("GMT"), null, null).getTime();
 		if (lastObservation == null || !date.equals(lastObservation.getDate())) {
 		    BigDecimal value = wmlValue.getValue();
+		    // no data values are stored as null
+		    if (value != null && noDataValue != null && value.compareTo(BigDecimal.valueOf(noDataValue)) == 0) {
+			value = null;
+		    }
 		    DataRecord record = new DataRecord();
 		    record.setDate(date);
 		    record.setValue(value);
 		    record.setDataIdentifier(onlineId);
 		    record.setSourceIdentifier(sourceId);
+		    record.setUom(metadata.units());
+		    record.setObservedProperty(metadata.observedProperty());
+		    record.setObservedPropertyURI(metadata.observedPropertyURI());
+		    record.setLatitudeLongitude(metadata.latitudeLongitude());
+		    record.setQuality(wmlValue.getQualityControlLevelCode());
 		    records.add(record);
 
 		    ////////////////////////////////
 		    // MQTT publishing
 		    ////////////////////////////////
-		    String country = "unknown";
-		    VariableInfoType variableInfo = series.getVariable();
-		    String variableURI = JAXBWML.getInstance().getVariableURI(variableInfo);
-		    String variable = variableInfo.getVariableName();
+		    if (publishMQTT) {
+			String country = "unknown";
+			VariableInfoType variableInfo = series.getVariable();
+			String variableURI = JAXBWML.getInstance().getVariableURI(variableInfo);
+			String variable = variableInfo.getVariableName();
 
-		    JSONObject json = new JSONObject();
-		    String id = onlineId + "-" + date.getTime();
-		    json.put("id", id);
-		    json.put("type", "Feature");
-		    json.put("version", "v04");
+			JSONObject json = new JSONObject();
+			String id = onlineId + "-" + date.getTime();
+			json.put("id", id);
+			json.put("type", "Feature");
+			json.put("version", "v04");
 
-		    SourceInfoType sourceInfo = series.getSourceInfo();
-		    String siteId = "unknown";
-		    if (sourceInfo instanceof SiteInfoType) {
-			SiteInfoType siteInfo = (SiteInfoType) sourceInfo;
+			SourceInfoType sourceInfo = series.getSourceInfo();
+			String siteId = "unknown";
+			if (sourceInfo instanceof SiteInfoType) {
+			    SiteInfoType siteInfo = (SiteInfoType) sourceInfo;
 
-			if (sourceId.contains("-")) {
-			    int dashIndex = sourceId.indexOf("-");
-			    String c = sourceId.substring(0, dashIndex);
-			    Country cc = Country.decode(c);
-			    if (cc != null) {
-				country = cc.getISO2().toLowerCase();
-				sourceAcronym = sourceId.substring(dashIndex + 1);
-			    }
-			}
-
-			if (country.equals("unknown")) {
-			    try {
-				country = JAXBWML.getInstance().getProperty(siteInfo, WML_SiteProperty.COUNTRY);
-				if (country != null && !country.isEmpty()) {
-				    country = Country.decode(country).getISO2().toLowerCase();
-				} else {
-				    country = "unknown";
+			    if (sourceId.contains("-")) {
+				int dashIndex = sourceId.indexOf("-");
+				String c = sourceId.substring(0, dashIndex);
+				Country cc = Country.decode(c);
+				if (cc != null) {
+				    country = cc.getISO2().toLowerCase();
+				    sourceAcronym = sourceId.substring(dashIndex + 1);
 				}
-			    } catch (Exception ex) {
-				GSLoggerFactory.getLogger(getClass()).error(ex);
 			    }
-			}
 
-			siteId = siteInfo.getSiteCode().get(0).getValue();
-			GeoLocation geoLocation = siteInfo.getGeoLocation();
-			double lon;
-			double lat;
-			if (geoLocation != null) {
-			    GeogLocationType geog = geoLocation.getGeogLocation();
-			    if (geog != null) {
-				if (geog instanceof LatLonPointType) {
-				    LatLonPointType latLon = (LatLonPointType) geog;
-				    lon = latLon.getLongitude();
-				    lat = latLon.getLatitude();
-				    JSONArray coordinates = new JSONArray();
-				    coordinates.put(lon);
-				    coordinates.put(lat);
-				    Double alt = siteInfo.getElevationM();
-				    if (alt != null) {
-					coordinates.put(alt);
+			    if (country.equals("unknown")) {
+				try {
+				    country = JAXBWML.getInstance().getProperty(siteInfo, WML_SiteProperty.COUNTRY);
+				    if (country != null && !country.isEmpty()) {
+					country = Country.decode(country).getISO2().toLowerCase();
+				    } else {
+					country = "unknown";
 				    }
-				    JSONObject geometry = new JSONObject();
-				    geometry.put("type", "Point");
-				    geometry.put("coordinates", coordinates);
-				    json.put("geometry", geometry);
+				} catch (Exception ex) {
+				    GSLoggerFactory.getLogger(getClass()).error(ex);
+				}
+			    }
+
+			    siteId = siteInfo.getSiteCode().get(0).getValue();
+			    GeoLocation geoLocation = siteInfo.getGeoLocation();
+			    double lon;
+			    double lat;
+			    if (geoLocation != null) {
+				GeogLocationType geog = geoLocation.getGeogLocation();
+				if (geog != null) {
+				    if (geog instanceof LatLonPointType) {
+					LatLonPointType latLon = (LatLonPointType) geog;
+					lon = latLon.getLongitude();
+					lat = latLon.getLatitude();
+					JSONArray coordinates = new JSONArray();
+					coordinates.put(lon);
+					coordinates.put(lat);
+					Double alt = siteInfo.getElevationM();
+					if (alt != null) {
+					    coordinates.put(alt);
+					}
+					JSONObject geometry = new JSONObject();
+					geometry.put("type", "Point");
+					geometry.put("coordinates", coordinates);
+					json.put("geometry", geometry);
+				    }
 				}
 			    }
 			}
-		    }
 
-		    String level11 = variable;
-		    WIS2Level10Topic wisLevel10 = WIS2Level10Topic.decode(variableURI);
-		    String level10 = wisLevel10.getId();
-		    String level9 = wisLevel10.getBroaderLevel().getId();
+			String level11 = variable;
+			WIS2Level10Topic wisLevel10 = WIS2Level10Topic.decode(variableURI);
+			String level10 = wisLevel10.getId();
+			String level9 = wisLevel10.getBroaderLevel().getId();
 
-		    String topic = "origin/a/wis2/" + country + "-" + sourceAcronym + "/data/core/hydrology/"
-			    + MQTTUtils.harmonizeTopicName(level9) + "/" + MQTTUtils.harmonizeTopicName(level10) + "/"
-			    + MQTTUtils.harmonizeTopicName(level11);
-		    JSONObject properties = new JSONObject();
-		    properties.put("data_id", topic + "/" + id);
-		    properties.put("datetime", ISO8601DateTimeUtils.getISO8601DateTime(date));
-		    properties.put("pubtime", ISO8601DateTimeUtils.getISO8601DateTime(new Date()));
+			String topic = "origin/a/wis2/" + country + "-" + sourceAcronym + "/data/core/hydrology/"
+				+ MQTTUtils.harmonizeTopicName(level9) + "/" + MQTTUtils.harmonizeTopicName(level10) + "/"
+				+ MQTTUtils.harmonizeTopicName(level11);
+			JSONObject properties = new JSONObject();
+			properties.put("data_id", topic + "/" + id);
+			properties.put("datetime", ISO8601DateTimeUtils.getISO8601DateTime(date));
+			properties.put("pubtime", ISO8601DateTimeUtils.getISO8601DateTime(new Date()));
 
-		    properties.put("value", record.getValue());
-		    properties.put("observedProperty", variable.trim());
-		    UnitsType units = series.getVariable().getUnit();
-		    if (units != null) {
-			String unitName = units.getUnitName();
-			properties.put("uom", unitName);
-		    }
-		    String dataType = series.getVariable().getDataType();
-		    if (dataType != null) {
-			properties.put("interpolation", dataType);
-		    }
+			properties.put("value", record.getValue());
+			properties.put("observedProperty", variable.trim());
+			UnitsType units = series.getVariable().getUnit();
+			if (units != null) {
+			    String unitName = units.getUnitName();
+			    properties.put("uom", unitName);
+			}
+			String dataType = series.getVariable().getDataType();
+			if (dataType != null) {
+			    properties.put("interpolation", dataType);
+			}
 
-		    String wigosId = "021016basin" + siteId;
-		    properties.put("wigos_station_identifier", wigosId);
+			String wigosId = "021016basin" + siteId;
+			properties.put("wigos_station_identifier", wigosId);
 
-		    json.put("properties", properties);
-		    JSONArray linksArray = new JSONArray();
-		    JSONObject link = new JSONObject();
-		    link.put("rel", "canonical");
-		    link.put("type", "application/netcdf");
-		    String variableCode = series.getVariable().getVariableCode().get(1).getValue();
-		    String d = ISO8601DateTimeUtils.getISO8601DateTime(date).replace("Z", "");
-		    link.put("href",
-			    "https://whos.geodab.eu/gs-service/services/essi/token/TOKEN/view/gs-view-and(whos,gs-view-source(" + sourceId
-				    + "))/cuahsi_1_1.asmx?request=GetValuesObject&site=" + siteId + "&variable=" + variableCode
-				    + "&beginDate=" + d + "&endDate=" + d + "&format=NetCDF");
-		    linksArray.put(link);
-		    json.put("links", linksArray);
-		    String msg = json.toString();
-		    if (client == null) {
-			GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
-		    } else {
-			client.publish(topic, msg, true);
+			json.put("properties", properties);
+			JSONArray linksArray = new JSONArray();
+			JSONObject link = new JSONObject();
+			link.put("rel", "canonical");
+			link.put("type", "application/netcdf");
+			String variableCode = series.getVariable().getVariableCode().get(1).getValue();
+			String d = ISO8601DateTimeUtils.getISO8601DateTime(date).replace("Z", "");
+			link.put("href",
+				"https://whos.geodab.eu/gs-service/services/essi/token/TOKEN/view/gs-view-and(whos,gs-view-source(" + sourceId
+					+ "))/cuahsi_1_1.asmx?request=GetValuesObject&site=" + siteId + "&variable=" + variableCode
+					+ "&beginDate=" + d + "&endDate=" + d + "&format=NetCDF");
+			linksArray.put(link);
+			json.put("links", linksArray);
+			String msg = json.toString();
+			if (client == null) {
+			    GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
+			} else {
+			    client.publish(topic, msg, true);
+			}
 		    }
 
 		    ////////////////////////////////
@@ -636,62 +672,16 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		    station.setLastHarvesting(records.get(records.size() - 1).getTimestamp());
 		    station.setWhosCategory("sensor");
 		    station.setLastDayObservations(dailyObservations);
-		    Optional<String> unitsURI = resource.getExtensionHandler().getAttributeUnitsURI();
-		    String unitsLabel = null;
-		    if (unitsURI.isPresent()) {
-			station.setUnitsURI(unitsURI.get());
-			WMOUnit units = WMOOntology.decodeUnit(unitsURI.get());
-			if (units != null) {
-			    unitsLabel = units.getPreferredLabel(null);
-			}
+		    if (metadata.unitsURI() != null) {
+			station.setUnitsURI(metadata.unitsURI());
 		    }
-		    if (unitsLabel == null) {
-			Optional<String> units = resource.getExtensionHandler().getAttributeUnits();
-			if (units.isPresent()) {
-			    unitsLabel = units.get();
-			}
+		    if (metadata.units() != null) {
+			station.setUnits(metadata.units());
 		    }
-		    if (unitsLabel != null) {
-			station.setUnits(unitsLabel);
+		    if (metadata.observedPropertyURI() != null) {
+			station.setObservedPropertyURI(metadata.observedPropertyURI());
 		    }
-		    String observedProperty = null;
-		    Optional<String> observedPropertyURI = resource.getExtensionHandler().getObservedPropertyURI();
-		    if (observedPropertyURI.isPresent()) {
-			station.setObservedPropertyURI(observedPropertyURI.get());
-			WHOSOntology ontology = new WHOSOntology();
-			SKOSConcept concept = ontology.getConcept(observedPropertyURI.get());
-			if (concept != null) {
-			    HashSet<String> closeMatches = concept.getCloseMatches();
-			    if (closeMatches != null && !closeMatches.isEmpty()) {
-				try {
-				    WMOOntology wmoOntology = new WMOOntology();
-				    for (String closeMatch : closeMatches) {
-					SKOSConcept variable = wmoOntology.getVariable(closeMatch);
-					if (variable != null) {
-					    String preferredLabel = variable.getPreferredLabel("");
-					    if (preferredLabel != null) {
-						observedProperty = preferredLabel;
-					    }
-					}
-				    }
-				} catch (Exception e) {
-				    e.printStackTrace();
-				}
-
-			    } else {
-				observedProperty = concept.getPreferredLabel("");
-			    }
-			}
-		    }
-		    if (observedProperty == null) {
-			CoverageDescription cd = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-				.getCoverageDescription();
-			if (cd != null) {
-			    String attribute = cd.getAttributeTitle();
-			    observedProperty = attribute;
-			}
-		    }
-		    station.setObservedProperty(observedProperty);
+		    station.setObservedProperty(metadata.observedProperty());
 		    dataCacheConnector.writeStation(station);
 		}
 
@@ -726,6 +716,87 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
     }
 
     
+
+    /**
+     * Metadata of a time series, written both in each value record and in the station record
+     */
+    private record SeriesMetadata(String units, String unitsURI, String observedProperty, String observedPropertyURI,
+	    LatitudeLongitude latitudeLongitude) {
+    }
+
+    /**
+     * @param resource
+     * @return the metadata of the time series of the given resource
+     * @throws Exception
+     */
+    private SeriesMetadata getSeriesMetadata(GSResource resource) throws Exception {
+
+	Optional<String> unitsURI = resource.getExtensionHandler().getAttributeUnitsURI();
+	String unitsLabel = null;
+	if (unitsURI.isPresent()) {
+	    WMOUnit units = WMOOntology.decodeUnit(unitsURI.get());
+	    if (units != null) {
+		unitsLabel = units.getPreferredLabel(null);
+	    }
+	}
+	if (unitsLabel == null) {
+	    Optional<String> units = resource.getExtensionHandler().getAttributeUnits();
+	    if (units.isPresent()) {
+		unitsLabel = units.get();
+	    }
+	}
+
+	String observedProperty = null;
+	Optional<String> observedPropertyURI = resource.getExtensionHandler().getObservedPropertyURI();
+	if (observedPropertyURI.isPresent()) {
+	    WHOSOntology ontology = new WHOSOntology();
+	    SKOSConcept concept = ontology.getConcept(observedPropertyURI.get());
+	    if (concept != null) {
+		HashSet<String> closeMatches = concept.getCloseMatches();
+		if (closeMatches != null && !closeMatches.isEmpty()) {
+		    try {
+			WMOOntology wmoOntology = new WMOOntology();
+			for (String closeMatch : closeMatches) {
+			    SKOSConcept variable = wmoOntology.getVariable(closeMatch);
+			    if (variable != null) {
+				String preferredLabel = variable.getPreferredLabel("");
+				if (preferredLabel != null) {
+				    observedProperty = preferredLabel;
+				}
+			    }
+			}
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
+
+		} else {
+		    observedProperty = concept.getPreferredLabel("");
+		}
+	    }
+	}
+	if (observedProperty == null) {
+	    CoverageDescription cd = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription();
+	    if (cd != null) {
+		observedProperty = cd.getAttributeTitle();
+	    }
+	}
+
+	// the center of the bounding box (usually a point, for stations)
+	LatitudeLongitude latitudeLongitude = null;
+	GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+	if (bbox != null) {
+	    Double s = bbox.getSouth() != null ? bbox.getSouth() : bbox.getNorth();
+	    Double n = bbox.getNorth() != null ? bbox.getNorth() : bbox.getSouth();
+	    Double w = bbox.getWest() != null ? bbox.getWest() : bbox.getEast();
+	    Double e = bbox.getEast() != null ? bbox.getEast() : bbox.getWest();
+	    if (s != null && w != null) {
+		latitudeLongitude = new LatitudeLongitude(BigDecimal.valueOf((s + n) / 2), BigDecimal.valueOf((w + e) / 2));
+	    }
+	}
+
+	return new SeriesMetadata(unitsLabel, unitsURI.orElse(null), observedProperty, observedPropertyURI.orElse(null),
+		latitudeLongitude);
+    }
 
     /**
      * @param accessExecutor

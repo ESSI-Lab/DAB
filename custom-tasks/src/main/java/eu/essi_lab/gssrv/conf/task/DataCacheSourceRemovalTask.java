@@ -40,7 +40,7 @@ import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.model.GSSource;
 
 /**
- * Removes all the values of a source from the data cache (values index).<br>
+ * Removes all the data of a source from the data cache: values, harvesting statistics, series statuses and stations.<br>
  * The source is given with the <code>SOURCE_ID</code> option (e.g. <code>sourceId=my-source</code>); if missing, the
  * source the task is attached to is used. The task does nothing if no source is specified, so that the whole cache is
  * never removed by mistake
@@ -103,6 +103,18 @@ public class DataCacheSourceRemovalTask extends AbstractCustomTask {
 	    long deleted = dataCacheConnector.deleteBefore(null, id, null);
 
 	    log(status, "Removed " + deleted + " values of source " + sourceName);
+
+	    long statistics = dataCacheConnector.deleteStatistics(id);
+
+	    log(status, "Removed " + statistics + " statistics of source " + sourceName);
+
+	    long statuses = dataCacheConnector.deleteSeriesStatus(id);
+
+	    log(status, "Removed " + statuses + " series statuses of source " + sourceName);
+
+	    dataCacheConnector.deleteStations(id);
+
+	    log(status, "Removed stations of source " + sourceName);
 
 	} finally {
 

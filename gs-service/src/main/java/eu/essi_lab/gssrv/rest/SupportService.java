@@ -690,6 +690,86 @@ public class SupportService {
     }
 
     /**
+     * A page of the stored statuses of the time series of a source (see {@link SeriesStatus}), sorted from the most
+     * severe
+     *
+     * @param view
+     * @param sourceId
+     * @param concept optional concept key ("uri:..." or "name:..."), as returned in the concepts list
+     * @param status optional status
+     * @param text optional text filter on identifier, title, platform and observed property
+     * @param cursor optional cursor of the page, as returned in the previous page ("next")
+     * @param limit
+     * @return
+     */
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/source-series-report")
+    public Response sourceSeriesReport(//
+	    @QueryParam("view") String view, //
+	    @QueryParam("source") String sourceId, //
+	    @QueryParam("concept") String concept, //
+	    @QueryParam("seriesStatus") String status, //
+	    @QueryParam("text") String text, //
+	    @QueryParam("cursor") String cursor, //
+	    @QueryParam("limit") @DefaultValue("100") int limit) {
+
+	if (view == null || view.isEmpty() || sourceId == null || sourceId.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("view and source parameters must be specified").toString())
+		    .build();
+	}
+
+	SeriesStatus seriesStatus = null;
+	if (status != null && !status.isBlank()) {
+	    try {
+		seriesStatus = SeriesStatus.valueOf(status.trim().toUpperCase());
+	    } catch (IllegalArgumentException e) {
+		return Response.serverError().entity(getJSONErrorResponse("unknown status: " + status).toString()).build();
+	    }
+	}
+
+	View v;
+	try {
+	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
+	}
+	Optional<GSSource> source = ConfigurationWrapper.getViewSources(v).stream()
+		.filter(s -> s.getUniqueIdentifier().equals(sourceId)).findFirst();
+	if (source.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("source not found in view").toString()).build();
+	}
+
+	DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+	if (dataCacheConnector == null) {
+	    try {
+		dataCacheConnector = DataCacheConnectorFactory.newDefaultDataCacheConnector();
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+		return Response.serverError().entity(getJSONErrorResponse("error init data cache connector").toString()).build();
+	    }
+	}
+
+	List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()//
+		.filter(o -> o.getOntologyAvailability() == OntologySetting.Availability.ENABLED)//
+		.map(OntologySetting::getOntologyEndpoint)//
+		.toList();
+
+	try {
+	    SeriesStatusPage page = dataCacheConnector.searchSeriesStatus(sourceId, concept, seriesStatus, text, cursor,
+		    Math.max(1, Math.min(limit, 1000)));
+
+	    JSONObject output = SourceSeriesReport.toJSON(source.get(), page, uri -> getConceptLabel(uri, ontologyUrls));
+	    return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse("error reading the series statuses").toString()).build();
+	}
+    }
+
+    /**
      * Resolves the English preferred label of an observed property concept from the ontologies registered and enabled in
      * the configuration (semantic settings). The label of the URIs not found, or of all the URIs if no ontology is
      * enabled, is the URI itself

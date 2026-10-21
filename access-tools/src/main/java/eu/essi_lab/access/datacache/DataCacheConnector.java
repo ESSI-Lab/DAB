@@ -28,6 +28,7 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory.DataConnectorType;
 
@@ -198,6 +199,138 @@ public abstract class DataCacheConnector {
      * @throws Exception
      */
     public abstract SimpleEntry<String, Date> getNextExpectedRecord(String sourceIdentifier) throws Exception;
+
+    /**
+     * A consumer of pages
+     *
+     * @param <T>
+     */
+    @FunctionalInterface
+    public interface PageConsumer<T> {
+
+	/**
+	 * @param page
+	 * @return false to stop the iteration
+	 * @throws Exception
+	 */
+	boolean accept(T page) throws Exception;
+    }
+
+    /**
+     * Iterates the identifiers of the data (time series) of the given source having at least one record in the cache,
+     * in pages
+     *
+     * @param sourceIdentifier
+     * @param consumer
+     * @throws Exception
+     */
+    public abstract void forEachDataIdentifiersPage(String sourceIdentifier, PageConsumer<List<String>> consumer) throws Exception;
+
+    /**
+     * Returns a summary of the given time series of the given source in the cache, including the outcome of their last
+     * update recorded in the statistics. Time series having only statistics (e.g. never successfully updated) are
+     * included as well, with no values
+     *
+     * @param sourceIdentifier
+     * @param dataIdentifiers
+     * @return the summaries, by data identifier
+     * @throws Exception
+     */
+    public abstract Map<String, SeriesCacheInfo> getSeriesCacheInfo(String sourceIdentifier, Collection<String> dataIdentifiers)
+	    throws Exception;
+
+    /**
+     * Removes the records, the stations and the status of the given data (time series) of the given source
+     *
+     * @param sourceIdentifier
+     * @param dataIdentifier
+     * @return the number of deleted records
+     * @throws Exception
+     */
+    public abstract long deleteData(String sourceIdentifier, String dataIdentifier) throws Exception;
+
+    /**
+     * Writes (synchronously) the given series statuses
+     *
+     * @param records
+     * @throws Exception
+     */
+    public abstract void writeSeriesStatus(List<SeriesStatusRecord> records) throws Exception;
+
+    /**
+     * @param sourceIdentifier
+     * @param dataIdentifiers
+     * @return the stored statuses of the given series, by data identifier
+     * @throws Exception
+     */
+    public abstract Map<String, SeriesStatusRecord> getSeriesStatus(String sourceIdentifier, Collection<String> dataIdentifiers)
+	    throws Exception;
+
+    /**
+     * @param sourceIdentifier
+     * @param attemptedBefore
+     * @param size
+     * @return series to fill ({@link SeriesStatus#MISSING}) or to refresh ({@link SeriesStatus#NOT_SCHEDULED}), whose
+     *         augmentation was not attempted after the given time
+     * @throws Exception
+     */
+    public abstract List<SeriesStatusRecord> getSeriesToAugment(String sourceIdentifier, Date attemptedBefore, int size)
+	    throws Exception;
+
+    /**
+     * Iterates, in pages, the stored statuses of the given source having the given base status
+     *
+     * @param sourceIdentifier
+     * @param status
+     * @param consumer
+     * @throws Exception
+     */
+    public abstract void forEachSeriesStatusPage(String sourceIdentifier, SeriesStatus status,
+	    PageConsumer<List<SeriesStatusRecord>> consumer) throws Exception;
+
+    /**
+     * Removes the stored statuses of the given source not written by the given pass
+     *
+     * @param sourceIdentifier
+     * @param passId
+     * @return the number of removed statuses
+     * @throws Exception
+     */
+    public abstract long deleteSeriesStatusNotInPass(String sourceIdentifier, String passId) throws Exception;
+
+    /**
+     * Removes all the stored series statuses of the given source
+     *
+     * @param sourceIdentifier
+     * @return the number of removed statuses
+     * @throws Exception
+     */
+    public abstract long deleteSeriesStatus(String sourceIdentifier) throws Exception;
+
+    /**
+     * Removes all the harvesting statistics of the given source
+     *
+     * @param sourceIdentifier
+     * @return the number of removed statistics
+     * @throws Exception
+     */
+    public abstract long deleteStatistics(String sourceIdentifier) throws Exception;
+
+    /**
+     * Searches the stored statuses of a source, sorted from the most severe (time dependent statuses are derived at the
+     * time of the search)
+     *
+     * @param sourceIdentifier
+     * @param conceptKey optional concept filter
+     * @param status optional (effective) status filter
+     * @param text optional text filter on data identifier, title, platform and observed property
+     * @param cursor optional cursor of the page, as returned by the previous page
+     * @param size
+     * @return
+     * @throws Exception
+     */
+    public abstract SeriesStatusPage searchSeriesStatus(String sourceIdentifier, String conceptKey, SeriesStatus status, String text,
+	    String cursor, int size) throws Exception;
 
     /**
      * Returns the list of expected available records from a given source identified by the provided sourceIdentifier,

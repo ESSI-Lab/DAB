@@ -101,6 +101,7 @@
 <h2>Observed properties</h2>
 <p>For each observed property concept, the table compares the datasets in the metadata database with the datasets available in the data cache, listing the observed property names used by the metadata records of the concept. Datasets without concept are grouped by name. The latest observation is the time of the most recent cached value.</p>
 <p id="overall"></p>
+<p><a id="seriesReportLink" href="#" target="_blank" rel="noopener">Series details: status of each time series, starting from the ones with issues &rarr;</a></p>
 <div id="propertiesTableContainer">
     <table id="propertiesTable">
         <thead>
@@ -113,6 +114,7 @@
                 <th>Values in cache</th>
                 <th>Latest observation</th>
                 <th>Days since latest observation</th>
+                <th>Series</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -171,6 +173,11 @@
 
     const formatNumber = value => typeof value === 'number' ? value.toLocaleString() : '-';
 
+    const seriesReportUrl = concept => `series-report.html?viewId=${encodeURIComponent(viewId)}&sourceId=${encodeURIComponent(sourceId)}`
+        + (concept ? `&concept=${encodeURIComponent(concept)}` : '');
+
+    document.getElementById('seriesReportLink').href = seriesReportUrl(null);
+
     fetch(`/gs-service/services/support/source-data-stats?view=${encodeURIComponent(viewId)}&source=${encodeURIComponent(sourceId)}`)
         .then(res => res.json())
         .then(response => {
@@ -217,11 +224,12 @@
                     <td class="number">${formatNumber(property.valuesInCache)}</td>
                     <td>${formatDate(property.newestObservation)}</td>
                     <td class="number ${ageClass(days)}">${isNaN(days) ? '-' : days}</td>
+                    <td><a href="${escapeHtml(seriesReportUrl(concept ? 'uri:' + concept.uri : 'name:' + (property.name || '')))}" target="_blank" rel="noopener">details</a></td>
                 `;
                 propertiesBody.appendChild(tr);
             });
             if (properties.length === 0) {
-                propertiesBody.innerHTML = '<tr><td colspan="8">No observed properties found.</td></tr>';
+                propertiesBody.innerHTML = '<tr><td colspan="9">No observed properties found.</td></tr>';
             }
 
             // TABLE: Harvesting history

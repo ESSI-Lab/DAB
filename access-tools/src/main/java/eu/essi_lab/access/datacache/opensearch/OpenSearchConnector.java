@@ -23,6 +23,7 @@ package eu.essi_lab.access.datacache.opensearch;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
@@ -33,8 +34,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,6 +55,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
@@ -57,8 +63,13 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.Conflicts;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
+import org.opensearch.client.opensearch._types.aggregations.CompositeAggregate;
+import org.opensearch.client.opensearch._types.aggregations.CompositeAggregationSource;
+import org.opensearch.client.opensearch._types.aggregations.CompositeBucket;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
 import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
@@ -72,6 +83,8 @@ import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.tasks.GetTasksResponse;
+import org.opensearch.client.opensearch.tasks.Status;
 import org.opensearch.client.opensearch.indices.ExistsRequest;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
@@ -90,6 +103,10 @@ import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.Polygon4326;
 import eu.essi_lab.access.datacache.Response;
+import eu.essi_lab.access.datacache.SeriesCacheInfo;
+import eu.essi_lab.access.datacache.SeriesStatus;
+import eu.essi_lab.access.datacache.SeriesStatusPage;
+import eu.essi_lab.access.datacache.SeriesStatusRecord;
 import eu.essi_lab.access.datacache.ResponseListener;
 import eu.essi_lab.access.datacache.PropertyCacheStats;
 import eu.essi_lab.access.datacache.SourceCacheStats;
@@ -121,6 +138,8 @@ public class OpenSearchConnector extends DataCacheConnector {
     private static final String THEME_CATEGORY_PROPERTY = "themeCategory";
     private static final String PLATFORM_IDENTIFIER_PROPERTY = "platformIdentifier";
     private static final String NEXT_RECORD_EXPECTED_TIME_PROPERTY = "nextRecordExpectedTime";
+    private static final int DATA_IDENTIFIERS_PAGE_SIZE = 1000;
+    private static final int MAX_REPORT_CONCEPTS = 2000;
 
     private static final String SOUTH_PROPERTY = "south";
     private static final String EAST_PROPERTY = "east";
@@ -140,7 +159,8 @@ public class OpenSearchConnector extends DataCacheConnector {
     private String databaseName = null;
 
     public enum DataCacheIndex {
-	VALUES("values", DataRecord.class), STATISTICS("statistics", StatisticsRecord.class), STATIONS("stations", StationRecord.class);
+	VALUES("values", DataRecord.class), STATISTICS("statistics", StatisticsRecord.class), STATIONS("stations", StationRecord.class),
+	SERIES_STATUS("series-status", SeriesStatusRecord.class);
 
 	private String suffix;
 
@@ -586,6 +606,12 @@ public class OpenSearchConnector extends DataCacheConnector {
     private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
     private ScheduledFuture<?> futureTask = null;
     private boolean flushInProgress = false;
+
+    /**
+     * Max time of a single run of the write task, so that a continuously filled buffer does not keep the run going
+     * forever (e.g. preventing a timely close)
+     */
+    private static final long MAX_WRITE_RUN_MS = 30 * 1000;
     private Runnable writeTask = new Runnable() {
 
 	@Override
@@ -596,7 +622,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 		    return;
 		}
 
-		writeRecords(dataRecordbuffer, new OperationCreator() {
+		OperationCreator dataCreator = new OperationCreator() {
 
 		    @Override
 		    public BulkOperation createOperation(Object object) {
@@ -612,9 +638,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 			bob.index(idx -> idx.index(DataCacheIndex.VALUES.getIndex(databaseName)).id(finalId).document(json.toMap()));
 			return bob.build();
 		    }
-		});
+		};
 
-		writeRecords(statisticsRecordbuffer, new OperationCreator() {
+		OperationCreator statisticsCreator = new OperationCreator() {
 
 		    @Override
 		    public BulkOperation createOperation(Object object) {
@@ -632,9 +658,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 			bob.index(idx -> idx.index(DataCacheIndex.STATISTICS.getIndex(databaseName)).id(finalId).document(json.toMap()));
 			return bob.build();
 		    }
-		});
+		};
 
-		writeRecords(stationRecordbuffer, new OperationCreator() {
+		OperationCreator stationCreator = new OperationCreator() {
 
 		    @Override
 		    public BulkOperation createOperation(Object object) {
@@ -652,7 +678,30 @@ public class OpenSearchConnector extends DataCacheConnector {
 			bob.index(idx -> idx.index(DataCacheIndex.STATIONS.getIndex(databaseName)).id(finalId).document(json.toMap()));
 			return bob.build();
 		    }
-		});
+		};
+
+		// bulks are written until the buffers are empty, so that the throughput is not limited to one bulk per run.
+		// the buffers are written in rounds, one bulk each, so that a busy buffer does not delay the others
+		long start = System.currentTimeMillis();
+		boolean written = true;
+		while (written && System.currentTimeMillis() - start < MAX_WRITE_RUN_MS) {
+
+		    if (Thread.currentThread().isInterrupted()) {
+			GSLoggerFactory.getLogger(getClass()).error("Thread interrupted");
+			return;
+		    }
+
+		    int data = writeRecords(dataRecordbuffer, dataCreator);
+		    int statistics = writeRecords(statisticsRecordbuffer, statisticsCreator);
+		    int stations = writeRecords(stationRecordbuffer, stationCreator);
+
+		    if (data < 0 || statistics < 0 || stations < 0) {
+			// retried at the next run
+			return;
+		    }
+
+		    written = data + statistics + stations > 0;
+		}
 
 	    } catch (Exception e) {
 		e.printStackTrace();
@@ -661,22 +710,29 @@ public class OpenSearchConnector extends DataCacheConnector {
 
 	}
 
-	private void writeRecords(JsonFileBuffer<?> dataRecordbuffer, OperationCreator operationCreator) throws IOException {
+	/**
+	 * Writes a bulk of at most {@link #maxBulkSize} records of the given buffer
+	 *
+	 * @return the number of records written, or -1 if the bulk failed
+	 */
+	private int writeRecords(JsonFileBuffer<?> dataRecordbuffer, OperationCreator operationCreator) throws IOException {
 	    List<?> tmp = dataRecordbuffer.poll(maxBulkSize);
 
-	    if (!tmp.isEmpty()) {
-		flushInProgress = true;
-		org.opensearch.client.opensearch.core.BulkRequest.Builder request = new org.opensearch.client.opensearch.core.BulkRequest.Builder();
-		List<BulkOperation> operations = new ArrayList<>();
-		for (Object record : tmp) {
-		    BulkOperation operation = operationCreator.createOperation(record);
-		    operations.add(operation);
-		}
-		request = request.operations(operations);
-		flush(request.build());
-		flushInProgress = false;
+	    if (tmp.isEmpty()) {
+		return 0;
 	    }
 
+	    flushInProgress = true;
+	    org.opensearch.client.opensearch.core.BulkRequest.Builder request = new org.opensearch.client.opensearch.core.BulkRequest.Builder();
+	    List<BulkOperation> operations = new ArrayList<>();
+	    for (Object record : tmp) {
+		BulkOperation operation = operationCreator.createOperation(record);
+		operations.add(operation);
+	    }
+	    request = request.operations(operations);
+	    boolean success = flush(request.build());
+	    flushInProgress = false;
+	    return success ? tmp.size() : -1;
 	}
     };
 
@@ -844,11 +900,97 @@ public class OpenSearchConnector extends DataCacheConnector {
 	qb = (Builder) qb.bool(bqb.build());
 	dqrb = dqrb.query(qb.build());
 
-	DeleteByQueryResponse response = client.deleteByQuery(dqrb.build());
-	long deleted = response.deleted();
+	long deleted = deleteByQueryTask(dqrb);
 	GSLoggerFactory.getLogger(getClass()).info("Deleted records: {}", deleted);
 
 	return deleted;
+    }
+
+    @Override
+    public long deleteStatistics(String sourceIdentifier) throws Exception {
+
+	if (sourceIdentifier == null) {
+	    throw new IllegalArgumentException("missing source identifier");
+	}
+
+	org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder dqrb = new org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder();
+	dqrb.index(DataCacheIndex.STATISTICS.getIndex(databaseName));
+	dqrb.query(q -> q.term(t -> t.field("sourceId.keyword").value(FieldValue.of(sourceIdentifier))));
+
+	long deleted = deleteByQueryTask(dqrb);
+	GSLoggerFactory.getLogger(getClass()).info("Deleted statistics of source {}: {}", sourceIdentifier, deleted);
+
+	return deleted;
+    }
+
+    @Override
+    public long deleteSeriesStatus(String sourceIdentifier) throws Exception {
+
+	if (sourceIdentifier == null) {
+	    throw new IllegalArgumentException("missing source identifier");
+	}
+
+	org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder dqrb = new org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder();
+	dqrb.index(DataCacheIndex.SERIES_STATUS.getIndex(databaseName));
+	dqrb.query(q -> q.term(t -> t.field(STATUS_SOURCE_FIELD).value(FieldValue.of(sourceIdentifier))));
+
+	long deleted = deleteByQueryTask(dqrb);
+	GSLoggerFactory.getLogger(getClass()).info("Deleted series statuses of source {}: {}", sourceIdentifier, deleted);
+
+	return deleted;
+    }
+
+    /**
+     * Executes the given delete by query as a background task, waiting for its completion. The deletion of many records
+     * can take longer than the client read timeout and the cluster cancels the deletion when the client disconnects, so
+     * the deletion is started as a background task and then polled
+     *
+     * @param dqrb
+     * @return the number of deleted records
+     * @throws Exception
+     */
+    private long deleteByQueryTask(org.opensearch.client.opensearch.core.DeleteByQueryRequest.Builder dqrb) throws Exception {
+
+	dqrb.waitForCompletion(false).conflicts(Conflicts.Proceed);
+
+	DeleteByQueryResponse response = client.deleteByQuery(dqrb.build());
+	String taskId = response.task();
+	GSLoggerFactory.getLogger(getClass()).info("Delete task started: {}", taskId);
+
+	return waitForDeleteTask(taskId);
+    }
+
+    /**
+     * Waits for the completion of the given delete by query task, logging its progress
+     *
+     * @param taskId
+     * @return the number of deleted records
+     * @throws Exception
+     */
+    private long waitForDeleteTask(String taskId) throws Exception {
+
+	while (true) {
+
+	    GetTasksResponse taskResponse = client.tasks().get(g -> g.taskId(taskId));
+
+	    if (taskResponse.completed()) {
+
+		if (taskResponse.error() != null) {
+		    throw new IOException("Delete task " + taskId + " failed: " + taskResponse.error().reason());
+		}
+
+		Status status = taskResponse.response() != null ? taskResponse.response() : taskResponse.task().status();
+
+		return status != null ? status.deleted() : 0;
+	    }
+
+	    Status status = taskResponse.task().status();
+	    if (status != null) {
+		GSLoggerFactory.getLogger(getClass()).info("Delete task {}: deleted {}/{}", taskId, status.deleted(), status.total());
+	    }
+
+	    Thread.sleep(10000);
+	}
     }
 
     @Override
@@ -1271,6 +1413,456 @@ public class OpenSearchConnector extends DataCacheConnector {
 	}
 	DataRecord dataRecord = records.get(0);
 	return new SimpleEntry<>(dataRecord.getDataIdentifier(), dataRecord.getNextRecordExpectedTime());
+    }
+
+    @Override
+    public void forEachDataIdentifiersPage(String sourceIdentifier, PageConsumer<List<String>> consumer) throws Exception {
+
+	Query query = Query.of(q -> q.term(t -> t.field(SOURCE_IDENTIFIER_PROPERTY + ".keyword").value(FieldValue.of(sourceIdentifier))));
+
+	forEachSeriesBucketPage(DataCacheIndex.VALUES, DATA_IDENTIFIER_PROPERTY, query, Map.of(),
+		buckets -> consumer.accept(buckets.stream().map(b -> b.key().get("id").to(String.class)).toList()));
+    }
+
+    @Override
+    public Map<String, SeriesCacheInfo> getSeriesCacheInfo(String sourceIdentifier, Collection<String> dataIdentifiers)
+	    throws Exception {
+
+	Map<String, SeriesCacheInfo> ret = new HashMap<>();
+
+	if (dataIdentifiers.isEmpty()) {
+	    return ret;
+	}
+
+	List<FieldValue> ids = dataIdentifiers.stream().map(FieldValue::of).toList();
+
+	// values summary, per series
+
+	Query valuesQuery = Query.of(q -> q.bool(b -> b //
+		.must(m -> m.term(t -> t.field(SOURCE_IDENTIFIER_PROPERTY + ".keyword").value(FieldValue.of(sourceIdentifier))))
+		.must(m -> m.terms(t -> t.field(DATA_IDENTIFIER_PROPERTY + ".keyword").terms(v -> v.value(ids))))));
+
+	Map<String, Aggregation> valuesAggregations = new HashMap<>();
+	valuesAggregations.put("first", Aggregation.of(a -> a.min(m -> m.field(DATE_PROPERTY))));
+	valuesAggregations.put("last", Aggregation.of(a -> a.max(m -> m.field(DATE_PROPERTY))));
+	valuesAggregations.put("next", Aggregation.of(a -> a.max(m -> m.field(NEXT_RECORD_EXPECTED_TIME_PROPERTY))));
+	valuesAggregations.put("insert", Aggregation.of(a -> a.max(m -> m.field("timestamp"))));
+	valuesAggregations.put("uri", Aggregation.of(a -> a.terms(t -> t.field("observedPropertyURI.keyword").size(1))));
+	valuesAggregations.put("name", Aggregation.of(a -> a.terms(t -> t.field("observedProperty.keyword").size(1))));
+
+	forEachSeriesBucketPage(DataCacheIndex.VALUES, DATA_IDENTIFIER_PROPERTY, valuesQuery, valuesAggregations, buckets -> {
+
+	    for (CompositeBucket bucket : buckets) {
+
+		String dataId = bucket.key().get("id").to(String.class);
+		SeriesCacheInfo info = ret.computeIfAbsent(dataId, k -> new SeriesCacheInfo());
+		info.setDataIdentifier(dataId);
+		info.setValuesCount(bucket.docCount());
+		info.setFirstObservation(toDate(bucket.aggregations().get("first").min().value()));
+		info.setLastObservation(toDate(bucket.aggregations().get("last").max().value()));
+		info.setNextExpected(toDate(bucket.aggregations().get("next").max().value()));
+		info.setLastInsert(toDate(bucket.aggregations().get("insert").max().value()));
+		info.setObservedPropertyURI(firstTerm(bucket.aggregations().get("uri")));
+		info.setObservedProperty(firstTerm(bucket.aggregations().get("name")));
+	    }
+	    return true;
+	});
+
+	// last update attempt, per series
+
+	Query statisticsQuery = Query.of(q -> q.bool(b -> b //
+		.must(m -> m.term(t -> t.field("sourceId.keyword").value(FieldValue.of(sourceIdentifier))))
+		.must(m -> m.terms(t -> t.field("dataIdentifier.keyword").terms(v -> v.value(ids))))));
+
+	Map<String, Aggregation> statisticsAggregations = new HashMap<>();
+	statisticsAggregations.put("latest", Aggregation.of(a -> a.topHits(th -> th.size(1)
+		.sort(so -> so.field(f -> f.field(DATE_PROPERTY).order(org.opensearch.client.opensearch._types.SortOrder.Desc))))));
+
+	forEachSeriesBucketPage(DataCacheIndex.STATISTICS, "dataIdentifier", statisticsQuery, statisticsAggregations, buckets -> {
+
+	    for (CompositeBucket bucket : buckets) {
+
+		List<Hit<JsonData>> hits = bucket.aggregations().get("latest").topHits().hits().hits();
+		if (hits.isEmpty() || hits.get(0).source() == null) {
+		    continue;
+		}
+
+		String dataId = bucket.key().get("id").to(String.class);
+		JSONObject latest = new JSONObject(hits.get(0).source().toJson().toString());
+
+		SeriesCacheInfo info = ret.computeIfAbsent(dataId, k -> new SeriesCacheInfo());
+		info.setDataIdentifier(dataId);
+		if (latest.has("date")) {
+		    info.setLastUpdate(new Date(latest.getLong("date")));
+		}
+		if (latest.has("harvestedRecords")) {
+		    info.setLastUpdateValues(latest.getInt("harvestedRecords"));
+		}
+		String error = latest.optString("error", null);
+		if (error != null && !error.isBlank()) {
+		    info.setLastUpdateError(error);
+		}
+	    }
+	    return true;
+	});
+
+	return ret;
+    }
+
+    /**
+     * Iterates, by composite aggregation, the pages of buckets of the documents matching the given query, grouped by the
+     * given series identifier field
+     */
+    private void forEachSeriesBucketPage(DataCacheIndex index, String idField, Query query, Map<String, Aggregation> subAggregations,
+	    PageConsumer<List<CompositeBucket>> consumer) throws Exception {
+
+	Map<String, String> after = null;
+
+	do {
+
+	    Map<String, String> currentAfter = after;
+
+	    SearchResponse<Void> response = client.search(s -> s.index(index.getIndex(databaseName)).size(0).query(query)
+		    .aggregations("series", a -> a.composite(c -> {
+			c.size(DATA_IDENTIFIERS_PAGE_SIZE)
+				.sources(Map.of("id", CompositeAggregationSource.of(cs -> cs.terms(t -> t.field(idField + ".keyword")))));
+			if (currentAfter != null) {
+			    c.after(currentAfter);
+			}
+			return c;
+		    }).aggregations(subAggregations)), Void.class);
+
+	    CompositeAggregate aggregate = response.aggregations().get("series").composite();
+
+	    if (!aggregate.buckets().array().isEmpty() && !consumer.accept(aggregate.buckets().array())) {
+		return;
+	    }
+
+	    after = null;
+	    if (!aggregate.buckets().array().isEmpty() && aggregate.afterKey() != null && !aggregate.afterKey().isEmpty()) {
+		after = new HashMap<>();
+		for (Map.Entry<String, JsonData> entry : aggregate.afterKey().entrySet()) {
+		    after.put(entry.getKey(), entry.getValue().to(String.class));
+		}
+	    }
+
+	} while (after != null);
+    }
+
+    private static Date toDate(double value) {
+
+	return Double.isFinite(value) ? new Date((long) value) : null;
+    }
+
+    private static String firstTerm(Aggregate aggregate) {
+
+	if (aggregate.isSterms() && !aggregate.sterms().buckets().array().isEmpty()) {
+	    String key = aggregate.sterms().buckets().array().get(0).key();
+	    return key == null || key.isBlank() ? null : key;
+	}
+	return null;
+    }
+
+    @Override
+    public long deleteData(String sourceIdentifier, String dataIdentifier) throws Exception {
+
+	if (dataIdentifier == null) {
+	    throw new IllegalArgumentException("missing data identifier");
+	}
+
+	long deleted = deleteBefore(null, sourceIdentifier, dataIdentifier);
+
+	BoolQuery.Builder bqb = new BoolQuery.Builder();
+	if (sourceIdentifier != null) {
+	    bqb.must(f -> f.term(t -> t.field(SOURCE_IDENTIFIER_PROPERTY + ".keyword").value(FieldValue.of(sourceIdentifier))));
+	}
+	bqb.must(f -> f.term(t -> t.field(DATA_IDENTIFIER_PROPERTY + ".keyword").value(FieldValue.of(dataIdentifier))));
+	BoolQuery query = bqb.build();
+
+	DeleteByQueryResponse response = client
+		.deleteByQuery(d -> d.index(DataCacheIndex.STATIONS.getIndex(databaseName)).query(q -> q.bool(query)));
+	GSLoggerFactory.getLogger(getClass()).info("Deleted stations of data {}: {}", dataIdentifier, response.deleted());
+
+	if (sourceIdentifier != null) {
+	    client.delete(d -> d.index(DataCacheIndex.SERIES_STATUS.getIndex(databaseName)).id(seriesStatusId(sourceIdentifier, dataIdentifier)));
+	}
+
+	return deleted;
+    }
+
+    //
+    // SERIES STATUS
+    //
+
+    private static final String STATUS_FIELD = "status.keyword";
+    private static final String STATUS_SOURCE_FIELD = "sourceIdentifier.keyword";
+    private static final String STATUS_DATA_FIELD = "dataIdentifier.keyword";
+
+    /**
+     * Effective status severity (see {@link SeriesStatus#effective(SeriesStatus, Date, Date, long)})
+     */
+    private static final String SEVERITY_SCRIPT = """
+	    String s = doc['status.keyword'].value;
+	    if (s == 'ERROR') { return 0; }
+	    if (s == 'MISSING') { return 4; }
+	    if (s == 'NOT_IN_METADATA') { return 5; }
+	    if (doc['nextExpected'].size() > 0 && doc['nextExpected'].value.toInstant().toEpochMilli() < params.overdue) { return 1; }
+	    if (s == 'HISTORICAL') { return 6; }
+	    if (s == 'NOT_SCHEDULED') { return 3; }
+	    if (doc['lastObservation'].size() == 0 || doc['lastObservation'].value.toInstant().toEpochMilli() < params.stale) { return 2; }
+	    return 7;
+	    """;
+
+    private static String seriesStatusId(String sourceIdentifier, String dataIdentifier) {
+
+	return UUID.nameUUIDFromBytes((sourceIdentifier + "\n" + dataIdentifier).getBytes(StandardCharsets.UTF_8)).toString();
+    }
+
+    private static SeriesStatusRecord toStatusRecord(JsonData source) {
+
+	return SeriesStatusRecord.fromJSON(new JSONObject(source.toJson().toString()));
+    }
+
+    @Override
+    public void writeSeriesStatus(List<SeriesStatusRecord> records) throws Exception {
+
+	if (records.isEmpty()) {
+	    return;
+	}
+
+	String index = DataCacheIndex.SERIES_STATUS.getIndex(databaseName);
+
+	List<BulkOperation> operations = new ArrayList<>();
+	for (SeriesStatusRecord record : records) {
+	    Map<String, Object> document = record.toJSON().toMap();
+	    String id = seriesStatusId(record.getSourceIdentifier(), record.getDataIdentifier());
+	    operations.add(BulkOperation.of(b -> b.index(i -> i.index(index).id(id).document(document))));
+	}
+
+	org.opensearch.client.opensearch.core.BulkResponse response = client.bulk(b -> b.operations(operations));
+	if (response.errors()) {
+	    response.items().stream().filter(i -> i.error() != null).findFirst().ifPresent(i -> GSLoggerFactory.getLogger(getClass())
+		    .error("Error writing series status {}: {}", i.id(), i.error().reason()));
+	}
+    }
+
+    @Override
+    public Map<String, SeriesStatusRecord> getSeriesStatus(String sourceIdentifier, Collection<String> dataIdentifiers)
+	    throws Exception {
+
+	Map<String, SeriesStatusRecord> ret = new HashMap<>();
+	List<String> ids = new ArrayList<>(dataIdentifiers);
+
+	for (int i = 0; i < ids.size(); i += DATA_IDENTIFIERS_PAGE_SIZE) {
+
+	    List<String> docIds = ids.subList(i, Math.min(ids.size(), i + DATA_IDENTIFIERS_PAGE_SIZE)).stream()
+		    .map(id -> seriesStatusId(sourceIdentifier, id)).toList();
+
+	    org.opensearch.client.opensearch.core.MgetResponse<JsonData> response = client
+		    .mget(m -> m.index(DataCacheIndex.SERIES_STATUS.getIndex(databaseName)).ids(docIds), JsonData.class);
+
+	    for (org.opensearch.client.opensearch.core.mget.MultiGetResponseItem<JsonData> item : response.docs()) {
+		if (item.isResult() && item.result().found() && item.result().source() != null) {
+		    SeriesStatusRecord record = toStatusRecord(item.result().source());
+		    ret.put(record.getDataIdentifier(), record);
+		}
+	    }
+	}
+
+	return ret;
+    }
+
+    @Override
+    public List<SeriesStatusRecord> getSeriesToAugment(String sourceIdentifier, Date attemptedBefore, int size) throws Exception {
+
+	List<FieldValue> statuses = List.of(FieldValue.of(SeriesStatus.MISSING.name()), FieldValue.of(SeriesStatus.NOT_SCHEDULED.name()));
+
+	SearchResponse<JsonData> response = client.search(s -> s.index(DataCacheIndex.SERIES_STATUS.getIndex(databaseName)).size(size)
+		.query(q -> q.bool(b -> b //
+			.must(m -> m.term(t -> t.field(STATUS_SOURCE_FIELD).value(FieldValue.of(sourceIdentifier))))
+			.must(m -> m.terms(t -> t.field(STATUS_FIELD).terms(v -> v.value(statuses))))
+			.should(sh -> sh.bool(nb -> nb.mustNot(mn -> mn.exists(e -> e.field("attempted")))))
+			.should(sh -> sh.range(r -> r.field("attempted").lt(JsonData.of(attemptedBefore.getTime()))))
+			.minimumShouldMatch("1"))),
+		JsonData.class);
+
+	return response.hits().hits().stream().filter(h -> h.source() != null).map(h -> toStatusRecord(h.source())).toList();
+    }
+
+    @Override
+    public void forEachSeriesStatusPage(String sourceIdentifier, SeriesStatus status, PageConsumer<List<SeriesStatusRecord>> consumer)
+	    throws Exception {
+
+	List<String> searchAfter = null;
+
+	while (true) {
+
+	    List<String> currentAfter = searchAfter;
+
+	    SearchResponse<JsonData> response = client.search(s -> {
+		s.index(DataCacheIndex.SERIES_STATUS.getIndex(databaseName)).size(DATA_IDENTIFIERS_PAGE_SIZE)
+			.query(q -> q.bool(b -> b //
+				.must(m -> m.term(t -> t.field(STATUS_SOURCE_FIELD).value(FieldValue.of(sourceIdentifier))))
+				.must(m -> m.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(status.name()))))))
+			.sort(so -> so.field(f -> f.field(STATUS_DATA_FIELD).order(org.opensearch.client.opensearch._types.SortOrder.Asc)));
+		if (currentAfter != null) {
+		    s.searchAfter(currentAfter);
+		}
+		return s;
+	    }, JsonData.class);
+
+	    List<Hit<JsonData>> hits = response.hits().hits();
+	    if (hits.isEmpty()) {
+		return;
+	    }
+
+	    List<SeriesStatusRecord> page = hits.stream().filter(h -> h.source() != null).map(h -> toStatusRecord(h.source())).toList();
+	    if (!consumer.accept(page)) {
+		return;
+	    }
+
+	    searchAfter = hits.get(hits.size() - 1).sort();
+	}
+    }
+
+    @Override
+    public long deleteSeriesStatusNotInPass(String sourceIdentifier, String passId) throws Exception {
+
+	DeleteByQueryResponse response = client.deleteByQuery(d -> d.index(DataCacheIndex.SERIES_STATUS.getIndex(databaseName))
+		.query(q -> q.bool(b -> b //
+			.must(m -> m.term(t -> t.field(STATUS_SOURCE_FIELD).value(FieldValue.of(sourceIdentifier))))
+			.mustNot(m -> m.term(t -> t.field("passId.keyword").value(FieldValue.of(passId)))))));
+
+	return response.deleted() == null ? 0 : response.deleted();
+    }
+
+    /**
+     * @return the query of the series having the given effective status (see
+     *         {@link SeriesStatus#effective(SeriesStatus, Date, Date, long)})
+     */
+    private static Query effectiveStatusQuery(SeriesStatus status, long now) {
+
+	long overdueLimit = now - SeriesStatus.OVERDUE_MS;
+	long staleLimit = now - SeriesStatus.STALE_MS;
+
+	Query overdue = Query.of(q -> q.range(r -> r.field("nextExpected").lt(JsonData.of(overdueLimit))));
+	Query notTimeIndependent = Query.of(q -> q.bool(b -> b.mustNot(m -> m.terms(t -> t.field(STATUS_FIELD)
+		.terms(v -> v.value(List.of(FieldValue.of("ERROR"), FieldValue.of("MISSING"), FieldValue.of("NOT_IN_METADATA"))))))));
+
+	return switch (status) {
+	case ERROR, MISSING, NOT_IN_METADATA -> Query.of(q -> q.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(status.name()))));
+	case OVERDUE -> Query.of(q -> q.bool(b -> b.must(notTimeIndependent).must(overdue)));
+	case HISTORICAL, NOT_SCHEDULED -> Query.of(q -> q.bool(b -> b //
+		.must(m -> m.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(status.name())))).mustNot(overdue)));
+	case STALE -> Query.of(q -> q.bool(b -> b //
+		.must(m -> m.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(SeriesStatus.OK.name())))).mustNot(overdue)
+		.should(sh -> sh.range(r -> r.field("lastObservation").lt(JsonData.of(staleLimit))))
+		.should(sh -> sh.bool(nb -> nb.mustNot(mn -> mn.exists(e -> e.field("lastObservation"))))).minimumShouldMatch("1")));
+	case OK -> Query.of(q -> q.bool(b -> b //
+		.must(m -> m.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(SeriesStatus.OK.name())))).mustNot(overdue)
+		.must(m -> m.range(r -> r.field("lastObservation").gte(JsonData.of(staleLimit))))));
+	};
+    }
+
+    @Override
+    public SeriesStatusPage searchSeriesStatus(String sourceIdentifier, String conceptKey, SeriesStatus status, String text,
+	    String cursor, int size) throws Exception {
+
+	SeriesStatusPage ret = new SeriesStatusPage();
+	long now = System.currentTimeMillis();
+	ret.setNow(now);
+
+	String index = DataCacheIndex.SERIES_STATUS.getIndex(databaseName);
+	Query sourceQuery = Query.of(q -> q.term(t -> t.field(STATUS_SOURCE_FIELD).value(FieldValue.of(sourceIdentifier))));
+
+	// query: source, concept and text. the status filter is applied as post filter, so that the counts per status
+	// match the other filters
+
+	BoolQuery.Builder bqb = new BoolQuery.Builder().must(sourceQuery);
+	if (conceptKey != null && !conceptKey.isBlank()) {
+	    bqb.must(m -> m.term(t -> t.field("conceptKey.keyword").value(FieldValue.of(conceptKey))));
+	}
+	if (text != null && !text.isBlank()) {
+	    String pattern = "*" + text.trim().replace("\\", "\\\\").replace("*", "\\*").replace("?", "\\?") + "*";
+	    BoolQuery.Builder textQuery = new BoolQuery.Builder().minimumShouldMatch("1");
+	    for (String field : List.of("dataIdentifier", "title", "platform", "observedProperty")) {
+		textQuery.should(sh -> sh.wildcard(w -> w.field(field + ".keyword").value(pattern).caseInsensitive(true)));
+	    }
+	    BoolQuery textBool = textQuery.build();
+	    bqb.must(m -> m.bool(textBool));
+	}
+	BoolQuery query = bqb.build();
+
+	Map<String, Query> statusFilters = new LinkedHashMap<>();
+	for (SeriesStatus s : SeriesStatus.values()) {
+	    statusFilters.put(s.name(), effectiveStatusQuery(s, now));
+	}
+
+	List<String> searchAfter = cursor == null || cursor.isBlank() ? null : new JSONArray(cursor).toList().stream().map(String::valueOf).toList();
+
+	SearchResponse<JsonData> response = client.search(s -> {
+	    s.index(index).size(size).trackTotalHits(t -> t.enabled(true)).query(q -> q.bool(query))
+		    .aggregations("statuses", a -> a.filters(f -> f.filters(b -> b.keyed(statusFilters))))
+		    .aggregations("computed", a -> a.max(m -> m.field("computed")))
+		    .sort(so -> so.script(sc -> sc.type(org.opensearch.client.opensearch._types.ScriptSortType.Number)
+			    .order(org.opensearch.client.opensearch._types.SortOrder.Asc)
+			    .script(scr -> scr.inline(i -> i.source(SEVERITY_SCRIPT).params("overdue", JsonData.of(now - SeriesStatus.OVERDUE_MS))
+				    .params("stale", JsonData.of(now - SeriesStatus.STALE_MS))))))
+		    .sort(so -> so.field(f -> f.field("lastObservation").order(org.opensearch.client.opensearch._types.SortOrder.Asc)
+			    .missing(FieldValue.of("_first"))))
+		    .sort(so -> so.field(f -> f.field(STATUS_DATA_FIELD).order(org.opensearch.client.opensearch._types.SortOrder.Asc)));
+	    if (status != null) {
+		s.postFilter(statusFilters.get(status.name()));
+	    }
+	    if (searchAfter != null) {
+		s.searchAfter(searchAfter);
+	    }
+	    return s;
+	}, JsonData.class);
+
+	List<Hit<JsonData>> hits = response.hits().hits();
+	for (Hit<JsonData> hit : hits) {
+	    if (hit.source() != null) {
+		ret.getRecords().add(toStatusRecord(hit.source()));
+	    }
+	}
+
+	ret.setTotal(response.hits().total() == null ? hits.size() : response.hits().total().value());
+	if (hits.size() == size) {
+	    ret.setNextCursor(new JSONArray(hits.get(hits.size() - 1).sort()).toString());
+	}
+
+	Map<String, org.opensearch.client.opensearch._types.aggregations.FiltersBucket> statusBuckets = response.aggregations().get("statuses")
+		.filters().buckets().keyed();
+	for (SeriesStatus s : SeriesStatus.values()) {
+	    org.opensearch.client.opensearch._types.aggregations.FiltersBucket bucket = statusBuckets.get(s.name());
+	    ret.getCounts().put(s, bucket == null ? 0l : bucket.docCount());
+	}
+
+	ret.setComputed(toDate(response.aggregations().get("computed").max().value()));
+
+	// concepts of the source
+
+	Query fine = Query.of(q -> q.bool(b -> b.should(effectiveStatusQuery(SeriesStatus.OK, now))
+		.should(effectiveStatusQuery(SeriesStatus.HISTORICAL, now)).minimumShouldMatch("1")));
+
+	SearchResponse<Void> conceptsResponse = client.search(s -> s.index(index).size(0).query(sourceQuery)
+		.aggregations("concepts", a -> a.terms(t -> t.field("conceptKey.keyword").size(MAX_REPORT_CONCEPTS))
+			.aggregations("uri", sa -> sa.terms(t -> t.field("observedPropertyURI.keyword").size(1)))
+			.aggregations("name", sa -> sa.terms(t -> t.field("observedProperty.keyword").size(1)))
+			.aggregations("fine", sa -> sa.filter(fine))),
+		Void.class);
+
+	Aggregate conceptsAggregate = conceptsResponse.aggregations().get("concepts");
+	if (conceptsAggregate.isSterms()) {
+	    for (StringTermsBucket bucket : conceptsAggregate.sterms().buckets().array()) {
+		long fineCount = bucket.aggregations().get("fine").filter().docCount();
+		ret.getConcepts().add(new SeriesStatusPage.ConceptCount(bucket.key(), firstTerm(bucket.aggregations().get("uri")),
+			firstTerm(bucket.aggregations().get("name")), bucket.docCount(), bucket.docCount() - fineCount));
+	    }
+	}
+
+	return ret;
     }
 
     @Override
