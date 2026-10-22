@@ -266,6 +266,20 @@ public class Configuration {
     }
 
     /**
+     * Read-only method. Applies the given <code>reader</code> to the setting with the given id, <i>without</i> cloning it.<br>
+     * For performance reasons, this method is recommended to read a few values of a single setting, but the <code>reader</code>
+     * must not alter the setting and must not return it, nor any of its objects
+     *
+     * @param settingId
+     * @param reader
+     * @return
+     */
+    public synchronized <R> Optional<R> read(String settingId, Function<Setting, R> reader) {
+
+	return SettingUtils.get(list, settingId).map(reader);
+    }
+
+    /**
      * Read-only method. Changes applied to the returned {@link Setting} will not alter the configuration status. Use write methods to
      * change the configuration status
      *

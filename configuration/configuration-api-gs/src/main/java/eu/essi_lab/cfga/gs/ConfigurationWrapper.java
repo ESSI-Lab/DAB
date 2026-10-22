@@ -50,6 +50,7 @@ import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 import eu.essi_lab.services.*;
+import org.json.*;
 import org.quartz.*;
 
 import java.util.*;
@@ -925,7 +926,7 @@ public class ConfigurationWrapper {
     /**
      *
      */
-    private static final HashMap<String, Chronometer> isJobCanceledMap = new HashMap<>();
+    private static final Map<String, Chronometer> isJobCanceledMap = new ConcurrentHashMap<>();
 
     /**
      * This method returns <code>true</code> in the following cases:
@@ -957,60 +958,38 @@ public class ConfigurationWrapper {
      * @param context
      * @return
      */
-    public synchronized static boolean isJobCanceled(JobExecutionContext context) {
+    public static boolean isJobCanceled(JobExecutionContext context) {
 
-	SchedulerWorkerSetting contextSetting = SchedulerUtils.getSetting(context);
-
-	//
-	//
-	//
-
-	List<SchedulerWorkerSetting> workerSettingList = getAugmenterWorkerSettings().//
-		stream().//
-		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
-		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
-		collect(Collectors.toList());
-
-	workerSettingList.addAll(getHarvestingSettings().//
-		stream().//
-		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
-		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
-		toList());
-
-	workerSettingList.addAll(getCustomTaskSettings().//
-		stream().//
-		map(s -> (SchedulerWorkerSetting) SettingUtils.downCast(s, s.getSettingClass())).//
-		filter(s -> s.getIdentifier().equals(contextSetting.getIdentifier())).//
-		toList());
+	String settingId = SchedulerUtils.getSettingIdentifier(context);
 
 	//
+	// the setting is read by id without cloning nor instantiating the configured settings, so this method
+	// can be frequently called by long-running tasks
 	//
-	//
+	Optional<Boolean> enabled = configuration.read(settingId, s -> {
 
-	if (!workerSettingList.isEmpty()) {
+	    JSONObject scheduling = s.getObject().optJSONObject(SchedulerWorkerSetting.SCHEDULING_SETTING_ID);
 
-	    Scheduling scheduling = workerSettingList.getFirst().getScheduling();
+	    return scheduling == null ? null : new Scheduling(scheduling).isEnabled();
+	});
 
-	    return !scheduling.isEnabled();
+	if (enabled.isPresent()) {
+
+	    return !enabled.get();
 	}
 
 	//
-	// if the list is empty, it means that the context setting is no longer in the configuration, it has been
+	// if the setting is missing, it means that the context setting is no longer in the configuration, it has been
 	// removed
 	//
 	if (ExecutionMode.get() != ExecutionMode.MIXED && ExecutionMode.get() != ExecutionMode.LOCAL_PRODUCTION) {
 
-	    Chronometer chronometer = isJobCanceledMap.get(contextSetting.getIdentifier());
+	    Chronometer chronometer = isJobCanceledMap.computeIfAbsent(settingId, id -> {
 
-	    if (chronometer == null) {
-
-		chronometer = new Chronometer();
-		chronometer.start();
-
-		isJobCanceledMap.put(contextSetting.getIdentifier(), chronometer);
-
-		return false;
-	    }
+		Chronometer c = new Chronometer();
+		c.start();
+		return c;
+	    });
 
 	    long elapsedTimeMillis = chronometer.getElapsedTimeMillis();
 	    long reloadTime = CONFIG_RELOAD_TIME_UNIT.toMillis(CONFIG_RELOAD_TIME * 2);
@@ -1021,7 +1000,8 @@ public class ConfigurationWrapper {
 	    }
 	}
 
-	GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Setting of worker '{}' removed", contextSetting.getWorkerName());
+	GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Setting of worker '{}' removed",
+		SchedulerUtils.getSetting(context).getWorkerName());
 
 	return true;
     }

@@ -39,6 +39,8 @@ import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting.SchedulingGrou
 
 public class SchedulerUtils {
 
+    private static final String JOB_KEY_NAME_PREFIX = "job_id_";
+
     /**
      * @param setting
      * @return
@@ -79,7 +81,7 @@ public class SchedulerUtils {
      */
     public static String createJobKeyName(String identifier) {
 
-	return "job_id_" + identifier;
+	return JOB_KEY_NAME_PREFIX + identifier;
     }
 
     /**
@@ -88,7 +90,7 @@ public class SchedulerUtils {
      */
     public static String retrieveSettingIdentifier(String jobKeyName) {
 
-	return jobKeyName.replace("job_id_", "");
+	return jobKeyName.replace(JOB_KEY_NAME_PREFIX, "");
     }
 
     /**
@@ -125,6 +127,25 @@ public class SchedulerUtils {
 	SchedulingGroup schedulingGroup = setting.getGroup();
 
 	return new TriggerKey("trigger_id_" + id, "trigger_group_" + schedulingGroup.getLabel());
+    }
+
+    /**
+     * Returns the identifier of the worker setting of the given context. Faster than <code>getSetting(context).getIdentifier()</code>
+     * since, if possible, the identifier is retrieved from the job key name without parsing the setting
+     *
+     * @param context
+     * @return
+     */
+    public static String getSettingIdentifier(JobExecutionContext context) {
+
+	JobKey key = context.getJobDetail().getKey();
+
+	if (key != null && key.getName().startsWith(JOB_KEY_NAME_PREFIX)) {
+
+	    return retrieveSettingIdentifier(key.getName());
+	}
+
+	return getSetting(context).getIdentifier();
     }
 
     /**
