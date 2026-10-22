@@ -325,20 +325,6 @@ public class OMHandler extends StreamingRequestHandler {
 	if (resolvedView!=null){
 	    discoveryMessage.setSources(ConfigurationWrapper.getViewSources(resolvedView));
 	}
-	if (useCache) {
-	    ResourceSelector selector = new ResourceSelector();
-	    selector.setSubset(ResourceSubset.NONE);
-	    selector.setIndexesPolicy(IndexesPolicy.NONE);
-	    selector.addIndex(MetadataElement.ONLINE_ID);
-	    selector.setIncludeOriginal(false);
-	    discoveryMessage.setExcludeResourceBinary(true);
-	    // selector.addIndex(MetadataElement.PLATFORM_TITLE);
-	    // selector.addIndex(ResourceProperty.SOURCE_ID);
-	    // selector.addIndex(MetadataElement.BOUNDING_BOX);
-	    // selector.addIndex(MetadataElement.COUNTRY);
-	    discoveryMessage.setResourceSelector(selector);
-	}
-
 	Page userPage = discoveryMessage.getPage();
 	int userSize = userPage.getSize();
 	int pageSize = Math.min(userSize, 1000);
@@ -494,7 +480,6 @@ public class OMHandler extends StreamingRequestHandler {
 
 		List<JSONObservation> observations = new ArrayList<>();
 		GSLoggerFactory.getLogger(getClass()).info("mapping");
-		String identifier = null;
 		ObservationMapper observationMapper = new ObservationMapper();
 		Optional<View> view = discoveryMessage.getView();
 
@@ -512,10 +497,6 @@ public class OMHandler extends StreamingRequestHandler {
 			observations.add(observation);
 		    }
 		}
-		for (JSONObservation observation : observations) {
-		    identifier = observation.getId();
-		}
-
 		tempSize += observations.size();
 
 		if (first) {
@@ -539,7 +520,8 @@ public class OMHandler extends StreamingRequestHandler {
 		    if ((includeValues != null && (includeValues.toLowerCase().equals("yes") || includeValues.toLowerCase()
 			    .equals("true")))) {
 
-			if (useCache && identifier != null) {
+			String observationId = observation.getId();
+			if (useCache && observationId != null && !observationId.isEmpty()) {
 
 			    GSLoggerFactory.getLogger(getClass()).info("Getting data from cache");
 			    ResultWriter finalWriter = resultWriter;
@@ -561,7 +543,7 @@ public class OMHandler extends StreamingRequestHandler {
 				    return completed;
 				}
 			    };
-			    dataCacheConnector.getRecords(listener, begin, end, new String[] { identifier });
+			    dataCacheConnector.getRecords(listener, begin, end, new String[] { observationId });
 
 			    while (!listener.isCompleted()) {
 				Thread.sleep(100);
