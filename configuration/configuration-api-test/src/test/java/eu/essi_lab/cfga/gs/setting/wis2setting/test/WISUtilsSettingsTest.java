@@ -12,7 +12,9 @@ import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
+import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.profiler.wis.WISUtils;
 
 /**
@@ -72,6 +74,7 @@ public class WISUtilsSettingsTest {
 	String source1 = ConfigurationWrapper.getHarvestedSources().get(1).getUniqueIdentifier();
 
 	Assert.assertEquals(WIS2DataPolicy.RECOMMENDED, WISUtils.getDataPolicy(source0));
+	Assert.assertFalse(WISUtils.isCoreDataPublished(source0));
 
 	// a new instance holds the sources of the configuration, so that they can be selected
 	WIS2Setting wis2Setting = new WIS2Setting();
@@ -79,8 +82,61 @@ public class WISUtilsSettingsTest {
 	wis2Setting.selectCoreSources(Arrays.asList(source0));
 	configuration.replace(wis2Setting);
 
+	// disabled: core sources are neither declared nor served
+	Assert.assertEquals(WIS2DataPolicy.RECOMMENDED, WISUtils.getDataPolicy(source0));
+	Assert.assertFalse(WISUtils.isCoreDataPublished(source0));
+
+	// private: core data are served and notified, but the records are unchanged
+	setMode(wis2Setting, DataNotificationsMode.PRIVATE);
+	Assert.assertEquals(WIS2DataPolicy.RECOMMENDED, WISUtils.getDataPolicy(source0));
+	Assert.assertTrue(WISUtils.isCoreDataPublished(source0));
+	Assert.assertFalse(WISUtils.isCoreDataPublished(source1));
+
+	// experimental: the records declare the core data policy
+	setMode(wis2Setting, DataNotificationsMode.EXPERIMENTAL);
 	Assert.assertEquals(WIS2DataPolicy.CORE, WISUtils.getDataPolicy(source0));
 	Assert.assertEquals(WIS2DataPolicy.RECOMMENDED, WISUtils.getDataPolicy(source1));
+    }
+
+    @Test
+    public void topicsTest() {
+
+	WIS2Setting wis2Setting = ConfigurationWrapper.getWIS2Setting();
+	wis2Setting.setCentreId("it-cnr-itiam-whos-dab-test");
+
+	String path = "/data/core/hydrology/surface-based-observations/water-quantity/stream";
+	String experimentalPath = "/data/core/hydrology/experimental/surface-based-observations/water-quantity/stream";
+
+	setMode(wis2Setting, DataNotificationsMode.DISABLED);
+	Assert.assertTrue(WISUtils.getAdvertisedTopic(WIS2HydrologyTopic.STREAM).isEmpty());
+	Assert.assertTrue(WISUtils.getPublicationTopic(WIS2HydrologyTopic.STREAM).isEmpty());
+
+	for (DataNotificationsMode mode : new DataNotificationsMode[] { DataNotificationsMode.DRY_RUN, DataNotificationsMode.PRIVATE }) {
+
+	    setMode(wis2Setting, mode);
+	    Assert.assertTrue(WISUtils.getAdvertisedTopic(WIS2HydrologyTopic.STREAM).isEmpty());
+	    Assert.assertEquals("test/a/wis2/it-cnr-itiam-whos-dab-test" + path,
+		    WISUtils.getPublicationTopic(WIS2HydrologyTopic.STREAM).get());
+	}
+
+	setMode(wis2Setting, DataNotificationsMode.EXPERIMENTAL);
+	Assert.assertEquals("origin/a/wis2/it-cnr-itiam-whos-dab-test" + experimentalPath,
+		WISUtils.getAdvertisedTopic(WIS2HydrologyTopic.STREAM).get());
+	Assert.assertEquals(WISUtils.getAdvertisedTopic(WIS2HydrologyTopic.STREAM), WISUtils.getPublicationTopic(WIS2HydrologyTopic.STREAM));
+
+	setMode(wis2Setting, DataNotificationsMode.OPERATIONAL);
+	Assert.assertEquals("origin/a/wis2/it-cnr-itiam-whos-dab-test" + path, WISUtils.getAdvertisedTopic(WIS2HydrologyTopic.STREAM).get());
+	Assert.assertEquals(WISUtils.getAdvertisedTopic(WIS2HydrologyTopic.STREAM), WISUtils.getPublicationTopic(WIS2HydrologyTopic.STREAM));
+    }
+
+    /**
+     * @param wis2Setting
+     * @param mode
+     */
+    private void setMode(WIS2Setting wis2Setting, DataNotificationsMode mode) {
+
+	wis2Setting.setDataNotificationsMode(mode);
+	configuration.replace(wis2Setting);
     }
 
     @Test

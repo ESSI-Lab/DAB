@@ -107,5 +107,12 @@ public class WIS2DataNotifierTest {
 	Assert.assertEquals("https://wis2.whos-dab.eu/gs-service/services/essi/view/whos/" + new WISProfilerSetting().getServicePath()
 		+ "/collections/observations/items/" + itemId, link.getString("href"));
 	Assert.assertEquals(content.getBytes(StandardCharsets.UTF_8).length, link.getInt("length"));
+
+	// the data id follows the given (e.g. experimental) topic
+	String experimental = WIS2HydrologyTopic.STREAM.getExperimentalTopic(CENTRE_ID, WIS2DataPolicy.CORE);
+	JSONObject experimentalMessage = WIS2DataNotifier.createMessage(record, experimental, "whos", metadataId, "WHOS DAB")
+		.getJSONObject();
+	Assert.assertEquals(CENTRE_ID + "/data/core/hydrology/experimental/surface-based-observations/water-quantity/stream/" + itemId,
+		experimentalMessage.getJSONObject("properties").getString("data_id"));
     }
 }

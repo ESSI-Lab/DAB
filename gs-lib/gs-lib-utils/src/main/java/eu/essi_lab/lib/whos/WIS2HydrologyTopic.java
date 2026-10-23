@@ -40,7 +40,14 @@ public enum WIS2HydrologyTopic {
     GROUNDWATER("subsurface-based-observations/water-quantity/groundwater"), //
     SOIL("subsurface-based-observations/water-quantity/soil");
 
+    /**
+     * Prefix of the topics published by the WIS2 nodes and relayed by the WIS2 Global Brokers
+     */
+    public static final String ORIGIN_PREFIX = "origin/a/wis2";
+
     private static final String EARTH_SYSTEM_DISCIPLINE = "hydrology";
+
+    private static final String EXPERIMENTAL = "experimental";
 
     private static final String HYDRO_ONTOLOGY_CONCEPT = "http://hydro.geodab.eu/hydro-ontology/concept/";
 
@@ -67,7 +74,38 @@ public enum WIS2HydrologyTopic {
      */
     public String getTopic(String centreId, WIS2DataPolicy dataPolicy) {
 
-	return "origin/a/wis2/" + centreId + "/data/" + dataPolicy.getId() + "/" + EARTH_SYSTEM_DISCIPLINE + "/" + path;
+	return ORIGIN_PREFIX + "/" + centreId + "/data/" + dataPolicy.getId() + "/" + EARTH_SYSTEM_DISCIPLINE + "/" + path;
+    }
+
+    /**
+     * @param centreId the WIS2 centre id
+     * @param dataPolicy the data policy of the published data
+     * @return the experimental variant of this topic, for provisional publications (e.g.
+     *         origin/a/wis2/it-cnr-itiam-whos-dab/data/core/hydrology/experimental/surface-based-observations/water-quantity/stream)
+     */
+    public String getExperimentalTopic(String centreId, WIS2DataPolicy dataPolicy) {
+
+	return ORIGIN_PREFIX + "/" + centreId + "/data/" + dataPolicy.getId() + "/" + EARTH_SYSTEM_DISCIPLINE + "/" + EXPERIMENTAL + "/"
+		+ path;
+    }
+
+    /**
+     * @param topic a topic starting with {@link #ORIGIN_PREFIX}
+     * @return the given topic without {@link #ORIGIN_PREFIX} (e.g. it-cnr-itiam-whos-dab/data/core/hydrology/...)
+     */
+    public static String withoutPrefix(String topic) {
+
+	return topic.substring(ORIGIN_PREFIX.length() + 1);
+    }
+
+    /**
+     * @param topic a topic starting with {@link #ORIGIN_PREFIX}
+     * @param prefix
+     * @return the given topic with {@link #ORIGIN_PREFIX} replaced by the given prefix
+     */
+    public static String withPrefix(String topic, String prefix) {
+
+	return prefix + "/" + withoutPrefix(topic);
     }
 
     /**
@@ -76,7 +114,7 @@ public enum WIS2HydrologyTopic {
      */
     public static String getMetadataTopic(String centreId) {
 
-	return "origin/a/wis2/" + centreId + "/metadata";
+	return ORIGIN_PREFIX + "/" + centreId + "/metadata";
     }
 
     /**

@@ -32,8 +32,10 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.TabContentDescriptor;
 import eu.essi_lab.cfga.gui.components.tabs.descriptor.TabContentDescriptorBuilder;
 import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
+import eu.essi_lab.lib.utils.LabeledEnum;
 import eu.essi_lab.model.GSSource;
 
 /**
@@ -55,6 +57,81 @@ public class WIS2Setting extends Setting implements EditableSetting {
     private static final String HOSTNAME_OPTION_KEY = "wis2Hostname";
     private static final String VIEW_ID_OPTION_KEY = "wis2ViewId";
     private static final String TOKEN_CONTACT_OPTION_KEY = "wis2TokenContact";
+    private static final String DATA_NOTIFICATIONS_MODE_OPTION_KEY = "wis2DataNotificationsMode";
+    private static final String PRIVATE_TOPIC_PREFIX_OPTION_KEY = "wis2PrivateTopicPrefix";
+
+    /**
+     * Default prefix of the private topics, not relayed by the WIS2 Global Brokers (which subscribe to
+     * <code>origin/a/wis2/#</code>)
+     */
+    public static final String DEFAULT_PRIVATE_TOPIC_PREFIX = "test/a/wis2";
+
+    /**
+     * How the data of the core sources are published, from the safest to the operational mode
+     *
+     * @author boldrini
+     */
+    public enum DataNotificationsMode implements LabeledEnum {
+
+	/**
+	 * Data notifications are not published, the records of the core sources do not advertise data topics and the
+	 * core data are not served
+	 */
+	DISABLED("Disabled"),
+
+	/**
+	 * Data notifications are built and logged, but not published. The core data are served, the records are
+	 * unchanged
+	 */
+	DRY_RUN("Dry run"),
+
+	/**
+	 * Data notifications are published under the private topic prefix, not relayed by the WIS2 Global Brokers. The
+	 * core data are served, the records are unchanged
+	 */
+	PRIVATE("Private"),
+
+	/**
+	 * Data notifications are published under the experimental topics of the hydrology discipline, advertised by the
+	 * records of the core sources
+	 */
+	EXPERIMENTAL("Experimental"),
+
+	/**
+	 * Data notifications are published under the official topics, advertised by the records of the core sources
+	 */
+	OPERATIONAL("Operational");
+
+	private final String label;
+
+	/**
+	 * @param label
+	 */
+	DataNotificationsMode(String label) {
+
+	    this.label = label;
+	}
+
+	@Override
+	public String toString() {
+
+	    return getLabel();
+	}
+
+	@Override
+	public String getLabel() {
+
+	    return label;
+	}
+
+	/**
+	 * @return true if the records of the core sources advertise the data topics, with the core data policy
+	 */
+	public boolean isAdvertised() {
+
+	    return this == EXPERIMENTAL || this == OPERATIONAL;
+	}
+    }
 
     private static final String CORE_SOURCES_SETTING_IDENTIFIER = "wis2CoreSources";
 
@@ -81,6 +158,23 @@ public class WIS2Setting extends Setting implements EditableSetting {
 
 	addOption(buildOption(TOKEN_CONTACT_OPTION_KEY, "Token request contact",
 		"E-mail address to contact in order to request the token needed by the authenticated APIs"));
+
+	Option<DataNotificationsMode> mode = OptionBuilder.get(DataNotificationsMode.class).//
+		withKey(DATA_NOTIFICATIONS_MODE_OPTION_KEY).//
+		withLabel("Data notifications").//
+		withDescription(
+			"How the data of the core sources are published: disabled; dry run (notifications logged only); private (notifications published under the private topic prefix, not relayed by WIS2); experimental (experimental topics, advertised in the records); operational (official topics, advertised in the records)")
+		.//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(DataNotificationsMode.class)).//
+		withSelectedValue(DataNotificationsMode.DISABLED).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(mode);
+
+	addOption(buildOption(PRIVATE_TOPIC_PREFIX_OPTION_KEY, "Private topic prefix",
+		"Prefix of the topics of the private data notifications, replacing origin/a/wis2. Default: " + DEFAULT_PRIVATE_TOPIC_PREFIX));
 
 	//
 	// sources published with the core data policy
@@ -287,6 +381,40 @@ public class WIS2Setting extends Setting implements EditableSetting {
     public void setTokenRequestContact(String contact) {
 
 	writeOption(TOKEN_CONTACT_OPTION_KEY, contact);
+    }
+
+    /**
+     * @return
+     */
+    public DataNotificationsMode getDataNotificationsMode() {
+
+	return getOption(DATA_NOTIFICATIONS_MODE_OPTION_KEY, DataNotificationsMode.class).//
+		map(Option::getValue).//
+		orElse(DataNotificationsMode.DISABLED);
+    }
+
+    /**
+     * @param mode
+     */
+    public void setDataNotificationsMode(DataNotificationsMode mode) {
+
+	getOption(DATA_NOTIFICATIONS_MODE_OPTION_KEY, DataNotificationsMode.class).get().setValue(mode);
+    }
+
+    /**
+     * @return the prefix of the private topics, replacing <code>origin/a/wis2</code>
+     */
+    public String getPrivateTopicPrefix() {
+
+	return readOption(PRIVATE_TOPIC_PREFIX_OPTION_KEY).orElse(DEFAULT_PRIVATE_TOPIC_PREFIX);
+    }
+
+    /**
+     * @param prefix
+     */
+    public void setPrivateTopicPrefix(String prefix) {
+
+	writeOption(PRIVATE_TOPIC_PREFIX_OPTION_KEY, prefix);
     }
 
     /**

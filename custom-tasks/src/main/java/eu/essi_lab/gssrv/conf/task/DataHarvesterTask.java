@@ -96,8 +96,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	RECONCILE_INTERVAL_HOURS,
 	/**
 	 * If "true", WIS2 data notifications are published for the new values of the scheduled series, after they have
-	 * been written to the cache. Values are notified only if the source is published with the core data policy (see
-	 * the WIS2 settings), under the data topics advertised by its published WCMP2 record. Default: "false"
+	 * been written to the cache. Values are notified only if the source is a core source, according to the data
+	 * notifications mode of the WIS2 settings (see WIS2DataNotifier). Default: "false"
 	 */
 	MQTT,
 	/**

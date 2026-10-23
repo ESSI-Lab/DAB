@@ -133,13 +133,14 @@ class SourceCollectionCreator {
 	dataset.getExtensionHandler().setWISTopicHierarchy(WIS2HydrologyTopic.getMetadataTopic(centreId));
 
 	// the data of core sources are published (by the data harvester task) under the topics of their observed
-	// properties, sorted to keep the generated record (and its integrity checksum) stable
+	// properties, advertised according to the data notifications mode. Topics are sorted to keep the generated record
+	// (and its integrity checksum) stable
 	if (WISUtils.getDataPolicy(sourceId) == WIS2DataPolicy.CORE) {
 	    TreeSet<String> topics = new TreeSet<>();
 	    Optional<ComputationResult> properties = responseItem.getFrequency(MetadataElement.OBSERVED_PROPERTY_URI);
 	    if (properties.isPresent()) {
 		for (TermFrequencyItem item : properties.get().getFrequencyItems()) {
-		    WIS2HydrologyTopic.decode(item.getTerm()).ifPresent(t -> topics.add(t.getTopic(centreId, WIS2DataPolicy.CORE)));
+		    WIS2HydrologyTopic.decode(item.getTerm()).flatMap(WISUtils::getAdvertisedTopic).ifPresent(topics::add);
 		}
 	    }
 	    topics.forEach(dataset.getExtensionHandler()::addWISDataTopic);

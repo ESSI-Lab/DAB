@@ -23,7 +23,6 @@ package eu.essi_lab.gssrv.conf.task.collection;
  */
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -39,6 +38,7 @@ import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.WIS2DataItem;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
@@ -48,10 +48,17 @@ import eu.essi_lab.profiler.wis.WISUtils;
 
 /**
  * Publishes a WIS2 data notification message for each new value of the series of a source. Values are notified only
- * if the source is published with the <code>core</code> data policy, and only under the data topics advertised by
- * the published WCMP2 record of the source (see {@link CollectionCreatorTask}), so that a topic is never used before
- * a record advertises it. Each message provides the value inline, and links the same content served by the WIS
- * profiler (the values are read back from the data cache, so that the notified content matches the served one)
+ * if the source is a core source (see {@link WISUtils#isCoreDataPublished(String)}), according to the data
+ * notifications mode of the WIS2 settings:
+ * <ul>
+ * <li>dry run: the messages are logged, not published</li>
+ * <li>private: the messages are published under the private topic prefix, not relayed by the WIS2 Global Brokers</li>
+ * <li>experimental and operational: the messages are published only under the data topics advertised by the published
+ * WCMP2 record of the source (see {@link CollectionCreatorTask}), so that a topic is never used before a record
+ * advertises it</li>
+ * </ul>
+ * Each message provides the value inline, and links the same content served by the WIS profiler (the values are read
+ * back from the data cache, so that the notified content matches the served one)
  *
  * @author boldrini
  */
@@ -64,6 +71,7 @@ public class WIS2DataNotifier {
 
     private final String sourceId;
     private Set<String> topics;
+    private boolean enabled;
     private long topicsRead;
 
     /**
@@ -90,16 +98,15 @@ public class WIS2DataNotifier {
 
 	Optional<String> viewId = WISUtils.getViewId();
 
-	if (WISUtils.getDataPolicy(sourceId) != WIS2DataPolicy.CORE) {
+	if (!WISUtils.isCoreDataPublished(sourceId)) {
 
-	    GSLoggerFactory.getLogger(getClass()).info("[WIS2] Source {} not published with the core data policy, no data notifications",
-		    sourceId);
+	    GSLoggerFactory.getLogger(getClass()).info("[WIS2] Source {} not a core source or data notifications disabled", sourceId);
 
 	} else if (viewId.isEmpty()) {
 
 	    GSLoggerFactory.getLogger(getClass()).error("[WIS2] View id not configured in the WIS2 settings, no data notifications");
 
-	} else {
+	} else if (WISUtils.getDataNotificationsMode().isAdvertised()) {
 
 	    try {
 
@@ -118,10 +125,11 @@ public class WIS2DataNotifier {
 	}
 
 	if (!ret.equals(topics)) {
-	    GSLoggerFactory.getLogger(getClass()).info("[WIS2] Source {} data topics: {}", sourceId, ret);
+	    GSLoggerFactory.getLogger(getClass()).info("[WIS2] Source {} advertised data topics: {}", sourceId, ret);
 	}
 
 	topics = ret;
+	enabled = WISUtils.isCoreDataPublished(sourceId) && viewId.isPresent();
     }
 
     /**
@@ -133,9 +141,11 @@ public class WIS2DataNotifier {
 
 	refreshTopics();
 
-	if (topics.isEmpty() || records.isEmpty()) {
+	if (!enabled || records.isEmpty()) {
 	    return 0;
 	}
+
+	DataNotificationsMode mode = WISUtils.getDataNotificationsMode();
 
 	// the period of the new values of each series
 	Map<String, Date[]> periods = new LinkedHashMap<>();
@@ -181,27 +191,38 @@ public class WIS2DataNotifier {
 		    continue;
 		}
 
-		String channel = topic.get().getTopic(centreId, WIS2DataPolicy.CORE);
-		if (!topics.contains(channel)) {
+		Optional<String> channel = WISUtils.getPublicationTopic(topic.get());
+		if (channel.isEmpty() || (mode.isAdvertised() && !topics.contains(channel.get()))) {
 		    continue;
 		}
 
-		WISNotificationMessage message = createMessage(record, channel, viewId, metadataId, generatedBy);
+		// the data id is based on the advertised topic or, if not advertised, on the official one
+		String dataTopic = WISUtils.getAdvertisedTopic(topic.get()).orElse(topic.get().getTopic(centreId, WIS2DataPolicy.CORE));
 
-		if (WIS2Publisher.publish(channel, message)) {
+		WISNotificationMessage message = createMessage(record, dataTopic, viewId, metadataId, generatedBy);
+
+		if (mode == DataNotificationsMode.DRY_RUN) {
+
+		    GSLoggerFactory.getLogger(getClass()).info("[WIS2] Dry run, not published to {}: {}", channel.get(),
+			    message.getJSONObject().toString());
+		    published++;
+
+		} else if (WIS2Publisher.publish(channel.get(), message)) {
+
 		    published++;
 		}
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("[WIS2] Source {} published {} data notifications", sourceId, published);
+	GSLoggerFactory.getLogger(getClass()).info("[WIS2] Source {} {} data notifications ({})", sourceId, published, mode);
 
 	return published;
     }
 
     /**
      * @param record
-     * @param topic
+     * @param topic the topic on which the data identifier is based (starting with
+     *        {@link WIS2HydrologyTopic#ORIGIN_PREFIX})
      * @param viewId
      * @param metadataId
      * @param generatedBy
@@ -213,7 +234,7 @@ public class WIS2DataNotifier {
 	String content = WIS2DataItem.encode(record);
 
 	// the data id is the topic, without the channel prefix, followed by the item id
-	String dataId = topic.substring(topic.indexOf("/wis2/") + "/wis2/".length()) + "/" + itemId;
+	String dataId = WIS2HydrologyTopic.withoutPrefix(topic) + "/" + itemId;
 
 	Link link = new Link("canonical", "application/json", WISUtils.getDataItemUrl(viewId, itemId));
 	link.setLength(content.getBytes(StandardCharsets.UTF_8).length);
@@ -231,13 +252,5 @@ public class WIS2DataNotifier {
 	message.setContent(content);
 
 	return message;
-    }
-
-    /**
-     * @return the topics advertised by the published record of the source, as last read
-     */
-    List<String> getTopics() {
-
-	return new ArrayList<>(topics);
     }
 }

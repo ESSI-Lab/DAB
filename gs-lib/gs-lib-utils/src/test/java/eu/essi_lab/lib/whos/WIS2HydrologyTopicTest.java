@@ -44,4 +44,20 @@ public class WIS2HydrologyTopicTest {
 
 	Assert.assertEquals("origin/a/wis2/it-cnr-itiam-whos-dab/metadata", WIS2HydrologyTopic.getMetadataTopic("it-cnr-itiam-whos-dab"));
     }
+
+    @Test
+    public void experimentalAndPrefixTest() {
+
+	String experimental = WIS2HydrologyTopic.STREAM.getExperimentalTopic("it-cnr-itiam-whos-dab", WIS2DataPolicy.CORE);
+
+	Assert.assertEquals(
+		"origin/a/wis2/it-cnr-itiam-whos-dab/data/core/hydrology/experimental/surface-based-observations/water-quantity/stream",
+		experimental);
+
+	Assert.assertEquals("it-cnr-itiam-whos-dab/data/core/hydrology/experimental/surface-based-observations/water-quantity/stream",
+		WIS2HydrologyTopic.withoutPrefix(experimental));
+
+	Assert.assertEquals("test/a/wis2/it-cnr-itiam-whos-dab/data/core/hydrology/surface-based-observations/water-quantity/stream",
+		WIS2HydrologyTopic.withPrefix(WIS2HydrologyTopic.STREAM.getTopic("it-cnr-itiam-whos-dab", WIS2DataPolicy.CORE), "test/a/wis2"));
+    }
 }

@@ -34,7 +34,6 @@ import jakarta.ws.rs.core.Response.Status;
 import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.WIS2DataItem;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
-import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
@@ -46,8 +45,9 @@ import eu.essi_lab.profiler.wis.WISUtils;
 
 /**
  * Serves a single cached value, encoded by {@link WIS2DataItem}. This is the canonical link of the WIS2 data
- * notification messages, so only the values of the sources published with the <code>core</code> data policy are
- * served, without authentication. The other values are reported as not found
+ * notification messages, so only the values of the core sources are served, without authentication, unless the data
+ * notifications are disabled (see {@link WISUtils#isCoreDataPublished(String)}). The other values are reported as not
+ * found
  *
  * @author boldrini
  */
@@ -107,7 +107,7 @@ public class WISObservationItemHandler extends DefaultRequestHandler {
 		return Optional.empty();
 	    }
 
-	    if (WISUtils.getDataPolicy(record.get().getSourceIdentifier()) != WIS2DataPolicy.CORE) {
+	    if (!WISUtils.isCoreDataPublished(record.get().getSourceIdentifier())) {
 
 		GSLoggerFactory.getLogger(getClass()).debug("Item {} of not core source {} requested", itemId,
 			record.get().getSourceIdentifier());

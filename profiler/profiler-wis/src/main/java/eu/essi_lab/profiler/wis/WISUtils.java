@@ -50,7 +50,10 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.profiler.wis.WISRequest.CollectionItems;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
+import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.Identification;
@@ -417,12 +420,68 @@ public class WISUtils {
     }
 
     /**
+     * @return
+     */
+    public static DataNotificationsMode getDataNotificationsMode() {
+
+	return ConfigurationWrapper.getWIS2Setting().getDataNotificationsMode();
+    }
+
+    /**
      * @param sourceId
-     * @return the WMO data policy of the data of the given source
+     * @return the WMO data policy of the data of the given source, as declared by its WCMP2 record: the core sources
+     *         are declared as such only when the data notifications are advertised (see
+     *         {@link DataNotificationsMode#isAdvertised()})
      */
     public static WIS2DataPolicy getDataPolicy(String sourceId) {
 
-	return ConfigurationWrapper.getWIS2Setting().isCoreSource(sourceId) ? WIS2DataPolicy.CORE : WIS2DataPolicy.RECOMMENDED;
+	WIS2Setting setting = ConfigurationWrapper.getWIS2Setting();
+
+	return setting.isCoreSource(sourceId) && setting.getDataNotificationsMode().isAdvertised() ? WIS2DataPolicy.CORE
+		: WIS2DataPolicy.RECOMMENDED;
+    }
+
+    /**
+     * @param sourceId
+     * @return true if the data of the given source are notified and served without authentication: the source is a core
+     *         source and the data notifications are not disabled
+     */
+    public static boolean isCoreDataPublished(String sourceId) {
+
+	WIS2Setting setting = ConfigurationWrapper.getWIS2Setting();
+
+	return setting.isCoreSource(sourceId) && setting.getDataNotificationsMode() != DataNotificationsMode.DISABLED;
+    }
+
+    /**
+     * @param topic
+     * @return the topic advertised in the WCMP2 records of the core sources for the given topic, according to the data
+     *         notifications mode: the experimental or the official topic, or none if the data notifications are not
+     *         advertised
+     */
+    public static Optional<String> getAdvertisedTopic(WIS2HydrologyTopic topic) {
+
+	return switch (getDataNotificationsMode()) {
+	case EXPERIMENTAL -> Optional.of(topic.getExperimentalTopic(getCentreId(), WIS2DataPolicy.CORE));
+	case OPERATIONAL -> Optional.of(topic.getTopic(getCentreId(), WIS2DataPolicy.CORE));
+	default -> Optional.empty();
+	};
+    }
+
+    /**
+     * @param topic
+     * @return the topic where the data notifications of the given topic are published, according to the data
+     *         notifications mode: the advertised topic, or the official topic under the private topic prefix, or none
+     *         if the data notifications are disabled
+     */
+    public static Optional<String> getPublicationTopic(WIS2HydrologyTopic topic) {
+
+	return switch (getDataNotificationsMode()) {
+	case DISABLED -> Optional.empty();
+	case DRY_RUN, PRIVATE -> Optional.of(WIS2HydrologyTopic.withPrefix(topic.getTopic(getCentreId(), WIS2DataPolicy.CORE),
+		ConfigurationWrapper.getWIS2Setting().getPrivateTopicPrefix()));
+	default -> getAdvertisedTopic(topic);
+	};
     }
 
     /**

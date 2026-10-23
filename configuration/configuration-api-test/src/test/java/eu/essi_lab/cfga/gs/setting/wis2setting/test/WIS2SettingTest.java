@@ -9,6 +9,7 @@ import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
 import eu.essi_lab.model.GSSource;
 
 /**
@@ -35,6 +36,8 @@ public class WIS2SettingTest {
 	Assert.assertTrue(setting.getViewId().isEmpty());
 	Assert.assertTrue(setting.getTokenRequestContact().isEmpty());
 	Assert.assertTrue(setting.getCoreSourcesIds().isEmpty());
+	Assert.assertEquals(DataNotificationsMode.DISABLED, setting.getDataNotificationsMode());
+	Assert.assertEquals(WIS2Setting.DEFAULT_PRIVATE_TOPIC_PREFIX, setting.getPrivateTopicPrefix());
     }
 
     @Test
@@ -76,9 +79,20 @@ public class WIS2SettingTest {
 	setting.setCentreId("  ");
 	Assert.assertTrue(setting.getCentreId().isEmpty());
 
+	Assert.assertEquals(DataNotificationsMode.DISABLED, setting.getDataNotificationsMode());
+	setting.setDataNotificationsMode(DataNotificationsMode.EXPERIMENTAL);
+	Assert.assertEquals(DataNotificationsMode.EXPERIMENTAL, setting.getDataNotificationsMode());
+	Assert.assertTrue(setting.getDataNotificationsMode().isAdvertised());
+	Assert.assertFalse(DataNotificationsMode.PRIVATE.isAdvertised());
+
+	setting.setPrivateTopicPrefix("dab-test/a/wis2");
+	Assert.assertEquals("dab-test/a/wis2", setting.getPrivateTopicPrefix());
+
 	// the setting is restored from its JSON representation
 	WIS2Setting restored = new WIS2Setting(setting.getObject().toString());
 	Assert.assertEquals("https://wis2.whos-dab.eu", restored.getHostname().get());
+	Assert.assertEquals(DataNotificationsMode.EXPERIMENTAL, restored.getDataNotificationsMode());
+	Assert.assertEquals("dab-test/a/wis2", restored.getPrivateTopicPrefix());
     }
 
     @Test
