@@ -1350,6 +1350,12 @@ public class DABStarter implements ConfigurationChangeListener {
 	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED || mode == ExecutionMode.LOCAL_PRODUCTION) {
 
 		SchedulerSupport.getInstance().updateDelayed();
+
+		//
+		// these exec modes schedule the workers, so they also restore the lost jobs of the workers scheduled to
+		// run indefinitely
+		//
+		SchedulingChecker.getInstance().start();
 	    }
 
 	} catch (SchedulerException e) {
