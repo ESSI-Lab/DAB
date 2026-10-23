@@ -60,22 +60,18 @@ import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.whos.MQTTUtils;
-import eu.essi_lab.lib.whos.WIS2Level10Topic;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Country;
@@ -92,8 +88,6 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
  * @author Fabrizio
  */
 public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSetting> {
-
-    private static MQTTPublisherHive client;
 
     /**
      * 
@@ -124,7 +118,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 
     private boolean waitForResults = true;
 
-    private boolean publishMQTT = false;
+    private List<DataRecord> newRecords = new ArrayList<>();
 
     private Integer fillDays;
 
@@ -156,11 +150,13 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
     }
 
     /**
-     * @param publishMQTT if true, each new value is also published to the WIS2 MQTT broker, if configured. Default: false
+     * @return the records retrieved and written to the cache by the last {@link #augment(GSResource)}, excluding the
+     *         past data loaded in chunks (see {@link #setFillDays(Integer)}) and the older data loaded before the update
+     *         (see {@link #setBackfill(Date, Date)}). For a series already cached, these are the new values of the series
      */
-    public void setPublishMQTT(boolean publishMQTT) {
+    public List<DataRecord> getNewRecords() {
 
-	this.publishMQTT = publishMQTT;
+	return newRecords;
     }
 
     /**
@@ -176,31 +172,10 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
     @Override
     public Optional<GSResource> augment(GSResource resource) throws GSException {
 
-	if (publishMQTT && client == null) {
-	    try {
-
-		Optional<MQTTBrokerSetting> broker = ConfigurationWrapper.getSystemSettings().getWis2MqttBroker();
-
-		if (broker.isEmpty()) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("WIS2 MQTT broker not configured");
-
-		} else {
-
-		    MQTTBrokerSetting mqtt = broker.get();
-		    client = new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get());
-		}
-
-	    } catch (Exception e) {
-
-		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
-		throw GSException.createException(getClass(), "MQTTClientInitError", e);
-	    }
-	}
+	newRecords = new ArrayList<>();
 
 	DataCacheConnector dataCacheConnector = null;
 	String sourceId = null;
-	String sourceAcronym = null;
 	String onlineId = null;
 	Date expected = null;
 	try {
@@ -228,7 +203,6 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	    GSLoggerFactory.getLogger(getClass()).info("[DATA-CACHE] Augmenting {}", onlineId);
 
 	    sourceId = resource.getSource().getUniqueIdentifier();
-	    sourceAcronym = sourceId;
 
 	    DataRecord toUpdate = null;
 	    // get the last 22 records from cache
@@ -380,127 +354,6 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		if (lastObservation == null || !date.equals(lastObservation.getDate())) {
 		    DataRecord record = toRecord(wmlValue, date, noDataValue, onlineId, sourceId, metadata);
 		    records.add(record);
-
-		    ////////////////////////////////
-		    // MQTT publishing
-		    ////////////////////////////////
-		    if (publishMQTT) {
-			String country = "unknown";
-			VariableInfoType variableInfo = series.getVariable();
-			String variableURI = JAXBWML.getInstance().getVariableURI(variableInfo);
-			String variable = variableInfo.getVariableName();
-
-			JSONObject json = new JSONObject();
-			String id = onlineId + "-" + date.getTime();
-			json.put("id", id);
-			json.put("type", "Feature");
-			json.put("version", "v04");
-
-			SourceInfoType sourceInfo = series.getSourceInfo();
-			String siteId = "unknown";
-			if (sourceInfo instanceof SiteInfoType) {
-			    SiteInfoType siteInfo = (SiteInfoType) sourceInfo;
-
-			    if (sourceId.contains("-")) {
-				int dashIndex = sourceId.indexOf("-");
-				String c = sourceId.substring(0, dashIndex);
-				Country cc = Country.decode(c);
-				if (cc != null) {
-				    country = cc.getISO2().toLowerCase();
-				    sourceAcronym = sourceId.substring(dashIndex + 1);
-				}
-			    }
-
-			    if (country.equals("unknown")) {
-				try {
-				    country = JAXBWML.getInstance().getProperty(siteInfo, WML_SiteProperty.COUNTRY);
-				    if (country != null && !country.isEmpty()) {
-					country = Country.decode(country).getISO2().toLowerCase();
-				    } else {
-					country = "unknown";
-				    }
-				} catch (Exception ex) {
-				    GSLoggerFactory.getLogger(getClass()).error(ex);
-				}
-			    }
-
-			    siteId = siteInfo.getSiteCode().get(0).getValue();
-			    GeoLocation geoLocation = siteInfo.getGeoLocation();
-			    double lon;
-			    double lat;
-			    if (geoLocation != null) {
-				GeogLocationType geog = geoLocation.getGeogLocation();
-				if (geog != null) {
-				    if (geog instanceof LatLonPointType) {
-					LatLonPointType latLon = (LatLonPointType) geog;
-					lon = latLon.getLongitude();
-					lat = latLon.getLatitude();
-					JSONArray coordinates = new JSONArray();
-					coordinates.put(lon);
-					coordinates.put(lat);
-					Double alt = siteInfo.getElevationM();
-					if (alt != null) {
-					    coordinates.put(alt);
-					}
-					JSONObject geometry = new JSONObject();
-					geometry.put("type", "Point");
-					geometry.put("coordinates", coordinates);
-					json.put("geometry", geometry);
-				    }
-				}
-			    }
-			}
-
-			String level11 = variable;
-			WIS2Level10Topic wisLevel10 = WIS2Level10Topic.decode(variableURI);
-			String level10 = wisLevel10.getId();
-			String level9 = wisLevel10.getBroaderLevel().getId();
-
-			String topic = "origin/a/wis2/" + country + "-" + sourceAcronym + "/data/core/hydrology/"
-				+ MQTTUtils.harmonizeTopicName(level9) + "/" + MQTTUtils.harmonizeTopicName(level10) + "/"
-				+ MQTTUtils.harmonizeTopicName(level11);
-			JSONObject properties = new JSONObject();
-			properties.put("data_id", topic + "/" + id);
-			properties.put("datetime", ISO8601DateTimeUtils.getISO8601DateTime(date));
-			properties.put("pubtime", ISO8601DateTimeUtils.getISO8601DateTime(new Date()));
-
-			properties.put("value", record.getValue());
-			properties.put("observedProperty", variable.trim());
-			UnitsType units = series.getVariable().getUnit();
-			if (units != null) {
-			    String unitName = units.getUnitName();
-			    properties.put("uom", unitName);
-			}
-			String dataType = series.getVariable().getDataType();
-			if (dataType != null) {
-			    properties.put("interpolation", dataType);
-			}
-
-			String wigosId = "021016basin" + siteId;
-			properties.put("wigos_station_identifier", wigosId);
-
-			json.put("properties", properties);
-			JSONArray linksArray = new JSONArray();
-			JSONObject link = new JSONObject();
-			link.put("rel", "canonical");
-			link.put("type", "application/netcdf");
-			String variableCode = series.getVariable().getVariableCode().get(1).getValue();
-			String d = ISO8601DateTimeUtils.getISO8601DateTime(date).replace("Z", "");
-			link.put("href",
-				"https://whos.geodab.eu/gs-service/services/essi/token/TOKEN/view/gs-view-and(whos,gs-view-source(" + sourceId
-					+ "))/cuahsi_1_1.asmx?request=GetValuesObject&site=" + siteId + "&variable=" + variableCode
-					+ "&beginDate=" + d + "&endDate=" + d + "&format=NetCDF");
-			linksArray.put(link);
-			json.put("links", linksArray);
-			String msg = json.toString();
-			if (client == null) {
-			    GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
-			} else {
-			    client.publish(topic, msg, true);
-			}
-		    }
-
-		    ////////////////////////////////
 		}
 	    }
 	    if (records.isEmpty()) {
@@ -591,6 +444,8 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 			dailyObservations++;
 		    }
 		}
+		newRecords = new ArrayList<>(records);
+
 		if (toUpdate != null) {
 		    records.add(0, toUpdate);
 		}

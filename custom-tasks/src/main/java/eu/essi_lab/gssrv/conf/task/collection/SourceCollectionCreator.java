@@ -44,6 +44,8 @@ import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.whos.WIS2DataPolicy;
+import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
@@ -62,7 +64,6 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
@@ -71,6 +72,16 @@ import eu.essi_lab.profiler.wis.WISUtils;
 import eu.essi_lab.request.executor.*;
 
 class SourceCollectionCreator {
+
+    /**
+     * Max number of terms of the frequency statistics, enough to get all the observed properties of a source
+     */
+    private static final int MAX_FREQUENCY_ITEMS = 100;
+
+    /**
+     * Max number of organisations added as point of contact
+     */
+    private static final int MAX_ORGANISATIONS = 10;
 
     protected final String centreId;
 
@@ -117,26 +128,22 @@ class SourceCollectionCreator {
 	}
 
 	dataset.setSource(source);
-	String country = "unknown";
 	String sourceId = source.getUniqueIdentifier();
-	String sourceAcronym = sourceId;
-	if (sourceId.contains("-")) {
-	    int dashIndex = sourceId.indexOf("-");
-	    String c = sourceId.substring(0, dashIndex);
-	    Country cc = Country.decode(c);
-	    if (cc != null) {
-		country = cc.getISO2().toLowerCase();
-		sourceAcronym = sourceId.substring(dashIndex + 1);
-	    }
-	}
-	// GET Country!
-	String topic = "origin/a/wis2/" + //
-		centreId
-		// country + "-" + sourceAcronym //
-		+ "/metadata"; // only at this level
-	// core/hydrology" + getAdditionalLevels(groupBy);
 
-	dataset.getExtensionHandler().setWISTopicHierarchy(topic);
+	dataset.getExtensionHandler().setWISTopicHierarchy(WIS2HydrologyTopic.getMetadataTopic(centreId));
+
+	// the data of core sources are published (by the data harvester task) under the topics of their observed
+	// properties, sorted to keep the generated record (and its integrity checksum) stable
+	if (WISUtils.getDataPolicy(sourceId) == WIS2DataPolicy.CORE) {
+	    TreeSet<String> topics = new TreeSet<>();
+	    Optional<ComputationResult> properties = responseItem.getFrequency(MetadataElement.OBSERVED_PROPERTY_URI);
+	    if (properties.isPresent()) {
+		for (TermFrequencyItem item : properties.get().getFrequencyItems()) {
+		    WIS2HydrologyTopic.decode(item.getTerm()).ifPresent(t -> topics.add(t.getTopic(centreId, WIS2DataPolicy.CORE)));
+		}
+	    }
+	    topics.forEach(dataset.getExtensionHandler()::addWISDataTopic);
+	}
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	String id = getMetadataIdentifier(source.getUniqueIdentifier(), groupBy);
@@ -184,7 +191,7 @@ class SourceCollectionCreator {
 	if (frequency.isPresent()) {
 	    List<TermFrequencyItem> list = frequency.get().getFrequencyItems();
 	    if (!list.isEmpty()) {
-		for (TermFrequencyItem item : list) {
+		for (TermFrequencyItem item : list.subList(0, Math.min(list.size(), MAX_ORGANISATIONS))) {
 		    String org = item.getTerm();
 		    ResponsibleParty party = new ResponsibleParty();
 		    party.setOrganisationName(org);
@@ -361,7 +368,8 @@ class SourceCollectionCreator {
 
 	statisticsMessage.computeTempExtentUnion();
 
-	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME, MetadataElement.USE_LEGAL_CONSTRAINTS_URI));
+	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME, MetadataElement.USE_LEGAL_CONSTRAINTS_URI,
+		MetadataElement.OBSERVED_PROPERTY_URI), MAX_FREQUENCY_ITEMS);
 	// computes count distinct of 2 queryables
 	statisticsMessage.countDistinct(//
 		Arrays.asList(//

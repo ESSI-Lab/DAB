@@ -32,7 +32,17 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Date;
 
-class WISNotificationMessage {
+/**
+ * A WIS2 notification message (https://github.com/wmo-im/wis2-notification-message)
+ *
+ * @author boldrini
+ */
+public class WISNotificationMessage {
+
+    /**
+     * Max size of the data provided inline, once encoded
+     */
+    public static final int MAX_CONTENT_SIZE = 4096;
 
     private JSONObject json = null;
 
@@ -127,6 +137,51 @@ class WISNotificationMessage {
 	Double s = bbox.getSouth();
 	Double n = bbox.getNorth();
 	WISUtils.addGeometry(json, w, e, s, n);
+    }
+
+    /**
+     * Sets the <code>metadata_id</code> property, the identifier of the WCMP2 record of the data
+     * 
+     * @param metadataId
+     */
+    public void setMetadataId(String metadataId) {
+	setPropertyString("metadata_id", metadataId);
+    }
+
+    /**
+     * Sets the geometry as the given point
+     * 
+     * @param longitude
+     * @param latitude
+     */
+    public void setPoint(double longitude, double latitude) {
+	JSONArray coordinates = new JSONArray();
+	coordinates.put(longitude);
+	coordinates.put(latitude);
+	JSONObject geometry = new JSONObject();
+	geometry.put("type", "Point");
+	geometry.put("coordinates", coordinates);
+	json.put("geometry", geometry);
+    }
+
+    /**
+     * Sets the <code>content</code> property with the given data, that must be identical to the one served at the
+     * canonical link
+     * 
+     * @param content
+     * @return false if the given data is too large to be provided inline, and has not been set
+     */
+    public boolean setContent(String content) {
+	int size = content.getBytes(StandardCharsets.UTF_8).length;
+	if (size > MAX_CONTENT_SIZE) {
+	    return false;
+	}
+	JSONObject object = new JSONObject();
+	object.put("encoding", "utf-8");
+	object.put("value", content);
+	object.put("size", size);
+	setProperty("content", object);
+	return true;
     }
 
     public JSONObject getJSONObject() {

@@ -32,6 +32,7 @@ import eu.essi_lab.cfga.gs.setting.ProfilerSetting;
 import eu.essi_lab.cfga.gs.setting.SchedulerViewSetting;
 import eu.essi_lab.cfga.gs.setting.SourcePrioritySetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting;
 import eu.essi_lab.cfga.gs.setting.augmenter.AugmenterSetting;
 import eu.essi_lab.cfga.gs.setting.database.DatabaseSetting;
 import eu.essi_lab.cfga.gs.setting.database.SourceStorageSetting;
@@ -214,6 +215,16 @@ public class SimpleConfiguration extends DefaultConfiguration {
 	gdcSourcesSetting.setIdentifier(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel());
 
 	put(gdcSourcesSetting);
+
+	//
+	// --- WIS2 setting
+	//
+
+	WIS2Setting wis2Setting = new WIS2Setting();
+
+	wis2Setting.setIdentifier(SingletonSettingsId.WIS2_SETTING.getLabel());
+
+	put(wis2Setting);
 
 	//
 	// --- System settings ----

@@ -39,13 +39,11 @@ import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
 import eu.essi_lab.indexes.IndexedElementsWriter;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
-import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.View;
@@ -77,12 +75,6 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    return;
 	}
 
-	if (client == null) {
-
-	    initializeClient();
-
-	}
-
 	String sourceId = taskOptions.get().get(CollectionCreatorTaskOptions.SOURCE_ID);
 	if (sourceId == null) {
 	    GSLoggerFactory.getLogger(getClass()).error("No source id option specified");
@@ -91,7 +83,10 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	String viewId = taskOptions.get().get(CollectionCreatorTaskOptions.VIEW_ID);
 	if (viewId == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("No view id option specified");
+	    viewId = WISUtils.getViewId().orElse(null);
+	}
+	if (viewId == null) {
+	    GSLoggerFactory.getLogger(getClass()).error("No view id option specified, neither in the task nor in the WIS2 settings");
 	    return;
 	}
 
@@ -125,36 +120,6 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	}
 
 	log(status, "Collection creator task ENDED");
-    }
-
-    private void initializeClient() throws Exception {
-
-	try {
-
-	    Optional<MQTTBrokerSetting> broker = ConfigurationWrapper.getSystemSettings().getWis2MqttBroker();
-
-	    if (broker.isEmpty()) {
-
-		GSLoggerFactory.getLogger(getClass()).error("WIS2 MQTT broker not configured");
-
-	    } else {
-
-		MQTTBrokerSetting mqtt = broker.get();
-		String endpoint = mqtt.getHost().get() + ":" + mqtt.getPort().get();
-
-		GSLoggerFactory.getLogger(getClass()).info("Connecting to WIS2 MQTT broker {} as user {}", endpoint, mqtt.getUser().get());
-
-		client = new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get());
-
-		GSLoggerFactory.getLogger(getClass()).info("Connected to WIS2 MQTT broker {}", endpoint);
-	    }
-
-	} catch (Exception e) {
-
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    throw e;
-	}
-
     }
 
     /**
@@ -234,7 +199,7 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 		System.out.println(topic.get());
 		System.out.println(wnm.getJSONObject().toString(3));
 		System.out.println(wcmp2);
-		publish(topic.get(), wnm);
+		WIS2Publisher.publish(topic.get(), wnm);
 
 	    } else {
 		GSLoggerFactory.getLogger(getClass()).error("Topic not present!");
@@ -268,47 +233,9 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    System.out.println(topic.get());
 	    System.out.println(wnm.getJSONObject().toString(3));
 
-	    publish(topic.get(), wnm);
+	    WIS2Publisher.publish(topic.get(), wnm);
 	}
     }
-
-    /**
-     * Publishes the given notification message to the WIS2 MQTT broker, reinitializing the client in case of error
-     * 
-     * @param topic
-     * @param wnm
-     */
-    private void publish(String topic, WISNotificationMessage wnm) {
-
-	if (client == null) {
-	    GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
-	    return;
-	}
-
-	try {
-	    // not retained: a retained message would be redelivered (e.g. on broker reconnections) after the record has
-	    // been regenerated, and its integrity would no longer match the content served at the link
-	    client.publish(topic, wnm.getJSONObject().toString(3), false);
-	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error(e);
-	    // reinitialize the client
-	    if (client != null) {
-		try {
-		    client.disconnect();
-		} catch (Exception e2) {
-		    GSLoggerFactory.getLogger(getClass()).error(e2);
-		}
-		client = null;
-	    }
-	    try {
-		initializeClient();
-	    } catch (Exception e3) {
-		GSLoggerFactory.getLogger(getClass()).error(e3);
-	    }
-	}
-    }
-
-    private static MQTTPublisherHive client;
 
     @Override
     public String getName() {

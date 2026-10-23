@@ -414,6 +414,27 @@ public class GSConfigurationView extends ConfigurationView {
 	    }
 
 	    //
+	    // WIS2Setting
+	    //
+
+	    WIS2Setting wis2Setting = ConfigurationWrapper.getWIS2Setting(getConfiguration());
+
+	    if (wis2Setting.isCoreSource(sourceIdentifier)) {
+
+		boolean deselected = wis2Setting.deselectSource(sourceIdentifier);
+		boolean replaced = getConfiguration().replace(wis2Setting);
+
+		if (deselected && replaced) {
+
+		    additionalRemovalInfo.add("Source " + sourceSetting.asSource().getLabel() + " deselected from WIS2 core sources");
+
+		} else {
+
+		    GSLoggerFactory.getLogger(getClass()).error("Unable to deselect source " + sourceIdentifier + " from WIS2 core sources");
+		}
+	    }
+
+	    //
 	    // SourceStorageSetting
 	    //
 

@@ -272,6 +272,26 @@ public class ConfigurationWrapper {
     }
 
     /**
+     * @return the WIS2 setting, or a new empty one if missing from the configuration
+     */
+    public static WIS2Setting getWIS2Setting() {
+
+	return getWIS2Setting(configuration);
+    }
+
+    /**
+     * @return the WIS2 setting, or a new empty one if missing from the given configuration
+     */
+    public static WIS2Setting getWIS2Setting(Configuration configuration) {
+
+	return configuration.get(//
+		SingletonSettingsId.WIS2_SETTING.getLabel(), //
+		WIS2Setting.class //
+	).//
+		orElseGet(WIS2Setting::new);
+    }
+
+    /**
      * @return
      */
     public static SchedulerViewSetting getSchedulerSetting() {

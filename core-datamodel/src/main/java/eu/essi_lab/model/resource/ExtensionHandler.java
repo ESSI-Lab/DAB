@@ -50,6 +50,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 
     private static final String MAG_LEVEL = "magLevel";
     private static final String ORIGINATOR_ORGANISATION_IDENTIFIER = "OriginatorOrganisationIdentifier";
+    private static final String WIS_DATA_TOPIC = "WISDataTopic";
     private static final String ORIGINATOR_ORGANISATION_DESCRIPTION = "OriginatorOrganisationDescription";
     private static final String FEDEO_SECOND_LEVEL_TEMPLATE = "fedeoSecondLevel";
     private static final String STAC_SECOND_LEVEL_TEMPLATE = "STACSecondLevel";
@@ -819,6 +820,32 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
 	}
 	return Optional.empty();
+    }
+
+    /**
+     * @param topic a WIS2 topic where the data notifications of this resource are published
+     */
+    public void addWISDataTopic(String topic) {
+	try {
+	    this.metadata.add(WIS_DATA_TOPIC, topic);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return the WIS2 topics where the data notifications of this resource are published
+     */
+    public List<String> getWISDataTopics() {
+	try {
+	    return this.metadata.getTextContents(WIS_DATA_TOPIC);
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return new ArrayList<>();
     }
 
     /**

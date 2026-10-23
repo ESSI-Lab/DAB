@@ -31,9 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -43,6 +45,7 @@ import org.quartz.JobExecutionContext;
 import eu.essi_lab.access.augmenter.DataCacheAugmenter;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
+import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.SeriesStatusRecord;
 import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -50,6 +53,7 @@ import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.gssrv.conf.task.collection.WIS2DataNotifier;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.TaskListExecutor;
 import eu.essi_lab.messages.HarvestingProperties;
@@ -91,7 +95,9 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	 */
 	RECONCILE_INTERVAL_HOURS,
 	/**
-	 * If "true", the new values are also published to the WIS2 MQTT broker. Default: "false"
+	 * If "true", WIS2 data notifications are published for the new values of the scheduled series, after they have
+	 * been written to the cache. Values are notified only if the source is published with the core data policy (see
+	 * the WIS2 settings), under the data topics advertised by its published WCMP2 record. Default: "false"
 	 */
 	MQTT,
 	/**
@@ -287,6 +293,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	Set<String> excluded = ConcurrentHashMap.newKeySet();
 
 	DataCacheReconciler reconciler = new DataCacheReconciler(sourceId, dataCacheConnector, observedPropertyURIs, fillDays);
+
+	WIS2DataNotifier notifier = mqtt ? new WIS2DataNotifier(sourceId) : null;
 	ReconcileState reconcileState = new ReconcileState();
 
 	int recordsDone = 0;
@@ -356,8 +364,11 @@ public class DataHarvesterTask extends AbstractCustomTask {
 
 		recordsDone += toProcess.size();
 
+		// the new values of the scheduled series, to be notified
+		Queue<DataRecord> newRecords = notifier != null ? new ConcurrentLinkedQueue<>() : null;
+
 		List<Future<Outcome>> futures = harvestBatch(context, dataCacheConnector, reconciler, excluded, threadsCount, toProcess,
-			scheduledCount, mqtt, fillDays);
+			scheduledCount, newRecords, fillDays);
 
 		if (futures == null) {
 		    GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Source {} batch interrupted", sourceId);
@@ -377,6 +388,11 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		if (waitForWrites(context, dataCacheConnector)) {
 		    canceled = true;
 		    break;
+		}
+
+		// the new values are notified once written and searchable, so that they are available at the notified link
+		if (notifier != null) {
+		    notifier.notify(newRecords, dataCacheConnector);
 		}
 
 		// the stored statuses of the processed series are updated
@@ -560,8 +576,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
      * @return the futures of the tasks, or null if the execution was interrupted
      */
     private List<Future<Outcome>> harvestBatch(JobExecutionContext context, DataCacheConnector dataCacheConnector,
-	    DataCacheReconciler reconciler, Set<String> excluded, int threadsCount, List<Job> jobs, int scheduledCount, boolean mqtt,
-	    int fillDays) {
+	    DataCacheReconciler reconciler, Set<String> excluded, int threadsCount, List<Job> jobs, int scheduledCount,
+	    Queue<DataRecord> newRecords, int fillDays) {
 
 	String sourceId = reconciler.getSourceId();
 
@@ -572,7 +588,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    Job job = jobs.get(i);
 	    int index = i + 1;
 
-	    taskList.addTask(() -> augment(context, dataCacheConnector, reconciler, excluded, job, index, jobs.size(), mqtt, fillDays));
+	    taskList.addTask(() -> augment(context, dataCacheConnector, reconciler, excluded, job, index, jobs.size(), newRecords, fillDays));
 	}
 
 	List<Future<Outcome>> futures = taskList.executeAndWait();
@@ -606,8 +622,11 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	return futures;
     }
 
+    /**
+     * @param newRecords if not null, the new values of a scheduled series are added to it
+     */
     private Outcome augment(JobExecutionContext context, DataCacheConnector dataCacheConnector, DataCacheReconciler reconciler,
-	    Set<String> excluded, Job job, int index, int total, boolean mqtt, int fillDays) {
+	    Set<String> excluded, Job job, int index, int total, Queue<DataRecord> newRecords, int fillDays) {
 
 	String sourceId = reconciler.getSourceId();
 
@@ -675,10 +694,13 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    DataCacheAugmenter augmenter = new DataCacheAugmenter();
 	    // for not scheduled series, missing recent data is not unexpected, so there is no need to wait for it
 	    augmenter.setWaitForResults(job.isScheduled());
-	    augmenter.setPublishMQTT(mqtt);
 	    augmenter.setFillDays(fillDays);
 	    augmenter.setBackfill(job.backfillBegin(), job.backfillEnd());
 	    augmenter.augment(resource);
+	    // only the values of scheduled series are new: the other ones fill the cache
+	    if (newRecords != null && job.isScheduled()) {
+		newRecords.addAll(augmenter.getNewRecords());
+	    }
 	    return Outcome.AUGMENTED;
 
 	} catch (Exception e) {

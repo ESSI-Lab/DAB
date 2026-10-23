@@ -93,19 +93,7 @@ public class WISObservationsHandler extends DefaultRequestHandler {
 
 	try {
 
-	    dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
-
-	    if (dataCacheConnector == null) {
-		DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
-		dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
-		String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
-		String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
-		String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
-		dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
-		dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
-		dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
-		DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
-	    }
+	    dataCacheConnector = WISUtils.getDataCacheConnector();
 
 	    WISRequest wis = new WISRequest(webRequest);
 
