@@ -100,8 +100,10 @@ public class CIMAForecastProcessor {
     private static final String NODATA_VALUE = "-9999";
     private static final String SOURCE_FILL_VALUE = "-8.9999999e+33";
 
-    // Natural Earth 1:50m land polygons clipped to the TRIGGER domain (35W-55E, 20N-80N), shared with COGS3SyncProcessor
-    private static final String LAND_MASK_RESOURCE = "trigger/land_mask.geojson";
+    // Sea polygons from OpenStreetMap (all touched land pixels), shared with COGS3SyncProcessor (see its SEA_MASK_RESOURCE): they
+    // follow the pixels of the 2.5 km EPSG:3857 grid aligned with -tap, the same of these COGs, and cover the ECMWF domain
+    // (25W-45E, 30N-72N) that contains the d03 Italy domain. Data (c) OpenStreetMap contributors, ODbL
+    private static final String SEA_MASK_RESOURCE = "trigger/sea_mask_osm.geojson";
 
     private static final DateTimeFormatter FILE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'")
 	    .withZone(ZoneOffset.UTC);
@@ -123,7 +125,7 @@ public class CIMAForecastProcessor {
     private boolean maskSea = true;
     private DownloadMode downloadMode = DownloadMode.REMOTE;
     private Path outputDir;
-    private Path landMask;
+    private Path seaMask;
     private TaskReport report = TaskReport.NONE;
 
     /**
@@ -245,7 +247,7 @@ public class CIMAForecastProcessor {
 	try {
 
 	    if (maskSea) {
-		landMask = extractLandMask(workDir);
+		seaMask = extractSeaMask(workDir);
 	    }
 
 	    // 2. Source: remote reading with HTTP range requests or local copy of the whole file
@@ -326,11 +328,11 @@ public class CIMAForecastProcessor {
 		cleanup(workDir);
 	    } else {
 		cleanup(workDir.resolve("download"));
-		if (landMask != null) {
-		    Files.deleteIfExists(landMask);
+		if (seaMask != null) {
+		    Files.deleteIfExists(seaMask);
 		}
 	    }
-	    landMask = null;
+	    seaMask = null;
 	}
     }
 
@@ -417,12 +419,15 @@ public class CIMAForecastProcessor {
 			    "-ot", "Float32", //
 			    "-dstnodata", NODATA_VALUE));
 
-		    // Sea mask: CUTLINE_ALL_TOUCHED keeps every pixel touching land (same options of COGS3SyncProcessor)
-		    if (landMask != null) {
-			warp.addAll(List.of("-cutline", landMask.toAbsolutePath().toString(), "-wo", "CUTLINE_ALL_TOUCHED=TRUE"));
-		    }
 		    warp.addAll(List.of("-of", "GTiff", vrt.toAbsolutePath().toString(), warped.toAbsolutePath().toString()));
 		    runProcess(warp);
+
+		    // Sea mask on the output grid: pixels whose centre is inside the sea polygons become NoData. Not done with
+		    // gdalwarp -cutline, which rasterizes the cutline on the source grid (same approach of COGS3SyncProcessor)
+		    if (seaMask != null) {
+			runProcess(List.of("gdal_rasterize", "-q", "-burn", NODATA_VALUE, seaMask.toAbsolutePath().toString(),
+				warped.toAbsolutePath().toString()));
+		    }
 
 		    runProcess(List.of("gdal_translate", "-q", //
 			    "-of", "COG", //
@@ -585,19 +590,19 @@ public class CIMAForecastProcessor {
 	return Map.of("Authorization", "Basic " + token);
     }
 
-    private Path extractLandMask(Path workDir) {
-	try (InputStream in = getClass().getClassLoader().getResourceAsStream(LAND_MASK_RESOURCE)) {
+    private Path extractSeaMask(Path workDir) {
+	try (InputStream in = getClass().getClassLoader().getResourceAsStream(SEA_MASK_RESOURCE)) {
 	    if (in == null) {
-		GSLoggerFactory.getLogger(getClass()).warn("Land mask resource not found, sea will not be masked: " + LAND_MASK_RESOURCE);
-		report.warn("Land mask resource not found, sea not masked");
+		GSLoggerFactory.getLogger(getClass()).warn("Sea mask resource not found, sea will not be masked: " + SEA_MASK_RESOURCE);
+		report.warn("Sea mask resource not found, sea not masked");
 		return null;
 	    }
-	    Path out = workDir.resolve("land_mask.geojson");
+	    Path out = workDir.resolve(Paths.get(SEA_MASK_RESOURCE).getFileName());
 	    Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING);
 	    return out;
 	} catch (IOException e) {
-	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract land mask, sea will not be masked: " + e.getMessage());
-	    report.warn("Unable to extract land mask, sea not masked: " + TaskReport.message(e));
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract sea mask, sea will not be masked: " + e.getMessage());
+	    report.warn("Unable to extract sea mask, sea not masked: " + TaskReport.message(e));
 	    return null;
 	}
     }
