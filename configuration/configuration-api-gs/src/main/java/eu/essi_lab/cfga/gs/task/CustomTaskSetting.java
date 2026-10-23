@@ -77,7 +77,7 @@ public class CustomTaskSetting extends SchedulerWorkerSetting implements Editabl
     /**
      *
      */
-    private static final String TASK_OPTIONS_OPTION_KEY = "taskOptions";
+    public static final String TASK_OPTIONS_OPTION_KEY = "taskOptions";
 
     /**
      *

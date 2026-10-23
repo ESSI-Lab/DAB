@@ -1446,6 +1446,8 @@ public class OpenSearchConnector extends DataCacheConnector {
 	valuesAggregations.put("first", Aggregation.of(a -> a.min(m -> m.field(DATE_PROPERTY))));
 	valuesAggregations.put("last", Aggregation.of(a -> a.max(m -> m.field(DATE_PROPERTY))));
 	valuesAggregations.put("next", Aggregation.of(a -> a.max(m -> m.field(NEXT_RECORD_EXPECTED_TIME_PROPERTY))));
+	// the max of a field without values is returned as 0 by the client, so its presence is checked separately
+	valuesAggregations.put("nextCount", Aggregation.of(a -> a.valueCount(v -> v.field(NEXT_RECORD_EXPECTED_TIME_PROPERTY))));
 	valuesAggregations.put("insert", Aggregation.of(a -> a.max(m -> m.field("timestamp"))));
 	valuesAggregations.put("uri", Aggregation.of(a -> a.terms(t -> t.field("observedPropertyURI.keyword").size(1))));
 	valuesAggregations.put("name", Aggregation.of(a -> a.terms(t -> t.field("observedProperty.keyword").size(1))));
@@ -1460,7 +1462,9 @@ public class OpenSearchConnector extends DataCacheConnector {
 		info.setValuesCount(bucket.docCount());
 		info.setFirstObservation(toDate(bucket.aggregations().get("first").min().value()));
 		info.setLastObservation(toDate(bucket.aggregations().get("last").max().value()));
-		info.setNextExpected(toDate(bucket.aggregations().get("next").max().value()));
+		if (bucket.aggregations().get("nextCount").valueCount().value() > 0) {
+		    info.setNextExpected(toDate(bucket.aggregations().get("next").max().value()));
+		}
 		info.setLastInsert(toDate(bucket.aggregations().get("insert").max().value()));
 		info.setObservedPropertyURI(firstTerm(bucket.aggregations().get("uri")));
 		info.setObservedProperty(firstTerm(bucket.aggregations().get("name")));
@@ -1605,12 +1609,13 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    String s = doc['status.keyword'].value;
 	    if (s == 'ERROR') { return 0; }
 	    if (s == 'MISSING') { return 4; }
-	    if (s == 'NOT_IN_METADATA') { return 5; }
+	    if (s == 'NOT_IN_METADATA') { return 6; }
 	    if (doc['nextExpected'].size() > 0 && doc['nextExpected'].value.toInstant().toEpochMilli() < params.overdue) { return 1; }
-	    if (s == 'HISTORICAL') { return 6; }
+	    if (s == 'INCOMPLETE') { return 5; }
+	    if (s == 'HISTORICAL') { return 7; }
 	    if (s == 'NOT_SCHEDULED') { return 3; }
 	    if (doc['lastObservation'].size() == 0 || doc['lastObservation'].value.toInstant().toEpochMilli() < params.stale) { return 2; }
-	    return 7;
+	    return 8;
 	    """;
 
     private static String seriesStatusId(String sourceIdentifier, String dataIdentifier) {
@@ -1675,7 +1680,8 @@ public class OpenSearchConnector extends DataCacheConnector {
     @Override
     public List<SeriesStatusRecord> getSeriesToAugment(String sourceIdentifier, Date attemptedBefore, int size) throws Exception {
 
-	List<FieldValue> statuses = List.of(FieldValue.of(SeriesStatus.MISSING.name()), FieldValue.of(SeriesStatus.NOT_SCHEDULED.name()));
+	List<FieldValue> statuses = List.of(FieldValue.of(SeriesStatus.MISSING.name()), FieldValue.of(SeriesStatus.INCOMPLETE.name()),
+		FieldValue.of(SeriesStatus.NOT_SCHEDULED.name()));
 
 	SearchResponse<JsonData> response = client.search(s -> s.index(DataCacheIndex.SERIES_STATUS.getIndex(databaseName)).size(size)
 		.query(q -> q.bool(b -> b //
@@ -1752,7 +1758,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	return switch (status) {
 	case ERROR, MISSING, NOT_IN_METADATA -> Query.of(q -> q.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(status.name()))));
 	case OVERDUE -> Query.of(q -> q.bool(b -> b.must(notTimeIndependent).must(overdue)));
-	case HISTORICAL, NOT_SCHEDULED -> Query.of(q -> q.bool(b -> b //
+	case INCOMPLETE, HISTORICAL, NOT_SCHEDULED -> Query.of(q -> q.bool(b -> b //
 		.must(m -> m.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(status.name())))).mustNot(overdue)));
 	case STALE -> Query.of(q -> q.bool(b -> b //
 		.must(m -> m.term(t -> t.field(STATUS_FIELD).value(FieldValue.of(SeriesStatus.OK.name())))).mustNot(overdue)
@@ -1804,6 +1810,7 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    s.index(index).size(size).trackTotalHits(t -> t.enabled(true)).query(q -> q.bool(query))
 		    .aggregations("statuses", a -> a.filters(f -> f.filters(b -> b.keyed(statusFilters))))
 		    .aggregations("computed", a -> a.max(m -> m.field("computed")))
+		    .aggregations("computedCount", a -> a.valueCount(v -> v.field("computed")))
 		    .sort(so -> so.script(sc -> sc.type(org.opensearch.client.opensearch._types.ScriptSortType.Number)
 			    .order(org.opensearch.client.opensearch._types.SortOrder.Asc)
 			    .script(scr -> scr.inline(i -> i.source(SEVERITY_SCRIPT).params("overdue", JsonData.of(now - SeriesStatus.OVERDUE_MS))
@@ -1839,7 +1846,10 @@ public class OpenSearchConnector extends DataCacheConnector {
 	    ret.getCounts().put(s, bucket == null ? 0l : bucket.docCount());
 	}
 
-	ret.setComputed(toDate(response.aggregations().get("computed").max().value()));
+	// the max of a field without values is returned as 0 by the client
+	if (response.aggregations().get("computedCount").valueCount().value() > 0) {
+	    ret.setComputed(toDate(response.aggregations().get("computed").max().value()));
+	}
 
 	// concepts of the source
 

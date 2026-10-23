@@ -37,6 +37,7 @@ import eu.essi_lab.cfga.gs.setting.ontology.*;
 import eu.essi_lab.cfga.gs.setting.ratelimiter.*;
 import eu.essi_lab.cfga.gs.setting.sessioncoordinator.*;
 import eu.essi_lab.cfga.gs.task.*;
+import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.scheduler.*;
 import eu.essi_lab.cfga.setting.*;
 import eu.essi_lab.cfga.setting.scheduling.*;
@@ -929,10 +930,85 @@ public class ConfigurationWrapper {
     private static final Map<String, Chronometer> isJobCanceledMap = new ConcurrentHashMap<>();
 
     /**
+     * Task options of the running jobs, by setting identifier, parsed from the job data
+     */
+    private static final Map<String, JobTaskOptions> jobTaskOptionsMap = new ConcurrentHashMap<>();
+
+    /**
+     * @param jobData the serialized setting of the job
+     * @param taskOptions the custom task options of the job setting
+     */
+    private record JobTaskOptions(String jobData, Optional<String> taskOptions) {
+    }
+
+    /**
+     * Current state of a worker setting in the configuration
+     *
+     * @param enabled
+     * @param taskOptions the custom task options, null if the setting is not a stand-alone custom task
+     */
+    private record WorkerState(boolean enabled, Optional<String> taskOptions) {
+    }
+
+    /**
+     * @param setting
+     * @return the custom task options of the given setting, or an empty optional if the setting has no task options option
+     */
+    private static Optional<Optional<String>> readTaskOptions(Setting setting) {
+
+	return setting.getOption(CustomTaskSetting.TASK_OPTIONS_OPTION_KEY, String.class).map(Option::getOptionalValue);
+    }
+
+    /**
+     * The job data is parsed only the first time and then each time it changes (e.g. when a new job of the same setting is executed)
+     *
+     * @param settingId
+     * @param context
+     * @return the custom task options of the job of the given context
+     */
+    private static Optional<String> getJobTaskOptions(String settingId, JobExecutionContext context) {
+
+	String jobData = context.getJobDetail().getJobDataMap().getString("setting");
+
+	JobTaskOptions cached = jobTaskOptionsMap.get(settingId);
+
+	if (cached == null || !cached.jobData().equals(jobData)) {
+
+	    Optional<String> taskOptions = readTaskOptions(SchedulerUtils.getSetting(context)).orElse(Optional.empty());
+
+	    cached = new JobTaskOptions(jobData, taskOptions);
+
+	    jobTaskOptionsMap.put(settingId, cached);
+	}
+
+	return cached.taskOptions();
+    }
+
+    /**
+     * @param context
+     * @return <code>true</code> if, in a production environment, this configuration has been synchronized with the
+     *         source before the job was fired
+     */
+    private static boolean isOlderThanJob(JobExecutionContext context) {
+
+	if (ExecutionMode.get() == ExecutionMode.MIXED || ExecutionMode.get() == ExecutionMode.LOCAL_PRODUCTION) {
+
+	    return false;
+	}
+
+	Date fireTime = context.getFireTime();
+
+	return fireTime != null && configuration.getSyncTime() < fireTime.getTime();
+    }
+
+    /**
      * This method returns <code>true</code> in the following cases:
      * <ol>
      * <li>the scheduling of the given worker setting is disabled</li>
      * <li>the given worker setting is not found in the configuration</li>
+     * <li>the given worker setting is a custom task whose task options in the configuration differ from the ones of the
+     * running job. This way, a running task (e.g. a task which runs indefinitely) is stopped when its options are edited,
+     * and the job rescheduled with the new options can start</li>
      * </ol>
      * The second case can return a false positive, since the given worker setting can result missing even if is
      * present
@@ -953,7 +1029,10 @@ public class ConfigurationWrapper {
      * for that worker setting. If
      * ({@value #CONFIG_RELOAD_TIME} * 2) minutes are not passed, the method returns <code>false</code> because we
      * cannot be sure that the setting is
-     * actually not present in the configuration
+     * actually not present in the configuration.<br>
+     * Similarly, the first and the third case are not considered if the configuration has been synchronized before the job
+     * was fired, since the job can have been scheduled with a more recent version of the setting (e.g. a worker disabled and
+     * soon after enabled, with the job fired before the configuration of this node is reloaded)
      *
      * @param context
      * @return
@@ -966,16 +1045,51 @@ public class ConfigurationWrapper {
 	// the setting is read by id without cloning nor instantiating the configured settings, so this method
 	// can be frequently called by long-running tasks
 	//
-	Optional<Boolean> enabled = configuration.read(settingId, s -> {
+	Optional<WorkerState> state = configuration.read(settingId, s -> {
 
 	    JSONObject scheduling = s.getObject().optJSONObject(SchedulerWorkerSetting.SCHEDULING_SETTING_ID);
 
-	    return scheduling == null ? null : new Scheduling(scheduling).isEnabled();
+	    if (scheduling == null) {
+
+		return null;
+	    }
+
+	    Optional<String> taskOptions = readTaskOptions(new Setting(s.getObject())).orElse(null);
+
+	    return new WorkerState(new Scheduling(scheduling).isEnabled(), taskOptions);
 	});
 
-	if (enabled.isPresent()) {
+	if (state.isPresent()) {
 
-	    return !enabled.get();
+	    boolean disabled = !state.get().enabled();
+
+	    boolean optionsChanged = state.get().taskOptions() != null
+		    && !state.get().taskOptions().equals(getJobTaskOptions(settingId, context));
+
+	    if ((disabled || optionsChanged) && isOlderThanJob(context)) {
+
+		//
+		// the job has been scheduled after the last synchronization of this configuration, so the setting of the job
+		// is more recent than the one in this configuration (e.g. the job has been enabled or its options edited
+		// after a previous disabling), and it cannot be canceled until the next reload
+		//
+		return false;
+	    }
+
+	    if (disabled) {
+
+		return true;
+	    }
+
+	    if (optionsChanged) {
+
+		GSLoggerFactory.getLogger(ConfigurationWrapper.class).info("Task options of worker '{}' changed",
+			SchedulerUtils.getSetting(context).getWorkerName());
+
+		return true;
+	    }
+
+	    return false;
 	}
 
 	//

@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Status of a time series, comparing its metadata with its data cache content and with the outcome of its last update.
  * <br>
- * A base status is stored (see {@link #compute(boolean, boolean, SeriesCacheInfo)}), while the time dependent statuses
+ * A base status is stored (see {@link #compute(boolean, boolean, boolean, SeriesCacheInfo)}), while the time dependent statuses
  * ({@link #OVERDUE} and {@link #STALE}) are derived when reading (see {@link #effective(SeriesStatus, Date, Date, long)}),
  * so that they are always current. Constants are sorted from the most to the least severe.
  *
@@ -40,6 +40,7 @@ public enum SeriesStatus {
     STALE("The metadata is current, but the latest cached observation is older than 30 days"), //
     NOT_SCHEDULED("The metadata is current and the series is cached, but it is not scheduled for update"), //
     MISSING("In the metadata, but not in the cache"), //
+    INCOMPLETE("Cached, but the cached data start after the data to load (see the fill days of the data harvester task): the older data are to be loaded"), //
     NOT_IN_METADATA("In the cache, but no more in the metadata"), //
     HISTORICAL("Cached, with metadata not current (temporal extent ended more than one year ago): no update expected"), //
     OK("Updated as expected");
@@ -81,11 +82,12 @@ public enum SeriesStatus {
     /**
      * @param inMetadata
      * @param current true if the metadata temporal extent ends now or recently
+     * @param incomplete true if the older data of the series are to be loaded
      * @param info the cache content and last update, null if none
      * @return the base status to store: one of {@link #ERROR}, {@link #MISSING}, {@link #NOT_IN_METADATA},
-     *         {@link #HISTORICAL}, {@link #NOT_SCHEDULED}, {@link #OK}
+     *         {@link #INCOMPLETE}, {@link #HISTORICAL}, {@link #NOT_SCHEDULED}, {@link #OK}
      */
-    public static SeriesStatus compute(boolean inMetadata, boolean current, SeriesCacheInfo info) {
+    public static SeriesStatus compute(boolean inMetadata, boolean current, boolean incomplete, SeriesCacheInfo info) {
 
 	boolean cached = info != null && info.getValuesCount() > 0;
 
@@ -97,6 +99,9 @@ public enum SeriesStatus {
 	}
 	if (!cached) {
 	    return MISSING;
+	}
+	if (incomplete) {
+	    return INCOMPLETE;
 	}
 	if (!current) {
 	    return HISTORICAL;

@@ -270,7 +270,8 @@ public abstract class DataCacheConnector {
      * @param sourceIdentifier
      * @param attemptedBefore
      * @param size
-     * @return series to fill ({@link SeriesStatus#MISSING}) or to refresh ({@link SeriesStatus#NOT_SCHEDULED}), whose
+     * @return series to fill ({@link SeriesStatus#MISSING}), to complete with older data ({@link SeriesStatus#INCOMPLETE})
+     *         or to refresh ({@link SeriesStatus#NOT_SCHEDULED}), whose
      *         augmentation was not attempted after the given time
      * @throws Exception
      */

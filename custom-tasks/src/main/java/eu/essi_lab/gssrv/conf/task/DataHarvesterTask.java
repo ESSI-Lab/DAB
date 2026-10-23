@@ -65,8 +65,9 @@ import eu.essi_lab.pdk.rsm.access.AccessQueryUtils;
  * an exponential backoff.<br>
  * Unless disabled, the cache is also aligned with the metadata of the source (see {@link DataCacheReconciler}) at the task
  * start, after each metadata harvesting of the source and at least every {@link DataHarvesterTaskOptions#RECONCILE_INTERVAL_HOURS}:
- * missing series are filled, current but not scheduled series are refreshed (with lower priority than the scheduled
- * ones) and series no more in the metadata are removed.<br>
+ * missing series are filled, cached series starting after the data to load (see
+ * {@link DataHarvesterTaskOptions#FILL_DAYS}) are completed with the older data, current but not scheduled series are
+ * refreshed (with lower priority than the scheduled ones) and series no more in the metadata are removed.<br>
  * If {@link DataHarvesterTaskOptions#OBSERVED_PROPERTY_URIS} is set, only the series having one of the given observed
  * property URIs are filled and updated. The cached series of other observed properties are removed.
  *
@@ -92,7 +93,13 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	/**
 	 * If "true", the new values are also published to the WIS2 MQTT broker. Default: "false"
 	 */
-	MQTT;
+	MQTT,
+	/**
+	 * Days of data loaded in the cache, back from the end of the temporal extent of each series. Default: the whole
+	 * temporal extent. Unless the alignment with the metadata is disabled, the cached series starting after this period
+	 * are completed with the older data
+	 */
+	FILL_DAYS;
     }
 
     private static final int DEFAULT_RECONCILE_INTERVAL_HOURS = 24;
@@ -148,8 +155,14 @@ public class DataHarvesterTask extends AbstractCustomTask {
      *
      * @param onlineId
      * @param expectedDate the next record expected time, null for not scheduled series
+     * @param backfillBegin begin of the older data to load, for not scheduled incomplete series
+     * @param backfillEnd end of the older data to load (the first cached observation), for not scheduled incomplete series
      */
-    private record Job(String onlineId, Date expectedDate) {
+    private record Job(String onlineId, Date expectedDate, Date backfillBegin, Date backfillEnd) {
+
+	Job(String onlineId, Date expectedDate) {
+	    this(onlineId, expectedDate, null, null);
+	}
 
 	boolean isScheduled() {
 	    return expectedDate != null;
@@ -226,6 +239,16 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	String mqttString = taskOptions.get().get(DataHarvesterTaskOptions.MQTT);
 	boolean mqtt = mqttString != null && mqttString.trim().equalsIgnoreCase("true");
 
+	int fillDays = DataCacheAugmenter.FILL_ALL;
+	String fillDaysString = taskOptions.get().get(DataHarvesterTaskOptions.FILL_DAYS);
+	if (fillDaysString != null) {
+	    fillDays = Integer.parseInt(fillDaysString.trim());
+	    if (fillDays < 1) {
+		GSLoggerFactory.getLogger(getClass()).warn("Invalid fill days {}, filling the whole temporal extent", fillDays);
+		fillDays = DataCacheAugmenter.FILL_ALL;
+	    }
+	}
+
 	long reconcileInterval = TimeUnit.HOURS.toMillis(DEFAULT_RECONCILE_INTERVAL_HOURS);
 	String reconcileIntervalString = taskOptions.get().get(DataHarvesterTaskOptions.RECONCILE_INTERVAL_HOURS);
 	if (reconcileIntervalString != null) {
@@ -253,8 +276,9 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info(
-		"[DATA-CACHE] Source {} harvesting with {} threads, max records {}, reconcile {}, MQTT {}, observed property URIs {}",
-		sourceId, threadsCount, maxRecords, reconcile, mqtt, observedPropertyURIs.isEmpty() ? "all" : observedPropertyURIs);
+		"[DATA-CACHE] Source {} harvesting with {} threads, max records {}, reconcile {}, MQTT {}, fill days {}, observed property URIs {}",
+		sourceId, threadsCount, maxRecords, reconcile, mqtt, fillDays == DataCacheAugmenter.FILL_ALL ? "all" : fillDays,
+		observedPropertyURIs.isEmpty() ? "all" : observedPropertyURIs);
 
 	// online id -> last attempt of a series whose expected time was not (yet) updated
 	Map<String, Attempt> attempts = new HashMap<>();
@@ -262,7 +286,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	// scheduled series not selected by the observed property URIs, whose removal failed
 	Set<String> excluded = ConcurrentHashMap.newKeySet();
 
-	DataCacheReconciler reconciler = new DataCacheReconciler(sourceId, dataCacheConnector, observedPropertyURIs);
+	DataCacheReconciler reconciler = new DataCacheReconciler(sourceId, dataCacheConnector, observedPropertyURIs, fillDays);
 	ReconcileState reconcileState = new ReconcileState();
 
 	int recordsDone = 0;
@@ -304,7 +328,11 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		    for (SeriesStatusRecord record : dataCacheConnector.getSeriesToAugment(sourceId, reconciler.getPassStart().get(),
 			    threadsCount * UNSCHEDULED_PER_THREAD)) {
 			if (!scheduledIds.contains(record.getDataIdentifier()) && !attempts.containsKey(record.getDataIdentifier())) {
-			    toProcess.add(new Job(record.getDataIdentifier(), null));
+			    if (record.isIncomplete()) {
+				toProcess.add(new Job(record.getDataIdentifier(), null, record.getFillBegin(), record.getFirstObservation()));
+			    } else {
+				toProcess.add(new Job(record.getDataIdentifier(), null));
+			    }
 			}
 		    }
 		}
@@ -329,7 +357,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		recordsDone += toProcess.size();
 
 		List<Future<Outcome>> futures = harvestBatch(context, dataCacheConnector, reconciler, excluded, threadsCount, toProcess,
-			scheduledCount, mqtt);
+			scheduledCount, mqtt, fillDays);
 
 		if (futures == null) {
 		    GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Source {} batch interrupted", sourceId);
@@ -532,7 +560,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
      * @return the futures of the tasks, or null if the execution was interrupted
      */
     private List<Future<Outcome>> harvestBatch(JobExecutionContext context, DataCacheConnector dataCacheConnector,
-	    DataCacheReconciler reconciler, Set<String> excluded, int threadsCount, List<Job> jobs, int scheduledCount, boolean mqtt) {
+	    DataCacheReconciler reconciler, Set<String> excluded, int threadsCount, List<Job> jobs, int scheduledCount, boolean mqtt,
+	    int fillDays) {
 
 	String sourceId = reconciler.getSourceId();
 
@@ -543,7 +572,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    Job job = jobs.get(i);
 	    int index = i + 1;
 
-	    taskList.addTask(() -> augment(context, dataCacheConnector, reconciler, excluded, job, index, jobs.size(), mqtt));
+	    taskList.addTask(() -> augment(context, dataCacheConnector, reconciler, excluded, job, index, jobs.size(), mqtt, fillDays));
 	}
 
 	List<Future<Outcome>> futures = taskList.executeAndWait();
@@ -578,7 +607,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
     }
 
     private Outcome augment(JobExecutionContext context, DataCacheConnector dataCacheConnector, DataCacheReconciler reconciler,
-	    Set<String> excluded, Job job, int index, int total, boolean mqtt) {
+	    Set<String> excluded, Job job, int index, int total, boolean mqtt, int fillDays) {
 
 	String sourceId = reconciler.getSourceId();
 
@@ -590,7 +619,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	Date expectedDate = job.expectedDate();
 
 	GSLoggerFactory.getLogger(getClass()).info("[DATA-CACHE] Augmenting {} record {} {}/{}",
-		job.isScheduled() ? "expected available" : "not scheduled", onlineId, index, total);
+		job.isScheduled() ? "expected available" : job.backfillBegin() != null ? "incomplete" : "not scheduled", onlineId, index,
+		total);
 
 	GSResource resource;
 
@@ -646,6 +676,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    // for not scheduled series, missing recent data is not unexpected, so there is no need to wait for it
 	    augmenter.setWaitForResults(job.isScheduled());
 	    augmenter.setPublishMQTT(mqtt);
+	    augmenter.setFillDays(fillDays);
+	    augmenter.setBackfill(job.backfillBegin(), job.backfillEnd());
 	    augmenter.augment(resource);
 	    return Outcome.AUGMENTED;
 

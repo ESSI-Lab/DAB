@@ -37,7 +37,7 @@ public class SeriesStatusRecord {
     private String dataIdentifier;
 
     /**
-     * The base status (see {@link SeriesStatus#compute(boolean, boolean, SeriesCacheInfo)})
+     * The base status (see {@link SeriesStatus#compute(boolean, boolean, boolean, SeriesCacheInfo)})
      */
     private String status;
 
@@ -66,6 +66,19 @@ public class SeriesStatusRecord {
     private Date lastUpdate;
     private Integer lastUpdateValues;
     private String lastUpdateError;
+
+    // fill
+
+    /**
+     * Begin of the data to load in the cache, according to the fill days of the data harvester task. Null if unknown
+     */
+    private Date fillBegin;
+
+    /**
+     * Begin of the data requested by the last successful fill of the series, if any. The data available from the source
+     * can start after it, so the series is not {@link SeriesStatus#INCOMPLETE} if this is not after the fill begin
+     */
+    private Date filledFrom;
 
     // processing
 
@@ -105,8 +118,17 @@ public class SeriesStatusRecord {
 	conceptKey = observedPropertyURI != null ? "uri:" + observedPropertyURI
 		: "name:" + (observedProperty == null ? "" : observedProperty);
 
-	status = SeriesStatus.compute(Boolean.TRUE.equals(inMetadata), Boolean.TRUE.equals(current), info).name();
+	status = SeriesStatus.compute(Boolean.TRUE.equals(inMetadata), Boolean.TRUE.equals(current), isIncomplete(), info).name();
 	computed = new Date();
+    }
+
+    /**
+     * @return true if the cached data start after the fill begin, and the series was not already filled from it
+     */
+    public boolean isIncomplete() {
+
+	return fillBegin != null && firstObservation != null && firstObservation.after(fillBegin)
+		&& (filledFrom == null || filledFrom.after(fillBegin));
     }
 
     /**
@@ -139,6 +161,8 @@ public class SeriesStatusRecord {
 	put(ret, "lastUpdate", lastUpdate);
 	put(ret, "lastUpdateValues", lastUpdateValues);
 	put(ret, "lastUpdateError", lastUpdateError);
+	put(ret, "fillBegin", fillBegin);
+	put(ret, "filledFrom", filledFrom);
 	put(ret, "passId", passId);
 	put(ret, "computed", computed);
 	put(ret, "attempted", attempted);
@@ -166,6 +190,8 @@ public class SeriesStatusRecord {
 	ret.lastUpdate = date(json, "lastUpdate");
 	ret.lastUpdateValues = json.has("lastUpdateValues") ? json.getInt("lastUpdateValues") : null;
 	ret.lastUpdateError = json.optString("lastUpdateError", null);
+	ret.fillBegin = date(json, "fillBegin");
+	ret.filledFrom = date(json, "filledFrom");
 	ret.passId = json.optString("passId", null);
 	ret.computed = date(json, "computed");
 	ret.attempted = date(json, "attempted");
@@ -288,6 +314,30 @@ public class SeriesStatusRecord {
 
     public String getLastUpdateError() {
 	return lastUpdateError;
+    }
+
+    public Date getFillBegin() {
+	return fillBegin;
+    }
+
+    /**
+     * @param fillBegin the begin of the data to load in the cache. The status is computed by
+     *        {@link #update(SeriesCacheInfo)}
+     */
+    public void setFillBegin(Date fillBegin) {
+	this.fillBegin = fillBegin;
+    }
+
+    public Date getFilledFrom() {
+	return filledFrom;
+    }
+
+    /**
+     * @param filledFrom the begin of the data requested by the last successful fill. The status is computed by
+     *        {@link #update(SeriesCacheInfo)}
+     */
+    public void setFilledFrom(Date filledFrom) {
+	this.filledFrom = filledFrom;
     }
 
     public String getPassId() {

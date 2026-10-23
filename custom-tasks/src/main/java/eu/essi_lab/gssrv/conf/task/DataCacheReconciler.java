@@ -31,8 +31,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
+import eu.essi_lab.access.augmenter.DataCacheAugmenter;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.SeriesCacheInfo;
 import eu.essi_lab.access.datacache.SeriesStatus;
@@ -53,7 +55,8 @@ import eu.essi_lab.model.GSSource;
  * <li>the metadata records are read in pages. For each page, the cache content and the last update of its time series
  * are read, and their statuses are stored. The selected series missing in the cache ({@link SeriesStatus#MISSING}) or
  * current but not scheduled for update ({@link SeriesStatus#NOT_SCHEDULED}) are then available to be augmented (see
- * {@link DataCacheConnector#getSeriesToAugment(String, Date, int)})</li>
+ * {@link DataCacheConnector#getSeriesToAugment(String, Date, int)}), as well as the cached series whose data start after
+ * the begin of the data to load, according to the fill days ({@link SeriesStatus#INCOMPLETE})</li>
  * <li>the time series in the cache are read in pages: the ones without a status stored by the first step are no more in
  * the metadata ({@link SeriesStatus#NOT_IN_METADATA})</li>
  * <li>the time series no more in the metadata are removed from the cache</li>
@@ -79,6 +82,7 @@ class DataCacheReconciler {
     private final String sourceId;
     private final DataCacheConnector dataCacheConnector;
     private final Set<String> observedPropertyURIs;
+    private final int fillDays;
 
     /**
      * Start of the last completed pass
@@ -94,6 +98,7 @@ class DataCacheReconciler {
 	long selected;
 	long cached;
 	long missing;
+	long incomplete;
 	long unscheduled;
 	long notInMetadata;
 	long removed;
@@ -105,7 +110,7 @@ class DataCacheReconciler {
 	public String toString() {
 
 	    return "Metadata series: " + metadataSeries + " Selected: " + selected + " Selected and cached: " + cached + " Missing: "
-		    + missing + " Current and unscheduled: " + unscheduled + " Not in metadata: " + notInMetadata
+		    + missing + " Incomplete: " + incomplete + " Current and unscheduled: " + unscheduled + " Not in metadata: " + notInMetadata
 		    + " Removed (not selected): " + excludedRemoved + " Removed (no more in the metadata): " + removed
 		    + (removalSkipped ? " (removal skipped)" : "") + (canceled ? " CANCELED" : "");
 	}
@@ -116,12 +121,15 @@ class DataCacheReconciler {
      * @param dataCacheConnector
      * @param observedPropertyURIs if not empty, only the time series having one of these observed property URIs are
      *        selected
+     * @param fillDays days of data to load, back from the end of the temporal extent of each series, or
+     *        {@link DataCacheAugmenter#FILL_ALL} to load the whole temporal extent
      */
-    DataCacheReconciler(String sourceId, DataCacheConnector dataCacheConnector, Set<String> observedPropertyURIs) {
+    DataCacheReconciler(String sourceId, DataCacheConnector dataCacheConnector, Set<String> observedPropertyURIs, int fillDays) {
 
 	this.sourceId = sourceId;
 	this.dataCacheConnector = dataCacheConnector;
 	this.observedPropertyURIs = observedPropertyURIs;
+	this.fillDays = fillDays;
     }
 
     String getSourceId() {
@@ -200,6 +208,7 @@ class DataCacheReconciler {
 	    result.metadataSeries += page.size();
 
 	    Map<String, SeriesCacheInfo> cache = dataCacheConnector.getSeriesCacheInfo(sourceId, page.keySet());
+	    Map<String, SeriesStatusRecord> previous = dataCacheConnector.getSeriesStatus(sourceId, page.keySet());
 
 	    List<SeriesStatusRecord> records = new ArrayList<>();
 
@@ -233,6 +242,10 @@ class DataCacheReconciler {
 		record.setObservedProperty(series.getObservedProperty());
 		record.setObservedPropertyURI(series.getObservedPropertyURI().orElse(null));
 		record.setPassId(passId);
+		record.setFillBegin(getFillBegin(series).orElse(null));
+		if (previous.containsKey(onlineId)) {
+		    record.setFilledFrom(previous.get(onlineId).getFilledFrom());
+		}
 		record.update(info);
 
 		if (info != null && info.getValuesCount() > 0) {
@@ -241,6 +254,7 @@ class DataCacheReconciler {
 
 		switch (SeriesStatus.valueOf(record.getStatus())) {
 		case MISSING -> result.missing++;
+		case INCOMPLETE -> result.incomplete++;
 		case NOT_SCHEDULED -> result.unscheduled++;
 		default -> {
 		}
@@ -365,10 +379,23 @@ class DataCacheReconciler {
     }
 
     /**
+     * @return the begin of the data to load in the cache for the given series, if known
+     */
+    private Optional<Date> getFillBegin(SeriesMetadata series) {
+
+	if (fillDays == DataCacheAugmenter.FILL_ALL) {
+	    return series.getBegin();
+	}
+
+	return series.getEnd().map(end -> new Date(end.getTime() - TimeUnit.DAYS.toMillis(fillDays)));
+    }
+
+    /**
      * Updates the stored statuses of the given series, after their augmentation
      *
      * @param ids
-     * @param attempted the series whose augmentation was attempted, to mark as such
+     * @param attempted the series whose augmentation was attempted, to mark as such. Unless their update failed, they
+     *        are also marked as filled from their fill begin
      * @throws Exception
      */
     void updateStatuses(Collection<String> ids, Set<String> attempted) throws Exception {
@@ -385,10 +412,15 @@ class DataCacheReconciler {
 
 	for (SeriesStatusRecord record : statuses.values()) {
 
-	    record.update(cache.get(record.getDataIdentifier()));
+	    SeriesCacheInfo info = cache.get(record.getDataIdentifier());
 	    if (attempted.contains(record.getDataIdentifier())) {
 		record.setAttempted(now);
+		// the augmenter loads the series from the fill begin (see DataHarvesterTask)
+		if (info != null && info.getLastUpdateError() == null && record.getFillBegin() != null) {
+		    record.setFilledFrom(record.getFillBegin());
+		}
 	    }
+	    record.update(info);
 	    records.add(record);
 	}
 

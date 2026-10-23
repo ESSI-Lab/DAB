@@ -76,6 +76,8 @@ public class SourceSeriesLister {
 	private String title;
 	private String platform;
 	private boolean current;
+	private Date begin;
+	private Date end;
 
 	private SeriesMetadata(String onlineId) {
 	    this.onlineId = onlineId;
@@ -110,6 +112,20 @@ public class SourceSeriesLister {
 	 */
 	public boolean isCurrent() {
 	    return current;
+	}
+
+	/**
+	 * @return the earliest begin of the temporal extent, if known
+	 */
+	public Optional<Date> getBegin() {
+	    return Optional.ofNullable(begin);
+	}
+
+	/**
+	 * @return the latest end of the temporal extent (the listing time, if it ends now), if known
+	 */
+	public Optional<Date> getEnd() {
+	    return Optional.ofNullable(end);
 	}
     }
 
@@ -147,6 +163,7 @@ public class SourceSeriesLister {
 
 	    ResourceSelector selector = new ResourceSelector();
 	    selector.addIndex(MetadataElement.ONLINE_ID);
+	    selector.addIndex(MetadataElement.TEMP_EXTENT_BEGIN);
 	    selector.addIndex(MetadataElement.TEMP_EXTENT_END);
 	    selector.addIndex(MetadataElement.TEMP_EXTENT_END_NOW);
 	    selector.addIndex(MetadataElement.OBSERVED_PROPERTY_URI);
@@ -175,6 +192,10 @@ public class SourceSeriesLister {
 		IndexesMetadata indexes = resource.getIndexesMetadata();
 
 		boolean current = isCurrent(indexes, currentLimit);
+		Optional<Date> begin = earliest(indexes.read(MetadataElement.TEMP_EXTENT_BEGIN));
+		Optional<Date> end = indexes.read(MetadataElement.TEMP_EXTENT_END_NOW).isEmpty()
+			? latest(indexes.read(MetadataElement.TEMP_EXTENT_END))
+			: Optional.of(new Date());
 		List<String> uris = indexes.read(MetadataElement.OBSERVED_PROPERTY_URI);
 
 		for (String onlineId : indexes.read(MetadataElement.ONLINE_ID)) {
@@ -185,6 +206,12 @@ public class SourceSeriesLister {
 
 		    SeriesMetadata series = page.computeIfAbsent(onlineId, SeriesMetadata::new);
 		    series.current |= current;
+		    if (begin.isPresent() && (series.begin == null || begin.get().before(series.begin))) {
+			series.begin = begin.get();
+		    }
+		    if (end.isPresent() && (series.end == null || end.get().after(series.end))) {
+			series.end = end.get();
+		    }
 		    for (String uri : uris) {
 			if (uri != null && !uri.isBlank() && !series.observedPropertyURIs.contains(uri.trim())) {
 			    series.observedPropertyURIs.add(uri.trim());
@@ -214,6 +241,16 @@ public class SourceSeriesLister {
     private static String first(IndexesMetadata indexes, MetadataElement element) {
 
 	return indexes.read(element).stream().filter(v -> v != null && !v.isBlank()).findFirst().orElse(null);
+    }
+
+    private static Optional<Date> earliest(List<String> dates) {
+
+	return dates.stream().map(ISO8601DateTimeUtils::parseISO8601ToDate).flatMap(Optional::stream).min(Date::compareTo);
+    }
+
+    private static Optional<Date> latest(List<String> dates) {
+
+	return dates.stream().map(ISO8601DateTimeUtils::parseISO8601ToDate).flatMap(Optional::stream).max(Date::compareTo);
     }
 
     /**

@@ -63,6 +63,11 @@ public class Configuration {
     private boolean autoreloadPaused;
 
     /**
+     * Time (in milliseconds) of the last synchronization of the settings with the source
+     */
+    private volatile long syncTime = System.currentTimeMillis();
+
+    /**
      * Creates an empty, in-memory only configuration with no related source.<br> This configuration <i>cannot be flushed</i>, use it only
      * for test purpose
      */
@@ -114,6 +119,7 @@ public class Configuration {
     public Configuration(ConfigurationSource source) throws Exception {
 
 	this.source = source;
+	this.syncTime = System.currentTimeMillis();
 	this.list = source.list();
 	this.listenerList = new ArrayList<>();
     }
@@ -188,6 +194,17 @@ public class Configuration {
     public synchronized boolean reload() throws Exception {
 
 	return reload(true);
+    }
+
+    /**
+     * Returns the time of the last synchronization of the settings with the source (the creation or the last reload). The
+     * changes applied to the source after this time, e.g. by another node, are not yet available in this configuration
+     *
+     * @return the time in milliseconds
+     */
+    public long getSyncTime() {
+
+	return syncTime;
     }
 
     /**
@@ -689,7 +706,12 @@ public class Configuration {
 
 	if (getState() == State.SYNCH) {
 
+	    // the time is taken before reading, so that the settings are at least as recent as the sync time
+	    long time = System.currentTimeMillis();
+
 	    list = source.list();
+
+	    syncTime = time;
 
 	    dispatchEvent(forced ? ConfigurationChangeListener.EventType.CONFIGURATION_FORCED_RELOADED : ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED);
 

@@ -47,6 +47,20 @@ public class IsJobCanceledTest {
 	configuration.replace(setting);
 	Assert.assertFalse(ConfigurationWrapper.isJobCanceled(context));
 
+	// task options changed: the running job is canceled
+	setting.setTaskOptions("sourceId=source1");
+	configuration.replace(setting);
+	Assert.assertTrue(ConfigurationWrapper.isJobCanceled(context));
+
+	// the job rescheduled with the new options is not canceled
+	JobExecutionContext newContext = createContext(setting);
+	Assert.assertFalse(ConfigurationWrapper.isJobCanceled(newContext));
+
+	// task options changed again
+	setting.setTaskOptions("sourceId=source2");
+	configuration.replace(setting);
+	Assert.assertTrue(ConfigurationWrapper.isJobCanceled(newContext));
+
 	// removed (in the default MIXED execution mode, the removal is immediately detected)
 	configuration.remove(setting.getIdentifier());
 	Assert.assertTrue(ConfigurationWrapper.isJobCanceled(context));
