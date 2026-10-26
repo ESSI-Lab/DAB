@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 import org.quartz.JobExecutionContext;
 
 import eu.essi_lab.access.augmenter.DataCacheAugmenter;
+import eu.essi_lab.access.augmenter.ExpectedTimeHandover;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
@@ -367,8 +368,11 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		// the new values of the scheduled series, to be notified
 		Queue<DataRecord> newRecords = notifier != null ? new ConcurrentLinkedQueue<>() : null;
 
+		// the expected times to clear once the new values are written
+		Queue<ExpectedTimeHandover> handovers = new ConcurrentLinkedQueue<>();
+
 		List<Future<Outcome>> futures = harvestBatch(context, dataCacheConnector, reconciler, excluded, threadsCount, toProcess,
-			scheduledCount, newRecords, fillDays);
+			scheduledCount, newRecords, handovers, fillDays);
 
 		if (futures == null) {
 		    GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Source {} batch interrupted", sourceId);
@@ -386,6 +390,13 @@ public class DataHarvesterTask extends AbstractCustomTask {
 		}
 
 		if (waitForWrites(context, dataCacheConnector)) {
+		    canceled = true;
+		    break;
+		}
+
+		// the previous expected times are cleared only if the new values have been written, otherwise they are kept
+		// so that the series are refreshed again
+		if (completeHandovers(handovers, dataCacheConnector, sourceId) && waitForWrites(context, dataCacheConnector)) {
 		    canceled = true;
 		    break;
 		}
@@ -577,7 +588,7 @@ public class DataHarvesterTask extends AbstractCustomTask {
      */
     private List<Future<Outcome>> harvestBatch(JobExecutionContext context, DataCacheConnector dataCacheConnector,
 	    DataCacheReconciler reconciler, Set<String> excluded, int threadsCount, List<Job> jobs, int scheduledCount,
-	    Queue<DataRecord> newRecords, int fillDays) {
+	    Queue<DataRecord> newRecords, Queue<ExpectedTimeHandover> handovers, int fillDays) {
 
 	String sourceId = reconciler.getSourceId();
 
@@ -588,7 +599,8 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    Job job = jobs.get(i);
 	    int index = i + 1;
 
-	    taskList.addTask(() -> augment(context, dataCacheConnector, reconciler, excluded, job, index, jobs.size(), newRecords, fillDays));
+	    taskList.addTask(
+		    () -> augment(context, dataCacheConnector, reconciler, excluded, job, index, jobs.size(), newRecords, handovers, fillDays));
 	}
 
 	List<Future<Outcome>> futures = taskList.executeAndWait();
@@ -624,9 +636,11 @@ public class DataHarvesterTask extends AbstractCustomTask {
 
     /**
      * @param newRecords if not null, the new values of a scheduled series are added to it
+     * @param handovers the expected time to clear once the new values are written, if any, is added to it
      */
     private Outcome augment(JobExecutionContext context, DataCacheConnector dataCacheConnector, DataCacheReconciler reconciler,
-	    Set<String> excluded, Job job, int index, int total, Queue<DataRecord> newRecords, int fillDays) {
+	    Set<String> excluded, Job job, int index, int total, Queue<DataRecord> newRecords, Queue<ExpectedTimeHandover> handovers,
+	    int fillDays) {
 
 	String sourceId = reconciler.getSourceId();
 
@@ -696,7 +710,9 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    augmenter.setWaitForResults(job.isScheduled());
 	    augmenter.setFillDays(fillDays);
 	    augmenter.setBackfill(job.backfillBegin(), job.backfillEnd());
+	    augmenter.setDeferExpectedTimeClearing(true);
 	    augmenter.augment(resource);
+	    augmenter.getExpectedTimeHandover().ifPresent(handovers::add);
 	    // only the values of scheduled series are new: the other ones fill the cache
 	    if (newRecords != null && job.isScheduled()) {
 		newRecords.addAll(augmenter.getNewRecords());
@@ -709,6 +725,42 @@ public class DataHarvesterTask extends AbstractCustomTask {
 	    GSLoggerFactory.getLogger(getClass()).error("[DATA-CACHE] Error augmenting {}: {}", onlineId, e.getMessage(), e);
 	    return Outcome.FAILED;
 	}
+    }
+
+    /**
+     * Clears the previous expected times of the series whose new values have been written
+     *
+     * @return true if at least one expected time has been cleared
+     */
+    private boolean completeHandovers(Queue<ExpectedTimeHandover> handovers, DataCacheConnector dataCacheConnector, String sourceId) {
+
+	int cleared = 0;
+	int kept = 0;
+
+	for (ExpectedTimeHandover handover : handovers) {
+
+	    try {
+
+		if (handover.confirmAndClear(dataCacheConnector)) {
+		    cleared++;
+		} else {
+		    kept++;
+		}
+
+	    } catch (Exception e) {
+
+		kept++;
+		GSLoggerFactory.getLogger(getClass()).error("[DATA-CACHE] Unable to clear the previous expected time of {}: {}",
+			handover.getDataIdentifier(), e.getMessage(), e);
+	    }
+	}
+
+	if (kept > 0) {
+	    GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Source {} previous expected times cleared {}, kept {}", sourceId,
+		    cleared, kept);
+	}
+
+	return cleared > 0;
     }
 
     private void writeStatistics(DataCacheConnector dataCacheConnector, String sourceId, String onlineId, String error,
