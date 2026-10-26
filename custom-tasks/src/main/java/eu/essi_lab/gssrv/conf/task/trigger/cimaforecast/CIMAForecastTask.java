@@ -51,7 +51,7 @@ import java.util.Optional;
  * <li>RUN: run to process, 00 or 12; default the latest available run</li>
  * <li>RUN_DATE: day of the run (yyyy-MM-dd), default today (UTC); used with RUN</li>
  * <li>MASK_SEA: false to keep the sea pixels; default true</li>
- * <li>MAX_LEAD_HOUR: last forecast hour, 0-48; default 48</li>
+ * <li>MAX_LEAD_HOUR: last forecast hour, 1-48; default 48 (the run time, hour 0, is never published)</li>
  * <li>DOWNLOAD_MODE: remote (HTTP range requests, with fallback to full) or full (whole file download); default remote</li>
  * </ul>
  * The task should be scheduled every 12 hours, after the publication of the runs (00 UTC run after 03:15 UTC, 12 UTC run after 15:15

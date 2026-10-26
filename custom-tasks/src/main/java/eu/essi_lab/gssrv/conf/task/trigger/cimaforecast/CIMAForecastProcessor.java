@@ -58,7 +58,7 @@ import java.util.regex.Pattern;
 
 /**
  * Publishes on S3 the CIMA WRF operational forecasts (Italy, domain d03, ~2.5 km) of the biometeorological indices UTCI, AT, WBGT and
- * WCT: every forecast hour (+0..+48 h) of the selected run (00 or 12 UTC) is converted into a Cloud Optimized GeoTIFF (EPSG:3857,
+ * WCT: every forecast hour (+1..+48 h, see FIRST_LEAD_HOUR) of the selected run (00 or 12 UTC) is converted into a Cloud Optimized GeoTIFF (EPSG:3857,
  * Float32, NoData -9999, sea optionally masked) and published with an index.json and a legend.svg per index, replacing the previous
  * run.<br>
  * <br>
@@ -83,6 +83,10 @@ public class CIMAForecastProcessor {
     public static final LocalTime RUN_12_AVAILABILITY_UTC = LocalTime.of(15, 15);
 
     public static final int MAX_LEAD_HOUR = 48;
+
+    // The run time (lead hour 0) is not published: in the WRF output the radiation fluxes are not computed yet at the first step
+    // (e.g. GLW = 0 everywhere in the 2026-10-26 00 UTC run), so UTCI is ~12 C colder than at the following hours
+    public static final int FIRST_LEAD_HOUR = 1;
 
     public enum DownloadMode {
 	/**
@@ -158,10 +162,10 @@ public class CIMAForecastProcessor {
     }
 
     /**
-     * Last forecast hour to publish (0-48), mainly for tests
+     * Last forecast hour to publish (1-48), mainly for tests
      */
     public void setMaxLeadHour(int maxLeadHour) {
-	this.maxLeadHour = Math.max(0, Math.min(MAX_LEAD_HOUR, maxLeadHour));
+	this.maxLeadHour = Math.max(FIRST_LEAD_HOUR, Math.min(MAX_LEAD_HOUR, maxLeadHour));
     }
 
     /**
@@ -222,10 +226,11 @@ public class CIMAForecastProcessor {
 	String url = runUrl(runInstant);
 
 	GSLoggerFactory.getLogger(getClass()).info("=== CIMA WRF forecast START ===");
-	GSLoggerFactory.getLogger(getClass()).info("Run: " + runInstant + ", lead hours 0-" + maxLeadHour + ", indices: " + indices);
+	GSLoggerFactory.getLogger(getClass()).info(
+		"Run: " + runInstant + ", lead hours " + FIRST_LEAD_HOUR + "-" + maxLeadHour + ", indices: " + indices);
 	GSLoggerFactory.getLogger(getClass()).info("Source: " + url);
 
-	report.info("Run " + runInstant + ", lead hours 0-" + maxLeadHour + ", indices " + String.join(", ", indices) + ", sea "
+	report.info("Run " + runInstant + ", lead hours " + FIRST_LEAD_HOUR + "-" + maxLeadHour + ", indices " + String.join(", ", indices) + ", sea "
 		+ (maskSea ? "masked" : "not masked"));
 
 	// 1. If the run is not published yet, the previous products are kept
@@ -379,13 +384,24 @@ public class CIMAForecastProcessor {
 
     private List<JSONObject> convertToCOGs(String source, String index, Grid grid, Instant runInstant, Path indexDir) throws Exception {
 
-	int bands = Math.min(grid.times().size(), maxLeadHour + 1);
+	// source bands (1-based) of the published lead hours: FIRST_LEAD_HOUR-maxLeadHour, computed from the valid times
+	List<Integer> sourceBands = new ArrayList<>();
+	for (int b = 1; b <= grid.times().size(); b++) {
+	    long lead = (grid.times().get(b - 1).getEpochSecond() - runInstant.getEpochSecond()) / 3600;
+	    if (lead >= FIRST_LEAD_HOUR && lead <= maxLeadHour) {
+		sourceBands.add(b);
+	    }
+	}
+	int bands = sourceBands.size();
+	if (bands == 0) {
+	    throw new IOException("No forecast hour " + FIRST_LEAD_HOUR + "-" + maxLeadHour + " in " + index);
+	}
 
 	// 1. Extraction of the index, georeferenced from the lat/lon extent
 	Path extracted = indexDir.resolve(index + "_source.tif");
 
 	List<String> extract = new ArrayList<>(List.of("gdal_translate", "-q"));
-	for (int b = 1; b <= bands; b++) {
+	for (int b : sourceBands) {
 	    extract.addAll(List.of("-b", String.valueOf(b)));
 	}
 	extract.addAll(List.of("-a_srs", "EPSG:4326", //
@@ -399,9 +415,10 @@ public class CIMAForecastProcessor {
 	// 2. One COG per hour
 	List<JSONObject> files = new ArrayList<>();
 	try {
+	    // b is the band of the extracted file, which contains only the published hours
 	    for (int b = 1; b <= bands; b++) {
 
-		Instant validTime = grid.times().get(b - 1);
+		Instant validTime = grid.times().get(sourceBands.get(b - 1) - 1);
 		String baseName = index + "_" + FILE_TIME_FORMATTER.format(validTime);
 
 		Path vrt = indexDir.resolve(baseName + ".vrt");
