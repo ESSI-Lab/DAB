@@ -115,7 +115,12 @@ public enum GSTabIndex implements TabIndex {
 			setting.setIdentifier(SingletonSettingsId.SESSION_COORDINATOR_SETTING.getLabel());
 			SelectionUtils.deepClean(setting);
 			return setting;
-		    }) //
+		    }), //
+	    Descriptor.of(s -> s.getIdentifier().equals(SingletonSettingsId.WIS2_SETTING.getLabel()), () -> {
+		WIS2Setting setting = new WIS2Setting();
+		setting.setIdentifier(SingletonSettingsId.WIS2_SETTING.getLabel());
+		return setting;
+	    }) //
     ),
 
     /**

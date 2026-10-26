@@ -55,26 +55,23 @@ import eu.essi_lab.access.datacache.BBOX4326;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.access.datacache.DataRecord;
+import eu.essi_lab.access.datacache.LatitudeLongitude;
 import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.StatisticsRecord;
 import eu.essi_lab.augmenter.ResourceAugmenter;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
-import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
-import eu.essi_lab.lib.mqtt.hive.MQTTPublisherHive;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOOntology;
 import eu.essi_lab.lib.net.utils.whos.WMOUnit;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
-import eu.essi_lab.lib.whos.MQTTUtils;
-import eu.essi_lab.lib.whos.WIS2Level10Topic;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.Country;
@@ -92,42 +89,93 @@ import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
  */
 public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSetting> {
 
-    private static MQTTPublisherHive client;
-
     /**
      * 
      */
     private static final String DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR = "DATA_CACHE_AUGMENTER_CONNECTOR_FACTORY_ERROR";
     private static final int MAX_RETRY = 10;
 
+    /**
+     * Value of {@link #setFillDays(Integer)} to load the whole temporal extent of the series
+     */
+    public static final int FILL_ALL = 0;
+
+    /**
+     * Max number of values requested at once when loading the past data of a series, if its time resolution is known
+     */
+    private static final long FILL_CHUNK_VALUES = 10000;
+
+    /**
+     * Period requested at once when loading the past data of a series, if its time resolution is unknown
+     */
+    private static final long DEFAULT_FILL_CHUNK_MS = TimeUnit.DAYS.toMillis(365);
+
+    /**
+     * While loading the past data of a series, writing is paused while the data cache buffer holds more than this number
+     * of records
+     */
+    private static final int FILL_BUFFER_SIZE = 20000;
+
+    private boolean waitForResults = true;
+
+    private List<DataRecord> newRecords = new ArrayList<>();
+
+    private Integer fillDays;
+
+    private Date backfillBegin;
+
+    private Date backfillEnd;
+
+    /**
+     * Sets the older data to load for a series already cached, before its update. Ignored if the series is not cached
+     *
+     * @param begin the begin of the data to load, null for none
+     * @param end the end of the data to load (usually the first cached observation), null for none
+     */
+    public void setBackfill(Date begin, Date end) {
+
+	this.backfillBegin = begin;
+	this.backfillEnd = end;
+    }
+
+    /**
+     * @param fillDays days of data loaded when the cache of a series is first filled, back from the end of its temporal
+     *        extent. {@link #FILL_ALL} loads the whole temporal extent. If not set (default), only the latest 20 time
+     *        steps are loaded (30 days, if the time resolution is unknown). The data older than this default window are
+     *        loaded in chunks, after the default window has been processed
+     */
+    public void setFillDays(Integer fillDays) {
+
+	this.fillDays = fillDays;
+    }
+
+    /**
+     * @return the records retrieved and written to the cache by the last {@link #augment(GSResource)}, excluding the
+     *         past data loaded in chunks (see {@link #setFillDays(Integer)}) and the older data loaded before the update
+     *         (see {@link #setBackfill(Date, Date)}). For a series already cached, these are the new values of the series
+     */
+    public List<DataRecord> getNewRecords() {
+
+	return newRecords;
+    }
+
+    /**
+     * @param waitForResults if true (default), when no results are found the retrieval is repeated every 5 minutes, up
+     *        to {@link #MAX_RETRY} times. Disabling it is useful when filling the cache of many resources, where missing
+     *        recent data is not an exceptional case
+     */
+    public void setWaitForResults(boolean waitForResults) {
+
+	this.waitForResults = waitForResults;
+    }
+
     @Override
     public Optional<GSResource> augment(GSResource resource) throws GSException {
 
-	if (client == null) {
-	    try {
-
-		Optional<MQTTBrokerSetting> broker = ConfigurationWrapper.getSystemSettings().getWis2MqttBroker();
-
-		if (broker.isEmpty()) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("WIS2 MQTT broker not configured");
-
-		} else {
-
-		    MQTTBrokerSetting mqtt = broker.get();
-		    client = new MQTTPublisherHive(mqtt.getHost().get(), mqtt.getPort().get(), mqtt.getUser().get(), mqtt.getPassword().get());
-		}
-
-	    } catch (Exception e) {
-
-		GSLoggerFactory.getLogger(DataCacheAugmenter.class).error(e);
-		throw GSException.createException(getClass(), "MQTTClientInitError", e);
-	    }
-	}
+	newRecords = new ArrayList<>();
 
 	DataCacheConnector dataCacheConnector = null;
 	String sourceId = null;
-	String sourceAcronym = null;
 	String onlineId = null;
 	Date expected = null;
 	try {
@@ -155,7 +203,6 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	    GSLoggerFactory.getLogger(getClass()).info("[DATA-CACHE] Augmenting {}", onlineId);
 
 	    sourceId = resource.getSource().getUniqueIdentifier();
-	    sourceAcronym = sourceId;
 
 	    DataRecord toUpdate = null;
 	    // get the last 22 records from cache
@@ -185,6 +232,16 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		    toUpdate = cachedRecord;
 		}
 	    }
+	    // older data of a cached series
+	    FillResult backfill = null;
+	    if (backfillBegin != null && backfillEnd != null && backfillBegin.before(backfillEnd) && !cachedRecords.isEmpty()) {
+		backfill = fillPast(dataCacheConnector, resource, onlineId, sourceId, getSeriesMetadata(resource), backfillBegin, backfillEnd,
+			getTimeResolution(resource, onlineId));
+		// the following update, if any, writes its own statistics
+		dataCacheConnector.writeStatistics(new StatisticsRecord(new Date(), sourceId, onlineId, backfill.values(), backfill.error(),
+			null, cachedRecords.get(0).getDate()));
+	    }
+
 	    DataRecord lastObservation = null;
 
 	    //////////// BEGIN and END dates calculation
@@ -236,75 +293,20 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	    DataDescriptor targetDescriptor = new DataDescriptor();
 	    targetDescriptor.setDataFormat(DataFormat.WATERML_1_1());
 
-	    ExtensionHandler handler = resource.getExtensionHandler();
+	    Long ms = getTimeResolution(resource, onlineId);
 
-	    Optional<String> timeResolution = Optional.empty();
-	    Optional<String> timeSupport = Optional.empty();
-
-	    try {
-		timeResolution = handler.getTimeResolution();
-		timeSupport = handler.getTimeSupport();
-	    } catch (Exception ex) {
-
-		GSLoggerFactory.getLogger(getClass()).error(ex);
-
-		if (ex instanceof XPathException) {
-
-		    GSLoggerFactory.getLogger(getClass()).error("Resource with XPathException:\n {}", resource.asString(false));
-		}
-	    }
-
-	    String time = null;
-	    if (timeResolution.isPresent()) {
-		time = timeResolution.get();
-	    } else if (timeSupport.isPresent()) {
-		time = timeSupport.get();
-	    }
-	    Optional<String> timeUnits = handler.getTimeUnits();
-	    Long ms = null;
-	    if (timeUnits.isPresent() && time != null) {
-		Long duration = null;
-		try {
-		    duration = Long.parseLong(time.trim());
-		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Time is not long for source {} online id {} time {}",
-			    resource.getSource().getUniqueIdentifier(), onlineId, time);
-		}
-		String timeUnitsString = timeUnits.get().toLowerCase();
-		switch (timeUnitsString) {
-		case "hour":
-		case "hours":
-		case "h":
-		    ms = TimeUnit.HOURS.toMillis(duration);
-		    break;
-		case "ms":
-		case "milliseconds":
-		case "millisecond":
-		    ms = TimeUnit.MILLISECONDS.toMillis(duration);
-		    break;
-		case "d":
-		case "day":
-		case "days":
-		    ms = TimeUnit.DAYS.toMillis(duration);
-		    break;
-		case "minute":
-		case "minutes":
-		    ms = TimeUnit.MINUTES.toMillis(duration);
-		    break;
-		case "month":
-		case "months":
-		    ms = TimeUnit.DAYS.toMillis(30 * duration);
-		    break;
-		default:
-		    break;
-		}
-	    }
+	    // begin of the past data to load after the first set of acquisitions, if any
+	    Date fillBegin = null;
 	    if (begin == null) {
 		// calculating begin date for the first set of acquisitions
 		if (ms != null) {
 		    begin = new Date(end.getTime() - ms * 20);
 		} else {
 		    begin = new Date(end.getTime() - TimeUnit.DAYS.toMillis(30));
+		}
+		fillBegin = getFillBegin(resource, onlineId, end, begin);
+		if (fillBegin.after(begin)) {
+		    begin = fillBegin;
 		}
 	    }
 	    targetDescriptor.setTemporalDimension(begin, end);
@@ -319,11 +321,11 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	    boolean effectiveCheck = false;
 	    int attempts = 1;
 
-	    while (results.isEmpty() && attempts < MAX_RETRY) {
+	    while (waitForResults && results.isEmpty() && attempts < MAX_RETRY) {
 
 		GSLoggerFactory.getLogger(getClass()).warn(
 			"[DATA-CACHE] Waiting source {} online id {} every 5 minutes for results from: {} now: {}",
-			resource.getSource().getUniqueIdentifier(), onlineId, time, ISO8601DateTimeUtils.getISO8601DateTime(end),
+			resource.getSource().getUniqueIdentifier(), onlineId, ISO8601DateTimeUtils.getISO8601DateTime(end),
 			ISO8601DateTimeUtils.getISO8601DateTime(new Date()));
 
 		effectiveCheck = true;
@@ -343,151 +345,15 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		return Optional.empty();
 	    }
 
-	    DataObject result = results.get(0);
-	    File file = result.getFile();
-	    TimeSeriesResponseType trt = null;
-	    try {
-		FileInputStream stream = new FileInputStream(file);
-		trt = JAXBWML.getInstance().parseTimeSeries(stream);
-		stream.close();
-		file.delete();
-	    } catch (Exception e) {
-		throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
-	    }
-	    if (trt == null) {
-		throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
-	    }
-	    TimeSeriesType series = trt.getTimeSeries().get(0);
+	    TimeSeriesType series = decode(results.get(0));
 	    List<ValueSingleVariable> values = series.getValues().get(0).getValue();
+	    SeriesMetadata metadata = getSeriesMetadata(resource);
+	    Double noDataValue = series.getVariable() != null ? series.getVariable().getNoDataValue() : null;
 	    for (ValueSingleVariable wmlValue : values) {
-		Date date = wmlValue.getDateTimeUTC().toGregorianCalendar(TimeZone.getTimeZone("GMT"), null, null).getTime();
+		Date date = getDate(wmlValue);
 		if (lastObservation == null || !date.equals(lastObservation.getDate())) {
-		    BigDecimal value = wmlValue.getValue();
-		    DataRecord record = new DataRecord();
-		    record.setDate(date);
-		    record.setValue(value);
-		    record.setDataIdentifier(onlineId);
-		    record.setSourceIdentifier(sourceId);
+		    DataRecord record = toRecord(wmlValue, date, noDataValue, onlineId, sourceId, metadata);
 		    records.add(record);
-
-		    ////////////////////////////////
-		    // MQTT publishing
-		    ////////////////////////////////
-		    String country = "unknown";
-		    VariableInfoType variableInfo = series.getVariable();
-		    String variableURI = JAXBWML.getInstance().getVariableURI(variableInfo);
-		    String variable = variableInfo.getVariableName();
-
-		    JSONObject json = new JSONObject();
-		    String id = onlineId + "-" + date.getTime();
-		    json.put("id", id);
-		    json.put("type", "Feature");
-		    json.put("version", "v04");
-
-		    SourceInfoType sourceInfo = series.getSourceInfo();
-		    String siteId = "unknown";
-		    if (sourceInfo instanceof SiteInfoType) {
-			SiteInfoType siteInfo = (SiteInfoType) sourceInfo;
-
-			if (sourceId.contains("-")) {
-			    int dashIndex = sourceId.indexOf("-");
-			    String c = sourceId.substring(0, dashIndex);
-			    Country cc = Country.decode(c);
-			    if (cc != null) {
-				country = cc.getISO2().toLowerCase();
-				sourceAcronym = sourceId.substring(dashIndex + 1);
-			    }
-			}
-
-			if (country.equals("unknown")) {
-			    try {
-				country = JAXBWML.getInstance().getProperty(siteInfo, WML_SiteProperty.COUNTRY);
-				if (country != null && !country.isEmpty()) {
-				    country = Country.decode(country).getISO2().toLowerCase();
-				} else {
-				    country = "unknown";
-				}
-			    } catch (Exception ex) {
-				GSLoggerFactory.getLogger(getClass()).error(ex);
-			    }
-			}
-
-			siteId = siteInfo.getSiteCode().get(0).getValue();
-			GeoLocation geoLocation = siteInfo.getGeoLocation();
-			double lon;
-			double lat;
-			if (geoLocation != null) {
-			    GeogLocationType geog = geoLocation.getGeogLocation();
-			    if (geog != null) {
-				if (geog instanceof LatLonPointType) {
-				    LatLonPointType latLon = (LatLonPointType) geog;
-				    lon = latLon.getLongitude();
-				    lat = latLon.getLatitude();
-				    JSONArray coordinates = new JSONArray();
-				    coordinates.put(lon);
-				    coordinates.put(lat);
-				    Double alt = siteInfo.getElevationM();
-				    if (alt != null) {
-					coordinates.put(alt);
-				    }
-				    JSONObject geometry = new JSONObject();
-				    geometry.put("type", "Point");
-				    geometry.put("coordinates", coordinates);
-				    json.put("geometry", geometry);
-				}
-			    }
-			}
-		    }
-
-		    String level11 = variable;
-		    WIS2Level10Topic wisLevel10 = WIS2Level10Topic.decode(variableURI);
-		    String level10 = wisLevel10.getId();
-		    String level9 = wisLevel10.getBroaderLevel().getId();
-
-		    String topic = "origin/a/wis2/" + country + "-" + sourceAcronym + "/data/core/hydrology/"
-			    + MQTTUtils.harmonizeTopicName(level9) + "/" + MQTTUtils.harmonizeTopicName(level10) + "/"
-			    + MQTTUtils.harmonizeTopicName(level11);
-		    JSONObject properties = new JSONObject();
-		    properties.put("data_id", topic + "/" + id);
-		    properties.put("datetime", ISO8601DateTimeUtils.getISO8601DateTime(date));
-		    properties.put("pubtime", ISO8601DateTimeUtils.getISO8601DateTime(new Date()));
-
-		    properties.put("value", record.getValue());
-		    properties.put("observedProperty", variable.trim());
-		    UnitsType units = series.getVariable().getUnit();
-		    if (units != null) {
-			String unitName = units.getUnitName();
-			properties.put("uom", unitName);
-		    }
-		    String dataType = series.getVariable().getDataType();
-		    if (dataType != null) {
-			properties.put("interpolation", dataType);
-		    }
-
-		    String wigosId = "021016basin" + siteId;
-		    properties.put("wigos_station_identifier", wigosId);
-
-		    json.put("properties", properties);
-		    JSONArray linksArray = new JSONArray();
-		    JSONObject link = new JSONObject();
-		    link.put("rel", "canonical");
-		    link.put("type", "application/netcdf");
-		    String variableCode = series.getVariable().getVariableCode().get(1).getValue();
-		    String d = ISO8601DateTimeUtils.getISO8601DateTime(date).replace("Z", "");
-		    link.put("href",
-			    "https://whos.geodab.eu/gs-service/services/essi/token/TOKEN/view/gs-view-and(whos,gs-view-source(" + sourceId
-				    + "))/cuahsi_1_1.asmx?request=GetValuesObject&site=" + siteId + "&variable=" + variableCode
-				    + "&beginDate=" + d + "&endDate=" + d + "&format=NetCDF");
-		    linksArray.put(link);
-		    json.put("links", linksArray);
-		    String msg = json.toString();
-		    if (client == null) {
-			GSLoggerFactory.getLogger(getClass()).info("WIS2 MQTT broker not configured");
-		    } else {
-			client.publish(topic, msg, true);
-		    }
-
-		    ////////////////////////////////
 		}
 	    }
 	    if (records.isEmpty()) {
@@ -578,6 +444,8 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 			dailyObservations++;
 		    }
 		}
+		newRecords = new ArrayList<>(records);
+
 		if (toUpdate != null) {
 		    records.add(0, toUpdate);
 		}
@@ -636,68 +504,39 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		    station.setLastHarvesting(records.get(records.size() - 1).getTimestamp());
 		    station.setWhosCategory("sensor");
 		    station.setLastDayObservations(dailyObservations);
-		    Optional<String> unitsURI = resource.getExtensionHandler().getAttributeUnitsURI();
-		    String unitsLabel = null;
-		    if (unitsURI.isPresent()) {
-			station.setUnitsURI(unitsURI.get());
-			WMOUnit units = WMOOntology.decodeUnit(unitsURI.get());
-			if (units != null) {
-			    unitsLabel = units.getPreferredLabel(null);
-			}
+		    if (metadata.unitsURI() != null) {
+			station.setUnitsURI(metadata.unitsURI());
 		    }
-		    if (unitsLabel == null) {
-			Optional<String> units = resource.getExtensionHandler().getAttributeUnits();
-			if (units.isPresent()) {
-			    unitsLabel = units.get();
-			}
+		    if (metadata.units() != null) {
+			station.setUnits(metadata.units());
 		    }
-		    if (unitsLabel != null) {
-			station.setUnits(unitsLabel);
+		    if (metadata.observedPropertyURI() != null) {
+			station.setObservedPropertyURI(metadata.observedPropertyURI());
 		    }
-		    String observedProperty = null;
-		    Optional<String> observedPropertyURI = resource.getExtensionHandler().getObservedPropertyURI();
-		    if (observedPropertyURI.isPresent()) {
-			station.setObservedPropertyURI(observedPropertyURI.get());
-			WHOSOntology ontology = new WHOSOntology();
-			SKOSConcept concept = ontology.getConcept(observedPropertyURI.get());
-			if (concept != null) {
-			    HashSet<String> closeMatches = concept.getCloseMatches();
-			    if (closeMatches != null && !closeMatches.isEmpty()) {
-				try {
-				    WMOOntology wmoOntology = new WMOOntology();
-				    for (String closeMatch : closeMatches) {
-					SKOSConcept variable = wmoOntology.getVariable(closeMatch);
-					if (variable != null) {
-					    String preferredLabel = variable.getPreferredLabel("");
-					    if (preferredLabel != null) {
-						observedProperty = preferredLabel;
-					    }
-					}
-				    }
-				} catch (Exception e) {
-				    e.printStackTrace();
-				}
-
-			    } else {
-				observedProperty = concept.getPreferredLabel("");
-			    }
-			}
-		    }
-		    if (observedProperty == null) {
-			CoverageDescription cd = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-				.getCoverageDescription();
-			if (cd != null) {
-			    String attribute = cd.getAttributeTitle();
-			    observedProperty = attribute;
-			}
-		    }
-		    station.setObservedProperty(observedProperty);
+		    station.setObservedProperty(metadata.observedProperty());
 		    dataCacheConnector.writeStation(station);
+		}
+
+		int writtenCount = records.size();
+		String fillError = null;
+
+		if (backfill != null) {
+		    writtenCount += backfill.values();
+		    fillError = backfill.error();
+		}
+
+		// past data older than the first set of acquisitions
+		if (fillBegin != null && fillBegin.before(begin)) {
+		    FillResult fill = fillPast(dataCacheConnector, resource, onlineId, sourceId, metadata, fillBegin, begin, ms);
+		    writtenCount += fill.values();
+		    if (fill.error() != null) {
+			fillError = fill.error();
+		    }
 		}
 
 		GSLoggerFactory.getLogger(getClass()).info("[DATA-CACHE] Augmented {}", onlineId);
 		dataCacheConnector.writeStatistics(
-			new StatisticsRecord(new Date(), sourceId, onlineId, records.size(), null, expected, lastObservationDate));
+			new StatisticsRecord(new Date(), sourceId, onlineId, writtenCount, fillError, expected, lastObservationDate));
 	    }
 
 	    try {
@@ -725,7 +564,327 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 	return Optional.empty();
     }
 
-    
+    /**
+     * @return the time resolution of the series of the given resource in ms (or its time support, if the resolution is
+     *         missing), null if unknown
+     */
+    private Long getTimeResolution(GSResource resource, String onlineId) throws Exception {
+
+	ExtensionHandler handler = resource.getExtensionHandler();
+
+	Optional<String> timeResolution = Optional.empty();
+	Optional<String> timeSupport = Optional.empty();
+
+	try {
+	    timeResolution = handler.getTimeResolution();
+	    timeSupport = handler.getTimeSupport();
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    if (ex instanceof XPathException) {
+
+		GSLoggerFactory.getLogger(getClass()).error("Resource with XPathException:\n {}", resource.asString(false));
+	    }
+	}
+
+	String time = null;
+	if (timeResolution.isPresent()) {
+	    time = timeResolution.get();
+	} else if (timeSupport.isPresent()) {
+	    time = timeSupport.get();
+	}
+	Optional<String> timeUnits = handler.getTimeUnits();
+	Long ms = null;
+	if (timeUnits.isPresent() && time != null) {
+	    Long duration = null;
+	    try {
+		duration = Long.parseLong(time.trim());
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Time is not long for source {} online id {} time {}",
+			resource.getSource().getUniqueIdentifier(), onlineId, time);
+	    }
+	    String timeUnitsString = timeUnits.get().toLowerCase();
+	    switch (timeUnitsString) {
+	    case "hour":
+	    case "hours":
+	    case "h":
+		ms = TimeUnit.HOURS.toMillis(duration);
+		break;
+	    case "ms":
+	    case "milliseconds":
+	    case "millisecond":
+		ms = TimeUnit.MILLISECONDS.toMillis(duration);
+		break;
+	    case "d":
+	    case "day":
+	    case "days":
+		ms = TimeUnit.DAYS.toMillis(duration);
+		break;
+	    case "minute":
+	    case "minutes":
+		ms = TimeUnit.MINUTES.toMillis(duration);
+		break;
+	    case "month":
+	    case "months":
+		ms = TimeUnit.DAYS.toMillis(30 * duration);
+		break;
+	    default:
+		break;
+	    }
+	}
+	return ms;
+    }
+
+    /**
+     * @param resource
+     * @param onlineId
+     * @param end the end of the series
+     * @param defaultBegin the begin of the first set of acquisitions
+     * @return the begin of the data to load when the cache of the series is first filled (see {@link #setFillDays(Integer)})
+     */
+    private Date getFillBegin(GSResource resource, String onlineId, Date end, Date defaultBegin) {
+
+	if (fillDays == null) {
+	    return defaultBegin;
+	}
+
+	if (fillDays > 0) {
+	    return new Date(end.getTime() - TimeUnit.DAYS.toMillis(fillDays));
+	}
+
+	TemporalExtent temporalExtent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
+	String beginPosition = temporalExtent == null ? null : temporalExtent.getBeginPosition();
+	Optional<Date> begin = beginPosition == null || beginPosition.isBlank() ? Optional.empty()
+		: ISO8601DateTimeUtils.parseISO8601ToDate(beginPosition);
+
+	if (begin.isEmpty() || !begin.get().before(end)) {
+	    GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Invalid begin position {} of online id {}, loading the latest data only",
+		    beginPosition, onlineId);
+	    return defaultBegin;
+	}
+
+	return begin.get();
+    }
+
+    /**
+     * The outcome of the load of the past data of a series
+     */
+    private record FillResult(int values, int chunks, int failedChunks) {
+
+	/**
+	 * @return the error to record in the statistics, null if all the chunks were loaded
+	 */
+	String error() {
+	    return failedChunks == 0 ? null : "Past data load incomplete: " + failedChunks + " of " + chunks + " chunks failed";
+	}
+    }
+
+    /**
+     * Loads in the cache the data of the given period, in chunks from the most recent one. A failed chunk is logged and
+     * skipped
+     *
+     * @param from the begin of the period (inclusive)
+     * @param to the end of the period (exclusive)
+     * @param resolution the time resolution of the series in ms, null if unknown
+     */
+    private FillResult fillPast(DataCacheConnector dataCacheConnector, GSResource resource, String onlineId, String sourceId,
+	    SeriesMetadata metadata, Date from, Date to, Long resolution) throws Exception {
+
+	AccessExecutor accessExecutor = ServiceLoader.load(AccessExecutor.class).iterator().next();
+
+	long chunk = resolution != null ? Math.max(resolution * FILL_CHUNK_VALUES, TimeUnit.DAYS.toMillis(1)) : DEFAULT_FILL_CHUNK_MS;
+
+	GSLoggerFactory.getLogger(getClass()).info("[DATA-CACHE] Loading past data of {} from {} to {}", onlineId,
+		ISO8601DateTimeUtils.getISO8601DateTime(from), ISO8601DateTimeUtils.getISO8601DateTime(to));
+
+	int values = 0;
+	int chunks = 0;
+	int failedChunks = 0;
+
+	long chunkEnd = to.getTime();
+
+	while (chunkEnd > from.getTime()) {
+
+	    long chunkBegin = Math.max(from.getTime(), chunkEnd - chunk);
+	    chunks++;
+
+	    try {
+
+		DataDescriptor descriptor = new DataDescriptor();
+		descriptor.setDataFormat(DataFormat.WATERML_1_1());
+		descriptor.setTemporalDimension(new Date(chunkBegin), new Date(chunkEnd));
+
+		List<DataObject> results = accessExecutor.retrieve(resource, onlineId, descriptor).getResultsList();
+
+		if (!results.isEmpty()) {
+
+		    TimeSeriesType series = decode(results.get(0));
+		    Double noDataValue = series.getVariable() != null ? series.getVariable().getNoDataValue() : null;
+
+		    List<DataRecord> records = new ArrayList<>();
+		    for (ValueSingleVariable wmlValue : series.getValues().get(0).getValue()) {
+			Date date = getDate(wmlValue);
+			// the chunk end is excluded, being already loaded by the following chunk
+			if (date.getTime() >= chunkBegin && date.getTime() < chunkEnd) {
+			    records.add(toRecord(wmlValue, date, noDataValue, onlineId, sourceId, metadata));
+			}
+		    }
+
+		    if (!records.isEmpty()) {
+			dataCacheConnector.write(records);
+			values += records.size();
+		    }
+		}
+
+	    } catch (Exception e) {
+
+		failedChunks++;
+		GSLoggerFactory.getLogger(getClass()).error("[DATA-CACHE] Error loading past data of {} from {} to {}: {}", onlineId,
+			ISO8601DateTimeUtils.getISO8601DateTime(new Date(chunkBegin)),
+			ISO8601DateTimeUtils.getISO8601DateTime(new Date(chunkEnd)), e.getMessage(), e);
+	    }
+
+	    while (dataCacheConnector.countRecordsInDataBuffer() > FILL_BUFFER_SIZE) {
+		Thread.sleep(1000);
+	    }
+
+	    chunkEnd = chunkBegin;
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("[DATA-CACHE] Loaded past data of {}: {} values, {} chunks, {} failed", onlineId,
+		values, chunks, failedChunks);
+
+	return new FillResult(values, chunks, failedChunks);
+    }
+
+    /**
+     * @param result a WaterML 1.1 data object, deleted after decoding
+     * @return the first time series of the given data object
+     */
+    private TimeSeriesType decode(DataObject result) {
+
+	File file = result.getFile();
+	TimeSeriesResponseType trt = null;
+	try (FileInputStream stream = new FileInputStream(file)) {
+	    trt = JAXBWML.getInstance().parseTimeSeries(stream);
+	} catch (Exception e) {
+	    throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
+	} finally {
+	    file.delete();
+	}
+	if (trt == null) {
+	    throw new IllegalArgumentException(DataValidatorErrorCode.DECODING_ERROR.toString());
+	}
+	return trt.getTimeSeries().get(0);
+    }
+
+    private static Date getDate(ValueSingleVariable wmlValue) {
+
+	return wmlValue.getDateTimeUTC().toGregorianCalendar(TimeZone.getTimeZone("GMT"), null, null).getTime();
+    }
+
+    private static DataRecord toRecord(ValueSingleVariable wmlValue, Date date, Double noDataValue, String onlineId, String sourceId,
+	    SeriesMetadata metadata) {
+
+	BigDecimal value = wmlValue.getValue();
+	// no data values are stored as null
+	if (value != null && noDataValue != null && value.compareTo(BigDecimal.valueOf(noDataValue)) == 0) {
+	    value = null;
+	}
+	DataRecord record = new DataRecord();
+	record.setDate(date);
+	record.setValue(value);
+	record.setDataIdentifier(onlineId);
+	record.setSourceIdentifier(sourceId);
+	record.setUom(metadata.units());
+	record.setObservedProperty(metadata.observedProperty());
+	record.setObservedPropertyURI(metadata.observedPropertyURI());
+	record.setLatitudeLongitude(metadata.latitudeLongitude());
+	record.setQuality(wmlValue.getQualityControlLevelCode());
+	return record;
+    }
+
+    /**
+     * Metadata of a time series, written both in each value record and in the station record
+     */
+    private record SeriesMetadata(String units, String unitsURI, String observedProperty, String observedPropertyURI,
+	    LatitudeLongitude latitudeLongitude) {
+    }
+
+    /**
+     * @param resource
+     * @return the metadata of the time series of the given resource
+     * @throws Exception
+     */
+    private SeriesMetadata getSeriesMetadata(GSResource resource) throws Exception {
+
+	Optional<String> unitsURI = resource.getExtensionHandler().getAttributeUnitsURI();
+	String unitsLabel = null;
+	if (unitsURI.isPresent()) {
+	    WMOUnit units = WMOOntology.decodeUnit(unitsURI.get());
+	    if (units != null) {
+		unitsLabel = units.getPreferredLabel(null);
+	    }
+	}
+	if (unitsLabel == null) {
+	    Optional<String> units = resource.getExtensionHandler().getAttributeUnits();
+	    if (units.isPresent()) {
+		unitsLabel = units.get();
+	    }
+	}
+
+	String observedProperty = null;
+	Optional<String> observedPropertyURI = resource.getExtensionHandler().getObservedPropertyURI();
+	if (observedPropertyURI.isPresent()) {
+	    WHOSOntology ontology = new WHOSOntology();
+	    SKOSConcept concept = ontology.getConcept(observedPropertyURI.get());
+	    if (concept != null) {
+		HashSet<String> closeMatches = concept.getCloseMatches();
+		if (closeMatches != null && !closeMatches.isEmpty()) {
+		    try {
+			WMOOntology wmoOntology = new WMOOntology();
+			for (String closeMatch : closeMatches) {
+			    SKOSConcept variable = wmoOntology.getVariable(closeMatch);
+			    if (variable != null) {
+				String preferredLabel = variable.getPreferredLabel("");
+				if (preferredLabel != null) {
+				    observedProperty = preferredLabel;
+				}
+			    }
+			}
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
+
+		} else {
+		    observedProperty = concept.getPreferredLabel("");
+		}
+	    }
+	}
+	if (observedProperty == null) {
+	    CoverageDescription cd = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getCoverageDescription();
+	    if (cd != null) {
+		observedProperty = cd.getAttributeTitle();
+	    }
+	}
+
+	// the center of the bounding box (usually a point, for stations)
+	LatitudeLongitude latitudeLongitude = null;
+	GeographicBoundingBox bbox = resource.getHarmonizedMetadata().getCoreMetadata().getBoundingBox();
+	if (bbox != null) {
+	    Double s = bbox.getSouth() != null ? bbox.getSouth() : bbox.getNorth();
+	    Double n = bbox.getNorth() != null ? bbox.getNorth() : bbox.getSouth();
+	    Double w = bbox.getWest() != null ? bbox.getWest() : bbox.getEast();
+	    Double e = bbox.getEast() != null ? bbox.getEast() : bbox.getWest();
+	    if (s != null && w != null) {
+		latitudeLongitude = new LatitudeLongitude(BigDecimal.valueOf((s + n) / 2), BigDecimal.valueOf((w + e) / 2));
+	    }
+	}
+
+	return new SeriesMetadata(unitsLabel, unitsURI.orElse(null), observedProperty, observedPropertyURI.orElse(null),
+		latitudeLongitude);
+    }
 
     /**
      * @param accessExecutor

@@ -63,6 +63,11 @@ public class Configuration {
     private boolean autoreloadPaused;
 
     /**
+     * Time (in milliseconds) of the last synchronization of the settings with the source
+     */
+    private volatile long syncTime = System.currentTimeMillis();
+
+    /**
      * Creates an empty, in-memory only configuration with no related source.<br> This configuration <i>cannot be flushed</i>, use it only
      * for test purpose
      */
@@ -114,6 +119,7 @@ public class Configuration {
     public Configuration(ConfigurationSource source) throws Exception {
 
 	this.source = source;
+	this.syncTime = System.currentTimeMillis();
 	this.list = source.list();
 	this.listenerList = new ArrayList<>();
     }
@@ -191,6 +197,17 @@ public class Configuration {
     }
 
     /**
+     * Returns the time of the last synchronization of the settings with the source (the creation or the last reload). The
+     * changes applied to the source after this time, e.g. by another node, are not yet available in this configuration
+     *
+     * @return the time in milliseconds
+     */
+    public long getSyncTime() {
+
+	return syncTime;
+    }
+
+    /**
      * @return
      */
     public boolean isAutoreloadPaused() {
@@ -263,6 +280,20 @@ public class Configuration {
     public synchronized Optional<Setting> get(String settingId) {
 
 	return SettingUtils.get(list, settingId).map(Setting::clone);
+    }
+
+    /**
+     * Read-only method. Applies the given <code>reader</code> to the setting with the given id, <i>without</i> cloning it.<br>
+     * For performance reasons, this method is recommended to read a few values of a single setting, but the <code>reader</code>
+     * must not alter the setting and must not return it, nor any of its objects
+     *
+     * @param settingId
+     * @param reader
+     * @return
+     */
+    public synchronized <R> Optional<R> read(String settingId, Function<Setting, R> reader) {
+
+	return SettingUtils.get(list, settingId).map(reader);
     }
 
     /**
@@ -675,7 +706,12 @@ public class Configuration {
 
 	if (getState() == State.SYNCH) {
 
+	    // the time is taken before reading, so that the settings are at least as recent as the sync time
+	    long time = System.currentTimeMillis();
+
 	    list = source.list();
+
+	    syncTime = time;
 
 	    dispatchEvent(forced ? ConfigurationChangeListener.EventType.CONFIGURATION_FORCED_RELOADED : ConfigurationChangeListener.EventType.CONFIGURATION_AUTO_RELOADED);
 

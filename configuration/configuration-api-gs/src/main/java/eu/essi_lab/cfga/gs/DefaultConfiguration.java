@@ -99,6 +99,11 @@ public class DefaultConfiguration extends Configuration {
 	/**
 	 *
 	 */
+	WIS2_SETTING("wis2Settings"), //
+
+	/**
+	 *
+	 */
 	DATA_CACHE_CONNECTOR_SETTING("dataCacheConnectorSettings"), //
 
 	/**
@@ -375,6 +380,16 @@ public class DefaultConfiguration extends Configuration {
 	gdcSourcesSetting.setIdentifier(SingletonSettingsId.GDC_SOURCES_SETTING.getLabel());
 
 	put(gdcSourcesSetting);
+
+	//
+	// --- WIS2 setting
+	//
+
+	WIS2Setting wis2Setting = new WIS2Setting();
+
+	wis2Setting.setIdentifier(SingletonSettingsId.WIS2_SETTING.getLabel());
+
+	put(wis2Setting);
 
 	//
 	// --- System settings ----

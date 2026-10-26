@@ -168,53 +168,66 @@ public class HarvestSchedulingRequest extends PutSourceRequest {
     @Override
     protected void contentTypeCheck(List<Parameter> supportedParams, String paramName, Object value) {
 
-	if (paramName.equals(REPEAT_INTERVAL)) {
-	    {
-		Integer interval = Integer.valueOf(value.toString());
-		if (interval < 1) {
+	repeatIntervalCheck(paramName, value);
 
-		    throw new IllegalArgumentException("Value of '" + REPEAT_INTERVAL + "' parameter must be >= 1");
-		}
-	    }
-	}
-	
 	super.contentTypeCheck(supportedParams, paramName, value);
     }
 
     /**
-     * @param parameters
+     * Checks the consistency of the scheduling parameters. Can be used by any request supporting the
+     * {@link #START_TIME}, {@link #REPEAT_COUNT}, {@link #REPEAT_INTERVAL} and {@link #REPEAT_INTERVAL_UNIT} parameters
+     *
+     * @param request
      */
-    static void mandatoryCheck(HarvestSchedulingRequest request) {
+    public static void mandatoryCheck(ConfigRequest request) {
 
-	List<String> parameters = request.readParameters();
+	boolean hasRepeatCount = request.read(REPEAT_COUNT).isPresent();
+	boolean hasInterval = request.read(REPEAT_INTERVAL).isPresent();
+	boolean hasIntervalUnit = request.read(REPEAT_INTERVAL_UNIT).isPresent();
 
-	if (parameters.contains(REPEAT_COUNT) && request.read(REPEAT_COUNT).get().equals(RepeatCount.INDEFINITELY.getLabel())) {
+	if (hasRepeatCount && request.read(REPEAT_COUNT).get().equals(RepeatCount.INDEFINITELY.getLabel())) {
 
-	    if (!parameters.contains(REPEAT_INTERVAL) && !parameters.contains(REPEAT_INTERVAL_UNIT)) {
+	    if (!hasInterval && !hasIntervalUnit) {
 
 		throw new IllegalArgumentException("Missing parameters '" + REPEAT_INTERVAL + "' and " + REPEAT_INTERVAL_UNIT
 			+ "' which are mandatory when '" + REPEAT_COUNT + "' is '" + RepeatCount.INDEFINITELY.getLabel() + "'");
 	    }
 
-	    if (!parameters.contains(REPEAT_INTERVAL) && parameters.contains(REPEAT_INTERVAL_UNIT)) {
+	    if (!hasInterval && hasIntervalUnit) {
 
 		throw new IllegalArgumentException("Missing parameter '" + REPEAT_INTERVAL + "' which is mandatory when '" + REPEAT_COUNT
 			+ "' is '" + RepeatCount.INDEFINITELY.getLabel() + "'");
 	    }
 
-	    if (parameters.contains(REPEAT_INTERVAL) && !parameters.contains(REPEAT_INTERVAL_UNIT)) {
+	    if (hasInterval && !hasIntervalUnit) {
 
 		throw new IllegalArgumentException("Missing parameter '" + REPEAT_INTERVAL + "' which is mandatory when '" + REPEAT_COUNT
 			+ "' is '" + RepeatCount.INDEFINITELY.getLabel() + "'");
 	    }
 	}
 
-	if (parameters.contains(REPEAT_COUNT) && request.read(REPEAT_COUNT).get().equals(RepeatCount.ONCE.getLabel())) {
+	if (hasRepeatCount && request.read(REPEAT_COUNT).get().equals(RepeatCount.ONCE.getLabel())) {
 
-	    if (parameters.contains(REPEAT_INTERVAL) || parameters.contains(REPEAT_INTERVAL_UNIT)) {
+	    if (hasInterval || hasIntervalUnit) {
 
 		throw new IllegalArgumentException("Parameters '" + REPEAT_INTERVAL + "' and '" + REPEAT_INTERVAL_UNIT
 			+ "' must be omitted when " + REPEAT_COUNT + "' is '" + RepeatCount.ONCE.getLabel() + "'");
+	    }
+	}
+    }
+
+    /**
+     * @param paramName
+     * @param value
+     */
+    public static void repeatIntervalCheck(String paramName, Object value) {
+
+	if (paramName.equals(REPEAT_INTERVAL)) {
+
+	    Integer interval = Integer.valueOf(value.toString());
+	    if (interval < 1) {
+
+		throw new IllegalArgumentException("Value of '" + REPEAT_INTERVAL + "' parameter must be >= 1");
 	    }
 	}
     }

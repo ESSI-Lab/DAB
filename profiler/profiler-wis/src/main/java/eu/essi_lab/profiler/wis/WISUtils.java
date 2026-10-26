@@ -44,8 +44,16 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.datacache.DataCacheConnector;
+import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.profiler.wis.WISRequest.CollectionItems;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
+import eu.essi_lab.lib.whos.WIS2DataPolicy;
+import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
 import eu.essi_lab.iso.datamodel.ISOMetadata;
 import eu.essi_lab.iso.datamodel.classes.Identification;
@@ -319,13 +327,14 @@ public class WISUtils {
     public static final String DEFAULT_HOSTNAME = "https://production.whos-dab.eu";
     public static final String DEFAULT_CENTRE_ID = "it-cnr-itiam-whos-dab";
     public static final String DEFAULT_GENERATED_BY = "WHOS DAB";
+    public static final String DEFAULT_TOKEN_REQUEST_CONTACT = "whos@wmo.int";
 
     /**
      * @return the organization added as publisher to the WIS2 metadata records
      */
     public static String getPublisher() {
 
-	return getWISOption(KeyValueOptionKeys.WIS_PUBLISHER, DEFAULT_PUBLISHER);
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getPublisher(), KeyValueOptionKeys.WIS_PUBLISHER, DEFAULT_PUBLISHER);
     }
 
     /**
@@ -333,7 +342,7 @@ public class WISUtils {
      */
     public static String getHostname() {
 
-	return getWISOption(KeyValueOptionKeys.WIS_HOSTNAME, DEFAULT_HOSTNAME);
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getHostname(), KeyValueOptionKeys.WIS_HOSTNAME, DEFAULT_HOSTNAME);
     }
 
     /**
@@ -341,7 +350,7 @@ public class WISUtils {
      */
     public static String getCentreId() {
 
-	return getWISOption(KeyValueOptionKeys.WIS_CENTRE_ID, DEFAULT_CENTRE_ID);
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getCentreId(), KeyValueOptionKeys.WIS_CENTRE_ID, DEFAULT_CENTRE_ID);
     }
 
     /**
@@ -349,17 +358,158 @@ public class WISUtils {
      */
     public static String getGeneratedBy() {
 
-	return getWISOption(KeyValueOptionKeys.WIS_GENERATED_BY, DEFAULT_GENERATED_BY);
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getGeneratedBy(), KeyValueOptionKeys.WIS_GENERATED_BY, DEFAULT_GENERATED_BY);
     }
 
     /**
-     * @return the value of the given system settings key-value option, or <code>defaultValue</code> if missing
+     * @return the data cache connector, initialized from the configuration if not yet available
+     * @throws Exception
      */
-    private static String getWISOption(KeyValueOptionKeys key, String defaultValue) {
+    public static DataCacheConnector getDataCacheConnector() throws Exception {
 
-	return ConfigurationWrapper.getSystemSettings().getKeyValueOptions().//
-		map(p -> p.getProperty(key.getLabel())).//
-		orElse(defaultValue);
+	DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+
+	if (dataCacheConnector == null) {
+	    DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+	    dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+	    String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
+	    String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
+	    String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
+	    dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
+	    dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
+	    dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
+	    DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
+	}
+
+	return dataCacheConnector;
+    }
+
+    /**
+     * @param sourceId
+     * @return the identifier of the WCMP2 record of the given source
+     */
+    public static String getMetadataIdentifier(String sourceId) {
+
+	return "urn:wmo:md:" + getCentreId() + ":" + sourceId;
+    }
+
+    /**
+     * @param viewId
+     * @param itemId
+     * @return the URL of the cached data item with the given identifier
+     */
+    public static String getDataItemUrl(String viewId, String itemId) {
+
+	return getServiceUrl(viewId) + "/collections/" + CollectionItems.OBSERVATIONS.getName() + "/items/" + itemId;
+    }
+
+    /**
+     * @return the identifier of the view through which the WIS2 records and data are served, if configured
+     */
+    public static Optional<String> getViewId() {
+
+	return ConfigurationWrapper.getWIS2Setting().getViewId();
+    }
+
+    /**
+     * @return the contact to request the token needed by the authenticated APIs
+     */
+    public static String getTokenRequestContact() {
+
+	return ConfigurationWrapper.getWIS2Setting().getTokenRequestContact().orElse(DEFAULT_TOKEN_REQUEST_CONTACT);
+    }
+
+    /**
+     * @return
+     */
+    public static DataNotificationsMode getDataNotificationsMode() {
+
+	return ConfigurationWrapper.getWIS2Setting().getDataNotificationsMode();
+    }
+
+    /**
+     * @param sourceId
+     * @return the WMO data policy of the data of the given source, as declared by its WCMP2 record: the core sources
+     *         are declared as such only when the data notifications are advertised (see
+     *         {@link DataNotificationsMode#isAdvertised()})
+     */
+    public static WIS2DataPolicy getDataPolicy(String sourceId) {
+
+	WIS2Setting setting = ConfigurationWrapper.getWIS2Setting();
+
+	return setting.isCoreSource(sourceId) && setting.getDataNotificationsMode().isAdvertised() ? WIS2DataPolicy.CORE
+		: WIS2DataPolicy.RECOMMENDED;
+    }
+
+    /**
+     * @param sourceId
+     * @return true if the data of the given source are notified and served without authentication: the source is a core
+     *         source and the data notifications are not disabled
+     */
+    public static boolean isCoreDataPublished(String sourceId) {
+
+	WIS2Setting setting = ConfigurationWrapper.getWIS2Setting();
+
+	return setting.isCoreSource(sourceId) && setting.getDataNotificationsMode() != DataNotificationsMode.DISABLED;
+    }
+
+    /**
+     * @param topic
+     * @return the topic advertised in the WCMP2 records of the core sources for the given topic, according to the data
+     *         notifications mode: the experimental or the official topic, or none if the data notifications are not
+     *         advertised
+     */
+    public static Optional<String> getAdvertisedTopic(WIS2HydrologyTopic topic) {
+
+	return switch (getDataNotificationsMode()) {
+	case EXPERIMENTAL -> Optional.of(topic.getExperimentalTopic(getCentreId(), WIS2DataPolicy.CORE));
+	case OPERATIONAL -> Optional.of(topic.getTopic(getCentreId(), WIS2DataPolicy.CORE));
+	default -> Optional.empty();
+	};
+    }
+
+    /**
+     * @param topic
+     * @return the topic where the data notifications of the given topic are published, according to the data
+     *         notifications mode: the advertised topic, or the official topic under the private topic prefix, or none
+     *         if the data notifications are disabled
+     */
+    public static Optional<String> getPublicationTopic(WIS2HydrologyTopic topic) {
+
+	return switch (getDataNotificationsMode()) {
+	case DISABLED -> Optional.empty();
+	case DRY_RUN, PRIVATE -> Optional.of(WIS2HydrologyTopic.withPrefix(topic.getTopic(getCentreId(), WIS2DataPolicy.CORE),
+		ConfigurationWrapper.getWIS2Setting().getPrivateTopicPrefix()));
+	default -> getAdvertisedTopic(topic);
+	};
+    }
+
+    /**
+     * @return the URL of the WIS2 MQTT broker where the data notifications can be subscribed (without credentials), if
+     *         configured
+     */
+    public static Optional<String> getBrokerUrl() {
+
+	return ConfigurationWrapper.getSystemSettings().getWis2MqttBroker().map(broker -> {
+
+	    int port = broker.getPort().get();
+	    String scheme = port == 1883 ? "mqtt" : "mqtts";
+
+	    return scheme + "://" + broker.getHost().get() + ":" + port;
+	});
+    }
+
+    /**
+     * @return the given WIS2 setting option, or the value of the given legacy system settings key-value option, or
+     *         <code>defaultValue</code> if both are missing
+     */
+    private static String getWISOption(Optional<String> option, KeyValueOptionKeys legacyKey, String defaultValue) {
+
+	return option.orElseGet(() -> ConfigurationWrapper.getSystemSettings().getKeyValueOptions().//
+		map(p -> p.getProperty(legacyKey.getLabel())).//
+		filter(value -> !value.isBlank()).//
+		map(String::trim).//
+		orElse(defaultValue));
     }
 
     public static JSONObject mapFeature(GSResource resource) throws GSException {
@@ -464,7 +614,7 @@ public class WISUtils {
 	cnrRoles.put("publisher");
 	cnr.put("roles", cnrRoles);
 	contacts.put(cnr);
-	properties.put("wmo:dataPolicy", "recommended");
+	properties.put("wmo:dataPolicy", getDataPolicy(resource.getSource().getUniqueIdentifier()).getId());
 	if (resource.getSource().getUniqueIdentifier().equals("argentina-ina")) {
 	    String url = "https://creativecommons.org/licenses/by/4.0/";
 	    WISUtils.addLink(feature, "text/html", "license", "CC BY 4.0", url);
@@ -569,7 +719,53 @@ public class WISUtils {
 
 	addDataAccessLinks(feature, resource.getSource(), viewId);
 
+	addDataNotificationLinks(feature, resource);
+
 	return feature;
+    }
+
+    /**
+     * Adds a link to subscribe to the data notifications for each WIS2 data topic of the given resource, with a filter
+     * on the identifier of the resource, since the data notifications of different records are published under the
+     * same topics
+     * 
+     * @param feature
+     * @param resource
+     */
+    private static void addDataNotificationLinks(JSONObject feature, GSResource resource) {
+
+	List<String> topics = resource.getExtensionHandler().getWISDataTopics();
+	if (topics.isEmpty()) {
+	    return;
+	}
+
+	Optional<String> brokerUrl = getBrokerUrl();
+	if (brokerUrl.isEmpty()) {
+	    GSLoggerFactory.getLogger(WISUtils.class).warn("WIS2 MQTT broker not configured, data notification links not added to {}",
+		    feature.getString("id"));
+	    return;
+	}
+
+	for (String topic : topics) {
+
+	    JSONObject link = new JSONObject();
+	    link.put("rel", "items");
+	    link.put("type", "application/geo+json");
+	    link.put("title", "Data notifications");
+	    link.put("href", brokerUrl.get());
+	    link.put("channel", topic);
+
+	    JSONObject metadataId = new JSONObject();
+	    metadataId.put("type", "string");
+	    metadataId.put("title", "Metadata identifier");
+	    metadataId.put("const", feature.getString("id"));
+
+	    JSONObject filters = new JSONObject();
+	    filters.put("metadata_id", metadataId);
+	    link.put("filters", filters);
+
+	    addLink(feature.getJSONArray("links"), link);
+	}
     }
 
     /**
@@ -638,11 +834,6 @@ public class WISUtils {
     }
 
     /**
-     * Contact to request the token needed by the DAB OM API
-     */
-    public static final String TOKEN_REQUEST_CONTACT = "whos@wmo.int";
-
-    /**
      * Adds to the last link of the given feature the description of the token based access control of the DAB OM API
      * (an OpenAPI API key security scheme, the token is accepted as <code>token</code> query parameter)
      * 
@@ -659,7 +850,7 @@ public class WISUtils {
 	scheme.put("name", "token");
 	scheme.put("description",
 		"Access requires a WHOS token, to be provided as 'token' query parameter. To request a token, please contact the WHOS Secretariat at "
-			+ TOKEN_REQUEST_CONTACT);
+			+ getTokenRequestContact());
 
 	JSONObject security = new JSONObject();
 	security.put("default", scheme);

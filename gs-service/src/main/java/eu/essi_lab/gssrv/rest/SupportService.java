@@ -27,9 +27,19 @@ import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.authorization.userfinder.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.gssrv.portal.*;
+import eu.essi_lab.harvester.HarvestingNotifier.HarvestingResult;
 import eu.essi_lab.iso.datamodel.classes.*;
 import eu.essi_lab.lib.odip.*;
 import eu.essi_lab.lib.odip.ODIPVocabularyHandler.*;
+import eu.essi_lab.cfga.gs.setting.ontology.OntologySetting;
+import eu.essi_lab.lib.skos.SKOSClient;
+import eu.essi_lab.lib.skos.SKOSClient.SearchTarget;
+import eu.essi_lab.lib.skos.SKOSConcept;
+import eu.essi_lab.lib.skos.SKOSResponse;
+import eu.essi_lab.lib.skos.expander.ConceptsExpander.ExpansionLevel;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit;
+import eu.essi_lab.lib.skos.expander.ExpansionLimit.LimitTarget;
+import eu.essi_lab.lib.skos.expander.impl.DefaultConceptsExpander;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.*;
 import eu.essi_lab.messages.RequestMessage.*;
@@ -46,6 +56,8 @@ import eu.essi_lab.model.resource.data.*;
 import eu.essi_lab.pdk.wrt.*;
 import eu.essi_lab.profiler.semantic.*;
 import eu.essi_lab.request.executor.*;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchHarvestingPublisher;
 import jakarta.jws.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.*;
@@ -58,6 +70,7 @@ import org.owasp.encoder.*;
 import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.Map.*;
 
 @WebService
@@ -66,6 +79,24 @@ import java.util.Map.*;
  * @author Fabrizio
  */
 public class SupportService {
+
+    private static final int HARVESTING_HISTORY_SIZE = 20;
+
+    /**
+     * Precision threshold of the count distinct computations of the data reports: the maximum supported by OpenSearch, so
+     * that the dataset counts are close to exact up to 40000 datasets per group (the default threshold is 3000)
+     */
+    private static final int REPORT_PRECISION_THRESHOLD = 40000;
+
+    /**
+     * Labels of the observed property concepts, resolved from the enabled ontologies
+     */
+    private static final ExpiringCache<String> CONCEPT_LABELS_CACHE = new ExpiringCache<>();
+
+    static {
+	CONCEPT_LABELS_CACHE.setDuration(TimeUnit.MINUTES.toMillis(30));
+	CONCEPT_LABELS_CACHE.setMaxSize(5000);
+    }
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
@@ -466,6 +497,8 @@ public class SupportService {
 	    return Response.serverError().entity(getJSONErrorResponse("error counting cached datasets").toString()).build();
 	}
 
+	Map<String, String> lastHarvestings = getLastHarvestings(sourceIdentifiers);
+
 	JSONArray sourcesArray = new JSONArray();
 
 	for (GSSource source : sources) {
@@ -479,15 +512,7 @@ public class SupportService {
 	    jsonSource.put("datasetsInDatabase", dbCount);
 	    SourceCacheStats sourceStats = stats.get(source.getUniqueIdentifier());
 
-	    try {
-		Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
-		SourceStorage storage = database.getStorage(source.getUniqueIdentifier());
-		HarvestingProperties harvestingProperties = storage.getHarvestingProperties();
-		String lastHarvesting = harvestingProperties.getEndHarvestingTimestamp();
-		jsonSource.put("lastHarvesting", lastHarvesting);
-	    } catch (Exception e) {
-		GSLoggerFactory.getLogger(getClass()).error(e);
-	    }
+	    jsonSource.put("lastHarvesting", lastHarvestings.get(source.getUniqueIdentifier()));
 
 	    if (sourceStats != null) {
 		Long cacheCount = sourceStats.getUniqueDatasetCount();
@@ -517,6 +542,468 @@ public class SupportService {
 	return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
     }
 
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/source-data-stats")
+    public Response sourceDataStats(//
+	    @QueryParam("view") String view, @QueryParam("source") String sourceId) { //
+
+	if (view == null || view.isEmpty() || sourceId == null || sourceId.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("view and source parameters must be specified").toString())
+		    .build();
+	}
+	View v;
+	try {
+	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
+	}
+	Optional<GSSource> source = ConfigurationWrapper.getViewSources(v).stream()
+		.filter(s -> s.getUniqueIdentifier().equals(sourceId)).findFirst();
+	if (source.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("source not found in view").toString()).build();
+	}
+
+	DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+	if (dataCacheConnector == null) {
+	    try {
+		dataCacheConnector = DataCacheConnectorFactory.newDefaultDataCacheConnector();
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+		return Response.serverError().entity(getJSONErrorResponse("error init data cache connector").toString()).build();
+	    }
+	}
+
+	// concept labels, resolved from the enabled ontologies
+	Map<String, String> conceptLabels = new HashMap<>();
+	List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()//
+		.filter(o -> o.getOntologyAvailability() == OntologySetting.Availability.ENABLED)//
+		.map(OntologySetting::getOntologyEndpoint)//
+		.toList();
+
+	// rows: one per observed property concept (URI), plus one per observed property name of the datasets without URI
+	Map<String, PropertyRow> rows = new HashMap<>();
+
+	// name (lower case) -> concept URI, used to match the cached values without URI
+	Map<String, String> uriByName = new HashMap<>();
+
+	try {
+	    // datasets with URI, per concept
+	    for (ResponseItem item : getDatasetsGroupedBy(source.get(), view, MetadataElement.OBSERVED_PROPERTY_URI,
+		    MetadataElement.ATTRIBUTE_TITLE)) {
+		String uri = item.getGroupedBy().orElse("");
+		if (uri.isBlank()) {
+		    continue;
+		}
+		PropertyRow row = rows.computeIfAbsent("uri:" + uri, k -> new PropertyRow(uri, null));
+		row.datasetsInDatabase += getDistinctCount(item);
+		row.names.addAll(getFrequencyTerms(item, MetadataElement.ATTRIBUTE_TITLE));
+	    }
+	    // datasets without URI, per name
+	    for (ResponseItem item : getDatasetsGroupedBy(source.get(), view, MetadataElement.ATTRIBUTE_TITLE,
+		    MetadataElement.OBSERVED_PROPERTY_URI)) {
+		String name = item.getGroupedBy().orElse("");
+		if (getFrequencyTerms(item, MetadataElement.OBSERVED_PROPERTY_URI).isEmpty()) {
+		    PropertyRow row = rows.computeIfAbsent("name:" + name, k -> new PropertyRow(null, name));
+		    row.datasetsInDatabase += getDistinctCount(item);
+		    row.names.add(name);
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse("error counting datasets").toString()).build();
+	}
+
+	for (PropertyRow row : rows.values()) {
+	    if (row.uri != null) {
+		String label = conceptLabels.computeIfAbsent(row.uri, u -> getConceptLabel(u, ontologyUrls));
+		uriByName.putIfAbsent(label.trim().toLowerCase(), row.uri);
+		for (String name : row.names) {
+		    uriByName.putIfAbsent(name.trim().toLowerCase(), row.uri);
+		}
+	    }
+	}
+
+	List<PropertyCacheStats> cacheStats;
+	try {
+	    cacheStats = dataCacheConnector.getCacheStatsPerObservedProperty(sourceId);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse("error counting cached datasets").toString()).build();
+	}
+
+	for (PropertyCacheStats stats : cacheStats) {
+	    String uri = stats.getObservedPropertyURI();
+	    String name = stats.getObservedProperty() == null ? "" : stats.getObservedProperty();
+	    if (uri == null || uri.isBlank()) {
+		// values cached before the URI was stored: the name is matched with the concept label or a metadata name
+		uri = uriByName.get(name.trim().toLowerCase());
+	    }
+	    String rowURI = uri;
+	    PropertyRow row = uri != null ? rows.computeIfAbsent("uri:" + uri, k -> new PropertyRow(rowURI, null))
+		    : rows.computeIfAbsent("name:" + name, k -> new PropertyRow(null, name));
+	    row.datasetsInCache += stats.getUniqueDatasetCount() == null ? 0 : stats.getUniqueDatasetCount();
+	    row.valuesInCache += stats.getRecordCount() == null ? 0 : stats.getRecordCount();
+	    row.newestObservation = max(row.newestObservation, stats.getNewestObservation());
+	    row.newestInsert = max(row.newestInsert, stats.getNewestInsert());
+	}
+
+	List<PropertyRow> sortedRows = new ArrayList<>(rows.values());
+	for (PropertyRow row : sortedRows) {
+	    if (row.uri != null) {
+		row.name = conceptLabels.computeIfAbsent(row.uri, u -> getConceptLabel(u, ontologyUrls));
+	    }
+	}
+	sortedRows.sort(Comparator.comparing((PropertyRow r) -> r.name.toLowerCase()));
+
+	JSONArray propertiesArray = new JSONArray();
+	for (PropertyRow row : sortedRows) {
+	    JSONObject jsonProperty = new JSONObject();
+	    jsonProperty.put("name", row.name);
+	    if (row.uri != null) {
+		JSONObject concept = new JSONObject();
+		concept.put("uri", row.uri);
+		concept.put("label", row.name);
+		jsonProperty.put("concept", concept);
+	    }
+	    jsonProperty.put("names", new JSONArray(row.names));
+	    jsonProperty.put("datasetsInDatabase", row.datasetsInDatabase);
+	    jsonProperty.put("datasetsInCache", row.datasetsInCache);
+	    jsonProperty.put("valuesInCache", row.valuesInCache);
+	    if (row.newestObservation != null) {
+		jsonProperty.put("newestObservation", ISO8601DateTimeUtils.getISO8601DateTime(row.newestObservation));
+	    }
+	    if (row.newestInsert != null) {
+		jsonProperty.put("newestInsert", ISO8601DateTimeUtils.getISO8601DateTime(row.newestInsert));
+	    }
+	    propertiesArray.put(jsonProperty);
+	}
+
+	JSONObject output = new JSONObject();
+	output.put("name", source.get().getLabel());
+	output.put("id", sourceId);
+	output.put("properties", propertiesArray);
+	output.put("harvestings", getHarvestingHistory(sourceId));
+	output.put("status", "success");
+	return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+    }
+
+    /**
+     * A page of the stored statuses of the time series of a source (see {@link SeriesStatus}), sorted from the most
+     * severe
+     *
+     * @param view
+     * @param sourceId
+     * @param concept optional concept key ("uri:..." or "name:..."), as returned in the concepts list
+     * @param status optional status
+     * @param text optional text filter on identifier, title, platform and observed property
+     * @param cursor optional cursor of the page, as returned in the previous page ("next")
+     * @param limit
+     * @return
+     */
+    @GET
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Path("/source-series-report")
+    public Response sourceSeriesReport(//
+	    @QueryParam("view") String view, //
+	    @QueryParam("source") String sourceId, //
+	    @QueryParam("concept") String concept, //
+	    @QueryParam("seriesStatus") String status, //
+	    @QueryParam("text") String text, //
+	    @QueryParam("cursor") String cursor, //
+	    @QueryParam("limit") @DefaultValue("100") int limit) {
+
+	if (view == null || view.isEmpty() || sourceId == null || sourceId.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("view and source parameters must be specified").toString())
+		    .build();
+	}
+
+	SeriesStatus seriesStatus = null;
+	if (status != null && !status.isBlank()) {
+	    try {
+		seriesStatus = SeriesStatus.valueOf(status.trim().toUpperCase());
+	    } catch (IllegalArgumentException e) {
+		return Response.serverError().entity(getJSONErrorResponse("unknown status: " + status).toString()).build();
+	    }
+	}
+
+	View v;
+	try {
+	    v = DiscoveryRequestTransformer.findView(ConfigurationWrapper.getStorageInfo(), view).get();
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse(e.getMessage()).toString()).build();
+	}
+	Optional<GSSource> source = ConfigurationWrapper.getViewSources(v).stream()
+		.filter(s -> s.getUniqueIdentifier().equals(sourceId)).findFirst();
+	if (source.isEmpty()) {
+	    return Response.serverError().entity(getJSONErrorResponse("source not found in view").toString()).build();
+	}
+
+	DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+	if (dataCacheConnector == null) {
+	    try {
+		dataCacheConnector = DataCacheConnectorFactory.newDefaultDataCacheConnector();
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error(e);
+		return Response.serverError().entity(getJSONErrorResponse("error init data cache connector").toString()).build();
+	    }
+	}
+
+	List<String> ontologyUrls = ConfigurationWrapper.getOntologySettings().stream()//
+		.filter(o -> o.getOntologyAvailability() == OntologySetting.Availability.ENABLED)//
+		.map(OntologySetting::getOntologyEndpoint)//
+		.toList();
+
+	try {
+	    SeriesStatusPage page = dataCacheConnector.searchSeriesStatus(sourceId, concept, seriesStatus, text, cursor,
+		    Math.max(1, Math.min(limit, 1000)));
+
+	    JSONObject output = SourceSeriesReport.toJSON(source.get(), page, uri -> getConceptLabel(uri, ontologyUrls));
+	    return Response.ok(output.toString(), MediaType.APPLICATION_JSON).build();
+
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+	    return Response.serverError().entity(getJSONErrorResponse("error reading the series statuses").toString()).build();
+	}
+    }
+
+    /**
+     * Resolves the English preferred label of an observed property concept from the ontologies registered and enabled in
+     * the configuration (semantic settings). The label of the URIs not found, or of all the URIs if no ontology is
+     * enabled, is the URI itself
+     *
+     * @param uri
+     * @param ontologyUrls the SPARQL endpoints of the enabled ontologies
+     * @return
+     */
+    private String getConceptLabel(String uri, List<String> ontologyUrls) {
+
+	String label = CONCEPT_LABELS_CACHE.get(uri);
+	if (label != null) {
+	    return label;
+	}
+	if (ontologyUrls.isEmpty()) {
+	    return uri;
+	}
+
+	label = uri;
+	try {
+	    SKOSClient client = new SKOSClient();
+	    client.setOntologyUrls(ontologyUrls);
+	    client.setSearchValue(SearchTarget.CONCEPTS, uri);
+	    client.setSearchLangs(List.of("en"));
+	    client.setSourceLangs(List.of("en"));
+	    client.setExpansionLevel(ExpansionLevel.NONE);
+	    client.setExpansionLimit(ExpansionLimit.of(LimitTarget.CONCEPTS, 1));
+
+	    DefaultConceptsExpander expander = new DefaultConceptsExpander();
+	    expander.setExcludeNoPrefConcepts(false);
+	    expander.getQueryBuilder().setIncludeNoLanguageConcepts(true);
+	    client.setExpander(expander);
+
+	    SKOSResponse response = client.search();
+	    for (SKOSConcept concept : response.getResults()) {
+		if (uri.equals(concept.getConceptURI()) && concept.getPref().isPresent() && !concept.getPref().get().isBlank()
+			&& !concept.getPref().get().equals(SKOSResponse.NONE_VALUE)) {
+		    label = concept.getPref().get();
+		    break;
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to resolve the label of concept {}: {}", uri, e.getMessage());
+	}
+
+	CONCEPT_LABELS_CACHE.put(uri, label);
+	return label;
+    }
+
+    /**
+     * A row of the source report: an observed property concept, or an observed property name of datasets without concept
+     */
+    private static class PropertyRow {
+
+	private final String uri;
+	private String name;
+	private final Set<String> names = new TreeSet<>();
+	private long datasetsInDatabase;
+	private long datasetsInCache;
+	private long valuesInCache;
+	private java.util.Date newestObservation;
+	private java.util.Date newestInsert;
+
+	private PropertyRow(String uri, String name) {
+	    this.uri = uri;
+	    this.name = name;
+	}
+    }
+
+    private static java.util.Date max(java.util.Date d1, java.util.Date d2) {
+	if (d1 == null) {
+	    return d2;
+	}
+	return d2 == null || d1.after(d2) ? d1 : d2;
+    }
+
+    /**
+     * Counts the distinct datasets (online identifiers) of the given source in the metadata database, grouped by the given
+     * element, also computing the most frequent values of the frequency target
+     *
+     * @param source
+     * @param view
+     * @param groupBy
+     * @param frequencyTarget
+     * @return
+     * @throws Exception
+     */
+    private List<ResponseItem> getDatasetsGroupedBy(GSSource source, String view, MetadataElement groupBy,
+	    MetadataElement frequencyTarget) throws Exception {
+
+	StatisticsMessage statisticsMessage = new StatisticsMessage();
+	statisticsMessage.setSources(Arrays.asList(source));
+	statisticsMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+
+	WebRequestTransformer.setView(//
+		view, //
+		statisticsMessage.getDataBaseURI(), //
+		statisticsMessage);
+	statisticsMessage.setUserBond(BondFactory.createSourceIdentifierBond(source.getUniqueIdentifier()));
+	statisticsMessage.groupBy(groupBy);
+	Page page = new Page();
+	page.setStart(1);
+	page.setSize(1000);
+	statisticsMessage.setPage(page);
+	statisticsMessage.countDistinct(//
+		Arrays.asList(//
+			MetadataElement.ONLINE_ID//
+		));
+	statisticsMessage.setCountDistinctPrecisionThreshold(REPORT_PRECISION_THRESHOLD);
+	statisticsMessage.computeFrequency(Arrays.asList(frequencyTarget), 50);
+	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
+	StatisticsExecutor executor = loader.iterator().next();
+
+	return executor.compute(statisticsMessage).getItems();
+    }
+
+    private static long getDistinctCount(ResponseItem item) {
+	return item.getCountDistinct(MetadataElement.ONLINE_ID).map(c -> Long.parseLong(c.getValue())).orElse(0l);
+    }
+
+    private static Set<String> getFrequencyTerms(ResponseItem item, MetadataElement target) {
+	Set<String> ret = new TreeSet<>();
+	Optional<ComputationResult> frequency = item.getFrequency(target);
+	if (frequency.isPresent() && frequency.get().getValue() != null) {
+	    for (TermFrequencyItem frequencyItem : frequency.get().getFrequencyItems()) {
+		if (frequencyItem.getTerm() != null && !frequencyItem.getTerm().isBlank()) {
+		    ret.add(frequencyItem.getTerm());
+		}
+	    }
+	}
+	return ret;
+    }
+
+    /**
+     * @param sourceId
+     * @return the last harvesting executions of the given source, read from the harvesting statistics index (see
+     *         {@link ElasticsearchHarvestingPublisher}); empty if the statistics gathering is disabled or the index is not
+     *         available
+     */
+    private JSONArray getHarvestingHistory(String sourceId) {
+
+	JSONArray ret = new JSONArray();
+
+	Optional<ElasticsearchClient> client = ElasticsearchHarvestingPublisher.createClient();
+	if (client.isEmpty()) {
+	    return ret;
+	}
+
+	JSONArray fields = new JSONArray();
+	for (String field : new String[] { "startDate", "endDate", "result", "durationMillis", "harvestedRecords", "recordsBefore",
+		"recordsAfter", "strategy", "errors" }) {
+	    fields.put(field);
+	}
+
+	JSONObject body = new JSONObject();
+	body.put("size", HARVESTING_HISTORY_SIZE);
+	body.put("sort", new JSONArray().put(new JSONObject().put("startDate", "desc")));
+	body.put("_source", fields);
+	body.put("query", new JSONObject().put("term", new JSONObject().put("sourceId", sourceId)));
+
+	try {
+	    JSONArray hits = client.get().search(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, body).getJSONObject("hits")
+		    .getJSONArray("hits");
+	    for (int i = 0; i < hits.length(); i++) {
+		ret.put(hits.getJSONObject(i).getJSONObject("_source"));
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to read the harvesting history of source {}: {}", sourceId,
+		    e.getMessage());
+	}
+
+	return ret;
+    }
+
+    /**
+     * Reads the end date of the last successful harvesting of each source from the harvesting statistics index (see
+     * {@link ElasticsearchHarvestingPublisher}) with a single aggregation query
+     *
+     * @param sourceIdentifiers
+     * @return the last harvesting end date per source identifier; empty if the statistics gathering is disabled or the
+     *         index is not available
+     */
+    private Map<String, String> getLastHarvestings(List<String> sourceIdentifiers) {
+
+	Map<String, String> ret = new HashMap<>();
+
+	Optional<ElasticsearchClient> client = ElasticsearchHarvestingPublisher.createClient();
+	if (client.isEmpty() || sourceIdentifiers.isEmpty()) {
+	    return ret;
+	}
+
+	JSONArray filter = new JSONArray();
+	filter.put(new JSONObject().put("terms", new JSONObject().put("sourceId", new JSONArray(sourceIdentifiers))));
+	filter.put(new JSONObject().put("terms", new JSONObject().put("result", new JSONArray()//
+		.put(HarvestingResult.COMPLETED.name())//
+		.put(HarvestingResult.CONSOLIDATED_FOLDER_SURVIVED.name()))));
+	filter.put(new JSONObject().put("exists", new JSONObject().put("field", "endDate")));
+
+	JSONObject topHit = new JSONObject();
+	topHit.put("size", 1);
+	topHit.put("sort", new JSONArray().put(new JSONObject().put("endDate", "desc")));
+	topHit.put("_source", new JSONArray().put("endDate"));
+
+	JSONObject terms = new JSONObject();
+	terms.put("field", "sourceId");
+	terms.put("size", sourceIdentifiers.size());
+
+	JSONObject bySource = new JSONObject();
+	bySource.put("terms", terms);
+	bySource.put("aggs", new JSONObject().put("last", new JSONObject().put("top_hits", topHit)));
+
+	JSONObject body = new JSONObject();
+	body.put("size", 0);
+	body.put("query", new JSONObject().put("bool", new JSONObject().put("filter", filter)));
+	body.put("aggs", new JSONObject().put("bySource", bySource));
+
+	try {
+	    JSONObject response = client.get().search(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, body);
+	    JSONArray buckets = response.getJSONObject("aggregations").getJSONObject("bySource").getJSONArray("buckets");
+	    for (int i = 0; i < buckets.length(); i++) {
+		JSONObject bucket = buckets.getJSONObject(i);
+		JSONArray hits = bucket.getJSONObject("last").getJSONObject("hits").getJSONArray("hits");
+		if (!hits.isEmpty()) {
+		    ret.put(bucket.getString("key"), hits.getJSONObject(0).getJSONObject("_source").optString("endDate", null));
+		}
+	    }
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to read the last harvestings from the harvesting statistics: {}",
+		    e.getMessage());
+	}
+
+	return ret;
+    }
+
     private Map<String, Long> getDatasetsInDatabase(List<GSSource> sources, String view) throws Exception {
 	Map<String, Long> ret = new HashMap<String, Long>();
 
@@ -537,6 +1024,7 @@ public class SupportService {
 		Arrays.asList(//
 			MetadataElement.ONLINE_ID//
 		));
+	statisticsMessage.setCountDistinctPrecisionThreshold(REPORT_PRECISION_THRESHOLD);
 	ServiceLoader<StatisticsExecutor> loader = ServiceLoader.load(StatisticsExecutor.class);
 	StatisticsExecutor executor = loader.iterator().next();
 

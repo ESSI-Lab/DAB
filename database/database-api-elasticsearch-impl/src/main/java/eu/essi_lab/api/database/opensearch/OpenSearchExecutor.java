@@ -166,7 +166,12 @@ public class OpenSearchExecutor implements DatabaseExecutor {
 	    List<Queryable> targets = countDistinctTargets.get();
 	    for (Queryable target : targets) {
 		String fieldName = DataFolderMapping.toKeywordField(target.getName());
-		Aggregation aggregation = Aggregation.of(b -> b.cardinality(CardinalityAggregation.of(bb -> bb.field(fieldName))));
+		Optional<Integer> precisionThreshold = message.getCountDistinctPrecisionThreshold();
+		Aggregation aggregation = Aggregation.of(b -> b.cardinality(CardinalityAggregation.of(bb -> {
+		    bb.field(fieldName);
+		    precisionThreshold.ifPresent(bb::precisionThreshold);
+		    return bb;
+		})));
 		map.put("distinct-" + target.getName(), aggregation);
 	    }
 	}
