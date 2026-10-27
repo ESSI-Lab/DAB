@@ -104,6 +104,7 @@
 		<module>accessor-kisters</module>
 		<module>accessor-uk-hydrology</module>
 		<module>accessor-de-pegelonline</module>
+		<module>accessor-nl-rijkswaterstaat</module>
 		<module>accessor-ch-slf</module>
 		<module>accessor-us-nrcs-awdb</module>
 		<module>accessor-geus-promice</module>
