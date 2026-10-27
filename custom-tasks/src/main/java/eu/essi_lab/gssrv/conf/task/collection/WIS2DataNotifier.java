@@ -37,9 +37,12 @@ import java.util.concurrent.TimeUnit;
 import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.LatitudeLongitude;
+import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.WIS2DataItem;
+import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.messages.ResultSet;
@@ -166,14 +169,19 @@ public class WIS2DataNotifier {
 	String metadataId = WISUtils.getMetadataIdentifier(sourceId);
 	String centreId = WISUtils.getCentreId();
 	String generatedBy = WISUtils.getGeneratedBy();
+	WIS2DataEncoding encoding = ConfigurationWrapper.getWIS2Setting().getDataEncoding();
 
 	int published = 0;
 
 	for (Map.Entry<String, Date[]> entry : periods.entrySet()) {
 
 	    List<DataRecord> cached;
+	    Optional<StationRecord> station;
 	    try {
 		cached = dataCacheConnector.getRecords(entry.getValue()[0], entry.getValue()[1], entry.getKey());
+		// the station is read as the item endpoint does, so that the notified content matches the served one
+		station = encoding == WIS2DataEncoding.OM_JSON ? WIS2DataItem.findStation(dataCacheConnector, entry.getKey())
+			: Optional.empty();
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error("[WIS2] Unable to read the new values of {}: {}", entry.getKey(), e.getMessage(),
 			e);
@@ -199,7 +207,9 @@ public class WIS2DataNotifier {
 		// the data id is based on the advertised topic or, if not advertised, on the official one
 		String dataTopic = WISUtils.getAdvertisedTopic(topic.get()).orElse(topic.get().getTopic(centreId, WIS2DataPolicy.CORE));
 
-		WISNotificationMessage message = createMessage(record, dataTopic, viewId, metadataId, generatedBy);
+		String content = WIS2DataItem.encode(record, encoding, station);
+
+		WISNotificationMessage message = createMessage(record, content, encoding, dataTopic, viewId, metadataId, generatedBy);
 
 		if (mode == DataNotificationsMode.DRY_RUN) {
 
@@ -221,6 +231,8 @@ public class WIS2DataNotifier {
 
     /**
      * @param record
+     * @param content the encoded record
+     * @param encoding the encoding of the content
      * @param topic the topic on which the data identifier is based (starting with
      *        {@link WIS2HydrologyTopic#ORIGIN_PREFIX})
      * @param viewId
@@ -228,15 +240,15 @@ public class WIS2DataNotifier {
      * @param generatedBy
      * @return
      */
-    static WISNotificationMessage createMessage(DataRecord record, String topic, String viewId, String metadataId, String generatedBy) {
+    static WISNotificationMessage createMessage(DataRecord record, String content, WIS2DataEncoding encoding, String topic, String viewId,
+	    String metadataId, String generatedBy) {
 
 	String itemId = WIS2DataItem.getItemId(record);
-	String content = WIS2DataItem.encode(record);
 
 	// the data id is the topic, without the channel prefix, followed by the item id
 	String dataId = WIS2HydrologyTopic.withoutPrefix(topic) + "/" + itemId;
 
-	Link link = new Link("canonical", "application/json", WISUtils.getDataItemUrl(viewId, itemId));
+	Link link = new Link("canonical", encoding.getMediaType(), WISUtils.getDataItemUrl(viewId, itemId, encoding));
 	link.setLength(content.getBytes(StandardCharsets.UTF_8).length);
 
 	WISNotificationMessage message = new WISNotificationMessage(UUID.randomUUID().toString(), null, dataId, link, generatedBy);
