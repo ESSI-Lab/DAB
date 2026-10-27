@@ -105,6 +105,10 @@
 		<module>accessor-uk-hydrology</module>
 		<module>accessor-de-pegelonline</module>
 		<module>accessor-nl-rijkswaterstaat</module>
+		<module>accessor-ie-opw</module>
+		<module>accessor-lt-lhmt</module>
+		<module>accessor-lu-age</module>
+		<module>accessor-enhydris</module>
 		<module>accessor-ch-slf</module>
 		<module>accessor-us-nrcs-awdb</module>
 		<module>accessor-geus-promice</module>

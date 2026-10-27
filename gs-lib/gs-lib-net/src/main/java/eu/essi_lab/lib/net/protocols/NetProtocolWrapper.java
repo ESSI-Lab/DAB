@@ -65,6 +65,10 @@ public enum NetProtocolWrapper {
     UK_HYDROLOGY(new UKHydrologyProtocol()),//
     PEGELONLINE(new PegelonlineProtocol()),//
     RIJKSWATERSTAAT(new RijkswaterstaatProtocol()),//
+    OPW(new OPWProtocol()),//
+    LHMT(new LHMTProtocol()),//
+    AGE(new AGEProtocol()),//
+    ENHYDRIS(new EnhydrisProtocol()),//
     SLF(new SLFMeasurementProtocol()),//
     NRCS_AWDB(new NRCSAWDBProtocol()),//
     PROMICE(new PROMICEProtocol()),//

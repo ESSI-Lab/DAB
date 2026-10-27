@@ -160,6 +160,8 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 		copy(station, timeSeries);
 
+		resolveParameterLongName(station, timeSeries);
+
 		OriginalMetadata originalMetadata = new OriginalMetadata();
 		originalMetadata.setMetadata(timeSeries.toString());
 		originalMetadata.setSchemeURI(KISTERSMapper.KISTERS_SCHEMA);
@@ -213,6 +215,40 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 		});
     }
 
+    /**
+     * When a station measures more than one parameter, the station list returns their ids, names and long names joined by ';'
+     * (e.g. SEPA). The time series carries its own parameter type id and name, while the long name is only available from the
+     * station, so it is picked from the station list at the same position of the time series parameter type id
+     * 
+     * @param station
+     * @param timeSeries
+     */
+    private void resolveParameterLongName(KISTERSEntity station, KISTERSEntity timeSeries) {
+
+	String stationParamIds = station.getObject().optString(KISTERSClient.PARAM_TYPE_ID);
+	String stationParamLongNames = station.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);
+	String paramId = timeSeries.getObject().optString(KISTERSClient.PARAM_TYPE_ID);
+
+	if (!stationParamIds.contains(";") || paramId.isEmpty() || paramId.contains(";")) {
+
+	    return;
+	}
+
+	List<String> ids = Arrays.asList(stationParamIds.split(";", -1));
+	List<String> longNames = Arrays.asList(stationParamLongNames.split(";", -1));
+
+	int index = ids.indexOf(paramId);
+
+	if (index >= 0 && ids.size() == longNames.size()) {
+
+	    timeSeries.getObject().put(KISTERSClient.PARAM_TYPE_LONG_NAME, longNames.get(index));
+
+	} else {
+
+	    timeSeries.getObject().put(KISTERSClient.PARAM_TYPE_LONG_NAME, timeSeries.getObject().optString(KISTERSClient.PARAM_TYPE_NAME));
+	}
+    }
+
     @Override
     public List<String> listMetadataFormats() throws GSException {
 
@@ -222,7 +258,7 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
     @Override
     public boolean supports(GSSource source) {
 
-	return source.getEndpoint().startsWith("https://portal.grdc.bafg.de/KiWIS/KiWIS");
+	return source.getEndpoint().contains("/KiWIS/KiWIS");
     }
 
     @Override

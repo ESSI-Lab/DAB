@@ -34,6 +34,7 @@ import org.json.JSONObject;
 
 import eu.essi_lab.accessor.kisters.KISTERSEntity.EntityType;
 import eu.essi_lab.lib.net.downloader.Downloader;
+import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * @author Fabrizio
@@ -90,11 +91,14 @@ public class KISTERSClient {
     }
 
     /**
+     * @param withParameterType if <code>true</code>, the parameter type id and name of each time series are also requested; this
+     *        is needed for KiWIS instances (e.g. SEPA) where a station measures more than one parameter, since the station list
+     *        returns all of them joined by ';'
      * @return
      */
-    private List<String> getTimeSeriesFields() {
+    private List<String> getTimeSeriesFields(boolean withParameterType) {
 
-	return Arrays.asList(
+	List<String> fields = new ArrayList<>(Arrays.asList(
 
 		TS_ID, //
 		STATION_ID, //
@@ -103,8 +107,18 @@ public class KISTERSClient {
 		TS_NAME, //
 		TS_UNIT_NAME, //
 		TS_SPACING, //
-		"coverage", //
-		"ca_sta&ca_sta_returnfields=GRDCCOUNTRY");
+		"coverage"));
+
+	if (withParameterType) {
+
+	    fields.add(PARAM_TYPE_ID);
+	    fields.add(PARAM_TYPE_NAME);
+	}
+
+	// must be the last one, since it carries its own parameter
+	fields.add("ca_sta&ca_sta_returnfields=GRDCCOUNTRY");
+
+	return fields;
     }
 
     /**
@@ -177,12 +191,8 @@ public class KISTERSClient {
      */
     public KISTERSEntity retrieveTimeSeries(String timeSeriesId) {
 
-	String returnfields = getTimeSeriesFields().//
-		stream().//
-		collect(Collectors.joining(","));
-
-	return retrieveEntities("service=kisters&type=queryServices&request=getTimeseriesList&ts_id=" + timeSeriesId
-		+ "&format=json&station_no=*&returnfields=" + returnfields).get(0);
+	return retrieveTimeSeriesEntities(
+		"service=kisters&type=queryServices&request=getTimeseriesList&ts_id=" + timeSeriesId + "&format=json&station_no=*").get(0);
     }
 
     /**
@@ -190,12 +200,7 @@ public class KISTERSClient {
      */
     public List<KISTERSEntity> retrieveTimeSeries() {
 
-	String returnfields = getTimeSeriesFields().//
-		stream().//
-		collect(Collectors.joining(","));
-
-	return retrieveEntities(
-		"service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_no=*&returnfields=" + returnfields);
+	return retrieveTimeSeriesEntities("service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_no=*");
     }
 
     /**
@@ -203,12 +208,39 @@ public class KISTERSClient {
      */
     public List<KISTERSEntity> retrieveTimeSeriesByStation(String stationNumber) {
 
-	String returnfields = getTimeSeriesFields().//
-		stream().//
-		collect(Collectors.joining(","));
+	return retrieveTimeSeriesEntities(
+		"service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_id=" + stationNumber);
+    }
 
-	return retrieveEntities("service=kisters&type=queryServices&request=getTimeseriesList&format=json&station_id=" + stationNumber
-		+ "&returnfields=" + returnfields);
+    /**
+     * Requests the time series also with their parameter type; if nothing is returned (KiWIS answers with an error, which the
+     * downloader turns into an empty response, when a return field is not supported by the instance), the request is repeated
+     * with the legacy return fields
+     * 
+     * @param query
+     * @return
+     */
+    private List<KISTERSEntity> retrieveTimeSeriesEntities(String query) {
+
+	List<KISTERSEntity> entities = retrieveEntities(query + "&returnfields=" + joinFields(getTimeSeriesFields(true)));
+
+	if (entities.isEmpty()) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("No time series with parameter type return fields, retrying with legacy fields");
+
+	    entities = retrieveEntities(query + "&returnfields=" + joinFields(getTimeSeriesFields(false)));
+	}
+
+	return entities;
+    }
+
+    /**
+     * @param fields
+     * @return
+     */
+    private String joinFields(List<String> fields) {
+
+	return fields.stream().collect(Collectors.joining(","));
     }
 
     /**
