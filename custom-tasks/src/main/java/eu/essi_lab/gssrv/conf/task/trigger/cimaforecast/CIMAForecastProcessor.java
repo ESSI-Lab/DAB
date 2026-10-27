@@ -58,7 +58,7 @@ import java.util.regex.Pattern;
 
 /**
  * Publishes on S3 the CIMA WRF operational forecasts (Italy, domain d03, ~2.5 km) of the biometeorological indices UTCI, AT, WBGT and
- * WCT: every forecast hour (+0..+48 h) of the selected run (00 or 12 UTC) is converted into a Cloud Optimized GeoTIFF (EPSG:3857,
+ * WCT: every forecast hour (+1..+48 h, see FIRST_LEAD_HOUR) of the selected run (00 or 12 UTC) is converted into a Cloud Optimized GeoTIFF (EPSG:3857,
  * Float32, NoData -9999, sea optionally masked) and published with an index.json and a legend.svg per index, replacing the previous
  * run.<br>
  * <br>
@@ -84,6 +84,10 @@ public class CIMAForecastProcessor {
 
     public static final int MAX_LEAD_HOUR = 48;
 
+    // The run time (lead hour 0) is not published: in the WRF output the radiation fluxes are not computed yet at the first step
+    // (e.g. GLW = 0 everywhere in the 2026-10-26 00 UTC run), so UTCI is ~12 C colder than at the following hours
+    public static final int FIRST_LEAD_HOUR = 1;
+
     public enum DownloadMode {
 	/**
 	 * Remote reading of the single indices with HTTP range requests, with automatic fallback to {@link #FULL}
@@ -100,8 +104,10 @@ public class CIMAForecastProcessor {
     private static final String NODATA_VALUE = "-9999";
     private static final String SOURCE_FILL_VALUE = "-8.9999999e+33";
 
-    // Natural Earth 1:50m land polygons clipped to the TRIGGER domain (35W-55E, 20N-80N), shared with COGS3SyncProcessor
-    private static final String LAND_MASK_RESOURCE = "trigger/land_mask.geojson";
+    // Sea polygons from OpenStreetMap (all touched land pixels), shared with COGS3SyncProcessor (see its SEA_MASK_RESOURCE): they
+    // follow the pixels of the 2.5 km EPSG:3857 grid aligned with -tap, the same of these COGs, and cover the ECMWF domain
+    // (25W-45E, 30N-72N) that contains the d03 Italy domain. Data (c) OpenStreetMap contributors, ODbL
+    private static final String SEA_MASK_RESOURCE = "trigger/sea_mask_osm.geojson";
 
     private static final DateTimeFormatter FILE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'")
 	    .withZone(ZoneOffset.UTC);
@@ -123,7 +129,7 @@ public class CIMAForecastProcessor {
     private boolean maskSea = true;
     private DownloadMode downloadMode = DownloadMode.REMOTE;
     private Path outputDir;
-    private Path landMask;
+    private Path seaMask;
     private TaskReport report = TaskReport.NONE;
 
     /**
@@ -156,10 +162,10 @@ public class CIMAForecastProcessor {
     }
 
     /**
-     * Last forecast hour to publish (0-48), mainly for tests
+     * Last forecast hour to publish (1-48), mainly for tests
      */
     public void setMaxLeadHour(int maxLeadHour) {
-	this.maxLeadHour = Math.max(0, Math.min(MAX_LEAD_HOUR, maxLeadHour));
+	this.maxLeadHour = Math.max(FIRST_LEAD_HOUR, Math.min(MAX_LEAD_HOUR, maxLeadHour));
     }
 
     /**
@@ -220,10 +226,11 @@ public class CIMAForecastProcessor {
 	String url = runUrl(runInstant);
 
 	GSLoggerFactory.getLogger(getClass()).info("=== CIMA WRF forecast START ===");
-	GSLoggerFactory.getLogger(getClass()).info("Run: " + runInstant + ", lead hours 0-" + maxLeadHour + ", indices: " + indices);
+	GSLoggerFactory.getLogger(getClass()).info(
+		"Run: " + runInstant + ", lead hours " + FIRST_LEAD_HOUR + "-" + maxLeadHour + ", indices: " + indices);
 	GSLoggerFactory.getLogger(getClass()).info("Source: " + url);
 
-	report.info("Run " + runInstant + ", lead hours 0-" + maxLeadHour + ", indices " + String.join(", ", indices) + ", sea "
+	report.info("Run " + runInstant + ", lead hours " + FIRST_LEAD_HOUR + "-" + maxLeadHour + ", indices " + String.join(", ", indices) + ", sea "
 		+ (maskSea ? "masked" : "not masked"));
 
 	// 1. If the run is not published yet, the previous products are kept
@@ -245,7 +252,7 @@ public class CIMAForecastProcessor {
 	try {
 
 	    if (maskSea) {
-		landMask = extractLandMask(workDir);
+		seaMask = extractSeaMask(workDir);
 	    }
 
 	    // 2. Source: remote reading with HTTP range requests or local copy of the whole file
@@ -326,11 +333,11 @@ public class CIMAForecastProcessor {
 		cleanup(workDir);
 	    } else {
 		cleanup(workDir.resolve("download"));
-		if (landMask != null) {
-		    Files.deleteIfExists(landMask);
+		if (seaMask != null) {
+		    Files.deleteIfExists(seaMask);
 		}
 	    }
-	    landMask = null;
+	    seaMask = null;
 	}
     }
 
@@ -377,13 +384,24 @@ public class CIMAForecastProcessor {
 
     private List<JSONObject> convertToCOGs(String source, String index, Grid grid, Instant runInstant, Path indexDir) throws Exception {
 
-	int bands = Math.min(grid.times().size(), maxLeadHour + 1);
+	// source bands (1-based) of the published lead hours: FIRST_LEAD_HOUR-maxLeadHour, computed from the valid times
+	List<Integer> sourceBands = new ArrayList<>();
+	for (int b = 1; b <= grid.times().size(); b++) {
+	    long lead = (grid.times().get(b - 1).getEpochSecond() - runInstant.getEpochSecond()) / 3600;
+	    if (lead >= FIRST_LEAD_HOUR && lead <= maxLeadHour) {
+		sourceBands.add(b);
+	    }
+	}
+	int bands = sourceBands.size();
+	if (bands == 0) {
+	    throw new IOException("No forecast hour " + FIRST_LEAD_HOUR + "-" + maxLeadHour + " in " + index);
+	}
 
 	// 1. Extraction of the index, georeferenced from the lat/lon extent
 	Path extracted = indexDir.resolve(index + "_source.tif");
 
 	List<String> extract = new ArrayList<>(List.of("gdal_translate", "-q"));
-	for (int b = 1; b <= bands; b++) {
+	for (int b : sourceBands) {
 	    extract.addAll(List.of("-b", String.valueOf(b)));
 	}
 	extract.addAll(List.of("-a_srs", "EPSG:4326", //
@@ -397,9 +415,10 @@ public class CIMAForecastProcessor {
 	// 2. One COG per hour
 	List<JSONObject> files = new ArrayList<>();
 	try {
+	    // b is the band of the extracted file, which contains only the published hours
 	    for (int b = 1; b <= bands; b++) {
 
-		Instant validTime = grid.times().get(b - 1);
+		Instant validTime = grid.times().get(sourceBands.get(b - 1) - 1);
 		String baseName = index + "_" + FILE_TIME_FORMATTER.format(validTime);
 
 		Path vrt = indexDir.resolve(baseName + ".vrt");
@@ -417,12 +436,15 @@ public class CIMAForecastProcessor {
 			    "-ot", "Float32", //
 			    "-dstnodata", NODATA_VALUE));
 
-		    // Sea mask: CUTLINE_ALL_TOUCHED keeps every pixel touching land (same options of COGS3SyncProcessor)
-		    if (landMask != null) {
-			warp.addAll(List.of("-cutline", landMask.toAbsolutePath().toString(), "-wo", "CUTLINE_ALL_TOUCHED=TRUE"));
-		    }
 		    warp.addAll(List.of("-of", "GTiff", vrt.toAbsolutePath().toString(), warped.toAbsolutePath().toString()));
 		    runProcess(warp);
+
+		    // Sea mask on the output grid: pixels whose centre is inside the sea polygons become NoData. Not done with
+		    // gdalwarp -cutline, which rasterizes the cutline on the source grid (same approach of COGS3SyncProcessor)
+		    if (seaMask != null) {
+			runProcess(List.of("gdal_rasterize", "-q", "-burn", NODATA_VALUE, seaMask.toAbsolutePath().toString(),
+				warped.toAbsolutePath().toString()));
+		    }
 
 		    runProcess(List.of("gdal_translate", "-q", //
 			    "-of", "COG", //
@@ -585,19 +607,19 @@ public class CIMAForecastProcessor {
 	return Map.of("Authorization", "Basic " + token);
     }
 
-    private Path extractLandMask(Path workDir) {
-	try (InputStream in = getClass().getClassLoader().getResourceAsStream(LAND_MASK_RESOURCE)) {
+    private Path extractSeaMask(Path workDir) {
+	try (InputStream in = getClass().getClassLoader().getResourceAsStream(SEA_MASK_RESOURCE)) {
 	    if (in == null) {
-		GSLoggerFactory.getLogger(getClass()).warn("Land mask resource not found, sea will not be masked: " + LAND_MASK_RESOURCE);
-		report.warn("Land mask resource not found, sea not masked");
+		GSLoggerFactory.getLogger(getClass()).warn("Sea mask resource not found, sea will not be masked: " + SEA_MASK_RESOURCE);
+		report.warn("Sea mask resource not found, sea not masked");
 		return null;
 	    }
-	    Path out = workDir.resolve("land_mask.geojson");
+	    Path out = workDir.resolve(Paths.get(SEA_MASK_RESOURCE).getFileName());
 	    Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING);
 	    return out;
 	} catch (IOException e) {
-	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract land mask, sea will not be masked: " + e.getMessage());
-	    report.warn("Unable to extract land mask, sea not masked: " + TaskReport.message(e));
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract sea mask, sea will not be masked: " + e.getMessage());
+	    report.warn("Unable to extract sea mask, sea not masked: " + TaskReport.message(e));
 	    return null;
 	}
     }

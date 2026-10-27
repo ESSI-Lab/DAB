@@ -59,14 +59,37 @@ public class COGS3SyncProcessor {
 
     private static final String TARGET_EPSG = "EPSG:3857";
 
-    // Natural Earth 1:50m land polygons clipped to the TRIGGER domain (35W-55E, 20N-80N): pixels outside are set to NoData
-    private static final String LAND_MASK_RESOURCE = "trigger/land_mask.geojson";
+    // Sea polygons: OpenStreetMap land polygons (osmdata.openstreetmap.de, land-polygons-split-3857 of 2026-10-23), rasterized on
+    // the 2.5 km output grid (EPSG:3857, origin -2785000 11755000, 3121x3299) with all touched pixels (gdal_rasterize -at: every
+    // pixel touching land is kept, so the coast and the small islands are always covered, data spill over the sea <= 1 pixel)
+    // and the sea pixels polygonized, so the mask is reproduced exactly. Pixels inside are set to NoData with a plain
+    // gdal_rasterize: the inverse (-i) of land polygons fails for islands inside lagoons (holes inside holes, e.g. Arabat spit).
+    // To be regenerated if the ECMWF domain or TARGET_RESOLUTION change: see custom-tasks/sea-mask/README.md. Data (c)
+    // OpenStreetMap contributors, ODbL. land_mask.geojson (Natural Earth 1:50m) is used by the CAMS optional sea masking
+    private static final String SEA_MASK_RESOURCE = "trigger/sea_mask_osm.geojson";
     private static final String NODATA_VALUE = "-9999";
 
-    private Path landMask;
+    // Output grid finer than the source (0.1 deg): values stay the model cells (nearest), but the coastline cut follows the coast
+    private static final String TARGET_RESOLUTION = "2500";
+
+    // Sea cells within this distance (in source cells) from land take the nearest land value, so coastal pixels never show sea values
+    private static final double LAND_FILL_RADIUS_CELLS = 2.5;
+
+    // Decimals kept in the published values: 0.1 is well below the model uncertainty and makes the COGs ~2.3 times smaller
+    // (Float32 noise in the last bits compresses badly). SHIWE is an integer index, not affected
+    private static final int VALUE_DECIMALS = 1;
+
+    private Path seaMask;
+
+    // Coast fill map (see computeFillSource): same for all the files of a run with the same source grid
+    private String fillGridKey;
+    private int[] fillSource;
 
     // Errors on single files written in the report: with a broken source there may be hundreds
     private static final int MAX_REPORTED_ERRORS = 10;
+
+    // Waits before the download retries (seconds)
+    private static final long[] DOWNLOAD_RETRY_WAITS_SECONDS = { 10, 30 };
 
     private TaskReport report = TaskReport.NONE;
     private int failedFiles;
@@ -105,7 +128,7 @@ public class COGS3SyncProcessor {
 
 	try {
 
-	    landMask = extractLandMask(tempWorkDir);
+	    seaMask = extractSeaMask(tempWorkDir);
 
 	    URL listURL = URI.create(sourceURL).toURL();
 	    String user = ConfigurationWrapper.getCredentialsSetting().getTriggerWAFUser().orElse(null);
@@ -152,25 +175,27 @@ public class COGS3SyncProcessor {
 
 	    cleanup(tempWorkDir);
 	    variableFilesMap = new HashMap<>();
-	    landMask = null;
+	    seaMask = null;
+	    fillGridKey = null;
+	    fillSource = null;
 	    failedFiles = 0;
 	}
     }
 
-    private Path extractLandMask(Path workDir) {
-	try (InputStream in = getClass().getClassLoader().getResourceAsStream(LAND_MASK_RESOURCE)) {
+    private Path extractSeaMask(Path workDir) {
+	try (InputStream in = getClass().getClassLoader().getResourceAsStream(SEA_MASK_RESOURCE)) {
 	    if (in == null) {
-		GSLoggerFactory.getLogger(getClass()).warn("Land mask resource not found, ocean will not be masked: " + LAND_MASK_RESOURCE);
-		report.warn("Land mask resource not found, ocean not masked");
+		GSLoggerFactory.getLogger(getClass()).warn("Sea mask resource not found, ocean will not be masked: " + SEA_MASK_RESOURCE);
+		report.warn("Sea mask resource not found, ocean not masked");
 		return null;
 	    }
-	    Path out = workDir.resolve("land_mask.geojson");
+	    Path out = workDir.resolve(Paths.get(SEA_MASK_RESOURCE).getFileName());
 	    Files.copy(in, out, StandardCopyOption.REPLACE_EXISTING);
-	    GSLoggerFactory.getLogger(getClass()).info("Land mask ready: " + out);
+	    GSLoggerFactory.getLogger(getClass()).info("Sea mask ready: " + out);
 	    return out;
 	} catch (IOException e) {
-	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract land mask, ocean will not be masked: " + e.getMessage());
-	    report.warn("Unable to extract land mask, ocean not masked: " + TaskReport.message(e));
+	    GSLoggerFactory.getLogger(getClass()).warn("Unable to extract sea mask, ocean will not be masked: " + e.getMessage());
+	    report.warn("Unable to extract sea mask, ocean not masked: " + TaskReport.message(e));
 	    return null;
 	}
     }
@@ -193,10 +218,7 @@ public class COGS3SyncProcessor {
 
 	    Path finalCog = varFolder.resolve(finalBaseName + ".tif");
 
-	    // Download
-	    try (InputStream in = d.downloadResponse(url.toExternalForm(), u, p).body()) {
-		Files.copy(in, raw, StandardCopyOption.REPLACE_EXISTING);
-	    }
+	    download(url, raw, d, u, p);
 
 	    //	    // GeoTools Reproject
 	    //	    reprojectTo3857(raw, reprojected);
@@ -220,43 +242,88 @@ public class COGS3SyncProcessor {
 	    Files.deleteIfExists(reprojected);
 
 	} catch (Exception e) {
-	    GSLoggerFactory.getLogger(getClass()).error("Error on " + originalName + ": " + e.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).error("Error on " + originalName + ": " + describe(e));
 	    if (++failedFiles <= MAX_REPORTED_ERRORS) {
 		report.error(originalName + ": " + TaskReport.message(e));
 	    }
 	}
     }
 
+    /**
+     * Downloads with retries: in a run of 2026-10-22, after ~50 requests every new ECPDS request failed immediately without an
+     * HTTP response (exception with null message), so a failed download waits before trying again
+     */
+    private void download(URL url, Path target, Downloader d, String u, String p) throws Exception {
+
+	for (int attempt = 1; ; attempt++) {
+	    try (InputStream in = d.downloadResponse(url.toExternalForm(), u, p).body()) {
+		Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+		return;
+	    } catch (Exception e) {
+		if (attempt >= DOWNLOAD_RETRY_WAITS_SECONDS.length + 1) {
+		    throw e;
+		}
+		long wait = DOWNLOAD_RETRY_WAITS_SECONDS[attempt - 1];
+		GSLoggerFactory.getLogger(getClass()).warn("Download of " + url + " failed (" + describe(e) + "), retry " + attempt + " in "
+			+ wait + " s");
+		Thread.sleep(wait * 1000);
+	    }
+	}
+    }
+
+    /**
+     * Exception type, message and root cause: several HTTP client errors (e.g. ConnectException) have a null message
+     */
+    private static String describe(Throwable e) {
+
+	Throwable root = e;
+	while (root.getCause() != null && root.getCause() != root) {
+	    root = root.getCause();
+	}
+	String text = e.getClass().getSimpleName() + (e.getMessage() != null ? ": " + e.getMessage() : "");
+	if (root != e) {
+	    text += " (cause " + root.getClass().getSimpleName() + (root.getMessage() != null ? ": " + root.getMessage() : "") + ")";
+	}
+	return text;
+    }
+
     private void runGdalWarpToCOG(Path input, Path output, Path temp) throws Exception {
 
-
+	Path landOnly = Paths.get(temp.toString().replace("_tmp.tif", "_land.tif"));
+	Path rawAsc = Paths.get(temp.toString().replace("_tmp.tif", "_raw.asc"));
+	Path landAsc = Paths.get(temp.toString().replace("_tmp.tif", "_land.asc"));
+	Path filledAsc = Paths.get(temp.toString().replace("_tmp.tif", "_filled.asc"));
 
 	try {
 
+	    // Coast fix: mask the sea on the source grid and extend land values over the first sea cells, so that the coastal pixels
+	    // of the output take land values (not sea values, e.g. SHIWE is 1 over the Mediterranean and often 0 on the coast)
+	    Path source = input;
+	    if (seaMask != null) {
+		extendLandValues(input, landOnly, rawAsc, landAsc, filledAsc);
+		source = filledAsc;
+	    }
+
+	    // Nearest resampling: the indices are classes (SHIWE 0..5) or model cells, any interpolation invents values
 	    List<String> warpCmd = new ArrayList<>(List.of(
 		    "gdalwarp",
 		    "-s_srs", "EPSG:4326",
 		    "-t_srs", "EPSG:3857",
-		    "-r", "cubic",
+		    "-r", "near",
 		    "-ot", "Float32",
-		    "-tr", "10000", "10000",
+		    "-tr", TARGET_RESOLUTION, TARGET_RESOLUTION,
 		    "-tap"));
 
-	    // Ocean mask: pixels outside the land polygons become NoData (transparent in the OpenLayers client).
-	    // CUTLINE_ALL_TOUCHED keeps every pixel touching land, so the coastline is never left uncovered
-	    if (landMask != null) {
-		warpCmd.addAll(List.of("-cutline", landMask.toAbsolutePath().toString(), "-wo", "CUTLINE_ALL_TOUCHED=TRUE", "-dstnodata",
-			NODATA_VALUE));
+	    if (seaMask != null) {
+		warpCmd.addAll(List.of("-srcnodata", NODATA_VALUE, "-dstnodata", NODATA_VALUE));
 	    }
 
+	    // Plain tiled GeoTIFF: the sea mask is burned below, then overviews and COG layout are built at the end
 	    warpCmd.addAll(List.of(
-		    "-of", "COG",
+		    "-of", "GTiff",
+		    "-co", "TILED=YES",
 		    "-co", "COMPRESS=DEFLATE",
-		    "-co", "PREDICTOR=2",
-		    "-co", "BLOCKSIZE=512",
-		    "-co", "OVERVIEWS=IGNORE_EXISTING",
-		    "-co", "RESAMPLING=CUBIC",
-		    input.toAbsolutePath().toString(),
+		    source.toAbsolutePath().toString(),
 		    temp.toAbsolutePath().toString()));
 
 	    ProcessBuilder pb = new ProcessBuilder(warpCmd);
@@ -286,7 +353,15 @@ public class COGS3SyncProcessor {
 		throw new IOException("COG not created: " + temp);
 	    }
 
-	    ProcessBuilder addoPb = new ProcessBuilder("gdaladdo", "-r", "cubic", temp.toString(), "2", "4", "8", "16");
+	    // Ocean mask on the output grid: pixels whose centre is inside the sea polygons become NoData (transparent in the
+	    // OpenLayers client). Not done with gdalwarp -cutline, which rasterizes the cutline on the coarse source grid
+	    // (coast in 10 km steps) and shifts the nearest sampling
+	    if (seaMask != null) {
+		runGdalStep(new ProcessBuilder("gdal_rasterize", "-burn", NODATA_VALUE, seaMask.toAbsolutePath().toString(),
+			temp.toAbsolutePath().toString()));
+	    }
+
+	    ProcessBuilder addoPb = new ProcessBuilder("gdaladdo", "-r", "nearest", temp.toString(), "2", "4", "8", "16");
 
 	    GSLoggerFactory.getLogger(getClass()).info("Running gdaladdo: " + String.join(" ", addoPb.command()));
 
@@ -305,7 +380,7 @@ public class COGS3SyncProcessor {
 
 	    // STEP 3: final COG
 	    ProcessBuilder translatePb = new ProcessBuilder("gdal_translate", temp.toString(), output.toString(), "-of", "COG", "-co",
-		    "COMPRESS=DEFLATE", "-co", "PREDICTOR=2", "-co", "BLOCKSIZE=512", "-co", "RESAMPLING=CUBIC");
+		    "COMPRESS=DEFLATE", "-co", "PREDICTOR=2", "-co", "BLOCKSIZE=512", "-co", "RESAMPLING=NEAREST");
 
 	    GSLoggerFactory.getLogger(getClass()).info("Running gdal_translate: " + String.join(" ", translatePb.command()));
 
@@ -327,8 +402,174 @@ public class COGS3SyncProcessor {
 	} finally {
 
 	    Files.deleteIfExists(temp);
+	    Files.deleteIfExists(landOnly);
+	    for (Path asc : List.of(rawAsc, landAsc)) {
+		Files.deleteIfExists(asc);
+		Files.deleteIfExists(Paths.get(asc + ".aux.xml"));
+		Files.deleteIfExists(Paths.get(asc.toString().replace(".asc", ".prj")));
+	    }
+	    Files.deleteIfExists(filledAsc);
 	}
 
+    }
+
+    /**
+     * Writes in <code>filledAsc</code> the source grid where the sea cells within {@link #LAND_FILL_RADIUS_CELLS} from land take the
+     * value of the nearest land cell. The other sea cells keep the model value: small islands with no land-centred cell nearby
+     * (e.g. Pantelleria) would otherwise stay without data. The sea is removed later on the output grid. Not resampled. Values
+     * are rounded to {@link #VALUE_DECIMALS} decimals.
+     */
+    private void extendLandValues(Path input, Path landOnly, Path rawAsc, Path landAsc, Path filledAsc) throws Exception {
+
+	// 1. source grid as it is. ASCII grid: simple to read and write, GDAL reads it back with the same georeferencing
+	runGdalStep(new ProcessBuilder("gdal_translate", "-ot", "Float32", "-a_srs", "EPSG:4326", "-a_nodata", NODATA_VALUE, "-of",
+		"AAIGrid", input.toAbsolutePath().toString(), rawAsc.toAbsolutePath().toString()));
+
+	AsciiGrid raw = readAsciiGrid(rawAsc);
+
+	// 2. the cell giving the value of each cell depends only on the grid and on the mask: computed once per run
+	String gridKey = raw.header().stream().filter(h -> !h.trim().toLowerCase().startsWith("nodata_value"))
+		.collect(Collectors.joining("|"));
+	if (!gridKey.equals(fillGridKey)) {
+	    fillSource = computeFillSource(input, landOnly, landAsc, raw.cols(), raw.rows());
+	    fillGridKey = gridKey;
+	}
+
+	// 3. values taken from the fill source cells, rounded
+	double scale = Math.pow(10, VALUE_DECIMALS);
+	int cols = raw.cols();
+	int rows = raw.rows();
+
+	try (BufferedWriter writer = Files.newBufferedWriter(filledAsc, StandardCharsets.US_ASCII)) {
+	    for (String h : raw.header()) {
+		writer.write(h);
+		writer.newLine();
+	    }
+	    StringBuilder row = new StringBuilder();
+	    for (int r = 0; r < rows; r++) {
+		row.setLength(0);
+		for (int c = 0; c < cols; c++) {
+		    if (c > 0) {
+			row.append(' ');
+		    }
+		    double v = raw.values()[fillSource[r * cols + c]];
+		    if (v != raw.nodata()) {
+			v = Math.round(v * scale) / scale;
+		    }
+		    row.append(v == Math.rint(v) ? String.valueOf((long) v) : String.valueOf(v));
+		}
+		writer.write(row.toString());
+		writer.newLine();
+	    }
+	}
+    }
+
+    /**
+     * @return for each source cell, the index of the cell giving its value: itself for land cells, the nearest land cell within
+     *         {@link #LAND_FILL_RADIUS_CELLS} for sea cells close to land, itself for the other sea cells
+     */
+    private int[] computeFillSource(Path input, Path landOnly, Path landAsc, int cols, int rows) throws Exception {
+
+	// copy of the source grid with the sea cells (centre inside the sea polygons) set to NoData
+	runGdalStep(new ProcessBuilder("gdal_translate", "-ot", "Float32", "-a_srs", "EPSG:4326", "-a_nodata", NODATA_VALUE,
+		input.toAbsolutePath().toString(), landOnly.toAbsolutePath().toString()));
+	runGdalStep(new ProcessBuilder("gdal_rasterize", "-burn", NODATA_VALUE, seaMask.toAbsolutePath().toString(),
+		landOnly.toAbsolutePath().toString()));
+	runGdalStep(new ProcessBuilder("gdal_translate", "-of", "AAIGrid", landOnly.toAbsolutePath().toString(),
+		landAsc.toAbsolutePath().toString()));
+
+	AsciiGrid land = readAsciiGrid(landAsc);
+	double nodata = land.nodata();
+	double[] values = land.values();
+
+	int radius = (int) Math.ceil(LAND_FILL_RADIUS_CELLS);
+	double maxDist2 = LAND_FILL_RADIUS_CELLS * LAND_FILL_RADIUS_CELLS;
+	int[] source = new int[cols * rows];
+
+	for (int r = 0; r < rows; r++) {
+	    for (int c = 0; c < cols; c++) {
+		source[r * cols + c] = r * cols + c;
+		if (values[r * cols + c] != nodata) {
+		    continue;
+		}
+		double best = maxDist2 + 1;
+		for (int dr = -radius; dr <= radius; dr++) {
+		    for (int dc = -radius; dc <= radius; dc++) {
+			int rr = r + dr;
+			int cc = c + dc;
+			double d2 = dr * dr + dc * dc;
+			if (rr < 0 || rr >= rows || cc < 0 || cc >= cols || d2 > maxDist2 || d2 >= best) {
+			    continue;
+			}
+			if (values[rr * cols + cc] != nodata) {
+			    best = d2;
+			    source[r * cols + c] = rr * cols + cc;
+			}
+		    }
+		}
+	    }
+	}
+
+	GSLoggerFactory.getLogger(getClass()).info("Coast fill map computed for a " + cols + "x" + rows + " source grid");
+	return source;
+    }
+
+    private record AsciiGrid(List<String> header, int cols, int rows, double nodata, double[] values) {
+    }
+
+    private static AsciiGrid readAsciiGrid(Path asc) throws IOException {
+
+	List<String> header = new ArrayList<>();
+	int cols = 0;
+	int rows = 0;
+	double nodata = Double.parseDouble(NODATA_VALUE);
+
+	try (BufferedReader reader = Files.newBufferedReader(asc, StandardCharsets.US_ASCII)) {
+
+	    String line;
+	    while ((line = reader.readLine()) != null) {
+		String[] kv = line.trim().split("\\s+");
+		if (!Character.isLetter(kv[0].charAt(0))) {
+		    break; // first data row
+		}
+		header.add(line);
+		switch (kv[0].toLowerCase()) {
+		case "ncols" -> cols = Integer.parseInt(kv[1]);
+		case "nrows" -> rows = Integer.parseInt(kv[1]);
+		case "nodata_value" -> nodata = Double.parseDouble(kv[1]);
+		default -> {
+		}
+		}
+	    }
+
+	    double[] values = new double[cols * rows];
+	    int i = 0;
+	    while (line != null) {
+		for (String token : line.trim().split("\\s+")) {
+		    if (!token.isEmpty()) {
+			values[i++] = Double.parseDouble(token);
+		    }
+		}
+		line = reader.readLine();
+	    }
+	    return new AsciiGrid(header, cols, rows, nodata, values);
+	}
+    }
+
+    private void runGdalStep(ProcessBuilder pb) throws Exception {
+
+	pb.redirectErrorStream(true);
+	Process p = pb.start();
+	StringBuilder out = new StringBuilder();
+	try (BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+	    String line;
+	    while ((line = reader.readLine()) != null) {
+		out.append(line).append('\n');
+	    }
+	}
+	if (p.waitFor() != 0) {
+	    throw new RuntimeException("GDAL failed: " + String.join(" ", pb.command()) + "\n" + out);
+	}
     }
 
     private void verifyCogFile(Path output) throws Exception {
