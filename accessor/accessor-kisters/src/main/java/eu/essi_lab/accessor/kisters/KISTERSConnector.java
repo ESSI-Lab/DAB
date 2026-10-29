@@ -30,6 +30,7 @@ import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author Fabrizio
@@ -127,21 +128,35 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 	// Time series
 	//
 
-	int stationIndex = 0;
+	List<String> groupIds = getSetting().getTimeSeriesGroupIds();
+
+	// the pages are the stations, or the time series groups if configured
+	int pagesCount = groupIds.isEmpty() ? stationIdentifiers.size() : groupIds.size();
+
+	int pageIndex = 0;
 	String resumptionToken = request.getResumptionToken();
 	if (resumptionToken != null) {
-	    stationIndex = Integer.valueOf(resumptionToken);
+	    pageIndex = Integer.valueOf(resumptionToken);
 	}
-	if (stationIndex>=stationIdentifiers.size()) {
+	if (pageIndex >= pagesCount) {
 	    ListRecordsResponse<OriginalMetadata> ret = new ListRecordsResponse<OriginalMetadata>();
-	    return ret ;
+	    return ret;
 	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Retrieving timeSeries STARTED");
 
-	String stationId = stationIdentifiers.get(stationIndex);
-	KISTERSEntity station = stations.get(stationId);
-	List<KISTERSEntity> timeSeriesList = kistersClient.retrieveTimeSeriesByStation(stationId);
+	List<KISTERSEntity> timeSeriesList = null;
+
+	if (groupIds.isEmpty()) {
+
+	    timeSeriesList = kistersClient.retrieveTimeSeriesByStation(stationIdentifiers.get(pageIndex));
+
+	} else {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("Retrieving timeSeries of group {}", groupIds.get(pageIndex));
+
+	    timeSeriesList = kistersClient.retrieveTimeSeriesByGroup(groupIds.get(pageIndex));
+	}
 
 	GSLoggerFactory.getLogger(getClass()).debug("Retrievied {} timeSeries", StringUtils.format(timeSeriesList.size()));
 
@@ -149,7 +164,26 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 	List<OriginalMetadata> originalMetadatas = new ArrayList<>();
 
+	Optional<Pattern> namePattern = getSetting().getTimeSeriesNameRegex().map(Pattern::compile);
+
+	boolean siteFilter = getSetting().getSiteName() != null && !getSetting().getSiteName().isEmpty();
+
 	timeSeriesList.forEach(timeSeries -> {
+
+	    String tsId = timeSeries.getObject().getString(KISTERSClient.TS_ID);
+
+	    KISTERSEntity station = stations.get(timeSeries.getObject().optString(KISTERSClient.STATION_ID));
+
+	    if (station == null && (groupIds.isEmpty() || siteFilter)) {
+
+		// group mode: the station has been excluded by the site name filter
+		return;
+	    }
+
+	    if (namePattern.isPresent() && !namePattern.get().matcher(timeSeries.getObject().optString(KISTERSClient.TS_NAME)).matches()) {
+
+		return;
+	    }
 
 	    String from = timeSeries.getObject().getString(KISTERSClient.TS_FROM);
 	    String to = timeSeries.getObject().getString(KISTERSClient.TS_TO);
@@ -158,9 +192,20 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 		timeSeries.setType(EntityType.TIME_SERIES);
 
-		copy(station, timeSeries);
+		if (station != null) {
+
+		    copy(station, timeSeries);
+		}
 
 		resolveParameterLongName(station, timeSeries);
+
+		if (timeSeries.getObject().optString(KISTERSClient.STATION_LAT).isEmpty()
+			|| timeSeries.getObject().optString(KISTERSClient.STATION_LON).isEmpty()) {
+
+		    // e.g. the basin pseudo stations of Wallonia
+		    GSLoggerFactory.getLogger(getClass()).warn("Time series {} has no station coordinates", tsId);
+		    return;
+		}
 
 		OriginalMetadata originalMetadata = new OriginalMetadata();
 		originalMetadata.setMetadata(timeSeries.toString());
@@ -170,8 +215,7 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 		response.addRecord(originalMetadata);
 	    } else {
 
-		GSLoggerFactory.getLogger(getClass()).warn("Time series {} has incomplete temporal extent",
-			timeSeries.getObject().getString(KISTERSClient.TS_ID));
+		GSLoggerFactory.getLogger(getClass()).warn("Time series {} has incomplete temporal extent", tsId);
 	    }
 	});
 
@@ -181,14 +225,14 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
 
 	GSLoggerFactory.getLogger(getClass()).debug("List partition size: {}", originalMetadatas.size());
 
-	GSLoggerFactory.getLogger(getClass()).debug("Current station index: [{}/{}]", stationIndex, stations.size());
+	GSLoggerFactory.getLogger(getClass()).debug("Current page index: [{}/{}]", pageIndex, pagesCount);
 
 	recordsCount += response.getRecordsAsList().size();
 
 	int maxRecords = getSetting().getMaxRecords().orElse(Integer.MAX_VALUE);
 
-	if (stationIndex < (stations.size() - 1) && recordsCount < maxRecords) {
-	    response.setResumptionToken(String.valueOf(++stationIndex));
+	if (pageIndex < (pagesCount - 1) && recordsCount < maxRecords) {
+	    response.setResumptionToken(String.valueOf(++pageIndex));
 	} else {
 	    response.setResumptionToken(null);
 	}
@@ -218,12 +262,28 @@ public class KISTERSConnector extends HarvestedQueryConnector<KISTERSConnectorSe
     /**
      * When a station measures more than one parameter, the station list returns their ids, names and long names joined by ';'
      * (e.g. SEPA). The time series carries its own parameter type id and name, while the long name is only available from the
-     * station, so it is picked from the station list at the same position of the time series parameter type id
+     * station, so it is picked from the station list at the same position of the time series parameter type id. Time series
+     * retrieved by group carry the long name of their station parameter (e.g. "River Discharge"), which is used if the station
+     * long name is missing (e.g. HIC Flanders) or ambiguous
      * 
      * @param station
      * @param timeSeries
      */
-    private void resolveParameterLongName(KISTERSEntity station, KISTERSEntity timeSeries) {
+    static void resolveParameterLongName(KISTERSEntity station, KISTERSEntity timeSeries) {
+
+	String stationParamLongName = timeSeries.getObject().optString(KISTERSClient.STATION_PARAM_LONG_NAME);
+	String currentLongName = timeSeries.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);
+
+	if (!stationParamLongName.isEmpty() && (currentLongName.isEmpty() || currentLongName.contains(";"))) {
+
+	    timeSeries.getObject().put(KISTERSClient.PARAM_TYPE_LONG_NAME, stationParamLongName);
+	    return;
+	}
+
+	if (station == null) {
+
+	    return;
+	}
 
 	String stationParamIds = station.getObject().optString(KISTERSClient.PARAM_TYPE_ID);
 	String stationParamLongNames = station.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);

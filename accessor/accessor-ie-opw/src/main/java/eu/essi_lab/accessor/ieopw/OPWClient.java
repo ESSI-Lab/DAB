@@ -714,11 +714,14 @@ public class OPWClient {
 
 	GSLoggerFactory.getLogger(getClass()).error(message);
 
+	// the overload taking only the cause uses its message as description, and fails when there is no cause
 	return GSException.createException(//
 		getClass(), //
+		message, //
+		null, //
 		ErrorInfo.ERRORTYPE_SERVICE, //
 		ErrorInfo.SEVERITY_ERROR, //
-		message, //
+		getClass().getSimpleName() + "_ERROR", //
 		cause);
     }
 

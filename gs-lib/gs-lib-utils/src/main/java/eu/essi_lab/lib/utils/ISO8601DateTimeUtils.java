@@ -95,6 +95,9 @@ public class ISO8601DateTimeUtils {
     }
 
     /**
+     * Normalizes a time based duration (e.g. PT60M becomes PT1H, PT24H becomes P1D) or a calendar based duration, which has no
+     * fixed length (e.g. P12M becomes P1Y, P1W becomes P7D)
+     *
      * @param isoDuration
      * @return
      */
@@ -102,7 +105,24 @@ public class ISO8601DateTimeUtils {
 
 	try {
 
-	    java.time.Duration d = java.time.Duration.parse(isoDuration);
+	    java.time.Duration d;
+
+	    if (isoDuration != null && !isoDuration.contains("T")) {
+
+		java.time.Period period = java.time.Period.parse(isoDuration);
+
+		if (period.getYears() != 0 || period.getMonths() != 0) {
+
+		    return period.normalized().toString();
+		}
+
+		// only days (or weeks): normalized as a time based duration
+		d = java.time.Duration.ofDays(period.getDays());
+
+	    } else {
+
+		d = java.time.Duration.parse(isoDuration);
+	    }
 
 	    long seconds = d.getSeconds();
 

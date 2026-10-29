@@ -62,18 +62,42 @@ public class KISTERSClient {
     public static final String TS_FROM = "from";
     public static final String TS_TO = "to";
     public static final String GRDC_COUNTRY = "GRDCCOUNTRY";
+    public static final String STATION_NO = "station_no";
+    public static final String STATION_PARAM_LONG_NAME = "stationparameter_longname";
     private String endpoint;
 
+    /**
+     * @param endpoint the KiWIS endpoint, optionally with instance specific parameters (e.g.
+     *        "https://timeseries.sepa.org.uk/KiWIS/KiWIS?datasource=0"); the request parameters are appended to it
+     */
     public KISTERSClient(String endpoint) {
-	this.endpoint = endpoint;
+	this.endpoint = normalizeEndpoint(endpoint);
     }
 
     /**
+     * Makes the endpoint ready to have the request parameters appended, by adding '?' or '&' if needed
+     * 
+     * @param endpoint
      * @return
      */
-    private List<String> getStationFields() {
+    static String normalizeEndpoint(String endpoint) {
 
-	return Arrays.asList(
+	if (endpoint == null || endpoint.endsWith("?") || endpoint.endsWith("&")) {
+
+	    return endpoint;
+	}
+
+	return endpoint + (endpoint.contains("?") ? "&" : "?");
+    }
+
+    /**
+     * @param full if <code>false</code>, the site long name, the parameter type long name and the river name are not requested,
+     *        since some KiWIS instances (e.g. HIC Flanders) do not support them and answer with an error
+     * @return
+     */
+    private List<String> getStationFields(boolean full) {
+
+	List<String> fields = new ArrayList<>(Arrays.asList(
 
 		STATION_NAME, //
 		STATION_ID, //
@@ -87,7 +111,35 @@ public class KISTERSClient {
 		PARAM_TYPE_LONG_NAME, //
 		RIVER_NAME, //
 		OBJECT_TYPE //
-	);
+	));
+
+	if (!full) {
+
+	    fields.removeAll(Arrays.asList(SITE_LONG_NAME, PARAM_TYPE_LONG_NAME, RIVER_NAME));
+	}
+
+	return fields;
+    }
+
+    /**
+     * The fields of the time series retrieved by group, which also carry the station name and position, and the long name of the
+     * station parameter (e.g. "River Discharge")
+     * 
+     * @return
+     */
+    private List<String> getGroupTimeSeriesFields() {
+
+	List<String> fields = getTimeSeriesFields(true);
+
+	fields.addAll(fields.size() - 1, Arrays.asList(//
+		STATION_NO, //
+		STATION_NAME, //
+		STATION_LAT, //
+		STATION_LON, //
+		SITE_NAME, //
+		STATION_PARAM_LONG_NAME));
+
+	return fields;
     }
 
     /**
@@ -143,6 +195,11 @@ public class KISTERSClient {
 	
 	String response = optString.get();
 
+	if (isError(response)) {
+
+	    return new ArrayList<>();
+	}
+
 	JSONArray responseArray = new JSONArray(response);
 
 	JSONObject responseObject = responseArray.getJSONObject(0);
@@ -164,25 +221,50 @@ public class KISTERSClient {
      */
     public List<KISTERSEntity> retrieveStations() {
 
-	String returnfields = getStationFields().//
-		stream().//
-		collect(Collectors.joining(","));
-
-	return retrieveEntities(
-		"service=kisters&type=queryServices&request=getStationList&format=json&returnfields=" + returnfields + "&flatten=true");
+	return retrieveStationEntities("service=kisters&type=queryServices&request=getStationList&format=json&flatten=true");
     }
-    
+
     /**
      * @return
      */
     public List<KISTERSEntity> retrieveStationsBySiteName(String name) {
 
-	String returnfields = getStationFields().//
-		stream().//
-		collect(Collectors.joining(","));
+	return retrieveStationEntities(
+		"service=kisters&type=queryServices&request=getStationList&site_name=" + name + "&format=json&flatten=true");
+    }
 
-	return retrieveEntities(
-		"service=kisters&type=queryServices&request=getStationList&site_name="+name+"&format=json&returnfields=" + returnfields + "&flatten=true");
+    /**
+     * Requests the stations with all the return fields; if nothing is returned (the instance does not support some of them), the
+     * request is repeated without the optional ones
+     * 
+     * @param query
+     * @return
+     */
+    private List<KISTERSEntity> retrieveStationEntities(String query) {
+
+	List<KISTERSEntity> entities = retrieveEntities(query + "&returnfields=" + joinFields(getStationFields(true)));
+
+	if (entities.isEmpty()) {
+
+	    GSLoggerFactory.getLogger(getClass()).debug("No stations with the full return fields, retrying with the basic fields");
+
+	    entities = retrieveEntities(query + "&returnfields=" + joinFields(getStationFields(false)));
+	}
+
+	return entities;
+    }
+
+    /**
+     * Retrieves the time series of the given time series group (e.g. the "SPW-WS-DebitHR" group of Wallonia), with the name and
+     * position of their station
+     * 
+     * @param groupId
+     * @return
+     */
+    public List<KISTERSEntity> retrieveTimeSeriesByGroup(String groupId) {
+
+	return retrieveEntities("service=kisters&type=queryServices&request=getTimeseriesList&format=json&timeseriesgroup_id=" + groupId
+		+ "&returnfields=" + joinFields(getGroupTimeSeriesFields()));
     }
 
     /**
@@ -191,8 +273,17 @@ public class KISTERSClient {
      */
     public KISTERSEntity retrieveTimeSeries(String timeSeriesId) {
 
-	return retrieveTimeSeriesEntities(
-		"service=kisters&type=queryServices&request=getTimeseriesList&ts_id=" + timeSeriesId + "&format=json&station_no=*").get(0);
+	List<KISTERSEntity> entities = retrieveTimeSeriesEntities(
+		"service=kisters&type=queryServices&request=getTimeseriesList&ts_id=" + timeSeriesId + "&format=json&station_no=*");
+
+	if (entities.isEmpty()) {
+
+	    // some instances (e.g. HIC Flanders) fail when the station number wildcard is combined with the time series id
+	    entities = retrieveTimeSeriesEntities(
+		    "service=kisters&type=queryServices&request=getTimeseriesList&ts_id=" + timeSeriesId + "&format=json");
+	}
+
+	return entities.get(0);
     }
 
     /**
@@ -262,6 +353,11 @@ public class KISTERSClient {
 		
 	String response = optString.get();
 
+	if (isError(response)) {
+
+	    return new ArrayList<>();
+	}
+
 	JSONArray responseArray = new JSONArray(response);
 
 	JSONArray fiealdsArray = responseArray.getJSONArray(0);
@@ -272,6 +368,36 @@ public class KISTERSClient {
 		map(o -> (List<String>) o).//
 		map(o -> new KISTERSEntity(fiealdsArray, o)).//
 		collect(Collectors.toList());
+    }
+
+    /**
+     * KiWIS answers with a JSON object instead of the expected JSON array in case of error (with HTTP status 200 in some
+     * instances, e.g. when a return field is not supported)
+     * 
+     * @param response
+     * @return
+     */
+    static boolean isError(String response) {
+
+	String trimmed = response.trim();
+
+	if (trimmed.startsWith("[")) {
+
+	    return false;
+	}
+
+	String message = trimmed;
+
+	try {
+	    message = new JSONObject(trimmed).optString("message", trimmed);
+	} catch (Exception e) {
+	    // not a JSON object, e.g. an HTML page
+	}
+
+	GSLoggerFactory.getLogger(KISTERSClient.class).warn("KiWIS error response: {}",
+		message.substring(0, Math.min(message.length(), 300)));
+
+	return true;
     }
 
     /**

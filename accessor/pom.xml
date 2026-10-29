@@ -109,6 +109,27 @@
 		<module>accessor-lt-lhmt</module>
 		<module>accessor-lu-age</module>
 		<module>accessor-enhydris</module>
+		<module>accessor-th-thaiwater</module>
+		<module>accessor-es-miteco-aforos</module>
+		<module>accessor-es-saih-jucar</module>
+		<module>accessor-hr-dhmz</module>
+		<module>accessor-de-brandenburg-pegel</module>
+		<module>accessor-wiskiweb3</module>
+		<module>accessor-r-arcticnet</module>
+		<module>accessor-adhi</module>
+		<module>accessor-de-rlp-wasser</module>
+		<module>accessor-mx-conagua</module>
+		<module>accessor-co-ideam</module>
+		<module>accessor-uk-ea-flood-monitoring</module>
+		<module>accessor-at-ehyd</module>
+		<module>accessor-cz-chmi</module>
+		<module>accessor-pl-imgw</module>
+		<module>accessor-si-arso</module>
+		<module>accessor-dk-vanda</module>
+		<module>accessor-es-aca</module>
+		<module>accessor-lv-lvgmc</module>
+		<module>accessor-it-trentino-floods</module>
+		<module>accessor-no-nve-magasin</module>
 		<module>accessor-ch-slf</module>
 		<module>accessor-us-nrcs-awdb</module>
 		<module>accessor-geus-promice</module>

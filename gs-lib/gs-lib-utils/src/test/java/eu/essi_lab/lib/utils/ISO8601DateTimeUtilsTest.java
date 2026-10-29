@@ -72,4 +72,21 @@ public class ISO8601DateTimeUtilsTest {
     
 
 
+    @Test
+    public void testNormalizeDuration() {
+
+	assertEquals("PT1H", ISO8601DateTimeUtils.normalizeISO8601Duration("PT60M"));
+	assertEquals("P1D", ISO8601DateTimeUtils.normalizeISO8601Duration("PT24H"));
+	assertEquals("P1D", ISO8601DateTimeUtils.normalizeISO8601Duration("P1D"));
+	assertEquals("P7D", ISO8601DateTimeUtils.normalizeISO8601Duration("P1W"));
+	assertEquals("PT10M", ISO8601DateTimeUtils.normalizeISO8601Duration("PT10M"));
+
+	// calendar based durations
+	assertEquals("P1M", ISO8601DateTimeUtils.normalizeISO8601Duration("P1M"));
+	assertEquals("P1Y", ISO8601DateTimeUtils.normalizeISO8601Duration("P1Y"));
+	assertEquals("P1Y", ISO8601DateTimeUtils.normalizeISO8601Duration("P12M"));
+	assertEquals("P1Y6M", ISO8601DateTimeUtils.normalizeISO8601Duration("P18M"));
+	assertEquals("P1M", ISO8601DateTimeUtils.normalizeISO8601Duration(ISO8601DateTimeUtils.normalizeISO8601Duration("P1M")));
+    }
+
 }
