@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import jakarta.xml.bind.JAXBElement;
 import javax.xml.datatype.DatatypeFactory;
@@ -68,6 +70,8 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 public class TRIGGERWafDownloader extends WMLDataDownloader {
+
+    private static final Pattern RUN_IN_FILE_NAME = Pattern.compile("_(\\d{10})\\.json$");
 
     private Downloader downloader;
     private String user;
@@ -230,6 +234,7 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 		isCams = linkage.contains("cams") ? true : false;
 		String nameId = null;
 		JSONArray data = null;
+		JSONArray steps = null;
 		String percentiles = null;
 		if (isCams) {
 		    String[] parts = linkage.split("/");
@@ -240,6 +245,10 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 		    JSONObject percentilesObj = ret.optJSONObject(percentiles);
 		    if (percentilesObj != null && !percentilesObj.isEmpty()) {
 			data = percentilesObj.optJSONArray(interpolation);
+		    }
+		    JSONObject members = ret.optJSONObject(nameId);
+		    if (members != null) {
+			steps = members.optJSONArray("steps");
 		    }
 		} else {
 		    data = ret.optJSONArray(interpolation);
@@ -256,7 +265,7 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 			    "TRIGGER WAF DOWNLOAD ERROR");
 		}
 
-		Map<String, BigDecimal> result = getDateValue(data, isCams);
+		Map<String, BigDecimal> result = getDateValue(data, isCams, getRunDate(ret, linkage), steps);
 
 		for (Map.Entry<String, BigDecimal> entry : result.entrySet()) {
 
@@ -325,23 +334,51 @@ public class TRIGGERWafDownloader extends WMLDataDownloader {
 		"TRIGGER WAF DOWNLOAD ERROR");
     }
 
-    private Map<String, BigDecimal> getDateValue(JSONArray data, Boolean isCams) {
-	Map<String, BigDecimal> result = new LinkedHashMap<>();
-	// Get today's date at 00:00 UTC
+    /**
+     * The harvester may index the files of the previous run when the current one is not yet complete on AUX, so the values must be
+     * anchored to the run of the file (JSON "date" + "time", or the yyyyMMddHH suffix of the file name), not to the current day
+     */
+    static Date getRunDate(JSONObject json, String linkage) {
+
+	Optional<Date> fromJson = ISO8601DateTimeUtils.parseNotStandard2ToDate(json.optString("date") + json.optString("time"));
+	if (fromJson.isPresent()) {
+	    return fromJson.get();
+	}
+
+	Matcher matcher = RUN_IN_FILE_NAME.matcher(linkage);
+	if (matcher.find()) {
+	    Optional<Date> fromName = ISO8601DateTimeUtils.parseNotStandard2ToDate(matcher.group(1) + "00");
+	    if (fromName.isPresent()) {
+		return fromName.get();
+	    }
+	}
+
 	Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 	calendar.set(Calendar.HOUR_OF_DAY, 0);
 	calendar.set(Calendar.MINUTE, 0);
 	calendar.set(Calendar.SECOND, 0);
 	calendar.set(Calendar.MILLISECOND, 0);
+	GSLoggerFactory.getLogger(TRIGGERWafDownloader.class).warn("Run date not found in {}, assuming today 00:00 UTC", linkage);
+	return calendar.getTime();
+    }
+
+    /**
+     * CAMS files start from lead hour 0 and list their lead hours in the "steps" array; the other variables start from lead hour 1 with
+     * 1, 3 and 6 hour steps
+     */
+    static Map<String, BigDecimal> getDateValue(JSONArray data, Boolean isCams, Date runDate, JSONArray steps) {
+	Map<String, BigDecimal> result = new LinkedHashMap<>();
+	Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+	calendar.setTime(runDate);
 
 	SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	isoFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 	if (isCams) {
-	    // First 90 values - Hourly data
-	    for (int i = 0; i < 96; i++) {
-		calendar.add(Calendar.HOUR_OF_DAY, 1); // Add 1 hour
-		result.put(isoFormat.format(calendar.getTime()), data.getBigDecimal(i));
+	    boolean useSteps = steps != null && steps.length() == data.length();
+	    for (int i = 0; i < data.length(); i++) {
+		int leadHour = useSteps ? Integer.parseInt(steps.get(i).toString()) : i;
+		result.put(isoFormat.format(new Date(runDate.getTime() + leadHour * 3600_000L)), data.getBigDecimal(i));
 	    }
 	} else {
 
