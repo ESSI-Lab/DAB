@@ -52,6 +52,7 @@ import eu.essi_lab.profiler.wis.WISRequest.CollectionItems;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
+import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
@@ -396,11 +397,13 @@ public class WISUtils {
     /**
      * @param viewId
      * @param itemId
-     * @return the URL of the cached data item with the given identifier
+     * @param encoding
+     * @return the URL of the cached data item with the given identifier, in the given encoding
      */
-    public static String getDataItemUrl(String viewId, String itemId) {
+    public static String getDataItemUrl(String viewId, String itemId, WIS2DataEncoding encoding) {
 
-	return getServiceUrl(viewId) + "/collections/" + CollectionItems.OBSERVATIONS.getName() + "/items/" + itemId;
+	return getServiceUrl(viewId) + "/collections/" + CollectionItems.OBSERVATIONS.getName() + "/items/" + itemId + "?f="
+		+ encoding.getId();
     }
 
     /**

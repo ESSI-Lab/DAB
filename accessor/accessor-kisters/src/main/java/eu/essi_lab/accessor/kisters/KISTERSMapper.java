@@ -23,10 +23,13 @@ import java.math.BigDecimal;
  * #L%
  */
 
+import java.util.Optional;
+
 import eu.essi_lab.iso.datamodel.classes.Citation;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
@@ -99,27 +102,27 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	//
 	//
 
-	String stationId = entity.getObject().getString(KISTERSClient.STATION_ID);
-	String stationName = entity.getObject().getString(KISTERSClient.STATION_NAME);
+	String stationId = entity.getObject().optString(KISTERSClient.STATION_ID);
+	String stationName = entity.getObject().optString(KISTERSClient.STATION_NAME);
 
-	double lat = Double.valueOf(entity.getObject().getString(KISTERSClient.STATION_LAT));
-	double lon = Double.valueOf(entity.getObject().getString(KISTERSClient.STATION_LON));
+	double lat = Double.valueOf(entity.getObject().optString(KISTERSClient.STATION_LAT));
+	double lon = Double.valueOf(entity.getObject().optString(KISTERSClient.STATION_LON));
 
-	String from = entity.getObject().getString(KISTERSClient.TS_FROM);
-	String to = entity.getObject().getString(KISTERSClient.TS_TO);
+	String from = entity.getObject().optString(KISTERSClient.TS_FROM);
+	String to = entity.getObject().optString(KISTERSClient.TS_TO);
 
-	String siteId = entity.getObject().getString(KISTERSClient.SITE_ID);
-	String siteName = entity.getObject().getString(KISTERSClient.SITE_NAME);
-	String siteLongName = entity.getObject().getString(KISTERSClient.SITE_LONG_NAME);
+	String siteId = entity.getObject().optString(KISTERSClient.SITE_ID);
+	String siteName = entity.getObject().optString(KISTERSClient.SITE_NAME);
+	String siteLongName = entity.getObject().optString(KISTERSClient.SITE_LONG_NAME);
 
-	String paramTypeId = entity.getObject().getString(KISTERSClient.PARAM_TYPE_ID);
-	String paramTypeName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_NAME);
-	String paramTypeLongName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_LONG_NAME);
+	String paramTypeId = entity.getObject().optString(KISTERSClient.PARAM_TYPE_ID);
+	String paramTypeName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_NAME);
+	String paramTypeLongName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);
 
-	String riverName = entity.getObject().getString(KISTERSClient.RIVER_NAME);
-	String objectType = entity.getObject().getString(KISTERSClient.OBJECT_TYPE);
+	String riverName = entity.getObject().optString(KISTERSClient.RIVER_NAME);
+	String objectType = entity.getObject().optString(KISTERSClient.OBJECT_TYPE);
 
-	String country = entity.getObject().getString(KISTERSClient.GRDC_COUNTRY);
+	String country = entity.getObject().optString(KISTERSClient.GRDC_COUNTRY);
 
 	ResponsibleParty party = new ResponsibleParty();
 	party.setOrganisationName(siteLongName);
@@ -196,7 +199,7 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setHierarchyLevelName("dataset");
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 
-	String parentId = entity.getObject().getString(KISTERSClient.STATION_ID);
+	String parentId = entity.getObject().optString(KISTERSClient.STATION_ID);
 	parentId = decorateIdentifier(source.getEndpoint(), parentId);
 
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setParentIdentifier(parentId);
@@ -215,39 +218,68 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	//
 	//
 
-	String tsId = entity.getObject().getString(KISTERSClient.TS_ID);
+	String tsId = entity.getObject().optString(KISTERSClient.TS_ID);
 
-	String stationName = entity.getObject().getString(KISTERSClient.STATION_NAME);
+	String stationName = entity.getObject().optString(KISTERSClient.STATION_NAME);
 
-	String lat = entity.getObject().getString(KISTERSClient.STATION_LAT);
-	String lon = entity.getObject().getString(KISTERSClient.STATION_LON);
+	String lat = entity.getObject().optString(KISTERSClient.STATION_LAT);
+	String lon = entity.getObject().optString(KISTERSClient.STATION_LON);
 
-	String from = entity.getObject().getString(KISTERSClient.TS_FROM);
-	String to = entity.getObject().getString(KISTERSClient.TS_TO);
+	String from = entity.getObject().optString(KISTERSClient.TS_FROM);
+	String to = entity.getObject().optString(KISTERSClient.TS_TO);
 
-	String siteId = entity.getObject().getString(KISTERSClient.SITE_ID);
-	String siteName = entity.getObject().getString(KISTERSClient.SITE_NAME);
-	String siteLongName = entity.getObject().getString(KISTERSClient.SITE_LONG_NAME);
+	String siteId = entity.getObject().optString(KISTERSClient.SITE_ID);
+	String siteName = entity.getObject().optString(KISTERSClient.SITE_NAME);
+	String siteLongName = entity.getObject().optString(KISTERSClient.SITE_LONG_NAME);
 
-	String paramTypeId = entity.getObject().getString(KISTERSClient.PARAM_TYPE_ID);
-	String paramTypeName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_NAME);
-	String paramTypeLongName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_LONG_NAME);
+	String paramTypeId = entity.getObject().optString(KISTERSClient.PARAM_TYPE_ID);
+	String paramTypeName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_NAME);
+	String paramTypeLongName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);
 
-	String riverName = entity.getObject().getString(KISTERSClient.RIVER_NAME);
-	String objectType = entity.getObject().getString(KISTERSClient.OBJECT_TYPE);
+	String riverName = entity.getObject().optString(KISTERSClient.RIVER_NAME);
+	String objectType = entity.getObject().optString(KISTERSClient.OBJECT_TYPE);
 
-	String country = entity.getObject().getString(KISTERSClient.GRDC_COUNTRY);
+	String country = entity.getObject().optString(KISTERSClient.GRDC_COUNTRY);
 
-	String tsName = entity.getObject().getString(KISTERSClient.TS_NAME);
+	String tsName = entity.getObject().optString(KISTERSClient.TS_NAME);
 
-	String unitSymbol = entity.getObject().getString(KISTERSClient.TS_UNIT_SYMBOL);
-	String unitName = entity.getObject().getString(KISTERSClient.TS_UNIT_NAME);
-	String spacing = entity.getObject().getString(KISTERSClient.TS_SPACING);
+	String unitSymbol = entity.getObject().optString(KISTERSClient.TS_UNIT_SYMBOL);
+	String unitName = entity.getObject().optString(KISTERSClient.TS_UNIT_NAME);
+	String spacing = entity.getObject().optString(KISTERSClient.TS_SPACING);
+
+	Optional<KISTERSInstance> instance = KISTERSInstance.fromEndpoint(source.getEndpoint());
+
+	if (instance.isPresent()) {
+
+	    if (country.isEmpty()) {
+
+		country = instance.get().getCountry();
+		entity.getObject().put(KISTERSClient.GRDC_COUNTRY, country);
+	    }
+
+	    if (siteLongName.isEmpty()) {
+
+		siteLongName = instance.get().getOrganisation();
+		entity.getObject().put(KISTERSClient.SITE_LONG_NAME, siteLongName);
+	    }
+	}
 
 	ResponsibleParty party = new ResponsibleParty();
-	party.setOrganisationName(siteLongName);
+	party.setOrganisationName(instance.isPresent() ? instance.get().getOrganisation() : siteLongName);
 	party.setRoleCode("pointOfContact");
 	dataId.addPointOfContact(party);
+
+	//
+	// Use limitation
+	//
+
+	if (instance.isPresent()) {
+
+	    LegalConstraints constraints = new LegalConstraints();
+	    constraints.addUseLimitation(instance.get().getUseLimitation());
+	    dataId.addLegalConstraints(constraints);
+	}
+
 	//
 	// Keywords
 	//
@@ -258,14 +290,45 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	// Title
 	//
 
-	coreMetadata.setTitle(stationName + " - " + tsName);
+	if (entity.getObject().has(KISTERSClient.STATION_PARAM_LONG_NAME) && !paramTypeLongName.isEmpty()) {
+
+	    // time series retrieved by group, e.g. "Seilles - Water Level (05-Hauteur.Complet)"
+	    coreMetadata.setTitle(stationName + " - " + paramTypeLongName + " (" + tsName + ")");
+
+	} else {
+
+	    coreMetadata.setTitle(stationName + " - " + tsName);
+	}
 
 	//
 	// Abstract
 	//
 
-	coreMetadata.setAbstract("Timeseries " + tsName + " with data from station " + stationName + ", river " + riverName + " located in "
-		+ siteLongName + " (" + country + ")");
+	StringBuilder abstractBuilder = new StringBuilder("Timeseries " + tsName);
+
+	if (instance.isPresent() && !paramTypeLongName.isEmpty() && !paramTypeLongName.contains(";")) {
+
+	    abstractBuilder.append(" of " + paramTypeLongName + (unitSymbol.isEmpty() ? "" : " (" + unitSymbol + ")"));
+	}
+
+	abstractBuilder.append(" with data from station " + stationName);
+
+	if (!riverName.isEmpty()) {
+
+	    abstractBuilder.append(", river " + riverName);
+	}
+
+	if (!siteLongName.isEmpty() || !country.isEmpty()) {
+
+	    abstractBuilder.append(" located in " + siteLongName + (country.isEmpty() ? "" : " (" + country + ")"));
+	}
+
+	if (instance.isPresent()) {
+
+	    abstractBuilder.append(". " + instance.get().getUseLimitation());
+	}
+
+	coreMetadata.setAbstract(abstractBuilder.toString().trim());
 
 	//
 	// Country
@@ -315,6 +378,11 @@ public class KISTERSMapper extends AbstractResourceMapper {
 		NetProtocolWrapper.KISTERS.getCommonURN(), //
 		"download");
 
+	if (instance.isPresent()) {
+
+	    setIndeterminatePosition(dataset);
+	}
+
 	return dataset;
     }
 
@@ -324,18 +392,18 @@ public class KISTERSMapper extends AbstractResourceMapper {
      */
     private void addKeywords(KISTERSEntity entity, Keywords keywords) {
 
-	String stationName = entity.getObject().getString(KISTERSClient.STATION_NAME);
+	String stationName = entity.getObject().optString(KISTERSClient.STATION_NAME);
 
-	String siteName = entity.getObject().getString(KISTERSClient.SITE_NAME);
-	String siteLongName = entity.getObject().getString(KISTERSClient.SITE_LONG_NAME);
+	String siteName = entity.getObject().optString(KISTERSClient.SITE_NAME);
+	String siteLongName = entity.getObject().optString(KISTERSClient.SITE_LONG_NAME);
 
-	String paramTypeName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_NAME);
-	String paramTypeLongName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_LONG_NAME);
+	String paramTypeName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_NAME);
+	String paramTypeLongName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);
 
-	String riverName = entity.getObject().getString(KISTERSClient.RIVER_NAME);
-	String objectType = entity.getObject().getString(KISTERSClient.OBJECT_TYPE);
+	String riverName = entity.getObject().optString(KISTERSClient.RIVER_NAME);
+	String objectType = entity.getObject().optString(KISTERSClient.OBJECT_TYPE);
 
-	String country = entity.getObject().getString(KISTERSClient.GRDC_COUNTRY);
+	String country = entity.getObject().optString(KISTERSClient.GRDC_COUNTRY);
 
 	keywords.addKeyword(stationName);
 	keywords.addKeyword(siteName);
@@ -354,12 +422,12 @@ public class KISTERSMapper extends AbstractResourceMapper {
      */
     private void addPlatform(KISTERSEntity entity, CoreMetadata coreMetadata) {
 
-	String stationId = entity.getObject().getString(KISTERSClient.STATION_ID);
-	String stationName = entity.getObject().getString(KISTERSClient.STATION_NAME);
+	String stationId = entity.getObject().optString(KISTERSClient.STATION_ID);
+	String stationName = entity.getObject().optString(KISTERSClient.STATION_NAME);
 
-	String siteLongName = entity.getObject().getString(KISTERSClient.SITE_LONG_NAME);
+	String siteLongName = entity.getObject().optString(KISTERSClient.SITE_LONG_NAME);
 
-	String country = entity.getObject().getString(KISTERSClient.GRDC_COUNTRY);
+	String country = entity.getObject().optString(KISTERSClient.GRDC_COUNTRY);
 
 	MIPlatform platform = new MIPlatform();
 
@@ -398,9 +466,9 @@ public class KISTERSMapper extends AbstractResourceMapper {
 
     private void addCoverageDescription(KISTERSEntity entity, CoreMetadata coreMetadata) {
 
-	String paramTypeId = entity.getObject().getString(KISTERSClient.PARAM_TYPE_ID);
-	String paramTypeName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_NAME);
-	String paramTypeLongName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_LONG_NAME);
+	String paramTypeId = entity.getObject().optString(KISTERSClient.PARAM_TYPE_ID);
+	String paramTypeName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_NAME);
+	String paramTypeLongName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);
 
 	CoverageDescription coverageDescription = new CoverageDescription();
 
@@ -408,7 +476,7 @@ public class KISTERSMapper extends AbstractResourceMapper {
 
 	coverageDescription.setAttributeDescription(paramTypeLongName);
 
-	String tsId = entity.getObject().getString(KISTERSClient.TS_ID);
+	String tsId = entity.getObject().optString(KISTERSClient.TS_ID);
 
 	String coverageId = NetProtocolWrapper.KISTERS.getCommonURN();
 	coverageId += ":" + tsId;
@@ -423,15 +491,15 @@ public class KISTERSMapper extends AbstractResourceMapper {
      */
     private void addExtensions(KISTERSEntity entity, ExtensionHandler handler) {
 
-	String unitSymbol = entity.getObject().getString(KISTERSClient.TS_UNIT_SYMBOL);
-	String unitName = entity.getObject().getString(KISTERSClient.TS_UNIT_NAME);
-	String spacing = entity.getObject().getString(KISTERSClient.TS_SPACING);
+	String unitSymbol = entity.getObject().optString(KISTERSClient.TS_UNIT_SYMBOL);
+	String unitName = entity.getObject().optString(KISTERSClient.TS_UNIT_NAME);
+	String spacing = entity.getObject().optString(KISTERSClient.TS_SPACING);
 
-	String paramTypeId = entity.getObject().getString(KISTERSClient.PARAM_TYPE_ID);
-	String paramTypeName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_NAME);
-	String paramTypeLongName = entity.getObject().getString(KISTERSClient.PARAM_TYPE_LONG_NAME);
+	String paramTypeId = entity.getObject().optString(KISTERSClient.PARAM_TYPE_ID);
+	String paramTypeName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_NAME);
+	String paramTypeLongName = entity.getObject().optString(KISTERSClient.PARAM_TYPE_LONG_NAME);
 
-	String country = entity.getObject().getString(KISTERSClient.GRDC_COUNTRY);
+	String country = entity.getObject().optString(KISTERSClient.GRDC_COUNTRY);
 
 	//
 	// Attribute units
@@ -447,7 +515,10 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	// Time resolution duration
 	//
 
-	handler.setTimeResolutionDuration8601(spacing);
+	if (!spacing.isEmpty()) {
+
+	    handler.setTimeResolutionDuration8601(spacing);
+	}
 
 	if (country != null && country.contains(" - ")) {
 	    country = country.substring(country.indexOf(" - ") + 3);
@@ -456,7 +527,7 @@ public class KISTERSMapper extends AbstractResourceMapper {
 	//
 	// Time interpolation
 	//
-	String tsName = entity.getObject().getString(KISTERSClient.TS_NAME);
+	String tsName = entity.getObject().optString(KISTERSClient.TS_NAME);
 	handler.setTimeInterpolation(tsName);
 
 	//
@@ -522,11 +593,11 @@ public class KISTERSMapper extends AbstractResourceMapper {
 
 	switch (entity.getType()) {
 	case STATION:
-	    entityId = entity.getObject().getString(KISTERSClient.STATION_ID);
+	    entityId = entity.getObject().optString(KISTERSClient.STATION_ID);
 	    break;
 
 	case TIME_SERIES:
-	    entityId = entity.getObject().getString(KISTERSClient.TS_ID);
+	    entityId = entity.getObject().optString(KISTERSClient.TS_ID);
 	    break;
 	}
 

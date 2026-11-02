@@ -36,6 +36,7 @@ import eu.essi_lab.cfga.option.OptionBuilder;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.Setting;
 import eu.essi_lab.lib.utils.LabeledEnum;
+import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.model.GSSource;
 
 /**
@@ -59,6 +60,7 @@ public class WIS2Setting extends Setting implements EditableSetting {
     private static final String TOKEN_CONTACT_OPTION_KEY = "wis2TokenContact";
     private static final String DATA_NOTIFICATIONS_MODE_OPTION_KEY = "wis2DataNotificationsMode";
     private static final String PRIVATE_TOPIC_PREFIX_OPTION_KEY = "wis2PrivateTopicPrefix";
+    private static final String DATA_ENCODING_OPTION_KEY = "wis2DataEncoding";
 
     /**
      * Default prefix of the private topics, not relayed by the WIS2 Global Brokers (which subscribe to
@@ -172,6 +174,20 @@ public class WIS2Setting extends Setting implements EditableSetting {
 		build();
 
 	addOption(mode);
+
+	Option<WIS2DataEncoding> encoding = OptionBuilder.get(WIS2DataEncoding.class).//
+		withKey(DATA_ENCODING_OPTION_KEY).//
+		withLabel("Data encoding").//
+		withDescription(
+			"Encoding of the values provided by the new data notifications and served at their links. The links of already published notifications keep their encoding")
+		.//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(WIS2DataEncoding.class)).//
+		withSelectedValue(WIS2DataEncoding.JSON).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(encoding);
 
 	addOption(buildOption(PRIVATE_TOPIC_PREFIX_OPTION_KEY, "Private topic prefix",
 		"Prefix of the topics of the private data notifications, replacing origin/a/wis2. Default: " + DEFAULT_PRIVATE_TOPIC_PREFIX));
@@ -399,6 +415,24 @@ public class WIS2Setting extends Setting implements EditableSetting {
     public void setDataNotificationsMode(DataNotificationsMode mode) {
 
 	getOption(DATA_NOTIFICATIONS_MODE_OPTION_KEY, DataNotificationsMode.class).get().setValue(mode);
+    }
+
+    /**
+     * @return
+     */
+    public WIS2DataEncoding getDataEncoding() {
+
+	return getOption(DATA_ENCODING_OPTION_KEY, WIS2DataEncoding.class).//
+		map(Option::getValue).//
+		orElse(WIS2DataEncoding.JSON);
+    }
+
+    /**
+     * @param encoding
+     */
+    public void setDataEncoding(WIS2DataEncoding encoding) {
+
+	getOption(DATA_ENCODING_OPTION_KEY, WIS2DataEncoding.class).get().setValue(encoding);
     }
 
     /**

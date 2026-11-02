@@ -31,9 +31,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import eu.essi_lab.access.datacache.DataCacheConnector;
 import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.WIS2DataItem;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
+import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.messages.ValidationMessage;
 import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.messages.web.WebRequest;
@@ -41,10 +43,12 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.pdk.handler.DefaultRequestHandler;
 import eu.essi_lab.profiler.wis.WISRequest;
+import eu.essi_lab.profiler.wis.WISRequest.Parameter;
 import eu.essi_lab.profiler.wis.WISUtils;
 
 /**
- * Serves a single cached value, encoded by {@link WIS2DataItem}. This is the canonical link of the WIS2 data
+ * Serves a single cached value, encoded by {@link WIS2DataItem} in the encoding given by the format parameter (e.g.
+ * f=csv, default JSON). This is the canonical link of the WIS2 data
  * notification messages, so only the values of the core sources are served, without authentication, unless the data
  * notifications are disabled (see {@link WISUtils#isCoreDataPublished(String)}). The other values are reported as not
  * found
@@ -68,14 +72,32 @@ public class WISObservationItemHandler extends DefaultRequestHandler {
     @Override
     public Response handle(WebRequest webRequest) throws GSException {
 
-	Optional<String> item = getItem(webRequest);
+	Optional<WIS2DataEncoding> encoding = getEncoding(webRequest);
+
+	if (encoding.isEmpty()) {
+
+	    return Response.status(Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity("{}").build();
+	}
+
+	Optional<String> item = getItem(webRequest, encoding.get());
 
 	if (item.isEmpty()) {
 
 	    return Response.status(Status.NOT_FOUND).type(MediaType.APPLICATION_JSON_TYPE).entity("{}").build();
 	}
 
-	return Response.ok(item.get().getBytes(StandardCharsets.UTF_8)).type(MediaType.APPLICATION_JSON_TYPE).build();
+	return Response.ok(item.get().getBytes(StandardCharsets.UTF_8)).type(MediaType.valueOf(encoding.get().getMediaType())).build();
+    }
+
+    /**
+     * @param webRequest
+     * @return the requested encoding, JSON if not specified, empty if not supported
+     */
+    private Optional<WIS2DataEncoding> getEncoding(WebRequest webRequest) {
+
+	String format = new WISRequest(webRequest).getParameterValue(Parameter.FORMAT);
+
+	return format == null || format.isBlank() ? Optional.of(WIS2DataEncoding.JSON) : WIS2DataEncoding.fromId(format.trim());
     }
 
     /**
@@ -83,7 +105,7 @@ public class WISObservationItemHandler extends DefaultRequestHandler {
      * @return the encoded item, if found and served
      * @throws GSException
      */
-    private Optional<String> getItem(WebRequest webRequest) throws GSException {
+    private Optional<String> getItem(WebRequest webRequest, WIS2DataEncoding encoding) throws GSException {
 
 	String itemId = new WISRequest(webRequest).getCollectionParameter();
 
@@ -97,7 +119,9 @@ public class WISObservationItemHandler extends DefaultRequestHandler {
 
 	try {
 
-	    Optional<DataRecord> record = WISUtils.getDataCacheConnector().//
+	    DataCacheConnector dataCacheConnector = WISUtils.getDataCacheConnector();
+
+	    Optional<DataRecord> record = dataCacheConnector.//
 		    getRecords(date, date, dataIdentifier).//
 		    stream().//
 		    filter(r -> date.equals(r.getDate())).//
@@ -114,7 +138,7 @@ public class WISObservationItemHandler extends DefaultRequestHandler {
 		return Optional.empty();
 	    }
 
-	    return Optional.of(WIS2DataItem.encode(record.get()));
+	    return Optional.of(WIS2DataItem.encode(record.get(), encoding, dataCacheConnector));
 
 	} catch (Exception e) {
 
@@ -130,7 +154,7 @@ public class WISObservationItemHandler extends DefaultRequestHandler {
     @Override
     public String getStringResponse(WebRequest webRequest) throws GSException {
 
-	return getItem(webRequest).orElse("{}");
+	return getItem(webRequest, getEncoding(webRequest).orElse(WIS2DataEncoding.JSON)).orElse("{}");
     }
 
     @Override

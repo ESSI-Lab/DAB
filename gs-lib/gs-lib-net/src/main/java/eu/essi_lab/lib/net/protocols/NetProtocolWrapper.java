@@ -64,6 +64,32 @@ public enum NetProtocolWrapper {
     KISTERS(new KISTERSProtocol()),//
     UK_HYDROLOGY(new UKHydrologyProtocol()),//
     PEGELONLINE(new PegelonlineProtocol()),//
+    RIJKSWATERSTAAT(new RijkswaterstaatProtocol()),//
+    OPW(new OPWProtocol()),//
+    LHMT(new LHMTProtocol()),//
+    AGE(new AGEProtocol()),//
+    ENHYDRIS(new EnhydrisProtocol()),//
+    ARSO(new ARSOProtocol()),//
+    CHMI(new CHMIProtocol()),//
+    IMGW(new IMGWProtocol()),//
+    ACA(new ACAProtocol()),//
+    EA_FLOOD_MONITORING(new EAFloodMonitoringProtocol()),//
+    VANDA(new VanDaProtocol()),//
+    TRENTINO_FLOODS(new TrentinoFloodsProtocol()),//
+    NVE_MAGASIN(new NVEMagasinProtocol()),//
+    IDEAM(new IDEAMProtocol()),//
+    LVGMC(new LVGMCProtocol()),//
+    EHYD(new EHYDProtocol()),//
+    WISKIWEB3(new WISKIWeb3Protocol()),//
+    THAIWATER(new ThaiWaterProtocol()),//
+    DHMZ(new DHMZProtocol()),//
+    SAIH_JUCAR(new SAIHJucarProtocol()),//
+    MITECO_AFOROS(new MITECOAforosProtocol()),//
+    CONAGUA(new CONAGUAProtocol()),//
+    R_ARCTICNET(new RArcticNetProtocol()),//
+    ADHI(new ADHIProtocol()),//
+    BRANDENBURG_PEGEL(new BrandenburgPegelProtocol()),//
+    RLP_WASSER(new RLPWasserProtocol()),//
     SLF(new SLFMeasurementProtocol()),//
     NRCS_AWDB(new NRCSAWDBProtocol()),//
     PROMICE(new PROMICEProtocol()),//

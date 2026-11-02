@@ -1,6 +1,10 @@
 package eu.essi_lab.accessor.kisters;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /*-
  * #%L
@@ -38,6 +42,8 @@ import eu.essi_lab.lib.utils.LabeledEnum;
 public class KISTERSConnectorSetting extends HarvestedConnectorSetting {
 
     public final String KISTERS_SITE_NAME = "KISTERS_SITE_NAME";
+    public static final String KISTERS_TS_GROUP_IDS = "KISTERS_TS_GROUP_IDS";
+    public static final String KISTERS_TS_NAME_REGEX = "KISTERS_TS_NAME_REGEX";
 
     /**
      * 
@@ -52,6 +58,25 @@ public class KISTERSConnectorSetting extends HarvestedConnectorSetting {
 		build();
 
 	addOption(option);
+
+	Option<String> groupsOption = StringOptionBuilder.get().//
+		withKey(KISTERS_TS_GROUP_IDS).//
+		withLabel("Comma separated identifiers of the time series groups to harvest (empty to harvest all the time series of"
+			+ " each station)").//
+		withValue("").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(groupsOption);
+
+	Option<String> regexOption = StringOptionBuilder.get().//
+		withKey(KISTERS_TS_NAME_REGEX).//
+		withLabel("Regular expression the time series name must match (empty for all time series)").//
+		withValue("").//
+		cannotBeDisabled().//
+		build();
+
+	addOption(regexOption);
     }
 
     /**
@@ -60,6 +85,54 @@ public class KISTERSConnectorSetting extends HarvestedConnectorSetting {
     public String getSiteName() {
 
 	return getOption(KISTERS_SITE_NAME, String.class).get().getValue();
+    }
+
+    /**
+     * @return the identifiers of the time series groups to harvest, an empty list if all the time series of each station must be
+     *         harvested (settings created before this option was added have no such option)
+     */
+    public List<String> getTimeSeriesGroupIds() {
+
+	String value = getOption(KISTERS_TS_GROUP_IDS, String.class).//
+		map(Option::getValue).//
+		orElse("");
+
+	if (value == null) {
+
+	    return new ArrayList<>();
+	}
+
+	return Arrays.stream(value.split(",")).//
+		map(String::trim).//
+		filter(v -> !v.isEmpty()).//
+		collect(Collectors.toList());
+    }
+
+    /**
+     * @param groupIds
+     */
+    public void setTimeSeriesGroupIds(String groupIds) {
+
+	getOption(KISTERS_TS_GROUP_IDS, String.class).get().setValue(groupIds);
+    }
+
+    /**
+     * @return the regular expression the time series name must match, if set
+     */
+    public Optional<String> getTimeSeriesNameRegex() {
+
+	return getOption(KISTERS_TS_NAME_REGEX, String.class).//
+		map(Option::getValue).//
+		map(String::trim).//
+		filter(v -> !v.isEmpty());
+    }
+
+    /**
+     * @param regex
+     */
+    public void setTimeSeriesNameRegex(String regex) {
+
+	getOption(KISTERS_TS_NAME_REGEX, String.class).get().setValue(regex);
     }
 
     /**

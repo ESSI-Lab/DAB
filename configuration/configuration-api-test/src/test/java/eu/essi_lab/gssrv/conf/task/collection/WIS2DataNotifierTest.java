@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.json.JSONArray;
@@ -19,6 +20,7 @@ import eu.essi_lab.access.datacache.WIS2DataItem;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
+import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.profiler.wis.WISProfilerSetting;
@@ -63,12 +65,14 @@ public class WIS2DataNotifierTest {
 	String topic = WIS2HydrologyTopic.STREAM.getTopic(CENTRE_ID, WIS2DataPolicy.CORE);
 	String metadataId = WISUtils.getMetadataIdentifier("argentina-ina");
 
-	JSONObject message = WIS2DataNotifier.createMessage(record, topic, "whos", metadataId, "WHOS DAB").getJSONObject();
+	String content = WIS2DataItem.encode(record);
+
+	JSONObject message = WIS2DataNotifier.createMessage(record, content, WIS2DataEncoding.JSON, topic, "whos", metadataId, "WHOS DAB")
+		.getJSONObject();
 
 	System.out.println(message.toString(3));
 
 	String itemId = WIS2DataItem.getItemId(record);
-	String content = WIS2DataItem.encode(record);
 
 	Assert.assertEquals("http://wis.wmo.int/spec/wnm/1/conf/core", message.getJSONArray("conformsTo").getString(0));
 	Assert.assertEquals("Feature", message.getString("type"));
@@ -105,14 +109,35 @@ public class WIS2DataNotifierTest {
 	Assert.assertEquals("canonical", link.getString("rel"));
 	Assert.assertEquals("application/json", link.getString("type"));
 	Assert.assertEquals("https://wis2.whos-dab.eu/gs-service/services/essi/view/whos/" + new WISProfilerSetting().getServicePath()
-		+ "/collections/observations/items/" + itemId, link.getString("href"));
+		+ "/collections/observations/items/" + itemId + "?f=json", link.getString("href"));
 	Assert.assertEquals(content.getBytes(StandardCharsets.UTF_8).length, link.getInt("length"));
 
 	// the data id follows the given (e.g. experimental) topic
 	String experimental = WIS2HydrologyTopic.STREAM.getExperimentalTopic(CENTRE_ID, WIS2DataPolicy.CORE);
-	JSONObject experimentalMessage = WIS2DataNotifier.createMessage(record, experimental, "whos", metadataId, "WHOS DAB")
-		.getJSONObject();
+	JSONObject experimentalMessage = WIS2DataNotifier
+		.createMessage(record, content, WIS2DataEncoding.JSON, experimental, "whos", metadataId, "WHOS DAB").getJSONObject();
 	Assert.assertEquals(CENTRE_ID + "/data/core/hydrology/experimental/surface-based-observations/water-quantity/stream/" + itemId,
 		experimentalMessage.getJSONObject("properties").getString("data_id"));
+
+	// CSV: the link has the CSV media type and format, the content and checksum are the CSV ones
+	String csv = WIS2DataItem.encode(record, WIS2DataEncoding.CSV, Optional.empty());
+	JSONObject csvMessage = WIS2DataNotifier.createMessage(record, csv, WIS2DataEncoding.CSV, topic, "whos", metadataId, "WHOS DAB")
+		.getJSONObject();
+	System.out.println(csvMessage.toString(3));
+	JSONObject csvLink = csvMessage.getJSONArray("links").getJSONObject(0);
+	Assert.assertEquals("text/csv", csvLink.getString("type"));
+	Assert.assertTrue(csvLink.getString("href").endsWith("/items/" + itemId + "?f=csv"));
+	Assert.assertEquals(csv, csvMessage.getJSONObject("properties").getJSONObject("content").getString("value"));
+	Assert.assertEquals(
+		Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-512").digest(csv.getBytes(StandardCharsets.UTF_8))),
+		csvMessage.getJSONObject("properties").getJSONObject("integrity").getString("value"));
+
+	// OM-JSON: same media type as JSON, own format
+	String om = WIS2DataItem.encode(record, WIS2DataEncoding.OM_JSON, Optional.empty());
+	JSONObject omMessage = WIS2DataNotifier.createMessage(record, om, WIS2DataEncoding.OM_JSON, topic, "whos", metadataId, "WHOS DAB")
+		.getJSONObject();
+	System.out.println(omMessage.toString(3));
+	Assert.assertTrue(omMessage.getJSONArray("links").getJSONObject(0).getString("href").endsWith("?f=omjson"));
+	Assert.assertEquals(om, omMessage.getJSONObject("properties").getJSONObject("content").getString("value"));
     }
 }

@@ -24,6 +24,7 @@ package eu.essi_lab.access.datacache;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,6 +33,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.iso.datamodel.classes.Distribution;
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
@@ -51,8 +54,10 @@ import eu.essi_lab.model.resource.ResourceProperty;
 import eu.essi_lab.request.executor.DiscoveryExecutor;
 
 /**
- * Lists, in pages, the time series (online identifiers) of the not deleted metadata records of a source, reading only the
- * indexes
+ * Lists, in pages, the time series (online identifiers) of the not deleted metadata records of a source, reading the
+ * indexes. The online resources of a record without the "download" function (e.g. links to site information pages) are
+ * not time series: since the indexes don't report the function, the full records having more online identifiers are read
+ * to select the download ones
  *
  * @author boldrini
  */
@@ -64,6 +69,13 @@ public class SourceSeriesLister {
     public static final long CURRENT_PERIOD_MS = TimeUnit.DAYS.toMillis(365);
 
     private static final int PAGE_SIZE = 1000;
+
+    /**
+     * Max records read in full by a single query (one private identifier clause each)
+     */
+    private static final int FULL_RECORDS_PAGE_SIZE = 200;
+
+    private static final String DOWNLOAD_FUNCTION = "download";
 
     /**
      * The metadata of a time series
@@ -162,6 +174,7 @@ public class SourceSeriesLister {
 	    message.setExcludeResourceBinary(true);
 
 	    ResourceSelector selector = new ResourceSelector();
+	    selector.addIndex(ResourceProperty.PRIVATE_ID);
 	    selector.addIndex(MetadataElement.ONLINE_ID);
 	    selector.addIndex(MetadataElement.TEMP_EXTENT_BEGIN);
 	    selector.addIndex(MetadataElement.TEMP_EXTENT_END);
@@ -185,11 +198,26 @@ public class SourceSeriesLister {
 
 	    ResultSet<GSResource> resultSet = executor.retrieve(message);
 
+	    // records with more online identifiers: their download online identifiers are read from the full records
+	    List<String> multipleOnlines = new ArrayList<>();
+	    for (GSResource resource : resultSet.getResultsList()) {
+		IndexesMetadata indexes = resource.getIndexesMetadata();
+		Optional<String> privateId = indexes.read(ResourceProperty.PRIVATE_ID);
+		if (privateId.isPresent() && indexes.read(MetadataElement.ONLINE_ID).stream().filter(id -> id != null && !id.isBlank())
+			.count() > 1) {
+		    multipleOnlines.add(privateId.get());
+		}
+	    }
+	    Map<String, List<String>> downloadOnlineIds = getDownloadOnlineIds(executor, source, bond, multipleOnlines);
+
 	    Map<String, SeriesMetadata> page = new HashMap<>();
 
 	    for (GSResource resource : resultSet.getResultsList()) {
 
 		IndexesMetadata indexes = resource.getIndexesMetadata();
+
+		List<String> onlineIds = indexes.read(ResourceProperty.PRIVATE_ID).map(downloadOnlineIds::get)
+			.orElse(indexes.read(MetadataElement.ONLINE_ID));
 
 		boolean current = isCurrent(indexes, currentLimit);
 		Optional<Date> begin = earliest(indexes.read(MetadataElement.TEMP_EXTENT_BEGIN));
@@ -198,7 +226,7 @@ public class SourceSeriesLister {
 			: Optional.of(new Date());
 		List<String> uris = indexes.read(MetadataElement.OBSERVED_PROPERTY_URI);
 
-		for (String onlineId : indexes.read(MetadataElement.ONLINE_ID)) {
+		for (String onlineId : onlineIds) {
 
 		    if (onlineId == null || onlineId.isBlank()) {
 			continue;
@@ -236,6 +264,66 @@ public class SourceSeriesLister {
 	    searchAfter = resultSet.getResultsList().isEmpty() ? null : resultSet.getSearchAfter().orElse(null);
 
 	} while (searchAfter != null);
+    }
+
+    /**
+     * Reads the given full records and returns, by private identifier, the identifiers of their online resources having
+     * the "download" function. Records without download online identifiers are not returned (all their online
+     * identifiers are listed)
+     *
+     * @param executor
+     * @param source
+     * @param bond the bond of the listing
+     * @param privateIds
+     * @return
+     * @throws Exception
+     */
+    private Map<String, List<String>> getDownloadOnlineIds(DiscoveryExecutor executor, GSSource source, Bond bond,
+	    List<String> privateIds) throws Exception {
+
+	Map<String, List<String>> ret = new HashMap<>();
+
+	for (int i = 0; i < privateIds.size(); i += FULL_RECORDS_PAGE_SIZE) {
+
+	    List<String> chunk = privateIds.subList(i, Math.min(i + FULL_RECORDS_PAGE_SIZE, privateIds.size()));
+
+	    List<Bond> idBonds = chunk.stream().map(id -> (Bond) BondFactory.createPrivateIdentifierBond(id)).toList();
+	    Bond chunkBond = BondFactory.createAndBond(bond, idBonds.size() == 1 ? idBonds.get(0) : BondFactory.createOrBond(idBonds));
+
+	    DiscoveryMessage message = new DiscoveryMessage();
+	    message.setRequestId("source-series-lister-onlines-" + source.getUniqueIdentifier() + "-" + UUID.randomUUID());
+	    message.setExcludeResourceBinary(false);
+	    message.setSources(List.of(source));
+	    message.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+	    message.setPermittedBond(chunkBond);
+	    message.setUserBond(chunkBond);
+	    message.setNormalizedBond(chunkBond);
+	    message.setPage(new Page(1, chunk.size()));
+
+	    for (GSResource resource : executor.retrieve(message).getResultsList()) {
+
+		Distribution distribution = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution();
+		if (distribution == null || resource.getPrivateId() == null) {
+		    continue;
+		}
+
+		List<String> ids = new ArrayList<>();
+		Iterator<Online> onlines = distribution.getDistributionOnlines();
+		while (onlines.hasNext()) {
+		    Online online = onlines.next();
+		    String id = online.getIdentifier();
+		    if (id != null && !id.isBlank() && DOWNLOAD_FUNCTION.equalsIgnoreCase(online.getFunctionCode())) {
+			ids.add(id);
+		    }
+		}
+
+		if (!ids.isEmpty()) {
+		    ret.put(resource.getPrivateId(), ids);
+		}
+	    }
+	}
+
+	return ret;
     }
 
     private static String first(IndexesMetadata indexes, MetadataElement element) {

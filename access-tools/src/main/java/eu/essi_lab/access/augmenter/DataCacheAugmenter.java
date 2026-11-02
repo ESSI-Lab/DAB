@@ -120,6 +120,10 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 
     private List<DataRecord> newRecords = new ArrayList<>();
 
+    private boolean deferExpectedTimeClearing = false;
+
+    private ExpectedTimeHandover expectedTimeHandover;
+
     private Integer fillDays;
 
     private Date backfillBegin;
@@ -160,6 +164,25 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
     }
 
     /**
+     * @param defer if true, the expected time of the current record of an updated series is not cleared by
+     *        {@link #augment(GSResource)}: the caller must clear it with {@link #getExpectedTimeHandover()} once the new
+     *        records are written. Otherwise (default) its clearing is written after the new records
+     */
+    public void setDeferExpectedTimeClearing(boolean defer) {
+
+	this.deferExpectedTimeClearing = defer;
+    }
+
+    /**
+     * @return the handover of the expected time of the series updated by the last {@link #augment(GSResource)}, if
+     *         deferred (see {@link #setDeferExpectedTimeClearing(boolean)}) and the series held an expected time
+     */
+    public Optional<ExpectedTimeHandover> getExpectedTimeHandover() {
+
+	return Optional.ofNullable(expectedTimeHandover);
+    }
+
+    /**
      * @param waitForResults if true (default), when no results are found the retrieval is repeated every 5 minutes, up
      *        to {@link #MAX_RETRY} times. Disabling it is useful when filling the cache of many resources, where missing
      *        recent data is not an exceptional case
@@ -173,6 +196,7 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
     public Optional<GSResource> augment(GSResource resource) throws GSException {
 
 	newRecords = new ArrayList<>();
+	expectedTimeHandover = null;
 
 	DataCacheConnector dataCacheConnector = null;
 	String sourceId = null;
@@ -204,7 +228,6 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 
 	    sourceId = resource.getSource().getUniqueIdentifier();
 
-	    DataRecord toUpdate = null;
 	    // get the last 22 records from cache
 	    List<DataRecord> cachedRecords = dataCacheConnector.getLastRecords(22, onlineId);
 
@@ -226,12 +249,18 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		if (date.after(yesterday)) {
 		    dailyObservations++;
 		}
-		expected = cachedRecord.getNextRecordExpectedTime();
-		if (expected != null) {
-		    cachedRecord.setNextRecordExpectedTime(null);
-		    toUpdate = cachedRecord;
-		}
 	    }
+
+	    // the current expected time is held by the newest record having one. The older ones (e.g. left by a failed
+	    // clearing) are stale and can be cleared at once; the current one is cleared only after the new records are
+	    // written, so that the series never remains without expected time
+	    List<DataRecord> stale = ExpectedTimeHandover.getStale(cachedRecords);
+	    if (!stale.isEmpty()) {
+		GSLoggerFactory.getLogger(getClass()).warn("[DATA-CACHE] Clearing {} stale expected times of {}", stale.size(), onlineId);
+		ExpectedTimeHandover.clear(stale, dataCacheConnector);
+	    }
+	    DataRecord current = ExpectedTimeHandover.getCurrent(cachedRecords).orElse(null);
+	    expected = current != null ? current.getNextRecordExpectedTime() : null;
 	    // older data of a cached series
 	    FillResult backfill = null;
 	    if (backfillBegin != null && backfillEnd != null && backfillBegin.before(backfillEnd) && !cachedRecords.isEmpty()) {
@@ -446,11 +475,22 @@ public class DataCacheAugmenter extends ResourceAugmenter<DataCacheAugmenterSett
 		}
 		newRecords = new ArrayList<>(records);
 
-		if (toUpdate != null) {
-		    records.add(0, toUpdate);
-		}
-
 		dataCacheConnector.write(records);
+
+		if (current != null) {
+
+		    Date newestDate = records.stream().map(DataRecord::getDate).max(Date::compareTo).get();
+
+		    if (deferExpectedTimeClearing) {
+
+			expectedTimeHandover = new ExpectedTimeHandover(onlineId, newestDate, List.of(current));
+
+		    } else {
+
+			// written after the new records, so that it is not written before them
+			ExpectedTimeHandover.clear(List.of(current), dataCacheConnector);
+		    }
+		}
 
 		StationRecord station = new StationRecord();
 		station.setSourceIdentifier(sourceId);
