@@ -32,13 +32,13 @@ public class TrentinoFloodsProtocol extends AbstractNetProtocol implements NetPr
     @Override
     public String getDescription() {
 
-	return "Provincia autonoma di Trento hydrometric open data (floods.it) Protocol";
+	return "Provincia autonoma di Trento hydrometric monitoring API (floods.it) Protocol";
     }
 
     @Override
     public String[] getURNs() {
 
-	return new String[] { "https://www.floods.it/public/Opendata" };
+	return new String[] { "https://www.floods.it/api/v1/monitoring", "https://www.floods.it/public/Opendata" };
     }
 
     @Override

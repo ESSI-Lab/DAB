@@ -28,8 +28,8 @@ import org.json.JSONObject;
 import eu.essi_lab.lib.utils.JSONObjectWrapper;
 
 /**
- * A Trentino floods time series: one hydrometric sensor (water level or calculated discharge) of a station, described by its
- * entry in the sensor registry
+ * A Trentino floods time series: one quantity (water level or discharge) monitored at a site, described by its entry in the series
+ * index
  *
  * @author boldrini
  */
@@ -52,7 +52,7 @@ public class TrentinoFloodsEntity extends JSONObjectWrapper {
     }
 
     /**
-     * @return the series identifier, e.g. "1|5"
+     * @return the series identifier, e.g. "32207"
      */
     public String getSeriesId() {
 
@@ -60,35 +60,19 @@ public class TrentinoFloodsEntity extends JSONObjectWrapper {
     }
 
     /**
-     * @return the sensor identifier, e.g. "5"
+     * @return the site name, e.g. "Ponte Arche"
      */
-    public String getSensorId() {
+    public String getSite() {
 
-	return getObject().optString(TrentinoFloodsClient.SENSOR_ID, null);
+	return getObject().optString(TrentinoFloodsClient.SITE, "Series " + getSeriesId());
     }
 
     /**
-     * @return the dataset identifier, e.g. "1"
-     */
-    public String getDataset() {
-
-	return getObject().optString(TrentinoFloodsClient.DATASET, null);
-    }
-
-    /**
-     * @return the station name, e.g. "Borgo Valsugana"
-     */
-    public String getStationName() {
-
-	return getObject().optString(TrentinoFloodsClient.STATION_NAME, "Sensor " + getSensorId());
-    }
-
-    /**
-     * @return
+     * @return the monitored quantity, if known
      */
     public Optional<TrentinoFloodsProperty> getProperty() {
 
-	return TrentinoFloodsProperty.decode(getDataset());
+	return TrentinoFloodsProperty.decode(getString(TrentinoFloodsClient.QUANTITY));
     }
 
     /**

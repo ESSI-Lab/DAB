@@ -162,6 +162,15 @@
    color: var(--color4);
  }
 
+ .rating-curves-disclaimer {
+   padding: 8px 12px;
+   border-left: 4px solid #e0a800;
+   background-color: #fff8e1;
+   color: #5c4400;
+   font-size: 14px;
+   font-style: italic;
+ }
+
  .data_table_headers_separator {
    padding: 7px !important;
    border: none !important;

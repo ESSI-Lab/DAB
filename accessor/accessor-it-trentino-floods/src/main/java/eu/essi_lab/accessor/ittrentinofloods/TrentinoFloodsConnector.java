@@ -35,9 +35,9 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**
- * Harvests one record per hydrometric sensor of the Ufficio Dighe of the Provincia autonoma di Trento (each sensor observes a single
- * property, water level or calculated discharge). The begin and end of each series are the first and last valid values of the file
- * of the sensor (which holds the last 7 days only); sensors without valid values are discarded.
+ * Harvests one record per series of the hydrometric monitoring API of the Ufficio Dighe of the Provincia autonoma di Trento (each
+ * series is a single quantity of a site, water level or calculated discharge). The begin and end of each series are the first and
+ * last valid values of its file (which holds the last 7 days only); series without valid values are discarded.
  *
  * @author boldrini
  */
@@ -137,12 +137,12 @@ public class TrentinoFloodsConnector extends HarvestedQueryConnector<TrentinoFlo
 	    return;
 	}
 
-	List<String> sensors = getSetting().getSensors();
+	List<String> selected = getSetting().getSeries();
 	List<TrentinoFloodsEntity> all = client.retrieveSeries();
 
 	series = new ArrayList<>();
 	for (TrentinoFloodsEntity entity : all) {
-	    if (sensors.isEmpty() || sensors.contains(entity.getSensorId())) {
+	    if (selected.isEmpty() || selected.contains(entity.getSeriesId())) {
 		series.add(entity);
 	    }
 	}

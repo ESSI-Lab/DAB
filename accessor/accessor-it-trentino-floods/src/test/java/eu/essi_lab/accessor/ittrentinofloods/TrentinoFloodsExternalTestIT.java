@@ -22,7 +22,6 @@ package eu.essi_lab.accessor.ittrentinofloods;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -59,36 +58,42 @@ public class TrentinoFloodsExternalTestIT {
 		System.getProperty("trentinoFloodsEndpoint", TrentinoFloodsClient.DEFAULT_ENDPOINT));
 
 	List<TrentinoFloodsEntity> series = client.retrieveSeries();
-	assertEquals(20, series.size());
-	assertEquals(10, series.stream().filter(s -> s.getProperty().get() == TrentinoFloodsProperty.LEVEL).count());
-	assertEquals(10, series.stream().filter(s -> s.getProperty().get() == TrentinoFloodsProperty.DISCHARGE).count());
+	GSLoggerFactory.getLogger(getClass()).info("Retrieved {} series", series.size());
 
-	TrentinoFloodsEntity trento = series.get(0);
-	assertEquals("1|1", trento.getSeriesId());
-	assertEquals("Trento", trento.getStationName());
+	// 131 series at the time of writing (72 water level, 59 discharge)
+	assertTrue(series.size() > 100);
+	assertTrue(series.stream().filter(s -> s.getProperty().orElse(null) == TrentinoFloodsProperty.LEVEL).count() > 50);
+	assertTrue(series.stream().filter(s -> s.getProperty().orElse(null) == TrentinoFloodsProperty.DISCHARGE).count() > 50);
+	assertTrue(series.stream().allMatch(s -> s.getObject().has(TrentinoFloodsClient.LAT)));
+
+	TrentinoFloodsEntity ponteArche = series.stream().filter(s -> s.getSeriesId().equals("32207")).findFirst().get();
+	assertEquals("Ponte Arche", ponteArche.getSite());
+	assertEquals("fiume Sarca", ponteArche.getString(TrentinoFloodsClient.WATERBODY));
+	assertEquals(TrentinoFloodsProperty.LEVEL, ponteArche.getProperty().get());
     }
 
     @Test
     public void testObservations() throws GSException {
 
 	TrentinoFloodsClient client = new TrentinoFloodsClient();
-	TrentinoFloodsEntity level = TrentinoFloodsClient.parseSeriesId("1|1");
+	TrentinoFloodsEntity level = TrentinoFloodsClient.parseSeriesId("32207");
 
 	SimpleEntry<Date, Date> extent = client.retrieveTemporalExtent(level).get();
 	GSLoggerFactory.getLogger(getClass()).info("Current extent: {} - {}", extent.getKey(), extent.getValue());
 
-	// rolling window of 7 days
+	// rolling window of 7 days (starting at local midnight), updated in real time
 	long width = extent.getValue().getTime() - extent.getKey().getTime();
-	assertTrue(width <= TrentinoFloodsClient.WINDOW + TimeUnit.HOURS.toMillis(2));
+	assertTrue(width <= TrentinoFloodsClient.WINDOW + TimeUnit.DAYS.toMillis(1));
+	assertTrue(System.currentTimeMillis() - extent.getValue().getTime() < TimeUnit.DAYS.toMillis(2));
 
 	TreeMap<Date, BigDecimal> values = client.retrieveObservations(level, extent.getKey(), extent.getValue());
-	// hourly values
+	// 15 minutes values (with some gaps)
 	assertTrue(values.size() > 100);
 
-	Date middle = new Date(extent.getKey().getTime() + TimeUnit.DAYS.toMillis(1));
+	Date middle = new Date(extent.getKey().getTime() + TimeUnit.HOURS.toMillis(6));
 	TreeMap<Date, BigDecimal> subset = client.retrieveObservations(level, extent.getKey(), middle);
-	assertTrue(subset.size() >= 24 && subset.size() <= 25);
-	assertFalse(subset.lastKey().after(middle));
+	assertTrue(subset.size() <= 25);
+	assertTrue(subset.isEmpty() || !subset.lastKey().after(middle));
     }
 
     @Test
@@ -96,7 +101,7 @@ public class TrentinoFloodsExternalTestIT {
 
 	TrentinoFloodsConnector connector = new TrentinoFloodsConnector();
 	connector.setSourceURL(TrentinoFloodsClient.DEFAULT_ENDPOINT);
-	connector.getSetting().setSensors("1,11,5");
+	connector.getSetting().setSeries("32207,42437,28210");
 	connector.getSetting().setMaxRecords(10);
 
 	List<OriginalMetadata> records = connector.listRecords(new ListRecordsRequest()).getRecordsAsList();
@@ -108,9 +113,9 @@ public class TrentinoFloodsExternalTestIT {
 		map(TrentinoFloodsEntity::getSeriesId).//
 		collect(Collectors.toList());
 
-	assertTrue(ids.contains("1|1"));
-	assertTrue(ids.contains("2|11"));
-	assertTrue(ids.contains("1|5"));
+	assertTrue(ids.contains("32207"));
+	assertTrue(ids.contains("42437"));
+	assertTrue(ids.contains("28210"));
     }
 
     @Test
@@ -118,7 +123,7 @@ public class TrentinoFloodsExternalTestIT {
 
 	TrentinoFloodsConnector connector = new TrentinoFloodsConnector();
 	connector.setSourceURL(TrentinoFloodsClient.DEFAULT_ENDPOINT);
-	connector.getSetting().setSensors("11");
+	connector.getSetting().setSeries("42437");
 
 	OriginalMetadata record = connector.listRecords(new ListRecordsRequest()).getRecordsAsList().get(0);
 

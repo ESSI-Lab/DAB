@@ -26,11 +26,14 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Date;
+
 import org.junit.Test;
 
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.net.protocols.NetProtocolWrapper;
+import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.CoreMetadata;
@@ -59,9 +62,9 @@ public class TrentinoFloodsMapperTest {
 	GSResource resource = new TrentinoFloodsMapper().map(originalMetadata, source);
 	CoreMetadata coreMetadata = resource.getHarmonizedMetadata().getCoreMetadata();
 
-	assertEquals("Trento-Fersina - Discharge", coreMetadata.getTitle());
+	assertEquals("Ponte Arche (fiume Sarca) - Discharge", coreMetadata.getTitle());
 	assertTrue(coreMetadata.getAbstract().contains("Portata (calcolata)"));
-	assertTrue(coreMetadata.getAbstract().contains("torr. Fersina"));
+	assertTrue(coreMetadata.getAbstract().contains("rating curve"));
 	assertTrue(coreMetadata.getAbstract().contains("last 7 days"));
 
 	TemporalExtent extent = coreMetadata.getTemporalExtent();
@@ -72,21 +75,37 @@ public class TrentinoFloodsMapperTest {
 
 	Online online = coreMetadata.getOnline();
 	assertNotNull(online);
-	assertEquals("2|12", online.getName());
+	assertEquals("42437", online.getName());
 	assertEquals(NetProtocolWrapper.TRENTINO_FLOODS.getCommonURN(), online.getProtocol());
 
 	assertEquals("m3/s", resource.getExtensionHandler().getAttributeUnitsAbbreviation().get());
+	assertEquals("PT15M", resource.getExtensionHandler().getTimeResolutionDuration8601().get());
 	assertEquals("Italy", resource.getExtensionHandler().getCountry().get());
 	assertNotNull(resource.getOriginalId());
 	assertEquals(NetProtocolWrapper.TRENTINO_FLOODS.getCommonURN() + ":DISCHARGE",
 		coreMetadata.getMIMetadata().getCoverageDescription().getAttributeIdentifier());
 
-	// level and discharge of the same station share the parent identifier
-	TrentinoFloodsEntity level = TrentinoFloodsClientTest.createSeries().get(0);
+	// level and discharge of the same site share the parent identifier
+	TrentinoFloodsEntity level = TrentinoFloodsClientTest.createSeries().get(1);
 	originalMetadata.setMetadata(level.toString());
 	GSResource levelResource = new TrentinoFloodsMapper().map(originalMetadata, source);
 	assertEquals(coreMetadata.getMIMetadata().getParentIdentifier(),
 		levelResource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getParentIdentifier());
-	assertEquals("Trento-Fersina - Water level", levelResource.getHarmonizedMetadata().getCoreMetadata().getTitle());
+	assertEquals("Ponte Arche (fiume Sarca) - Water level", levelResource.getHarmonizedMetadata().getCoreMetadata().getTitle());
+	assertEquals("m", levelResource.getExtensionHandler().getAttributeUnitsAbbreviation().get());
+
+	// a recent series has an indeterminate end
+	level.getObject().put(TrentinoFloodsClient.BEGIN, ISO8601DateTimeUtils.getISO8601DateTime(new Date(System.currentTimeMillis() - TrentinoFloodsClient.WINDOW)));
+	level.getObject().put(TrentinoFloodsClient.END, ISO8601DateTimeUtils.getISO8601DateTime(new Date()));
+	originalMetadata.setMetadata(level.toString());
+	levelResource = new TrentinoFloodsMapper().map(originalMetadata, source);
+	assertTrue(levelResource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent().isEndPositionIndeterminate());
+
+	// unknown quantities keep their original name and unit
+	TrentinoFloodsEntity unknown = TrentinoFloodsClientTest.createSeries().get(3);
+	originalMetadata.setMetadata(unknown.toString());
+	GSResource unknownResource = new TrentinoFloodsMapper().map(originalMetadata, source);
+	assertEquals("Unknown - precipitation", unknownResource.getHarmonizedMetadata().getCoreMetadata().getTitle());
+	assertEquals("mm", unknownResource.getExtensionHandler().getAttributeUnitsAbbreviation().get());
     }
 }

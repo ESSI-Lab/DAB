@@ -60,6 +60,7 @@
   "station_information_page": "Pagina informazioni stazione",
   "rating_curves": "Scale di deflusso",
   "rating_curve_metadata": "Metadati scale di deflusso",
+  "rating_curves_disclaimer": "Le scale di deflusso sono pubblicate a titolo puramente informativo. Per quanto riguarda il dato di portata, si prega di fare affidamento sempre e solo sulle serie di portata pubblicate dagli Uffici competenti e disponibili qui su HIS Central.",
   "available_periods": "Periodi disponibili",
   "selected_period": "Periodo selezionato",
   "period": "periodo",

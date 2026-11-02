@@ -24,24 +24,19 @@ package eu.essi_lab.accessor.ittrentinofloods;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import eu.essi_lab.lib.net.downloader.Downloader;
@@ -51,74 +46,66 @@ import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
 
 /**
- * Client of the open data of the hydrometric sensors of the Ufficio Dighe of the Provincia autonoma di Trento
- * (https://www.floods.it/public/Opendata/), published on https://dati.trentino.it as the datasets "Anagrafica Sensori Ufficio Dighe"
- * (sensor registry, Dataset=0), "Rilevamento Sensori Idrometrici - Livello" (Dataset=1) and "Rilevamento Sensori Idrometrici -
- * Portata (Calcolata)" (Dataset=2).<br>
- * Each sensor is published as a CSV file with the hourly values of the last 7 days only (no date parameters are supported, the file
- * is the whole content available for the sensor). Times are local times, flagged as solar time (UTC+1) or summer time (UTC+2).
+ * Client of the real time hydrometric monitoring API of the Ufficio Dighe of the Provincia autonoma di Trento
+ * (https://www.floods.it/public/DatiLive.php).<br>
+ * The index (index.json) is a GeoJSON FeatureCollection with one Point per monitored series (water level or discharge of a site);
+ * the values of each series are published as &lt;series id&gt;.json, with epoch times (UTC), and hold the last 7 days only (no date
+ * parameters are supported, the file is the whole content available for the series).
  *
  * @author boldrini
  */
 public class TrentinoFloodsClient {
 
-    public static final String DEFAULT_ENDPOINT = "https://www.floods.it/public/Opendata/";
+    public static final String DEFAULT_ENDPOINT = "https://www.floods.it/api/v1/monitoring/";
 
-    static final String DOWNLOAD_PATH = "ODdownload.php";
-
-    static final String REGISTRY_DATASET = "0";
-    static final String LEVEL_DATASET = "1";
-    static final String DISCHARGE_DATASET = "2";
+    static final String INDEX = "index.json";
 
     /**
-     * Width of the rolling window of the sensor files
+     * Path of the discontinued open data download page (data stopped in January 2024)
+     */
+    static final String OLD_OPENDATA_PATH = "/public/Opendata";
+
+    /**
+     * Width of the rolling window of the series files
      */
     public static final long WINDOW = TimeUnit.DAYS.toMillis(7);
 
     /**
-     * Response returned (with HTTP 200) for unknown datasets or sensors
+     * Minimum interval between two requests: the server answers 429 after about 90 requests in a few seconds
      */
-    static final String NOT_EXISTING = "Il file non esiste";
+    static final long MIN_REQUEST_INTERVAL = TimeUnit.SECONDS.toMillis(1);
 
-    // columns of the sensor registry
-    static final String REGISTRY_SENSOR_ID = "IdSensore";
-    static final String REGISTRY_DESCRIPTION = "Descrizione";
-    static final String REGISTRY_TYPE = "Tipologia";
-    static final String REGISTRY_LAT = "Latitudine WGS";
-    // sic
-    static final String REGISTRY_LON = "Logitudine WGS";
-    static final String REGISTRY_X = "X WGS";
-    static final String REGISTRY_Y = "Y WGS";
-    static final String REGISTRY_BASIN = "Bacino";
-    static final String REGISTRY_WATERBODY = "Corpo Idrico";
-    static final String REGISTRY_URL = "Url";
+    private static long lastRequest;
 
-    // columns of the sensor files
-    static final String DATA_DATE = "Data/Ora";
-    static final String DATA_VALUE = "Valore";
-    static final String DATA_VALIDATED = "Validato";
-    static final String DATA_SOLAR_TIME = "OraSolare";
+    // members of the index features
+    static final String INDEX_METADATA = "metadata";
+    static final String INDEX_SERIES_ID = "series id";
+    static final String INDEX_SITE = "site";
+    static final String INDEX_WATERBODY = "water body";
+    static final String INDEX_UOM = "uom";
+    static final String INDEX_QUANTITY = "quantity";
+    static final String INDEX_QUANTITY_TYPE = "quantity type";
+    static final String INDEX_COLLECTION_METHOD = "collection method";
+    static final String INDEX_AUTHOR = "author";
+
+    // members of the series files
+    static final String DATA_TIMESTAMP = "timestamp";
+    static final String DATA_VALUE = "value";
+    static final String DATA_TIME_FORMAT = "time_format";
 
     // keys of the entity
-    public static final String SENSOR_ID = "sensorId";
-    public static final String DATASET = "dataset";
-    public static final String STATION_NAME = "stationName";
-    public static final String TYPE = "type";
+    public static final String SERIES_ID = "seriesId";
+    public static final String SITE = "site";
+    public static final String WATERBODY = "waterbody";
+    public static final String UOM = "uom";
+    public static final String QUANTITY = "quantity";
+    public static final String QUANTITY_TYPE = "quantityType";
+    public static final String COLLECTION_METHOD = "collectionMethod";
+    public static final String AUTHOR = "author";
     public static final String LAT = "lat";
     public static final String LON = "lon";
-    public static final String UTM_X = "utmX";
-    public static final String UTM_Y = "utmY";
-    public static final String BASIN = "basin";
-    public static final String WATERBODY = "waterbody";
-    public static final String URL = "url";
-    public static final String SERIES_ID = "seriesId";
     public static final String BEGIN = "begin";
     public static final String END = "end";
-    public static final String VALIDATED = "validated";
-
-    private static final String SERIES_ID_SEPARATOR = "|";
-
-    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final String endpoint;
     private final Downloader downloader;
@@ -139,98 +126,105 @@ public class TrentinoFloodsClient {
 	this.endpoint = normalizeEndpoint(endpoint);
 	this.downloader = new Downloader();
 	this.downloader.setResponseTimeout(TimeUnit.MINUTES, 2);
-	this.downloader.setRetryPolicy(r -> r.statusCode() >= 500 || r.statusCode() == 429, 3, TimeUnit.SECONDS, 10);
+	// after a burst of requests the server answers 429 for about one minute
+	this.downloader.setRetryPolicy(r -> r.statusCode() >= 500 || r.statusCode() == 429, 6, TimeUnit.SECONDS, 20);
     }
 
     /**
-     * Retrieves the time series (one per sensor) listed by the sensor registry
+     * Waits until {@link #MIN_REQUEST_INTERVAL} has elapsed since the previous request of any client of this JVM
      *
-     * @return the series sorted by sensor identifier
+     * @throws InterruptedException
+     */
+    private static synchronized void throttle() throws InterruptedException {
+
+	long wait = lastRequest + MIN_REQUEST_INTERVAL - System.currentTimeMillis();
+	if (wait > 0) {
+	    Thread.sleep(wait);
+	}
+
+	lastRequest = System.currentTimeMillis();
+    }
+
+    /**
+     * Retrieves the series listed by the index
+     *
+     * @return the series sorted by site and series identifier
      * @throws GSException
      */
     public List<TrentinoFloodsEntity> retrieveSeries() throws GSException {
 
-	String registry = get(REGISTRY_DATASET, null).orElseThrow(() -> createException("Sensor registry not available", null));
+	String index = get(INDEX).orElseThrow(() -> createException("Series index not available", null));
 
-	return parseRegistry(registry);
+	try {
+	    return parseIndex(index);
+	} catch (JSONException e) {
+	    throw createException("Invalid series index", e);
+	}
     }
 
     /**
-     * @param registry the CSV of the sensor registry
-     * @return the series of the water level and discharge sensors, sorted by sensor identifier
+     * @param index the GeoJSON of the series index
+     * @return the series, sorted by site and series identifier
      */
-    static List<TrentinoFloodsEntity> parseRegistry(String registry) {
+    static List<TrentinoFloodsEntity> parseIndex(String index) {
 
 	List<TrentinoFloodsEntity> ret = new ArrayList<>();
 
-	List<Map<String, String>> rows = parseCSV(registry);
+	JSONArray features = new JSONObject(index).optJSONArray("features");
+	if (features == null) {
+	    return ret;
+	}
 
-	for (Map<String, String> row : rows) {
+	for (int i = 0; i < features.length(); i++) {
 
-	    String sensorId = row.getOrDefault(REGISTRY_SENSOR_ID, "");
-	    if (sensorId.isEmpty()) {
+	    JSONObject feature = features.optJSONObject(i);
+	    JSONObject metadata = feature == null ? null
+		    : Optional.ofNullable(feature.optJSONObject("properties")).map(p -> p.optJSONObject(INDEX_METADATA)).orElse(null);
+	    if (metadata == null) {
 		continue;
 	    }
 
-	    String type = row.getOrDefault(REGISTRY_TYPE, "");
-	    String dataset = getDataset(row.getOrDefault(REGISTRY_URL, ""), type);
-	    if (TrentinoFloodsProperty.decode(dataset).isEmpty()) {
-		GSLoggerFactory.getLogger(TrentinoFloodsClient.class).warn("Unknown type {} of sensor {}", type, sensorId);
+	    String seriesId = metadata.optString(INDEX_SERIES_ID, "").trim();
+	    if (seriesId.isEmpty()) {
 		continue;
 	    }
 
 	    JSONObject object = new JSONObject();
-	    object.put(SENSOR_ID, sensorId);
-	    object.put(DATASET, dataset);
-	    object.put(SERIES_ID, buildSeriesId(dataset, sensorId));
-	    object.put(TYPE, type);
+	    object.put(SERIES_ID, seriesId);
 
-	    put(object, STATION_NAME, row.get(REGISTRY_DESCRIPTION));
-	    put(object, BASIN, row.get(REGISTRY_BASIN));
-	    put(object, WATERBODY, row.get(REGISTRY_WATERBODY));
-	    put(object, URL, row.get(REGISTRY_URL));
-	    put(object, UTM_X, row.get(REGISTRY_X));
-	    put(object, UTM_Y, row.get(REGISTRY_Y));
+	    put(object, SITE, metadata.optString(INDEX_SITE));
+	    put(object, WATERBODY, metadata.optString(INDEX_WATERBODY));
+	    put(object, UOM, metadata.optString(INDEX_UOM));
+	    put(object, QUANTITY, metadata.optString(INDEX_QUANTITY));
+	    put(object, QUANTITY_TYPE, metadata.optString(INDEX_QUANTITY_TYPE));
+	    put(object, COLLECTION_METHOD, metadata.optString(INDEX_COLLECTION_METHOD));
+	    put(object, AUTHOR, metadata.optString(INDEX_AUTHOR));
 
-	    try {
-		object.put(LAT, new BigDecimal(row.getOrDefault(REGISTRY_LAT, "")));
-		object.put(LON, new BigDecimal(row.getOrDefault(REGISTRY_LON, "")));
-	    } catch (NumberFormatException e) {
-		GSLoggerFactory.getLogger(TrentinoFloodsClient.class).warn("Invalid coordinates of sensor {}", sensorId);
+	    // GeoJSON coordinates are longitude, latitude
+	    JSONArray coordinates = Optional.ofNullable(feature.optJSONObject("geometry")).map(g -> g.optJSONArray("coordinates"))
+		    .orElse(null);
+	    if (coordinates != null && coordinates.length() >= 2) {
+		try {
+		    object.put(LON, coordinates.getBigDecimal(0));
+		    object.put(LAT, coordinates.getBigDecimal(1));
+		} catch (JSONException e) {
+		    GSLoggerFactory.getLogger(TrentinoFloodsClient.class).warn("Invalid coordinates of series {}", seriesId);
+		}
+	    }
+
+	    if (TrentinoFloodsProperty.decode(object.optString(QUANTITY)).isEmpty()) {
+		GSLoggerFactory.getLogger(TrentinoFloodsClient.class).warn("Unknown quantity {} of series {}", object.optString(QUANTITY),
+			seriesId);
 	    }
 
 	    ret.add(new TrentinoFloodsEntity(object));
 	}
 
-	ret.sort(Comparator.comparing((TrentinoFloodsEntity e) -> parseInt(e.getSensorId())).thenComparing(TrentinoFloodsEntity::getSensorId));
+	ret.sort(Comparator.comparing(TrentinoFloodsEntity::getSite)
+		.thenComparing((TrentinoFloodsEntity e) -> parseLong(e.getSeriesId()))
+		.thenComparing(TrentinoFloodsEntity::getSeriesId));
 
 	return ret;
-    }
-
-    /**
-     * @param url the download URL listed by the registry
-     * @param type the sensor type, e.g. "Idrometro-Livello (m)"
-     * @return the dataset of the sensor
-     */
-    static String getDataset(String url, String type) {
-
-	int index = url.indexOf("Dataset=");
-	if (index >= 0) {
-	    String dataset = url.substring(index + "Dataset=".length()).split("&")[0].trim();
-	    if (!dataset.isEmpty()) {
-		return dataset;
-	    }
-	}
-
-	String lower = type.toLowerCase();
-	if (lower.contains("livello")) {
-	    return LEVEL_DATASET;
-	}
-	if (lower.contains("portata")) {
-	    return DISCHARGE_DATASET;
-	}
-
-	return "";
     }
 
     /**
@@ -242,14 +236,13 @@ public class TrentinoFloodsClient {
      */
     public boolean addTemporalExtent(TrentinoFloodsEntity series) throws GSException {
 
-	SensorData data = retrieveData(series);
-	if (data.values.isEmpty()) {
+	TreeMap<Date, BigDecimal> values = retrieveData(series);
+	if (values.isEmpty()) {
 	    return false;
 	}
 
-	series.getObject().put(BEGIN, ISO8601DateTimeUtils.getISO8601DateTime(data.values.firstKey()));
-	series.getObject().put(END, ISO8601DateTimeUtils.getISO8601DateTime(data.values.lastKey()));
-	series.getObject().put(VALIDATED, data.validated);
+	series.getObject().put(BEGIN, ISO8601DateTimeUtils.getISO8601DateTime(values.firstKey()));
+	series.getObject().put(END, ISO8601DateTimeUtils.getISO8601DateTime(values.lastKey()));
 
 	return true;
     }
@@ -261,7 +254,7 @@ public class TrentinoFloodsClient {
      */
     public Optional<SimpleEntry<Date, Date>> retrieveTemporalExtent(TrentinoFloodsEntity series) throws GSException {
 
-	TreeMap<Date, BigDecimal> values = retrieveData(series).values;
+	TreeMap<Date, BigDecimal> values = retrieveData(series);
 	if (values.isEmpty()) {
 	    return Optional.empty();
 	}
@@ -278,7 +271,7 @@ public class TrentinoFloodsClient {
      */
     public TreeMap<Date, BigDecimal> retrieveObservations(TrentinoFloodsEntity series, Date begin, Date end) throws GSException {
 
-	TreeMap<Date, BigDecimal> values = retrieveData(series).values;
+	TreeMap<Date, BigDecimal> values = retrieveData(series);
 	if (values.isEmpty()) {
 	    return values;
 	}
@@ -291,159 +284,101 @@ public class TrentinoFloodsClient {
      * @return
      * @throws GSException
      */
-    private SensorData retrieveData(TrentinoFloodsEntity series) throws GSException {
+    private TreeMap<Date, BigDecimal> retrieveData(TrentinoFloodsEntity series) throws GSException {
 
-	Optional<String> csv = get(series.getDataset(), series.getSensorId());
-	if (csv.isEmpty()) {
+	Optional<String> json = get(series.getSeriesId() + ".json");
+	if (json.isEmpty()) {
 	    GSLoggerFactory.getLogger(getClass()).warn("No data available for series {}", series.getSeriesId());
-	    return new SensorData();
+	    return new TreeMap<>();
 	}
-
-	return parseData(csv.get());
-    }
-
-    /**
-     * Values of a sensor file
-     */
-    static class SensorData {
-
-	final TreeMap<Date, BigDecimal> values = new TreeMap<>();
-
-	/**
-	 * True if all the valid values are flagged as validated
-	 */
-	boolean validated = true;
-    }
-
-    /**
-     * @param csv the content of a sensor file
-     * @return the valid values (missing and not numeric values are skipped)
-     */
-    static SensorData parseData(String csv) {
-
-	SensorData ret = new SensorData();
-
-	for (Map<String, String> row : parseCSV(csv)) {
-
-	    String value = row.getOrDefault(DATA_VALUE, "").replace(",", ".");
-	    if (value.isEmpty()) {
-		continue;
-	    }
-
-	    BigDecimal decimal;
-	    try {
-		decimal = new BigDecimal(value);
-	    } catch (NumberFormatException e) {
-		continue;
-	    }
-
-	    Optional<Date> date = parseDate(row.getOrDefault(DATA_DATE, ""), row.getOrDefault(DATA_SOLAR_TIME, "SI"));
-	    if (date.isEmpty()) {
-		continue;
-	    }
-
-	    ret.values.put(date.get(), decimal);
-	    if (!"SI".equalsIgnoreCase(row.getOrDefault(DATA_VALIDATED, ""))) {
-		ret.validated = false;
-	    }
-	}
-
-	return ret;
-    }
-
-    /**
-     * @param date e.g. "04/01/2024 13:00"
-     * @param solarTime "SI" for solar time (UTC+1), "NO" for summer time (UTC+2)
-     * @return
-     */
-    static Optional<Date> parseDate(String date, String solarTime) {
 
 	try {
-	    LocalDateTime local = LocalDateTime.parse(date.trim(), DATE_FORMAT);
-	    ZoneOffset offset = "NO".equalsIgnoreCase(solarTime.trim()) ? ZoneOffset.ofHours(2) : ZoneOffset.ofHours(1);
-	    return Optional.of(Date.from(local.toInstant(offset)));
-	} catch (DateTimeParseException e) {
-	    return Optional.empty();
+	    return parseData(json.get());
+	} catch (JSONException e) {
+	    throw createException("Invalid data of series " + series.getSeriesId(), e);
 	}
     }
 
     /**
-     * @param csv a comma separated file with a header row
-     * @return the rows, as maps from the column names to the (trimmed) values
+     * @param json the content of a series file
+     * @return the valid values (missing and not numeric values are skipped)
      */
-    static List<Map<String, String>> parseCSV(String csv) {
+    static TreeMap<Date, BigDecimal> parseData(String json) {
 
-	List<Map<String, String>> ret = new ArrayList<>();
+	TreeMap<Date, BigDecimal> ret = new TreeMap<>();
 
-	String[] lines = csv.replace("﻿", "").split("\\r?\\n");
-	if (lines.length == 0) {
+	JSONArray features = new JSONObject(json).optJSONArray("features");
+	if (features == null) {
 	    return ret;
 	}
 
-	String[] header = lines[0].split(",", -1);
+	for (int i = 0; i < features.length(); i++) {
 
-	for (int i = 1; i < lines.length; i++) {
-
-	    if (lines[i].isBlank()) {
+	    JSONObject properties = Optional.ofNullable(features.optJSONObject(i)).map(f -> f.optJSONObject("properties")).orElse(null);
+	    JSONObject data = properties == null ? null : properties.optJSONObject("data");
+	    if (data == null) {
 		continue;
 	    }
 
-	    String[] fields = lines[i].split(",", -1);
-
-	    Map<String, String> row = new HashMap<>();
-	    for (int j = 0; j < header.length && j < fields.length; j++) {
-		row.put(header[j].trim(), fields[j].trim());
+	    String timeFormat = Optional.ofNullable(properties.optJSONObject(INDEX_METADATA)).map(m -> m.optString(DATA_TIME_FORMAT))
+		    .orElse("epoch");
+	    if (!timeFormat.isEmpty() && !"epoch".equalsIgnoreCase(timeFormat)) {
+		GSLoggerFactory.getLogger(TrentinoFloodsClient.class).warn("Unsupported time format {}", timeFormat);
+		continue;
 	    }
-	    ret.add(row);
+
+	    JSONArray timestamps = data.optJSONArray(DATA_TIMESTAMP);
+	    JSONArray values = data.optJSONArray(DATA_VALUE);
+	    if (timestamps == null || values == null) {
+		continue;
+	    }
+
+	    for (int j = 0; j < timestamps.length() && j < values.length(); j++) {
+
+		if (timestamps.isNull(j) || values.isNull(j)) {
+		    continue;
+		}
+
+		try {
+		    Date date = new Date(TimeUnit.SECONDS.toMillis(timestamps.getLong(j)));
+		    ret.put(date, values.getBigDecimal(j));
+		} catch (JSONException e) {
+		    // not numeric value
+		}
+	    }
 	}
 
 	return ret;
     }
 
     /**
-     * @param dataset
-     * @param sensorId
-     * @return e.g. "1|5"
-     */
-    public static String buildSeriesId(String dataset, String sensorId) {
-
-	return dataset + SERIES_ID_SEPARATOR + sensorId;
-    }
-
-    /**
-     * @param seriesId e.g. "1|5"
-     * @return an entity with the dataset and sensor of the series, or null if the identifier is not valid
+     * @param seriesId e.g. "32207"
+     * @return an entity with the series, or null if the identifier is not valid
      */
     public static TrentinoFloodsEntity parseSeriesId(String seriesId) {
 
-	if (seriesId == null) {
-	    return null;
-	}
-
-	String[] split = seriesId.split("\\" + SERIES_ID_SEPARATOR);
-	if (split.length != 2 || split[1].trim().isEmpty() || TrentinoFloodsProperty.decode(split[0].trim()).isEmpty()) {
+	if (seriesId == null || seriesId.isBlank() || seriesId.contains("/")) {
 	    return null;
 	}
 
 	JSONObject object = new JSONObject();
-	object.put(DATASET, split[0].trim());
-	object.put(SENSOR_ID, split[1].trim());
-	object.put(SERIES_ID, buildSeriesId(split[0].trim(), split[1].trim()));
+	object.put(SERIES_ID, seriesId.trim());
 
 	return new TrentinoFloodsEntity(object);
     }
 
     /**
-     * @param dataset
-     * @param sensorId the sensor, or null for the registry
+     * @param path the file, relative to the endpoint
      * @return the response, or empty if the file does not exist
      * @throws GSException
      */
-    private Optional<String> get(String dataset, String sensorId) throws GSException {
+    private Optional<String> get(String path) throws GSException {
 
-	String url = endpoint + DOWNLOAD_PATH + "?Dataset=" + dataset + (sensorId == null ? "" : "&Sensore=" + sensorId);
+	String url = endpoint + path;
 
 	try {
+
+	    throttle();
 
 	    HttpResponse<InputStream> response = downloader.downloadResponse(url);
 
@@ -460,9 +395,9 @@ public class TrentinoFloodsClient {
 		throw createException(url + " returned HTTP " + response.statusCode(), null);
 	    }
 
-	    String text = decode(bytes);
+	    String text = new String(bytes, StandardCharsets.UTF_8);
 
-	    if (text.isBlank() || text.trim().startsWith(NOT_EXISTING)) {
+	    if (text.isBlank()) {
 		return Optional.empty();
 	    }
 
@@ -480,28 +415,14 @@ public class TrentinoFloodsClient {
     }
 
     /**
-     * @param bytes
-     * @return the text, decoded as UTF-8 or as Windows-1252 if not valid UTF-8
-     */
-    static String decode(byte[] bytes) {
-
-	String text = new String(bytes, StandardCharsets.UTF_8);
-	if (text.contains("�")) {
-	    text = new String(bytes, Charset.forName("windows-1252"));
-	}
-
-	return text;
-    }
-
-    /**
      * @param object
      * @param key
      * @param value
      */
     private static void put(JSONObject object, String key, String value) {
 
-	if (value != null && !value.isEmpty()) {
-	    object.put(key, value);
+	if (value != null && !value.trim().isEmpty()) {
+	    object.put(key, value.trim());
 	}
     }
 
@@ -509,12 +430,12 @@ public class TrentinoFloodsClient {
      * @param value
      * @return
      */
-    private static int parseInt(String value) {
+    private static long parseLong(String value) {
 
 	try {
-	    return Integer.parseInt(value);
+	    return Long.parseLong(value);
 	} catch (NumberFormatException e) {
-	    return Integer.MAX_VALUE;
+	    return Long.MAX_VALUE;
 	}
     }
 
@@ -544,14 +465,19 @@ public class TrentinoFloodsClient {
      */
     static String normalizeEndpoint(String endpoint) {
 
-	if (endpoint == null || endpoint.isEmpty()) {
+	if (endpoint == null || endpoint.isBlank()) {
 	    return DEFAULT_ENDPOINT;
 	}
 
 	String normalized = endpoint.trim();
 
-	// the download page itself can be given as endpoint
-	int index = normalized.indexOf(DOWNLOAD_PATH);
+	// sources configured with the discontinued open data page are redirected to the monitoring API
+	if (normalized.contains(OLD_OPENDATA_PATH)) {
+	    return DEFAULT_ENDPOINT;
+	}
+
+	// the index itself can be given as endpoint
+	int index = normalized.indexOf(INDEX);
 	if (index >= 0) {
 	    normalized = normalized.substring(0, index);
 	}

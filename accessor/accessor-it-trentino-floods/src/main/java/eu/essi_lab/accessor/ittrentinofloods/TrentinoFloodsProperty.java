@@ -25,38 +25,38 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * The properties observed by the hydrometric sensors of the Ufficio Dighe, one per open data dataset
+ * The quantities monitored by the hydrometric sensors of the Ufficio Dighe, as named by the "quantity" member of the series index
  *
  * @author boldrini
  */
 public enum TrentinoFloodsProperty {
 
     /**
-     * Water level, dataset "Rilevamento Sensori Idrometrici - Livello"
+     * Water level (gage height) measured by the sensor
      */
-    LEVEL(TrentinoFloodsClient.LEVEL_DATASET, "Water level", "Livello", "m", "metres"),
+    LEVEL("gage height", "Water level", "Livello idrometrico", "m", "metres"),
 
     /**
-     * Discharge calculated from the water level, dataset "Rilevamento Sensori Idrometrici - Portata (Calcolata)"
+     * Discharge calculated from the water level by means of a rating curve
      */
-    DISCHARGE(TrentinoFloodsClient.DISCHARGE_DATASET, "Discharge", "Portata (calcolata)", "m3/s", "cubic metres per second");
+    DISCHARGE("discharge", "Discharge", "Portata (calcolata)", "m3/s", "cubic metres per second");
 
-    private final String dataset;
+    private final String quantity;
     private final String label;
     private final String originalName;
     private final String unitAbbreviation;
     private final String unitName;
 
     /**
-     * @param dataset
+     * @param quantity
      * @param label
      * @param originalName
      * @param unitAbbreviation
      * @param unitName
      */
-    private TrentinoFloodsProperty(String dataset, String label, String originalName, String unitAbbreviation, String unitName) {
+    private TrentinoFloodsProperty(String quantity, String label, String originalName, String unitAbbreviation, String unitName) {
 
-	this.dataset = dataset;
+	this.quantity = quantity;
 	this.label = label;
 	this.originalName = originalName;
 	this.unitAbbreviation = unitAbbreviation;
@@ -64,11 +64,11 @@ public enum TrentinoFloodsProperty {
     }
 
     /**
-     * @return the identifier of the open data dataset (the "Dataset" parameter of the download page)
+     * @return the quantity as named by the series index, e.g. "gage height"
      */
-    public String getDataset() {
+    public String getQuantity() {
 
-	return dataset;
+	return quantity;
     }
 
     /**
@@ -80,7 +80,7 @@ public enum TrentinoFloodsProperty {
     }
 
     /**
-     * @return the Italian name used by the provider, e.g. "Livello"
+     * @return the Italian name used by the provider, e.g. "Livello idrometrico"
      */
     public String getOriginalName() {
 
@@ -104,15 +104,15 @@ public enum TrentinoFloodsProperty {
     }
 
     /**
-     * @param dataset
+     * @param quantity the "quantity" member of the series index, e.g. "gage height"
      * @return
      */
-    public static Optional<TrentinoFloodsProperty> decode(String dataset) {
+    public static Optional<TrentinoFloodsProperty> decode(String quantity) {
 
-	if (dataset == null) {
+	if (quantity == null) {
 	    return Optional.empty();
 	}
 
-	return Arrays.stream(values()).filter(p -> p.getDataset().equals(dataset.trim())).findFirst();
+	return Arrays.stream(values()).filter(p -> p.getQuantity().equalsIgnoreCase(quantity.trim())).findFirst();
     }
 }

@@ -36,6 +36,7 @@ import eu.essi_lab.cfga.option.ISODateTime;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
 import eu.essi_lab.cfga.scheduler.SchedulerUtils;
+import eu.essi_lab.cfga.setting.scheduling.SchedulerSetting.JobStoreType;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
 import eu.essi_lab.cfga.setting.scheduling.Scheduling;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -47,7 +48,8 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
  * The job of such a setting is expected to always exist, so a missing job means that it has been lost (e.g. by a failed
  * rescheduling, or by a job canceled because of an outdated configuration). Settings run once or for a given number of
  * times are not checked, since their job is deleted by the scheduler when the last execution ends.<br>
- * The check should run on a single node, the one which schedules the workers (the configuration node)
+ * The check should run on a single node, the one which schedules the workers (the configuration node), and only with a
+ * persistent job store
  *
  * @author boldrini
  */
@@ -81,6 +83,19 @@ public class SchedulingChecker {
     public synchronized void start() {
 
 	if (timer != null) {
+
+	    return;
+	}
+
+	//
+	// with a volatile job store all the jobs are lost by design at each restart (e.g. in LOCAL_PRODUCTION mode, where
+	// the production settings are used with a volatile job store), so scheduling them would start workers not
+	// expected to run
+	//
+	if (ConfigurationWrapper.getSchedulerSetting().getJobStoreType() != JobStoreType.PERSISTENT) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Scheduling checker not started, job store type: {}",
+		    ConfigurationWrapper.getSchedulerSetting().getJobStoreType());
 
 	    return;
 	}
