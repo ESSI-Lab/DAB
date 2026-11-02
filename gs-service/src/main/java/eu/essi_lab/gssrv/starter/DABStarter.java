@@ -1353,9 +1353,13 @@ public class DABStarter implements ConfigurationChangeListener {
 
 		//
 		// these exec modes schedule the workers, so they also restore the lost jobs of the workers scheduled to
-		// run indefinitely
+		// run indefinitely. Not in LOCAL_PRODUCTION: its job store is volatile, so all the workers would be
+		// scheduled
 		//
-		SchedulingChecker.getInstance().start();
+		if (mode != ExecutionMode.LOCAL_PRODUCTION) {
+
+		    SchedulingChecker.getInstance().start();
+		}
 	    }
 
 	} catch (SchedulerException e) {
