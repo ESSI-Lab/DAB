@@ -58,10 +58,14 @@ public class InputPattern {
 	    "^(\\w+|\\w+ {1})+$", //
 	    "^(\\w+|\\w+ {1})*$");
 
+    /**
+     * Consecutive minus are allowed, since they are used by the ids of the sources harvested from registries (e.g.:
+     * 'FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9e790b87-828f-42b8-a595-5ab32bc3e150')
+     */
     public static final InputPattern ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS = new InputPattern(//
 	    "alphaNumUnderscoreMinus", //
-	    "^(\\w+|\\w+-{1})+$", //
-	    "^(\\w+|\\w+-{1})*$");
+	    "^\\w[\\w-]*$", //
+	    "^(\\w[\\w-]*)?$");
 
     private final String pattern;
     private final String requiredPattern;

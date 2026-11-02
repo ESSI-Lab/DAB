@@ -1955,6 +1955,7 @@ var displayRatingCurvesSection = function(ratingCurves) {
 	sectionHtml += t('rating_curves');
 	sectionHtml += '</th></tr></thead>';
 	sectionHtml += '<tbody id="ratingCurves-content" style="display: none;">';
+	sectionHtml += '<tr><td colspan="2" class="rating-curves-disclaimer">' + t('rating_curves_disclaimer') + '</td></tr>';
 	sectionHtml += '<tr><td class="data_table_td" id="ratingCurvesDataTable"></td>';
 	sectionHtml += '<td rowspan="2" id="ratingCurvesPlotDiv"></td></tr>';
 	sectionHtml += '<tr><td id="ratingCurvesBottomTd"></td></tr>';

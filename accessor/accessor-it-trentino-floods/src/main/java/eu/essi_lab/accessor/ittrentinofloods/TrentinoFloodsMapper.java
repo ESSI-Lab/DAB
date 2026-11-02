@@ -52,12 +52,11 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
     /**
      *
      */
-    public static final String TRENTINO_FLOODS_SCHEMA = "https://www.floods.it/public/Opendata/schema";
+    public static final String TRENTINO_FLOODS_SCHEMA = "https://www.floods.it/api/v1/monitoring/schema";
 
     static final String LICENSE = "Creative Commons Attribution 4.0 International (CC BY 4.0) - Source: Provincia autonoma di Trento"
-	    + " - Servizio Prevenzione Rischi e Centrale Unica di Emergenza, Ufficio Dighe (https://dati.trentino.it/dataset/"
-	    + "rilevamento-sensori-idrometrici-livello, https://dati.trentino.it/dataset/rilevamento-sensori-idrometrici-portata-calcolata)."
-	    + " Data are not validated.";
+	    + " - Servizio Prevenzione Rischi e Centrale Unica di Emergenza, Ufficio Dighe (https://www.floods.it/public/DatiLive.php)."
+	    + " Data are acquired in real time and are not validated; they are released without any warranty.";
 
     static final String ORGANIZATION = "Provincia autonoma di Trento - Servizio Prevenzione Rischi e Centrale Unica di Emergenza,"
 	    + " Ufficio Dighe";
@@ -65,7 +64,7 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
     /**
      * Resolution of the observations
      */
-    static final String RESOLUTION = "PT1H";
+    static final String RESOLUTION = "PT15M";
 
     @Override
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
@@ -89,11 +88,11 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().setHierarchyLevelName("dataset");
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 
-	String stationName = entity.getStationName();
+	String site = entity.getSite();
 
-	// the level and discharge sensors of a station share the station name
+	// the level and discharge series of a site share the site name (the coordinates of the two may differ slightly)
 	dataset.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
-		.setParentIdentifier(decorateIdentifier(source.getEndpoint(), "station:" + stationName));
+		.setParentIdentifier(decorateIdentifier(source.getEndpoint(), "site:" + site));
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	DataIdentification dataId = coreMetadata.getDataIdentification();
@@ -115,12 +114,14 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
 	dataId.addKeywords(keywords);
 	addKeywords(entity, propertyName, keywords);
 
-	coreMetadata.setTitle(stationName + " - " + propertyName);
+	String waterbody = entity.getString(TrentinoFloodsClient.WATERBODY);
 
-	coreMetadata.setAbstract("Time series of " + getPropertyDescription(entity) + " measured by the hydrometric sensor "
-		+ entity.getSensorId() + " (" + entity.getString(TrentinoFloodsClient.TYPE) + ") at station " + stationName
-		+ getWaterbodyDescription(entity) + ", from the open data of the " + ORGANIZATION + ". The provider publishes only the"
-		+ " hourly values of the last 7 days (rolling window, updated to the previous day); values are not validated.");
+	coreMetadata.setTitle(site + (waterbody.isEmpty() ? "" : " (" + waterbody + ")") + " - " + propertyName);
+
+	coreMetadata.setAbstract("Time series of " + getPropertyDescription(entity) + " (series " + entity.getSeriesId() + ") at site "
+		+ site + getWaterbodyDescription(entity) + ", from the real time hydrometric monitoring of the " + ORGANIZATION
+		+ ". The provider publishes only the values of the last 7 days (rolling window, updated in real time); values are not"
+		+ " validated.");
 
 	if (begin != null && end != null) {
 	    coreMetadata.addTemporalExtent(begin, end);
@@ -152,12 +153,12 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
      */
     static String getPropertyName(TrentinoFloodsEntity entity) {
 
-	return entity.getProperty().map(TrentinoFloodsProperty::getLabel).orElse(entity.getString(TrentinoFloodsClient.TYPE));
+	return entity.getProperty().map(TrentinoFloodsProperty::getLabel).orElse(entity.getString(TrentinoFloodsClient.QUANTITY));
     }
 
     /**
      * @param entity
-     * @return e.g. "water level (Livello)"
+     * @return e.g. "water level (Livello idrometrico)"
      */
     static String getPropertyDescription(TrentinoFloodsEntity entity) {
 
@@ -165,11 +166,11 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
 
 	    String description = p.getLabel().toLowerCase() + " (" + p.getOriginalName() + ")";
 	    if (p == TrentinoFloodsProperty.DISCHARGE) {
-		description += " calculated from the water level";
+		description += " calculated from the water level by means of a rating curve";
 	    }
 	    return description;
 
-	}).orElse(entity.getString(TrentinoFloodsClient.TYPE));
+	}).orElse(entity.getString(TrentinoFloodsClient.QUANTITY));
     }
 
     /**
@@ -179,17 +180,8 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
     private static String getWaterbodyDescription(TrentinoFloodsEntity entity) {
 
 	String waterbody = entity.getString(TrentinoFloodsClient.WATERBODY);
-	String basin = entity.getString(TrentinoFloodsClient.BASIN);
 
-	StringBuilder builder = new StringBuilder();
-	if (!waterbody.isEmpty()) {
-	    builder.append(", ").append(waterbody);
-	}
-	if (!basin.isEmpty()) {
-	    builder.append(", basin ").append(basin.replace("\\", "/"));
-	}
-
-	return builder.toString();
+	return waterbody.isEmpty() ? "" : ", " + waterbody;
     }
 
     /**
@@ -199,15 +191,11 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
      */
     private void addKeywords(TrentinoFloodsEntity entity, String propertyName, Keywords keywords) {
 
-	addKeyword(keywords, entity.getStationName());
+	addKeyword(keywords, entity.getSite());
 	addKeyword(keywords, propertyName);
 	entity.getProperty().ifPresent(p -> addKeyword(keywords, p.getOriginalName()));
-	addKeyword(keywords, entity.getString(TrentinoFloodsClient.TYPE));
+	addKeyword(keywords, entity.getString(TrentinoFloodsClient.QUANTITY));
 	addKeyword(keywords, entity.getString(TrentinoFloodsClient.WATERBODY));
-
-	for (String basin : entity.getString(TrentinoFloodsClient.BASIN).split("\\\\")) {
-	    addKeyword(keywords, basin.trim());
-	}
 
 	addKeyword(keywords, "Trentino");
 	addKeyword(keywords, "Italy");
@@ -233,14 +221,14 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
 
 	MIPlatform platform = new MIPlatform();
 
-	String stationName = entity.getStationName();
+	String site = entity.getSite();
 
 	Citation citation = new Citation();
-	citation.setTitle(stationName);
+	citation.setTitle(site);
 	platform.setCitation(citation);
 
-	platform.setDescription("Hydrometric station " + stationName + getWaterbodyDescription(entity) + " (Trentino, Italy)");
-	platform.setMDIdentifierCode(NetProtocolWrapper.TRENTINO_FLOODS.getCommonURN() + "/" + stationName.replace(" ", ""));
+	platform.setDescription("Hydrometric site " + site + getWaterbodyDescription(entity) + " (Trentino, Italy)");
+	platform.setMDIdentifierCode(NetProtocolWrapper.TRENTINO_FLOODS.getCommonURN() + "/" + site.replace(" ", ""));
 
 	coreMetadata.getMIMetadata().addMIPlatform(platform);
     }
@@ -256,7 +244,7 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
 	coverageDescription.setAttributeTitle(propertyName);
 	coverageDescription.setAttributeDescription(getPropertyDescription(entity));
 	coverageDescription.setAttributeIdentifier(NetProtocolWrapper.TRENTINO_FLOODS.getCommonURN() + ":"
-		+ entity.getProperty().map(TrentinoFloodsProperty::name).orElse(entity.getDataset()));
+		+ entity.getProperty().map(TrentinoFloodsProperty::name).orElse(entity.getString(TrentinoFloodsClient.QUANTITY)));
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
     }
 
@@ -266,9 +254,16 @@ public class TrentinoFloodsMapper extends AbstractResourceMapper {
      */
     private void addExtensions(TrentinoFloodsEntity entity, ExtensionHandler handler) {
 
-	entity.getProperty().ifPresent(p -> {
+	String uom = entity.getString(TrentinoFloodsClient.UOM);
+
+	entity.getProperty().ifPresentOrElse(p -> {
 	    handler.setAttributeUnits(p.getUnitName());
-	    handler.setAttributeUnitsAbbreviation(p.getUnitAbbreviation());
+	    handler.setAttributeUnitsAbbreviation(uom.isEmpty() ? p.getUnitAbbreviation() : uom);
+	}, () -> {
+	    if (!uom.isEmpty()) {
+		handler.setAttributeUnits(uom);
+		handler.setAttributeUnitsAbbreviation(uom);
+	    }
 	});
 
 	handler.setCountry("Italy");

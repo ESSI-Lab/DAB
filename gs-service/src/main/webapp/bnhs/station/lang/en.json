@@ -60,6 +60,7 @@
   "station_information_page": "Station information page",
   "rating_curves": "Rating Curves",
   "rating_curve_metadata": "Rating curve metadata",
+  "rating_curves_disclaimer": "Rating curves are published for informational purposes only. For discharge data, please always and only rely on the discharge series published by the competent Offices and available here on HIS Central.",
   "available_periods": "Available periods",
   "selected_period": "Selected period",
   "period": "period",

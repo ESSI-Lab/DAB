@@ -27,7 +27,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
@@ -41,106 +40,116 @@ import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
  */
 public class TrentinoFloodsClientTest {
 
-    static final String REGISTRY = "IdSensore,Descrizione,Tipologia,Latitudine WGS,Logitudine WGS,X WGS,Y WGS,Bacino,Corpo Idrico,Url\r\n"
-	    + "5,Borgo Valsugana,Idrometro-Livello (m),46.054072,11.460107,690304,5102998,Brenta,fiume Brenta,"
-	    + "http://www.floods.it/public/Opendata/ODdownload.php?Dataset=1&Sensore=5\r\n"
-	    + "12,Trento-Fersina,Idrometro-Portata (mc/s),46.043983,11.117988,663869,5101115,Adige\\Fersina,torr. Fersina,"
-	    + "http://www.floods.it/public/Opendata/ODdownload.php?Dataset=2&Sensore=12\r\n"
-	    + "2,Trento-Fersina,Idrometro-Livello (m),46.043983,11.117988,663869,5101115,Adige\\Fersina,torr. Fersina,"
-	    + "http://www.floods.it/public/Opendata/ODdownload.php?Dataset=1&Sensore=2\r\n"
-	    + "99,Unknown,Pluviometro (mm),46.0,11.0,0,0,Adige,,\r\n";
+    /**
+     * Excerpt of https://www.floods.it/api/v1/monitoring/index.json
+     */
+    static final String INDEX = "{\"type\":\"FeatureCollection\",\"language\":\"en-US\",\"features\":[" //
+	    + feature("42437", "Ponte Arche", "fiume Sarca", "m3/s", "discharge", "derived from measurement", "10.87,46.037222") + "," //
+	    + feature("32207", "Ponte Arche", "fiume Sarca", "m", "gage height", "measurement", "10.870244,46.037477") + "," //
+	    + feature("28210", "Ala", "torrente Ala", "m", "gage height", "measurement", "11.006637,45.758606") + "," //
+	    + feature("99999", "Unknown", "", "mm", "precipitation", "measurement", "11.0,46.0") + "," //
+	    // no series identifier
+	    + "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[11.0,46.0]},\"properties\":{\"metadata\":{\"site\":\"X\"}}}"
+	    + "]}";
 
-    static final String DATA = "IdSensore,Data/Ora,Valore,Validato,OraSolare\r\n" //
-	    + "5,04/01/2024 00:00,,NO,SI\r\n" //
-	    + "5,04/01/2024 01:00,0.23,NO,SI\r\n" //
-	    + "5,04/01/2024 02:00,n.d.,NO,SI\r\n" //
-	    + "5,04/01/2024 03:00,0.24,NO,SI\r\n" //
-	    + "5,15/07/2024 12:00,0.30,SI,NO\r\n";
+    /**
+     * Excerpt of https://www.floods.it/api/v1/monitoring/32207.json
+     */
+    static final String DATA = "{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\","
+	    + "\"coordinates\":[0,0]},\"properties\":{\"metadata\":{\"time_format\":\"epoch\",\"tz\":\"UTC\",\"api_warnings\":null},"
+	    + "\"data\":{\"timestamp\":[1793055600,1793056500,1793057400,1793058300,1793059200],"
+	    + "\"value\":[0.18,null,\"n.d.\",0.17,0.18],\"quality\":null}}}]}";
+
+    /**
+     * @return
+     */
+    static String feature(String id, String site, String waterbody, String uom, String quantity, String method, String coordinates) {
+
+	return "{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[" + coordinates + "]},\"properties\":{\"metadata\":{"
+		+ "\"site\":\"" + site + "\",\"water body\":\"" + waterbody + "\",\"uom\":\"" + uom + "\",\"quantity\":\"" + quantity
+		+ "\",\"quantity type\":\"instantaneous\",\"collection method\":\"" + method + "\","
+		+ "\"author\":\"Provincia Autonoma di Trento – Ufficio Dighe\",\"series id\":\"" + id + "\","
+		+ "\"url json\":\"https://www.floods.it/api/v1/monitoring/" + id + ".json\","
+		+ "\"url csv\":\"https://www.floods.it/api/v1/monitoring/" + id + ".csv\"}}}";
+    }
 
     /**
      * @return
      */
     static List<TrentinoFloodsEntity> createSeries() {
 
-	return TrentinoFloodsClient.parseRegistry(REGISTRY);
+	return TrentinoFloodsClient.parseIndex(INDEX);
     }
 
     @Test
-    public void registryTest() {
+    public void indexTest() {
 
 	List<TrentinoFloodsEntity> series = createSeries();
 
-	// the rain gauge is discarded, sorted by sensor
-	assertEquals(3, series.size());
-	assertEquals("2", series.get(0).getSensorId());
-	assertEquals("5", series.get(1).getSensorId());
-	assertEquals("12", series.get(2).getSensorId());
+	// the feature without identifier is discarded, sorted by site and series
+	assertEquals(4, series.size());
+	assertEquals("28210", series.get(0).getSeriesId());
+	assertEquals("32207", series.get(1).getSeriesId());
+	assertEquals("42437", series.get(2).getSeriesId());
+	assertEquals("99999", series.get(3).getSeriesId());
 
 	TrentinoFloodsEntity discharge = series.get(2);
-	assertEquals("2|12", discharge.getSeriesId());
 	assertEquals(TrentinoFloodsProperty.DISCHARGE, discharge.getProperty().get());
-	assertEquals("Trento-Fersina", discharge.getStationName());
-	assertEquals("torr. Fersina", discharge.getString(TrentinoFloodsClient.WATERBODY));
-	assertEquals("Adige\\Fersina", discharge.getString(TrentinoFloodsClient.BASIN));
-	assertEquals(new BigDecimal("46.043983"), discharge.getObject().getBigDecimal(TrentinoFloodsClient.LAT));
-	assertEquals(new BigDecimal("11.117988"), discharge.getObject().getBigDecimal(TrentinoFloodsClient.LON));
-    }
+	assertEquals("Ponte Arche", discharge.getSite());
+	assertEquals("fiume Sarca", discharge.getString(TrentinoFloodsClient.WATERBODY));
+	assertEquals("m3/s", discharge.getString(TrentinoFloodsClient.UOM));
+	assertEquals("derived from measurement", discharge.getString(TrentinoFloodsClient.COLLECTION_METHOD));
+	assertEquals("Provincia Autonoma di Trento – Ufficio Dighe", discharge.getString(TrentinoFloodsClient.AUTHOR));
 
-    @Test
-    public void datasetTest() {
+	// GeoJSON coordinates are longitude, latitude
+	assertEquals(new BigDecimal("46.037222"), discharge.getObject().getBigDecimal(TrentinoFloodsClient.LAT));
+	assertEquals(new BigDecimal("10.87"), discharge.getObject().getBigDecimal(TrentinoFloodsClient.LON));
 
-	assertEquals("1", TrentinoFloodsClient.getDataset("http://www.floods.it/public/Opendata/ODdownload.php?Dataset=1&Sensore=5", ""));
-	assertEquals("2", TrentinoFloodsClient.getDataset("", "Idrometro-Portata (mc/s)"));
-	assertEquals("1", TrentinoFloodsClient.getDataset("", "Idrometro-Livello (m)"));
-	assertEquals("", TrentinoFloodsClient.getDataset("", "Pluviometro (mm)"));
+	assertEquals(TrentinoFloodsProperty.LEVEL, series.get(1).getProperty().get());
+
+	// unknown quantities are kept, with their original name and unit
+	assertFalse(series.get(3).getProperty().isPresent());
+	assertEquals("precipitation", series.get(3).getString(TrentinoFloodsClient.QUANTITY));
     }
 
     @Test
     public void dataTest() {
 
-	TrentinoFloodsClient.SensorData data = TrentinoFloodsClient.parseData(DATA);
-	TreeMap<Date, BigDecimal> values = data.values;
+	TreeMap<Date, BigDecimal> values = TrentinoFloodsClient.parseData(DATA);
 
 	// missing and not numeric values are skipped
 	assertEquals(3, values.size());
-	assertFalse(data.validated);
 
-	// solar time is UTC+1
-	assertEquals("2024-01-04T00:00:00Z", ISO8601DateTimeUtils.getISO8601DateTime(values.firstKey()));
-	assertEquals(new BigDecimal("0.23"), values.firstEntry().getValue());
+	// epoch times are UTC
+	assertEquals("2026-10-26T23:00:00Z", ISO8601DateTimeUtils.getISO8601DateTime(values.firstKey()));
+	assertEquals(new BigDecimal("0.18"), values.firstEntry().getValue());
+	assertEquals("2026-10-27T00:00:00Z", ISO8601DateTimeUtils.getISO8601DateTime(values.lastKey()));
 
-	// summer time is UTC+2
-	assertEquals("2024-07-15T10:00:00Z", ISO8601DateTimeUtils.getISO8601DateTime(values.lastKey()));
+	assertTrue(TrentinoFloodsClient.parseData("{\"type\":\"FeatureCollection\",\"features\":[]}").isEmpty());
     }
 
     @Test
     public void seriesIdTest() {
 
-	TrentinoFloodsEntity series = TrentinoFloodsClient.parseSeriesId("1|5");
-	assertEquals("1", series.getDataset());
-	assertEquals("5", series.getSensorId());
-	assertEquals(TrentinoFloodsProperty.LEVEL, series.getProperty().get());
+	TrentinoFloodsEntity series = TrentinoFloodsClient.parseSeriesId(" 32207 ");
+	assertEquals("32207", series.getSeriesId());
 
-	assertNull(TrentinoFloodsClient.parseSeriesId("3|5"));
-	assertNull(TrentinoFloodsClient.parseSeriesId("1|"));
-	assertNull(TrentinoFloodsClient.parseSeriesId("15"));
+	assertNull(TrentinoFloodsClient.parseSeriesId(""));
+	assertNull(TrentinoFloodsClient.parseSeriesId("../index"));
 	assertNull(TrentinoFloodsClient.parseSeriesId(null));
     }
 
     @Test
     public void endpointTest() {
 
-	assertEquals(TrentinoFloodsClient.DEFAULT_ENDPOINT, TrentinoFloodsClient.normalizeEndpoint("https://www.floods.it/public/Opendata"));
+	assertEquals(TrentinoFloodsClient.DEFAULT_ENDPOINT, TrentinoFloodsClient.normalizeEndpoint("https://www.floods.it/api/v1/monitoring"));
+	assertEquals(TrentinoFloodsClient.DEFAULT_ENDPOINT,
+		TrentinoFloodsClient.normalizeEndpoint("https://www.floods.it/api/v1/monitoring/index.json"));
+	assertEquals(TrentinoFloodsClient.DEFAULT_ENDPOINT, TrentinoFloodsClient.normalizeEndpoint(null));
+
+	// the discontinued open data page is redirected to the monitoring API
+	assertEquals(TrentinoFloodsClient.DEFAULT_ENDPOINT, TrentinoFloodsClient.normalizeEndpoint("https://www.floods.it/public/Opendata/"));
 	assertEquals(TrentinoFloodsClient.DEFAULT_ENDPOINT,
 		TrentinoFloodsClient.normalizeEndpoint("https://www.floods.it/public/Opendata/ODdownload.php?Dataset=0"));
-	assertEquals(TrentinoFloodsClient.DEFAULT_ENDPOINT, TrentinoFloodsClient.normalizeEndpoint(null));
-    }
-
-    @Test
-    public void decodeTest() {
-
-	assertEquals("Malè", TrentinoFloodsClient.decode("Malè".getBytes(Charset.forName("windows-1252"))));
-	assertEquals("Malè", TrentinoFloodsClient.decode("Malè".getBytes(Charset.forName("UTF-8"))));
-	assertTrue(TrentinoFloodsClient.decode("Il file non esiste!".getBytes()).startsWith(TrentinoFloodsClient.NOT_EXISTING));
     }
 }

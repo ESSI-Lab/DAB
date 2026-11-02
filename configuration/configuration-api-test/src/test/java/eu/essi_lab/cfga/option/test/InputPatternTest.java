@@ -242,7 +242,49 @@ public class InputPatternTest {
     }
 
     /**
-     * 
+     *
+     */
+    @Test
+    public void alphaNumericAndUnderscoreAndMinusPatternTest() {
+
+	String text = "";
+	Assert.assertTrue(notRequired(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+	Assert.assertFalse(required(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = " ";
+	Assert.assertFalse(notRequired(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "a b";
+	Assert.assertFalse(notRequired(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "a!";
+	Assert.assertFalse(notRequired(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "-";
+	Assert.assertFalse(notRequired(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "-a";
+	Assert.assertFalse(required(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "a";
+	Assert.assertTrue(required(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "a-";
+	Assert.assertTrue(required(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "ita-sir-arpa-puglia";
+	Assert.assertTrue(required(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "UUID-456602db-4275-4410-8b68-436fd23ace69";
+	Assert.assertTrue(required(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+
+	text = "FROMREGISTRY--regprefseparator--registrytestid1--regprefseparator--9e790b87-828f-42b8-a595-5ab32bc3e150";
+	Assert.assertTrue(required(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+	Assert.assertTrue(notRequired(text, InputPattern.ALPHANUMERIC_AND_UNDERSCORE_AND_MINUS));
+    }
+
+    /**
+     *
      */
     @Test
     public void alphaNumericAndSpacePatternTest() {

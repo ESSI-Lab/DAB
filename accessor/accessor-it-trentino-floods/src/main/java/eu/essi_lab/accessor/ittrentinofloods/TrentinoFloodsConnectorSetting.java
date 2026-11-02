@@ -37,22 +37,21 @@ import eu.essi_lab.cfga.option.StringOptionBuilder;
  */
 public class TrentinoFloodsConnectorSetting extends HarvestedConnectorSetting {
 
-    public static final String TRENTINO_FLOODS_SENSORS = "TRENTINO_FLOODS_SENSORS";
+    public static final String TRENTINO_FLOODS_SERIES = "TRENTINO_FLOODS_SERIES";
 
     /**
      *
      */
     public TrentinoFloodsConnectorSetting() {
 
-	Option<String> sensorsOption = StringOptionBuilder.get().//
-		withKey(TRENTINO_FLOODS_SENSORS).//
-		withLabel("Comma separated sensor identifiers to harvest (empty for all the sensors of the registry, 1-10 = water level,"
-			+ " 11-20 = discharge)").//
+	Option<String> seriesOption = StringOptionBuilder.get().//
+		withKey(TRENTINO_FLOODS_SERIES).//
+		withLabel("Comma separated series identifiers to harvest, e.g. 32207,42437 (empty for all the series of the index)").//
 		withValue("").//
 		cannotBeDisabled().//
 		build();
 
-	addOption(sensorsOption);
+	addOption(seriesOption);
     }
 
     /**
@@ -72,19 +71,19 @@ public class TrentinoFloodsConnectorSetting extends HarvestedConnectorSetting {
     }
 
     /**
-     * @return the sensor identifiers to harvest, empty for all
+     * @return the series identifiers to harvest, empty for all
      */
-    public List<String> getSensors() {
+    public List<String> getSeries() {
 
-	return split(getOption(TRENTINO_FLOODS_SENSORS, String.class).map(Option::getValue).orElse(""));
+	return split(getOption(TRENTINO_FLOODS_SERIES, String.class).map(Option::getValue).orElse(""));
     }
 
     /**
-     * @param sensors
+     * @param series
      */
-    public void setSensors(String sensors) {
+    public void setSeries(String series) {
 
-	getOption(TRENTINO_FLOODS_SENSORS, String.class).get().setValue(sensors);
+	getOption(TRENTINO_FLOODS_SERIES, String.class).get().setValue(series);
     }
 
     /**

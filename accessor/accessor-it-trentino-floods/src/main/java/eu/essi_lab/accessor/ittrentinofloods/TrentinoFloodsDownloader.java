@@ -55,7 +55,7 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 /**
- * Downloads the values of a sensor as WaterML 1.1. Since the provider publishes only a rolling window of 7 days, the temporal extent
+ * Downloads the values of a series as WaterML 1.1. Since the provider publishes only a rolling window of 7 days, the temporal extent
  * is the one of the file currently published (falling back to the harvested extent)
  *
  * @author boldrini
