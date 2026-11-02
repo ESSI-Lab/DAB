@@ -33,6 +33,7 @@ import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
+import eu.essi_lab.iso.datamodel.classes.MIInstrument;
 import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
@@ -190,14 +191,20 @@ public class DatalakesMapper extends FileIdentifierMapper {
 	    mi.getDataIdentification().addVerticalExtent(verticalExtent);
 	}
 
+	// each Datalakes dataset is a station: the sensor type is shared across many datasets, so it can't be the platform
+	MIPlatform platform = new MIPlatform();
+	platform.setMDIdentifierCode("datalakes-dataset-" + datasetId);
+	platform.setDescription(datasetInfo.optString("description", datasetTitle));
+	Citation platformCitation = new Citation();
+	platformCitation.setTitle(datasetTitle);
+	platform.setCitation(platformCitation);
+	mi.addMIPlatform(platform);
+
 	if (sensor != null) {
-	    MIPlatform platform = new MIPlatform();
-	    platform.setMDIdentifierCode(String.valueOf(sensor.optInt("id")));
-	    platform.setDescription(sensor.optString("name", null));
-	    Citation platformCitation = new Citation();
-	    platformCitation.setTitle(sensor.optString("name", "Sensor"));
-	    platform.setCitation(platformCitation);
-	    mi.addMIPlatform(platform);
+	    MIInstrument instrument = new MIInstrument();
+	    instrument.setMDIdentifierTypeCode("datalakes-sensor-" + sensor.optInt("id"));
+	    instrument.setTitle(sensor.optString("name", "Sensor"));
+	    mi.addMIInstrument(instrument);
 	}
 
 	ReferenceSystem referenceSystem = new ReferenceSystem();
