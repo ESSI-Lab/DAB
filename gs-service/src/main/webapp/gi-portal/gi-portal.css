@@ -2185,3 +2185,45 @@ body.toolbar-layout .toolbar-tabs-host {
         transform: rotate(360deg);
     }
 }
+/* Password gate shown when config.password is set */
+#password-gate {
+	position: fixed;
+	inset: 0;
+	z-index: 10000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: #2c3e50;
+}
+
+#password-gate-form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	width: 300px;
+	padding: 24px;
+	background-color: white;
+	border-radius: 6px;
+	font-family: sans-serif;
+}
+
+#password-gate-title {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+#password-gate-input {
+	padding: 8px;
+	font-size: 1em;
+}
+
+#password-gate-error {
+	display: none;
+	color: #c0392b;
+}
+
+#password-gate-form button {
+	padding: 8px;
+	font-size: 1em;
+	cursor: pointer;
+}
