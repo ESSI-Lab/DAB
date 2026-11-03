@@ -190,7 +190,10 @@ public class WISObservationsHandler extends DefaultRequestHandler {
 	    String url = WISUtils.getUrl(webRequest);
 	    SimpleEntry<String, String> sourceParameter = WISUtils.extractSourceAndParameter(topic);
 	    String sourceId = sourceParameter.getKey();
-	    String parameterURI = sourceParameter.getValue();
+	    String parameterURI = null;
+	    if (sourceParameter.getValue() != null) {
+		parameterURI = "http://hydro.geodab.eu/hydro-ontology/concept/" + sourceParameter.getValue();
+	    }
 	    String view = WISUtils.getWHOSView(sourceId, parameterURI);
 	    url = url.replace("/view/whos/", "/view/" + view + "/");
 

@@ -242,10 +242,6 @@ class SourceCollectionCreator {
 	return dataset;
     }
 
-    protected String getAdditionalLevels(String groupBy) {
-	return "";
-    }
-
     protected String getTitle(GSSource source, String parameter) {
 	return "Observations from " + normalize(source.getLabel());
     }
@@ -341,7 +337,7 @@ class SourceCollectionCreator {
     }
 
     protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
-	return "urn:wmo:md:" + centreId + ":" + sourceIdentifier;
+	return WISUtils.getMetadataIdentifier(centreId, sourceIdentifier, null);
     }
 
     protected List<ResponseItem> getStatistics(String sourceId, Queryable queryable) throws GSException {

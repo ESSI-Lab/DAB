@@ -10,6 +10,7 @@ import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
 import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.model.GSSource;
 
@@ -40,6 +41,7 @@ public class WIS2SettingTest {
 	Assert.assertEquals(DataNotificationsMode.DISABLED, setting.getDataNotificationsMode());
 	Assert.assertEquals(WIS2Setting.DEFAULT_PRIVATE_TOPIC_PREFIX, setting.getPrivateTopicPrefix());
 	Assert.assertEquals(WIS2DataEncoding.JSON, setting.getDataEncoding());
+	Assert.assertEquals(RecordGranularity.SOURCE, setting.getRecordGranularity());
     }
 
     @Test
@@ -90,6 +92,8 @@ public class WIS2SettingTest {
 	setting.setPrivateTopicPrefix("dab-test/a/wis2");
 	setting.setDataEncoding(WIS2DataEncoding.CSV);
 	Assert.assertEquals(WIS2DataEncoding.CSV, setting.getDataEncoding());
+	setting.setRecordGranularity(RecordGranularity.OBSERVED_PROPERTY);
+	Assert.assertEquals(RecordGranularity.OBSERVED_PROPERTY, setting.getRecordGranularity());
 	Assert.assertEquals("dab-test/a/wis2", setting.getPrivateTopicPrefix());
 
 	// the setting is restored from its JSON representation
@@ -98,6 +102,7 @@ public class WIS2SettingTest {
 	Assert.assertEquals(DataNotificationsMode.EXPERIMENTAL, restored.getDataNotificationsMode());
 	Assert.assertEquals("dab-test/a/wis2", restored.getPrivateTopicPrefix());
 	Assert.assertEquals(WIS2DataEncoding.CSV, restored.getDataEncoding());
+	Assert.assertEquals(RecordGranularity.OBSERVED_PROPERTY, restored.getRecordGranularity());
     }
 
     @Test

@@ -52,6 +52,7 @@ import eu.essi_lab.profiler.wis.WISRequest.CollectionItems;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
 import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
@@ -281,22 +282,23 @@ public class WISUtils {
     }
 
     /**
-     * From the metadata identifier (e.g. urn:wmo:md:sourceId:parameterConceptId),
-     * it extracts the sourceId and the parameter URI according to WHOS Hydro
-     * Ontology
+     * From the metadata identifier (e.g. urn:wmo:md:centreId:sourceId:parameterConceptId, see
+     * {@link #getMetadataIdentifier(String, String, String)}), it extracts the sourceId and the parameter concept id
+     * according to WHOS Hydro Ontology (null if the identifier has no parameter)
      * 
      * @param identifier
      * @return
      */
     public static SimpleEntry<String, String> extractSourceAndParameter(String identifier) {
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
+	// skips urn:wmo:md:centreId:
+	for (int i = 0; i < 4; i++) {
+	    identifier = identifier.substring(identifier.indexOf(":") + 1);
+	}
 	String sourceId = identifier;
 	String parameter = null;
 	if (sourceId.contains(":")) {
-	    sourceId = sourceId.substring(0, sourceId.indexOf(":"));
 	    parameter = sourceId.substring(sourceId.indexOf(":") + 1);
+	    sourceId = sourceId.substring(0, sourceId.indexOf(":"));
 	}
 	SimpleEntry<String, String> ret = new SimpleEntry<>(sourceId, parameter);
 	return ret;
@@ -386,12 +388,48 @@ public class WISUtils {
     }
 
     /**
-     * @param sourceId
-     * @return the identifier of the WCMP2 record of the given source
+     * @return what each published WCMP2 record describes
      */
-    public static String getMetadataIdentifier(String sourceId) {
+    public static RecordGranularity getRecordGranularity() {
 
-	return "urn:wmo:md:" + getCentreId() + ":" + sourceId;
+	return ConfigurationWrapper.getWIS2Setting().getRecordGranularity();
+    }
+
+    /**
+     * @param sourceId
+     * @param observedPropertyURI the harmonized observed property of the described data, possibly null
+     * @return the identifier of the WCMP2 record describing the data of the given source and observed property,
+     *         according to the configured {@link RecordGranularity}
+     */
+    public static String getMetadataIdentifier(String sourceId, String observedPropertyURI) {
+
+	String propertyURI = getRecordGranularity() == RecordGranularity.OBSERVED_PROPERTY ? observedPropertyURI : null;
+
+	return getMetadataIdentifier(getCentreId(), sourceId, propertyURI);
+    }
+
+    /**
+     * @param centreId
+     * @param sourceId
+     * @param observedPropertyURI if not null, the identifier is the one of the record of this observed property of the
+     *        source
+     * @return <code>urn:wmo:md:{centre-id}:{source-id}</code> or, with an observed property,
+     *         <code>urn:wmo:md:{centre-id}:{source-id}:{property-id}</code>, where the property id is the last segment
+     *         of the property URI (e.g. 11 for http://hydro.geodab.eu/hydro-ontology/concept/11)
+     */
+    public static String getMetadataIdentifier(String centreId, String sourceId, String observedPropertyURI) {
+
+	String id = "urn:wmo:md:" + centreId + ":" + sourceId;
+
+	if (observedPropertyURI == null || observedPropertyURI.isBlank()) {
+
+	    return id;
+	}
+
+	String uri = observedPropertyURI.trim().replaceAll("/+$", "");
+	String propertyId = uri.substring(uri.lastIndexOf('/') + 1).replaceAll("[^A-Za-z0-9._-]", "_");
+
+	return id + ":" + propertyId;
     }
 
     /**

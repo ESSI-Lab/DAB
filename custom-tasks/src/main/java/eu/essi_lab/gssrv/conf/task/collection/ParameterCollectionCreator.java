@@ -22,41 +22,37 @@ package eu.essi_lab.gssrv.conf.task.collection;
  */
 
 import eu.essi_lab.lib.net.utils.whos.*;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
 import eu.essi_lab.lib.whos.*;
 import eu.essi_lab.model.*;
 import eu.essi_lab.model.exceptions.*;
 import eu.essi_lab.model.resource.*;
+import eu.essi_lab.profiler.wis.WISUtils;
 
 import java.util.*;
 
+/**
+ * Creates a collection for each harmonized observed property of a source, used with the
+ * {@link RecordGranularity#OBSERVED_PROPERTY} granularity. Datasets without a harmonized observed property are not
+ * described
+ *
+ * @author boldrini
+ */
 class ParameterCollectionCreator extends SourceCollectionCreator {
+
+    /**
+     * @param centreId
+     */
+    public ParameterCollectionCreator(String centreId) {
+	super(centreId);
+    }
 
     protected Queryable getGroupByQueryable() {
 	return MetadataElement.OBSERVED_PROPERTY_URI;
     }
 
     protected String getMetadataIdentifier(String sourceIdentifier, String parameterURI) {
-	String parameter = "";
-	if (parameterURI != null && parameterURI.contains("/")) {
-	    parameter = ":" + parameterURI.substring(parameterURI.lastIndexOf("/") + 1);
-	}
-	return "urn:wmo:md:" + centreId + ":" + sourceIdentifier + parameter;
-    }
-
-    protected String getAdditionalLevels(String parameterURI) {
-	WHOSOntology ontology = new WHOSOntology();
-	SKOSConcept concept = ontology.getConcept(parameterURI);
-	WIS2Level10Topic wisLevel10 = WIS2Level10Topic.UNHARMONIZED;
-	String level11 = parameterURI;
-	if (concept != null) {
-	    wisLevel10 = WIS2Level10Topic.decode(parameterURI);
-	    level11 = concept.getPreferredLabel("en");
-	}
-	String level10 = wisLevel10.getId();
-	String level9 = wisLevel10.getBroaderLevel().getId();
-	return "/" + MQTTUtils.harmonizeTopicName(level9)//
-		+ "/" + MQTTUtils.harmonizeTopicName(level10) //
-		+ "/" + MQTTUtils.harmonizeTopicName(level11);
+	return WISUtils.getMetadataIdentifier(centreId, sourceIdentifier, parameterURI);
     }
 
     protected void addAdditionalElements(DatasetCollection dataset, String sourceId, String parameterURI) throws GSException {
@@ -64,14 +60,28 @@ class ParameterCollectionCreator extends SourceCollectionCreator {
 	HashSet<PropertyResult> observedProperties = new HashSet<SourceCollectionCreator.PropertyResult>();
 	PropertyResult property = new PropertyResult();
 	property.setUri(parameterURI);
+	property.setName(getParameterLabel(parameterURI));
 	observedProperties.add(property);
 	addProperties(dataset, observedProperties);
 
     }
 
     protected String getTitle(GSSource source, String parameterURI) {
-	WHOSOntology ontology = new WHOSOntology();
-	SKOSConcept concept = ontology.getConcept(parameterURI);
-	return concept.getPreferredLabel("") + " observations from " + normalize(source.getLabel());
+	return getParameterLabel(parameterURI) + " observations from " + normalize(source.getLabel());
+    }
+
+    /**
+     * @param parameterURI
+     * @return the english preferred label of the parameter concept or, if not found in the ontology, the parameter URI
+     */
+    private String getParameterLabel(String parameterURI) {
+	SKOSConcept concept = new WHOSOntology().getConcept(parameterURI);
+	if (concept != null) {
+	    String label = concept.getPreferredLabel("en");
+	    if (label != null && !label.isBlank()) {
+		return label;
+	    }
+	}
+	return parameterURI;
     }
 }

@@ -7,6 +7,7 @@
 	"minZoom": 1,
 	"maxZoom": 10,
 	"token": "whos-test-d40a452b-b865-4fbe-8165-43a96ebf1b3d",
+	"password": "sandbox",
 	"temporalMinYear": 1900,
 	"stationPageMapZoom": 10,
 	"toolbarLayout": true,
