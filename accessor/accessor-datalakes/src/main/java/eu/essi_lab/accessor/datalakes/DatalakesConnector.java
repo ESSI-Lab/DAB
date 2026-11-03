@@ -141,10 +141,10 @@ public class DatalakesConnector extends HarvestedQueryConnector<DatalakesConnect
 		int datasetId = dataset.getInt("id");
 		List<JSONObject> datasetParameters = client.getDatasetParameters(datasetId);
 		String payloadType = DatalakesClient.resolvePayloadType(datasetParameters);
-		boolean downloadable = DatalakesClient.isTimeSeriesRecord(payloadType, dataset);
+		boolean downloadable = DatalakesClient.hasTimeSeries(dataset, datasetParameters);
 
 		for (JSONObject datasetParameter : datasetParameters) {
-		    if (!DatalakesClient.isObservableParameter(datasetParameter)) {
+		    if (!DatalakesClient.isObservableParameter(datasetParameter, payloadType)) {
 			continue;
 		    }
 		    JSONObject record = buildRecord(dataset, datasetParameter, datasetParameters, payloadType, downloadable,
@@ -207,7 +207,7 @@ public class DatalakesConnector extends HarvestedQueryConnector<DatalakesConnect
 
 	JSONArray observableParameters = new JSONArray();
 	for (JSONObject candidate : datasetParameters) {
-	    if (DatalakesClient.isObservableParameter(candidate)) {
+	    if (DatalakesClient.isObservableParameter(candidate, payloadType)) {
 		observableParameters.put(candidate);
 	    }
 	}

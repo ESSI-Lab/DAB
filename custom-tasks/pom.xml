@@ -789,6 +789,12 @@
 
 		<dependency>
 			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>accessor-metno-gcw</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
 			<artifactId>accessor-ch-existenz-bafu</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>

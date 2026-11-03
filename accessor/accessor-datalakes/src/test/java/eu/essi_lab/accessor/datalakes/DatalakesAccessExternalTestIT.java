@@ -3,6 +3,7 @@ package eu.essi_lab.accessor.datalakes;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -29,6 +30,7 @@ public class DatalakesAccessExternalTestIT {
 
     private static final int FIGINO = 1399;
     private static final int LEXPLORE_HEAT_FLUXES = 886;
+    private static final int LAKE_THUN_CTD = 1336;
 
     @Test
     public void figinoTest() throws Exception {
@@ -50,10 +52,30 @@ public class DatalakesAccessExternalTestIT {
 	Assert.assertEquals("Figino Multiparameter Probe (1m)",
 		figino.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getMIPlatform().getCitation().getTitle());
 
-	String onlineId = figino.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution().getDistributionOnline()
+	assertExecution(figino);
+    }
+
+    @Test
+    public void lakeThunGridTest() throws Exception {
+
+	GSSource source = new GSSource();
+	source.setEndpoint(DatalakesClient.DEFAULT_ENDPOINT);
+	source.setUniqueIdentifier("che-datalakes");
+
+	List<OriginalMetadata> records = harvest();
+
+	// the y axis is the depth coordinate of the z profiles, y1..y9 are time series (e.g. mixed layer depth)
+	Assert.assertFalse(find(records, LAKE_THUN_CTD, "y").isPresent());
+
+	assertExecution(map(records, LAKE_THUN_CTD, "y1", source));
+    }
+
+    private void assertExecution(GSResource resource) throws Exception {
+
+	String onlineId = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDistribution().getDistributionOnline()
 		.getIdentifier();
 
-	DatalakesDownloader downloader = createDownloader(figino, onlineId);
+	DatalakesDownloader downloader = createDownloader(resource, onlineId);
 	Assert.assertTrue(downloader.canDownload());
 
 	List<DataDescriptor> full = downloader.getRemoteDescriptors();
@@ -63,7 +85,7 @@ public class DatalakesAccessExternalTestIT {
 	DataComplianceReport report = tester.test(DataComplianceTest.EXECUTION, preview.get(0), full.get(0),
 		DataComplianceLevel.TIME_SERIES_BASIC_DATA_COMPLIANCE);
 
-	Assert.assertEquals(DataComplianceTest.EXECUTION, report.getLastSucceededTest());
+	Assert.assertEquals(report.toString(), DataComplianceTest.EXECUTION, report.getLastSucceededTest());
     }
 
     private List<OriginalMetadata> harvest() throws Exception {
@@ -86,12 +108,15 @@ public class DatalakesAccessExternalTestIT {
 
     private GSResource map(List<OriginalMetadata> records, int datasetId, String axis, GSSource source) throws Exception {
 
-	OriginalMetadata record = records.stream().filter(r -> {
+	return new DatalakesMapper().map(find(records, datasetId, axis).get(), source);
+    }
+
+    private Optional<OriginalMetadata> find(List<OriginalMetadata> records, int datasetId, String axis) {
+
+	return records.stream().filter(r -> {
 	    JSONObject json = new JSONObject(r.getMetadata());
 	    return json.getInt("datasetId") == datasetId && json.getString("axis").equals(axis);
-	}).findFirst().get();
-
-	return new DatalakesMapper().map(record, source);
+	}).findFirst();
     }
 
     /**

@@ -138,17 +138,34 @@ public class DatalakesClient {
 	return "internal".equalsIgnoreCase(dataset.optString("datasource", ""));
     }
 
-    public static boolean isObservableParameter(JSONObject datasetParameter) {
+    public static boolean isObservableParameter(JSONObject datasetParameter, String payloadType) {
 	String axis = datasetParameter.optString("axis", "");
 	if (!axis.startsWith("y")) {
+	    return false;
+	}
+	// in grids the plain y axis is the vertical coordinate of the z variables (e.g. depth), not an observation
+	if (PAYLOAD_GRID.equals(payloadType) && axis.equals("y")) {
 	    return false;
 	}
 	String parseParameter = datasetParameter.optString("parseparameter", "").toLowerCase();
 	return !parseParameter.endsWith("_qual") && !parseParameter.contains("qual");
     }
 
-    public static boolean isTimeSeriesRecord(String payloadType, JSONObject dataset) {
-	return PAYLOAD_TIME_SERIES.equals(payloadType) && isInternalDataset(dataset);
+    /**
+     * Returns true when the observable parameters of the dataset are aligned with a time {@code x} axis, so that they can be
+     * downloaded as a time series. This holds also for the {@code y1..yn} series of a grid dataset (e.g. mixed layer
+     * depth of a CTD monitoring), but not for profiles where {@code x} holds the measured variables
+     */
+    public static boolean hasTimeSeries(JSONObject dataset, List<JSONObject> datasetParameters) {
+	if (!isInternalDataset(dataset)) {
+	    return false;
+	}
+	for (JSONObject parameter : datasetParameters) {
+	    if ("x".equals(parameter.optString("axis")) && "time".equalsIgnoreCase(parameter.optString("parseparameter"))) {
+		return true;
+	    }
+	}
+	return false;
     }
 
     public static JSONObject findLookupEntry(JSONArray table, int id) {
