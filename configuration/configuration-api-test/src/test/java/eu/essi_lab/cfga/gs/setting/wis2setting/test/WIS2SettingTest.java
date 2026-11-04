@@ -33,6 +33,7 @@ public class WIS2SettingTest {
 
 	Assert.assertTrue(setting.getCentreId().isEmpty());
 	Assert.assertTrue(setting.getPublisher().isEmpty());
+	Assert.assertTrue(setting.getPublisherEmail().isEmpty());
 	Assert.assertTrue(setting.getGeneratedBy().isEmpty());
 	Assert.assertTrue(setting.getHostname().isEmpty());
 	Assert.assertTrue(setting.getViewId().isEmpty());
@@ -67,6 +68,7 @@ public class WIS2SettingTest {
 
 	setting.setCentreId(" it-cnr-itiam-whos-dab-test ");
 	setting.setPublisher("CNR-ITIAm");
+	setting.setPublisherEmail(" whos@cnr.it ");
 	setting.setGeneratedBy("WHOS DAB");
 	setting.setHostname("https://wis2.whos-dab.eu");
 	setting.setViewId("whos");
@@ -74,6 +76,7 @@ public class WIS2SettingTest {
 
 	Assert.assertEquals("it-cnr-itiam-whos-dab-test", setting.getCentreId().get());
 	Assert.assertEquals("CNR-ITIAm", setting.getPublisher().get());
+	Assert.assertEquals("whos@cnr.it", setting.getPublisherEmail().get());
 	Assert.assertEquals("WHOS DAB", setting.getGeneratedBy().get());
 	Assert.assertEquals("https://wis2.whos-dab.eu", setting.getHostname().get());
 	Assert.assertEquals("whos", setting.getViewId().get());

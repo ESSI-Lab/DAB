@@ -486,6 +486,37 @@ public class WISUtils {
     }
 
     /**
+     * @return the e-mail address of the publisher of the WIS2 metadata records
+     */
+    public static Optional<String> getPublisherEmail() {
+
+	return ConfigurationWrapper.getWIS2Setting().getPublisherEmail();
+    }
+
+    /**
+     * @param organization
+     * @param email possibly null
+     * @param role
+     * @return a WCMP2 contact
+     */
+    public static JSONObject getContact(String organization, String email, String role) {
+
+	JSONObject contact = new JSONObject();
+	contact.put("organization", organization);
+	if (email != null && !email.isBlank()) {
+	    JSONObject emailObject = new JSONObject();
+	    emailObject.put("value", email.trim());
+	    JSONArray emails = new JSONArray();
+	    emails.put(emailObject);
+	    contact.put("emails", emails);
+	}
+	JSONArray roles = new JSONArray();
+	roles.put(role);
+	contact.put("roles", roles);
+	return contact;
+    }
+
+    /**
      * @return the contact to request the token needed by the authenticated APIs
      */
     public static String getTokenRequestContact() {
@@ -676,19 +707,13 @@ public class WISUtils {
 	JSONArray contacts = new JSONArray();
 	properties.put("contacts", contacts);
 	for (ResponsibleParty party : parties) {
-	    JSONObject contact = new JSONObject();
-	    contact.put("organization", party.getOrganisationName());
-	    JSONArray roles = new JSONArray();
-	    roles.put("host");
-	    contact.put("roles", roles);
-	    contacts.put(contact);
+	    String email = null;
+	    if (party.getContact() != null && party.getContact().getAddress() != null) {
+		email = party.getContact().getAddress().getElectronicMailAddress();
+	    }
+	    contacts.put(getContact(party.getOrganisationName(), email, "host"));
 	}
-	JSONObject cnr = new JSONObject();
-	cnr.put("organization", getPublisher());
-	JSONArray cnrRoles = new JSONArray();
-	cnrRoles.put("publisher");
-	cnr.put("roles", cnrRoles);
-	contacts.put(cnr);
+	contacts.put(getContact(getPublisher(), getPublisherEmail().orElse(null), "publisher"));
 	properties.put("wmo:dataPolicy", getDataPolicy(resource.getSource().getUniqueIdentifier()).getId());
 	if (resource.getSource().getUniqueIdentifier().equals("argentina-ina")) {
 	    String url = "https://creativecommons.org/licenses/by/4.0/";
