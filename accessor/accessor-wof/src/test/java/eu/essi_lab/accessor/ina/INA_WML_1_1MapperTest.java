@@ -15,7 +15,11 @@ import org.junit.Test;
 import com.google.common.collect.Lists;
 
 import eu.essi_lab.accessor.wof.WML_1_1Mapper;
+import eu.essi_lab.accessor.wof.WML_1_1_INAMapper;
+import eu.essi_lab.accessor.wof.client.datamodel.SitesResponseDocument;
+import eu.essi_lab.accessor.wof.client.datamodel.TimeSeries;
 import eu.essi_lab.accessor.wof.utils.WOFIdentifierMangler;
+import eu.essi_lab.iso.datamodel.classes.Address;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
 import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.Dimension;
@@ -34,6 +38,7 @@ import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.HarmonizedMetadata;
+import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.ommdk.AbstractResourceMapper;
 import junit.framework.TestCase;
@@ -198,6 +203,81 @@ public class INA_WML_1_1MapperTest {
 	Assert.assertEquals(NetProtocolWrapper.CUAHSI_WATER_ONE_FLOW_1_1.getCommonURN(), online.getProtocol());
 	Assert.assertEquals("download", online.getFunctionCode());
 
+    }
+
+    @Test
+    public void testINAContactInformation() throws Exception {
+	InputStream stream = INA_WML_1_1MapperTest.class.getClassLoader().getResourceAsStream("ina_sitesResponse_contact.xml");
+
+	TestCase.assertNotNull(stream);
+	String string = IOUtils.toString(stream);
+	stream.close();
+
+	OriginalMetadata originalMD = new OriginalMetadata();
+	originalMD.setMetadata(string);
+
+	GSSource source = new GSSource();
+	source.setEndpoint("https://alerta.ina.gob.ar/wml");
+	GSResource resource = new WML_1_1_INAMapper().map(originalMD, source);
+
+	DataIdentification dataIdentification = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		.getDataIdentification();
+
+	ArrayList<ResponsibleParty> contacts = Lists.newArrayList(dataIdentification.getPointOfContacts());
+	TestCase.assertEquals(2, contacts.size());
+
+	ResponsibleParty originator = dataIdentification.getPointOfContact("originator");
+	TestCase.assertEquals("Red Hidrológica Nacional - SSRH", originator.getOrganisationName());
+
+	ResponsibleParty contact = contacts.get(0);
+	TestCase.assertEquals("Instituto Nacional del Agua (INA)", contact.getOrganisationName());
+	TestCase.assertEquals("Juan Bianchi", contact.getIndividualName());
+	TestCase.assertEquals("main", contact.getPositionName());
+	TestCase.assertEquals("pointOfContact", contact.getRoleCode());
+
+	Address address = contact.getContact().getAddress();
+	TestCase.assertEquals("jbianchi@ina.gob.ar", address.getElectronicMailAddress());
+	TestCase.assertEquals("Au. Ezeiza-Cañuelas km 1,520, Ezeiza, Buenos Aires, Argentina", address.getDeliveryPoint());
+    }
+
+    @Test
+    public void testINASite30() throws Exception {
+	// series 1: Caudal (m^3/s)
+	GSResource discharge = mapINASeries("ina_siteInfo_30.xml", 1);
+	TestCase.assertEquals("m^3/s", discharge.getExtensionHandler().getAttributeUnitsAbbreviation().get());
+
+	DataIdentification dataIdentification = discharge.getHarmonizedMetadata().getCoreMetadata().getMIMetadata()
+		.getDataIdentification();
+	TestCase.assertEquals("Instituto Nacional del Agua (INA)", dataIdentification.getPointOfContact().getOrganisationName());
+	TestCase.assertEquals("escalas Prefectura Nacional", dataIdentification.getPointOfContact("originator").getOrganisationName());
+
+	// series 4: code 49 (monthly minimum), 6: code 51 (monthly minimum), 7: code 52 (monthly maximum), 8: code 67
+	// (weekly average)
+	TestCase.assertEquals(InterpolationType.MIN_SUCC, mapINASeries("ina_siteInfo_30.xml", 4).getExtensionHandler().getTimeInterpolation().get());
+	TestCase.assertEquals(InterpolationType.MIN_SUCC, mapINASeries("ina_siteInfo_30.xml", 6).getExtensionHandler().getTimeInterpolation().get());
+	TestCase.assertEquals(InterpolationType.MAX_SUCC, mapINASeries("ina_siteInfo_30.xml", 7).getExtensionHandler().getTimeInterpolation().get());
+	TestCase.assertEquals(InterpolationType.AVERAGE_SUCC,
+		mapINASeries("ina_siteInfo_30.xml", 8).getExtensionHandler().getTimeInterpolation().get());
+    }
+
+    /**
+     * Maps the given series of a GetSiteInfo response, as a single series record (the same way as the connector does)
+     */
+    private GSResource mapINASeries(String resource, int seriesIndex) throws Exception {
+	InputStream stream = INA_WML_1_1MapperTest.class.getClassLoader().getResourceAsStream(resource);
+	SitesResponseDocument document = new SitesResponseDocument(stream);
+	stream.close();
+
+	TimeSeries series = new SitesResponseDocument(document.getReader().asStream()).getSitesInfo().get(0).getSeries().get(seriesIndex);
+	document.getSites().get(0).clearSeries();
+	document.getSites().get(0).addSeries(series);
+
+	OriginalMetadata originalMD = new OriginalMetadata();
+	originalMD.setMetadata(document.getReader().asString());
+
+	GSSource source = new GSSource();
+	source.setEndpoint("https://alerta.ina.gob.ar/wml");
+	return new WML_1_1_INAMapper().map(originalMD, source);
     }
 
     private void assertKeyword(String expectedValue, MIMetadata metadata) {
