@@ -202,6 +202,27 @@ public class ExtendedMetadata {
     }
 
     /**
+     * Creates an xml element with the supplied <code>elementName</code> and <code>textContent</code> with the "gs"
+     * prefix and GI-suite name space URI ( {@link NameSpace#GS_DATA_MODEL_SCHEMA_URI} ) and appends it to the extension
+     * element, also if other xml elements with such <code>elementName</code> already exist (unlike
+     * {@link #add(String, String)}, which replaces them)
+     * 
+     * @see #getTextContents(String)
+     * @param elementName a non <code>null</code> element name
+     * @param textContent a non <code>null</code> text content
+     */
+    public void append(String elementName, String textContent) {
+
+	init();
+
+	Element element = document.createElementNS(NameSpace.GS_DATA_MODEL_SCHEMA_URI, "gs:" + elementName);
+	element.setTextContent(textContent);
+
+	document.getDocumentElement().appendChild(element);
+	extension = document.getDocumentElement();
+    }
+
+    /**
      * Set the text content to the xml element with the supplied <code>prefix</code> and <code>elementName</code>
      * 
      * @param prefix a non <code>null</code> prefix

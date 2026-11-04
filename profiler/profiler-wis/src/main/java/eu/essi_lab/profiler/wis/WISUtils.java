@@ -268,6 +268,39 @@ public class WISUtils {
 
     }
 
+    /**
+     * WCMP2 allows a single resolution in each temporal extent: the finest resolution is added as
+     * <code>time.resolution</code> and the second finest as <code>additionalExtents.temporal.resolution</code>, with
+     * the same interval as <code>time</code>. Further resolutions are not encoded
+     * 
+     * @param feature a feature with a time interval (see {@link #addTimeInterval(JSONObject, String, String)})
+     * @param resolutions ISO 8601 durations, from the finest
+     */
+    public static void addTimeResolutions(JSONObject feature, List<String> resolutions) {
+
+	JSONObject time = feature.optJSONObject("time");
+	if (time == null || resolutions.isEmpty()) {
+	    return;
+	}
+
+	time.put("resolution", resolutions.get(0));
+
+	if (resolutions.size() > 1) {
+
+	    JSONArray interval = new JSONArray();
+	    interval.put(new JSONArray(time.getJSONArray("interval").toList()));
+
+	    JSONObject temporal = new JSONObject();
+	    temporal.put("interval", interval);
+	    temporal.put("resolution", resolutions.get(1));
+	    temporal.put("trs", "https://www.opengis.net/def/uom/ISO-8601/0/Gregorian");
+
+	    JSONObject additionalExtents = new JSONObject();
+	    additionalExtents.put("temporal", temporal);
+	    feature.put("additionalExtents", additionalExtents);
+	}
+    }
+
     public static void addKeywords(JSONObject feature, String... keywords) {
 	JSONArray kArray;
 	if (feature.has("keywords")) {
@@ -576,6 +609,7 @@ public class WISUtils {
 	TemporalExtent temporalExtent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
 	if (temporalExtent != null) {
 	    WISUtils.addTimeInterval(feature, temporalExtent.getBeginPosition(), temporalExtent.getEndPosition());
+	    WISUtils.addTimeResolutions(feature, resource.getExtensionHandler().getWISTimeResolutions());
 	}
 
 	Iterator<Keywords> keywords = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getKeywords();

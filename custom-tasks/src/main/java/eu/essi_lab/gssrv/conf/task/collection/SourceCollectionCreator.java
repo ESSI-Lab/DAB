@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 
@@ -220,6 +221,11 @@ class SourceCollectionCreator {
 	    }
 	}
 
+	// time resolutions of the children, from the finest: the WCMP2 record provides the finest as time.resolution and
+	// the second finest as additionalExtents.temporal.resolution, while the abstract lists all of them
+	List<String> resolutions = getTimeResolutions(responseItem);
+	resolutions.forEach(dataset.getExtensionHandler()::addWISTimeResolution);
+
 	List<ComputationResult> count = responseItem.getCountDistinct();
 	ComputationResult attributes = count.get(0);
 	ComputationResult platforms = count.get(1);
@@ -234,12 +240,50 @@ class SourceCollectionCreator {
 	    time = "Temporal range: from " + beginString + " to " + endString + ". ";
 	}
 
-	coreMetadata
-		.setAbstract("Data provider: " + source.getLabel() + ". " + time + "Number of platforms: " + platforms.getValue() + ".");
+	String timeResolutions = "";
+	if (!resolutions.isEmpty()) {
+	    timeResolutions = " Time resolutions: " + String.join(", ", resolutions) + ".";
+	}
+
+	coreMetadata.setAbstract("Data provider: " + source.getLabel() + ". " + time + "Number of platforms: " + platforms.getValue() + "."
+		+ timeResolutions);
 
 	addAdditionalElements(dataset, source.getUniqueIdentifier(), groupBy);
 
 	return dataset;
+    }
+
+    /**
+     * @param responseItem
+     * @return the distinct time resolutions of the grouped datasets, as normalized ISO 8601 durations sorted from the
+     *         finest. Invalid and non positive durations are discarded
+     */
+    private List<String> getTimeResolutions(ResponseItem responseItem) {
+
+	// calendar based durations (e.g. P1M) have no fixed length: they are compared from a reference date
+	Date reference = new Date(0);
+	TreeMap<Long, String> sorted = new TreeMap<>();
+
+	Optional<ComputationResult> frequency = responseItem.getFrequency(MetadataElement.TIME_RESOLUTION_DURATION_8601);
+	if (frequency.isPresent()) {
+	    for (TermFrequencyItem item : frequency.get().getFrequencyItems()) {
+		String term = item.getTerm();
+		if (term == null || term.isBlank()) {
+		    continue;
+		}
+		try {
+		    String resolution = ISO8601DateTimeUtils.normalizeISO8601Duration(term.trim());
+		    long millis = ISO8601DateTimeUtils.getDuration(resolution).getTimeInMillis(reference);
+		    if (millis > 0) {
+			sorted.putIfAbsent(millis, resolution);
+		    }
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).warn("Discarded time resolution {}: {}", term, e.getMessage());
+		}
+	    }
+	}
+
+	return new ArrayList<>(sorted.values());
     }
 
     protected String getTitle(GSSource source, String parameter) {
@@ -332,7 +376,7 @@ class SourceCollectionCreator {
 	if (!propertyNames.isEmpty()) {
 	    props = "Number of observed properties: " + propertyNames.size() + " (" + properties + ").";
 	}
-	coreMetadata.setAbstract((abs + props).trim());
+	coreMetadata.setAbstract((abs + " " + props).trim());
 
     }
 
@@ -366,7 +410,7 @@ class SourceCollectionCreator {
 	statisticsMessage.computeTempExtentUnion();
 
 	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME, MetadataElement.USE_LEGAL_CONSTRAINTS_URI,
-		MetadataElement.OBSERVED_PROPERTY_URI), MAX_FREQUENCY_ITEMS);
+		MetadataElement.OBSERVED_PROPERTY_URI, MetadataElement.TIME_RESOLUTION_DURATION_8601), MAX_FREQUENCY_ITEMS);
 	// computes count distinct of 2 queryables
 	statisticsMessage.countDistinct(//
 		Arrays.asList(//
