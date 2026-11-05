@@ -29,7 +29,7 @@ import eu.essi_lab.adk.harvest.HarvestedAccessor;
 public class HISCentralLombardiaAccessor extends HarvestedAccessor<HISCentralLombardiaConnector> {
 
     /**
-     * 
+     *
      */
     public static final String TYPE = "SIR_LOMBARDIA";
 
