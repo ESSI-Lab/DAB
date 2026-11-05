@@ -159,6 +159,8 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
     public static final String HISCENTRAL_PIEMONTE_NS_URI = "http://essi-lab.eu/his-central/piemonte";
     public static final String HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/piemonte-scala-deflusso";
     public static final String HISCENTRAL_RATING_CURVES_NS_URI = "http://essi-lab.eu/his-central/rating-curves";
+    public static final String HISCENTRAL_LOMBARDIA_OPEN_DATA_NS_URI = "http://essi-lab.eu/his-central/lombardia-open-data";
+    public static final String HISCENTRAL_LOMBARDIA_OPEN_DATA_SCALE_DEFLUSSO_NS_URI = "http://essi-lab.eu/his-central/lombardia-open-data-scala-deflusso";
     public static final String HISCENTRAL_LIGURIA_NS_URI = "http://essi-lab.eu/his-central/liguria";
     public static final String HISCENTRAL_BOLZANO_NS_URI = "http://essi-lab.eu/his-central/bolzano";
     public static final String HISCENTRAL_PUGLIA_NS_URI = "http://essi-lab.eu/his-central/puglia";
@@ -260,6 +262,8 @@ public class CommonNameSpaceContext extends NamespacePrefixMapper implements Nam
 	map.put("hiscentralpiemonte", HISCENTRAL_PIEMONTE_NS_URI);
 	map.put("hiscentralpiemontescaladeflusso", HISCENTRAL_PIEMONTE_SCALE_DEFLUSSO_NS_URI);
 	map.put("hiscentralratingcurves", HISCENTRAL_RATING_CURVES_NS_URI);
+	map.put("hiscentrallombardiaopendata", HISCENTRAL_LOMBARDIA_OPEN_DATA_NS_URI);
+	map.put("hiscentrallombardiaopendatascaladeflusso", HISCENTRAL_LOMBARDIA_OPEN_DATA_SCALE_DEFLUSSO_NS_URI);
 	map.put("hiscentralliguria", HISCENTRAL_LIGURIA_NS_URI);
 	map.put("hiscentralbolzano", HISCENTRAL_BOLZANO_NS_URI);
 	map.put("hiscentralsardegna", HISCENTRAL_SARDEGNA_NS_URI);

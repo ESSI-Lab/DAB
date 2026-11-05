@@ -88,7 +88,8 @@ public class HISCentralLombardiaConnector extends HarvestedQueryConnector<HISCen
     @Override
     public boolean supports(GSSource source) {
 	String url = source.getEndpoint();
-	return url.contains("lombardia");
+	// the open data portal is handled by HISCentralLombardiaOpenDataConnector
+	return url.contains("lombardia") && !url.contains("dati.lombardia.it");
     }
 
     private static String NS = "arpalombardia.it";
