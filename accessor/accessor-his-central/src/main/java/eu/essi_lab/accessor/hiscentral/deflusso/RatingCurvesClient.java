@@ -89,6 +89,27 @@ public class RatingCurvesClient {
     }
 
     /**
+     * Parses only the {@code .xlsx} files of the sub-folder named after the given HIS-Central source id.
+     *
+     * @param sourceId HIS-Central source id (SharePoint sub-folder name)
+     * @return the parsed stations, or an empty list if no sub-folder with this name exists
+     */
+    public List<RatingCurves> harvest(String sourceId) throws IOException {
+
+	List<RatingCurves> stations = new ArrayList<>();
+	SharePointClient client = new SharePointClient(endpoint);
+
+	if (!client.listFolders().contains(sourceId)) {
+	    return stations;
+	}
+
+	client.cd(sourceId);
+	parseFolderFiles(client, stations, sourceId);
+
+	return stations;
+    }
+
+    /**
      * Harvests the shared folder and returns the rating curves of the station with the given identifier in the
      * given HIS-Central source (SharePoint sub-folder name).
      *
