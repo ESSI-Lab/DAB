@@ -220,6 +220,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    hexacode = "#2222cc";
 	    break;
 	case "ita-sir-lombardia":
+	case "ita-sir-lombardia-open-data":
 	    hexacode = "#CC00CC";
 	    break;
 	case "ita-sir-piemonte":

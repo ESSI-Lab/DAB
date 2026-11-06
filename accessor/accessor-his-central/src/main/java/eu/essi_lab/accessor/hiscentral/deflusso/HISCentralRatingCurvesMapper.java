@@ -195,8 +195,8 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	    distribution.addDistributionOnline(download);
 
 	    CoverageDescription coverageDescription = new CoverageDescription();
-	    coverageDescription.setAttributeIdentifier("scala_deflusso");
-	    coverageDescription.setAttributeTitle("Scala di deflusso");
+	    coverageDescription.setAttributeIdentifier("Rating curve");
+	    coverageDescription.setAttributeTitle("Rating curve");
 	    coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
 
 	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.AVERAGE);

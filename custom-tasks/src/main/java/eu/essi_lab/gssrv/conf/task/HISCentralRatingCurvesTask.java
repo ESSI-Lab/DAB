@@ -73,6 +73,7 @@ import eu.essi_lab.model.resource.ResourceProperty;
  *
  * <pre>
  * endpoint=https://tenant-my.sharepoint.com/:f:/g/... (sharing link of the rating curves root folder)
+ * observedPropertyURI=http://... (optional, defaults to {@value #DEFAULT_OBSERVED_PROPERTY_URI})
  * </pre>
  *
  * @author boldrini
@@ -80,8 +81,15 @@ import eu.essi_lab.model.resource.ResourceProperty;
 public class HISCentralRatingCurvesTask extends AbstractEmbeddedTask {
 
     public enum HISCentralRatingCurvesTaskOptions implements OptionsKey {
-	ENDPOINT;
+	ENDPOINT, //
+	OBSERVED_PROPERTY_URI;
     }
+
+    /**
+     * HIS-Central hydro-ontology concept used when the {@link HISCentralRatingCurvesTaskOptions#OBSERVED_PROPERTY_URI}
+     * option is not set
+     */
+    public static final String DEFAULT_OBSERVED_PROPERTY_URI = "http://his-central-ontology.geodab.eu/hydro-ontology/concept/1c";
 
     private static final int PAGE_SIZE = 500;
 
@@ -99,9 +107,19 @@ public class HISCentralRatingCurvesTask extends AbstractEmbeddedTask {
 	GSSource source = optSource.get();
 	String sourceId = source.getUniqueIdentifier();
 
-	Optional<String> endpoint = readTaskOptions(context, HISCentralRatingCurvesTaskOptions.class)//
-		.map(options -> options.get(HISCentralRatingCurvesTaskOptions.ENDPOINT))//
+	Optional<EnumMap<HISCentralRatingCurvesTaskOptions, String>> options = readTaskOptions(context,
+		HISCentralRatingCurvesTaskOptions.class);
+
+	Optional<String> endpoint = options//
+		.map(o -> o.get(HISCentralRatingCurvesTaskOptions.ENDPOINT))//
 		.filter(e -> !e.isBlank());
+
+	String observedPropertyURI = options//
+		.map(o -> o.get(HISCentralRatingCurvesTaskOptions.OBSERVED_PROPERTY_URI))//
+		.filter(u -> !u.isBlank())//
+		.orElse(DEFAULT_OBSERVED_PROPERTY_URI);
+
+	log(status, "Observed property URI: " + observedPropertyURI);
 
 	if (endpoint.isEmpty()) {
 	    status.addWarningMessage("Missing 'endpoint' task option, HIS-Central rating curves task skipped");
@@ -140,6 +158,8 @@ public class HISCentralRatingCurvesTask extends AbstractEmbeddedTask {
 		resource.setPublicId(originalId);
 
 		augmenter.augment(resource);
+
+		resource.getExtensionHandler().setObservedPropertyURI(observedPropertyURI);
 
 		IndexedElementsWriter.write(resource);
 
