@@ -4,6 +4,7 @@ eu.essi_lab.accessor.hiscentral.marche.HISCentralMarcheMapper
 eu.essi_lab.accessor.hiscentral.friuli.HISCentralFriuliMapper
 eu.essi_lab.accessor.hiscentral.veneto.HISCentralVenetoMapper
 eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioMapper
+eu.essi_lab.accessor.hiscentral.sicilia.HISCentralSiciliaMapper
 eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaMapper
 eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteMapper
 eu.essi_lab.accessor.hiscentral.liguria.HISCentralLiguriaMapper
