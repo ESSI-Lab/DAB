@@ -21,9 +21,13 @@ package eu.essi_lab.accessor.canswe;
  * #L%
  */
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
+import eu.essi_lab.cfga.option.StringOptionBuilder;
 
 /**
  * @author boldrini
@@ -31,9 +35,66 @@ import eu.essi_lab.cfga.gs.setting.connector.HarvestedConnectorSetting;
 public class CanSWEConnectorSetting extends HarvestedConnectorSetting {
 
     /**
+     * Automatic measurements: snow pillows or snow scales (2) and passive gamma sensors (3)
+     */
+    public static final String DEFAULT_MEASUREMENT_TYPES = "2,3";
+
+    /**
+     * Value to harvest the stations of all the measurement types
+     */
+    public static final String ALL_MEASUREMENT_TYPES = "*";
+
+    public static final String CANSWE_MEASUREMENT_TYPES = "CANSWE_MEASUREMENT_TYPES";
+
+    /**
      *
      */
     public CanSWEConnectorSetting() {
+
+	addOption(StringOptionBuilder.get().//
+		withKey(CANSWE_MEASUREMENT_TYPES).//
+		withLabel("Comma separated WMO measurement type codes of the stations to harvest (* for all): "
+			+ "0 multi point manual snow survey, 1 single point manual SWE measurement, 2 snow pillow or snow scale, "
+			+ "3 passive gamma, 4 GNSS/GPS, 5 cosmic ray attenuation, 6 time domain reflectometry")
+		.//
+		withValue(DEFAULT_MEASUREMENT_TYPES).//
+		required().//
+		cannotBeDisabled().//
+		build());
+    }
+
+    /**
+     * @return the measurement type codes of the stations to harvest, or null for all the stations
+     */
+    public Set<Long> getMeasurementTypes() {
+
+	String value = getOption(CANSWE_MEASUREMENT_TYPES, String.class).map(o -> o.getValue()).orElse(DEFAULT_MEASUREMENT_TYPES);
+
+	return parseMeasurementTypes(value);
+    }
+
+    /**
+     * @param value comma separated codes, or {@link #ALL_MEASUREMENT_TYPES}
+     * @return the codes, or null for all the measurement types
+     */
+    static Set<Long> parseMeasurementTypes(String value) {
+
+	if (value == null || value.trim().isEmpty() || value.trim().equals(ALL_MEASUREMENT_TYPES)) {
+	    return null;
+	}
+
+	Set<Long> ret = new TreeSet<>();
+	for (String item : value.split(",")) {
+	    if (!item.trim().isEmpty()) {
+		try {
+		    ret.add(Long.parseLong(item.trim()));
+		} catch (NumberFormatException e) {
+		    throw new IllegalArgumentException("Invalid CanSWE measurement type: " + item.trim());
+		}
+	    }
+	}
+
+	return ret.isEmpty() ? null : ret;
     }
 
     /**

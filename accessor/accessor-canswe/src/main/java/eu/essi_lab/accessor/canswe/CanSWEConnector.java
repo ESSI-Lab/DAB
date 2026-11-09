@@ -25,9 +25,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cdk.harvest.HarvestedQueryConnector;
@@ -40,10 +40,8 @@ import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**
- * Harvests one metadata record for each time series of the CanSWE NetCDF file. The stations having the same coordinates
- * are grouped in a site; for each site and variable (snow water equivalent, snow depth, snow density) a single time
- * series is published if there is at most one value at each time, otherwise two time series are published: one with
- * the maximum and one with the minimum of the values at each time.
+ * Harvests one metadata record for each station and variable (snow water equivalent, snow depth, snow density) of the
+ * CanSWE NetCDF file having at least one valid value
  *
  * @author boldrini
  */
@@ -59,23 +57,20 @@ public class CanSWEConnector extends HarvestedQueryConnector<CanSWEConnectorSett
      */
     public static final String RECORD_FILE_URL = "fileURL";
     public static final String RECORD_GLOBAL = "global";
-    public static final String RECORD_SITE = "site";
-    public static final String RECORD_SITE_ID = "id";
-    public static final String RECORD_SITE_LATITUDE = "latitude";
-    public static final String RECORD_SITE_LONGITUDE = "longitude";
-    public static final String RECORD_SITE_STATIONS = "stations";
+    public static final String RECORD_STATION = "station";
+    public static final String RECORD_STATION_ID = "station_id";
+    public static final String RECORD_LATITUDE = "latitude";
+    public static final String RECORD_LONGITUDE = "longitude";
     public static final String RECORD_VARIABLE = "variable";
     public static final String RECORD_VARIABLE_NAME = "name";
-    public static final String RECORD_STATISTIC = "statistic";
     public static final String RECORD_BEGIN = "begin";
     public static final String RECORD_END = "end";
     public static final String RECORD_VALUES = "values";
-    public static final String RECORD_MULTIPLE_VALUES = "timesWithMultipleValues";
 
     /**
-     * Number of sites harvested by each listRecords call
+     * Number of stations harvested by each listRecords call
      */
-    static final int SITES_PER_PAGE = 100;
+    static final int STATIONS_PER_PAGE = 100;
 
     private static final String CANSWE_CONNECTOR_ERROR = "CANSWE_CONNECTOR_ERROR";
 
@@ -103,13 +98,11 @@ public class CanSWEConnector extends HarvestedQueryConnector<CanSWEConnectorSett
 
 	String fileURL;
 	CanSWEDataset dataset;
-	List<CanSWESite> sites;
 
 	try {
 	    CanSWEClient client = new CanSWEClient(getSourceURL());
 	    fileURL = client.getFileURL();
 	    dataset = client.getDataset();
-	    sites = dataset.getSites();
 
 	} catch (Exception e) {
 
@@ -123,64 +116,69 @@ public class CanSWEConnector extends HarvestedQueryConnector<CanSWEConnectorSett
 		    e);
 	}
 
+	Set<Long> measurementTypes = getSetting().getMeasurementTypes();
+
+	// the stations of the selected measurement types (all if null)
+	List<CanSWEStation> stations = dataset.getStations().stream().//
+		filter(s -> measurementTypes == null || measurementTypes.contains(s.getMeasurementType())).//
+		collect(Collectors.toList());
+
+	if (index == 0) {
+	    GSLoggerFactory.getLogger(getClass()).info("Harvesting {}/{} stations of measurement types {}", stations.size(),
+		    dataset.getStations().size(), measurementTypes == null ? "*" : measurementTypes);
+	}
+
 	JSONObject global = new JSONObject();
 	for (Entry<String, String> entry : dataset.getGlobalAttributes().entrySet()) {
 	    global.put(entry.getKey(), entry.getValue());
 	}
 
 	boolean maxReached = false;
-	int end = Math.min(index + SITES_PER_PAGE, sites.size());
+	int end = Math.min(index + STATIONS_PER_PAGE, stations.size());
 
 	for (int i = index; i < end && !maxReached; i++) {
 
-	    CanSWESite site = sites.get(i);
-	    JSONObject siteObject = toJSON(site);
+	    CanSWEStation station = stations.get(i);
+	    JSONObject stationObject = toJSON(station);
 
 	    for (String variable : CanSWEDataset.VARIABLES) {
 
-		TreeMap<Integer, double[]> aggregate = site.aggregate(variable);
-		long multiple = aggregate.values().stream().filter(v -> v[2] > 1).count();
-
-		for (CanSWEStatistic statistic : CanSWESite.getStatistics(aggregate)) {
-
-		    if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
-			maxReached = true;
-			break;
-		    }
-
-		    JSONObject variableObject = new JSONObject();
-		    variableObject.put(RECORD_VARIABLE_NAME, variable);
-		    for (Entry<String, String> entry : dataset.getVariableAttributes(variable).entrySet()) {
-			variableObject.put(entry.getKey(), entry.getValue());
-		    }
-
-		    JSONObject record = new JSONObject();
-		    record.put(RECORD_FILE_URL, fileURL);
-		    record.put(RECORD_GLOBAL, global);
-		    record.put(RECORD_SITE, siteObject);
-		    record.put(RECORD_VARIABLE, variableObject);
-		    record.put(RECORD_STATISTIC, statistic.name());
-		    record.put(RECORD_BEGIN, dataset.getDate(aggregate.firstKey()).getTime());
-		    record.put(RECORD_END, dataset.getDate(aggregate.lastKey()).getTime());
-		    record.put(RECORD_VALUES, aggregate.size());
-		    record.put(RECORD_MULTIPLE_VALUES, multiple);
-
-		    OriginalMetadata originalMetadata = new OriginalMetadata();
-		    originalMetadata.setMetadata(record.toString());
-		    originalMetadata.setSchemeURI(CanSWEMapper.CANSWE_SCHEMA);
-		    response.addRecord(originalMetadata);
-		    partialNumbers++;
+		int[] times = station.getTimeIndexes(variable);
+		if (times.length == 0) {
+		    continue;
 		}
 
-		if (maxReached) {
+		if (!unlimited && mr.isPresent() && partialNumbers >= mr.get()) {
+		    maxReached = true;
 		    break;
 		}
+
+		JSONObject variableObject = new JSONObject();
+		variableObject.put(RECORD_VARIABLE_NAME, variable);
+		for (Entry<String, String> entry : dataset.getVariableAttributes(variable).entrySet()) {
+		    variableObject.put(entry.getKey(), entry.getValue());
+		}
+
+		JSONObject record = new JSONObject();
+		record.put(RECORD_FILE_URL, fileURL);
+		record.put(RECORD_GLOBAL, global);
+		record.put(RECORD_STATION, stationObject);
+		record.put(RECORD_VARIABLE, variableObject);
+		record.put(RECORD_BEGIN, dataset.getDate(times[0]).getTime());
+		record.put(RECORD_END, dataset.getDate(times[times.length - 1]).getTime());
+		record.put(RECORD_VALUES, times.length);
+
+		OriginalMetadata originalMetadata = new OriginalMetadata();
+		originalMetadata.setMetadata(record.toString());
+		originalMetadata.setSchemeURI(CanSWEMapper.CANSWE_SCHEMA);
+		response.addRecord(originalMetadata);
+		partialNumbers++;
 	    }
 	}
 
-	GSLoggerFactory.getLogger(getClass()).debug("Sites [{}-{}]/{}: {} records so far", index + 1, end, sites.size(), partialNumbers);
+	GSLoggerFactory.getLogger(getClass()).debug("Stations [{}-{}]/{}: {} records so far", index + 1, end, stations.size(), partialNumbers);
 
-	if (end < sites.size() && !maxReached) {
+	if (end < stations.size() && !maxReached) {
 	    response.setResumptionToken(String.valueOf(end));
 	} else {
 	    response.setResumptionToken(null);
@@ -193,26 +191,18 @@ public class CanSWEConnector extends HarvestedQueryConnector<CanSWEConnectorSett
     }
 
     /**
-     * @param site
-     * @return
+     * @param station
+     * @return the station metadata, with the coordinates
      */
-    static JSONObject toJSON(CanSWESite site) {
+    static JSONObject toJSON(CanSWEStation station) {
 
-	JSONObject ret = new JSONObject();
-	ret.put(RECORD_SITE_ID, site.getId());
+	JSONObject ret = station.toJSON();
 
-	CanSWEStation first = site.getStations().get(0);
-	if (!Double.isNaN(first.getLatitude()) && !Double.isNaN(first.getLongitude())) {
+	if (!Double.isNaN(station.getLatitude()) && !Double.isNaN(station.getLongitude())) {
 	    // float precision of the file
-	    ret.put(RECORD_SITE_LATITUDE, Float.toString((float) first.getLatitude()));
-	    ret.put(RECORD_SITE_LONGITUDE, Float.toString((float) first.getLongitude()));
+	    ret.put(RECORD_LATITUDE, Float.toString((float) station.getLatitude()));
+	    ret.put(RECORD_LONGITUDE, Float.toString((float) station.getLongitude()));
 	}
-
-	JSONArray stations = new JSONArray();
-	for (CanSWEStation station : site.getStations()) {
-	    stations.put(station.toJSON());
-	}
-	ret.put(RECORD_SITE_STATIONS, stations);
 
 	return ret;
     }

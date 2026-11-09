@@ -24,13 +24,12 @@ package eu.essi_lab.accessor.canswe;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.TimeZone;
-import java.util.TreeMap;
 
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -51,8 +50,8 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 /**
- * Downloads a CanSWE time series as WaterML 1.1. The online resource linkage is the NetCDF file URL and its name is
- * made of variable, statistic and site id (see {@link CanSWEMapper#getOnlineName(String, CanSWEStatistic, String)}).
+ * Downloads a CanSWE station time series as WaterML 1.1. The online resource linkage is the NetCDF file URL and its
+ * name is made of variable and station id (see {@link CanSWEMapper#getOnlineName(String, String)}).
  *
  * @author boldrini
  */
@@ -70,9 +69,10 @@ public class CanSWEDownloader extends WMLDataDownloader {
 
 	try {
 	    CanSWEDataset dataset = getDataset();
-	    TreeMap<Integer, double[]> aggregate = getAggregate(dataset);
-	    if (!aggregate.isEmpty()) {
-		descriptor.setTemporalDimension(dataset.getDate(aggregate.firstKey()), dataset.getDate(aggregate.lastKey()));
+	    String[] parts = getNameParts();
+	    int[] times = getStation(dataset, parts[1]).getTimeIndexes(parts[0]);
+	    if (times.length > 0) {
+		descriptor.setTemporalDimension(dataset.getDate(times[0]), dataset.getDate(times[times.length - 1]));
 	    }
 	} catch (Exception e) {
 	    GSLoggerFactory.getLogger(getClass()).error("Unable to read {} {}: {}", online.getLinkage(), online.getName(), e.getMessage());
@@ -101,24 +101,19 @@ public class CanSWEDownloader extends WMLDataDownloader {
 
 	try {
 	    CanSWEDataset dataset = getDataset();
-	    CanSWEStatistic statistic = CanSWEStatistic.valueOf(getNameParts()[1]);
+	    String[] parts = getNameParts();
 
-	    List<Entry<Integer, Double>> values = CanSWESite.getSeries(//
-		    getAggregate(dataset), //
-		    statistic, //
-		    dataset.getFirstIndexNotBefore(begin), //
-		    dataset.getLastIndexNotAfter(end));
+	    List<SimpleEntry<Date, Double>> values = dataset.getValues(getStation(dataset, parts[1]), parts[0], begin, end);
 
 	    TimeSeriesTemplate tsrt = getTimeSeriesTemplate(getClass().getSimpleName(), ".wml");
 
-	    for (Entry<Integer, Double> value : values) {
+	    for (SimpleEntry<Date, Double> value : values) {
 
 		ValueSingleVariable v = new ValueSingleVariable();
-		// the values are stored as floats
-		v.setValue(new BigDecimal(Float.toString(value.getValue().floatValue())));
+		v.setValue(BigDecimal.valueOf(value.getValue()));
 
 		GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
-		c.setTime(dataset.getDate(value.getKey()));
+		c.setTime(value.getKey());
 		XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
 		v.setDateTimeUTC(date);
 		addValue(tsrt, v);
@@ -143,7 +138,7 @@ public class CanSWEDownloader extends WMLDataDownloader {
     }
 
     /**
-     * @return variable, statistic and site id
+     * @return variable and station id
      * @throws IOException
      */
     private String[] getNameParts() throws IOException {
@@ -153,14 +148,13 @@ public class CanSWEDownloader extends WMLDataDownloader {
 
     /**
      * @param dataset
+     * @param stationId
      * @return
      * @throws IOException
      */
-    private TreeMap<Integer, double[]> getAggregate(CanSWEDataset dataset) throws IOException {
+    private CanSWEStation getStation(CanSWEDataset dataset, String stationId) throws IOException {
 
-	String[] parts = getNameParts();
-	CanSWESite site = dataset.getSite(parts[2]).orElseThrow(() -> new IOException("Site not found: " + parts[2]));
-	return site.aggregate(parts[0]);
+	return dataset.getStation(stationId).orElseThrow(() -> new IOException("Station not found: " + stationId));
     }
 
     @Override

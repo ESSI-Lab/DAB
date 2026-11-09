@@ -28,24 +28,51 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 import org.junit.Test;
 
+import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.messages.listrecords.ListRecordsRequest;
 import eu.essi_lab.messages.listrecords.ListRecordsResponse;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.OriginalMetadata;
 import eu.essi_lab.model.resource.data.DataDescriptor;
-import eu.essi_lab.iso.datamodel.classes.Online;
 
 /**
- * Downloads the CanSWE v6 NetCDF file from Zenodo, harvests the first page of sites, maps the records and downloads the
- * maximum and minimum snow water equivalent of two co-located stations
+ * Downloads the CanSWE v6 NetCDF file from Zenodo; harvests all the stations of the default measurement types (2, 3);
+ * harvests the first page of stations of all the measurement types, maps the records and downloads the snow water
+ * equivalent of the first station
  */
 public class CanSWEHarvestExternalTestIT {
+
+    @Test
+    public void testDefaultMeasurementTypes() throws Exception {
+
+	CanSWEConnector connector = new CanSWEConnector();
+	connector.setSourceURL(CanSWEClient.DEFAULT_ENDPOINT);
+
+	java.util.Set<String> stations = new java.util.HashSet<>();
+	String token = null;
+	do {
+	    ListRecordsRequest request = new ListRecordsRequest();
+	    request.setResumptionToken(token);
+	    ListRecordsResponse<OriginalMetadata> response = connector.listRecords(request);
+	    Iterator<OriginalMetadata> records = response.getRecords();
+	    while (records.hasNext()) {
+		org.json.JSONObject station = new org.json.JSONObject(records.next().getMetadata())
+			.getJSONObject(CanSWEConnector.RECORD_STATION);
+		long type = station.getLong("type_mes");
+		assertTrue(type == 2 || type == 3);
+		stations.add(station.getString(CanSWEConnector.RECORD_STATION_ID));
+	    }
+	    token = response.getResumptionToken();
+	} while (token != null);
+
+	System.out.println("Harvested stations of measurement types 2, 3: " + stations.size());
+	// 149 snow pillows and 120 passive gamma sensors
+	assertEquals(269, stations.size());
+    }
 
     @Test
     public void testHarvestMapAndDownload() throws Exception {
@@ -56,73 +83,53 @@ public class CanSWEHarvestExternalTestIT {
 	CanSWEDataset dataset = client.getDataset();
 	assertEquals(2921, dataset.getStations().size());
 
-	List<CanSWESite> sites = dataset.getSites();
-	long colocated = sites.stream().filter(s -> s.getStations().size() > 1).count();
-	System.out.println("Sites: " + sites.size() + ", co-located groups: " + colocated);
-	assertTrue(colocated > 100);
-
-	// two stations at the same location with values at the same times
-	CanSWESite westCastle = dataset.getSite("ALE-05AA801,ALE-05AA805").get();
-	assertEquals(CanSWESite.getStatistics(westCastle.aggregate(CanSWEDataset.SNW)).size(), 2);
-	assertTrue(sites.stream().anyMatch(s -> s.getId().equals("ALE-05AA801,ALE-05AA805")));
-
 	CanSWEConnector connector = new CanSWEConnector();
 	connector.setSourceURL(CanSWEClient.DEFAULT_ENDPOINT);
+	connector.getSetting().getOption(CanSWEConnectorSetting.CANSWE_MEASUREMENT_TYPES, String.class).get()
+		.setValue(CanSWEConnectorSetting.ALL_MEASUREMENT_TYPES);
 
 	ListRecordsResponse<OriginalMetadata> response = connector.listRecords(new ListRecordsRequest());
-	assertEquals(String.valueOf(CanSWEConnector.SITES_PER_PAGE), response.getResumptionToken());
+	assertEquals(String.valueOf(CanSWEConnector.STATIONS_PER_PAGE), response.getResumptionToken());
 
 	GSSource source = new GSSource();
 	source.setEndpoint(CanSWEClient.DEFAULT_ENDPOINT);
 
 	CanSWEMapper mapper = new CanSWEMapper();
-	GSResource maximum = null;
-	GSResource minimum = null;
+	GSResource swe = null;
 	int count = 0;
 
 	Iterator<OriginalMetadata> records = response.getRecords();
 	while (records.hasNext()) {
 	    GSResource resource = mapper.map(records.next(), source);
-	    String name = resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getName();
-	    if (name.equals("snw;MAXIMUM;ALE-05AA801,ALE-05AA805")) {
-		maximum = resource;
+	    if (resource.getHarmonizedMetadata().getCoreMetadata().getOnline().getName().equals("snw;ALE-05AA805")) {
+		swe = resource;
 		System.out.println("MAPPED " + resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
 		System.out.println(resource.getHarmonizedMetadata().getCoreMetadata().getAbstract());
-	    }
-	    if (name.equals("snw;MINIMUM;ALE-05AA801,ALE-05AA805")) {
-		minimum = resource;
 	    }
 	    count++;
 	}
 
 	System.out.println("Records of the first page: " + count);
-	assertTrue(count > CanSWEConnector.SITES_PER_PAGE);
-	assertNotNull(maximum);
-	assertNotNull(minimum);
+	assertTrue(count > CanSWEConnector.STATIONS_PER_PAGE);
+	assertNotNull(swe);
 
-	String max = download(maximum);
-	String min = download(minimum);
-
-	// 1968-03-06: ALE-05AA805 155.0, ALE-05AA801 277.0
-	assertTrue(max.contains("1968-03-06T00:00:00") && max.contains(">277.0<"));
-	assertTrue(min.contains("1968-03-06T00:00:00") && min.contains(">155.0<"));
-    }
-
-    private String download(GSResource resource) throws Exception {
-
-	Online online = resource.getHarmonizedMetadata().getCoreMetadata().getOnline();
+	Online online = swe.getHarmonizedMetadata().getCoreMetadata().getOnline();
 	// during harvesting the identifier is assigned by the identifier decorator
 	online.setIdentifier();
 
 	CanSWEDownloader downloader = new CanSWEDownloader();
-	downloader.setOnlineResource(resource, online.getIdentifier());
+	downloader.setOnlineResource(swe, online.getIdentifier());
 	assertTrue(downloader.canDownload());
 	assertTrue(downloader.canConnect());
 
 	DataDescriptor descriptor = downloader.getRemoteDescriptors().get(0);
 	assertNotNull(descriptor.getTemporalDimension());
 
-	File file = Optional.ofNullable(downloader.download(descriptor)).get();
-	return Files.readString(file.toPath());
+	File file = downloader.download(descriptor);
+	assertNotNull(file);
+
+	String wml = Files.readString(file.toPath());
+	// 1968-03-06: 155.0 kg m-2
+	assertTrue(wml.contains("1968-03-06T00:00:00") && wml.contains(">155.0<"));
     }
 }

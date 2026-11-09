@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -435,50 +436,39 @@ public class CanSWEDataset {
     }
 
     /**
-     * @return the stations grouped by location (identical coordinates), in the order of the file
+     * @param stationId
+     * @return the station with the given id
      */
-    public List<CanSWESite> getSites() {
+    public Optional<CanSWEStation> getStation(String stationId) {
 
-	Map<String, List<CanSWEStation>> groups = new LinkedHashMap<>();
-
-	for (CanSWEStation station : stations) {
-
-	    String key;
-	    if (Double.isNaN(station.getLatitude()) || Double.isNaN(station.getLongitude())) {
-		// without coordinates a station is a site on its own
-		key = "id:" + station.getId();
-	    } else {
-		key = Float.toString((float) station.getLatitude()) + ";" + Float.toString((float) station.getLongitude());
-	    }
-
-	    groups.computeIfAbsent(key, k -> new ArrayList<>()).add(station);
-	}
-
-	List<CanSWESite> ret = new ArrayList<>();
-	for (List<CanSWEStation> group : groups.values()) {
-	    ret.add(new CanSWESite(group));
-	}
-
-	return ret;
+	return stationId == null ? Optional.empty() : Optional.ofNullable(stationsById.get(stationId.trim()));
     }
 
     /**
-     * @param siteId as returned by {@link CanSWESite#getId()}
-     * @return the site made of the given stations
+     * @param station
+     * @param variable
+     * @param begin inclusive, null for no lower limit
+     * @param end inclusive, null for no upper limit
+     * @return the valid values of the given station and variable in the given time range
      */
-    public Optional<CanSWESite> getSite(String siteId) {
+    public List<SimpleEntry<Date, Double>> getValues(CanSWEStation station, String variable, Date begin, Date end) {
 
-	List<CanSWEStation> group = new ArrayList<>();
+	Integer beginIndex = getFirstIndexNotBefore(begin);
+	Integer endIndex = getLastIndexNotAfter(end);
 
-	for (String id : siteId.split(CanSWESite.ID_SEPARATOR)) {
-	    CanSWEStation station = stationsById.get(id.trim());
-	    if (station == null) {
-		return Optional.empty();
+	int[] indexes = station.getTimeIndexes(variable);
+	float[] values = station.getValues(variable);
+
+	List<SimpleEntry<Date, Double>> ret = new ArrayList<>();
+	for (int i = 0; i < indexes.length; i++) {
+	    if ((beginIndex != null && indexes[i] < beginIndex) || (endIndex != null && indexes[i] > endIndex)) {
+		continue;
 	    }
-	    group.add(station);
+	    // the values are stored as floats
+	    ret.add(new SimpleEntry<>(getDate(indexes[i]), Double.valueOf(Float.toString(values[i]))));
 	}
 
-	return group.isEmpty() ? Optional.empty() : Optional.of(new CanSWESite(group));
+	return ret;
     }
 
     /**

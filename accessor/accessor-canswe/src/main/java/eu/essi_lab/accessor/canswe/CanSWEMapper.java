@@ -22,14 +22,9 @@ package eu.essi_lab.accessor.canswe;
  */
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.iso.datamodel.classes.Citation;
@@ -65,15 +60,13 @@ public class CanSWEMapper extends AbstractResourceMapper {
     public static final String CANSWE_SCHEMA = "https://zenodo.org/records/10835278/CanSWE/schema";
 
     /**
-     * Separator of the parts of the online resource name: variable, statistic and site id
+     * Separator of the parts of the online resource name: variable and station id
      */
     static final String NAME_SEPARATOR = ";";
 
     private static final String PUBLISHER = "Environment and Climate Change Canada (ECCC)";
 
     private static final String LICENSE = "Open Government Licence - Canada (https://open.canada.ca/en/open-government-licence-canada)";
-
-    private static final String HYDRO_QUEBEC = "Hydro-Quebec";
 
     private static final String HYDRO_QUEBEC_LICENSE = "Hydro-Quebec data are available under the terms of the Creative Commons Attribution - Non Commercial - Share A Like 4.0 International License (https://creativecommons.org/licenses/by-nc-sa/4.0/)";
 
@@ -83,46 +76,17 @@ public class CanSWEMapper extends AbstractResourceMapper {
     protected GSResource execMapping(OriginalMetadata originalMD, GSSource source) throws GSException {
 
 	JSONObject record = new JSONObject(originalMD.getMetadata());
-	JSONObject global = record.optJSONObject(CanSWEConnector.RECORD_GLOBAL);
-	if (global == null) {
-	    global = new JSONObject();
-	}
-	JSONObject site = record.getJSONObject(CanSWEConnector.RECORD_SITE);
+	JSONObject station = record.getJSONObject(CanSWEConnector.RECORD_STATION);
 	JSONObject variable = record.getJSONObject(CanSWEConnector.RECORD_VARIABLE);
-	JSONArray stations = site.getJSONArray(CanSWEConnector.RECORD_SITE_STATIONS);
-	CanSWEStatistic statistic = CanSWEStatistic.valueOf(record.getString(CanSWEConnector.RECORD_STATISTIC));
 
-	String siteId = site.getString(CanSWEConnector.RECORD_SITE_ID);
+	String stationId = station.getString(CanSWEConnector.RECORD_STATION_ID);
+	String stationName = station.optString("station_name", stationId);
+	String provider = station.optString("source", null);
+	String method = station.optString("type_mes_label", null);
 	String variableName = variable.getString(CanSWEConnector.RECORD_VARIABLE_NAME);
 	String longName = getVariableLabel(variableName, variable.optString("long_name", variableName));
 	String units = normalizeUnits(variable.optString("units", ""));
-
-	Set<String> names = new LinkedHashSet<>();
-	Set<String> ids = new LinkedHashSet<>();
-	Set<String> providers = new LinkedHashSet<>();
-	Set<String> methods = new LinkedHashSet<>();
-	List<Double> elevations = new ArrayList<>();
-
-	for (int i = 0; i < stations.length(); i++) {
-	    JSONObject station = stations.getJSONObject(i);
-	    ids.add(station.getString("station_id"));
-	    if (station.has("station_name")) {
-		names.add(station.getString("station_name"));
-	    }
-	    if (station.has("source")) {
-		providers.add(station.getString("source"));
-	    }
-	    if (station.has("type_mes_label")) {
-		methods.add(station.getString("type_mes_label"));
-	    }
-	    if (station.has("elevation")) {
-		elevations.add(station.getDouble("elevation"));
-	    }
-	}
-
-	String siteName = names.isEmpty() ? siteId : String.join(" / ", names);
-	String siteLabel = siteName + " (" + String.join(", ", ids) + ")";
-	boolean colocated = stations.length() > 1;
+	String stationLabel = stationName + " (" + stationId + ")";
 
 	Dataset dataset = new Dataset();
 	dataset.setSource(source);
@@ -130,34 +94,26 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	coreMetadata.getMIMetadata().setHierarchyLevelName("dataset");
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
-	coreMetadata.getMIMetadata().setParentIdentifier(decorateIdentifier(source.getEndpoint(), siteId));
+	coreMetadata.getMIMetadata().setParentIdentifier(decorateIdentifier(source.getEndpoint(), stationId));
 
-	String title = longName;
-	if (statistic != CanSWEStatistic.VALUE) {
-	    title += " (" + statistic.getLabel() + " values)";
-	}
-	title += " at " + siteLabel;
-	coreMetadata.setTitle(title);
+	coreMetadata.setTitle(longName + " at " + stationLabel);
 
 	StringBuilder abstract_ = new StringBuilder();
 	abstract_.append("Timeseries of ").append(longName.toLowerCase());
 	if (!units.isEmpty()) {
 	    abstract_.append(" (").append(units).append(")");
 	}
-	abstract_.append(" at ").append(colocated ? "the co-located stations " : "the station ").append(siteLabel);
-	if (!providers.isEmpty()) {
-	    abstract_.append(", data provided by ").append(String.join(", ", providers));
+	abstract_.append(" at the station ").append(stationLabel);
+	if (provider != null) {
+	    abstract_.append(", data provided by ").append(provider);
 	}
 	abstract_.append(", from the Canadian historical Snow Water Equivalent dataset (CanSWE).");
-	if (!methods.isEmpty()) {
-	    abstract_.append(" Measurement method: ").append(String.join(", ", methods).toLowerCase()).append(".");
+	if (method != null) {
+	    abstract_.append(" Measurement method: ").append(method.toLowerCase()).append(".");
 	}
-	if (statistic != CanSWEStatistic.VALUE) {
-	    abstract_.append(" At this location more than one value is available at the same time (")
-		    .append(record.optLong(CanSWEConnector.RECORD_MULTIPLE_VALUES)).append(" times): this time series has the ")
-		    .append(statistic.getLabel()).append(" of the values at each time (when a single value is available, it is reported).");
-	} else if (colocated) {
-	    abstract_.append(" The time series merges the values of the co-located stations.");
+	String alternativeIds = join(station.optString("station_id_sec", null), station.optString("station_id_ter", null));
+	if (!alternativeIds.isEmpty()) {
+	    abstract_.append(" Alternative station ids: ").append(alternativeIds).append(".");
 	}
 	if (variable.has("description")) {
 	    abstract_.append("\n").append(variable.getString("description"));
@@ -171,7 +127,7 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	publisher.setRoleCode("publisher");
 	dataId.addPointOfContact(publisher);
 
-	for (String provider : providers) {
+	if (provider != null) {
 	    ResponsibleParty originator = new ResponsibleParty();
 	    originator.setOrganisationName(provider);
 	    originator.setRoleCode("originator");
@@ -180,7 +136,7 @@ public class CanSWEMapper extends AbstractResourceMapper {
 
 	LegalConstraints constraints = new LegalConstraints();
 	constraints.addUseLimitation(LICENSE);
-	if (providers.stream().anyMatch(p -> p.toLowerCase().startsWith("hydro-qu"))) {
+	if (provider != null && provider.toLowerCase().startsWith("hydro-qu")) {
 	    constraints.addUseLimitation(HYDRO_QUEBEC_LICENSE);
 	}
 	dataId.addLegalConstraints(constraints);
@@ -188,10 +144,14 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	dataId.setSupplementalInformation("Please cite: " + CITATION + " Dataset: " + source.getEndpoint());
 
 	Keywords keywords = new Keywords();
-	ids.forEach(id -> addKeyword(keywords, id));
-	names.forEach(name -> addKeyword(keywords, name));
-	providers.forEach(provider -> addKeyword(keywords, provider));
-	methods.forEach(method -> addKeyword(keywords, method));
+	addKeyword(keywords, stationId);
+	addKeyword(keywords, stationName);
+	addKeyword(keywords, station.optString("station_name_sec", null));
+	addKeyword(keywords, station.optString("station_name_ter", null));
+	addKeyword(keywords, station.optString("station_id_sec", null));
+	addKeyword(keywords, station.optString("station_id_ter", null));
+	addKeyword(keywords, provider);
+	addKeyword(keywords, method);
 	addKeyword(keywords, longName);
 	addKeyword(keywords, variable.optString("standard_name", null));
 	addKeyword(keywords, "CanSWE");
@@ -209,30 +169,29 @@ public class CanSWEMapper extends AbstractResourceMapper {
 		    ISO8601DateTimeUtils.getISO8601DateTime(new Date(record.getLong(CanSWEConnector.RECORD_END))));
 	}
 
-	if (site.has(CanSWEConnector.RECORD_SITE_LATITUDE) && site.has(CanSWEConnector.RECORD_SITE_LONGITUDE)) {
-	    BigDecimal lat = new BigDecimal(site.getString(CanSWEConnector.RECORD_SITE_LATITUDE));
-	    BigDecimal lon = new BigDecimal(site.getString(CanSWEConnector.RECORD_SITE_LONGITUDE));
+	if (station.has(CanSWEConnector.RECORD_LATITUDE) && station.has(CanSWEConnector.RECORD_LONGITUDE)) {
+	    BigDecimal lat = new BigDecimal(station.getString(CanSWEConnector.RECORD_LATITUDE));
+	    BigDecimal lon = new BigDecimal(station.getString(CanSWEConnector.RECORD_LONGITUDE));
 	    coreMetadata.addBoundingBox(lat, lon, lat, lon);
 	}
 
-	if (!elevations.isEmpty()) {
+	if (station.has("elevation")) {
 	    VerticalExtent verticalExtent = new VerticalExtent();
-	    verticalExtent.setMinimumValue(elevations.stream().mapToDouble(Double::doubleValue).min().getAsDouble());
-	    verticalExtent.setMaximumValue(elevations.stream().mapToDouble(Double::doubleValue).max().getAsDouble());
+	    verticalExtent.setMinimumValue(station.getDouble("elevation"));
+	    verticalExtent.setMaximumValue(station.getDouble("elevation"));
 	    dataId.addVerticalExtent(verticalExtent);
 	}
 
 	MIPlatform platform = new MIPlatform();
 	Citation citation = new Citation();
-	citation.setTitle(siteName);
+	citation.setTitle(stationName);
 	platform.setCitation(citation);
-	platform.setDescription(siteLabel + (providers.isEmpty() ? "" : ", " + String.join(", ", providers)));
-	platform.setMDIdentifierCode(NetProtocolWrapper.CANSWE.getCommonURN() + "/" + siteId);
+	platform.setDescription(stationLabel + (provider == null ? "" : ", " + provider));
+	platform.setMDIdentifierCode(NetProtocolWrapper.CANSWE.getCommonURN() + "/" + stationId);
 	coreMetadata.getMIMetadata().addMIPlatform(platform);
 
 	CoverageDescription coverageDescription = new CoverageDescription();
-	coverageDescription.setAttributeIdentifier(NetProtocolWrapper.CANSWE.getCommonURN() + ":" + variableName
-		+ (statistic == CanSWEStatistic.VALUE ? "" : ":" + statistic.getLabel()));
+	coverageDescription.setAttributeIdentifier(NetProtocolWrapper.CANSWE.getCommonURN() + ":" + variableName);
 	coverageDescription.setAttributeTitle(longName);
 	coverageDescription.setAttributeDescription(longName + (units.isEmpty() ? "" : ", " + units));
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
@@ -241,21 +200,11 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	handler.setAttributeUnits(units);
 	handler.setAttributeUnitsAbbreviation(units);
 	handler.setCountry(Country.CANADA.getShortName());
-
-	switch (statistic) {
-	case MAXIMUM:
-	    handler.setTimeInterpolation(InterpolationType.MAX);
-	    break;
-	case MINIMUM:
-	    handler.setTimeInterpolation(InterpolationType.MIN);
-	    break;
-	default:
-	    // snow surveys and automatic sensors observations
-	    handler.setTimeInterpolation(InterpolationType.CONTINUOUS);
-	}
+	// snow surveys and automatic sensors observations
+	handler.setTimeInterpolation(InterpolationType.CONTINUOUS);
 
 	coreMetadata.addDistributionOnlineResource(//
-		getOnlineName(variableName, statistic, siteId), //
+		getOnlineName(variableName, stationId), //
 		record.getString(CanSWEConnector.RECORD_FILE_URL), //
 		NetProtocolWrapper.CANSWE.getCommonURN(), //
 		"download");
@@ -265,18 +214,17 @@ public class CanSWEMapper extends AbstractResourceMapper {
 
     /**
      * @param variable
-     * @param statistic
-     * @param siteId
+     * @param stationId
      * @return the name of the online resource
      */
-    public static String getOnlineName(String variable, CanSWEStatistic statistic, String siteId) {
+    public static String getOnlineName(String variable, String stationId) {
 
-	return variable + NAME_SEPARATOR + statistic.name() + NAME_SEPARATOR + siteId;
+	return variable + NAME_SEPARATOR + stationId;
     }
 
     /**
-     * @param name as returned by {@link #getOnlineName(String, CanSWEStatistic, String)}
-     * @return variable, statistic and site id
+     * @param name as returned by {@link #getOnlineName(String, String)}
+     * @return variable and station id
      */
     public static Optional<String[]> parseOnlineName(String name) {
 
@@ -284,14 +232,8 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	    return Optional.empty();
 	}
 
-	String[] split = name.split(NAME_SEPARATOR, 3);
-	if (split.length != 3) {
-	    return Optional.empty();
-	}
-
-	try {
-	    CanSWEStatistic.valueOf(split[1]);
-	} catch (IllegalArgumentException e) {
+	String[] split = name.split(NAME_SEPARATOR, 2);
+	if (split.length != 2 || split[0].isEmpty() || split[1].isEmpty()) {
 	    return Optional.empty();
 	}
 
@@ -326,6 +268,17 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	return units.replace("**", "").trim();
     }
 
+    private static String join(String... values) {
+
+	StringBuilder ret = new StringBuilder();
+	for (String value : values) {
+	    if (value != null && !value.isEmpty()) {
+		ret.append(ret.length() == 0 ? "" : ", ").append(value);
+	    }
+	}
+	return ret.toString();
+    }
+
     /**
      * @param keywords
      * @param value
@@ -349,8 +302,7 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	JSONObject record = new JSONObject(resource.getOriginalMetadata().getMetadata());
 	String name = getOnlineName(//
 		record.getJSONObject(CanSWEConnector.RECORD_VARIABLE).getString(CanSWEConnector.RECORD_VARIABLE_NAME), //
-		CanSWEStatistic.valueOf(record.getString(CanSWEConnector.RECORD_STATISTIC)), //
-		record.getJSONObject(CanSWEConnector.RECORD_SITE).getString(CanSWEConnector.RECORD_SITE_ID));
+		record.getJSONObject(CanSWEConnector.RECORD_STATION).getString(CanSWEConnector.RECORD_STATION_ID));
 	return decorateIdentifier(resource.getSource().getEndpoint(), name);
     }
 
