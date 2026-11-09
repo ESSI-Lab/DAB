@@ -19,3 +19,4 @@ eu.essi_lab.accessor.hiscentral.puglia.HISCentralPugliaAccessor
 eu.essi_lab.accessor.hiscentral.puglia.arpa.HISCentralARPAPugliaAccessor
 eu.essi_lab.accessor.hiscentral.deflusso.HISCentralRatingCurvesAccessor
 
+eu.essi_lab.accessor.hiscentral.lombardia.opendata.HISCentralLombardiaOpenDataAccessor

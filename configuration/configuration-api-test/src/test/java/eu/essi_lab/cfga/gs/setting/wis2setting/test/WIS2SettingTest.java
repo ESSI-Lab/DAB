@@ -10,6 +10,7 @@ import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.DefaultConfiguration.SingletonSettingsId;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
 import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.model.GSSource;
 
@@ -32,6 +33,7 @@ public class WIS2SettingTest {
 
 	Assert.assertTrue(setting.getCentreId().isEmpty());
 	Assert.assertTrue(setting.getPublisher().isEmpty());
+	Assert.assertTrue(setting.getPublisherEmail().isEmpty());
 	Assert.assertTrue(setting.getGeneratedBy().isEmpty());
 	Assert.assertTrue(setting.getHostname().isEmpty());
 	Assert.assertTrue(setting.getViewId().isEmpty());
@@ -40,6 +42,7 @@ public class WIS2SettingTest {
 	Assert.assertEquals(DataNotificationsMode.DISABLED, setting.getDataNotificationsMode());
 	Assert.assertEquals(WIS2Setting.DEFAULT_PRIVATE_TOPIC_PREFIX, setting.getPrivateTopicPrefix());
 	Assert.assertEquals(WIS2DataEncoding.JSON, setting.getDataEncoding());
+	Assert.assertEquals(RecordGranularity.SOURCE, setting.getRecordGranularity());
     }
 
     @Test
@@ -65,6 +68,7 @@ public class WIS2SettingTest {
 
 	setting.setCentreId(" it-cnr-itiam-whos-dab-test ");
 	setting.setPublisher("CNR-ITIAm");
+	setting.setPublisherEmail(" whos@cnr.it ");
 	setting.setGeneratedBy("WHOS DAB");
 	setting.setHostname("https://wis2.whos-dab.eu");
 	setting.setViewId("whos");
@@ -72,6 +76,7 @@ public class WIS2SettingTest {
 
 	Assert.assertEquals("it-cnr-itiam-whos-dab-test", setting.getCentreId().get());
 	Assert.assertEquals("CNR-ITIAm", setting.getPublisher().get());
+	Assert.assertEquals("whos@cnr.it", setting.getPublisherEmail().get());
 	Assert.assertEquals("WHOS DAB", setting.getGeneratedBy().get());
 	Assert.assertEquals("https://wis2.whos-dab.eu", setting.getHostname().get());
 	Assert.assertEquals("whos", setting.getViewId().get());
@@ -90,6 +95,8 @@ public class WIS2SettingTest {
 	setting.setPrivateTopicPrefix("dab-test/a/wis2");
 	setting.setDataEncoding(WIS2DataEncoding.CSV);
 	Assert.assertEquals(WIS2DataEncoding.CSV, setting.getDataEncoding());
+	setting.setRecordGranularity(RecordGranularity.OBSERVED_PROPERTY);
+	Assert.assertEquals(RecordGranularity.OBSERVED_PROPERTY, setting.getRecordGranularity());
 	Assert.assertEquals("dab-test/a/wis2", setting.getPrivateTopicPrefix());
 
 	// the setting is restored from its JSON representation
@@ -98,6 +105,7 @@ public class WIS2SettingTest {
 	Assert.assertEquals(DataNotificationsMode.EXPERIMENTAL, restored.getDataNotificationsMode());
 	Assert.assertEquals("dab-test/a/wis2", restored.getPrivateTopicPrefix());
 	Assert.assertEquals(WIS2DataEncoding.CSV, restored.getDataEncoding());
+	Assert.assertEquals(RecordGranularity.OBSERVED_PROPERTY, restored.getRecordGranularity());
     }
 
     @Test

@@ -166,7 +166,6 @@ public class WIS2DataNotifier {
 	}
 
 	String viewId = WISUtils.getViewId().get();
-	String metadataId = WISUtils.getMetadataIdentifier(sourceId);
 	String centreId = WISUtils.getCentreId();
 	String generatedBy = WISUtils.getGeneratedBy();
 	WIS2DataEncoding encoding = ConfigurationWrapper.getWIS2Setting().getDataEncoding();
@@ -208,6 +207,9 @@ public class WIS2DataNotifier {
 		String dataTopic = WISUtils.getAdvertisedTopic(topic.get()).orElse(topic.get().getTopic(centreId, WIS2DataPolicy.CORE));
 
 		String content = WIS2DataItem.encode(record, encoding, station);
+
+		// the record describing the data, depending on the records granularity
+		String metadataId = WISUtils.getMetadataIdentifier(sourceId, record.getObservedPropertyURI());
 
 		WISNotificationMessage message = createMessage(record, content, encoding, dataTopic, viewId, metadataId, generatedBy);
 

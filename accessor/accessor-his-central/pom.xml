@@ -42,6 +42,13 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 
+		<!-- hydrometric zeros of ARPA Lombardia are published in the gauge monographs (PDF) -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>

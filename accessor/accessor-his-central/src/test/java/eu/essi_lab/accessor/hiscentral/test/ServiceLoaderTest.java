@@ -10,6 +10,7 @@ import eu.essi_lab.accessor.hiscentral.friuli.*;
 import eu.essi_lab.accessor.hiscentral.lazio.*;
 import eu.essi_lab.accessor.hiscentral.liguria.*;
 import eu.essi_lab.accessor.hiscentral.lombardia.*;
+import eu.essi_lab.accessor.hiscentral.lombardia.opendata.*;
 import eu.essi_lab.accessor.hiscentral.marche.*;
 import eu.essi_lab.accessor.hiscentral.piemonte.*;
 import eu.essi_lab.accessor.hiscentral.puglia.*;
@@ -47,7 +48,7 @@ public class ServiceLoaderTest {
 
 	    accessors.sort(Comparator.comparing(a -> a.getClass().getName()));
 
-	    Assert.assertEquals(20, accessors.size());
+	    Assert.assertEquals(21, accessors.size());
 
 	    Assert.assertEquals(HISCentralAbruzzoAccessor.class, accessors.get(0).getClass());
 	    Assert.assertEquals(HISCentralBasilicataAccessor.class, accessors.get(1).getClass());
@@ -59,16 +60,17 @@ public class ServiceLoaderTest {
 	    Assert.assertEquals(HISCentralLazioAccessor.class, accessors.get(7).getClass());
 	    Assert.assertEquals(HISCentralLiguriaAccessor.class, accessors.get(8).getClass());
 	    Assert.assertEquals(HISCentralLombardiaAccessor.class, accessors.get(9).getClass());
-	    Assert.assertEquals(HISCentralMarcheAccessor.class, accessors.get(10).getClass());
-	    Assert.assertEquals(HISCentralPiemonteAccessor.class, accessors.get(11).getClass());
-	    Assert.assertEquals(HISCentralPugliaAccessor.class, accessors.get(12).getClass());
-	    Assert.assertEquals(HISCentralARPAPugliaAccessor.class, accessors.get(13).getClass());
-	    Assert.assertEquals(HISCentralSardegnaAccessor.class, accessors.get(14).getClass());
-	    Assert.assertEquals(HISCentralSiciliaAccessor.class, accessors.get(15).getClass());
-	    Assert.assertEquals(HISCentralToscanaAccessor.class, accessors.get(16).getClass());
-	    Assert.assertEquals(HISCentralUmbriaAccessor.class, accessors.get(17).getClass());
-	    Assert.assertEquals(HISCentralValdaostaAccessor.class, accessors.get(18).getClass());
-	    Assert.assertEquals(HISCentralVenetoAccessor.class, accessors.get(19).getClass());
+	    Assert.assertEquals(HISCentralLombardiaOpenDataAccessor.class, accessors.get(10).getClass());
+	    Assert.assertEquals(HISCentralMarcheAccessor.class, accessors.get(11).getClass());
+	    Assert.assertEquals(HISCentralPiemonteAccessor.class, accessors.get(12).getClass());
+	    Assert.assertEquals(HISCentralPugliaAccessor.class, accessors.get(13).getClass());
+	    Assert.assertEquals(HISCentralARPAPugliaAccessor.class, accessors.get(14).getClass());
+	    Assert.assertEquals(HISCentralSardegnaAccessor.class, accessors.get(15).getClass());
+	    Assert.assertEquals(HISCentralSiciliaAccessor.class, accessors.get(16).getClass());
+	    Assert.assertEquals(HISCentralToscanaAccessor.class, accessors.get(17).getClass());
+	    Assert.assertEquals(HISCentralUmbriaAccessor.class, accessors.get(18).getClass());
+	    Assert.assertEquals(HISCentralValdaostaAccessor.class, accessors.get(19).getClass());
+	    Assert.assertEquals(HISCentralVenetoAccessor.class, accessors.get(20).getClass());
 
 	}
 
@@ -77,7 +79,7 @@ public class ServiceLoaderTest {
 
 	    accessors.sort(Comparator.comparing(a -> a.getClass().getName()));
 
-	    Assert.assertEquals(20, accessors.size());
+	    Assert.assertEquals(21, accessors.size());
 
 	    Assert.assertEquals(HISCentralAbruzzoAccessor.class, accessors.get(0).getClass());
 	    Assert.assertEquals(HISCentralBasilicataAccessor.class, accessors.get(1).getClass());
@@ -89,16 +91,17 @@ public class ServiceLoaderTest {
 	    Assert.assertEquals(HISCentralLazioAccessor.class, accessors.get(7).getClass());
 	    Assert.assertEquals(HISCentralLiguriaAccessor.class, accessors.get(8).getClass());
 	    Assert.assertEquals(HISCentralLombardiaAccessor.class, accessors.get(9).getClass());
-	    Assert.assertEquals(HISCentralMarcheAccessor.class, accessors.get(10).getClass());
-	    Assert.assertEquals(HISCentralPiemonteAccessor.class, accessors.get(11).getClass());
-	    Assert.assertEquals(HISCentralPugliaAccessor.class, accessors.get(12).getClass());
-	    Assert.assertEquals(HISCentralARPAPugliaAccessor.class, accessors.get(13).getClass());
-	    Assert.assertEquals(HISCentralSardegnaAccessor.class, accessors.get(14).getClass());
-	    Assert.assertEquals(HISCentralSiciliaAccessor.class, accessors.get(15).getClass());
-	    Assert.assertEquals(HISCentralToscanaAccessor.class, accessors.get(16).getClass());
-	    Assert.assertEquals(HISCentralUmbriaAccessor.class, accessors.get(17).getClass());
-	    Assert.assertEquals(HISCentralValdaostaAccessor.class, accessors.get(18).getClass());
-	    Assert.assertEquals(HISCentralVenetoAccessor.class, accessors.get(19).getClass());
+	    Assert.assertEquals(HISCentralLombardiaOpenDataAccessor.class, accessors.get(10).getClass());
+	    Assert.assertEquals(HISCentralMarcheAccessor.class, accessors.get(11).getClass());
+	    Assert.assertEquals(HISCentralPiemonteAccessor.class, accessors.get(12).getClass());
+	    Assert.assertEquals(HISCentralPugliaAccessor.class, accessors.get(13).getClass());
+	    Assert.assertEquals(HISCentralARPAPugliaAccessor.class, accessors.get(14).getClass());
+	    Assert.assertEquals(HISCentralSardegnaAccessor.class, accessors.get(15).getClass());
+	    Assert.assertEquals(HISCentralSiciliaAccessor.class, accessors.get(16).getClass());
+	    Assert.assertEquals(HISCentralToscanaAccessor.class, accessors.get(17).getClass());
+	    Assert.assertEquals(HISCentralUmbriaAccessor.class, accessors.get(18).getClass());
+	    Assert.assertEquals(HISCentralValdaostaAccessor.class, accessors.get(19).getClass());
+	    Assert.assertEquals(HISCentralVenetoAccessor.class, accessors.get(20).getClass());
 	}
 
 	{
@@ -115,7 +118,7 @@ public class ServiceLoaderTest {
 
 	ServiceLoader<IHarvestedQueryConnector> loader = ServiceLoader.load(IHarvestedQueryConnector.class);
 
-	Assert.assertEquals(20, StreamUtils.iteratorToStream(loader.iterator()).count());
+	Assert.assertEquals(21, StreamUtils.iteratorToStream(loader.iterator()).count());
 
 	Assert.assertTrue(//
 		StreamUtils.iteratorToStream(//

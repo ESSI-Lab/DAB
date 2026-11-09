@@ -97,7 +97,9 @@ public class HISCentralRatingCurveAugmenter extends ResourceAugmenter<AugmenterS
             Bond sourceBond = BondFactory.createSourceIdentifierBond(sourceId);
             Bond platformBond = BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.PLATFORM_IDENTIFIER,
                     stationId);
-            LogicalBond andBond = BondFactory.createAndBond(sourceBond, platformBond);
+            // excludes rating curves themselves, which share the station platform identifier
+            Bond notRatingCurveBond = BondFactory.createNotBond(BondFactory.createIsRatingCurveBond(true));
+            LogicalBond andBond = BondFactory.createAndBond(sourceBond, platformBond, notRatingCurveBond);
 
             DiscoveryMessage message = new DiscoveryMessage();
             message.setSources(Collections.singletonList(lookupSource));

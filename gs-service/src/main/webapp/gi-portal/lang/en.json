@@ -341,5 +341,9 @@
 	"status_in_progress" : "In Progress",
 	"status_pending" : "Pending",
 	"status_processing" : "Processing",
-	"status_started" : "Started"
+	"status_started" : "Started",
+	"password_gate_title" : "Protected portal",
+	"password_gate_placeholder" : "Password",
+	"password_gate_enter" : "Enter",
+	"password_gate_wrong" : "Wrong password"
 }

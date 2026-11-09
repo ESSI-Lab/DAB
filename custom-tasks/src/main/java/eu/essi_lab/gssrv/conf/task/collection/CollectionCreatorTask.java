@@ -39,6 +39,7 @@ import eu.essi_lab.api.database.DatabaseFolder.FolderEntry;
 import eu.essi_lab.api.database.SourceStorageProvider;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
 import eu.essi_lab.cfga.gs.task.AbstractEmbeddedTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
@@ -140,12 +141,12 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	DatabaseFolder folder = sourceStorage.getDataFolder(sourceId, true).get();
 
-	List<DatasetCollection> datasets = new SourceCollectionCreator(centreId).getCollections(sourceId, view.getSourceDeployment());
+	// one collection for the source, or one for each of its harmonized observed properties
+	SourceCollectionCreator creator = WISUtils.getRecordGranularity() == RecordGranularity.OBSERVED_PROPERTY
+		? new ParameterCollectionCreator(centreId)
+		: new SourceCollectionCreator(centreId);
 
-	// List<DatasetCollection> children = new ParameterCollectionCreator().getCollections(sourceId,
-	// view.getSourceDeployment());
-	//
-	// datasets.addAll(children);
+	List<DatasetCollection> datasets = creator.getCollections(sourceId, view.getSourceDeployment());
 
 	GSLoggerFactory.getLogger(getClass()).info("Number of generated collections: {}", datasets.size());
 

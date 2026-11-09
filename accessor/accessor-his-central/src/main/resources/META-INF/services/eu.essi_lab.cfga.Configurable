@@ -39,3 +39,5 @@ eu.essi_lab.accessor.hiscentral.puglia.arpa.HISCentralARPAPugliaConnector
 eu.essi_lab.accessor.hiscentral.deflusso.HISCentralRatingCurvesAccessor
 eu.essi_lab.accessor.hiscentral.deflusso.HISCentralRatingCurvesConnector
 eu.essi_lab.accessor.hiscentral.deflusso.HISCentralRatingCurveAugmenter
+eu.essi_lab.accessor.hiscentral.lombardia.opendata.HISCentralLombardiaOpenDataConnector
+eu.essi_lab.accessor.hiscentral.lombardia.opendata.HISCentralLombardiaOpenDataAccessor

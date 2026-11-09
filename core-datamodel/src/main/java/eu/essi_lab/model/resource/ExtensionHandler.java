@@ -51,6 +51,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String MAG_LEVEL = "magLevel";
     private static final String ORIGINATOR_ORGANISATION_IDENTIFIER = "OriginatorOrganisationIdentifier";
     private static final String WIS_DATA_TOPIC = "WISDataTopic";
+    private static final String WIS_TIME_RESOLUTION = "WISTimeResolution";
     private static final String ORIGINATOR_ORGANISATION_DESCRIPTION = "OriginatorOrganisationDescription";
     private static final String FEDEO_SECOND_LEVEL_TEMPLATE = "fedeoSecondLevel";
     private static final String STAC_SECOND_LEVEL_TEMPLATE = "STACSecondLevel";
@@ -827,7 +828,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
      */
     public void addWISDataTopic(String topic) {
 	try {
-	    this.metadata.add(WIS_DATA_TOPIC, topic);
+	    this.metadata.append(WIS_DATA_TOPIC, topic);
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
@@ -840,6 +841,34 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     public List<String> getWISDataTopics() {
 	try {
 	    return this.metadata.getTextContents(WIS_DATA_TOPIC);
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return new ArrayList<>();
+    }
+
+    /**
+     * @param resolution an ISO 8601 duration, one of the time resolutions of the datasets described by this resource.
+     *        Resolutions are expected to be added from the finest
+     */
+    public void addWISTimeResolution(String resolution) {
+	try {
+	    this.metadata.append(WIS_TIME_RESOLUTION, resolution);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return the time resolutions of the datasets described by this resource, as ISO 8601 durations, in the order
+     *         they were added (from the finest)
+     */
+    public List<String> getWISTimeResolutions() {
+	try {
+	    return this.metadata.getTextContents(WIS_TIME_RESOLUTION);
 	} catch (XPathExpressionException e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);

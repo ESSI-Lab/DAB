@@ -52,6 +52,7 @@ import eu.essi_lab.profiler.wis.WISRequest.CollectionItems;
 import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
 import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
@@ -267,6 +268,39 @@ public class WISUtils {
 
     }
 
+    /**
+     * WCMP2 allows a single resolution in each temporal extent: the finest resolution is added as
+     * <code>time.resolution</code> and the second finest as <code>additionalExtents.temporal.resolution</code>, with
+     * the same interval as <code>time</code>. Further resolutions are not encoded
+     * 
+     * @param feature a feature with a time interval (see {@link #addTimeInterval(JSONObject, String, String)})
+     * @param resolutions ISO 8601 durations, from the finest
+     */
+    public static void addTimeResolutions(JSONObject feature, List<String> resolutions) {
+
+	JSONObject time = feature.optJSONObject("time");
+	if (time == null || resolutions.isEmpty()) {
+	    return;
+	}
+
+	time.put("resolution", resolutions.get(0));
+
+	if (resolutions.size() > 1) {
+
+	    JSONArray interval = new JSONArray();
+	    interval.put(new JSONArray(time.getJSONArray("interval").toList()));
+
+	    JSONObject temporal = new JSONObject();
+	    temporal.put("interval", interval);
+	    temporal.put("resolution", resolutions.get(1));
+	    temporal.put("trs", "https://www.opengis.net/def/uom/ISO-8601/0/Gregorian");
+
+	    JSONObject additionalExtents = new JSONObject();
+	    additionalExtents.put("temporal", temporal);
+	    feature.put("additionalExtents", additionalExtents);
+	}
+    }
+
     public static void addKeywords(JSONObject feature, String... keywords) {
 	JSONArray kArray;
 	if (feature.has("keywords")) {
@@ -281,22 +315,23 @@ public class WISUtils {
     }
 
     /**
-     * From the metadata identifier (e.g. urn:wmo:md:sourceId:parameterConceptId),
-     * it extracts the sourceId and the parameter URI according to WHOS Hydro
-     * Ontology
+     * From the metadata identifier (e.g. urn:wmo:md:centreId:sourceId:parameterConceptId, see
+     * {@link #getMetadataIdentifier(String, String, String)}), it extracts the sourceId and the parameter concept id
+     * according to WHOS Hydro Ontology (null if the identifier has no parameter)
      * 
      * @param identifier
      * @return
      */
     public static SimpleEntry<String, String> extractSourceAndParameter(String identifier) {
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
+	// skips urn:wmo:md:centreId:
+	for (int i = 0; i < 4; i++) {
+	    identifier = identifier.substring(identifier.indexOf(":") + 1);
+	}
 	String sourceId = identifier;
 	String parameter = null;
 	if (sourceId.contains(":")) {
-	    sourceId = sourceId.substring(0, sourceId.indexOf(":"));
 	    parameter = sourceId.substring(sourceId.indexOf(":") + 1);
+	    sourceId = sourceId.substring(0, sourceId.indexOf(":"));
 	}
 	SimpleEntry<String, String> ret = new SimpleEntry<>(sourceId, parameter);
 	return ret;
@@ -386,12 +421,48 @@ public class WISUtils {
     }
 
     /**
-     * @param sourceId
-     * @return the identifier of the WCMP2 record of the given source
+     * @return what each published WCMP2 record describes
      */
-    public static String getMetadataIdentifier(String sourceId) {
+    public static RecordGranularity getRecordGranularity() {
 
-	return "urn:wmo:md:" + getCentreId() + ":" + sourceId;
+	return ConfigurationWrapper.getWIS2Setting().getRecordGranularity();
+    }
+
+    /**
+     * @param sourceId
+     * @param observedPropertyURI the harmonized observed property of the described data, possibly null
+     * @return the identifier of the WCMP2 record describing the data of the given source and observed property,
+     *         according to the configured {@link RecordGranularity}
+     */
+    public static String getMetadataIdentifier(String sourceId, String observedPropertyURI) {
+
+	String propertyURI = getRecordGranularity() == RecordGranularity.OBSERVED_PROPERTY ? observedPropertyURI : null;
+
+	return getMetadataIdentifier(getCentreId(), sourceId, propertyURI);
+    }
+
+    /**
+     * @param centreId
+     * @param sourceId
+     * @param observedPropertyURI if not null, the identifier is the one of the record of this observed property of the
+     *        source
+     * @return <code>urn:wmo:md:{centre-id}:{source-id}</code> or, with an observed property,
+     *         <code>urn:wmo:md:{centre-id}:{source-id}:{property-id}</code>, where the property id is the last segment
+     *         of the property URI (e.g. 11 for http://hydro.geodab.eu/hydro-ontology/concept/11)
+     */
+    public static String getMetadataIdentifier(String centreId, String sourceId, String observedPropertyURI) {
+
+	String id = "urn:wmo:md:" + centreId + ":" + sourceId;
+
+	if (observedPropertyURI == null || observedPropertyURI.isBlank()) {
+
+	    return id;
+	}
+
+	String uri = observedPropertyURI.trim().replaceAll("/+$", "");
+	String propertyId = uri.substring(uri.lastIndexOf('/') + 1).replaceAll("[^A-Za-z0-9._-]", "_");
+
+	return id + ":" + propertyId;
     }
 
     /**
@@ -412,6 +483,37 @@ public class WISUtils {
     public static Optional<String> getViewId() {
 
 	return ConfigurationWrapper.getWIS2Setting().getViewId();
+    }
+
+    /**
+     * @return the e-mail address of the publisher of the WIS2 metadata records
+     */
+    public static Optional<String> getPublisherEmail() {
+
+	return ConfigurationWrapper.getWIS2Setting().getPublisherEmail();
+    }
+
+    /**
+     * @param organization
+     * @param email possibly null
+     * @param role
+     * @return a WCMP2 contact
+     */
+    public static JSONObject getContact(String organization, String email, String role) {
+
+	JSONObject contact = new JSONObject();
+	contact.put("organization", organization);
+	if (email != null && !email.isBlank()) {
+	    JSONObject emailObject = new JSONObject();
+	    emailObject.put("value", email.trim());
+	    JSONArray emails = new JSONArray();
+	    emails.put(emailObject);
+	    contact.put("emails", emails);
+	}
+	JSONArray roles = new JSONArray();
+	roles.put(role);
+	contact.put("roles", roles);
+	return contact;
     }
 
     /**
@@ -538,6 +640,7 @@ public class WISUtils {
 	TemporalExtent temporalExtent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
 	if (temporalExtent != null) {
 	    WISUtils.addTimeInterval(feature, temporalExtent.getBeginPosition(), temporalExtent.getEndPosition());
+	    WISUtils.addTimeResolutions(feature, resource.getExtensionHandler().getWISTimeResolutions());
 	}
 
 	Iterator<Keywords> keywords = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getKeywords();
@@ -604,19 +707,13 @@ public class WISUtils {
 	JSONArray contacts = new JSONArray();
 	properties.put("contacts", contacts);
 	for (ResponsibleParty party : parties) {
-	    JSONObject contact = new JSONObject();
-	    contact.put("organization", party.getOrganisationName());
-	    JSONArray roles = new JSONArray();
-	    roles.put("host");
-	    contact.put("roles", roles);
-	    contacts.put(contact);
+	    String email = null;
+	    if (party.getContact() != null && party.getContact().getAddress() != null) {
+		email = party.getContact().getAddress().getElectronicMailAddress();
+	    }
+	    contacts.put(getContact(party.getOrganisationName(), email, "host"));
 	}
-	JSONObject cnr = new JSONObject();
-	cnr.put("organization", getPublisher());
-	JSONArray cnrRoles = new JSONArray();
-	cnrRoles.put("publisher");
-	cnr.put("roles", cnrRoles);
-	contacts.put(cnr);
+	contacts.put(getContact(getPublisher(), getPublisherEmail().orElse(null), "publisher"));
 	properties.put("wmo:dataPolicy", getDataPolicy(resource.getSource().getUniqueIdentifier()).getId());
 	if (resource.getSource().getUniqueIdentifier().equals("argentina-ina")) {
 	    String url = "https://creativecommons.org/licenses/by/4.0/";

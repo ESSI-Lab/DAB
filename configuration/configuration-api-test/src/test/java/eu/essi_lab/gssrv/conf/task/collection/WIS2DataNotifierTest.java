@@ -3,6 +3,7 @@ package eu.essi_lab.gssrv.conf.task.collection;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import eu.essi_lab.access.datacache.WIS2DataItem;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
 import eu.essi_lab.cfga.gs.setting.WIS2Setting;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
 import eu.essi_lab.lib.whos.WIS2DataEncoding;
 import eu.essi_lab.lib.whos.WIS2DataPolicy;
 import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
@@ -50,6 +52,33 @@ public class WIS2DataNotifierTest {
     }
 
     @Test
+    public void metadataIdentifierTest() throws Exception {
+
+	String propertyURI = "http://hydro.geodab.eu/hydro-ontology/concept/11";
+
+	// default granularity: one record per source
+	Assert.assertEquals("urn:wmo:md:" + CENTRE_ID + ":argentina-ina", WISUtils.getMetadataIdentifier("argentina-ina", propertyURI));
+
+	DefaultConfiguration configuration = (DefaultConfiguration) ConfigurationWrapper.getConfiguration().get();
+	WIS2Setting setting = ConfigurationWrapper.getWIS2Setting();
+	setting.setRecordGranularity(RecordGranularity.OBSERVED_PROPERTY);
+	configuration.replace(setting);
+
+	// one record per harmonized observed property
+	String id = WISUtils.getMetadataIdentifier("argentina-ina", propertyURI);
+	Assert.assertEquals("urn:wmo:md:" + CENTRE_ID + ":argentina-ina:11", id);
+	Assert.assertEquals("urn:wmo:md:" + CENTRE_ID + ":argentina-ina", WISUtils.getMetadataIdentifier("argentina-ina", null));
+
+	SimpleEntry<String, String> sourceParameter = WISUtils.extractSourceAndParameter(id);
+	Assert.assertEquals("argentina-ina", sourceParameter.getKey());
+	Assert.assertEquals("11", sourceParameter.getValue());
+
+	sourceParameter = WISUtils.extractSourceAndParameter("urn:wmo:md:" + CENTRE_ID + ":argentina-ina");
+	Assert.assertEquals("argentina-ina", sourceParameter.getKey());
+	Assert.assertNull(sourceParameter.getValue());
+    }
+
+    @Test
     public void messageTest() throws Exception {
 
 	DataRecord record = new DataRecord();
@@ -63,7 +92,7 @@ public class WIS2DataNotifierTest {
 	record.setLatitudeLongitude(new LatitudeLongitude(new BigDecimal("-34.6"), new BigDecimal("-58.3667")));
 
 	String topic = WIS2HydrologyTopic.STREAM.getTopic(CENTRE_ID, WIS2DataPolicy.CORE);
-	String metadataId = WISUtils.getMetadataIdentifier("argentina-ina");
+	String metadataId = WISUtils.getMetadataIdentifier("argentina-ina", record.getObservedPropertyURI());
 
 	String content = WIS2DataItem.encode(record);
 
