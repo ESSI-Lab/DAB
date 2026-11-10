@@ -10,6 +10,8 @@ eu.essi_lab.accessor.hiscentral.veneto.HISCentralVenetoConnector
 eu.essi_lab.accessor.hiscentral.veneto.HISCentralVenetoAccessor
 eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioConnector
 eu.essi_lab.accessor.hiscentral.lazio.HISCentralLazioAccessor
+eu.essi_lab.accessor.hiscentral.sicilia.HISCentralSiciliaConnector
+eu.essi_lab.accessor.hiscentral.sicilia.HISCentralSiciliaAccessor
 eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaConnector
 eu.essi_lab.accessor.hiscentral.valdaosta.HISCentralValdaostaAccessor
 eu.essi_lab.accessor.hiscentral.piemonte.HISCentralPiemonteConnector

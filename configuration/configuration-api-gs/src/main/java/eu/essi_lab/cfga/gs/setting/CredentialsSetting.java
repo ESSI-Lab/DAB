@@ -74,6 +74,11 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     private static final String HIS_CENTRAL_LAZIO_CLIENT_INSTANCE = "lazioInstance";
     private static final String HIS_CENTRAL_LAZIO_CLIENT_ID = "lazioId";
 
+    private static final String HIS_CENTRAL_SICILIA_CLIENT_USERNAME = "siciliaUsername";
+    private static final String HIS_CENTRAL_SICILIA_CLIENT_PASSWORD = "siciliaPassword";
+    private static final String HIS_CENTRAL_SICILIA_CLIENT_INSTANCE = "siciliaInstance";
+    private static final String HIS_CENTRAL_SICILIA_CLIENT_ID = "siciliaId";
+
     private static final String HIS_CENTRAL_FRIULI_CLIENT_PASSWORD = "friuliPassword";
     private static final String HIS_CENTRAL_FRIULI_CLIENT_ID = "friuliId";
 
@@ -528,6 +533,51 @@ public class CredentialsSetting extends Setting implements EditableSetting {
 		    get().//
 		    withKey(HIS_CENTRAL_LAZIO_CLIENT_ID).//
 		    withLabel("The client id used by HIS-Central Lazio connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(id);
+
+	}
+
+	// HIS-Central Sicilia
+	{
+
+	    Option<String> user = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_SICILIA_CLIENT_USERNAME).//
+		    withLabel("The username used by HIS-Central Sicilia connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(user);
+
+	    Option<String> password = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_SICILIA_CLIENT_PASSWORD).//
+		    withLabel("The password used by HIS-Central Sicilia connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(password);
+
+	    Option<String> instance = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_SICILIA_CLIENT_INSTANCE).//
+		    withLabel("The client instance used by HIS-Central Sicilia connector").//
+		    required().//
+		    cannotBeDisabled().//
+		    build();
+
+	    addOption(instance);
+
+	    Option<String> id = StringOptionBuilder.//
+		    get().//
+		    withKey(HIS_CENTRAL_SICILIA_CLIENT_ID).//
+		    withLabel("The client id used by HIS-Central Sicilia connector").//
 		    required().//
 		    cannotBeDisabled().//
 		    build();
@@ -1277,6 +1327,70 @@ public class CredentialsSetting extends Setting implements EditableSetting {
     public Optional<String> getLazioClientUser() {
 
 	return getOption(HIS_CENTRAL_LAZIO_CLIENT_USERNAME, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param user
+     */
+    public void setSiciliaClientUser(String user) {
+
+	getOption(HIS_CENTRAL_SICILIA_CLIENT_USERNAME, String.class).get().setValue(user);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getSiciliaClientUser() {
+
+	return getOption(HIS_CENTRAL_SICILIA_CLIENT_USERNAME, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param password
+     */
+    public void setSiciliaClientPassword(String password) {
+
+	getOption(HIS_CENTRAL_SICILIA_CLIENT_PASSWORD, String.class).get().setValue(password);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getSiciliaClientPassword() {
+
+	return getOption(HIS_CENTRAL_SICILIA_CLIENT_PASSWORD, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param instance
+     */
+    public void setSiciliaClientInstance(String instance) {
+
+	getOption(HIS_CENTRAL_SICILIA_CLIENT_INSTANCE, String.class).get().setValue(instance);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getSiciliaClientInstance() {
+
+	return getOption(HIS_CENTRAL_SICILIA_CLIENT_INSTANCE, String.class).get().getOptionalValue();
+    }
+
+    /**
+     * @param id
+     */
+    public void setSiciliaClientId(String id) {
+
+	getOption(HIS_CENTRAL_SICILIA_CLIENT_ID, String.class).get().setValue(id);
+    }
+
+    /**
+     *
+     */
+    public Optional<String> getSiciliaClientId() {
+
+	return getOption(HIS_CENTRAL_SICILIA_CLIENT_ID, String.class).get().getOptionalValue();
     }
 
     /**

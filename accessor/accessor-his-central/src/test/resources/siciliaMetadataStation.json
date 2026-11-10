@@ -1,0 +1,28 @@
+{
+    "station-info": {
+        "i": 776300,
+        "n": "Canicatti' SPC73 [X]",
+        "o": "REGIONE SICILIA",
+        "x": 13.828055,
+        "y": 37.43,
+        "s": 0,
+        "l": 3,
+        "hwl": false,
+        "hsl": false,
+        "hr": true
+    },
+    "element-info": {
+        "elementId": 68615,
+        "elementName": "Temperatura Aria",
+        "stationId": 776300,
+        "stationName": "Canicatti' SPC73 [X]",
+        "quantity": "Temperatura Aria",
+        "measUnit": "°C",
+        "startDate": "2020-07-14T00:00:00",
+        "endDate": null,
+        "dtr": 600,
+        "isVirtual": false,
+        "basin": "063_01/Fiume Platani",
+        "river": null
+    }
+}
