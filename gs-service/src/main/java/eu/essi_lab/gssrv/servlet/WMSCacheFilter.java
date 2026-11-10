@@ -198,10 +198,10 @@ public class WMSCacheFilter implements Filter {
     }
 
     /**
-     *
+     * Initializes the {@link WMSCache} according to the {@link WMSCacheSetting}, and sets the {@link #enabled} flag
      */
-    private void initWMSCache() {
-	GSLoggerFactory.getLogger(getClass()).info("WMS Cache initialization STARTED");
+    public static synchronized void initWMSCache() {
+	GSLoggerFactory.getLogger(WMSCacheFilter.class).info("WMS Cache initialization STARTED");
 
 	Optional<WMSCacheSetting> setting = ConfigurationWrapper.getWMSCacheSettings();
 
@@ -258,10 +258,10 @@ public class WMSCacheFilter implements Filter {
 	    enabled = false;
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("WMS Cache initialization ENDED");
+	GSLoggerFactory.getLogger(WMSCacheFilter.class).info("WMS Cache initialization ENDED");
     }
 
-    private void applyShapeViewSetting(WMSCacheSetting setting) {
+    private static void applyShapeViewSetting(WMSCacheSetting setting) {
 
 	Optional<String> shapeView = setting.getShapeView();
 	if (shapeView.isPresent() && !shapeView.get().isBlank()) {

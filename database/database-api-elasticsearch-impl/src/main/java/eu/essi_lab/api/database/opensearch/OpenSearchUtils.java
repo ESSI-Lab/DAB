@@ -169,6 +169,12 @@ public class OpenSearchUtils {
 			item.setAlternateDecodedTermLanguage("it");
 		    }
 		}
+		if (target.equals(MetadataElement.COUNTRY_ISO3_EL_NAME)) {
+		    Country country = Country.decode(term);
+		    if (country != null) {
+			decoded = country.getShortName();
+		    }
+		}
 		if (target.contains("Duration8601")){
 		    String decodedEn = formatISO8601DurationEn(term);
 		    String decodedIt = formatISO8601DurationIt(term);
@@ -267,6 +273,9 @@ public class OpenSearchUtils {
 		    break;
 		case AGGREGATION_DURATION:
 		    mapType.getAggregationDuration().add(item);
+		    break;
+		case COUNTRY_ISO3:
+		    mapType.getCountry().add(item);
 		    break;
 		}
 	    }

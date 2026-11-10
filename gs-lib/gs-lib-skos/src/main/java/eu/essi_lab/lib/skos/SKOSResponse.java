@@ -66,6 +66,21 @@ public class SKOSResponse {
     }
 
     /**
+     * @param list the results of the same concept, e.g. returned by different ontologies
+     * @return the first preferred label found in the given results, or {@link #NONE_VALUE}. Ontologies not including the
+     *         concept return it without labels, so the first result is not necessarily the one with the label
+     */
+    private static String getPref(List<SKOSConcept> list) {
+
+	return list.stream().//
+		map(SKOSConcept::getPref).//
+		flatMap(Optional::stream).//
+		filter(pref -> !pref.equals(NONE_VALUE)).//
+		findFirst().//
+		orElse(NONE_VALUE);
+    }
+
+    /**
      * @param concept
      * @return
      */
@@ -98,7 +113,7 @@ public class SKOSResponse {
 
 		SKOSConcept skosConcept = SKOSConcept.of(//
 			concept, //
-			list.get(0).getPref().orElse("none"));
+			getPref(list));
 
 		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
 		list.forEach(c -> skosConcept.getExpanded().addAll(c.getExpanded()));
@@ -149,7 +164,7 @@ public class SKOSResponse {
 
 		SKOSConcept skosConcept = SKOSConcept.of(//
 			key.concept(), //
-			list.get(0).getPref().orElse(NONE_VALUE));
+			getPref(list));
 
 		skosConcept.setLevel(ExpansionLevel.of(key.level()).get());
 
@@ -228,7 +243,7 @@ public class SKOSResponse {
 
 		SKOSConcept skosConcept = SKOSConcept.of(//
 			concept, //
-			list.get(0).getPref().orElse("none"));
+			getPref(list));
 
 		list.forEach(c -> skosConcept.getAlt().addAll(c.getAlt()));
 		list.forEach(c -> skosConcept.getExpanded().addAll(c.getExpanded()));

@@ -49,6 +49,7 @@ import eu.essi_lab.gssrv.conf.*;
 import eu.essi_lab.gssrv.conf.task.*;
 import eu.essi_lab.gssrv.health.*;
 import eu.essi_lab.gssrv.servlet.*;
+import eu.essi_lab.gssrv.servlet.wmscache.*;
 import eu.essi_lab.gssrv.servlet.mcp.ViewObservedPropertiesMcpSpecifications;
 import eu.essi_lab.harvester.*;
 import eu.essi_lab.jaxb.common.*;
@@ -960,6 +961,15 @@ public class DABStarter implements ConfigurationChangeListener {
 		    System.setProperty("javax.net.ssl.trustStoreType", Downloader.DEFAULT_KEY_STORE_TYPE);
 		    System.setProperty("javax.net.ssl.trustStorePassword", trustStorePwd.get());
 
+		    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		    tmf.init(mergedKS); // contains both the JVM default and the custom certificates
+
+		    SSLContext sslContext = SSLContext.getInstance("TLS");
+		    sslContext.init(null, tmf.getTrustManagers(), null);
+
+		    SSLContext.setDefault(sslContext);
+		    HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+
 		    GSLoggerFactory.getLogger(getClass()).info("Using merged trust store at {}", mergedTrustStore.getAbsolutePath());
 
 		    FileUtils.printTrustStoreCertificates(mergedTrustStore, trustStorePwd.get());
@@ -1019,6 +1029,12 @@ public class DABStarter implements ConfigurationChangeListener {
 
 	    HarvestingReportsHandler.enable();
 	}
+
+	//
+	// registers the WMS cache invalidation at the end of the harvesting procedures.
+	// the listener checks the WMS cache settings at each harvesting end, so it is always registered
+	//
+	HarvestingNotifier.addListener(new WMSCacheHarvestingInvalidator());
 
 	//
 	// enables the email reporting during augmentation
@@ -1334,6 +1350,16 @@ public class DABStarter implements ConfigurationChangeListener {
 	    if (mode == CONFIGURATION || mode == ExecutionMode.MIXED || mode == ExecutionMode.LOCAL_PRODUCTION) {
 
 		SchedulerSupport.getInstance().updateDelayed();
+
+		//
+		// these exec modes schedule the workers, so they also restore the lost jobs of the workers scheduled to
+		// run indefinitely. Not in LOCAL_PRODUCTION: its job store is volatile, so all the workers would be
+		// scheduled
+		//
+		if (mode != ExecutionMode.LOCAL_PRODUCTION) {
+
+		    SchedulingChecker.getInstance().start();
+		}
 	    }
 
 	} catch (SchedulerException e) {

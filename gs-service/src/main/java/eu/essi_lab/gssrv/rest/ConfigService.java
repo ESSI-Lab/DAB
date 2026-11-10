@@ -13,9 +13,11 @@ import eu.essi_lab.cfga.gs.setting.accessor.*;
 import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.cfga.gs.setting.harvesting.*;
 import eu.essi_lab.cfga.gs.setting.ontology.*;
+import eu.essi_lab.cfga.gs.task.*;
 import eu.essi_lab.cfga.rest.*;
 import eu.essi_lab.cfga.rest.ontology.*;
 import eu.essi_lab.cfga.rest.source.*;
+import eu.essi_lab.cfga.rest.task.*;
 import eu.essi_lab.cfga.rest.views.*;
 import eu.essi_lab.cfga.scheduler.Scheduler;
 import eu.essi_lab.cfga.scheduler.SchedulerFactory;
@@ -117,13 +119,20 @@ public class ConfigService {
 
 	String requestName = optRequestName.get();
 
+	//
+	// list requests do not require the authentication token, except the custom tasks list since
+	// the task options can contain sensitive information such as credentials
+	//
+	boolean publicRequest = requestName.toLowerCase().contains("list") && //
+		!requestName.equals(ConfigRequest.computeName(ListCustomTasksRequest.class));
+
 	Optional<String> path = uriInfo.getPathSegments().stream().map(PathSegment::getPath).findFirst();
-	if (path.isEmpty() && !requestName.toLowerCase().contains("list")) {
+	if (path.isEmpty() && !publicRequest) {
 
 	    return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "Missing required authentication token");
 	}
 
-	if (!path.get().equals(configServiceAuthToken) && !requestName.toLowerCase().contains("list")) {
+	if (!publicRequest && !path.get().equals(configServiceAuthToken)) {
 
 	    return buildErrorResponse(Status.UNAUTHORIZED, "Unrecognized authentication token");
 	}
@@ -282,6 +291,64 @@ public class ConfigService {
 	    Optional<Response> validate = validate(request);
 
 	    response = validate.orElseGet(() -> handleListViewsRequest(request));
+	}
+
+	//
+	// custom task requests
+	//
+
+	if (requestName.equals(ConfigRequest.computeName(PutCustomTaskRequest.class))) {
+
+	    PutCustomTaskRequest request = new PutCustomTaskRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handlePutCustomTaskRequest(request));
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(EditCustomTaskRequest.class))) {
+
+	    EditCustomTaskRequest request = new EditCustomTaskRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleEditCustomTaskRequest(request));
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(RemoveCustomTaskRequest.class))) {
+
+	    RemoveCustomTaskRequest request = new RemoveCustomTaskRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleRemoveCustomTaskRequest(request));
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(CustomTaskSchedulingRequest.class))) {
+
+	    CustomTaskSchedulingRequest request = new CustomTaskSchedulingRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleCustomTaskSchedulingRequest(request));
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(CustomTaskUnschedulingRequest.class))) {
+
+	    CustomTaskUnschedulingRequest request = new CustomTaskUnschedulingRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleCustomTaskUnschedulingRequest(request));
+	}
+
+	if (requestName.equals(ConfigRequest.computeName(ListCustomTasksRequest.class))) {
+
+	    ListCustomTasksRequest request = new ListCustomTasksRequest(requestObject);
+
+	    Optional<Response> validate = validate(request);
+
+	    response = validate.orElseGet(() -> handleListCustomTasksRequest(request));
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Serving '{}' request ENDED", requestName);
@@ -1276,55 +1343,7 @@ public class ConfigService {
 		    sourceObject.put(PutSourceRequest.SOURCE_DEPLOYMENT, String.join(",", source.getDeployment()));
 		}
 
-		JSONObject scheduling = new JSONObject();
-
-		String jobPhase = support.getJobPhase(setting);
-		if (!jobPhase.isEmpty()) {
-
-		    scheduling.put("phase", jobPhase);
-		}
-
-		String elapsedTime = support.getElapsedTime(setting);
-		if (!elapsedTime.isEmpty()) {
-
-		    scheduling.put("elapsedTime", elapsedTime);
-		}
-
-		String endTime = support.getEndTime(setting);
-		if (!endTime.isEmpty()) {
-
-		    scheduling.put("endTime", endTime);
-		}
-
-		String firedTime = support.getFiredTime(setting);
-		if (!firedTime.isEmpty()) {
-
-		    scheduling.put("firedTime", firedTime);
-		}
-
-		String nextFireTime = support.getNextFireTime(setting);
-		if (!nextFireTime.isEmpty()) {
-
-		    scheduling.put("nextFireTime", nextFireTime);
-		}
-
-		String repeatCount = support.getRepeatCount(setting);
-		if (!repeatCount.isEmpty()) {
-
-		    scheduling.put("repeatCount", repeatCount);
-		}
-
-		String repeatInterval = support.getRepeatInterval(setting);
-		if (!repeatInterval.isEmpty()) {
-
-		    scheduling.put("repeatInterval", repeatInterval);
-		}
-
-		String size = support.getSize(setting);
-		if (!size.isEmpty()) {
-
-		    scheduling.put("size", size);
-		}
+		JSONObject scheduling = buildSchedulingObject(support, setting);
 
 		if (!scheduling.keySet().isEmpty()) {
 
@@ -1337,6 +1356,513 @@ public class ConfigService {
 		entity(out.toString(3)).//
 		type(MediaType.APPLICATION_JSON).//
 		build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handlePutCustomTaskRequest(PutCustomTaskRequest request) {
+
+	Optional<String> optTaskId = request.readString(PutCustomTaskRequest.TASK_ID);
+
+	Optional<String> randomId = Optional.empty();
+
+	//
+	// task id presence check
+	//
+
+	if (optTaskId.isPresent()) {
+
+	    if (CustomTaskSettingUtils.find(optTaskId.get()).isPresent()) {
+
+		return buildErrorResponse(Status.BAD_REQUEST, "Custom task with id '" + optTaskId.get() + "' already exists");
+	    }
+
+	} else {
+
+	    //
+	    // random id creation
+	    //
+
+	    randomId = Optional.of(UUID.randomUUID().toString());
+
+	    request.put(PutCustomTaskRequest.TASK_ID, randomId.get());
+	}
+
+	//
+	// putting new custom task setting and flushing
+	//
+
+	CustomTaskSetting setting = CustomTaskSettingUtils.build(request);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	boolean put = configuration.put(setting);
+
+	if (!put) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to put new custom task");
+	}
+
+	Optional<Response> errorResponse = flush(configuration);
+
+	if (errorResponse.isPresent()) {
+
+	    return errorResponse.get();
+	}
+
+	//
+	// optional scheduling
+	//
+
+	if (request.readCompositeParameters().contains(PutCustomTaskRequest.TASK_SCHEDULING)) {
+
+	    Response schedulingResponse = handleCustomTaskSchedulingRequest(request.getSchedulingRequest());
+
+	    if (schedulingResponse.getStatus() != Status.OK.getStatusCode()) {
+
+		return schedulingResponse;
+	    }
+	}
+
+	//
+	// in case of random id, it is provided in the response
+	//
+
+	if (randomId.isPresent()) {
+
+	    JSONObject object = new JSONObject();
+	    object.put(PutCustomTaskRequest.TASK_ID, randomId.get());
+
+	    return Response.status(Status.CREATED).//
+		    entity(object.toString(3)).//
+		    type(MediaType.APPLICATION_JSON).//
+		    build();
+	}
+
+	return Response.status(Status.CREATED).build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleEditCustomTaskRequest(EditCustomTaskRequest request) {
+
+	SettingFinder<CustomTaskSetting> finder = CustomTaskSettingUtils.getCustomTaskSettingFinder(request);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	CustomTaskSetting setting = CustomTaskSettingUtils.build(request, finder.getSetting().get());
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	//
+	// replacing and flushing
+	//
+
+	boolean replaced = configuration.replace(setting);
+
+	if (!replaced) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "No changes to apply");
+	}
+
+	Optional<Response> errorResponse = flush(configuration);
+
+	if (errorResponse.isPresent()) {
+
+	    return errorResponse.get();
+	}
+
+	//
+	// the setting is serialized in the job data, so a scheduled task must be rescheduled
+	// in order to apply the changes
+	//
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
+
+	try {
+
+	    if (isScheduled(scheduler, setting)) {
+
+		scheduler.reschedule(setting);
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Changes saved but unable to reschedule task: " + ex.getMessage());
+	}
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleRemoveCustomTaskRequest(RemoveCustomTaskRequest request) {
+
+	SettingFinder<CustomTaskSetting> finder = CustomTaskSettingUtils.getCustomTaskSettingFinder(request);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	CustomTaskSetting setting = finder.getSetting().get();
+
+	if (isRunning(setting)) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST,
+		    "The requested custom task is currently running and cannot be removed until its execution is complete");
+	}
+
+	//
+	// unscheduling job
+	//
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
+
+	try {
+
+	    scheduler.unschedule(setting);
+
+	} catch (SchedulerException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unscheduling failed: " + e.getMessage());
+	}
+
+	//
+	// removing setting and flushing configuration
+	//
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	boolean removed = configuration.remove(setting.getIdentifier());
+
+	if (!removed) {
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to remove custom task");
+	}
+
+	return flush(configuration).orElse(Response.status(Status.OK).build());
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleCustomTaskSchedulingRequest(CustomTaskSchedulingRequest request) {
+
+	SettingFinder<CustomTaskSetting> finder = CustomTaskSettingUtils.getCustomTaskSettingFinder(request);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	//
+	// task running check in case of start now
+	//
+
+	Optional<String> startTime = request.readString(HarvestSchedulingRequest.START_TIME);
+
+	if (startTime.isEmpty() && isRunning(finder.getSetting().get())) {
+
+	    return buildErrorResponse(Status.BAD_REQUEST, "Unable to start the custom task now since it is currently running");
+	}
+
+	//
+	// start time in the past check
+	//
+
+	if (startTime.isPresent()) {
+
+	    String currentTime = ISO8601DateTimeUtils.getISO8601DateTime("Europe/Berlin");
+
+	    if (startTime.get().compareTo(currentTime) < 0) {
+
+		return buildErrorResponse(Status.METHOD_NOT_ALLOWED, "The provided start time '" + startTime.get() + "' is in the past");
+	    }
+	}
+
+	//
+	// updating custom task scheduling
+	//
+
+	CustomTaskSetting setting = SettingUtils.downCast(SelectionUtils.resetAndSelect(finder.getSetting().get(), false),
+		CustomTaskSetting.class);
+
+	HarvestingSettingUtils.udpate(request, setting.getScheduling());
+
+	SelectionUtils.deepClean(setting);
+	SelectionUtils.deepAfterClean(setting);
+
+	//
+	// replacing setting. if the operation fails, it means that the scheduling is not changed
+	//
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	boolean replaced = configuration.replace(setting);
+
+	if (replaced) {
+
+	    Optional<Response> errorResponse = flush(configuration);
+
+	    if (errorResponse.isPresent()) {
+
+		return errorResponse.get();
+	    }
+	}
+
+	//
+	// scheduling or rescheduling
+	//
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
+
+	try {
+
+	    if (isScheduled(scheduler, setting)) {
+
+		scheduler.reschedule(setting);
+
+	    } else {
+
+		scheduler.schedule(setting);
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(ex);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unable to schedule task: " + ex.getMessage());
+	}
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleCustomTaskUnschedulingRequest(CustomTaskUnschedulingRequest request) {
+
+	SettingFinder<CustomTaskSetting> finder = CustomTaskSettingUtils.getCustomTaskSettingFinder(request);
+
+	if (finder.getErrorResponse().isPresent()) {
+
+	    return finder.getErrorResponse().get();
+	}
+
+	CustomTaskSetting setting = finder.getSetting().get();
+
+	//
+	// unscheduling
+	//
+
+	Scheduler scheduler = SchedulerFactory.getScheduler(ConfigurationWrapper.getSchedulerSetting());
+
+	try {
+
+	    scheduler.pause(setting);
+
+	} catch (SchedulerException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e);
+
+	    return buildErrorResponse(Status.INTERNAL_SERVER_ERROR, "Unscheduling failed: " + e.getMessage());
+	}
+
+	//
+	// disabling scheduling and flushing configuration
+	//
+
+	setting.getScheduling().setEnabled(false);
+
+	Configuration configuration = ConfigurationWrapper.getConfiguration().get();
+
+	boolean replaced = configuration.replace(setting);
+
+	if (replaced) {
+
+	    Optional<Response> errorResponse = flush(configuration);
+
+	    if (errorResponse.isPresent()) {
+
+		return errorResponse.get();
+	    }
+	}
+
+	return Response.status(Status.OK).build();
+    }
+
+    /**
+     * @param request
+     * @return
+     */
+    private Response handleListCustomTasksRequest(ListCustomTasksRequest request) {
+
+	SchedulerSupport support = SchedulerSupport.getInstance();
+	support.update();
+
+	List<CustomTaskSetting> settings = ConfigurationWrapper.getCustomTaskSettings();
+
+	//
+	// reading optional task ids
+	//
+
+	List<String> taskIds = request.readStrings(PutCustomTaskRequest.TASK_ID);
+
+	if (!taskIds.isEmpty()) {
+
+	    List<String> ids = settings.stream().map(Setting::getIdentifier).toList();
+
+	    String missingTasks = taskIds. //
+		    stream().//
+		    filter(id -> !ids.contains(id)).//
+		    collect(Collectors.joining(","));//
+
+	    if (!missingTasks.isEmpty()) {
+
+		String message = missingTasks.contains(",")
+			? "Custom tasks with id '" + missingTasks + "' not found"
+			: "Custom task with id '" + missingTasks + "' not found";
+
+		return buildErrorResponse(Status.NOT_FOUND, message);
+	    }
+	}
+
+	JSONArray out = new JSONArray();
+
+	settings.stream().//
+		filter(setting -> taskIds.isEmpty() || taskIds.contains(setting.getIdentifier())).//
+		forEach(setting -> {
+
+		    JSONObject taskObject = new JSONObject();
+		    out.put(taskObject);
+
+		    taskObject.put(PutCustomTaskRequest.TASK_ID, setting.getIdentifier());
+		    taskObject.put(PutCustomTaskRequest.TASK_NAME, setting.getSelectedTaskName());
+		    taskObject.put(PutCustomTaskRequest.TASK_DESCRIPTION, setting.getTaskDescription());
+
+		    setting.getTaskOptions().ifPresent(options -> taskObject.put(PutCustomTaskRequest.TASK_OPTIONS, options));
+
+		    List<String> recipients = setting.getEmailRecipients();
+		    if (!recipients.isEmpty()) {
+
+			taskObject.put(PutCustomTaskRequest.EMAIL_RECIPIENTS, String.join(",", recipients));
+		    }
+
+		    JSONObject scheduling = buildSchedulingObject(support, setting);
+
+		    if (!scheduling.keySet().isEmpty()) {
+
+			taskObject.put("scheduling", scheduling);
+		    }
+		});
+
+	return Response.status(Status.OK).//
+		entity(out.toString(3)).//
+		type(MediaType.APPLICATION_JSON).//
+		build();
+    }
+
+    /**
+     * @param support
+     * @param setting
+     * @return
+     */
+    private JSONObject buildSchedulingObject(SchedulerSupport support, Setting setting) {
+
+	JSONObject scheduling = new JSONObject();
+
+	String jobPhase = support.getJobPhase(setting);
+	if (!jobPhase.isEmpty()) {
+
+	    scheduling.put("phase", jobPhase);
+	}
+
+	String elapsedTime = support.getElapsedTime(setting);
+	if (!elapsedTime.isEmpty()) {
+
+	    scheduling.put("elapsedTime", elapsedTime);
+	}
+
+	String endTime = support.getEndTime(setting);
+	if (!endTime.isEmpty()) {
+
+	    scheduling.put("endTime", endTime);
+	}
+
+	String firedTime = support.getFiredTime(setting);
+	if (!firedTime.isEmpty()) {
+
+	    scheduling.put("firedTime", firedTime);
+	}
+
+	String nextFireTime = support.getNextFireTime(setting);
+	if (!nextFireTime.isEmpty()) {
+
+	    scheduling.put("nextFireTime", nextFireTime);
+	}
+
+	String repeatCount = support.getRepeatCount(setting);
+	if (!repeatCount.isEmpty()) {
+
+	    scheduling.put("repeatCount", repeatCount);
+	}
+
+	String repeatInterval = support.getRepeatInterval(setting);
+	if (!repeatInterval.isEmpty()) {
+
+	    scheduling.put("repeatInterval", repeatInterval);
+	}
+
+	String size = support.getSize(setting);
+	if (!size.isEmpty()) {
+
+	    scheduling.put("size", size);
+	}
+
+	return scheduling;
+    }
+
+    /**
+     * @param scheduler
+     * @param setting
+     * @return
+     * @throws Exception
+     */
+    private boolean isScheduled(Scheduler scheduler, Setting setting) throws Exception {
+
+	return scheduler.//
+		listScheduledSettings().//
+		stream().//
+		map(Setting::getIdentifier).//
+		anyMatch(id -> id.equals(setting.getIdentifier()));
+    }
+
+    /**
+     * @param setting
+     * @return
+     */
+    private boolean isRunning(CustomTaskSetting setting) {
+
+	SchedulerSupport support = SchedulerSupport.getInstance();
+	support.update();
+
+	return support.getJobPhase(setting).equals(JobPhase.RUNNING.getLabel());
     }
 
     /**

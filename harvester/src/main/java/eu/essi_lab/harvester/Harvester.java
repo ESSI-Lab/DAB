@@ -27,6 +27,7 @@ import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.task.*;
 import eu.essi_lab.cfga.gs.task.HarvestingEmbeddedTask.*;
 import eu.essi_lab.cfga.scheduler.*;
+import eu.essi_lab.harvester.HarvestingNotifier.*;
 import eu.essi_lab.harvester.worker.HarvesterWorker.*;
 import eu.essi_lab.identifierdecorator.*;
 import eu.essi_lab.lib.utils.*;
@@ -108,8 +109,44 @@ public class Harvester {
 
 	boolean recovery = context.isRecovering() && getAccessor().supportsRecovery();
 
+	//
+	// a previous execution which is not completed has been interrupted (e.g. the process died), and this execution
+	// continues it (by recovery, resuming, or from scratch)
+	//
+
+	boolean previousInterrupted = !properties.isCompleted().orElse(true);
+	Optional<String> previousHarvestingId = properties.getHarvestingId();
+	Optional<String> previousRootHarvestingId = properties.getRootHarvestingId();
+
 	// always reset the completed state
 	properties.setCompleted(false);
+
+	//
+	// the notifier sent at the start and at the end of the harvesting procedure
+	//
+
+	HarvestingNotifier notifier = new HarvestingNotifier(//
+		getAccessor().getSource(), //
+		strategy, //
+		recovery, //
+		resumed, //
+		properties.getResourcesCount());
+
+	notifier.setAccessorType(getAccessor().getClass().getSimpleName());
+	notifier.setIncrementalFrom(isIncremental ? properties.getStartHarvestingTimestamp() : null);
+	notifier.setPreviousHarvestingEndDate(properties.getEndHarvestingTimestamp());
+	notifier.setHarvestingCount(properties.getHarvestingCount());
+
+	if (previousInterrupted && previousHarvestingId.isPresent()) {
+
+	    Continuation continuation = recovery ? Continuation.RECOVERY : resumed ? Continuation.RESUME : Continuation.RESTART;
+
+	    notifier.setContinuationOf(previousHarvestingId.get(), previousRootHarvestingId, continuation);
+	}
+
+	// stored with the harvesting properties during the harvesting, so they survive an interruption
+	properties.setHarvestingId(notifier.getHarvestingId());
+	properties.setRootHarvestingId(notifier.getRootHarvestingId());
 
 	//
 	// sends the harvesting started email
@@ -166,8 +203,15 @@ public class Harvester {
 
 	    reportsHandler.sendErrorAndWarnMessageEmail();
 
+	    notifier.setRecordsAfter(properties.getResourcesCount());
+	    notifier.setResult(HarvestingResult.FAILED);
+	    notifier.setException(ex);
+	    notifier.publish();
+
 	    throw ex;
 	}
+
+	notifier.publishStarted();
 
 	//
 	// executes the harvesting procedure
@@ -235,6 +279,8 @@ public class Harvester {
 		handleCustomTask(getAccessor().getSource(), context, status, request);
 	    }
 
+	    checkConsolidation(storage, strategy, notifier);
+
 	    getSourceStorage().harvestingEnded(//
 		    getAccessor().getSource(), //
 		    Optional.of(properties), //
@@ -280,6 +326,24 @@ public class Harvester {
 		properties);
 
 	reportsHandler.sendErrorAndWarnMessageEmail();
+
+	//
+	// sends the harvesting notification
+	//
+
+	notifier.setRecordsAfter(properties.getResourcesCount());
+
+	if (exception != null) {
+
+	    notifier.setResult(HarvestingResult.FAILED);
+	    notifier.setException(exception);
+
+	} else if (status != null && status.getPhase() == JobPhase.CANCELED) {
+
+	    notifier.setResult(HarvestingResult.CANCELED);
+	}
+
+	notifier.publish();
 
 	//
 	//
@@ -350,6 +414,39 @@ public class Harvester {
     public HarvesterPlan getPlan() {
 
 	return this.harvesterPlan;
+    }
+
+    /**
+     * Before the storage finalization, detects the number of harvested records and if, due to a low quantity of records,
+     * the consolidated folder is going to survive
+     *
+     * @param storage
+     * @param strategy
+     * @param notifier
+     */
+    private void checkConsolidation(SourceStorage storage, HarvestingStrategy strategy, HarvestingNotifier notifier) {
+
+	if (strategy != HarvestingStrategy.FULL) {
+
+	    return;
+	}
+
+	try {
+
+	    DatabaseFolder writingFolder = storage.isData1WritingFolder() ? storage.getData1Folder() : storage.getData2Folder();
+
+	    // the writing folder tag is excluded
+	    notifier.setHarvestedRecords(writingFolder.size() - 1);
+
+	    if (storage.consolidatedFolderSurvives().orElse(false)) {
+
+		notifier.setResult(HarvestingResult.CONSOLIDATED_FOLDER_SURVIVED);
+	    }
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to check consolidation: {}", ex.getMessage(), ex);
+	}
     }
 
     /**

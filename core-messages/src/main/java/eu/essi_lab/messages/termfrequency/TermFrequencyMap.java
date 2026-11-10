@@ -169,7 +169,11 @@ public class TermFrequencyMap extends DOMSerializer {
 	/**
 	 * 
 	 */
-	AGGREGATION_DURATION(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME);
+	AGGREGATION_DURATION(MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME),
+	/**
+	 * 
+	 */
+	COUNTRY_ISO3(MetadataElement.COUNTRY_ISO3_EL_NAME);
 
 	private final String name;
 
@@ -208,6 +212,7 @@ public class TermFrequencyMap extends DOMSerializer {
 		case MetadataElement.TIME_RESOLUTION_DURATION_8601_EL_NAME -> TermFrequencyTarget.INTENDED_OBSERVATION_SPACING;
 		case MetadataElement.TIME_INTERPOLATION_EL_NAME -> TermFrequencyTarget.TIME_INTERPOLATION;
 		case MetadataElement.TIME_AGGREGATION_DURATION_8601_EL_NAME -> TermFrequencyTarget.AGGREGATION_DURATION;
+		case MetadataElement.COUNTRY_ISO3_EL_NAME -> TermFrequencyTarget.COUNTRY_ISO3;
 		default -> null;
 	    };
 

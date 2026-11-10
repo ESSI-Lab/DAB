@@ -50,7 +50,6 @@ import eu.essi_lab.access.availability.DownloadInformation;
 import eu.essi_lab.api.database.Database;
 import eu.essi_lab.api.database.DatabaseExecutor;
 import eu.essi_lab.api.database.DatabaseFinder;
-import eu.essi_lab.api.database.SourceStorage;
 import eu.essi_lab.api.database.factory.DatabaseFactory;
 import eu.essi_lab.api.database.factory.DatabaseProviderFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
@@ -94,9 +93,13 @@ import eu.essi_lab.pdk.wrt.WebRequestTransformer;
 import eu.essi_lab.profiler.semantic.SourceStatistics;
 import eu.essi_lab.profiler.semantic.Stats;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchClient;
+import eu.essi_lab.shared.driver.es.stats.ElasticsearchHarvestingPublisher;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Gathers statistics info
@@ -156,16 +159,15 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
  *
  * <dt>{@link StatisticsMetric#LAST_HARVESTING_UNIX_TIMESTAMP_MS LAST_HARVESTING_UNIX_TIMESTAMP_MS}
  * ({@code last_harvesting_unix_timestamp_ms})</dt>
- * <dd>Unix epoch <b>milliseconds</b> of the last harvesting run end time, from harvesting properties. Omitted if no end
- * timestamp is stored.</dd>
+ * <dd>Unix epoch <b>milliseconds</b> of the last harvesting run end time (whatever its result), from the harvesting
+ * statistics index (see {@link ElasticsearchHarvestingPublisher}). Omitted if no ended harvesting is recorded.</dd>
  *
  * <dt>{@link StatisticsMetric#LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS
  * LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS} ({@code last_successful_ingestion_harvest_unix_timestamp_ms})</dt>
- * <dd>Unix epoch <b>milliseconds</b> of the last <b>completed</b> harvest end time when {@link HarvestingProperties}
- * reports {@code resourcesCount &gt; 0} and {@link SourceStorage#consolidatedFolderSurvives()} matches
- * {@link ResourcesComparatorTask}: the consolidated snapshot does not “survive” (optional empty or {@code false}), i.e.
- * the same situation where remote-sourced records are processed for comparison. Omitted when the last run was not
- * completed, left no resources, consolidated survives, or end time is missing.</dd>
+ * <dd>Unix epoch <b>milliseconds</b> of the end time of the last harvest which replaced the source records, from the
+ * harvesting statistics index: the last harvest with result {@code COMPLETED} (so not failed, canceled, or with the
+ * consolidated folder surviving because of a low records count) and at least one record after the harvest. Omitted if no
+ * such harvest is recorded.</dd>
  *
  * <dt>{@link StatisticsMetric#SOURCE_UP SOURCE_UP} ({@code source_up})</dt>
  * <dd>{@code 1} if the source is marked up in harvesting properties, {@code 0} if down or unknown.</dd>
@@ -277,10 +279,10 @@ public class StatisticsTask extends AbstractCustomTask {
 	DOWNLOAD_AVAILABILITY("download_availability", "Download availability "),
 	HARVESTED_RECORDS("harvested_records", "Total number of harvested records "),
 	LAST_HARVESTING_UNIX_TIMESTAMP_MS("last_harvesting_unix_timestamp_ms",
-		"Last harvesting end timestamp in Unix epoch milliseconds"),
+		"Last harvesting end timestamp in Unix epoch milliseconds (from the harvesting statistics)"),
 	LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS("last_successful_ingestion_harvest_unix_timestamp_ms",
-		"Last completed harvest end time (Unix ms) when resourcesCount>0 and consolidated folder does not survive "
-			+ "(same gate as ResourcesComparatorTask)"),
+		"Last completed harvest end time (Unix ms) with at least one record, the consolidated folder not surviving "
+			+ "(from the harvesting statistics)"),
 	SOURCE_UP("source_up", "Source connectivity status (1=up, 0=down)"),
 	CONNECTIVITY_TEST_DURATION_MS("connectivity_test_duration_ms",
 		"Duration of the last source connectivity test in milliseconds"),
@@ -533,6 +535,13 @@ public class StatisticsTask extends AbstractCustomTask {
 	PrometheusConfig config = PrometheusConfig.DEFAULT;
 	PrometheusMeterRegistry registry = new PrometheusMeterRegistry(config);
 	Database database = DatabaseFactory.get(ConfigurationWrapper.getStorageInfo());
+
+	Map<String, HarvestTimestamps> harvestTimestamps = new HashMap<>();
+	if (metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS)
+		|| metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS)) {
+	    harvestTimestamps = readHarvestTimestamps();
+	}
+
 	int si = 0;
 	for (String source : overallStats.keySet()) {
 
@@ -551,9 +560,7 @@ public class StatisticsTask extends AbstractCustomTask {
 	    }
 	    try {
 		Stats stats = overallStats.get(source);
-		boolean needHarvestingProps = metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS)
-			|| metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS)
-			|| metrics.contains(StatisticsMetric.SOURCE_UP)
+		boolean needHarvestingProps = metrics.contains(StatisticsMetric.SOURCE_UP)
 			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_DURATION_MS)
 			|| metrics.contains(StatisticsMetric.CONNECTIVITY_TEST_UNIX_TIMESTAMP_MS)
 			|| metrics.contains(StatisticsMetric.LAST_SOURCE_UP_UNIX_TIMESTAMP_MS);
@@ -591,43 +598,27 @@ public class StatisticsTask extends AbstractCustomTask {
 			    register(registry);
 		}
 
-		if (metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS) && harvestingProperties != null) {
-		    String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
-		    Optional<Date> lastHarvesting = ISO8601DateTimeUtils.parseISO8601ToDate(endHarvestingTimestamp);
-		    if (lastHarvesting.isPresent()) {
-			long ms = lastHarvesting.get().getTime();
-			lastHarvestingTime.put(source, ms);
-			io.micrometer.core.instrument.Gauge.builder(
-				StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS.prometheusName(), lastHarvestingTime,
-				g -> g.get(source))//
-				.description(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS.description())//
-				.tag("source_id", source).//
-				register(registry);
-		    }
+		HarvestTimestamps timestamps = harvestTimestamps.get(source);
+
+		if (metrics.contains(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS) && timestamps != null
+			&& timestamps.lastEndMs() != null) {
+		    lastHarvestingTime.put(source, timestamps.lastEndMs());
+		    io.micrometer.core.instrument.Gauge.builder(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS.prometheusName(),
+			    lastHarvestingTime, g -> g.get(source))//
+			    .description(StatisticsMetric.LAST_HARVESTING_UNIX_TIMESTAMP_MS.description())//
+			    .tag("source_id", source).//
+			    register(registry);
 		}
 
-		if (metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS)
-			&& harvestingProperties != null) {
-		    if (harvestingProperties.isCompleted().orElse(false) && harvestingProperties.getResourcesCount() > 0) {
-			try {
-			    	String endHarvestingTimestamp = harvestingProperties.getEndHarvestingTimestamp();
-				Optional<Date> endHarvest = ISO8601DateTimeUtils.parseISO8601ToDate(endHarvestingTimestamp);
-				if (endHarvest.isPresent()) {
-				    long ms = endHarvest.get().getTime();
-				    lastSuccessfulIngestionHarvestTime.put(source, ms);
-				    io.micrometer.core.instrument.Gauge.builder(
-					    StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.prometheusName(),
-					    lastSuccessfulIngestionHarvestTime, g -> g.get(source))//
-					    .description(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.description())//
-					    .tag("source_id", source).//
-					    register(registry);
-				}
-
-			} catch (Exception e) {
-			    GSLoggerFactory.getLogger(getClass()).warn("consolidatedFolderSurvives for source {}: {}", source,
-				    e.getMessage());
-			}
-		    }
+		if (metrics.contains(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS) && timestamps != null
+			&& timestamps.lastSuccessfulEndMs() != null) {
+		    lastSuccessfulIngestionHarvestTime.put(source, timestamps.lastSuccessfulEndMs());
+		    io.micrometer.core.instrument.Gauge.builder(
+			    StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.prometheusName(),
+			    lastSuccessfulIngestionHarvestTime, g -> g.get(source))//
+			    .description(StatisticsMetric.LAST_SUCCESSFUL_INGESTION_HARVEST_UNIX_TIMESTAMP_MS.description())//
+			    .tag("source_id", source).//
+			    register(registry);
 		}
 
 		if (metrics.contains(StatisticsMetric.SOURCE_UP)) {
@@ -1166,6 +1157,86 @@ public class StatisticsTask extends AbstractCustomTask {
     private static String metadataCompletenessSetKey(String sourceId, String elementSetTag) {
 
 	return sourceId + '\0' + "s:" + elementSetTag;
+    }
+
+    /**
+     * End timestamps (Unix ms) of the last harvests of a source, <code>null</code> if not recorded
+     *
+     * @param lastEndMs the end of the last ended harvest, whatever its result
+     * @param lastSuccessfulEndMs the end of the last harvest which replaced the source records (result COMPLETED and
+     *        at least one record)
+     */
+    record HarvestTimestamps(Long lastEndMs, Long lastSuccessfulEndMs) {
+    }
+
+    /**
+     * Reads the end timestamps of the last harvests of all the sources from the harvesting statistics index, with a
+     * single aggregation request
+     *
+     * @return source id -> timestamps; empty if the statistics are not available
+     */
+    private Map<String, HarvestTimestamps> readHarvestTimestamps() {
+
+	Map<String, HarvestTimestamps> out = new HashMap<>();
+
+	Optional<ElasticsearchClient> client = ElasticsearchHarvestingPublisher.createClient();
+
+	if (client.isEmpty()) {
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Harvesting statistics not available, harvesting timestamp metrics skipped");
+
+	    return out;
+	}
+
+	JSONObject successful = new JSONObject()//
+		.put("filter", new JSONObject().put("bool", new JSONObject().put("filter", new JSONArray()//
+			.put(new JSONObject().put("term", new JSONObject().put("result", "COMPLETED")))//
+			.put(new JSONObject().put("range", new JSONObject().put("recordsAfter", new JSONObject().put("gt", 0)))))))//
+		.put("aggs", new JSONObject().put("last_end", new JSONObject().put("max", new JSONObject().put("field", "endDate"))));
+
+	JSONObject bySource = new JSONObject()//
+		.put("terms", new JSONObject().put("field", "sourceId").put("size", 10000))//
+		.put("aggs", new JSONObject()//
+			.put("last_end", new JSONObject().put("max", new JSONObject().put("field", "endDate")))//
+			.put("successful", successful));
+
+	JSONObject body = new JSONObject()//
+		.put("size", 0)//
+		.put("query", new JSONObject().put("exists", new JSONObject().put("field", "endDate")))//
+		.put("aggs", new JSONObject().put("by_source", bySource));
+
+	try {
+
+	    JSONObject response = client.get().search(ElasticsearchHarvestingPublisher.HARVESTS_INDEX, body);
+
+	    JSONArray buckets = response.getJSONObject("aggregations").getJSONObject("by_source").getJSONArray("buckets");
+
+	    for (int i = 0; i < buckets.length(); i++) {
+
+		JSONObject bucket = buckets.getJSONObject(i);
+
+		out.put(bucket.getString("key"), new HarvestTimestamps(//
+			maxValue(bucket.getJSONObject("last_end")), //
+			maxValue(bucket.getJSONObject("successful").getJSONObject("last_end"))));
+	    }
+
+	    GSLoggerFactory.getLogger(getClass()).info("Harvesting timestamps read for {} sources", out.size());
+
+	} catch (Exception ex) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to read the harvesting timestamps: {}", ex.getMessage(), ex);
+	}
+
+	return out;
+    }
+
+    /**
+     * @param maxAggregation
+     * @return the value of a max aggregation on a date field (Unix ms), <code>null</code> if no document has the field
+     */
+    private static Long maxValue(JSONObject maxAggregation) {
+
+	return maxAggregation.isNull("value") ? null : (long) maxAggregation.getDouble("value");
     }
 
     /**

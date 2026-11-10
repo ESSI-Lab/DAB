@@ -59,6 +59,7 @@ import eu.essi_lab.model.resource.data.DataFormat;
 import eu.essi_lab.model.resource.data.DataType;
 import eu.essi_lab.model.resource.data.Unit;
 import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
+import eu.essi_lab.model.resource.data.dimension.ContinueDimension.LimitType;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 /**
@@ -146,6 +147,18 @@ public class DatalakesDownloader extends WMLDataDownloader {
 
 	descriptors.add(descriptor);
 	return descriptors;
+    }
+
+    @Override
+    protected void reduceDescriptor(DataDescriptor descriptor) {
+	super.reduceDescriptor(descriptor);
+	// sparse series (e.g. monthly CTD casts) have no data point near the bounds of the reduced time window,
+	// so the preview only requires the values to fall inside it
+	DataDimension temporalDimension = descriptor.getTemporalDimension();
+	if (temporalDimension != null && temporalDimension.getContinueDimension() != null) {
+	    temporalDimension.getContinueDimension().setLowerType(LimitType.CONTAINS);
+	    temporalDimension.getContinueDimension().setUpperType(LimitType.CONTAINS);
+	}
     }
 
     @Override

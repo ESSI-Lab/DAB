@@ -42,6 +42,7 @@ public class DataRecord {
     //
     private String uom;
     private String observedProperty;
+    private String observedPropertyURI;
     private LatitudeLongitude latitudeLongitude;
 
     private Date timestamp; // the time the record was inserted in the cache
@@ -123,6 +124,14 @@ public class DataRecord {
 
     public void setObservedProperty(String observedProperty) {
 	this.observedProperty = observedProperty;
+    }
+
+    public String getObservedPropertyURI() {
+	return observedPropertyURI;
+    }
+
+    public void setObservedPropertyURI(String observedPropertyURI) {
+	this.observedPropertyURI = observedPropertyURI;
     }
 
     public LatitudeLongitude getLatitudeLongitude() {

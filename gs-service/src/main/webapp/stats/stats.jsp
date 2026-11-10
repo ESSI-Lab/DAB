@@ -164,6 +164,7 @@
 
     .org-summary {
       width: 100%;
+      box-sizing: border-box;
       display: flex;
       align-items: center;
       gap: 16px;
@@ -231,6 +232,10 @@
 
     .org-details[hidden] {
       display: none;
+    }
+
+    .org-own-contacts {
+      padding: 0 20px 14px 20px;
     }
 
     .org-contact {
@@ -785,9 +790,10 @@
 
         page.push('<div class="provider-layout">');
         page.push('<div class="provider-left">');
+        page.push('<div id="organizations-container"></div>');
+        page.push('<div id="license-container"></div>');
         page.push('<h2>' + escapeHtml(translator('provider_statistics', 'Provider statistics')) + '</h2>');
         page.push('<ul class="stats-list">' + statsItems.join('') + '</ul>');
-        page.push('<div id="organizations-container"></div>');
         page.push('</div>');
 
         page.push('<div class="provider-right">');
@@ -816,6 +822,9 @@
 
         var orgContainer = document.getElementById('organizations-container');
         renderOrganizations(orgContainer, entry['organization-stats'] || [], translator);
+
+        var licenseContainer = document.getElementById('license-container');
+        renderLicenses(licenseContainer, entry['license-stats'] || [], entry['license-uri-stats'] || [], translator);
 
         var tableBody = document.getElementById('platform-table-body');
         var paginationContainer = document.getElementById('platform-pagination');
@@ -857,11 +866,11 @@
         var data = aggregateOrganizations(frequencyItems, translator);
 
         if (!data.length) {
-          container.innerHTML = '<h3>' + escapeHtml(translator('involved_organizations', 'Involved organizations')) + '</h3><p>' + escapeHtml(translator('no_organizations_available', 'No organization data available.')) + '</p>';
+          container.innerHTML = '<h2>' + escapeHtml(translator('responsible_organizations', 'Responsible organizations')) + '</h2><p>' + escapeHtml(translator('no_organizations_available', 'No organization data available.')) + '</p>';
           return;
         }
 
-        var html = ['<h3>' + escapeHtml(translator('involved_organizations', 'Involved organizations')) + '</h3>', '<div class="org-list">'];
+        var html = ['<h2>' + escapeHtml(translator('responsible_organizations', 'Responsible organizations')) + '</h2>', '<div class="org-list">'];
         for (var i = 0; i < data.length; i++) {
           var org = data[i];
           var detailsId = 'org-details-' + i;
@@ -880,6 +889,10 @@
             html.push('<span class="org-toggle">' + escapeHtml(showLabel) + '</span>');
           }
           html.push('</' + summaryTag + '>');
+          var orgContactParts = buildContactLinks(org.emails, org.homepages);
+          if (orgContactParts.length) {
+            html.push('<div class="org-contact-meta org-own-contacts">' + joinWithSeparator(orgContactParts, "<span class='org-meta-sep'>&#8226;</span>") + '</div>');
+          }
           if (org.showToggle) {
             html.push('<div class="org-details" id="' + detailsId + '" hidden>');
             for (var j = 0; j < org.contributors.length; j++) {
@@ -892,23 +905,7 @@
               if (contributor.roleSummary) {
                 metaParts.push('<span class="org-role-label">' + escapeHtml(contributor.roleSummary) + '</span>');
               }
-              if (contributor.emails.length) {
-                var emailFragments = [];
-                for (var e = 0; e < contributor.emails.length; e++) {
-                  var emailValue = contributor.emails[e];
-                  var emailHref = 'mailto:' + encodeURIComponent(emailValue);
-                  emailFragments.push('<a href="' + emailHref + '">' + escapeHtml(emailValue) + '</a>');
-                }
-                metaParts.push(emailFragments.join(', '));
-              }
-              if (contributor.homepages.length) {
-                var homepageFragments = [];
-                for (var h = 0; h < contributor.homepages.length; h++) {
-                  var homepageValue = contributor.homepages[h];
-                  homepageFragments.push('<a href="' + escapeHtml(homepageValue) + '" target="_blank" rel="noopener">Website</a>');
-                }
-                metaParts.push(homepageFragments.join(', '));
-              }
+              metaParts = metaParts.concat(buildContactLinks(contributor.emails, contributor.homepages));
               if (metaParts.length) {
                 html.push('<div class="org-contact-meta">' + joinWithSeparator(metaParts, "<span class='org-meta-sep'>&#8226;</span>") + '</div>');
               }
@@ -922,6 +919,115 @@
 
         container.innerHTML = html.join('');
         initializeOrgToggles(container, showLabel, hideLabel);
+      }
+
+      function renderLicenses(container, licenseItems, licenseUriItems, translator) {
+        if (!container) {
+          return;
+        }
+        var texts = collectFrequencyTerms(licenseItems);
+        var uris = collectFrequencyTerms(licenseUriItems);
+        if (!texts.length && !uris.length) {
+          return;
+        }
+
+        var seen = {};
+        var html = ['<h2>' + escapeHtml(translator('license', 'License')) + '</h2>', '<ul class="stats-list license-list">'];
+        for (var i = 0; i < texts.length; i++) {
+          var text = texts[i];
+          seen[text.term.toLowerCase()] = true;
+          var label = isHttpUrl(text.term)
+            ? '<a href="' + escapeHtml(text.term) + '" target="_blank" rel="noopener">' + escapeHtml(text.term) + '</a>'
+            : escapeHtml(text.term);
+          html.push('<li>' + label + ' (' + formatValue(text.count) + ' datasets)</li>');
+        }
+        for (var j = 0; j < uris.length; j++) {
+          var uri = uris[j];
+          if (seen[uri.term.toLowerCase()]) {
+            continue;
+          }
+          var uriLabel = isHttpUrl(uri.term)
+            ? '<a href="' + escapeHtml(uri.term) + '" target="_blank" rel="noopener">' + escapeHtml(uri.term) + '</a>'
+            : escapeHtml(uri.term);
+          html.push('<li>' + uriLabel + ' (' + formatValue(uri.count) + ' datasets)</li>');
+        }
+        html.push('</ul>');
+        container.innerHTML = html.join('');
+      }
+
+      function collectFrequencyTerms(items) {
+        var result = [];
+        if (!Array.isArray(items)) {
+          return result;
+        }
+        for (var i = 0; i < items.length; i++) {
+          var item = items[i] || {};
+          var term = trimToNull(item.term) || trimToNull(item.label);
+          if (term) {
+            result.push({ term: term, count: item.count !== undefined ? item.count : item.freq });
+          }
+        }
+        return result;
+      }
+
+      function isHttpUrl(value) {
+        return /^https?:\/\//i.test(value);
+      }
+
+      // the role can be a single value or, when the responsible party has several roles, a JSON array string
+      function parseRoles(value) {
+        var text = trimToNull(value);
+        if (!text) {
+          return [];
+        }
+        var values = [text];
+        if (text.charAt(0) === '[') {
+          try {
+            var parsed = JSON.parse(text);
+            if (Array.isArray(parsed)) {
+              values = parsed;
+            }
+          } catch (e) {
+            values = text.replace(/^\[|\]$/g, '').split(',');
+          }
+        }
+        var roles = [];
+        for (var i = 0; i < values.length; i++) {
+          var role = trimToNull(String(values[i]).replace(/^"|"$/g, ''));
+          if (role && roles.indexOf(role) === -1) {
+            roles.push(role);
+          }
+        }
+        return roles;
+      }
+
+      function objectValues(obj) {
+        var values = [];
+        for (var key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            values.push(obj[key]);
+          }
+        }
+        return values;
+      }
+
+      function buildContactLinks(emails, homepages) {
+        var parts = [];
+        if (emails && emails.length) {
+          var emailFragments = [];
+          for (var e = 0; e < emails.length; e++) {
+            emailFragments.push('<a href="' + escapeHtml('mailto:' + emails[e]) + '">' + escapeHtml(emails[e]) + '</a>');
+          }
+          parts.push(emailFragments.join(', '));
+        }
+        if (homepages && homepages.length) {
+          var homepageFragments = [];
+          for (var h = 0; h < homepages.length; h++) {
+            homepageFragments.push('<a href="' + escapeHtml(homepages[h]) + '" target="_blank" rel="noopener">Website</a>');
+          }
+          parts.push(homepageFragments.join(', '));
+        }
+        return parts;
       }
 
       function initializeOrgToggles(container, showLabel, hideLabel) {
@@ -980,6 +1086,8 @@
               name: orgName,
               totalCount: 0,
               roles: {},
+              emails: {},
+              homepages: {},
               contributors: {}
             };
           }
@@ -991,9 +1099,25 @@
             entry.totalCount += freqValue;
           }
 
-          var role = trimToNull(props.role);
-          if (role) {
-            entry.roles[role] = true;
+          var roles = parseRoles(props.role);
+          for (var r = 0; r < roles.length; r++) {
+            entry.roles[roles[r]] = true;
+          }
+
+          var email = trimToNull(props.email);
+          var homepage = trimToNull(props.homePageURL || props.homepage);
+          var individualName = trimToNull(props.individualName);
+
+          // ISO 19115 responsible party: without an individual name, the contact info belongs to the organization
+          if (!individualName) {
+            // case insensitive deduplication, keeping the first spelling found
+            if (email && !entry.emails[email.toLowerCase()]) {
+              entry.emails[email.toLowerCase()] = email;
+            }
+            if (homepage && !entry.homepages[homepage.toLowerCase()]) {
+              entry.homepages[homepage.toLowerCase()] = homepage;
+            }
+            continue;
           }
 
           var contributorKey = [
@@ -1016,14 +1140,12 @@
           if (!isNaN(freqValue)) {
             contributor.count += freqValue;
           }
-          if (role) {
-            contributor.roles[role] = true;
+          for (var cr = 0; cr < roles.length; cr++) {
+            contributor.roles[roles[cr]] = true;
           }
-          var email = trimToNull(props.email);
           if (email) {
             contributor.emails[email] = true;
           }
-          var homepage = trimToNull(props.homePageURL || props.homepage);
           if (homepage) {
             contributor.homepages[homepage] = true;
           }
@@ -1098,12 +1220,17 @@
             name: orgEntry.name,
             totalCount: orgEntry.totalCount,
             rolesSummary: rolesSummary,
+            emails: objectValues(orgEntry.emails).sort(compareIgnoreCase),
+            homepages: objectValues(orgEntry.homepages).sort(compareIgnoreCase),
             contributors: contributors,
             showToggle: contributors.length > 0
           });
         }
 
         results.sort(function (a, b) {
+          if (b.totalCount !== a.totalCount) {
+            return b.totalCount - a.totalCount;
+          }
           return compareIgnoreCase(a.name, b.name);
         });
 
@@ -1295,6 +1422,11 @@
           return;
         }
 
+        // bbox crossing the antimeridian: unwrap east so that the extent is not empty
+        if (west > east) {
+          east += 360;
+        }
+
         mapContainer.innerHTML = '';
 
         var layers = [
@@ -1338,8 +1470,12 @@
           controls: []
         });
 
-        var extent = ol.proj.transformExtent([west, south, east, north], 'EPSG:4326', 'EPSG:3857');
-        map.getView().fit(extent, { padding: [20, 20, 20, 20], maxZoom: 12 });
+        try {
+          var extent = ol.proj.transformExtent([west, south, east, north], 'EPSG:4326', 'EPSG:3857');
+          map.getView().fit(extent, { padding: [20, 20, 20, 20], maxZoom: 12 });
+        } catch (error) {
+          console.error('[stats] Unable to fit map to bbox', error);
+        }
       }
 
     })();

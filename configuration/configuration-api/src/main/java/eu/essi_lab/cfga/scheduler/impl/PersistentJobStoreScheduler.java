@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.quartz.JobDataMap;
 import org.quartz.Scheduler;
@@ -75,15 +76,35 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
      */
     public PersistentJobStoreScheduler(Scheduler quartzScheduler, SchedulerSetting setting) {
 
+	this(quartzScheduler, setting, createManager(setting));
+    }
+
+    /**
+     * @param quartzScheduler
+     * @param setting
+     * @param manager
+     */
+    public PersistentJobStoreScheduler(Scheduler quartzScheduler, SchedulerSetting setting, MySQLConnectionManager manager) {
+
 	super(quartzScheduler);
 
 	this.setting = setting;
+	this.manager = manager;
+    }
 
-	this.manager = new MySQLConnectionManager();
-	this.manager.setDbUri(setting.getSQLDatabaseUri());
-	this.manager.setDbName(setting.getSQLDatabaseName());
-	this.manager.setUser(setting.getSQLDatabaseUser());
-	this.manager.setPwd(setting.getSQLDatabasePassword());
+    /**
+     * @param setting
+     * @return
+     */
+    private static MySQLConnectionManager createManager(SchedulerSetting setting) {
+
+	MySQLConnectionManager manager = new MySQLConnectionManager();
+	manager.setDbUri(setting.getSQLDatabaseUri());
+	manager.setDbName(setting.getSQLDatabaseName());
+	manager.setUser(setting.getSQLDatabaseUser());
+	manager.setPwd(setting.getSQLDatabasePassword());
+
+	return manager;
     }
 
     /**
@@ -165,7 +186,7 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
 	    String triggerName = rs.getString("JOB_NAME");
 	    long firedTime = rs.getLong("FIRED_TIME");
 
-	    ResultSet jobDataRs = manager.execQuery("select JOB_DATA,JOB_NAME from GS_QRTZ_TRIGGERS where JOB_NAME='" + triggerName + "'");
+	    ResultSet jobDataRs = manager.execQuery("select JOB_DATA,JOB_NAME from GS_QRTZ_TRIGGERS where JOB_NAME = ?", triggerName);
 
 	    while (jobDataRs.next()) {
 
@@ -184,7 +205,7 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
 		}
 	    }
 
-	    jobDataRs.close();
+	    manager.close(jobDataRs);
 	}
 
 	manager.close(rs);
@@ -195,16 +216,19 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
     @Override
     public void setJobStatus(SchedulerJobStatus status) throws SQLException {
 
-	String updateQuery = "UPDATE GS_QRTZ_JOB_DETAILS SET JOB_STATUS = '" + status.toString() + "' WHERE JOB_NAME = '"
-		+ SchedulerUtils.createJobKeyName(status.getSettingId()) + "'";
-
-	manager.execUpdate(updateQuery);
+	//
+	// the status is bound as a parameter: concatenating it into the SQL string breaks the statement (or lets MySQL
+	// unescape the JSON backslash sequences such as \" and \n), so that corrupted JSON was stored
+	//
+	manager.execUpdate("UPDATE GS_QRTZ_JOB_DETAILS SET JOB_STATUS = ? WHERE JOB_NAME = ?", //
+		status.toString(), //
+		SchedulerUtils.createJobKeyName(status.getSettingId()));
     }
 
     @Override
     public List<SchedulerJobStatus> getJobStatuslist() throws SQLException {
 
-	ResultSet rs = manager.execQuery("select JOB_STATUS from GS_QRTZ_JOB_DETAILS");
+	ResultSet rs = manager.execQuery("select JOB_NAME, JOB_STATUS from GS_QRTZ_JOB_DETAILS");
 
 	ArrayList<SchedulerJobStatus> list = new ArrayList<>();
 
@@ -212,7 +236,19 @@ public class PersistentJobStoreScheduler extends AbstractScheduler {
 
 	    String status = rs.getString("JOB_STATUS");
 	    if (status != null && !status.isEmpty()) {
-		list.add(new SchedulerJobStatus(new JSONObject(status)));
+
+		try {
+
+		    list.add(new SchedulerJobStatus(new JSONObject(status)));
+
+		} catch (JSONException ex) {
+
+		    //
+		    // a single corrupted row must not prevent listing the other job status
+		    //
+		    GSLoggerFactory.getLogger(getClass()).error("Skipping unparsable status of job {}: {}", rs.getString("JOB_NAME"),
+			    ex.getMessage());
+		}
 	    }
 	}
 

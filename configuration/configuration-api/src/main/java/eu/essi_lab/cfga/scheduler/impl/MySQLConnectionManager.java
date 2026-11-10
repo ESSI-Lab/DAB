@@ -24,6 +24,7 @@ package eu.essi_lab.cfga.scheduler.impl;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -199,6 +200,86 @@ public class MySQLConnectionManager {
     }
 
     /**
+     * Executes the given parameterized query (with '?' placeholders) using a {@link PreparedStatement}, so that the
+     * parameter values are bound by the driver and never interpreted as SQL
+     * 
+     * @param query
+     * @param params
+     * @return
+     * @throws SQLException
+     */
+    public ResultSet execQuery(String query, Object... params) throws SQLException {
+
+	GSLoggerFactory.getLogger(getClass()).debug("Prepared query execution STARTED");
+
+	ResultSet resultSet = null;
+	PreparedStatement statement = null;
+
+	try {
+
+	    statement = prepareStatement(getConnection(), query, params);
+
+	    resultSet = statement.executeQuery();
+
+	} catch (CommunicationsException comEx) {
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Communication exception occurred: {}", comEx.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).warn("Creating new connection and try again");
+
+	    connection = createConnection();
+	    statement = prepareStatement(connection, query, params);
+
+	    resultSet = statement.executeQuery();
+	}
+
+	rsSetToStmntMap.put(resultSet, statement);
+
+	GSLoggerFactory.getLogger(getClass()).debug("Prepared query execution ENDED");
+
+	return resultSet;
+    }
+
+    /**
+     * Executes the given parameterized update (with '?' placeholders) using a {@link PreparedStatement}, so that the
+     * parameter values are bound by the driver and never interpreted as SQL
+     * 
+     * @param query
+     * @param params
+     * @throws SQLException
+     */
+    public void execUpdate(String query, Object... params) throws SQLException {
+
+	GSLoggerFactory.getLogger(getClass()).debug("Prepared update execution STARTED");
+
+	PreparedStatement statement = null;
+
+	try {
+
+	    statement = prepareStatement(getConnection(), query, params);
+
+	    statement.executeUpdate();
+
+	} catch (CommunicationsException comEx) {
+
+	    GSLoggerFactory.getLogger(getClass()).warn("Communication exception occurred: {}", comEx.getMessage());
+	    GSLoggerFactory.getLogger(getClass()).warn("Creating new connection and try again");
+
+	    connection = createConnection();
+	    statement = prepareStatement(connection, query, params);
+
+	    statement.executeUpdate();
+
+	} finally {
+
+	    if (statement != null) {
+		statement.close();
+	    }
+	}
+
+	GSLoggerFactory.getLogger(getClass()).debug("Prepared update execution ENDED");
+    }
+
+    /**
      * @param resultSet
      */
     public void close(ResultSet resultSet) {
@@ -352,6 +433,25 @@ public class MySQLConnectionManager {
 	}
 
 	return connection;
+    }
+
+    /**
+     * @param connection
+     * @param query
+     * @param params
+     * @return
+     * @throws SQLException
+     */
+    private static PreparedStatement prepareStatement(Connection connection, String query, Object... params) throws SQLException {
+
+	PreparedStatement statement = connection.prepareStatement(query);
+
+	for (int i = 0; i < params.length; i++) {
+
+	    statement.setObject(i + 1, params[i]);
+	}
+
+	return statement;
     }
 
     /**

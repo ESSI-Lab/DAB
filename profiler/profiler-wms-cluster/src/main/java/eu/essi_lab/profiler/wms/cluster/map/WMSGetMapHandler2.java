@@ -220,6 +220,7 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 	    hexacode = "#2222cc";
 	    break;
 	case "ita-sir-lombardia":
+	case "ita-sir-lombardia-open-data":
 	    hexacode = "#CC00CC";
 	    break;
 	case "ita-sir-piemonte":
@@ -1090,6 +1091,15 @@ public class WMSGetMapHandler2 extends StreamingRequestHandler {
 		    BondOperator.EQUAL, //
 		    MetadataElement.TIME_INTERPOLATION, //
 		    timeInterpolation.get()));
+	}
+
+	Optional<String> country = parser.getOptionalValue("country");
+	if (country.isPresent() && !country.get().equals(KeyValueParser.UNDEFINED)) {
+
+	    andBond.getOperands().add(BondFactory.createSimpleValueBond(//
+		    BondOperator.EQUAL, //
+		    MetadataElement.COUNTRY_ISO3, //
+		    country.get()));
 	}
 
 	Optional<String> aggregationDuration = parser.getOptionalValue("aggregationDuration");

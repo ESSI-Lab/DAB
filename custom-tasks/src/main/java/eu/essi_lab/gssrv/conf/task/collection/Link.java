@@ -23,7 +23,12 @@ package eu.essi_lab.gssrv.conf.task.collection;
 
 import org.json.*;
 
-class Link {
+/**
+ * A link of a WIS2 notification message
+ *
+ * @author boldrini
+ */
+public class Link {
     private String rel = null;
     private String type = null;
     private String href = null;

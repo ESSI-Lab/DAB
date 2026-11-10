@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Series Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1300px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+        #seriesTableContainer {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        td.number {
+            text-align: right;
+        }
+        td.series {
+            overflow-wrap: anywhere;
+        }
+        code {
+            font-size: 12px;
+            color: #555;
+        }
+        .note {
+            color: #777;
+            font-size: 13px;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin: 16px 0;
+        }
+        .controls select, .controls input {
+            padding: 6px;
+            font-size: 14px;
+            max-width: 100%;
+        }
+        .controls input {
+            width: 260px;
+        }
+        button {
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0;
+        }
+        .chip {
+            border: 1px solid #ccc;
+            border-radius: 16px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #fff;
+        }
+        .chip.selected {
+            outline: 2px solid #2c3e50;
+        }
+        .chip .count {
+            font-weight: bold;
+            margin-left: 4px;
+        }
+        .status-ERROR { background-color: #f8c4c4; }
+        .status-OVERDUE { background-color: #f9d3b4; }
+        .status-STALE { background-color: #fff3b0; }
+        .status-NOT_SCHEDULED { background-color: #fde9a9; }
+        .status-MISSING { background-color: #e3d7f4; }
+        .status-INCOMPLETE { background-color: #ece4f8; }
+        .status-NOT_IN_METADATA { background-color: #dcdcdc; }
+        .status-HISTORICAL { background-color: #e1ecf7; }
+        .status-OK { background-color: #c8e6c9; }
+        .age-green { background-color: #c8e6c9; }
+        .age-yellow { background-color: #fff3b0; }
+        .age-red { background-color: #f8c4c4; }
+        .error-text {
+            color: #a00;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+        .pager {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin: 16px 0;
+        }
+        #loadingMessage {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            color: #2c3e50;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 15px;
+            border: 4px solid #ddd;
+            border-top-color: #2c3e50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingMessage">
+    <div class="spinner"></div>
+    <div>Loading series report, please wait...</div>
+</div>
+
+<h1 id="sourceName">Series report</h1>
+<p id="sourceId"></p>
+<p class="note">For each time series of the source, the metadata is compared with the data cache content and with the outcome of the last update. The statuses are computed by the Data harvester task when it aligns the data cache with the metadata (at its start, after each metadata harvesting and at least daily) and are updated each time a series is updated; the overdue and stale statuses are always current. Series are sorted from the most severe status, then from the oldest latest observation.</p>
+<p id="computed"></p>
+
+<div class="chips" id="statusChips"></div>
+
+<div class="controls">
+    <label>Observed property
+        <select id="conceptSelect"></select>
+    </label>
+    <label>Search
+        <input id="textInput" type="search" placeholder="identifier, title, platform, property">
+    </label>
+</div>
+
+<p id="statusDescription" class="note"></p>
+
+<div id="seriesTableContainer">
+    <table id="seriesTable">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Series</th>
+                <th>Observed property</th>
+                <th>Values</th>
+                <th>First observation</th>
+                <th>Latest observation</th>
+                <th>Days since latest observation</th>
+                <th>Next expected</th>
+                <th>Last update</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div class="pager">
+    <button id="prevButton">&larr; Previous</button>
+    <span id="pageInfo"></span>
+    <button id="nextButton">Next &rarr;</button>
+</div>
+
+<script>
+    const PAGE_SIZE = 100;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewId = urlParams.get('viewId') || 'default-view-id';
+    const sourceId = urlParams.get('sourceId') || '';
+
+    const state = {
+        concept: urlParams.get('concept') || '',
+        status: urlParams.get('status') || '',
+        text: urlParams.get('text') || '',
+        // cursors of the previous pages, and of the current one
+        cursors: [],
+        cursor: null,
+        next: null
+    };
+
+    const resetPaging = () => {
+        state.cursors = [];
+        state.cursor = null;
+    };
+
+    let statusDescriptions = {};
+
+    const escapeHtml = value => String(value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const formatDate = value => {
+        if (!value) return '-';
+        const date = new Date(value);
+        return isNaN(date) ? '-' : date.toISOString().replace('T', ' ').substring(0, 16);
+    };
+
+    const daysSince = value => {
+        if (!value) return NaN;
+        const date = new Date(value);
+        return isNaN(date) ? NaN : Math.floor((Date.now() - date.getTime()) / 86400000);
+    };
+
+    const ageClass = days => isNaN(days) ? '' : days <= 14 ? 'age-green' : days <= 30 ? 'age-yellow' : 'age-red';
+
+    const formatNumber = value => typeof value === 'number' ? value.toLocaleString() : '-';
+
+    const statusLabel = status => status.charAt(0) + status.slice(1).toLowerCase().replace(/_/g, ' ');
+
+    document.getElementById('textInput').value = state.text;
+
+    function updateLocation() {
+        const params = new URLSearchParams({ viewId, sourceId });
+        if (state.concept) params.set('concept', state.concept);
+        if (state.status) params.set('status', state.status);
+        if (state.text) params.set('text', state.text);
+        history.replaceState(null, '', '?' + params.toString());
+    }
+
+    function load() {
+        updateLocation();
+        document.getElementById('loadingMessage').style.display = 'flex';
+
+        const params = new URLSearchParams({
+            view: viewId,
+            source: sourceId,
+            limit: PAGE_SIZE
+        });
+        if (state.concept) params.set('concept', state.concept);
+        if (state.status) params.set('seriesStatus', state.status);
+        if (state.text) params.set('text', state.text);
+        if (state.cursor) params.set('cursor', state.cursor);
+
+        fetch(`/gs-service/services/support/source-series-report?${params.toString()}`)
+            .then(res => res.json())
+            .then(response => {
+                document.getElementById('loadingMessage').style.display = 'none';
+                if (response.status !== 'success') {
+                    throw new Error(response.message || 'unexpected response');
+                }
+                render(response);
+            })
+            .catch(error => {
+                document.getElementById('loadingMessage').style.display = 'none';
+                console.error('Error fetching series report:', error);
+                alert('Failed to load the series report.');
+            });
+    }
+
+    function render(response) {
+        document.title = 'Series Report - ' + response.name;
+        document.getElementById('sourceName').textContent = response.name;
+        document.getElementById('sourceId').innerHTML = 'Source identifier: <code>' + escapeHtml(response.id) + '</code>';
+        document.getElementById('computed').innerHTML = response.computed
+            ? `Statuses last computed at <strong>${formatDate(response.computed)}</strong> UTC.`
+            : '<strong>No series status stored for this source.</strong> Statuses are computed by the Data harvester task running on the source, with the reconciliation enabled.';
+
+        // STATUS CHIPS
+        const chips = document.getElementById('statusChips');
+        chips.innerHTML = '';
+        const total = response.statuses.reduce((sum, s) => sum + s.count, 0);
+        const addChip = (id, label, count, cssClass, description) => {
+            const chip = document.createElement('span');
+            chip.className = `chip ${cssClass}` + (state.status === id ? ' selected' : '');
+            chip.title = description || '';
+            chip.innerHTML = `${escapeHtml(label)}<span class="count">${formatNumber(count)}</span>`;
+            chip.onclick = () => {
+                state.status = id;
+                resetPaging();
+                load();
+            };
+            chips.appendChild(chip);
+        };
+        addChip('', 'All', total, '', 'All the series');
+        statusDescriptions = {};
+        response.statuses.forEach(s => {
+            statusDescriptions[s.id] = s.description;
+            addChip(s.id, statusLabel(s.id), s.count, `status-${s.id}`, s.description);
+        });
+        document.getElementById('statusDescription').textContent = state.status
+            ? statusLabel(state.status) + ': ' + (statusDescriptions[state.status] || '') : '';
+
+        // CONCEPTS
+        const select = document.getElementById('conceptSelect');
+        select.innerHTML = '';
+        const allOption = document.createElement('option');
+        allOption.value = '';
+        allOption.textContent = 'All';
+        select.appendChild(allOption);
+        response.concepts.forEach(c => {
+            const option = document.createElement('option');
+            option.value = c.key;
+            option.textContent = `${c.label}${c.uri ? '' : ' (no concept)'} - ${c.count} series` + (c.issues > 0 ? `, ${c.issues} with issues` : '');
+            if (c.uri) option.title = c.uri;
+            select.appendChild(option);
+        });
+        select.value = state.concept;
+        if (select.value !== state.concept) {
+            // unknown concept key
+            select.value = '';
+        }
+
+        // TABLE
+        const body = document.querySelector('#seriesTable tbody');
+        body.innerHTML = '';
+        response.series.forEach(series => {
+            const days = daysSince(series.lastObservation);
+            const lastUpdate = series.lastUpdate
+                ? `${formatDate(series.lastUpdate)}`
+                    + (typeof series.lastUpdateValues === 'number' ? `<br><span class="note">${formatNumber(series.lastUpdateValues)} values</span>` : '')
+                    + (series.lastUpdateError ? `<br><span class="error-text">${escapeHtml(series.lastUpdateError)}</span>` : '')
+                : '-';
+            const name = series.title || series.platform || '';
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="status-${escapeHtml(series.status)}" title="${escapeHtml(statusDescriptions[series.status] || '')}">${escapeHtml(statusLabel(series.status))}</td>
+                <td class="series">${name ? escapeHtml(name) + '<br>' : ''}${series.platform && series.title ? `<span class="note">${escapeHtml(series.platform)}</span><br>` : ''}<code>${escapeHtml(series.id)}</code></td>
+                <td>${series.observedProperty ? escapeHtml(series.observedProperty) : '-'}</td>
+                <td class="number">${formatNumber(series.values)}</td>
+                <td>${formatDate(series.firstObservation)}</td>
+                <td>${formatDate(series.lastObservation)}</td>
+                <td class="number ${ageClass(days)}">${isNaN(days) ? '-' : days}</td>
+                <td>${formatDate(series.nextExpected)}</td>
+                <td>${lastUpdate}</td>
+            `;
+            body.appendChild(tr);
+        });
+        if (response.series.length === 0) {
+            body.innerHTML = '<tr><td colspan="9">No series found.</td></tr>';
+        }
+
+        // PAGER
+        state.next = response.next || null;
+        const offset = state.cursors.length * PAGE_SIZE;
+        const from = response.total === 0 ? 0 : offset + 1;
+        const to = offset + response.series.length;
+        document.getElementById('pageInfo').textContent = `${formatNumber(from)}-${formatNumber(to)} of ${formatNumber(response.total)}`;
+        document.getElementById('prevButton').disabled = state.cursors.length === 0;
+        document.getElementById('nextButton').disabled = !state.next;
+    }
+
+    document.getElementById('conceptSelect').onchange = event => {
+        state.concept = event.target.value;
+        resetPaging();
+        load();
+    };
+
+    let textTimer = null;
+    document.getElementById('textInput').oninput = event => {
+        clearTimeout(textTimer);
+        textTimer = setTimeout(() => {
+            state.text = event.target.value.trim();
+            resetPaging();
+            load();
+        }, 400);
+    };
+
+    document.getElementById('prevButton').onclick = () => {
+        state.cursor = state.cursors.pop() || null;
+        load();
+    };
+    document.getElementById('nextButton').onclick = () => {
+        if (!state.next) return;
+        state.cursors.push(state.cursor);
+        state.cursor = state.next;
+        load();
+    };
+
+    load();
+</script>
+
+</body>
+</html>

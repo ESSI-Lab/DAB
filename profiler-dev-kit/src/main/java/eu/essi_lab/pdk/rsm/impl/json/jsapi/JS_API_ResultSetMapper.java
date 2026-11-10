@@ -854,6 +854,8 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	}
 
 	putMetadataStringArray(report, "doi", MetadataElement.DOI, resource);
+	putCitationDetails(report, resource);
+	putUseLicense(report, resource);
 	putMetadataStringArray(report, "observedPropertyURI", MetadataElement.OBSERVED_PROPERTY_URI, resource);
 	putObservedPropertyTitles(report, message, resource);
 	putMetadataStringArray(report, "timeInterpolation", MetadataElement.TIME_INTERPOLATION, resource);
@@ -1141,6 +1143,51 @@ public class JS_API_ResultSetMapper extends DiscoveryResultSetMapper<String> {
 	}
 
 	report.put(jsonKey, array);
+    }
+
+    private void putCitationDetails(JSONObject report, GSResource resource) {
+
+	try {
+
+	    MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	    if (miMetadata == null) {
+		return;
+	    }
+
+	    TreeSet<String> citations = new TreeSet<>();
+	    Iterator<DataIdentification> identifications = miMetadata.getDataIdentifications();
+	    while (identifications.hasNext()) {
+
+		String details = new Citation(identifications.next().getFirstCitation()).getOtherCitationDetails();
+		normalizeText(details).ifPresent(citations::add);
+	    }
+
+	    putStringSetAsJsonArray(report, "citation_details", citations);
+
+	} catch (RuntimeException ex) {
+	    // nothing to do here
+	}
+    }
+
+    private void putUseLicense(JSONObject report, GSResource resource) {
+
+	TreeSet<String> licenses = new TreeSet<>();
+
+	List<String> licenseTexts = resource.getIndexesMetadata().read(MetadataElement.USE_LEGAL_CONSTRAINTS);
+	if (licenseTexts != null) {
+	    for (String value : licenseTexts) {
+		normalizeText(value).ifPresent(licenses::add);
+	    }
+	}
+
+	List<String> licenseUris = resource.getIndexesMetadata().read(MetadataElement.USE_LEGAL_CONSTRAINTS_URI);
+	if (licenseUris != null) {
+	    for (String value : licenseUris) {
+		normalizeText(value).ifPresent(licenses::add);
+	    }
+	}
+
+	putStringSetAsJsonArray(report, "use_license", licenses);
     }
 
     /**

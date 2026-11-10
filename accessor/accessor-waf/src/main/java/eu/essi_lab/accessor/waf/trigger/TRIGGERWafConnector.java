@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -94,6 +95,9 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
     private static final int STEP = 10;
 
     private List<URL> allFiles;
+    private List<URL> runFiles;
+    private static final Pattern RUN_IN_FILE_NAME = Pattern.compile("_(\\d{10})\\.json$");
+    private static final Pattern CAMS_FILE_NAME = Pattern.compile("^(cams_eu_[a-zA-Z0-9._]+_web)_([A-Za-z]+)_\\d+\\.json$");
     private static final String BUCKET_NAME = "trigger-json-files";
 
     private Downloader downloader;
@@ -231,12 +235,19 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 
 		GSLoggerFactory.getLogger(getClass()).debug("Download URLs from ECMWF WAF ENDED");
 
+		runFiles = null;
 	    }
 
-	    List<URL> filteredURLs = filterURLsByToday(allFiles, 0);
-	    if (filteredURLs == null || filteredURLs.isEmpty() || filteredURLs.size() < 97) {
-		filteredURLs = filterURLsByToday(allFiles, -1);
+	    if (runFiles == null) {
+		runFiles = filterURLsByLatestRun(allFiles);
+	    }
+	    List<URL> filteredURLs = runFiles;
 
+	    if (start > filteredURLs.size()) {
+		// e.g. resumption token saved by a previous harvest on a different file list
+		GSLoggerFactory.getLogger(getClass()).warn("Resumption token {} beyond the {} files of the run, restarting from 0", start,
+			filteredURLs.size());
+		start = 0;
 	    }
 
 	    int end = start + STEP;
@@ -252,60 +263,38 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	    for (URL url : subList) {
 
 		String fileURL = url.toExternalForm();
-		String name = url.getFile();
+		String fileName = getFileName(url);
+		TRIGGERWAFVariable variable = getVariable(fileName);
+		if (variable == null) {
+		    GSLoggerFactory.getLogger(getClass()).debug("Skipping {}: variable not supported", fileName);
+		    continue;
+		}
 
-		String[] parts = name.split("/");
-		String fileName = parts[parts.length - 1];
-		String[] splittedName = fileName.split("_");
-		// check splitted names - for now we take only the simple files
-		String varId = null;
 		String city = null;
-		String date = null;
-		boolean isCams = false;
+		boolean isCams = isCamsFile(fileName);
 		Map<String, String> interpolationMap = new HashMap<String, String>();
 
-		if (splittedName.length == 3) {
-		    isCams = false;
-		    varId = splittedName[0];
-		    if (!varId.contains("uvindex")) {
-			TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
-			for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
-			    String id = interpolation.getId();
-			    String label = interpolation.getLabel();
-			    interpolationMap.put(id, label);
-			}
-		    } else {
-			continue;
+		if (!isCams) {
+		    TRIGGER_INTERPOLATIONS[] interpolations = TRIGGER_INTERPOLATIONS.values();
+		    for (TRIGGER_INTERPOLATIONS interpolation : interpolations) {
+			String id = interpolation.getId();
+			String label = interpolation.getLabel();
+			interpolationMap.put(id, label);
 		    }
 
 		} else {
 		    // other variables: e.g.cams_eu_ragweed_pollen_web
-		    if (!fileName.contains("extended_anomaly")) {
-			String pattern = "^(cams_eu_[a-zA-Z0-9._]+_web)_([A-Za-z]+)_\\d+\\.json$";
-			Pattern regex = Pattern.compile(pattern);
-			Matcher matcher = regex.matcher(fileName);
-
-			if (matcher.find()) {
-			    varId = matcher.group(1);
-			    city = matcher.group(2);
-
-			}
-		    } else {
-			continue;
+		    Matcher matcher = CAMS_FILE_NAME.matcher(fileName);
+		    if (matcher.find()) {
+			city = matcher.group(2);
 		    }
 
-		    isCams = true;
 		    CAMS_TRIGGER_INTERPOLATIONS[] interpolations = CAMS_TRIGGER_INTERPOLATIONS.values();
 		    for (CAMS_TRIGGER_INTERPOLATIONS interpolation : interpolations) {
 			String id = interpolation.getId();
 			String label = interpolation.getLabel();
 			interpolationMap.put(id, label);
 		    }
-		}
-
-		TRIGGERWAFVariable variable = TRIGGERWAFVariable.decode(varId);
-		if (variable == null) {
-		    continue;
 		}
 
 		String json = getDownloader().downloadOptionalString(fileURL, username, password).orElse(null);
@@ -326,8 +315,9 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	    GSLoggerFactory.getLogger(getClass()).debug("Downloading files [{}-{}/{}] ENDED", start, end, allFiles.size());
 
 	    if (response.getResumptionToken() == null) {
+		GSLoggerFactory.getLogger(getClass()).info("Harvest of {} files ENDED", filteredURLs.size());
 		allFiles = null;
-		filteredURLs = null;
+		runFiles = null;
 	    }
 
 	} catch (Exception e) {
@@ -351,24 +341,85 @@ public class TRIGGERWafConnector extends HarvestedQueryConnector<TRIGGERWafConne
 	allFiles.removeIf(url -> url.toString().toLowerCase().contains("tiff"));
     }
 
-    private List<URL> filterURLsByToday(List<URL> urls, int i) {
-	String todayDateString = getTodayDateString(i);
-	return urls.stream().filter(url -> url.toString().contains(todayDateString)).collect(Collectors.toList());
+    /**
+     * Returns the last path segment, or an empty string for URLs without a file (e.g. https://aux.ecmwf.int/#, found in
+     * the listing)
+     */
+    private static String getFileName(URL url) {
+	String path = url.getPath();
+	return path == null ? "" : path.substring(path.lastIndexOf('/') + 1);
     }
 
-    private String getTodayDateString(int i) {
-	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-	Date d;
-	// today date
-	if (i == 0) {
-	    d = new Date();
+    /**
+     * Simple files (e.g. utci_Bologna_2026110200.json) have 3 parts, CAMS files (e.g.
+     * cams_eu_ragweed_pollen_web_Bologna_2026110200.json) more
+     */
+    private static boolean isCamsFile(String fileName) {
+	return fileName.split("_").length != 3;
+    }
+
+    /**
+     * Returns the variable of a JSON file, or null if the file is not harvested (e.g. uvindex, extended_anomaly or
+     * unknown variables)
+     */
+    static TRIGGERWAFVariable getVariable(String fileName) {
+
+	String varId = null;
+	if (!isCamsFile(fileName)) {
+	    varId = fileName.split("_")[0];
 	} else {
-	    // yesterday date
-	    d = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
+	    Matcher matcher = CAMS_FILE_NAME.matcher(fileName);
+	    if (matcher.find()) {
+		varId = matcher.group(1);
+	    }
+	}
+	return varId == null ? null : TRIGGERWAFVariable.decode(varId);
+    }
+
+    /**
+     * Returns the JSON files of the most recent run (e.g. _2026110200.json). The latest run is used only if it is
+     * complete, i.e. it has at least as many files as the previous run; otherwise the previous run is used. Only the
+     * harvested files are counted, since the others are published at different times (e.g. the extended anomaly of a
+     * run arrives the following day).
+     */
+    static List<URL> filterURLsByLatestRun(List<URL> urls) {
+
+	TreeMap<String, List<URL>> byRun = new TreeMap<>();
+	int skipped = 0;
+	for (URL url : urls) {
+	    String fileName = getFileName(url);
+	    Matcher matcher = RUN_IN_FILE_NAME.matcher(fileName);
+	    if (!matcher.find()) {
+		continue;
+	    }
+	    if (getVariable(fileName) == null) {
+		skipped++;
+		continue;
+	    }
+	    byRun.computeIfAbsent(matcher.group(1), k -> new ArrayList<>()).add(url);
 	}
 
-	return sdf.format(d); // Returns today's date in "yyyyMMdd" format
+	GSLoggerFactory.getLogger(TRIGGERWafConnector.class).info("Listed files: {}, JSON files not harvested: {}", urls.size(), skipped);
+	byRun.forEach((run, files) -> GSLoggerFactory.getLogger(TRIGGERWafConnector.class).info("Run {}: {} files", run, files.size()));
 
+	if (byRun.isEmpty()) {
+	    GSLoggerFactory.getLogger(TRIGGERWafConnector.class).warn("No run found in the listed files");
+	    return new ArrayList<>();
+	}
+
+	Entry<String, List<URL>> latest = byRun.lastEntry();
+	Entry<String, List<URL>> previous = byRun.lowerEntry(latest.getKey());
+
+	if (previous == null) {
+	    GSLoggerFactory.getLogger(TRIGGERWafConnector.class).warn("Only run {} available, completeness not checked", latest.getKey());
+	} else if (latest.getValue().size() < previous.getValue().size()) {
+	    GSLoggerFactory.getLogger(TRIGGERWafConnector.class).warn("Run {} incomplete ({} of {} files), using run {}", latest.getKey(),
+		    latest.getValue().size(), previous.getValue().size(), previous.getKey());
+	    return previous.getValue();
+	}
+
+	GSLoggerFactory.getLogger(TRIGGERWafConnector.class).info("Using run {} ({} files)", latest.getKey(), latest.getValue().size());
+	return latest.getValue();
     }
 
     private Dataset mapJSONToISO(JSONObject jsonObject, Entry<String, String> entry, TRIGGERWAFVariable variable, URL fileURL,

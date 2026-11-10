@@ -214,6 +214,8 @@
   "sources_tab": "SORGENTI",
   "measurement_info": "Informazioni sulla osservazione",
   "result_doi": "DOI",
+  "result_citation": "Citazione",
+  "result_license": "Licenza",
   "more_info": "Maggiori informazioni",
   "full_metadata": "File dei metadati",
   "platform_description": "Piattaforma usata per la osservazione",
@@ -319,6 +321,7 @@
   "tf-intendedObservationSpacing": "Risoluzione temporale",
   "tf-timeInterpolation": "Interpolazione temporale",
   "tf-aggregationDuration": "Durata di aggregazione",
+  "tf-country": "Paese",
   "tf-observedPropertyURI": "Proprietà osservata - URI",
 
   "tf-attributeId": "Identificativo parametro",
@@ -372,7 +375,11 @@
   "status_in_progress": "In corso",
   "status_pending": "In attesa",
   "status_processing": "Elaborazione",
-  "status_started": "Avviato"
+  "status_started": "Avviato",
+  "password_gate_title": "Portale protetto",
+  "password_gate_placeholder": "Password",
+  "password_gate_enter": "Entra",
+  "password_gate_wrong": "Password errata"
 }
 
 

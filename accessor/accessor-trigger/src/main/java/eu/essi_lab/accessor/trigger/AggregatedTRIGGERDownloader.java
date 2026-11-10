@@ -388,7 +388,9 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 	    AggregatedTRIGGERConnector.TRIGGER_TOKEN = AggregatedTRIGGERConnector.getBearerToken();
 	}
 
+
 	String body;
+
 
 	try {
 	    HttpResponse<InputStream> triggerResponse = new Downloader().downloadResponse(//
@@ -397,6 +399,7 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 
 	    int statusCode = triggerResponse.statusCode();
 	    body = readBody(triggerResponse);
+
 
 	    if (statusCode >= 500) {
 		// a server-side failure: retrying with a fresh token won't help, so don't bother
@@ -421,6 +424,7 @@ public class AggregatedTRIGGERDownloader extends DataDownloader {
 
 		body = readBody(triggerResponse);
 	    }
+
 
 	    GSLoggerFactory.getLogger(AggregatedTRIGGERConnector.class).info("Got " + linkage);
 

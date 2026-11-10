@@ -2386,6 +2386,14 @@ function initializeLogin(config) {
 			});
 		}
 
+		// Data report button click handler (admin only)
+		if (isAdmin) {
+			document.getElementById('dataReportBtn').addEventListener('click', function() {
+				userMenu.style.display = 'none';
+				window.open('../stats/data-report.html?viewId=' + encodeURIComponent(view), '_blank', 'noopener,noreferrer');
+			});
+		}
+
 		// Logout menu button click handler
 		document.getElementById('logoutMenuBtn').addEventListener('click', function() {
 			localStorage.removeItem('authToken');
@@ -2400,6 +2408,49 @@ function initializeLogin(config) {
 			window.location.reload();
 		});
 	}
+}
+
+function portalUnlockKey(config) {
+	return 'portalUnlocked_' + (config.view || window.location.pathname);
+}
+
+function isPortalUnlocked(config) {
+	try {
+		return sessionStorage.getItem(portalUnlockKey(config)) === config.password;
+	} catch (e) {
+		return false;
+	}
+}
+
+function showPasswordGate(config, onUnlock) {
+	var overlay = document.createElement('div');
+	overlay.id = 'password-gate';
+	overlay.innerHTML = `
+		<form id="password-gate-form" autocomplete="off">
+			<div id="password-gate-title"></div>
+			<input type="password" id="password-gate-input" placeholder="${t('password_gate_placeholder')}">
+			<div id="password-gate-error">${t('password_gate_wrong')}</div>
+			<button type="submit">${t('password_gate_enter')}</button>
+		</form>`;
+	overlay.querySelector('#password-gate-title').textContent = config.title || t('password_gate_title');
+	document.body.appendChild(overlay);
+
+	var input = overlay.querySelector('#password-gate-input');
+	var error = overlay.querySelector('#password-gate-error');
+	input.focus();
+
+	overlay.querySelector('#password-gate-form').addEventListener('submit', function(e) {
+		e.preventDefault();
+		if (input.value === config.password) {
+			try { sessionStorage.setItem(portalUnlockKey(config), config.password); } catch (ex) { }
+			overlay.remove();
+			onUnlock();
+		} else {
+			error.style.display = 'block';
+			input.value = '';
+			input.focus();
+		}
+	});
 }
 
 export function initializePortal(config) {
@@ -2422,6 +2473,12 @@ export function initializePortal(config) {
 
 	// Initialize i18n (defaults to 'en', overridden by localStorage or config.language)
 	try { loadI18nSync(); } catch (e) { }
+
+	// Optional password gate: when config.password is set, the portal is initialized only after the password is entered
+	if (config.password && !isPortalUnlocked(config)) {
+		showPasswordGate(config, function() { initializePortal(config); });
+		return;
+	}
 
 	// Configure jQuery UI datepicker locale based on current language
 	if (window.jQuery && window.jQuery.datepicker && typeof window.jQuery.datepicker.setDefaults === 'function') {

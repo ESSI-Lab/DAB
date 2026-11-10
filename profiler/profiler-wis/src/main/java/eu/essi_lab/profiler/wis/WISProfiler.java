@@ -49,6 +49,8 @@ import eu.essi_lab.profiler.wis.metadata.collection.WISDiscoveryMetadataFilter;
 import eu.essi_lab.profiler.wis.metadata.collection.WISDiscoveryMetadataHandler;
 import eu.essi_lab.profiler.wis.metadata.dataset.WISDatasetDiscoveryMetadataFilter;
 import eu.essi_lab.profiler.wis.metadata.dataset.WISDatasetDiscoveryMetadataHandler;
+import eu.essi_lab.profiler.wis.observations.WISObservationItemFilter;
+import eu.essi_lab.profiler.wis.observations.WISObservationItemHandler;
 import eu.essi_lab.profiler.wis.observations.WISObservationsFilter;
 import eu.essi_lab.profiler.wis.observations.WISObservationsHandler;
 import eu.essi_lab.profiler.wis.station.info.WISStationInfoFilter;
@@ -100,6 +102,10 @@ public class WISProfiler extends Profiler<WISProfilerSetting> {
 	selector.register(new WISStationInfoFilter(), stationInfoHandler);
 
 	// Observations
+	// single cached values, before the observations collection
+	WISObservationItemHandler observationItemHandler = new WISObservationItemHandler();
+	selector.register(new WISObservationItemFilter(), observationItemHandler);
+
 	WISObservationsHandler observationsHandler = new WISObservationsHandler();
 	selector.register(new WISObservationsFilter(), observationsHandler);
 

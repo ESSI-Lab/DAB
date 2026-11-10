@@ -93,7 +93,7 @@ public class SchedulerWorkerSetting extends Setting {
 	}
     }
 
-    private static final String SCHEDULING_SETTING_ID = "scheduling";
+    public static final String SCHEDULING_SETTING_ID = "scheduling";
     private Date nextFireTime;
     private Date firedTime;
 

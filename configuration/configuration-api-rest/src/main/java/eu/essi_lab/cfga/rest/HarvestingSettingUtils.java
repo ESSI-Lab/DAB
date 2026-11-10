@@ -112,7 +112,7 @@ public class HarvestingSettingUtils {
      * @param scheduling
      * @return
      */
-    public static void udpate(HarvestSchedulingRequest request, Scheduling scheduling) {
+    public static void udpate(ConfigRequest request, Scheduling scheduling) {
 
 	Optional<String> startTime = request.readString(HarvestSchedulingRequest.START_TIME);
 

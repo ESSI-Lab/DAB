@@ -28,9 +28,41 @@
         th {
             background-color: #f4f4f4;
         }
+        .age-green { background-color: #c8e6c9; }
+        .age-yellow { background-color: #fff3b0; }
+        .age-red { background-color: #f8c4c4; }
+        #loadingMessage {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 18px;
+            color: #2c3e50;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 15px;
+            border: 4px solid #ddd;
+            border-top-color: #2c3e50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+
+<div id="loadingMessage">
+    <div class="spinner"></div>
+    <div>Loading data report, please wait...</div>
+</div>
 
 <h2>Metadata composition</h2>
 <p>This chart illustrates the distribution of datasets among different sources.</p>
@@ -40,13 +72,15 @@
 </div>
 
 <h2>Last Metadata Harvesting</h2>
-<p>The table below shows the date of the last harvesting per source, as recorded in the metadata database.</p>
+<p>The table below shows the date of the last successful harvesting per source, as recorded in the harvesting statistics, and the number of datasets of the source in the metadata database.</p>
 <div id="harvestingTableContainer">
     <table id="harvestingTable">
         <thead>
             <tr>
                 <th>Source</th>
                 <th>Last Harvesting Date</th>
+                <th>Days Since Last Harvesting</th>
+                <th>Datasets</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -54,7 +88,7 @@
 </div>
 
 <h2>Data cache composition</h2>
-<p>This chart illustrates the distribution of values in the cache among different sources.</p>
+<p>This chart illustrates the distribution of values in the cache among different sources. Click on a source, in the charts or in the tables, to see its details.</p>
 <p id="overallData"></p>
 
 <div id="cachePieContainer">
@@ -95,6 +129,7 @@
     fetch(`/gs-service/services/support/data-stats?view=${encodeURIComponent(viewId)}`)
         .then(res => res.json())
         .then(response => {
+            document.getElementById('loadingMessage').style.display = 'none';
             const sources = response.sources.sort((a, b) => a.name.localeCompare(b.name));
 
             const labels = sources.map(s => s.name);
@@ -119,6 +154,20 @@
 
             const pieColors = labels.map((_, i) => `hsl(${i * 360 / labels.length}, 70%, 60%)`);
 
+            // opens the detail page of the source at the given index
+            const sourceUrl = index => `source-report.html?viewId=${encodeURIComponent(viewId)}&sourceId=${encodeURIComponent(sources[index].id)}`;
+            const sourceLink = (source, index) => `<a href="${sourceUrl(index)}" target="_blank" rel="noopener">${source.name}</a>`;
+            const clickOptions = {
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        window.open(sourceUrl(elements[0].index), '_blank', 'noopener');
+                    }
+                },
+                onHover: (event, elements) => {
+                    event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+                }
+            };
+
             const canvas = document.getElementById('cacheChart');
             const rowHeight = 40;
             const padding = 50;
@@ -140,6 +189,7 @@
                     }]
                 },
                 options: {
+                    ...clickOptions,
                     indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
@@ -183,6 +233,7 @@
                     }]
                 },
                 options: {
+                    ...clickOptions,
                     responsive: true,
                     plugins: {
                         legend: {
@@ -212,6 +263,7 @@
                     }]
                 },
                 options: {
+                    ...clickOptions,
                     responsive: true,
                     plugins: {
                         legend: {
@@ -228,14 +280,14 @@
 
             // TABLE: Insertion Times
             const tableBody = document.querySelector('#timestampTable tbody');
-            sources.forEach(source => {
+            sources.forEach((source, index) => {
                 const tr = document.createElement('tr');
                 const oldest = new Date(source.oldestInsert);
                 const newest = new Date(source.newestInsert);
                 const avgAge = Math.round(source.avgAgeHours);
 
                 tr.innerHTML = `
-                    <td>${source.name}</td>
+                    <td>${sourceLink(source, index)}</td>
                     <td>${isNaN(oldest) ? '-' : oldest.toISOString().split('T')[0]}</td>
                     <td>${isNaN(newest) ? '-' : newest.toISOString().split('T')[0]}</td>
                     <td>${isNaN(avgAge) ? '-' : avgAge}</td>
@@ -245,18 +297,23 @@
 
             // TABLE: Last Harvesting
             const harvestingBody = document.querySelector('#harvestingTable tbody');
-            sources.forEach(source => {
+            sources.forEach((source, index) => {
                 const tr = document.createElement('tr');
                 const lastHarvest = new Date(source.lastHarvesting);
+                const days = isNaN(lastHarvest) ? NaN : Math.floor((Date.now() - lastHarvest.getTime()) / 86400000);
+                const ageClass = isNaN(days) ? '' : days <= 14 ? 'age-green' : days <= 30 ? 'age-yellow' : 'age-red';
 
                 tr.innerHTML = `
-                    <td>${source.name}</td>
+                    <td>${sourceLink(source, index)}</td>
                     <td>${isNaN(lastHarvest) ? '-' : lastHarvest.toISOString().split('T')[0]}</td>
+                    <td class="${ageClass}">${isNaN(days) ? '-' : days}</td>
+                    <td style="text-align: right">${typeof source.datasetsInDatabase === 'number' ? source.datasetsInDatabase.toLocaleString() : '-'}</td>
                 `;
                 harvestingBody.appendChild(tr);
             });
         })
         .catch(error => {
+            document.getElementById('loadingMessage').style.display = 'none';
             console.error("Error fetching cache status:", error);
             alert("Failed to load cache data.");
         });

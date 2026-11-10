@@ -24,6 +24,7 @@ package eu.essi_lab.profiler.wis;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import jakarta.ws.rs.core.UriInfo;
@@ -42,9 +44,23 @@ import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import eu.essi_lab.access.datacache.DataCacheConnector;
+import eu.essi_lab.access.datacache.DataCacheConnectorFactory;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.cfga.gs.setting.dc_connector.DataCacheConnectorSetting;
+import eu.essi_lab.profiler.wis.WISRequest.CollectionItems;
+import eu.essi_lab.cfga.gs.setting.SystemSetting.KeyValueOptionKeys;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.DataNotificationsMode;
+import eu.essi_lab.cfga.gs.setting.WIS2Setting.RecordGranularity;
+import eu.essi_lab.lib.whos.WIS2DataEncoding;
+import eu.essi_lab.lib.whos.WIS2DataPolicy;
+import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.ISOMetadata;
+import eu.essi_lab.iso.datamodel.classes.Identification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -55,8 +71,10 @@ import eu.essi_lab.messages.RequestMessage.IterationMode;
 import eu.essi_lab.messages.ResourceSelector.IndexesPolicy;
 import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
+import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.resource.GSResource;
@@ -250,6 +268,39 @@ public class WISUtils {
 
     }
 
+    /**
+     * WCMP2 allows a single resolution in each temporal extent: the finest resolution is added as
+     * <code>time.resolution</code> and the second finest as <code>additionalExtents.temporal.resolution</code>, with
+     * the same interval as <code>time</code>. Further resolutions are not encoded
+     * 
+     * @param feature a feature with a time interval (see {@link #addTimeInterval(JSONObject, String, String)})
+     * @param resolutions ISO 8601 durations, from the finest
+     */
+    public static void addTimeResolutions(JSONObject feature, List<String> resolutions) {
+
+	JSONObject time = feature.optJSONObject("time");
+	if (time == null || resolutions.isEmpty()) {
+	    return;
+	}
+
+	time.put("resolution", resolutions.get(0));
+
+	if (resolutions.size() > 1) {
+
+	    JSONArray interval = new JSONArray();
+	    interval.put(new JSONArray(time.getJSONArray("interval").toList()));
+
+	    JSONObject temporal = new JSONObject();
+	    temporal.put("interval", interval);
+	    temporal.put("resolution", resolutions.get(1));
+	    temporal.put("trs", "https://www.opengis.net/def/uom/ISO-8601/0/Gregorian");
+
+	    JSONObject additionalExtents = new JSONObject();
+	    additionalExtents.put("temporal", temporal);
+	    feature.put("additionalExtents", additionalExtents);
+	}
+    }
+
     public static void addKeywords(JSONObject feature, String... keywords) {
 	JSONArray kArray;
 	if (feature.has("keywords")) {
@@ -264,22 +315,23 @@ public class WISUtils {
     }
 
     /**
-     * From the metadata identifier (e.g. urn:wmo:md:sourceId:parameterConceptId),
-     * it extracts the sourceId and the parameter URI according to WHOS Hydro
-     * Ontology
+     * From the metadata identifier (e.g. urn:wmo:md:centreId:sourceId:parameterConceptId, see
+     * {@link #getMetadataIdentifier(String, String, String)}), it extracts the sourceId and the parameter concept id
+     * according to WHOS Hydro Ontology (null if the identifier has no parameter)
      * 
      * @param identifier
      * @return
      */
     public static SimpleEntry<String, String> extractSourceAndParameter(String identifier) {
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
-	identifier = identifier.substring(identifier.indexOf(":") + 1);
+	// skips urn:wmo:md:centreId:
+	for (int i = 0; i < 4; i++) {
+	    identifier = identifier.substring(identifier.indexOf(":") + 1);
+	}
 	String sourceId = identifier;
 	String parameter = null;
 	if (sourceId.contains(":")) {
-	    sourceId = sourceId.substring(0, sourceId.indexOf(":"));
 	    parameter = sourceId.substring(sourceId.indexOf(":") + 1);
+	    sourceId = sourceId.substring(0, sourceId.indexOf(":"));
 	}
 	SimpleEntry<String, String> ret = new SimpleEntry<>(sourceId, parameter);
 	return ret;
@@ -307,6 +359,264 @@ public class WISUtils {
 	return features;
     }
 
+    public static final String DEFAULT_PUBLISHER = "CNR-ITIAm";
+    public static final String DEFAULT_HOSTNAME = "https://production.whos-dab.eu";
+    public static final String DEFAULT_CENTRE_ID = "it-cnr-itiam-whos-dab";
+    public static final String DEFAULT_GENERATED_BY = "WHOS DAB";
+    public static final String DEFAULT_TOKEN_REQUEST_CONTACT = "whos@wmo.int";
+
+    /**
+     * @return the organization added as publisher to the WIS2 metadata records
+     */
+    public static String getPublisher() {
+
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getPublisher(), KeyValueOptionKeys.WIS_PUBLISHER, DEFAULT_PUBLISHER);
+    }
+
+    /**
+     * @return the base URL of the links in the WIS2 notification messages
+     */
+    public static String getHostname() {
+
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getHostname(), KeyValueOptionKeys.WIS_HOSTNAME, DEFAULT_HOSTNAME);
+    }
+
+    /**
+     * @return the WIS2 centre id, used in topics and metadata identifiers
+     */
+    public static String getCentreId() {
+
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getCentreId(), KeyValueOptionKeys.WIS_CENTRE_ID, DEFAULT_CENTRE_ID);
+    }
+
+    /**
+     * @return the generated_by value of the WIS2 notification messages
+     */
+    public static String getGeneratedBy() {
+
+	return getWISOption(ConfigurationWrapper.getWIS2Setting().getGeneratedBy(), KeyValueOptionKeys.WIS_GENERATED_BY, DEFAULT_GENERATED_BY);
+    }
+
+    /**
+     * @return the data cache connector, initialized from the configuration if not yet available
+     * @throws Exception
+     */
+    public static DataCacheConnector getDataCacheConnector() throws Exception {
+
+	DataCacheConnector dataCacheConnector = DataCacheConnectorFactory.getDataCacheConnector();
+
+	if (dataCacheConnector == null) {
+	    DataCacheConnectorSetting setting = ConfigurationWrapper.getDataCacheConnectorSetting();
+	    dataCacheConnector = DataCacheConnectorFactory.newDataCacheConnector(setting);
+	    String cachedDays = setting.getOptionValue(DataCacheConnector.CACHED_DAYS).get();
+	    String flushInterval = setting.getOptionValue(DataCacheConnector.FLUSH_INTERVAL_MS).get();
+	    String maxBulkSize = setting.getOptionValue(DataCacheConnector.MAX_BULK_SIZE).get();
+	    dataCacheConnector.configure(DataCacheConnector.MAX_BULK_SIZE, maxBulkSize);
+	    dataCacheConnector.configure(DataCacheConnector.FLUSH_INTERVAL_MS, flushInterval);
+	    dataCacheConnector.configure(DataCacheConnector.CACHED_DAYS, cachedDays);
+	    DataCacheConnectorFactory.setDataCacheConnector(dataCacheConnector);
+	}
+
+	return dataCacheConnector;
+    }
+
+    /**
+     * @return what each published WCMP2 record describes
+     */
+    public static RecordGranularity getRecordGranularity() {
+
+	return ConfigurationWrapper.getWIS2Setting().getRecordGranularity();
+    }
+
+    /**
+     * @param sourceId
+     * @param observedPropertyURI the harmonized observed property of the described data, possibly null
+     * @return the identifier of the WCMP2 record describing the data of the given source and observed property,
+     *         according to the configured {@link RecordGranularity}
+     */
+    public static String getMetadataIdentifier(String sourceId, String observedPropertyURI) {
+
+	String propertyURI = getRecordGranularity() == RecordGranularity.OBSERVED_PROPERTY ? observedPropertyURI : null;
+
+	return getMetadataIdentifier(getCentreId(), sourceId, propertyURI);
+    }
+
+    /**
+     * @param centreId
+     * @param sourceId
+     * @param observedPropertyURI if not null, the identifier is the one of the record of this observed property of the
+     *        source
+     * @return <code>urn:wmo:md:{centre-id}:{source-id}</code> or, with an observed property,
+     *         <code>urn:wmo:md:{centre-id}:{source-id}:{property-id}</code>, where the property id is the last segment
+     *         of the property URI (e.g. 11 for http://hydro.geodab.eu/hydro-ontology/concept/11)
+     */
+    public static String getMetadataIdentifier(String centreId, String sourceId, String observedPropertyURI) {
+
+	String id = "urn:wmo:md:" + centreId + ":" + sourceId;
+
+	if (observedPropertyURI == null || observedPropertyURI.isBlank()) {
+
+	    return id;
+	}
+
+	String uri = observedPropertyURI.trim().replaceAll("/+$", "");
+	String propertyId = uri.substring(uri.lastIndexOf('/') + 1).replaceAll("[^A-Za-z0-9._-]", "_");
+
+	return id + ":" + propertyId;
+    }
+
+    /**
+     * @param viewId
+     * @param itemId
+     * @param encoding
+     * @return the URL of the cached data item with the given identifier, in the given encoding
+     */
+    public static String getDataItemUrl(String viewId, String itemId, WIS2DataEncoding encoding) {
+
+	return getServiceUrl(viewId) + "/collections/" + CollectionItems.OBSERVATIONS.getName() + "/items/" + itemId + "?f="
+		+ encoding.getId();
+    }
+
+    /**
+     * @return the identifier of the view through which the WIS2 records and data are served, if configured
+     */
+    public static Optional<String> getViewId() {
+
+	return ConfigurationWrapper.getWIS2Setting().getViewId();
+    }
+
+    /**
+     * @return the e-mail address of the publisher of the WIS2 metadata records
+     */
+    public static Optional<String> getPublisherEmail() {
+
+	return ConfigurationWrapper.getWIS2Setting().getPublisherEmail();
+    }
+
+    /**
+     * @param organization
+     * @param email possibly null
+     * @param role
+     * @return a WCMP2 contact
+     */
+    public static JSONObject getContact(String organization, String email, String role) {
+
+	JSONObject contact = new JSONObject();
+	contact.put("organization", organization);
+	if (email != null && !email.isBlank()) {
+	    JSONObject emailObject = new JSONObject();
+	    emailObject.put("value", email.trim());
+	    JSONArray emails = new JSONArray();
+	    emails.put(emailObject);
+	    contact.put("emails", emails);
+	}
+	JSONArray roles = new JSONArray();
+	roles.put(role);
+	contact.put("roles", roles);
+	return contact;
+    }
+
+    /**
+     * @return the contact to request the token needed by the authenticated APIs
+     */
+    public static String getTokenRequestContact() {
+
+	return ConfigurationWrapper.getWIS2Setting().getTokenRequestContact().orElse(DEFAULT_TOKEN_REQUEST_CONTACT);
+    }
+
+    /**
+     * @return
+     */
+    public static DataNotificationsMode getDataNotificationsMode() {
+
+	return ConfigurationWrapper.getWIS2Setting().getDataNotificationsMode();
+    }
+
+    /**
+     * @param sourceId
+     * @return the WMO data policy of the data of the given source, as declared by its WCMP2 record: the core sources
+     *         are declared as such only when the data notifications are advertised (see
+     *         {@link DataNotificationsMode#isAdvertised()})
+     */
+    public static WIS2DataPolicy getDataPolicy(String sourceId) {
+
+	WIS2Setting setting = ConfigurationWrapper.getWIS2Setting();
+
+	return setting.isCoreSource(sourceId) && setting.getDataNotificationsMode().isAdvertised() ? WIS2DataPolicy.CORE
+		: WIS2DataPolicy.RECOMMENDED;
+    }
+
+    /**
+     * @param sourceId
+     * @return true if the data of the given source are notified and served without authentication: the source is a core
+     *         source and the data notifications are not disabled
+     */
+    public static boolean isCoreDataPublished(String sourceId) {
+
+	WIS2Setting setting = ConfigurationWrapper.getWIS2Setting();
+
+	return setting.isCoreSource(sourceId) && setting.getDataNotificationsMode() != DataNotificationsMode.DISABLED;
+    }
+
+    /**
+     * @param topic
+     * @return the topic advertised in the WCMP2 records of the core sources for the given topic, according to the data
+     *         notifications mode: the experimental or the official topic, or none if the data notifications are not
+     *         advertised
+     */
+    public static Optional<String> getAdvertisedTopic(WIS2HydrologyTopic topic) {
+
+	return switch (getDataNotificationsMode()) {
+	case EXPERIMENTAL -> Optional.of(topic.getExperimentalTopic(getCentreId(), WIS2DataPolicy.CORE));
+	case OPERATIONAL -> Optional.of(topic.getTopic(getCentreId(), WIS2DataPolicy.CORE));
+	default -> Optional.empty();
+	};
+    }
+
+    /**
+     * @param topic
+     * @return the topic where the data notifications of the given topic are published, according to the data
+     *         notifications mode: the advertised topic, or the official topic under the private topic prefix, or none
+     *         if the data notifications are disabled
+     */
+    public static Optional<String> getPublicationTopic(WIS2HydrologyTopic topic) {
+
+	return switch (getDataNotificationsMode()) {
+	case DISABLED -> Optional.empty();
+	case DRY_RUN, PRIVATE -> Optional.of(WIS2HydrologyTopic.withPrefix(topic.getTopic(getCentreId(), WIS2DataPolicy.CORE),
+		ConfigurationWrapper.getWIS2Setting().getPrivateTopicPrefix()));
+	default -> getAdvertisedTopic(topic);
+	};
+    }
+
+    /**
+     * @return the URL of the WIS2 MQTT broker where the data notifications can be subscribed (without credentials), if
+     *         configured
+     */
+    public static Optional<String> getBrokerUrl() {
+
+	return ConfigurationWrapper.getSystemSettings().getWis2MqttBroker().map(broker -> {
+
+	    int port = broker.getPort().get();
+	    String scheme = port == 1883 ? "mqtt" : "mqtts";
+
+	    return scheme + "://" + broker.getHost().get() + ":" + port;
+	});
+    }
+
+    /**
+     * @return the given WIS2 setting option, or the value of the given legacy system settings key-value option, or
+     *         <code>defaultValue</code> if both are missing
+     */
+    private static String getWISOption(Optional<String> option, KeyValueOptionKeys legacyKey, String defaultValue) {
+
+	return option.orElseGet(() -> ConfigurationWrapper.getSystemSettings().getKeyValueOptions().//
+		map(p -> p.getProperty(legacyKey.getLabel())).//
+		filter(value -> !value.isBlank()).//
+		map(String::trim).//
+		orElse(defaultValue));
+    }
+
     public static JSONObject mapFeature(GSResource resource) throws GSException {
 
 	JSONObject feature = new JSONObject();
@@ -330,6 +640,7 @@ public class WISUtils {
 	TemporalExtent temporalExtent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
 	if (temporalExtent != null) {
 	    WISUtils.addTimeInterval(feature, temporalExtent.getBeginPosition(), temporalExtent.getEndPosition());
+	    WISUtils.addTimeResolutions(feature, resource.getExtensionHandler().getWISTimeResolutions());
 	}
 
 	Iterator<Keywords> keywords = resource.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getKeywords();
@@ -396,20 +707,14 @@ public class WISUtils {
 	JSONArray contacts = new JSONArray();
 	properties.put("contacts", contacts);
 	for (ResponsibleParty party : parties) {
-	    JSONObject contact = new JSONObject();
-	    contact.put("organization", party.getOrganisationName());
-	    JSONArray roles = new JSONArray();
-	    roles.put("host");
-	    contact.put("roles", roles);
-	    contacts.put(contact);
+	    String email = null;
+	    if (party.getContact() != null && party.getContact().getAddress() != null) {
+		email = party.getContact().getAddress().getElectronicMailAddress();
+	    }
+	    contacts.put(getContact(party.getOrganisationName(), email, "host"));
 	}
-	JSONObject cnr = new JSONObject();
-	cnr.put("organization", "CNR-IIA");
-	JSONArray cnrRoles = new JSONArray();
-	cnrRoles.put("publisher");
-	cnr.put("roles", cnrRoles);
-	contacts.put(cnr);
-	properties.put("wmo:dataPolicy", "recommended");
+	contacts.put(getContact(getPublisher(), getPublisherEmail().orElse(null), "publisher"));
+	properties.put("wmo:dataPolicy", getDataPolicy(resource.getSource().getUniqueIdentifier()).getId());
 	if (resource.getSource().getUniqueIdentifier().equals("argentina-ina")) {
 	    String url = "https://creativecommons.org/licenses/by/4.0/";
 	    WISUtils.addLink(feature, "text/html", "license", "CC BY 4.0", url);
@@ -417,6 +722,7 @@ public class WISUtils {
 	    WISUtils.addLink(feature, "application/xml", "service", "INA SIyAH - Servicio web de datos WaterML",
 		    "https://alerta.ina.gob.ar/wml/");
 	}
+	addLicenseLinks(feature, resource);
 	// properties.put("rights", "WHOS Terms of Use");
 	properties.put("title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
 	properties.put("type", "dataset");
@@ -427,6 +733,19 @@ public class WISUtils {
     }
 
     public static ResultSet<GSResource> getMetadataItems(String metadataIdentifier, Optional<String> optionalView) throws GSException {
+
+	return getMetadataItems(metadataIdentifier, optionalView, Optional.empty());
+    }
+
+    /**
+     * @param metadataIdentifier
+     * @param optionalView
+     * @param optionalSourceId if present, only the items of this source are returned
+     * @return
+     * @throws GSException
+     */
+    public static ResultSet<GSResource> getMetadataItems(String metadataIdentifier, Optional<String> optionalView,
+	    Optional<String> optionalSourceId) throws GSException {
 	ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
 	DiscoveryExecutor executor = loader.iterator().next();
 
@@ -448,33 +767,235 @@ public class WISUtils {
 	    viewId = optionalView.get();
 	    WebRequestTransformer.setView(viewId, uri, discoveryMessage);
 	}
+	Bond userBond;
 	if (metadataIdentifier != null) {
-	    discoveryMessage.setUserBond(BondFactory.createOriginalIdentifierBond(metadataIdentifier));
+	    userBond = BondFactory.createOriginalIdentifierBond(metadataIdentifier);
 	} else {
-	    discoveryMessage.setUserBond(BondFactory.createExistsSimpleValueBond(MetadataElement.WIS_TOPIC_HIERARCHY));
+	    userBond = BondFactory.createExistsSimpleValueBond(MetadataElement.WIS_TOPIC_HIERARCHY);
 	}
+	if (optionalSourceId.isPresent()) {
+	    userBond = BondFactory.createAndBond(userBond, BondFactory.createSourceIdentifierBond(optionalSourceId.get()));
+	}
+	discoveryMessage.setUserBond(userBond);
 
 	ResultSet<GSResource> resultSet = executor.retrieve(discoveryMessage);
 	return resultSet;
     }
 
+    /**
+     * Adds the canonical link to features mapped without a view (see {@link #mapFeature(GSResource, String)} for the
+     * view case)
+     * 
+     * @param features
+     * @param webRequest
+     */
     public static void enrichFeaturesWithLinks(JSONArray features, WebRequest webRequest) {
+
+	String url = getUrl(webRequest);
+
 	for (int i = 0; i < features.length(); i++) {
 	    JSONObject feature = features.getJSONObject(i);
 	    String id = feature.getString("id");
+	    WISUtils.addLink(feature, "application/json", "canonical", id, getRecordUrl(url, id));
+	}
+    }
 
-	    // the base URL, e.g.:
-	    // http://localhost:9090/gs-service/services/essi/view/whos/oapi
-	    SimpleEntry<String, String> sourceParameter = WISUtils.extractSourceAndParameter(id);
-	    String sourceId = sourceParameter.getKey();
-	    String parameterURI = sourceParameter.getValue();
+    /**
+     * Maps the given resource to a WCMP2 record of the given view, with the canonical and the data access links.<br>
+     * Links are based on the configured WIS hostname rather than on the request URL, so that the served records are
+     * byte-identical to the ones hashed in the WIS2 notification messages
+     * 
+     * @param resource
+     * @param viewId
+     * @return
+     * @throws GSException
+     */
+    public static JSONObject mapFeature(GSResource resource, String viewId) throws GSException {
 
-	    String view = WISUtils.getWHOSView(sourceId, parameterURI);
-	    String url = WISUtils.getUrl(webRequest);
-	    // url = url.replace("/view/whos/", "/view/" + view + "/");
-	    WISUtils.addLink(feature, "application/json", "canonical", id, url + "/collections/discovery-metadata/items/" + id);
-	    // WISUtils.addLink(links, "application/json", "collection", id, url + "/collections/" + id);
+	JSONObject feature = mapFeature(resource);
+
+	String id = feature.getString("id");
+	WISUtils.addLink(feature, "application/json", "canonical", id, getRecordUrl(getServiceUrl(viewId), id));
+
+	addDataAccessLinks(feature, resource.getSource(), viewId);
+
+	addDataNotificationLinks(feature, resource);
+
+	return feature;
+    }
+
+    /**
+     * Adds a link to subscribe to the data notifications for each WIS2 data topic of the given resource, with a filter
+     * on the identifier of the resource, since the data notifications of different records are published under the
+     * same topics
+     * 
+     * @param feature
+     * @param resource
+     */
+    private static void addDataNotificationLinks(JSONObject feature, GSResource resource) {
+
+	List<String> topics = resource.getExtensionHandler().getWISDataTopics();
+	if (topics.isEmpty()) {
+	    return;
 	}
 
+	Optional<String> brokerUrl = getBrokerUrl();
+	if (brokerUrl.isEmpty()) {
+	    GSLoggerFactory.getLogger(WISUtils.class).warn("WIS2 MQTT broker not configured, data notification links not added to {}",
+		    feature.getString("id"));
+	    return;
+	}
+
+	for (String topic : topics) {
+
+	    JSONObject link = new JSONObject();
+	    link.put("rel", "items");
+	    link.put("type", "application/geo+json");
+	    link.put("title", "Data notifications");
+	    link.put("href", brokerUrl.get());
+	    link.put("channel", topic);
+
+	    JSONObject metadataId = new JSONObject();
+	    metadataId.put("type", "string");
+	    metadataId.put("title", "Metadata identifier");
+	    metadataId.put("const", feature.getString("id"));
+
+	    JSONObject filters = new JSONObject();
+	    filters.put("metadata_id", metadataId);
+	    link.put("filters", filters);
+
+	    addLink(feature.getJSONArray("links"), link);
+	}
+    }
+
+    /**
+     * Adds the links to the DAB OM API, providing access to the stations and the time series of the given source
+     * 
+     * @param feature
+     * @param source
+     * @param viewId
+     */
+    private static void addDataAccessLinks(JSONObject feature, GSSource source, String viewId) {
+
+	if (source == null) {
+	    return;
+	}
+
+	String label = source.getLabel() != null ? source.getLabel() : source.getUniqueIdentifier();
+	String omApi = getViewUrl(viewId) + "/om-api";
+	String provider = "?provider=" + URLEncoder.encode(source.getUniqueIdentifier(), StandardCharsets.UTF_8);
+
+	WISUtils.addLink(feature, "application/json", "data", "Stations of " + label + " (DAB OM API)",
+		omApi + "/features" + provider);
+	addTokenSecurity(feature);
+
+	WISUtils.addLink(feature, "application/json", "data", "Time series of " + label + " (DAB OM API)",
+		omApi + "/observations" + provider);
+	addTokenSecurity(feature);
+
+	WISUtils.addLink(feature, "text/html", "service-doc", "DAB OM API documentation", getHostname() + "/gs-service/om-api/whos.html");
+    }
+
+    /**
+     * Adds a <code>license</code> link for each license URI found in the legal constraints of the given resource (for
+     * source collections, the license URIs aggregated from their children), sorted by URI and skipping the ones already
+     * linked
+     * 
+     * @param feature
+     * @param resource
+     */
+    private static void addLicenseLinks(JSONObject feature, GSResource resource) {
+
+	// href -> title
+	TreeMap<String, String> licenses = new TreeMap<>();
+
+	for (Identification identification : resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getIdentifications()) {
+
+	    Iterator<LegalConstraints> constraints = identification.getLegalConstraints();
+	    while (constraints.hasNext()) {
+		for (CharacterStringPropertyType other : constraints.next().getElementType().getOtherConstraints()) {
+		    String href = ISOMetadata.getHREFStringFromCharacterString(other);
+		    if (href != null && !href.isBlank()) {
+			String title = ISOMetadata.getStringFromCharacterString(other);
+			licenses.putIfAbsent(href.trim(), title != null && !title.isBlank() ? title : href.trim());
+		    }
+		}
+	    }
+	}
+
+	if (feature.has("links")) {
+	    JSONArray links = feature.getJSONArray("links");
+	    for (int i = 0; i < links.length(); i++) {
+		licenses.remove(links.getJSONObject(i).optString("href"));
+	    }
+	}
+
+	licenses.forEach((href, title) -> WISUtils.addLink(feature, "text/html", "license", title, href));
+    }
+
+    /**
+     * Adds to the last link of the given feature the description of the token based access control of the DAB OM API
+     * (an OpenAPI API key security scheme, the token is accepted as <code>token</code> query parameter)
+     * 
+     * @param feature
+     */
+    private static void addTokenSecurity(JSONObject feature) {
+
+	JSONArray links = feature.getJSONArray("links");
+	JSONObject link = links.getJSONObject(links.length() - 1);
+
+	JSONObject scheme = new JSONObject();
+	scheme.put("type", "apiKey");
+	scheme.put("in", "query");
+	scheme.put("name", "token");
+	scheme.put("description",
+		"Access requires a WHOS token, to be provided as 'token' query parameter. To request a token, please contact the WHOS Secretariat at "
+			+ getTokenRequestContact());
+
+	JSONObject security = new JSONObject();
+	security.put("default", scheme);
+	link.put("security", security);
+    }
+
+    /**
+     * @param viewId
+     * @return the public base URL of the given view, based on the configured WIS hostname
+     */
+    public static String getViewUrl(String viewId) {
+
+	return getHostname() + "/gs-service/services/essi/view/" + viewId;
+    }
+
+    /**
+     * @param viewId
+     * @return the public OGC API base URL of the given view, based on the configured WIS hostname
+     */
+    public static String getServiceUrl(String viewId) {
+
+	return getViewUrl(viewId) + "/" + new WISProfilerSetting().getServicePath();
+    }
+
+    /**
+     * @param serviceUrl
+     * @param id
+     * @return the URL of the WCMP2 record with the given identifier
+     */
+    public static String getRecordUrl(String serviceUrl, String id) {
+
+	return serviceUrl + "/collections/discovery-metadata/items/" + id;
+    }
+
+    /**
+     * Encodes the given resource as a WCMP2 record, exactly as served by the discovery-metadata item endpoint of the
+     * given view
+     *
+     * @param resource
+     * @param viewId
+     * @return
+     * @throws GSException
+     */
+    public static String getWCMP2Record(GSResource resource, String viewId) throws GSException {
+
+	return mapFeature(resource, viewId).toString();
     }
 }

@@ -27,6 +27,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,7 +49,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.iso.datamodel.ISOMetadata;
+import eu.essi_lab.iso.datamodel.classes.Citation;
+import eu.essi_lab.iso.datamodel.classes.DataIdentification;
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.iso.datamodel.classes.VerticalExtent;
@@ -85,6 +91,7 @@ import eu.essi_lab.request.executor.DiscoveryExecutor;
 import eu.essi_lab.rip.RuntimeInfoProvider;
 import eu.essi_lab.shared.driver.es.stats.ElasticsearchInfoPublisher;
 import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
+import net.opengis.iso19139.gco.v_20060504.CharacterStringPropertyType;
 
 /**
  * This handler is responsible for the station page
@@ -565,6 +572,16 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 		    object = create(object, "doi", doi.get(), "DOI");
 		}
 
+		Optional<String> citationDetails = getOtherCitationDetails(resource);
+		if (citationDetails.isPresent()) {
+		    object = create(object, "citation_details", citationDetails.get(), "Citation");
+		}
+
+		Optional<String> useLicense = getUseLicense(resource);
+		if (useLicense.isPresent()) {
+		    object = create(object, "use_license", useLicense.get(), "License");
+		}
+
 		object = create(object, "title", resource.getHarmonizedMetadata().getCoreMetadata().getTitle(), "Title");
 
 		object = create(object, "platform_id", platformId, "Station ID");
@@ -739,6 +756,81 @@ public class BNHSStationHandler implements WebRequestHandler, WebRequestValidato
 	}
 	return param[0];
 
+    }
+
+    private static Optional<String> getOtherCitationDetails(GSResource resource) {
+
+	try {
+
+	    DataIdentification dataIdentification = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDataIdentification();
+	    if (dataIdentification == null) {
+		return Optional.empty();
+	    }
+
+	    String details = new Citation(dataIdentification.getFirstCitation()).getOtherCitationDetails();
+	    if (details != null && !details.isBlank()) {
+		return Optional.of(details.trim());
+	    }
+
+	} catch (RuntimeException ex) {
+	    // nothing to do here
+	}
+
+	return Optional.empty();
+    }
+
+    private static Optional<String> getUseLicense(GSResource resource) {
+
+	LinkedHashSet<String> licenseTexts = new LinkedHashSet<>();
+
+	try {
+
+	    DataIdentification dataIdentification = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata().getDataIdentification();
+	    if (dataIdentification == null) {
+		return Optional.empty();
+	    }
+
+	    Iterator<LegalConstraints> constraints = dataIdentification.getLegalConstraints();
+	    while (constraints.hasNext()) {
+
+		LegalConstraints legalConstraints = constraints.next();
+
+		Iterator<String> useLimitations = legalConstraints.getUseLimitations();
+		while (useLimitations.hasNext()) {
+		    addLicenseText(licenseTexts, useLimitations.next());
+		}
+
+		for (CharacterStringPropertyType otherConstraint : legalConstraints.getElementType().getOtherConstraints()) {
+
+		    String text = ISOMetadata.getStringFromCharacterString(otherConstraint);
+		    if (text != null && !text.isBlank()) {
+			addLicenseText(licenseTexts, text);
+			continue;
+		    }
+
+		    String href = ISOMetadata.getHREFStringFromCharacterString(otherConstraint);
+		    if (href != null && !href.isBlank()) {
+			addLicenseText(licenseTexts, href);
+		    }
+		}
+	    }
+
+	} catch (RuntimeException ex) {
+	    // nothing to do here
+	}
+
+	if (licenseTexts.isEmpty()) {
+	    return Optional.empty();
+	}
+
+	return Optional.of(String.join("; ", licenseTexts));
+    }
+
+    private static void addLicenseText(Set<String> licenseTexts, String value) {
+
+	if (value != null && !value.isBlank()) {
+	    licenseTexts.add(value.trim());
+	}
     }
 
     /**

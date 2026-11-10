@@ -23,24 +23,34 @@ package eu.essi_lab.gssrv.conf.task.collection;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.UUID;
 
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
+import eu.essi_lab.iso.datamodel.classes.Address;
+import eu.essi_lab.iso.datamodel.classes.Contact;
 import eu.essi_lab.iso.datamodel.classes.CoverageDescription;
+import eu.essi_lab.iso.datamodel.classes.Identification;
 import eu.essi_lab.iso.datamodel.classes.Keywords;
+import eu.essi_lab.iso.datamodel.classes.LegalConstraints;
 import eu.essi_lab.iso.datamodel.classes.MIMetadata;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
 import eu.essi_lab.lib.net.utils.whos.SKOSConcept;
 import eu.essi_lab.lib.net.utils.whos.WHOSOntology;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
+import eu.essi_lab.lib.whos.WIS2DataPolicy;
+import eu.essi_lab.lib.whos.WIS2HydrologyTopic;
 import eu.essi_lab.messages.DiscoveryMessage;
 import eu.essi_lab.messages.Page;
 import eu.essi_lab.messages.RequestMessage.IterationMode;
@@ -49,6 +59,7 @@ import eu.essi_lab.messages.ResourceSelector.ResourceSubset;
 import eu.essi_lab.messages.ResultSet;
 import eu.essi_lab.messages.bond.Bond;
 import eu.essi_lab.messages.bond.BondFactory;
+import eu.essi_lab.messages.bond.BondOperator;
 import eu.essi_lab.messages.stats.ComputationResult;
 import eu.essi_lab.messages.stats.ResponseItem;
 import eu.essi_lab.messages.stats.StatisticsMessage;
@@ -59,14 +70,45 @@ import eu.essi_lab.model.StorageInfo;
 import eu.essi_lab.model.exceptions.GSException;
 import eu.essi_lab.model.index.jaxb.CardinalValues;
 import eu.essi_lab.model.resource.CoreMetadata;
-import eu.essi_lab.model.resource.Country;
 import eu.essi_lab.model.resource.DatasetCollection;
 import eu.essi_lab.model.resource.GSResource;
 import eu.essi_lab.model.resource.MetadataElement;
 import eu.essi_lab.model.resource.ResourceProperty;
+import eu.essi_lab.profiler.wis.WISUtils;
 import eu.essi_lab.request.executor.*;
 
 class SourceCollectionCreator {
+
+    /**
+     * Max number of terms of the frequency statistics, enough to get all the observed properties of a source
+     */
+    private static final int MAX_FREQUENCY_ITEMS = 100;
+
+    /**
+     * Max number of organisations added as point of contact
+     */
+    private static final int MAX_ORGANISATIONS = 10;
+
+    protected final String centreId;
+
+    /**
+     * Max number of datasets of an organisation read to find its e-mail address
+     */
+    private static final int MAX_EMAIL_DATASETS = 10;
+
+    /**
+     * The e-mail addresses of the organisations of a source, by organisation name, cached since the same organisations
+     * appear in all the collections of the source
+     */
+    private final HashMap<String, Optional<String>> organisationEmails = new HashMap<>();
+
+    public SourceCollectionCreator() {
+	this(WISUtils.getCentreId());
+    }
+
+    public SourceCollectionCreator(String centreId) {
+	this.centreId = centreId;
+    }
 
     public List<DatasetCollection> getCollections(String sourceId, String sourceDeployments) throws GSException {
 
@@ -103,26 +145,23 @@ class SourceCollectionCreator {
 	}
 
 	dataset.setSource(source);
-	String country = "unknown";
 	String sourceId = source.getUniqueIdentifier();
-	String sourceAcronym = sourceId;
-	if (sourceId.contains("-")) {
-	    int dashIndex = sourceId.indexOf("-");
-	    String c = sourceId.substring(0, dashIndex);
-	    Country cc = Country.decode(c);
-	    if (cc != null) {
-		country = cc.getISO2().toLowerCase();
-		sourceAcronym = sourceId.substring(dashIndex + 1);
-	    }
-	}
-	// GET Country!
-	String topic = "origin/a/wis2/" + //
-		"it-cnr-iia"
-		// country + "-" + sourceAcronym //
-		+ "/metadata"; // only at this level
-	// core/hydrology" + getAdditionalLevels(groupBy);
 
-	dataset.getExtensionHandler().setWISTopicHierarchy(topic);
+	dataset.getExtensionHandler().setWISTopicHierarchy(WIS2HydrologyTopic.getMetadataTopic(centreId));
+
+	// the data of core sources are published (by the data harvester task) under the topics of their observed
+	// properties, advertised according to the data notifications mode. Topics are sorted to keep the generated record
+	// (and its integrity checksum) stable
+	if (WISUtils.getDataPolicy(sourceId) == WIS2DataPolicy.CORE) {
+	    TreeSet<String> topics = new TreeSet<>();
+	    Optional<ComputationResult> properties = responseItem.getFrequency(MetadataElement.OBSERVED_PROPERTY_URI);
+	    if (properties.isPresent()) {
+		for (TermFrequencyItem item : properties.get().getFrequencyItems()) {
+		    WIS2HydrologyTopic.decode(item.getTerm()).flatMap(WISUtils::getAdvertisedTopic).ifPresent(topics::add);
+		}
+	    }
+	    topics.forEach(dataset.getExtensionHandler()::addWISDataTopic);
+	}
 
 	CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 	String id = getMetadataIdentifier(source.getUniqueIdentifier(), groupBy);
@@ -170,14 +209,45 @@ class SourceCollectionCreator {
 	if (frequency.isPresent()) {
 	    List<TermFrequencyItem> list = frequency.get().getFrequencyItems();
 	    if (!list.isEmpty()) {
-		for (TermFrequencyItem item : list) {
+		for (TermFrequencyItem item : list.subList(0, Math.min(list.size(), MAX_ORGANISATIONS))) {
 		    String org = item.getTerm();
 		    ResponsibleParty party = new ResponsibleParty();
 		    party.setOrganisationName(org);
+		    getOrganisationEmail(source.getUniqueIdentifier(), org).ifPresent(email -> {
+			Address address = new Address();
+			address.addElectronicMailAddress(email);
+			Contact contact = new Contact();
+			contact.setAddress(address);
+			party.setContactInfo(contact);
+		    });
 		    coreMetadata.getDataIdentification().addPointOfContact(party);
 		}
 	    }
 	}
+
+	// license URIs of the children, sorted to keep the generated record (and its integrity checksum) stable
+	Optional<ComputationResult> licenses = responseItem.getFrequency(MetadataElement.USE_LEGAL_CONSTRAINTS_URI);
+	if (licenses.isPresent()) {
+	    TreeSet<String> uris = new TreeSet<>();
+	    for (TermFrequencyItem item : licenses.get().getFrequencyItems()) {
+		String uri = item.getTerm();
+		if (uri != null && !uri.isBlank()) {
+		    uris.add(uri.trim());
+		}
+	    }
+	    if (!uris.isEmpty()) {
+		LegalConstraints legalConstraints = new LegalConstraints();
+		for (String uri : uris) {
+		    legalConstraints.addOtherConstraints(uri, uri);
+		}
+		coreMetadata.getMIMetadata().getDataIdentification().addLegalConstraints(legalConstraints);
+	    }
+	}
+
+	// time resolutions of the children, from the finest: the WCMP2 record provides the finest as time.resolution and
+	// the second finest as additionalExtents.temporal.resolution, while the abstract lists all of them
+	List<String> resolutions = getTimeResolutions(responseItem);
+	resolutions.forEach(dataset.getExtensionHandler()::addWISTimeResolution);
 
 	List<ComputationResult> count = responseItem.getCountDistinct();
 	ComputationResult attributes = count.get(0);
@@ -193,16 +263,138 @@ class SourceCollectionCreator {
 	    time = "Temporal range: from " + beginString + " to " + endString + ". ";
 	}
 
-	coreMetadata
-		.setAbstract("Data provider: " + source.getLabel() + ". " + time + "Number of platforms: " + platforms.getValue() + ".");
+	String timeResolutions = "";
+	if (!resolutions.isEmpty()) {
+	    timeResolutions = " Time resolutions: " + String.join(", ", resolutions) + ".";
+	}
+
+	coreMetadata.setAbstract("Data provider: " + source.getLabel() + ". " + time + "Number of platforms: " + platforms.getValue() + "."
+		+ timeResolutions);
 
 	addAdditionalElements(dataset, source.getUniqueIdentifier(), groupBy);
 
 	return dataset;
     }
 
-    protected String getAdditionalLevels(String groupBy) {
-	return "";
+    /**
+     * @param responseItem
+     * @return the distinct time resolutions of the grouped datasets, as normalized ISO 8601 durations sorted from the
+     *         finest. Invalid and non positive durations are discarded
+     */
+    private List<String> getTimeResolutions(ResponseItem responseItem) {
+
+	// calendar based durations (e.g. P1M) have no fixed length: they are compared from a reference date
+	Date reference = new Date(0);
+	TreeMap<Long, String> sorted = new TreeMap<>();
+
+	Optional<ComputationResult> frequency = responseItem.getFrequency(MetadataElement.TIME_RESOLUTION_DURATION_8601);
+	if (frequency.isPresent()) {
+	    for (TermFrequencyItem item : frequency.get().getFrequencyItems()) {
+		String term = item.getTerm();
+		if (term == null || term.isBlank()) {
+		    continue;
+		}
+		try {
+		    String resolution = ISO8601DateTimeUtils.normalizeISO8601Duration(term.trim());
+		    long millis = ISO8601DateTimeUtils.getDuration(resolution).getTimeInMillis(reference);
+		    if (millis > 0) {
+			sorted.putIfAbsent(millis, resolution);
+		    }
+		} catch (Exception e) {
+		    GSLoggerFactory.getLogger(getClass()).warn("Discarded time resolution {}: {}", term, e.getMessage());
+		}
+	    }
+	}
+
+	return new ArrayList<>(sorted.values());
+    }
+
+    /**
+     * @param sourceId
+     * @param organisationName
+     * @return the e-mail address of the given organisation, from the first of its datasets in the given source where
+     *         the organisation has one
+     */
+    private Optional<String> getOrganisationEmail(String sourceId, String organisationName) {
+
+	return organisationEmails.computeIfAbsent(organisationName, name -> {
+
+	    try {
+
+		DiscoveryMessage discoveryMessage = new DiscoveryMessage();
+		discoveryMessage.setRequestId(UUID.randomUUID().toString());
+		discoveryMessage.getResourceSelector().setIndexesPolicy(IndexesPolicy.NONE);
+		discoveryMessage.getResourceSelector().setSubset(ResourceSubset.FULL);
+		discoveryMessage.setPage(new Page(1, MAX_EMAIL_DATASETS));
+		discoveryMessage.setSources(ConfigurationWrapper.getHarvestedSources());
+		discoveryMessage.setDataBaseURI(ConfigurationWrapper.getStorageInfo());
+
+		// the datasets of the organisation, excluding the collections
+		discoveryMessage.setUserBond(BondFactory.createAndBond(//
+			BondFactory.createSourceIdentifierBond(sourceId), //
+			BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.ORGANISATION_NAME, name), //
+			BondFactory.createMissingSimpleValueBond(MetadataElement.WIS_TOPIC_HIERARCHY)));
+
+		ServiceLoader<DiscoveryExecutor> loader = ServiceLoader.load(DiscoveryExecutor.class);
+		ResultSet<GSResource> resultSet = loader.iterator().next().retrieve(discoveryMessage);
+
+		for (GSResource resource : resultSet.getResultsList()) {
+		    for (ResponsibleParty party : getParties(resource)) {
+			if (party != null && name.equalsIgnoreCase(Objects.toString(party.getOrganisationName(), "").trim())) {
+			    Optional<String> email = getEmail(party);
+			    if (email.isPresent()) {
+				return email;
+			    }
+			}
+		    }
+		}
+
+	    } catch (Exception e) {
+		GSLoggerFactory.getLogger(getClass()).error("Unable to find the e-mail of {}: {}", name, e.getMessage(), e);
+	    }
+
+	    return Optional.empty();
+	});
+    }
+
+    /**
+     * @param resource
+     * @return the parties of the given resource indexed as its organisations
+     */
+    private List<ResponsibleParty> getParties(GSResource resource) {
+
+	List<ResponsibleParty> parties = new ArrayList<>();
+	MIMetadata miMetadata = resource.getHarmonizedMetadata().getCoreMetadata().getMIMetadata();
+	Iterator<ResponsibleParty> contacts = miMetadata.getContacts();
+	if (contacts != null) {
+	    contacts.forEachRemaining(parties::add);
+	}
+	for (Identification identification : miMetadata.getIdentifications()) {
+	    identification.getPointOfContacts().forEachRemaining(parties::add);
+	    parties.addAll(identification.getCitedParty());
+	}
+	if (miMetadata.getDistribution() != null) {
+	    parties.addAll(miMetadata.getDistribution().getDistributorParties());
+	}
+	return parties;
+    }
+
+    /**
+     * @param party
+     * @return the e-mail address of the given party, without the possible mailto: prefix
+     */
+    private Optional<String> getEmail(ResponsibleParty party) {
+
+	Contact contact = party.getContact();
+	if (contact == null || contact.getAddress() == null) {
+	    return Optional.empty();
+	}
+	String email = contact.getAddress().getElectronicMailAddress();
+	if (email == null) {
+	    return Optional.empty();
+	}
+	email = email.trim().replaceFirst("(?i)^mailto:", "");
+	return email.contains("@") && !email.contains(" ") ? Optional.of(email) : Optional.empty();
     }
 
     protected String getTitle(GSSource source, String parameter) {
@@ -234,7 +426,12 @@ class SourceCollectionCreator {
 	WHOSOntology ontology = new WHOSOntology();
 	miMetadata.getDataIdentification().addKeyword("DAB");
 
-	for (PropertyResult property : observedProperties) {
+	// sorted, so that keywords and abstract (and the integrity checksum of the WIS2 notification) are stable among runs
+	List<PropertyResult> sortedProperties = new ArrayList<>(observedProperties);
+	sortedProperties.sort(Comparator.comparing(PropertyResult::getName, Comparator.nullsLast(Comparator.naturalOrder()))
+		.thenComparing(PropertyResult::getUri, Comparator.nullsLast(Comparator.naturalOrder())));
+
+	for (PropertyResult property : sortedProperties) {
 	    if (property.getUri() != null) {
 		if (!propertyURIs.contains(property.getUri())) {
 		    List<SKOSConcept> concepts = ontology.findConcepts(property.getUri(), true, false);
@@ -290,12 +487,12 @@ class SourceCollectionCreator {
 	if (!propertyNames.isEmpty()) {
 	    props = "Number of observed properties: " + propertyNames.size() + " (" + properties + ").";
 	}
-	coreMetadata.setAbstract((abs + props).trim());
+	coreMetadata.setAbstract((abs + " " + props).trim());
 
     }
 
     protected String getMetadataIdentifier(String sourceIdentifier, String groupBy) {
-	return "urn:wmo:md:it-cnr-iia:" + sourceIdentifier ;
+	return WISUtils.getMetadataIdentifier(centreId, sourceIdentifier, null);
     }
 
     protected List<ResponseItem> getStatistics(String sourceId, Queryable queryable) throws GSException {
@@ -323,7 +520,8 @@ class SourceCollectionCreator {
 
 	statisticsMessage.computeTempExtentUnion();
 
-	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME));
+	statisticsMessage.computeFrequency(Arrays.asList(MetadataElement.ORGANISATION_NAME, MetadataElement.USE_LEGAL_CONSTRAINTS_URI,
+		MetadataElement.OBSERVED_PROPERTY_URI, MetadataElement.TIME_RESOLUTION_DURATION_8601), MAX_FREQUENCY_ITEMS);
 	// computes count distinct of 2 queryables
 	statisticsMessage.countDistinct(//
 		Arrays.asList(//
@@ -371,6 +569,11 @@ class SourceCollectionCreator {
 		}
 	    }
 	    return false;
+	}
+
+	@Override
+	public int hashCode() {
+	    return Objects.hash(getName(), getUri());
 	}
 
     }

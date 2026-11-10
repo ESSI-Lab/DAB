@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.cfga.SelectionUtils;
+import eu.essi_lab.cfga.gs.setting.MQTTBrokerSetting;
 import eu.essi_lab.cfga.gs.setting.SystemSetting;
 import eu.essi_lab.cfga.gs.setting.ontology.DefaultSemanticSearchSetting;
 import eu.essi_lab.cfga.setting.Setting;
@@ -359,5 +360,82 @@ public class SystemSettingTest {
 	Assert.assertFalse(setting.getStatisticsSetting().isPresent());
 
 	Assert.assertFalse(setting.getKeyValueOptions().isPresent());
+
+	Assert.assertFalse(setting.getWis2MqttBroker().isPresent());
+	Assert.assertFalse(setting.getDabMqttBroker().isPresent());
+    }
+
+    @Test
+    public void legacyMqttBrokerIsCopiedIntoBothBrokers() {
+
+	SystemSetting setting = new SystemSetting();
+
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel(), "broker.example");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel(), "1883");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_USER.getLabel(), "user");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel(), "secret");
+	setting.putKeyValue("other", "keep");
+
+	MQTTBrokerSetting wis2 = setting.getWis2MqttBroker().get();
+	MQTTBrokerSetting dab = setting.getDabMqttBroker().get();
+
+	Assert.assertEquals("broker.example", wis2.getHost().get());
+	Assert.assertEquals(Integer.valueOf(1883), wis2.getPort().get());
+	Assert.assertEquals("user", wis2.getUser().get());
+	Assert.assertEquals("secret", wis2.getPassword().get());
+	Assert.assertTrue(wis2.isEnabled());
+
+	Assert.assertEquals("broker.example", dab.getHost().get());
+	Assert.assertEquals(Integer.valueOf(1883), dab.getPort().get());
+	Assert.assertTrue(dab.isEnabled());
+
+	Assert.assertFalse(setting.readKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_HOST).isPresent());
+	Assert.assertEquals("keep", setting.readKeyValue("other").get());
+
+	setting.getSetting("wis2MqttBroker", MQTTBrokerSetting.class).get().setEnabled(false);
+
+	Assert.assertFalse(setting.getWis2MqttBroker().isPresent());
+	Assert.assertTrue(setting.getDabMqttBroker().isPresent());
+    }
+
+    @Test
+    public void legacyMqttBrokerIsUsedWhenBrokerSettingsAreMissing() {
+
+	SystemSetting setting = new SystemSetting();
+
+	setting.getSettings().stream().filter(child -> child.getSettingClass().equals(MQTTBrokerSetting.class))
+		.map(Setting::getIdentifier).toList().forEach(setting::removeSetting);
+
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel(), "legacy.example");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel(), "1883");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_USER.getLabel(), "user");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel(), "secret");
+
+	Assert.assertEquals("legacy.example", setting.getWis2MqttBroker().get().getHost().get());
+	Assert.assertEquals("legacy.example", setting.getDabMqttBroker().get().getHost().get());
+	Assert.assertEquals("legacy.example", setting.readKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_HOST).get());
+    }
+
+    @Test
+    public void legacyMqttBrokerDoesNotOverwriteAConfiguredBroker() {
+
+	SystemSetting setting = new SystemSetting();
+
+	MQTTBrokerSetting wis2 = setting.getSetting("wis2MqttBroker", MQTTBrokerSetting.class).get();
+	wis2.setEnabled(true);
+	wis2.setHost("wis.example");
+	wis2.setPort(8883);
+	wis2.setUser("wis-user");
+	wis2.setPassword("wis-secret");
+
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_HOST.getLabel(), "legacy.example");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_PORT.getLabel(), "1883");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_USER.getLabel(), "user");
+	setting.putKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_PWD.getLabel(), "secret");
+
+	Assert.assertEquals("wis.example", setting.getWis2MqttBroker().get().getHost().get());
+	Assert.assertEquals(Integer.valueOf(8883), setting.getWis2MqttBroker().get().getPort().get());
+	Assert.assertEquals("legacy.example", setting.getDabMqttBroker().get().getHost().get());
+	Assert.assertFalse(setting.readKeyValue(SystemSetting.KeyValueOptionKeys.MQTT_BROKER_HOST).isPresent());
     }
 }

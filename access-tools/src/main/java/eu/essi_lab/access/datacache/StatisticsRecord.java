@@ -38,6 +38,12 @@ public class StatisticsRecord {
     private Date expected; // the date the harvesting was expected to take place
     private Date lastObservationDate; // the date of the more recent harvested record
 
+    /**
+     * Needed for JSON deserialization (e.g. by the data cache file buffer)
+     */
+    public StatisticsRecord() {
+    }
+
     public StatisticsRecord(Date date, String sourceId, String dataIdentifier, Integer harvestedRecords, String error, Date expected,
 	    Date lastObservationDate) {
 	super();

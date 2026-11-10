@@ -24,10 +24,12 @@ package eu.essi_lab.gssrv.conf.task.trigger;
 import eu.essi_lab.cfga.gs.task.AbstractCustomTask;
 import eu.essi_lab.cfga.gs.task.OptionsKey;
 import eu.essi_lab.cfga.scheduler.SchedulerJobStatus;
+import eu.essi_lab.messages.JobStatus.JobPhase;
 import eu.essi_lab.lib.net.s3.S3TransferWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import org.quartz.JobExecutionContext;
 
+import java.time.Instant;
 import java.util.EnumMap;
 import java.util.Optional;
 
@@ -41,7 +43,9 @@ public class COGS3Task extends AbstractCustomTask {
 
     @Override
     public void doJob(JobExecutionContext context, SchedulerJobStatus status) throws Exception {
+	Instant start = Instant.now();
 	log(status, "COGS3Task STARTED");
+	TaskReport report = TaskReport.of(status);
 
 	//CustomTaskSetting setting = retrieveSetting(context);
 	//Optional<String> taskOptions = setting.getTaskOptions();
@@ -51,39 +55,59 @@ public class COGS3Task extends AbstractCustomTask {
 
 	Optional<EnumMap<COGS3Task.COGS3TaskTaskOptions, String>> taskOptions = readTaskOptions(context, COGS3Task.COGS3TaskTaskOptions.class);
 	if (taskOptions.isEmpty()) {
-	    GSLoggerFactory.getLogger(getClass()).error("No options specified");
+	    cancel(status, report, "No options specified");
 	    return;
 	}
 	String bucketName = taskOptions.get().get(COGS3TaskTaskOptions.BUCKET_NAME);
 	if (bucketName == null && bucketName == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("No bucket name option specified");
+	    cancel(status, report, "No bucket name option specified");
 	    return;
 	}
 
 	String varName = taskOptions.get().get(COGS3TaskTaskOptions.VAR_NAMES);
 	if (varName == null && varName == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("No variable names option specified");
+	    cancel(status, report, "No variable names option specified");
 	    return;
 	}
 
 	String sourceURL = taskOptions.get().get(COGS3TaskTaskOptions.SOURCE_URL);
 	if (sourceURL == null && sourceURL == null) {
-	    GSLoggerFactory.getLogger(getClass()).error("No Geotiff url option specified");
+	    cancel(status, report, "No Geotiff url option specified");
 	    return;
 	}
 	String[] variables = varName.split(",");
 
 
 	Optional<S3TransferWrapper> manager = getS3TransferManager();
-
-	if (manager.isPresent()) {
-	    COGS3SyncProcessor processor = new COGS3SyncProcessor(manager.get(), bucketName, variables, sourceURL);
-	    processor.execute();
-	} else {
-	    GSLoggerFactory.getLogger(getClass()).error("S3 manager not present");
+	if (manager.isEmpty()) {
+	    cancel(status, report, "S3 manager not present");
+	    return;
 	}
 
-	log(status, "COGS3Task ENDED");
+	COGS3SyncProcessor processor = new COGS3SyncProcessor(manager.get(), bucketName, variables, sourceURL);
+	processor.setReport(report);
+
+	// The exception is not rethrown, otherwise the summary e-mail is not sent: the ERROR phase is kept by the scheduler
+	try {
+	    processor.execute();
+	    status.setPhase(JobPhase.COMPLETED);
+	} catch (Exception e) {
+	    GSLoggerFactory.getLogger(getClass()).error("COGS3Task failed: " + e.getMessage(), e);
+	    report.error("Task failed: " + TaskReport.message(e));
+	    status.setErrorPhase();
+	}
+
+	log(status, "COGS3Task ENDED (duration " + TaskReport.elapsed(start) + ")");
+    }
+
+    /**
+     * Invalid configuration: the task is not executed
+     */
+    private void cancel(SchedulerJobStatus status, TaskReport report, String message) {
+
+	GSLoggerFactory.getLogger(getClass()).error(message);
+	report.error(message);
+	status.setPhase(JobPhase.CANCELED);
     }
 
     @Override

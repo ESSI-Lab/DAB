@@ -146,21 +146,7 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 
 	    GSLoggerFactory.getLogger(getClass()).info("Worker not scheduled (scheduling was disabled), adding new job");
 
-	    JobKey key = jobDetail.getKey();
-
-	    boolean exists = scheduler.checkExists(key);
-
-	    if (exists) {
-
-		GSLoggerFactory.getLogger(getClass()).info("Deleting existing job before adding a new one");
-
-		boolean deleted = scheduler.deleteJob(key);
-
-		if (!deleted) {
-
-		    GSLoggerFactory.getLogger(getClass()).warn("Unable to deleted existing job: {}", key.getName());
-		}
-	    }
+	    deleteJobIfExists(jobDetail.getKey());
 
 	    schedule(setting);
 	    return;
@@ -174,15 +160,46 @@ public abstract class AbstractScheduler implements eu.essi_lab.cfga.scheduler.Sc
 
 	if (!unscheduled) {
 
-	    GSLoggerFactory.getLogger(getClass()).error("Unscheduling of worker {} failed, trigger not found", setting.getName());
-	    return;
+	    //
+	    // the trigger can be missing if the job is executed by a different trigger, e.g. a recovery trigger
+	    // created by Quartz after a restart. In this case the job is deleted (with all its triggers) below
+	    //
+	    GSLoggerFactory.getLogger(getClass()).warn("Unscheduling of worker {}: trigger not found", setting.getName());
 	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Unscheduling of current job ENDED");
 
+	//
+	// the job can still exist (e.g. with a recovery trigger), and it must be replaced, otherwise the new setting is
+	// not stored. If the job is executing, the execution is not interrupted, and since the job disallows concurrent
+	// execution, the new trigger is blocked until the current execution ends
+	//
+	deleteJobIfExists(jobDetail.getKey());
+
 	schedule(setting);
 
 	GSLoggerFactory.getLogger(getClass()).info("Rescheduling of worker {} ENDED", setting.getName());
+    }
+
+    /**
+     * Deletes the job with the given key, with all its triggers
+     *
+     * @param key
+     * @throws SchedulerException
+     */
+    private void deleteJobIfExists(JobKey key) throws SchedulerException {
+
+	if (scheduler.checkExists(key)) {
+
+	    GSLoggerFactory.getLogger(getClass()).info("Deleting existing job before adding a new one");
+
+	    boolean deleted = scheduler.deleteJob(key);
+
+	    if (!deleted) {
+
+		GSLoggerFactory.getLogger(getClass()).warn("Unable to deleted existing job: {}", key.getName());
+	    }
+	}
     }
 
     /**

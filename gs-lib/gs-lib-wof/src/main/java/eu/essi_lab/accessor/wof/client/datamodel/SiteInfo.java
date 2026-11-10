@@ -113,7 +113,7 @@ public class SiteInfo implements ISiteInfo {
     
     public String getDataPolicy() {
 	try {
-	    return reader.evaluateString("*:extension/dataPolicy/@name");
+	    return reader.evaluateString("*:extension/*:dataPolicy/@name");
 	} catch (XPathExpressionException e) {
 	    logger.warn("Vertical not found", e);
 	    return null;

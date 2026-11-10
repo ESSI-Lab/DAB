@@ -214,6 +214,8 @@
 	"sources_tab" : "SOURCES",
 	"measurement_info" : "Measurement info",
 	"result_doi" : "DOI",
+	"result_citation" : "Citation",
+	"result_license" : "License",
 	"more_info" : "More info",
 	"full_metadata" : "Full metadata",
 	"platform_description" : "Platform from which the observation was made",
@@ -294,6 +296,7 @@
 	"tf-intendedObservationSpacing" : "Intended observation spacing",
 	"tf-timeInterpolation" : "Time interpolation",
 	"tf-aggregationDuration" : "Aggregation duration",
+	"tf-country" : "Country",
 	"tf-observedPropertyURI" : "Observed property URI",
 	"tf-attributeId" : "Attribute identifier",
 	"tf-instrumentId" : "Instrument identifier",
@@ -338,5 +341,9 @@
 	"status_in_progress" : "In Progress",
 	"status_pending" : "Pending",
 	"status_processing" : "Processing",
-	"status_started" : "Started"
+	"status_started" : "Started",
+	"password_gate_title" : "Protected portal",
+	"password_gate_placeholder" : "Password",
+	"password_gate_enter" : "Enter",
+	"password_gate_wrong" : "Wrong password"
 }

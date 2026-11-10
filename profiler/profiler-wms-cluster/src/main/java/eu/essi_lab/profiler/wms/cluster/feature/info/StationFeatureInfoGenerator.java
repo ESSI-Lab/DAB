@@ -135,6 +135,7 @@ public class StationFeatureInfoGenerator implements WMSFeatureInfoGenerator {
 	    queryParams += getParamIfPresent(request, "intendedObservationSpacing");
 	    queryParams += getParamIfPresent(request, "aggregationDuration");
 	    queryParams += getParamIfPresent(request, "timeInterpolation");
+	    queryParams += getParamIfPresent(request, "country");
 	    queryParams += getParamIfPresent(request, "observedPropertyURI");
 	    queryParams += getParamIfPresent(request, "organisationName");
 

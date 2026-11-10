@@ -342,6 +342,14 @@ public class WMSGetFeatureInfoHandler extends StreamingRequestHandler {
 			}
 		    }
 
+		    String country = getParam(parameterMap, "country");
+		    if (country != null) {
+			Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, country, MetadataElement.COUNTRY_ISO3);
+			if (optBond.isPresent()) {
+			    operands.add(optBond.get());
+			}
+		    }
+
 		    String observedPropertyURI = getParam(parameterMap, "observedPropertyURI");
 		    if (observedPropertyURI != null) {
 			Optional<Bond> optBond = BondUtils.createBond(BondOperator.EQUAL, observedPropertyURI,

@@ -6,14 +6,21 @@ import WebGLTileLayer from 'ol/layer/WebGLTile.js';
 import GeoTIFF from 'ol/source/GeoTIFF.js';
 
 
+// NoData (-9999, ocean mask): OpenLayers writes 0 in band 1 for NoData pixels and adds an alpha band (band 2: 0 = NoData, 255 = data).
+// A custom 'case' style ignores that alpha band, so every style must test it first. getOrCreateSource() always sets nodata,
+// so band 2 exists even for files without NoData metadata.
+const NODATA_VALUE = -9999;
+const NODATA_CASE = ['<', ['band', 2], 128];
+
 // Global Data Matrix: Curated European Historical Events (Jan 2023 - July 2025)
 const CONFIG = {
   wct: {
     title: "Wind Chill Temperature (WCT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/wct/index.json",
     style: {
       color: [
         'case',
+        NODATA_CASE, 'transparent',
         ['<', ['band', 1], -45.0], '#8b008b',
         ['<', ['band', 1], -40.0], '#ff00ff',
         ['<', ['band', 1], -35.0], '#7f00ff',
@@ -40,10 +47,11 @@ const CONFIG = {
   },
   at: {
     title: "Apparent Temperature (AT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/at/index.json",
     style: {
       color: [
         'case',
+        NODATA_CASE, 'transparent',
         ['<', ['band', 1], 26.7],  '#e0f3f8',
         ['<', ['band', 1], 32.2],  '#ffff00',
         ['<', ['band', 1], 39.4],  '#ffb300',
@@ -67,10 +75,11 @@ const CONFIG = {
   },
   wbgt: {
     title: "Wet Bulb Globe Temperature (WBGT)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/wbgt/index.json",
     style: {
       color: [
         'case',
+        NODATA_CASE, 'transparent',
         ['<', ['band', 1], 26.7],  '#e0f3f8',
         ['<', ['band', 1], 29.4],  '#008000',
         ['<', ['band', 1], 31.1],  '#ffff00',
@@ -94,10 +103,11 @@ const CONFIG = {
   },
   utci: {
     title: "Universal Thermal Climate Index (UTCI)",
-    url: "https://s3.us-east-1.amazonaws.com/s3-demo-geotiff/CIMA/wct/index.json",
+    url: "https://s3.us-east-1.amazonaws.com/trigger/CIMA/utci/index.json",
     style: {
       color: [
         'case',
+        NODATA_CASE, 'transparent',
         ['<', ['band', 1], -40.0], '#000066',
         ['<', ['band', 1], -27.0], '#0000ff',
         ['<', ['band', 1], -13.0], '#007fff',
@@ -236,7 +246,7 @@ function updateMap(index) {
 
 function getOrCreateSource(fileUrl) {
   if (geoTiffCache.has(fileUrl)) return geoTiffCache.get(fileUrl);
-  const source = new GeoTIFF({ sources: [{ url: fileUrl }], normalize: false, transition: 0 });
+  const source = new GeoTIFF({ sources: [{ url: fileUrl, nodata: NODATA_VALUE }], normalize: false, transition: 0 });
   if (geoTiffCache.size >= MAX_CACHE_SIZE) geoTiffCache.delete(geoTiffCache.keys().next().value);
   geoTiffCache.set(fileUrl, source);
   return source;

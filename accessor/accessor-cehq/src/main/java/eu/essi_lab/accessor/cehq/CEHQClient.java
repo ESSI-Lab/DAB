@@ -28,6 +28,8 @@ import eu.essi_lab.model.exceptions.*;
 import jakarta.xml.bind.annotation.*;
 import org.apache.commons.io.*;
 import org.ccil.cowan.tagsoup.Parser;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
@@ -54,19 +56,36 @@ public class CEHQClient {
 	this.endpoint = endpoint;
     }
 
+    /**
+     * The historical data station list page (historique_donnees/default.asp) now redirects to the Atlas hydroclimatique,
+     * whose station map is backed by this ArcGIS feature layer
+     */
+    private static final String STATIONS_LAYER = "https://services3.arcgis.com/0lL78GhXbg1Po7WO/arcgis/rest/services/StationsHydrometriques_v2/FeatureServer/0";
+
     public List<String> getStationIdentifiers() throws IOException {
-	byte[] response = downloadBytes(getEndpoint());
-	String str = new String(response, Charset.forName("windows-1252"));
 	List<String> ret = new ArrayList<>();
-	str = str.substring(str.indexOf("id=\"lstStation\""));
-	str = str.substring(0, str.indexOf("select"));
-	String[] split = str.split("value=");
-	for (int i = 1; i < split.length; i++) {
-	    String valueString = split[i];
-	    valueString = valueString.substring(valueString.indexOf("\"") + 1);
-	    valueString = valueString.substring(0, valueString.indexOf("\""));
-	    valueString = valueString.trim();
-	    ret.add(valueString);
+	int offset = 0;
+	while (true) {
+	    String url = STATIONS_LAYER + "/query?where=1%3D1&outFields=no,lien_historique&returnGeometry=false&orderByFields=no"
+		    + "&resultOffset=" + offset + "&f=json";
+	    JSONObject response = new JSONObject(new String(downloadBytes(url), StandardCharsets.UTF_8));
+	    if (response.has("error")) {
+		throw new IOException("Unable to list stations: " + response.get("error"));
+	    }
+	    JSONArray features = response.getJSONArray("features");
+	    for (int i = 0; i < features.length(); i++) {
+		JSONObject attributes = features.getJSONObject(i).getJSONObject("attributes");
+		String id = attributes.optString("no", "").trim();
+		// stations operated by Environment Canada link to www.eau.ec.gc.ca and have no CEHQ historical data
+		String link = attributes.optString("lien_historique", "");
+		if (!id.isEmpty() && link.contains("cehq.gouv.qc.ca") && !ret.contains(id)) {
+		    ret.add(id);
+		}
+	    }
+	    if (!response.optBoolean("exceededTransferLimit", false) || features.length() == 0) {
+		break;
+	    }
+	    offset += features.length();
 	}
 
 	return ret;
@@ -254,8 +273,8 @@ public class CEHQClient {
 	    }
 	}
 
-	Set<CEHQVariable> vars = tmp.keySet();
-	for (CEHQVariable var : vars) {
+	Map<CEHQVariable, SimpleEntry<Integer, Integer>> ret = new HashMap<>();
+	for (CEHQVariable var : tmp.keySet()) {
 	    SimpleEntry<Integer, Integer> years = tmp.get(var);
 	    Integer min = years.getKey();
 	    Integer max = years.getValue();
@@ -280,11 +299,15 @@ public class CEHQClient {
 		    break;
 		}
 	    }
-	    tmp.put(var, new SimpleEntry<>(min, max));
+	    // no yearly file with actual values for this variable
+	    if (min > max) {
+		continue;
+	    }
+	    ret.put(var, new SimpleEntry<>(min, max));
 
 	}
 
-	return tmp;
+	return ret;
     }
 
     public SimpleEntry<Date, Date> getRangebyYear(String stationId, CEHQVariable var, Integer year) throws GSException {
@@ -386,7 +409,8 @@ public class CEHQClient {
 	Integer minutes = Integer.parseInt(split[1]);
 	Integer seconds = Integer.parseInt(split[2]) + minutes * 60;
 	Double remainder = seconds.doubleValue() / 3600.0;
-	return d + remainder;
+	// the sign applies to the whole value: -77° 11' 14" is -77.187, not -76.813
+	return split[0].startsWith("-") ? d - remainder : d + remainder;
     }
 
     @XmlTransient
