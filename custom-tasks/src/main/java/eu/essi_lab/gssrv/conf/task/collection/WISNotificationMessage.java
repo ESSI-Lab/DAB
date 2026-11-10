@@ -149,6 +149,28 @@ public class WISNotificationMessage {
     }
 
     /**
+     * Sets the {@link WISUtils#DATA_NOTIFICATION_FEATURE_OF_INTEREST} property, if the given identifier is not blank
+     *
+     * @param featureOfInterest the identifier of the station of the data
+     */
+    public void setFeatureOfInterest(String featureOfInterest) {
+	if (featureOfInterest != null && !featureOfInterest.isBlank()) {
+	    setPropertyString(WISUtils.DATA_NOTIFICATION_FEATURE_OF_INTEREST, featureOfInterest.trim());
+	}
+    }
+
+    /**
+     * Sets the {@link WISUtils#DATA_NOTIFICATION_OBSERVED_PROPERTY} property, if the given URI is not blank
+     *
+     * @param observedPropertyURI the URI of the observed property of the data
+     */
+    public void setObservedProperty(String observedPropertyURI) {
+	if (observedPropertyURI != null && !observedPropertyURI.isBlank()) {
+	    setPropertyString(WISUtils.DATA_NOTIFICATION_OBSERVED_PROPERTY, observedPropertyURI.trim());
+	}
+    }
+
+    /**
      * Sets the geometry as the given point
      * 
      * @param longitude

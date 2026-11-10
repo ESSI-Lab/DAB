@@ -258,6 +258,12 @@ public class WISUtils {
 	properties.put("themes", tArray);
     }
 
+    /**
+     * The temporal reference system of the WCMP2 additional temporal extents (required there by the WCMP2 schema; the
+     * <code>time</code> property has no trs, being always Gregorian)
+     */
+    public static final String GREGORIAN_TRS = "https://www.opengis.net/def/uom/ISO-8601/0/Gregorian";
+
     public static void addTimeInterval(JSONObject feature, String begin, String end) {
 	JSONObject time = new JSONObject();
 	JSONArray timeArray = new JSONArray();
@@ -293,7 +299,7 @@ public class WISUtils {
 	    JSONObject temporal = new JSONObject();
 	    temporal.put("interval", interval);
 	    temporal.put("resolution", resolutions.get(1));
-	    temporal.put("trs", "https://www.opengis.net/def/uom/ISO-8601/0/Gregorian");
+	    temporal.put("trs", GREGORIAN_TRS);
 
 	    JSONObject additionalExtents = new JSONObject();
 	    additionalExtents.put("temporal", temporal);
@@ -847,9 +853,19 @@ public class WISUtils {
     }
 
     /**
-     * Adds a link to subscribe to the data notifications for each WIS2 data topic of the given resource, with a filter
-     * on the identifier of the resource, since the data notifications of different records are published under the
-     * same topics
+     * The data notification property with the identifier of the feature of interest (station) of the notified value
+     */
+    public static final String DATA_NOTIFICATION_FEATURE_OF_INTEREST = "featureOfInterest";
+
+    /**
+     * The data notification property with the URI of the observed property of the notified value
+     */
+    public static final String DATA_NOTIFICATION_OBSERVED_PROPERTY = "observedProperty";
+
+    /**
+     * Adds a link to subscribe to the data notifications for each WIS2 data topic of the given resource, with filters
+     * on the feature of interest and on the observed property of the notified values (no filter is declared on
+     * <code>metadata_id</code>, being a property required by the WIS2 notification message)
      * 
      * @param feature
      * @param resource
@@ -877,13 +893,20 @@ public class WISUtils {
 	    link.put("href", brokerUrl.get());
 	    link.put("channel", topic);
 
-	    JSONObject metadataId = new JSONObject();
-	    metadataId.put("type", "string");
-	    metadataId.put("title", "Metadata identifier");
-	    metadataId.put("const", feature.getString("id"));
+	    JSONObject featureOfInterest = new JSONObject();
+	    featureOfInterest.put("type", "string");
+	    featureOfInterest.put("title", "Feature of interest");
+	    featureOfInterest.put("description", "The identifier of the station (monitoring point) of the notified value");
+
+	    JSONObject observedProperty = new JSONObject();
+	    observedProperty.put("type", "string");
+	    observedProperty.put("format", "uri");
+	    observedProperty.put("title", "Observed property");
+	    observedProperty.put("description", "The URI of the harmonized observed property of the notified value");
 
 	    JSONObject filters = new JSONObject();
-	    filters.put("metadata_id", metadataId);
+	    filters.put(DATA_NOTIFICATION_FEATURE_OF_INTEREST, featureOfInterest);
+	    filters.put(DATA_NOTIFICATION_OBSERVED_PROPERTY, observedProperty);
 	    link.put("filters", filters);
 
 	    addLink(feature.getJSONArray("links"), link);

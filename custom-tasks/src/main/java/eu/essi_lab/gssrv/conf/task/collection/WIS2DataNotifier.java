@@ -178,9 +178,9 @@ public class WIS2DataNotifier {
 	    Optional<StationRecord> station;
 	    try {
 		cached = dataCacheConnector.getRecords(entry.getValue()[0], entry.getValue()[1], entry.getKey());
-		// the station is read as the item endpoint does, so that the notified content matches the served one
-		station = encoding == WIS2DataEncoding.OM_JSON ? WIS2DataItem.findStation(dataCacheConnector, entry.getKey())
-			: Optional.empty();
+		// the station is read as the item endpoint does, so that the notified content matches the served one; it
+		// also provides the feature of interest of the notifications, whatever the encoding
+		station = WIS2DataItem.findStation(dataCacheConnector, entry.getKey());
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error("[WIS2] Unable to read the new values of {}: {}", entry.getKey(), e.getMessage(),
 			e);
@@ -212,6 +212,7 @@ public class WIS2DataNotifier {
 		String metadataId = WISUtils.getMetadataIdentifier(sourceId, record.getObservedPropertyURI());
 
 		WISNotificationMessage message = createMessage(record, content, encoding, dataTopic, viewId, metadataId, generatedBy);
+		message.setFeatureOfInterest(station.map(StationRecord::getPlatformIdentifier).orElse(null));
 
 		if (mode == DataNotificationsMode.DRY_RUN) {
 
@@ -255,6 +256,7 @@ public class WIS2DataNotifier {
 
 	WISNotificationMessage message = new WISNotificationMessage(UUID.randomUUID().toString(), null, dataId, link, generatedBy);
 	message.setMetadataId(metadataId);
+	message.setObservedProperty(record.getObservedPropertyURI());
 	message.setDatetime(record.getDate());
 
 	LatitudeLongitude location = record.getLatitudeLongitude();

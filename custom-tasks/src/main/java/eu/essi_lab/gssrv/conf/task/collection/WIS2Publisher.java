@@ -31,11 +31,17 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 
 /**
  * Publishes the WIS2 notification messages to the WIS2 MQTT broker configured in the system settings. The connection
- * is shared and opened at the first publication; in case of error it is closed, and reopened at the next publication
+ * is shared and opened at the first publication; when it has been dropped or a publication fails, it is closed and
+ * reopened, and the publication is retried once
  *
  * @author boldrini
  */
 public class WIS2Publisher {
+
+    /**
+     * Publication attempts of a message: a failed attempt closes the connection, and the next one opens a new one
+     */
+    private static final int MAX_ATTEMPTS = 2;
 
     private static MQTTPublisherHive client;
 
@@ -53,20 +59,57 @@ public class WIS2Publisher {
      */
     public static synchronized boolean publish(String topic, WISNotificationMessage message) {
 
-	if (client == null && !connect()) {
-	    return false;
+	String payload = message.getJSONObject().toString(3);
+
+	for (int attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+
+	    // the shared connection may have been dropped by the broker since the last publication (e.g. idle timeout or
+	    // broker restart): in this case it is replaced by a new one, instead of waiting for the automatic reconnection
+	    if (client != null && !isConnected()) {
+
+		GSLoggerFactory.getLogger(WIS2Publisher.class).info("WIS2 MQTT broker connection lost, reconnecting");
+		disconnect();
+	    }
+
+	    if (client == null && !connect()) {
+		return false;
+	    }
+
+	    try {
+
+		client.publish(topic, payload, false);
+		return true;
+
+	    } catch (Exception e) {
+
+		disconnect();
+
+		if (attempt < MAX_ATTEMPTS) {
+
+		    GSLoggerFactory.getLogger(WIS2Publisher.class).warn("Unable to publish to WIS2 MQTT broker topic {}: {}, retrying with a new connection",
+			    topic, e.getMessage());
+		} else {
+
+		    GSLoggerFactory.getLogger(WIS2Publisher.class).error("Unable to publish to WIS2 MQTT broker topic {}: {}", topic,
+			    e.getMessage(), e);
+		}
+	    }
 	}
+
+	return false;
+    }
+
+    /**
+     * @return true if the shared client is currently connected to the broker
+     */
+    private static boolean isConnected() {
 
 	try {
 
-	    client.publish(topic, message.getJSONObject().toString(3), false);
-	    return true;
+	    return client.getWrappedClient().getState().isConnected();
 
 	} catch (Exception e) {
 
-	    GSLoggerFactory.getLogger(WIS2Publisher.class).error("Unable to publish to WIS2 MQTT broker topic {}: {}", topic, e.getMessage(),
-		    e);
-	    disconnect();
 	    return false;
 	}
     }
@@ -113,7 +156,8 @@ public class WIS2Publisher {
 	    try {
 		client.disconnect();
 	    } catch (Exception e) {
-		GSLoggerFactory.getLogger(WIS2Publisher.class).error(e);
+		// expected when the connection has already been dropped (the client is not connected)
+		GSLoggerFactory.getLogger(WIS2Publisher.class).debug("Disconnection from WIS2 MQTT broker: {}", e.getMessage());
 	    }
 	    client = null;
 	}
