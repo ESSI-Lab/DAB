@@ -287,7 +287,9 @@ function buildMasterTimeline() {
 function createSource(url) {
   return new GeoTIFF({
     sources: [{ url, nodata: NODATA_VALUE }],
-    normalize: false
+    normalize: false,
+    // Nearest sampling: linear filtering blends land values with the NoData sea (0) and draws a false low-value rim on the coast
+    interpolate: false
   });
 }
 

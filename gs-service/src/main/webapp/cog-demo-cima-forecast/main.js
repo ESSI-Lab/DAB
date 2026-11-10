@@ -246,6 +246,7 @@ function getOrCreateSource(fileUrl) {
   const source = new GeoTIFF({
     sources: [{ url: fileUrl, nodata: NODATA_VALUE }],
     normalize: false,
+    interpolate: false, // nearest sampling: no blending with NoData at the coast
     transition: 0,
     attributions: ATTRIBUTION
   });

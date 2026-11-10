@@ -246,7 +246,7 @@ function updateMap(index) {
 
 function getOrCreateSource(fileUrl) {
   if (geoTiffCache.has(fileUrl)) return geoTiffCache.get(fileUrl);
-  const source = new GeoTIFF({ sources: [{ url: fileUrl, nodata: NODATA_VALUE }], normalize: false, transition: 0 });
+  const source = new GeoTIFF({ sources: [{ url: fileUrl, nodata: NODATA_VALUE }], normalize: false, interpolate: false, transition: 0 });
   if (geoTiffCache.size >= MAX_CACHE_SIZE) geoTiffCache.delete(geoTiffCache.keys().next().value);
   geoTiffCache.set(fileUrl, source);
   return source;
