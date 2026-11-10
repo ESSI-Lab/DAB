@@ -11,7 +11,7 @@ masking of `CAMSAirQualityProcessor` (task option `MASK_SEA`, default false) and
 
 ## Source and license
 
-- OpenStreetMap land polygons, `land-polygons-split-3857.zip` of 2026-10-23, from
+- OpenStreetMap land polygons, `land-polygons-split-3857.zip` with data of 2026-05-25 (regenerated 2026-11-10; the 2026-10-23 snapshot used before differs by 39 isolated pixels), from
   <https://osmdata.openstreetmap.de/data/land-polygons.html>
 - Data © OpenStreetMap contributors, available under the Open Database License (ODbL). The maps showing these COGs should credit
   "© OpenStreetMap contributors" (the OSM base map of the demos and of the TRIGGER dashboard already does).
@@ -25,7 +25,7 @@ The mask is not a copy of the land polygons: it is computed on the output grid o
 changes.
 
 1. The land polygons are rasterized on the output grid: 2500 m EPSG:3857 pixels aligned with `gdalwarp -tap`, extent
-   -2785000, 3507500, 5017500, 11755000 (3121 x 3299 pixels, ECMWF domain 25W-45E, 30N-72N). All touched pixels: every pixel touching
+   -2785000, 3490000, 5017500, 11755000 (3121 x 3306 pixels, ECMWF domain 25W-45E, ~29.9N-72N; the ECMWF COGs reach y 3500000, so the grid goes a few rows lower to mask their last rows). All touched pixels: every pixel touching
    land is land, so the coast and the small islands are always covered (data spill over the sea by at most one pixel).
 2. The sea pixels are polygonized: the polygons follow the pixel edges, so `gdal_rasterize -burn -9999 sea_mask_osm.geojson` on any
    2500 m `-tap` grid inside that extent reproduces the mask exactly (checked by the script).
@@ -53,7 +53,7 @@ The script prints the number of land pixels and sea polygons and fails if the po
 grid (e.g. a new ECMWF domain or a different `TARGET_RESOLUTION` in the processors), edit `RESOLUTION`, `XMIN`, `YMAX`, `WIDTH`,
 `HEIGHT` at the top of `make_sea_mask.py`: take them from `gdalinfo` of a COG produced by the task.
 
-Reference values (2026-10-23): 4,790,006 land pixels, 2,419 sea polygons, 1.98 MB.
+Reference values (2026-11-10): 4,807,068 land pixels, 2,420 sea polygons, 1.98 MB.
 
 ## Other grids: historical CIMA COGs
 
