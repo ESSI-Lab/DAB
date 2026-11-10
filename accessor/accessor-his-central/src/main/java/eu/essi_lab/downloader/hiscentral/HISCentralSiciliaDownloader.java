@@ -67,6 +67,11 @@ public class HISCentralSiciliaDownloader extends WMLDataDownloader {
 
     private static final String HISCENTRAL_SICILIA_DOWNLOAD_ERROR = "HISCENTRAL_SICILIA_DOWNLOAD_ERROR";
 
+    /**
+     * Marker used by the Datascape API for invalid measures
+     */
+    private static final BigDecimal INVALID_VALUE = BigDecimal.valueOf(Integer.MIN_VALUE);
+
     @Override
     public boolean canDownload() {
 
@@ -171,8 +176,14 @@ public class HISCentralSiciliaDownloader extends WMLDataDownloader {
 
 		JSONArray pair = data.getJSONArray(i);
 
+		BigDecimal value = pair.optBigDecimal(1, null);
+		if (value == null || value.compareTo(INVALID_VALUE) == 0) {
+		    // invalid measures are returned as Integer.MIN_VALUE (part=ValueWithInvalid)
+		    continue;
+		}
+
 		ValueSingleVariable variable = new ValueSingleVariable();
-		variable.setValue(pair.optBigDecimal(1, new BigDecimal("-9999")));
+		variable.setValue(value);
 
 		GregorianCalendar calendar = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 		calendar.setTimeInMillis(pair.getLong(0));
