@@ -48,6 +48,18 @@ public class CanSWEMapperTest {
     }
 
     @Test
+    public void measurementCategory() {
+
+	assertEquals("snow course", CanSWEMapper.getMeasurementCategory(0).get());
+	assertEquals("manual", CanSWEMapper.getMeasurementCategory(1).get());
+	assertEquals("automatic", CanSWEMapper.getMeasurementCategory(2).get());
+	assertEquals("automatic", CanSWEMapper.getMeasurementCategory(3).get());
+	assertEquals("automatic", CanSWEMapper.getMeasurementCategory(6).get());
+	assertFalse(CanSWEMapper.getMeasurementCategory(-1).isPresent());
+	assertFalse(CanSWEMapper.getMeasurementCategory(7).isPresent());
+    }
+
+    @Test
     public void measurementTypes() {
 
 	assertEquals(new java.util.TreeSet<>(java.util.Arrays.asList(2l, 3l)), new CanSWEConnectorSetting().getMeasurementTypes());

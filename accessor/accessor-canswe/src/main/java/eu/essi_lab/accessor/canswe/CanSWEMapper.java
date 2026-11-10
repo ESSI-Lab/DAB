@@ -83,6 +83,7 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	String stationName = station.optString("station_name", stationId);
 	String provider = station.optString("source", null);
 	String method = station.optString("type_mes_label", null);
+	Optional<String> category = getMeasurementCategory(station.optLong("type_mes", -1));
 	String variableName = variable.getString(CanSWEConnector.RECORD_VARIABLE_NAME);
 	String longName = getVariableLabel(variableName, variable.optString("long_name", variableName));
 	String units = normalizeUnits(variable.optString("units", ""));
@@ -96,7 +97,7 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	coreMetadata.getMIMetadata().addHierarchyLevelScopeCodeListValue("dataset");
 	coreMetadata.getMIMetadata().setParentIdentifier(decorateIdentifier(source.getEndpoint(), stationId));
 
-	coreMetadata.setTitle(longName + " at " + stationLabel);
+	coreMetadata.setTitle(longName + category.map(c -> " (" + c + ")").orElse("") + " at " + stationLabel);
 
 	StringBuilder abstract_ = new StringBuilder();
 	abstract_.append("Timeseries of ").append(longName.toLowerCase());
@@ -152,6 +153,7 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	addKeyword(keywords, station.optString("station_id_ter", null));
 	addKeyword(keywords, provider);
 	addKeyword(keywords, method);
+	category.ifPresent(c -> addKeyword(keywords, Character.toUpperCase(c.charAt(0)) + c.substring(1)));
 	addKeyword(keywords, longName);
 	addKeyword(keywords, variable.optString("standard_name", null));
 	addKeyword(keywords, "CanSWE");
@@ -257,6 +259,25 @@ public class CanSWEMapper extends AbstractResourceMapper {
 	default:
 	    return longName;
 	}
+    }
+
+    /**
+     * @param measurementType the WMO code of the type_mes variable
+     * @return "snow course" for multi point manual snow surveys (0), "manual" for single point manual measurements (1),
+     *         "automatic" for the automatic sensors (2-6: snow pillows and scales, passive gamma, GNSS, cosmic ray, TDR)
+     */
+    static Optional<String> getMeasurementCategory(long measurementType) {
+
+	if (measurementType == 0) {
+	    return Optional.of("snow course");
+	}
+	if (measurementType == 1) {
+	    return Optional.of("manual");
+	}
+	if (measurementType >= 2 && measurementType <= 6) {
+	    return Optional.of("automatic");
+	}
+	return Optional.empty();
     }
 
     /**

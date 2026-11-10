@@ -360,8 +360,6 @@ public class WISUtils {
     }
 
     public static final String DEFAULT_PUBLISHER = "CNR-ITIAm";
-    public static final String DEFAULT_HOSTNAME = "https://production.whos-dab.eu";
-    public static final String DEFAULT_CENTRE_ID = "it-cnr-itiam-whos-dab";
     public static final String DEFAULT_GENERATED_BY = "WHOS DAB";
     public static final String DEFAULT_TOKEN_REQUEST_CONTACT = "whos@wmo.int";
 
@@ -374,19 +372,43 @@ public class WISUtils {
     }
 
     /**
-     * @return the base URL of the links in the WIS2 notification messages
+     * The hostname has no default value: a default one would make every DAB deployment link its WIS2 records and
+     * notification messages to the same host
+     *
+     * @return the base URL of the links in the WIS2 metadata records and notification messages
+     * @throws IllegalStateException if the hostname is configured neither in the WIS2 setting nor in the legacy
+     *         key-value options
      */
     public static String getHostname() {
 
-	return getWISOption(ConfigurationWrapper.getWIS2Setting().getHostname(), KeyValueOptionKeys.WIS_HOSTNAME, DEFAULT_HOSTNAME);
+	String hostname = getWISOption(ConfigurationWrapper.getWIS2Setting().getHostname(), KeyValueOptionKeys.WIS_HOSTNAME, null);
+
+	if (hostname == null || hostname.isBlank()) {
+
+	    throw new IllegalStateException("WIS2 hostname not configured: set it in the WIS2 setting");
+	}
+
+	return hostname.trim();
     }
 
     /**
+     * The centre id has no default value: it identifies the publishing WIS2 centre, so a default one would make every
+     * DAB deployment publish (topics and metadata identifiers) on behalf of the same centre
+     *
      * @return the WIS2 centre id, used in topics and metadata identifiers
+     * @throws IllegalStateException if the centre id is configured neither in the WIS2 setting nor in the legacy
+     *         key-value options
      */
     public static String getCentreId() {
 
-	return getWISOption(ConfigurationWrapper.getWIS2Setting().getCentreId(), KeyValueOptionKeys.WIS_CENTRE_ID, DEFAULT_CENTRE_ID);
+	String centreId = getWISOption(ConfigurationWrapper.getWIS2Setting().getCentreId(), KeyValueOptionKeys.WIS_CENTRE_ID, null);
+
+	if (centreId == null || centreId.isBlank()) {
+
+	    throw new IllegalStateException("WIS2 centre id not configured: set it in the WIS2 setting");
+	}
+
+	return centreId.trim();
     }
 
     /**

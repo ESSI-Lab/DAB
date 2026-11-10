@@ -39,10 +39,11 @@ public class WISUtilsSettingsTest {
     @Test
     public void defaultsTest() {
 
-	Assert.assertEquals(WISUtils.DEFAULT_CENTRE_ID, WISUtils.getCentreId());
+	// no default centre id, to avoid publishing on behalf of another centre
+	Assert.assertThrows(IllegalStateException.class, WISUtils::getCentreId);
 	Assert.assertEquals(WISUtils.DEFAULT_PUBLISHER, WISUtils.getPublisher());
 	Assert.assertEquals(WISUtils.DEFAULT_GENERATED_BY, WISUtils.getGeneratedBy());
-	Assert.assertEquals(WISUtils.DEFAULT_HOSTNAME, WISUtils.getHostname());
+	Assert.assertThrows(IllegalStateException.class, WISUtils::getHostname);
 	Assert.assertEquals(WISUtils.DEFAULT_TOKEN_REQUEST_CONTACT, WISUtils.getTokenRequestContact());
 	Assert.assertTrue(WISUtils.getViewId().isEmpty());
     }

@@ -52,6 +52,9 @@ public class CanSWEHarvestExternalTestIT {
 	CanSWEConnector connector = new CanSWEConnector();
 	connector.setSourceURL(CanSWEClient.DEFAULT_ENDPOINT);
 
+	GSSource source = new GSSource();
+	source.setEndpoint(CanSWEClient.DEFAULT_ENDPOINT);
+
 	java.util.Set<String> stations = new java.util.HashSet<>();
 	String token = null;
 	do {
@@ -60,8 +63,10 @@ public class CanSWEHarvestExternalTestIT {
 	    ListRecordsResponse<OriginalMetadata> response = connector.listRecords(request);
 	    Iterator<OriginalMetadata> records = response.getRecords();
 	    while (records.hasNext()) {
-		org.json.JSONObject station = new org.json.JSONObject(records.next().getMetadata())
-			.getJSONObject(CanSWEConnector.RECORD_STATION);
+		OriginalMetadata record = records.next();
+		String title = new CanSWEMapper().map(record, source).getHarmonizedMetadata().getCoreMetadata().getTitle();
+		assertTrue(title, title.contains(" (automatic) at "));
+		org.json.JSONObject station = new org.json.JSONObject(record.getMetadata()).getJSONObject(CanSWEConnector.RECORD_STATION);
 		long type = station.getLong("type_mes");
 		assertTrue(type == 2 || type == 3);
 		stations.add(station.getString(CanSWEConnector.RECORD_STATION_ID));
@@ -112,6 +117,11 @@ public class CanSWEHarvestExternalTestIT {
 	System.out.println("Records of the first page: " + count);
 	assertTrue(count > CanSWEConnector.STATIONS_PER_PAGE);
 	assertNotNull(swe);
+	assertEquals("Snow water equivalent (snow course) at WEST CASTLE SNOW (ALE-05AA805)",
+		swe.getHarmonizedMetadata().getCoreMetadata().getTitle());
+	java.util.List<String> keywords = new java.util.ArrayList<>();
+	swe.getHarmonizedMetadata().getCoreMetadata().getDataIdentification().getKeywordsValues().forEachRemaining(keywords::add);
+	assertTrue(keywords.toString(), keywords.contains("Snow course"));
 
 	Online online = swe.getHarmonizedMetadata().getCoreMetadata().getOnline();
 	// during harvesting the identifier is assigned by the identifier decorator

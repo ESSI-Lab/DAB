@@ -61,7 +61,12 @@ import eu.essi_lab.profiler.wis.WISUtils;
 public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
     public enum CollectionCreatorTaskOptions implements OptionsKey {
-	SOURCE_ID, VIEW_ID;
+	SOURCE_ID, VIEW_ID,
+	/**
+	 * The WIS2 centre id of the generated records (metadata identifiers and metadata topic). If missing, the centre id
+	 * of the WIS2 setting is used
+	 */
+	CENTRE_ID;
     }
 
     @Override
@@ -97,7 +102,13 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    return;
 	}
 	String hostname = WISUtils.getHostname();
-	String centreId = WISUtils.getCentreId();
+	String centreId = taskOptions.get().get(CollectionCreatorTaskOptions.CENTRE_ID);
+	if (centreId == null || centreId.isBlank()) {
+	    centreId = WISUtils.getCentreId();
+	} else {
+	    centreId = centreId.trim();
+	    log(status, "Using the centre id of the task options: " + centreId);
+	}
 	String generatedBy = WISUtils.getGeneratedBy();
 
 	String[] splits = sourceId.split(";");
