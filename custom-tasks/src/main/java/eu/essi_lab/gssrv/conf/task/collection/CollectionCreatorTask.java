@@ -1,6 +1,7 @@
 package eu.essi_lab.gssrv.conf.task.collection;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.EnumMap;
 
 /*-
@@ -66,7 +67,12 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	 * The WIS2 centre id of the generated records (metadata identifiers and metadata topic). If missing, the centre id
 	 * of the WIS2 setting is used
 	 */
-	CENTRE_ID;
+	CENTRE_ID,
+	/**
+	 * If <code>true</code>, no record is generated: all the records of the source currently published are removed and
+	 * a deletion notification is sent for each of them, on the topic where it was published
+	 */
+	DELETE;
     }
 
     @Override
@@ -102,12 +108,21 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 	    return;
 	}
 	String hostname = WISUtils.getHostname();
-	String centreId = taskOptions.get().get(CollectionCreatorTaskOptions.CENTRE_ID);
-	if (centreId == null || centreId.isBlank()) {
-	    centreId = WISUtils.getCentreId();
+
+	boolean delete = Boolean.parseBoolean(taskOptions.get().get(CollectionCreatorTaskOptions.DELETE));
+
+	// the centre id is only needed to generate the records: the deleted ones keep their own identifier and topic
+	String centreId = null;
+	if (delete) {
+	    log(status, "Delete mode: the published records of the source will be removed and deletion notifications sent");
 	} else {
-	    centreId = centreId.trim();
-	    log(status, "Using the centre id of the task options: " + centreId);
+	    centreId = taskOptions.get().get(CollectionCreatorTaskOptions.CENTRE_ID);
+	    if (centreId == null || centreId.isBlank()) {
+		centreId = WISUtils.getCentreId();
+	    } else {
+		centreId = centreId.trim();
+		log(status, "Using the centre id of the task options: " + centreId);
+	    }
 	}
 	String generatedBy = WISUtils.getGeneratedBy();
 
@@ -127,7 +142,8 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	    } else {
 
-		run(hostname, centreId, generatedBy, targetSource.get().getUniqueIdentifier(), view.get());
+		run(hostname, centreId, generatedBy, targetSource.get().getUniqueIdentifier(), ConfigurationWrapper.getStorageInfo(),
+			view.get(), delete);
 	    }
 	}
 
@@ -148,16 +164,31 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
      */
     public void run(String hostname, String centreId, String generatedBy, String sourceId, StorageInfo databaseURI, View view) throws Exception {
 
+	run(hostname, centreId, generatedBy, sourceId, databaseURI, view, false);
+    }
+
+    /**
+     * @param delete if <code>true</code>, no record is generated and all the published records of the source are
+     *        removed, sending the deletion notifications
+     */
+    public void run(String hostname, String centreId, String generatedBy, String sourceId, StorageInfo databaseURI, View view,
+	    boolean delete) throws Exception {
+
 	SourceStorageProvider sourceStorage = DatabaseProviderFactory.getSourceStorage(databaseURI);
 
 	DatabaseFolder folder = sourceStorage.getDataFolder(sourceId, true).get();
 
-	// one collection for the source, or one for each of its harmonized observed properties
-	SourceCollectionCreator creator = WISUtils.getRecordGranularity() == RecordGranularity.OBSERVED_PROPERTY
-		? new ParameterCollectionCreator(centreId)
-		: new SourceCollectionCreator(centreId);
+	List<DatasetCollection> datasets = new ArrayList<>();
 
-	List<DatasetCollection> datasets = creator.getCollections(sourceId, view.getSourceDeployment());
+	if (!delete) {
+
+	    // one collection for the source, or one for each of its harmonized observed properties
+	    SourceCollectionCreator creator = WISUtils.getRecordGranularity() == RecordGranularity.OBSERVED_PROPERTY
+		    ? new ParameterCollectionCreator(centreId)
+		    : new SourceCollectionCreator(centreId);
+
+	    datasets = creator.getCollections(sourceId, view.getSourceDeployment());
+	}
 
 	GSLoggerFactory.getLogger(getClass()).info("Number of generated collections: {}", datasets.size());
 
