@@ -865,7 +865,9 @@ public class WISUtils {
     /**
      * Adds a link to subscribe to the data notifications for each WIS2 data topic of the given resource, with filters
      * on the feature of interest and on the observed property of the notified values (no filter is declared on
-     * <code>metadata_id</code>, being a property required by the WIS2 notification message)
+     * <code>metadata_id</code>, being a property required by the WIS2 notification message). If the record describes a
+     * single observed property (see {@link eu.essi_lab.model.resource.ExtensionHandler#getWISObservedProperty()}), the observed property filter
+     * is constant
      * 
      * @param feature
      * @param resource
@@ -903,6 +905,8 @@ public class WISUtils {
 	    observedProperty.put("format", "uri");
 	    observedProperty.put("title", "Observed property");
 	    observedProperty.put("description", "The URI of the harmonized observed property of the notified value");
+	    // a record for each observed property: all its data notifications have the same observed property
+	    resource.getExtensionHandler().getWISObservedProperty().ifPresent(uri -> observedProperty.put("const", uri));
 
 	    JSONObject filters = new JSONObject();
 	    filters.put(DATA_NOTIFICATION_FEATURE_OF_INTEREST, featureOfInterest);

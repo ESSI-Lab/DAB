@@ -39,6 +39,24 @@ public class WCMP2TimeResolutionTest {
     }
 
     @Test
+    public void storedObservedPropertyTest() throws Exception {
+
+	// a record for the whole source: no constant observed property
+	DatasetCollection collection = new DatasetCollection();
+	Assert.assertTrue(GSResource.create(collection.asDocument(true)).getExtensionHandler().getWISObservedProperty().isEmpty());
+
+	// a record for each observed property: the exact URI is kept, also with other observed property URIs (e.g. the
+	// matching WMO concepts) added to the record
+	String uri = "http://hydro.geodab.eu/hydro-ontology/concept/11";
+	collection.getExtensionHandler().setObservedPropertyURI("http://codes.wmo.int/wmdr/ObservedVariableTerrestrial/171");
+	collection.getExtensionHandler().setWISObservedProperty(uri);
+	collection.getExtensionHandler().setWISObservedProperty("http://hydro.geodab.eu/hydro-ontology/concept/12");
+
+	GSResource restored = GSResource.create(collection.asDocument(true));
+	Assert.assertEquals(uri, restored.getExtensionHandler().getWISObservedProperty().get());
+    }
+
+    @Test
     public void encodingTest() {
 
 	// the finest resolution in time, the second finest in the additional temporal extent
