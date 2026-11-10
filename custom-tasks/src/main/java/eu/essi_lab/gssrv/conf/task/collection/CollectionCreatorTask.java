@@ -273,6 +273,8 @@ public class CollectionCreatorTask extends AbstractEmbeddedTask {
 
 	    Link link = new Link("deletion", "application/geo+json", url);
 	    WISNotificationMessage wnm = new WISNotificationMessage(UUID.randomUUID().toString(), bbox, fileIdentifier, link, generatedBy);
+	    // the deleted resource is a WCMP2 record, so its metadata identifier is the record identifier
+	    wnm.setMetadataId(fileIdentifier);
 	    System.out.println(topic.get());
 	    System.out.println(wnm.getJSONObject().toString(3));
 

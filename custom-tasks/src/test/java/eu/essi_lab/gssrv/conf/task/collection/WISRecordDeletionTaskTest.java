@@ -61,6 +61,7 @@ public class WISRecordDeletionTaskTest {
 
 	JSONObject properties = message.getJSONObject("properties");
 	assertEquals("urn:wmo:md:it-cnr-itiam-whos-dab:can-swe:10", properties.getString("data_id"));
+	assertEquals("urn:wmo:md:it-cnr-itiam-whos-dab:can-swe:10", properties.getString("metadata_id"));
 	assertTrue(properties.has("pubtime"));
 	assertFalse(properties.has("integrity"));
 

@@ -147,6 +147,8 @@ public class WISRecordDeletionTask extends AbstractEmbeddedTask {
 	Link link = new Link("deletion", "application/geo+json", getCanonicalURL(record).orElse(stripQuery(recordURL)));
 
 	WISNotificationMessage message = new WISNotificationMessage(UUID.randomUUID().toString(), null, recordId, link, generatedBy);
+	// the deleted resource is a WCMP2 record, so its metadata identifier is the record identifier
+	message.setMetadataId(recordId);
 
 	Object geometry = record.opt("geometry");
 	message.getJSONObject().put("geometry", geometry == null ? JSONObject.NULL : geometry);
