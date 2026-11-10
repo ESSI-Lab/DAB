@@ -30,11 +30,12 @@ import rasterio
 from rasterio.features import shapes
 from shapely.geometry import mapping, shape
 
-# Output grid of the COGs: 2500 m EPSG:3857 aligned with gdalwarp -tap, covering the ECMWF domain (25W-45E, 30N-72N).
+# Output grid of the COGs: 2500 m EPSG:3857 aligned with gdalwarp -tap, covering the ECMWF domain (25W-45E, ~29.9N-72N).
 # Pixels are multiples of 2500 m, so the mask is also aligned with any other 2500 m -tap grid inside this extent (e.g. CIMA d03).
+# The ECMWF COGs reach y = 3500000 (29.97N): the grid goes down to 3490000, a few rows below, so their last rows are masked too.
 RESOLUTION = 2500
 XMIN, YMAX = -2785000, 11755000
-WIDTH, HEIGHT = 3121, 3299
+WIDTH, HEIGHT = 3121, 3306
 XMAX, YMIN = XMIN + WIDTH * RESOLUTION, YMAX - HEIGHT * RESOLUTION
 
 
