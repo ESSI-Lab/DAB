@@ -114,6 +114,7 @@ public class HISCentralVenetoMapperTest {
 	originalMD.setSchemeURI(CommonNameSpaceContext.HISCENTRAL_VENETO_NS_URI);
 
 	GSSource gsSource = new GSSource();
+	gsSource.setEndpoint("https://example.com/veneto/");
 
 	GSResource resource = mapper.map(originalMD, gsSource);
 
@@ -196,6 +197,7 @@ public class HISCentralVenetoMapperTest {
 	InputStream stream = HISCentralVenetoMapperTest.class.getClassLoader().getResourceAsStream("venetoStation.json");
 	String metadataTemplate = IOUtils.toString(stream);
 	GSSource gsSource = new GSSource();
+	gsSource.setEndpoint("https://example.com/veneto/");
 
 	Set<String> ids = new HashSet<>();
 	for (String interpolation : new String[] { "MINIMO", "MEDIO", "MASSIMO" }) {
