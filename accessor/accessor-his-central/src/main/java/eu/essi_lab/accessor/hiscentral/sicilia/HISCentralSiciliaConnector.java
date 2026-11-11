@@ -59,7 +59,7 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 	JSONArray stationsArray = client.getStations();
 	for (int i = 0; i < stationsArray.length(); i++) {
 	    JSONObject station = stationsArray.getJSONObject(i);
-	    stations.put(station.optString("i"), station);
+	    stations.put(station.optString("i"), flatten(station));
 	}
 
 	JSONArray elements = client.getElements();
@@ -79,7 +79,102 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 		continue;
 	    }
 
+	    if (station.has(SUB_LOCATIONS)) {
+		station = locateElement(client, station, element);
+	    }
+
 	    ret.addRecord(HISCentralSiciliaMapper.create(station, element));
+	}
+
+	return ret;
+    }
+
+    /**
+     * Key of the sub-locations array of the stations having more than one location (e.g. the dams, where some sensors
+     * are placed downstream)
+     */
+    static final String SUB_LOCATIONS = "l";
+
+    /**
+     * Some stations (e.g. "Arancio Diga R2") have no name and coordinates at the first level, but an array "l" of
+     * sub-locations, each one with its own name and coordinates. The main sub-location (t = 0, otherwise the first
+     * one) provides the station name and coordinates; the array is kept to locate the sensors.
+     *
+     * @param station a {@code /v3/locations} item
+     * @return the station with name and coordinates at the first level
+     */
+    static JSONObject flatten(JSONObject station) {
+
+	JSONArray subLocations = station.optJSONArray(SUB_LOCATIONS);
+	if (subLocations == null || subLocations.isEmpty() || station.has("n")) {
+	    return station;
+	}
+
+	JSONObject main = subLocations.getJSONObject(0);
+	for (int i = 0; i < subLocations.length(); i++) {
+	    if (subLocations.getJSONObject(i).optInt("t", -1) == 0) {
+		main = subLocations.getJSONObject(i);
+		break;
+	    }
+	}
+
+	JSONObject ret = new JSONObject(main.toString());
+	ret.put("i", station.opt("i"));
+	ret.put("o", station.optString("o"));
+	ret.put(SUB_LOCATIONS, subLocations);
+	return ret;
+    }
+
+    /**
+     * Sensors of multi-location stations can have their own position (_strictElementLongitude/Latitude in the element
+     * detail); in this case the station coordinates are replaced with the sensor ones
+     */
+    static JSONObject locateElement(HISCentralSiciliaClient client, JSONObject station, JSONObject element) {
+
+	String elementId = element.optString("elementId");
+
+	try {
+
+	    JSONObject detail = client.getElement(elementId);
+	    return locate(station, detail);
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(HISCentralSiciliaConnector.class).warn("Unable to get the detail of element {}, using the station location: {}",
+		    elementId, e.getMessage());
+	    return station;
+	}
+    }
+
+    /**
+     * @param station a flattened station
+     * @param detail a {@code /v3/elements/{id}} response
+     */
+    static JSONObject locate(JSONObject station, JSONObject detail) {
+
+	if (detail.isNull("_strictElementLongitude") || detail.isNull("_strictElementLatitude")) {
+	    return station;
+	}
+
+	double lon = detail.getDouble("_strictElementLongitude");
+	double lat = detail.getDouble("_strictElementLatitude");
+
+	JSONObject ret = new JSONObject(station.toString());
+	ret.put("x", lon);
+	ret.put("y", lat);
+	ret.remove("z"); // the station altitude does not apply to a sensor placed elsewhere
+
+	if (!detail.isNull("altitude")) {
+	    ret.put("z", detail.get("altitude"));
+	} else {
+	    // altitude of the sub-location having the sensor coordinates
+	    JSONArray subLocations = station.optJSONArray(SUB_LOCATIONS);
+	    for (int i = 0; subLocations != null && i < subLocations.length(); i++) {
+		JSONObject sub = subLocations.getJSONObject(i);
+		if (Math.abs(sub.optDouble("x", Double.NaN) - lon) < 1e-6 && Math.abs(sub.optDouble("y", Double.NaN) - lat) < 1e-6) {
+		    ret.put("z", sub.opt("z"));
+		}
+	    }
 	}
 
 	return ret;

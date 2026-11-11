@@ -95,6 +95,9 @@ public class HISCentralSiciliaMapper extends FileIdentifierMapper {
 
 	String stationId = station.optString("i");
 	String stationName = station.optString("n");
+	if (stationName.isEmpty()) {
+	    stationName = element.optString("stationName");
+	}
 	String owner = station.optString("o");
 	BigDecimal lon = station.optBigDecimal("x", null);
 	BigDecimal lat = station.optBigDecimal("y", null);

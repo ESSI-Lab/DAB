@@ -139,6 +139,15 @@ public class HISCentralSiciliaClient {
     }
 
     /**
+     * @return the detail of the given element (includes e.g. longitude, latitude, altitude and the
+     *         {@code _strictElementLongitude/Latitude} of the sensors having a location different from the station one)
+     */
+    public JSONObject getElement(String elementId) throws GSException {
+
+	return new JSONObject(get(root + "/v3/elements/" + elementId + "?ui_culture=it"));
+    }
+
+    /**
      * @param elementId
      * @param begin
      * @param end
