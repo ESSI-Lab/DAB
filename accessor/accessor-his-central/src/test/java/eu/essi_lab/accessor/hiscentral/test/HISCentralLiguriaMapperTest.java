@@ -77,6 +77,7 @@ public class HISCentralLiguriaMapperTest {
 	originalMD.setSchemeURI(CommonNameSpaceContext.HISCENTRAL_VENETO_NS_URI);
 
 	GSSource gsSource = new GSSource();
+	gsSource.setEndpoint("https://example.com/liguria/");
 
 	GSResource resource = mapper.map(originalMD, gsSource);
 
@@ -112,7 +113,7 @@ public class HISCentralLiguriaMapperTest {
 	TestCase.assertEquals(70.0, verticalExtent.getMaximumValue());
 	
 	// id
-	TestCase.assertEquals("FC02E8D1F843D0325FF5C36783FB80050551DCC2", resource.getOriginalId().get());
+	TestCase.assertEquals("1538A7055ECE2FA2F95AEEFD5FC7C7FA31F3809B", resource.getOriginalId().get());
 
 	// responsible party
 	ResponsibleParty originator = dataIdentification.getPointOfContact("owner");

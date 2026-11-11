@@ -100,6 +100,7 @@ public class HISCentralValdaostaMapperTest {
 	originalMD.setSchemeURI(CommonNameSpaceContext.HISCENTRAL_VALDAOSTA_NS_URI);
 
 	GSSource gsSource = new GSSource();
+	gsSource.setEndpoint("https://example.com/valdaosta/");
 
 	GSResource resource = mapper.map(originalMD, gsSource);
 
