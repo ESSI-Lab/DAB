@@ -30,7 +30,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -118,11 +117,21 @@ public class HISCentralSiciliaClient {
     }
 
     /**
-     * @return the base of the data download linkages: {@code <root>/v3/data-combo/}
+     * @return the base of the data download linkages: {@code <root>/v3/data/}
      */
     public static String getDataLinkagePrefix(String endpoint) {
 
-	return normalizeRoot(endpoint) + "/v3/data-combo/";
+	return normalizeRoot(endpoint) + "/v3/data/";
+    }
+
+    /**
+     * @return true if the given linkage is a data linkage of the given endpoint, including the {@code /v3/data-combo/}
+     *         linkages of the records harvested before the switch to {@code /v3/data/}
+     */
+    public static boolean isDataLinkage(String linkage, String endpoint) {
+
+	String root = normalizeRoot(endpoint);
+	return linkage.startsWith(root + "/v3/data/") || linkage.startsWith(root + "/v3/data-combo/");
     }
 
     /**
@@ -134,11 +143,12 @@ public class HISCentralSiciliaClient {
     }
 
     /**
-     * @return all the elements (sensors) with the {@link #ELEMENT_FIELDS}
+     * @return the enabled elements (sensors) with the {@link #ELEMENT_FIELDS}; elements disabled as station or as
+     *         element are excluded ({@code enabling=Enabled})
      */
     public JSONArray getElements() throws GSException {
 
-	StringBuilder url = new StringBuilder(root + "/v3/elements?category=All&ui_culture=it");
+	StringBuilder url = new StringBuilder(root + "/v3/elements?category=All&enabling=Enabled&ui_culture=it");
 	for (String field : ELEMENT_FIELDS.split(",")) {
 	    url.append("&field=").append(field);
 	}
@@ -158,17 +168,18 @@ public class HISCentralSiciliaClient {
      * @param elementId
      * @param begin
      * @param end
-     * @return the plausible data as an array of [epoch milliseconds, value] pairs
+     * @return the data as an array of [epoch milliseconds, value] pairs ({@code /v3/data/{elementId}} with
+     *         {@code type=Auto}: day by day, the validated data if available, otherwise the plausible ones; invalid
+     *         values are expressed as -2147483648, absent ones as null)
      */
     public JSONArray getData(String elementId, Instant begin, Instant end) throws GSException {
 
 	String url = getDataLinkagePrefix(root) + elementId + //
 		"?from=" + encode(DATE_FORMATTER.format(begin)) + //
 		"&to=" + encode(DATE_FORMATTER.format(end)) + //
-		"&basicType=Plausible&part=EpochTime&part=ValueWithInvalid&timing=Original&loadAlsoExtemp=false";
+		"&type=Auto&part=EpochTime&part=ValueWithInvalid&timing=Original";
 
-	JSONObject response = new JSONObject(get(url));
-	return Optional.ofNullable(response.optJSONArray("plausibleData")).orElse(new JSONArray());
+	return new JSONArray(get(url));
     }
 
     /**

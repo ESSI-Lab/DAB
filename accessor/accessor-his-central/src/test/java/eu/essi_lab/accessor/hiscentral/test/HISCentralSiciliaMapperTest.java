@@ -45,7 +45,7 @@ public class HISCentralSiciliaMapperTest {
 	Assert.assertTrue(extent.isEndPositionIndeterminate());
 
 	Online online = core.getOnline();
-	Assert.assertEquals("https://www.protezionecivilesicilia.it:8443/DatascapeA/v3/data-combo/68615", online.getLinkage());
+	Assert.assertEquals("https://www.protezionecivilesicilia.it:8443/DatascapeA/v3/data/68615", online.getLinkage());
 	Assert.assertEquals(CommonNameSpaceContext.HISCENTRAL_SICILIA_NS_URI, online.getProtocol());
 	Assert.assertEquals("download", online.getFunctionCode());
 

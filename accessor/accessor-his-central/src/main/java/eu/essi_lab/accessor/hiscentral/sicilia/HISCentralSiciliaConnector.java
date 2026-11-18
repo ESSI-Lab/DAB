@@ -68,15 +68,28 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 	GSLoggerFactory.getLogger(getClass()).info("Found {} stations and {} elements", stations.size(), elements.length());
 
 	int maxRecords = getSetting().getMaxRecords().orElse(Integer.MAX_VALUE);
+	int virtual = 0;
+	int inactive = 0;
 
 	for (int i = 0; i < elements.length() && ret.getRecordsAsList().size() < maxRecords; i++) {
 
 	    JSONObject element = elements.getJSONObject(i);
+
+	    if (isVirtual(element)) {
+		virtual++;
+		continue;
+	    }
+
 	    JSONObject station = stations.get(element.optString("stationId"));
 
 	    if (station == null) {
 		GSLoggerFactory.getLogger(getClass()).warn("Station {} of element {} not found, skipping", //
 			element.optString("stationId"), element.optString("elementId"));
+		continue;
+	    }
+
+	    if (!isActive(station)) {
+		inactive++;
 		continue;
 	    }
 
@@ -87,7 +100,32 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 	    ret.addRecord(HISCentralSiciliaMapper.create(station, element));
 	}
 
+	GSLoggerFactory.getLogger(getClass()).info("Skipped {} virtual elements and {} elements of inactive stations", virtual, inactive);
+
 	return ret;
+    }
+
+    /**
+     * Key of the station state in the {@code /v3/locations} items
+     */
+    static final String STATE = "s";
+
+    /**
+     * Only the stations with state 0 provide data: the other ones (mostly s = 40, e.g. Lipari) return no data with
+     * any data type and are not published. The enabling filter of {@code /v3/elements} does not exclude them.
+     */
+    static boolean isActive(JSONObject station) {
+
+	return station.optInt(STATE, 0) == 0;
+    }
+
+    /**
+     * Virtual elements are computed by Datascape from other elements of the same station (e.g. "Pioggia Raccolta in 1
+     * Ora" from "Pioggia Cumulata") and are not published
+     */
+    static boolean isVirtual(JSONObject element) {
+
+	return element.optBoolean("isVirtual", false);
     }
 
     /**
@@ -122,6 +160,9 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 	JSONObject ret = new JSONObject(main.toString());
 	ret.put("i", station.opt("i"));
 	ret.put("o", station.optString("o"));
+	if (station.has(STATE)) {
+	    ret.put(STATE, station.opt(STATE));
+	}
 	ret.put(SUB_LOCATIONS, subLocations);
 	return ret;
     }

@@ -58,8 +58,8 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 /**
- * Downloads the plausible data of a Protezione Civile Regione Siciliana element, e.g.:
- * https://www.protezionecivilesicilia.it:8443/DatascapeA/v3/data-combo/68615?from=...&to=...
+ * Downloads the data (validated if available, otherwise plausible) of a Protezione Civile Regione Siciliana element,
+ * e.g.: https://siciliadrpc-aegis.caedns.it/platform/v3/data/68615?from=...&to=...
  *
  * @author Roberto
  */
@@ -78,7 +78,7 @@ public class HISCentralSiciliaDownloader extends WMLDataDownloader {
 	return online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().startsWith(HISCentralSiciliaClient.getDataLinkagePrefix(resource.getSource().getEndpoint())) && //
+		HISCentralSiciliaClient.isDataLinkage(online.getLinkage(), resource.getSource().getEndpoint()) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_SICILIA_NS_URI);
     }
