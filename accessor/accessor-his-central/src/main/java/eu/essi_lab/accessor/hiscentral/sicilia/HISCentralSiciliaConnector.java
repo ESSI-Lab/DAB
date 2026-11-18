@@ -40,7 +40,8 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**
  * Harvests the stations and sensors (elements) of the Protezione Civile Regione Siciliana (CAE Datascape API, e.g.
- * https://www.protezionecivilesicilia.it:8443/DatascapeA). One record per element.
+ * https://siciliadrpc-aegis.caedns.it/platform or https://www.protezionecivilesicilia.it:8443/DatascapeA). One record
+ * per element.
  *
  * @author Roberto
  */
@@ -197,7 +198,8 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
     @Override
     public boolean supports(GSSource source) {
 
-	return source.getEndpoint().contains("protezionecivilesicilia.it");
+	String endpoint = source.getEndpoint();
+	return endpoint.contains("protezionecivilesicilia.it") || endpoint.contains("siciliadrpc-aegis.caedns.it");
     }
 
     @Override

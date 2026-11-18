@@ -51,7 +51,9 @@ import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * Client of the CAE Datascape (AEGIS) REST API of the Protezione Civile Regione Siciliana, e.g.
- * https://www.protezionecivilesicilia.it:8443/DatascapeA. Credentials are read from the {@link CredentialsSetting}.
+ * https://siciliadrpc-aegis.caedns.it/platform. Credentials are read from the {@link CredentialsSetting}: the token is
+ * acquired with the OAuth2 password grant ({@code /connect/token}) using the institutional user (e.g. "ispra") and the
+ * {@value #DEFAULT_CLIENT_ID} client id.
  *
  * @author Roberto
  */
@@ -64,6 +66,11 @@ public class HISCentralSiciliaClient {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx")
 	    .withZone(ZoneOffset.UTC);
+
+    /**
+     * OAuth2 client of the institutional accounts (password grant with username and password only)
+     */
+    static final String DEFAULT_CLIENT_ID = "GenericClient";
 
     private static final long TOKEN_EXPIRATION_MARGIN_MS = TimeUnit.SECONDS.toMillis(60);
 
@@ -225,8 +232,10 @@ public class HISCentralSiciliaClient {
 	params.put("grant_type", "password");
 	params.put("username", credentials.getSiciliaClientUser().orElseThrow(() -> missingCredential("siciliaUsername")));
 	params.put("password", credentials.getSiciliaClientPassword().orElseThrow(() -> missingCredential("siciliaPassword")));
-	params.put("client_id", credentials.getSiciliaClientId().orElseThrow(() -> missingCredential("siciliaId")));
-	params.put("client_instance", credentials.getSiciliaClientInstance().orElseThrow(() -> missingCredential("siciliaInstance")));
+	params.put("client_id", credentials.getSiciliaClientId().filter(id -> !id.isBlank()).orElse(DEFAULT_CLIENT_ID));
+	// the client instance is not required by the GenericClient
+	credentials.getSiciliaClientInstance().filter(instance -> !instance.isBlank())
+		.ifPresent(instance -> params.put("client_instance", instance));
 
 	try {
 
