@@ -22,6 +22,7 @@ package eu.essi_lab.accessor.hiscentral.sicilia;
  */
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -253,6 +254,51 @@ public class HISCentralSiciliaMapper extends FileIdentifierMapper {
 	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
+
+	getObservedPropertyURI(quantity).ifPresent(uri -> dataset.getExtensionHandler().setObservedPropertyURI(uri));
+    }
+
+    private static final String CONCEPT_BASE_URI = "http://his-central-ontology.geodab.eu/hydro-ontology/concept/";
+
+    /**
+     * HIS-Central ontology concepts of the quantities. Most quantity names are not ontology labels (e.g. "Velocità
+     * Vento Vettoriale", "Temperatura Aria Minima"), so the variable augmenter would not find them; the statistic of
+     * the min/max/average quantities is given by the time interpolation
+     */
+    private static final Map<String, String> CONCEPTS = Map.ofEntries(//
+	    Map.entry("temperatura aria", "49"), //
+	    Map.entry("temperatura aria minima", "49"), //
+	    Map.entry("temperatura aria massima", "49"), //
+	    Map.entry("temperatura aria media", "49"), //
+	    Map.entry("pioggia cumulata", "65"), //
+	    Map.entry("incrementi di pioggia", "65"), //
+	    Map.entry("intensità di pioggia", "5262"), //
+	    Map.entry("umidità relativa", "133"), //
+	    Map.entry("livello idrometrico", "11"), //
+	    Map.entry("pressione atmosferica", "55"), //
+	    Map.entry("livello neve", "9"), //
+	    Map.entry("temperatura acqua", "51"), //
+	    Map.entry("velocità vento vettoriale", "33"), //
+	    Map.entry("velocità vento scalare", "33"), //
+	    Map.entry("velocità vento raffica", "5327"), //
+	    Map.entry("direzione vento vettoriale", "67"), //
+	    Map.entry("direzione vento scalare", "67"), //
+	    Map.entry("direzione vento raffica", "68"), //
+	    Map.entry("radiazione solare diretta", "5167"), //
+	    Map.entry("umidità suolo", "138"), //
+	    Map.entry("salinità dell'acqua", "2294"), //
+	    Map.entry("ph dell'acqua", "2293"), //
+	    Map.entry("solidi disciolti totali - tds", "2264"), //
+	    Map.entry("conducibilità", "2297"));
+
+    /**
+     * @param quantity
+     * @return the HIS-Central ontology concept URI of the quantity, if known
+     */
+    static Optional<String> getObservedPropertyURI(String quantity) {
+
+	String key = quantity.trim().toLowerCase().replace('’', '\'');
+	return Optional.ofNullable(CONCEPTS.get(key)).map(id -> CONCEPT_BASE_URI + id);
     }
 
     private static final Pattern MIN_PATTERN = Pattern.compile("\\b(min|minima|minimo)\\b");
