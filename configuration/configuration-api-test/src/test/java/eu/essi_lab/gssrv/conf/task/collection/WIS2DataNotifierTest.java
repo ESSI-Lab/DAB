@@ -17,6 +17,7 @@ import org.junit.Test;
 
 import eu.essi_lab.access.datacache.DataRecord;
 import eu.essi_lab.access.datacache.LatitudeLongitude;
+import eu.essi_lab.access.datacache.StationRecord;
 import eu.essi_lab.access.datacache.WIS2DataItem;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.cfga.gs.DefaultConfiguration;
@@ -96,8 +97,12 @@ public class WIS2DataNotifierTest {
 
 	String content = WIS2DataItem.encode(record);
 
-	JSONObject message = WIS2DataNotifier.createMessage(record, content, WIS2DataEncoding.JSON, topic, "whos", metadataId, "WHOS DAB")
-		.getJSONObject();
+	StationRecord stationRecord = new StationRecord();
+	stationRecord.setPlatformIdentifier("urn:argentina-ina:52");
+	Optional<StationRecord> station = Optional.of(stationRecord);
+
+	JSONObject message = WIS2DataNotifier
+		.createMessage(record, station, content, WIS2DataEncoding.JSON, topic, "whos", metadataId, "WHOS DAB").getJSONObject();
 
 	System.out.println(message.toString(3));
 
@@ -119,6 +124,11 @@ public class WIS2DataNotifierTest {
 	Assert.assertEquals("urn:wmo:md:" + CENTRE_ID + ":argentina-ina", properties.getString("metadata_id"));
 	Assert.assertEquals("2026-10-23T09:00:00Z", properties.getString("datetime"));
 	Assert.assertTrue(properties.has("pubtime"));
+
+	// the properties advertised as filters by the data notification links of the WCMP2 records
+	Assert.assertEquals("urn:argentina-ina:52", properties.getString(WISUtils.DATA_NOTIFICATION_FEATURE_OF_INTEREST));
+	Assert.assertEquals("http://hydro.geodab.eu/hydro-ontology/concept/11",
+		properties.getString(WISUtils.DATA_NOTIFICATION_OBSERVED_PROPERTY));
 
 	// inline content
 	JSONObject contentObject = properties.getJSONObject("content");
@@ -144,14 +154,18 @@ public class WIS2DataNotifierTest {
 	// the data id follows the given (e.g. experimental) topic
 	String experimental = WIS2HydrologyTopic.STREAM.getExperimentalTopic(CENTRE_ID, WIS2DataPolicy.CORE);
 	JSONObject experimentalMessage = WIS2DataNotifier
-		.createMessage(record, content, WIS2DataEncoding.JSON, experimental, "whos", metadataId, "WHOS DAB").getJSONObject();
+		.createMessage(record, station, content, WIS2DataEncoding.JSON, experimental, "whos", metadataId, "WHOS DAB")
+		.getJSONObject();
 	Assert.assertEquals(CENTRE_ID + "/data/core/hydrology/experimental/surface-based-observations/water-quantity/stream/" + itemId,
 		experimentalMessage.getJSONObject("properties").getString("data_id"));
 
 	// CSV: the link has the CSV media type and format, the content and checksum are the CSV ones
-	String csv = WIS2DataItem.encode(record, WIS2DataEncoding.CSV, Optional.empty());
-	JSONObject csvMessage = WIS2DataNotifier.createMessage(record, csv, WIS2DataEncoding.CSV, topic, "whos", metadataId, "WHOS DAB")
-		.getJSONObject();
+	String csv = WIS2DataItem.encode(record, WIS2DataEncoding.CSV, station);
+	JSONObject csvMessage = WIS2DataNotifier
+		.createMessage(record, station, csv, WIS2DataEncoding.CSV, topic, "whos", metadataId, "WHOS DAB").getJSONObject();
+	// the filter properties do not depend on the encoding
+	Assert.assertEquals("urn:argentina-ina:52",
+		csvMessage.getJSONObject("properties").getString(WISUtils.DATA_NOTIFICATION_FEATURE_OF_INTEREST));
 	System.out.println(csvMessage.toString(3));
 	JSONObject csvLink = csvMessage.getJSONArray("links").getJSONObject(0);
 	Assert.assertEquals("text/csv", csvLink.getString("type"));
@@ -162,11 +176,21 @@ public class WIS2DataNotifierTest {
 		csvMessage.getJSONObject("properties").getJSONObject("integrity").getString("value"));
 
 	// OM-JSON: same media type as JSON, own format
-	String om = WIS2DataItem.encode(record, WIS2DataEncoding.OM_JSON, Optional.empty());
-	JSONObject omMessage = WIS2DataNotifier.createMessage(record, om, WIS2DataEncoding.OM_JSON, topic, "whos", metadataId, "WHOS DAB")
-		.getJSONObject();
+	String om = WIS2DataItem.encode(record, WIS2DataEncoding.OM_JSON, station);
+	JSONObject omMessage = WIS2DataNotifier
+		.createMessage(record, station, om, WIS2DataEncoding.OM_JSON, topic, "whos", metadataId, "WHOS DAB").getJSONObject();
 	System.out.println(omMessage.toString(3));
 	Assert.assertTrue(omMessage.getJSONArray("links").getJSONObject(0).getString("href").endsWith("?f=omjson"));
 	Assert.assertEquals(om, omMessage.getJSONObject("properties").getJSONObject("content").getString("value"));
+	// the feature of interest property is the same station of the OM-JSON content
+	Assert.assertEquals("urn:argentina-ina:52", new JSONObject(om).getJSONObject("featureOfInterest").getString("href"));
+	Assert.assertEquals("urn:argentina-ina:52",
+		omMessage.getJSONObject("properties").getString(WISUtils.DATA_NOTIFICATION_FEATURE_OF_INTEREST));
+
+	// without a station, the feature of interest property is omitted
+	JSONObject noStationMessage = WIS2DataNotifier
+		.createMessage(record, Optional.empty(), content, WIS2DataEncoding.JSON, topic, "whos", metadataId, "WHOS DAB")
+		.getJSONObject();
+	Assert.assertFalse(noStationMessage.getJSONObject("properties").has(WISUtils.DATA_NOTIFICATION_FEATURE_OF_INTEREST));
     }
 }

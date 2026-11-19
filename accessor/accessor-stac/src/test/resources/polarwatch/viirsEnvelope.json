@@ -1,0 +1,739 @@
+{
+ "catalogUrl": "https://polarwatch.noaa.gov/stac/catalog.json",
+ "collectionUrl": "https://polarwatch.noaa.gov/stac/collections/noaacwVIIRSn20iceconcNP06Daily/collection.json",
+ "collection": {
+  "type": "Collection",
+  "id": "noaacwVIIRSn20iceconcNP06Daily",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+   "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+   "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "title": "Ice Concentration, NOAA-20 VIIRS, Near Real-Time, Polar Stereographic (North), Daily",
+  "description": "Enterprise Ice Concentration/ Ice Mask/ Ice Surface Temperature Products",
+  "license": "https://science.nasa.gov/earth-science/earth-science-data/data-information-policy/ The data may be used and redistributed for free but is not intended\nfor legal use, since it may contain inaccuracies. Neither the data\nContributor, ERD, NOAA, nor the United States Government, nor any\nof their employees or contractors, makes any warranty, express or\nimplied, including warranties of merchantability and fitness for a\nparticular purpose, or assumes any legal liability for the accuracy,\ncompleteness, or usefulness, of this information.",
+  "keywords": [
+   "Earth Science > Cryosphere > Sea Ice > Sea Ice Concentration",
+   "Earth Science > Oceans > Sea Ice > Sea Ice Concentration"
+  ],
+  "providers": [
+   {
+    "name": "NOAA NESDIS CoastWatch",
+    "roles": [
+     "producer",
+     "processor"
+    ],
+    "url": "https://coastwatch.noaa.gov/erddap"
+   }
+  ],
+  "extent": {
+   "spatial": {
+    "bbox": [
+     [
+      -3434002.5,
+      -3434002.5,
+      3434002.5,
+      3434002.5
+     ]
+    ]
+   },
+   "temporal": {
+    "interval": [
+     [
+      "2021-03-23T17:43:11Z",
+      null
+     ]
+    ]
+   }
+  },
+  "summaries": {
+   "platform": [
+    "NOAA-20"
+   ],
+   "instruments": [
+    "VIIRS"
+   ],
+   "proj:epsg": [
+    3413
+   ]
+  },
+  "links": [
+   {
+    "rel": "self",
+    "href": "./collections/noaacwVIIRSn20iceconcNP06Daily/collection.json",
+    "type": "application/json",
+    "title": "This collection"
+   },
+   {
+    "rel": "root",
+    "href": "../../catalog.json",
+    "type": "application/json",
+    "title": "STAC Catalog"
+   },
+   {
+    "rel": "parent",
+    "href": "../../catalog.json",
+    "type": "application/json",
+    "title": "STAC Catalog"
+   },
+   {
+    "rel": "about",
+    "href": "https://coastwatch.noaa.gov/erddap/griddap/noaacwVIIRSn20iceconcNP06Daily.html",
+    "type": "text/html",
+    "title": "ERDDAP Data Access Form"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://coastwatch.noaa.gov/erddap/info/noaacwVIIRSn20iceconcNP06Daily/index.html",
+    "type": "text/html",
+    "title": "ERDDAP Dataset Information"
+   },
+   {
+    "rel": "service",
+    "href": "https://coastwatch.noaa.gov/erddap/griddap/noaacwVIIRSn20iceconcNP06Daily",
+    "type": "text/html",
+    "external": false,
+    "title": "ERDDAP Data Access Form"
+   }
+  ],
+  "assets": {
+   "files": {
+    "href": "https://coastwatch.noaa.gov/erddap/files/noaacwVIIRSn20iceconcNP06Daily",
+    "type": "text/html",
+    "title": "HTTPS files directory",
+    "external": false,
+    "roles": [
+     "data"
+    ],
+    "pw:service_type": "https"
+   }
+  },
+  "item_assets": {
+   "IceConc": {
+    "type": "application/x-netcdf",
+    "title": "Ice Concentration",
+    "roles": [
+     "data"
+    ]
+   }
+  },
+  "pw:service_type": "erddap",
+  "pw:conventions": "CF-1.6, COARDS, ACDD-1.3",
+  "pw:naming_authority": "gov.noaa.coastwatch",
+  "pw:standard_name_vocabulary": "CF Standard Name Table v29",
+  "pw:processing_level": "",
+  "pw:resolution_spatial": "",
+  "pw:resolution_temporal": "",
+  "pw:license_text": "https://science.nasa.gov/earth-science/earth-science-data/data-information-policy/ The data may be used and redistributed for free but is not intended\nfor legal use, since it may contain inaccuracies. Neither the data\nContributor, ERD, NOAA, nor the United States Government, nor any\nof their employees or contractors, makes any warranty, express or\nimplied, including warranties of merchantability and fitness for a\nparticular purpose, or assumes any legal liability for the accuracy,\ncompleteness, or usefulness, of this information.",
+  "pw:creator_name": "NOAA/NESDIS/STAR/SOCD/CoastWatch",
+  "pw:creator_email": "coastwatch.info@noaa.gov",
+  "proj:epsg": 3413,
+  "proj:proj4": "+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+ },
+ "erddap": {
+  "base": "https://coastwatch.noaa.gov/erddap",
+  "protocol": "griddap",
+  "datasetId": "noaacwVIIRSn20iceconcNP06Daily",
+  "info": {
+   "table": {
+    "columnNames": [
+     "Row Type",
+     "Variable Name",
+     "Attribute Name",
+     "Data Type",
+     "Value"
+    ],
+    "columnTypes": [
+     "String",
+     "String",
+     "String",
+     "String",
+     "String"
+    ],
+    "rows": [
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "cdm_data_type",
+      "String",
+      "Grid"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "Conventions",
+      "String",
+      "CF-1.6, COARDS, ACDD-1.3"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "creator_email",
+      "String",
+      "coastwatch.info@noaa.gov"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "creator_name",
+      "String",
+      "NOAA/NESDIS/STAR/SOCD/CoastWatch"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "creator_url",
+      "String",
+      "https://coastwatch.noaa.gov"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "crs_wkt",
+      "String",
+      "PROJCS[\"WGS 84 / NSIDC Sea Ice Polar Stereographic North\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",70],PARAMETER[\"central_meridian\",-45],PARAMETER[\"scale_factor\",1],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH],AUTHORITY[\"EPSG\",\"3413\"]]"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "date_created",
+      "String",
+      "2026-11-06T05:11:13Z"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "defaultGraphQuery",
+      "String",
+      "IceConc%5B(time_coverage_end)%5D%5B(0.0)%5D%5B(3255922.5):(-3255922.5)%5D%5B(-3255922.5):(3255922.5)%5D%26.draw=surface%26.vars=cols\n%7Crows%7CIceThickness%26.colorBar=KT_ice%7C%7CLog%7C%7C%7C%26.bgColor=0xffccccff"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "end_orbit_number",
+      "int",
+      "46459"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "geospatial_bounds",
+      "String",
+      "POLYGON((-180.0 47.197074,161.565051 55.58931,135.0 59.044941,108.434949 55.58931,90.0 47.197074,71.565051 55.58931,45.0 59.044941,18.434949 55.58931,0.0 47.197074,-18.434949 55.58931,-45.0 59.044941,-71.565051 55.58931,-90.0 47.197074,-108.434949 55.58931,-135.0 59.044941,-161.565051 55.58931,-180.0 47.197074))"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "geospatial_vertical_max",
+      "double",
+      "0.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "geospatial_vertical_min",
+      "double",
+      "0.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "geospatial_vertical_positive",
+      "String",
+      "up"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "geospatial_vertical_units",
+      "String",
+      "m"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "history",
+      "String",
+      "[cwutils 4.0.1.7 20240513_133416] cwcomposite --pedantic --coherent IceConc/latitude --optimal sat_zenith/minabs --method optimal --inputs - --match ^(longitude|latitude|QCFlags|sat_zenith|IceConc)$ /home/pub/svc_cwatch/aps/aps_t/browse/lvl4/modis/coastwatch/hdf/VX1CCW_C2026309_C197_011633-233924_NP06_edgemask_IceConc.hdf\n[cwutils 4.0.1.7 20240513_133416] cwgraphics /home/pub/svc_cwatch/aps/aps_t/browse/lvl4/modis/coastwatch/hdf/VX1CCW_C2026309_C197_011633-233924_NP06_edgemask_IceConc.hdf"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "identifier_product_doi_authority",
+      "String",
+      "https://dx.doi.org"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "infoUrl",
+      "String",
+      "https://coastwatch.noaa.gov"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "institution",
+      "String",
+      "NOAA NESDIS CoastWatch"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "instrument",
+      "String",
+      "VIIRS"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "keywords",
+      "String",
+      "Earth Science > Cryosphere > Sea Ice > Sea Ice Concentration, Earth Science > Oceans > Sea Ice > Sea Ice Concentration"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "keywords_vocabulary",
+      "String",
+      "GCMD Science Keywords"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "license",
+      "String",
+      "https://science.nasa.gov/earth-science/earth-science-data/data-information-policy/ The data may be used and redistributed for free but is not intended\nfor legal use, since it may contain inaccuracies. Neither the data\nContributor, ERD, NOAA, nor the United States Government, nor any\nof their employees or contractors, makes any warranty, express or\nimplied, including warranties of merchantability and fitness for a\nparticular purpose, or assumes any legal liability for the accuracy,\ncompleteness, or usefulness, of this information."
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "naming_authority",
+      "String",
+      "gov.noaa.coastwatch"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "OBSERVED_PROPERTY",
+      "String",
+      "IceConc"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "platform",
+      "String",
+      "NOAA-20"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "proj4text",
+      "String",
+      "+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "source",
+      "String",
+      "NOAA-20_VIIRS_IceConc"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "sourceUrl",
+      "String",
+      "(local files)"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "srid",
+      "String",
+      "EPSG:3413"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "standard_name_vocabulary",
+      "String",
+      "CF Standard Name Table v29"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "start_orbit_number",
+      "int",
+      "46446"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "summary",
+      "String",
+      "Enterprise Ice Concentration/ Ice Mask/ Ice Surface Temperature Products"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "testOutOfDate",
+      "String",
+      "now-2days"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "time_coverage_end",
+      "String",
+      "2026-11-05T12:28:41Z"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "time_coverage_start",
+      "String",
+      "2021-03-23T17:43:11Z"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "title",
+      "String",
+      "Ice Concentration, NOAA-20 VIIRS, Near Real-Time, Polar Stereographic (North), Daily"
+     ],
+     [
+      "dimension",
+      "time",
+      "",
+      "double",
+      "nValues=1994, evenlySpaced=false, averageSpacing=1 day 0h 43m 12s"
+     ],
+     [
+      "attribute",
+      "time",
+      "_CoordinateAxisType",
+      "String",
+      "Time"
+     ],
+     [
+      "attribute",
+      "time",
+      "actual_range",
+      "double",
+      "1.6165213913285E9, 1.793881721399E9"
+     ],
+     [
+      "attribute",
+      "time",
+      "axis",
+      "String",
+      "T"
+     ],
+     [
+      "attribute",
+      "time",
+      "bounds",
+      "String",
+      "time_bounds"
+     ],
+     [
+      "attribute",
+      "time",
+      "calendar",
+      "String",
+      "gregorian"
+     ],
+     [
+      "attribute",
+      "time",
+      "ioos_category",
+      "String",
+      "Time"
+     ],
+     [
+      "attribute",
+      "time",
+      "long_name",
+      "String",
+      "Time"
+     ],
+     [
+      "attribute",
+      "time",
+      "standard_name",
+      "String",
+      "time"
+     ],
+     [
+      "attribute",
+      "time",
+      "time_origin",
+      "String",
+      "01-JAN-1970 00:00:00"
+     ],
+     [
+      "attribute",
+      "time",
+      "units",
+      "String",
+      "seconds since 1970-01-01T00:00:00Z"
+     ],
+     [
+      "dimension",
+      "altitude",
+      "",
+      "double",
+      "nValues=1, onlyValue=0.0"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "_CoordinateAxisType",
+      "String",
+      "Height"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "_CoordinateZisPositive",
+      "String",
+      "up"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "actual_range",
+      "double",
+      "0.0, 0.0"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "axis",
+      "String",
+      "Z"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "ioos_category",
+      "String",
+      "Location"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "long_name",
+      "String",
+      "Altitude"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "positive",
+      "String",
+      "up"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "standard_name",
+      "String",
+      "altitude"
+     ],
+     [
+      "attribute",
+      "altitude",
+      "units",
+      "String",
+      "m"
+     ],
+     [
+      "dimension",
+      "rows",
+      "",
+      "double",
+      "nValues=8640, evenlySpaced=true, averageSpacing=-795.0"
+     ],
+     [
+      "attribute",
+      "rows",
+      "actual_range",
+      "double",
+      "-3434002.5, 3434002.5"
+     ],
+     [
+      "attribute",
+      "rows",
+      "axis",
+      "String",
+      "Y"
+     ],
+     [
+      "attribute",
+      "rows",
+      "ioos_category",
+      "String",
+      "Location"
+     ],
+     [
+      "attribute",
+      "rows",
+      "long_name",
+      "String",
+      "Northing of Pixel Centers"
+     ],
+     [
+      "attribute",
+      "rows",
+      "standard_name",
+      "String",
+      "projection_y_coordinate"
+     ],
+     [
+      "attribute",
+      "rows",
+      "units",
+      "String",
+      "m"
+     ],
+     [
+      "dimension",
+      "cols",
+      "",
+      "double",
+      "nValues=8640, evenlySpaced=true, averageSpacing=795.0"
+     ],
+     [
+      "attribute",
+      "cols",
+      "actual_range",
+      "double",
+      "-3434002.5, 3434002.5"
+     ],
+     [
+      "attribute",
+      "cols",
+      "axis",
+      "String",
+      "X"
+     ],
+     [
+      "attribute",
+      "cols",
+      "ioos_category",
+      "String",
+      "Location"
+     ],
+     [
+      "attribute",
+      "cols",
+      "long_name",
+      "String",
+      "Easting of Pixel Centers"
+     ],
+     [
+      "attribute",
+      "cols",
+      "standard_name",
+      "String",
+      "projection_x_coordinate"
+     ],
+     [
+      "attribute",
+      "cols",
+      "units",
+      "String",
+      "m"
+     ],
+     [
+      "variable",
+      "IceConc",
+      "",
+      "float",
+      "time, altitude, rows, cols"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "_FillValue",
+      "float",
+      "-9.99"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "colorBarMaximum",
+      "double",
+      "1.0"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "colorBarMinimum",
+      "double",
+      "0.0"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "coordinates",
+      "String",
+      "longitude latitude"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "grid_mapping",
+      "String",
+      "polar_stereographic_proj"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "ioos_category",
+      "String",
+      "Ice Distribution"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "long_name",
+      "String",
+      "Ice Concentration"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "missing_value",
+      "float",
+      "-9.99"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "units",
+      "String",
+      "1"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "valid_max",
+      "float",
+      "1.0"
+     ],
+     [
+      "attribute",
+      "IceConc",
+      "valid_min",
+      "float",
+      "0.0"
+     ]
+    ]
+   }
+  }
+ }
+}

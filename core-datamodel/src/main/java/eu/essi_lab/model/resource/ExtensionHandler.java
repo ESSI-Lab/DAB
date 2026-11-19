@@ -52,6 +52,7 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
     private static final String ORIGINATOR_ORGANISATION_IDENTIFIER = "OriginatorOrganisationIdentifier";
     private static final String WIS_DATA_TOPIC = "WISDataTopic";
     private static final String WIS_TIME_RESOLUTION = "WISTimeResolution";
+    private static final String WIS_OBSERVED_PROPERTY = "WISObservedProperty";
     private static final String ORIGINATOR_ORGANISATION_DESCRIPTION = "OriginatorOrganisationDescription";
     private static final String FEDEO_SECOND_LEVEL_TEMPLATE = "fedeoSecondLevel";
     private static final String STAC_SECOND_LEVEL_TEMPLATE = "STACSecondLevel";
@@ -875,6 +876,40 @@ public class ExtensionHandler implements PropertiesAdapter<ExtensionHandler> {
 	}
 
 	return new ArrayList<>();
+    }
+
+    /**
+     * @param uri the harmonized observed property URI of all the data described by this WIS2 record, set when one
+     *        record is generated for each observed property. Unlike {@link #setObservedPropertyURI(String)}, it holds
+     *        exactly the URI carried by the data notifications of the record
+     */
+    public void setWISObservedProperty(String uri) {
+	if (getWISObservedProperty().isPresent()) {
+	    GSLoggerFactory.getLogger(getClass()).warn("WIS observed property already set, {} ignored", uri);
+	    return;
+	}
+	try {
+	    this.metadata.append(WIS_OBSERVED_PROPERTY, uri);
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+    }
+
+    /**
+     * @return the harmonized observed property URI of all the data described by this WIS2 record, if one record is
+     *         generated for each observed property
+     */
+    public Optional<String> getWISObservedProperty() {
+	try {
+	    List<String> values = this.metadata.getTextContents(WIS_OBSERVED_PROPERTY);
+	    return values.isEmpty() ? Optional.empty() : Optional.ofNullable(values.get(0));
+	} catch (XPathExpressionException e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error(e.getMessage(), e);
+	}
+
+	return Optional.empty();
     }
 
     /**

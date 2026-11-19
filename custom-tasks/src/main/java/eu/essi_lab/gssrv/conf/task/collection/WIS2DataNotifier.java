@@ -178,9 +178,9 @@ public class WIS2DataNotifier {
 	    Optional<StationRecord> station;
 	    try {
 		cached = dataCacheConnector.getRecords(entry.getValue()[0], entry.getValue()[1], entry.getKey());
-		// the station is read as the item endpoint does, so that the notified content matches the served one
-		station = encoding == WIS2DataEncoding.OM_JSON ? WIS2DataItem.findStation(dataCacheConnector, entry.getKey())
-			: Optional.empty();
+		// the station is read as the item endpoint does, so that the notified content matches the served one; it
+		// also provides the feature of interest of the notifications, whatever the encoding
+		station = WIS2DataItem.findStation(dataCacheConnector, entry.getKey());
 	    } catch (Exception e) {
 		GSLoggerFactory.getLogger(getClass()).error("[WIS2] Unable to read the new values of {}: {}", entry.getKey(), e.getMessage(),
 			e);
@@ -211,7 +211,8 @@ public class WIS2DataNotifier {
 		// the record describing the data, depending on the records granularity
 		String metadataId = WISUtils.getMetadataIdentifier(sourceId, record.getObservedPropertyURI());
 
-		WISNotificationMessage message = createMessage(record, content, encoding, dataTopic, viewId, metadataId, generatedBy);
+		WISNotificationMessage message = createMessage(record, station, content, encoding, dataTopic, viewId, metadataId,
+			generatedBy);
 
 		if (mode == DataNotificationsMode.DRY_RUN) {
 
@@ -232,7 +233,12 @@ public class WIS2DataNotifier {
     }
 
     /**
+     * Creates the data notification message of the given record, with the properties advertised as filters by the
+     * data notification links of the WCMP2 records (see {@link WISUtils#DATA_NOTIFICATION_FEATURE_OF_INTEREST} and
+     * {@link WISUtils#DATA_NOTIFICATION_OBSERVED_PROPERTY})
+     *
      * @param record
+     * @param station the station of the series, providing the feature of interest
      * @param content the encoded record
      * @param encoding the encoding of the content
      * @param topic the topic on which the data identifier is based (starting with
@@ -242,8 +248,8 @@ public class WIS2DataNotifier {
      * @param generatedBy
      * @return
      */
-    static WISNotificationMessage createMessage(DataRecord record, String content, WIS2DataEncoding encoding, String topic, String viewId,
-	    String metadataId, String generatedBy) {
+    static WISNotificationMessage createMessage(DataRecord record, Optional<StationRecord> station, String content,
+	    WIS2DataEncoding encoding, String topic, String viewId, String metadataId, String generatedBy) {
 
 	String itemId = WIS2DataItem.getItemId(record);
 
@@ -255,6 +261,8 @@ public class WIS2DataNotifier {
 
 	WISNotificationMessage message = new WISNotificationMessage(UUID.randomUUID().toString(), null, dataId, link, generatedBy);
 	message.setMetadataId(metadataId);
+	message.setFeatureOfInterest(station.map(StationRecord::getPlatformIdentifier).orElse(null));
+	message.setObservedProperty(record.getObservedPropertyURI());
 	message.setDatetime(record.getDate());
 
 	LatitudeLongitude location = record.getLatitudeLongitude();

@@ -64,6 +64,8 @@ class ParameterCollectionCreator extends SourceCollectionCreator {
 	observedProperties.add(property);
 	addProperties(dataset, observedProperties);
 
+	// the exact URI carried by the data notifications of this record, advertised as a constant filter
+	dataset.getExtensionHandler().setWISObservedProperty(parameterURI);
     }
 
     protected String getTitle(GSSource source, String parameterURI) {

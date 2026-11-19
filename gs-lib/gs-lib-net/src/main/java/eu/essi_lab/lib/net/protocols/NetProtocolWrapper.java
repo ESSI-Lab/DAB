@@ -93,6 +93,7 @@ public enum NetProtocolWrapper {
     SLF(new SLFMeasurementProtocol()),//
     NRCS_AWDB(new NRCSAWDBProtocol()),//
     PROMICE(new PROMICEProtocol()),//
+    CANSWE(new CanSWEProtocol()),//
     GCW(new GCWProtocol()),//
     CH_EXISTENZ_BAFU(new CHExistenzBafuProtocol()),//
     NASAGSFCOZONE(new NASAGSFCOZONEProtocol()),//

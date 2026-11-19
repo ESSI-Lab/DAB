@@ -258,6 +258,12 @@ public class WISUtils {
 	properties.put("themes", tArray);
     }
 
+    /**
+     * The temporal reference system of the WCMP2 additional temporal extents (required there by the WCMP2 schema; the
+     * <code>time</code> property has no trs, being always Gregorian)
+     */
+    public static final String GREGORIAN_TRS = "https://www.opengis.net/def/uom/ISO-8601/0/Gregorian";
+
     public static void addTimeInterval(JSONObject feature, String begin, String end) {
 	JSONObject time = new JSONObject();
 	JSONArray timeArray = new JSONArray();
@@ -293,7 +299,7 @@ public class WISUtils {
 	    JSONObject temporal = new JSONObject();
 	    temporal.put("interval", interval);
 	    temporal.put("resolution", resolutions.get(1));
-	    temporal.put("trs", "https://www.opengis.net/def/uom/ISO-8601/0/Gregorian");
+	    temporal.put("trs", GREGORIAN_TRS);
 
 	    JSONObject additionalExtents = new JSONObject();
 	    additionalExtents.put("temporal", temporal);
@@ -360,8 +366,6 @@ public class WISUtils {
     }
 
     public static final String DEFAULT_PUBLISHER = "CNR-ITIAm";
-    public static final String DEFAULT_HOSTNAME = "https://production.whos-dab.eu";
-    public static final String DEFAULT_CENTRE_ID = "it-cnr-itiam-whos-dab";
     public static final String DEFAULT_GENERATED_BY = "WHOS DAB";
     public static final String DEFAULT_TOKEN_REQUEST_CONTACT = "whos@wmo.int";
 
@@ -374,19 +378,43 @@ public class WISUtils {
     }
 
     /**
-     * @return the base URL of the links in the WIS2 notification messages
+     * The hostname has no default value: a default one would make every DAB deployment link its WIS2 records and
+     * notification messages to the same host
+     *
+     * @return the base URL of the links in the WIS2 metadata records and notification messages
+     * @throws IllegalStateException if the hostname is configured neither in the WIS2 setting nor in the legacy
+     *         key-value options
      */
     public static String getHostname() {
 
-	return getWISOption(ConfigurationWrapper.getWIS2Setting().getHostname(), KeyValueOptionKeys.WIS_HOSTNAME, DEFAULT_HOSTNAME);
+	String hostname = getWISOption(ConfigurationWrapper.getWIS2Setting().getHostname(), KeyValueOptionKeys.WIS_HOSTNAME, null);
+
+	if (hostname == null || hostname.isBlank()) {
+
+	    throw new IllegalStateException("WIS2 hostname not configured: set it in the WIS2 setting");
+	}
+
+	return hostname.trim();
     }
 
     /**
+     * The centre id has no default value: it identifies the publishing WIS2 centre, so a default one would make every
+     * DAB deployment publish (topics and metadata identifiers) on behalf of the same centre
+     *
      * @return the WIS2 centre id, used in topics and metadata identifiers
+     * @throws IllegalStateException if the centre id is configured neither in the WIS2 setting nor in the legacy
+     *         key-value options
      */
     public static String getCentreId() {
 
-	return getWISOption(ConfigurationWrapper.getWIS2Setting().getCentreId(), KeyValueOptionKeys.WIS_CENTRE_ID, DEFAULT_CENTRE_ID);
+	String centreId = getWISOption(ConfigurationWrapper.getWIS2Setting().getCentreId(), KeyValueOptionKeys.WIS_CENTRE_ID, null);
+
+	if (centreId == null || centreId.isBlank()) {
+
+	    throw new IllegalStateException("WIS2 centre id not configured: set it in the WIS2 setting");
+	}
+
+	return centreId.trim();
     }
 
     /**
@@ -825,9 +853,21 @@ public class WISUtils {
     }
 
     /**
-     * Adds a link to subscribe to the data notifications for each WIS2 data topic of the given resource, with a filter
-     * on the identifier of the resource, since the data notifications of different records are published under the
-     * same topics
+     * The data notification property with the identifier of the feature of interest (station) of the notified value
+     */
+    public static final String DATA_NOTIFICATION_FEATURE_OF_INTEREST = "featureOfInterest";
+
+    /**
+     * The data notification property with the URI of the observed property of the notified value
+     */
+    public static final String DATA_NOTIFICATION_OBSERVED_PROPERTY = "observedProperty";
+
+    /**
+     * Adds a link to subscribe to the data notifications for each WIS2 data topic of the given resource, with filters
+     * on the feature of interest and on the observed property of the notified values (no filter is declared on
+     * <code>metadata_id</code>, being a property required by the WIS2 notification message). If the record describes a
+     * single observed property (see {@link eu.essi_lab.model.resource.ExtensionHandler#getWISObservedProperty()}), the observed property filter
+     * is constant
      * 
      * @param feature
      * @param resource
@@ -855,13 +895,22 @@ public class WISUtils {
 	    link.put("href", brokerUrl.get());
 	    link.put("channel", topic);
 
-	    JSONObject metadataId = new JSONObject();
-	    metadataId.put("type", "string");
-	    metadataId.put("title", "Metadata identifier");
-	    metadataId.put("const", feature.getString("id"));
+	    JSONObject featureOfInterest = new JSONObject();
+	    featureOfInterest.put("type", "string");
+	    featureOfInterest.put("title", "Feature of interest");
+	    featureOfInterest.put("description", "The identifier of the station (monitoring point) of the notified value");
+
+	    JSONObject observedProperty = new JSONObject();
+	    observedProperty.put("type", "string");
+	    observedProperty.put("format", "uri");
+	    observedProperty.put("title", "Observed property");
+	    observedProperty.put("description", "The URI of the harmonized observed property of the notified value");
+	    // a record for each observed property: all its data notifications have the same observed property
+	    resource.getExtensionHandler().getWISObservedProperty().ifPresent(uri -> observedProperty.put("const", uri));
 
 	    JSONObject filters = new JSONObject();
-	    filters.put("metadata_id", metadataId);
+	    filters.put(DATA_NOTIFICATION_FEATURE_OF_INTEREST, featureOfInterest);
+	    filters.put(DATA_NOTIFICATION_OBSERVED_PROPERTY, observedProperty);
 	    link.put("filters", filters);
 
 	    addLink(feature.getJSONArray("links"), link);

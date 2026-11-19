@@ -1,0 +1,940 @@
+{
+ "catalogUrl": "https://polarwatch.noaa.gov/stac/catalog.json",
+ "collectionUrl": "https://polarwatch.noaa.gov/stac/collections/lara_snowdepth_5yrs_awi_nh/collection.json",
+ "collection": {
+  "type": "Collection",
+  "id": "lara_snowdepth_5yrs_awi_nh",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+   "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+   "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "title": "LaRA (Laser/Radar Altimeter) snow depth 5-year monthly mean (using AWI/CS-2 standard algorithm), Arctic, 25km, 2018-2023 (winter)",
+  "description": "Laser/Radar Altimeter (LaRA) Arctic Snow Depth (ESA version) is a five-year mean representation of Arctic snow depth on sea ice calculated using complementary observations of Arctic sea ice from laser and radar satellite altimeters.  CryoSat-2 freeboards from the ESA standard algorithm were combined with ICESat-2 freeboards to derive LaRA snow depths over the Arctic Ocean. Monthly mean LaRA snow depths covering winter months (November through April) were averaged over five winters spanning 2018-2023 to create 5-year snow depth means for each winter month. CryoSat-2 Baseline-E L1A/L2 and ICESat-2 ATL07/10 release 6 data were used in development. Sea ice concentration data from the National Snow and Ice Data Center (NSIDC) and sea surface type data from OSI SAF were used as ancillary data.",
+  "license": "proprietary",
+  "keywords": [
+   "algorithms",
+   "altimetry",
+   "Arctic",
+   "EARTH SCIENCE>CLIMATE INDICATORS>CRYOSPHERIC INDICATORS>SNOW DEPTH",
+   "remote sensing",
+   "sea ice",
+   "snow depth"
+  ],
+  "providers": [
+   {
+    "name": "NOAA NESDIS STAR",
+    "roles": [
+     "producer",
+     "processor"
+    ]
+   }
+  ],
+  "extent": {
+   "spatial": {
+    "bbox": [
+     [
+      -180,
+      -90,
+      180,
+      90
+     ]
+    ]
+   },
+   "temporal": {
+    "interval": [
+     [
+      "2018-01-12T00:00:00+00:00",
+      "2018-12-12T00:00:00+00:00"
+     ]
+    ]
+   }
+  },
+  "summaries": {
+   "platform": [
+    "ICESat-2, CryoSat-2"
+   ],
+   "instruments": [
+    ""
+   ],
+   "proj:epsg": [
+    3413
+   ]
+  },
+  "links": [
+   {
+    "rel": "self",
+    "href": "./collections/lara_snowdepth_5yrs_awi_nh/collection.json",
+    "type": "application/json",
+    "title": "This collection"
+   },
+   {
+    "rel": "root",
+    "href": "../../catalog.json",
+    "type": "application/json",
+    "title": "STAC Catalog"
+   },
+   {
+    "rel": "parent",
+    "href": "../../catalog.json",
+    "type": "application/json",
+    "title": "STAC Catalog"
+   },
+   {
+    "rel": "about",
+    "href": "https://polarwatch.noaa.gov/erddap/griddap/lara_snowdepth_5yrs_awi_nh.html",
+    "type": "text/html",
+    "title": "ERDDAP Data Access Form"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://polarwatch.noaa.gov/erddap/info/lara_snowdepth_5yrs_awi_nh/index.html",
+    "type": "text/html",
+    "title": "ERDDAP Dataset Information"
+   },
+   {
+    "rel": "item",
+    "href": "./lara_snowdepth_5yrs_awi_nh_20180112.json",
+    "type": "application/geo+json",
+    "title": "2018-01-12T00:00:00+00:00"
+   },
+   {
+    "rel": "item",
+    "href": "./lara_snowdepth_5yrs_awi_nh_20180212.json",
+    "type": "application/geo+json",
+    "title": "2018-02-12T00:00:00+00:00"
+   },
+   {
+    "rel": "item",
+    "href": "./lara_snowdepth_5yrs_awi_nh_20180312.json",
+    "type": "application/geo+json",
+    "title": "2018-03-12T00:00:00+00:00"
+   },
+   {
+    "rel": "item",
+    "href": "./lara_snowdepth_5yrs_awi_nh_20180412.json",
+    "type": "application/geo+json",
+    "title": "2018-04-12T00:00:00+00:00"
+   },
+   {
+    "rel": "item",
+    "href": "./lara_snowdepth_5yrs_awi_nh_20181112.json",
+    "type": "application/geo+json",
+    "title": "2018-11-12T00:00:00+00:00"
+   },
+   {
+    "rel": "item",
+    "href": "./lara_snowdepth_5yrs_awi_nh_20181212.json",
+    "type": "application/geo+json",
+    "title": "2018-12-12T00:00:00+00:00"
+   }
+  ],
+  "assets": {
+   "files": {
+    "href": "https://www.star.nesdis.noaa.gov/data/pub0052/polarwatch/erddap/lara_snowdepth_5yrs_awi_nh/",
+    "type": "application/x-netcdf",
+    "title": "HTTPS data directory",
+    "roles": [
+     "data"
+    ],
+    "pw:service_type": "https",
+    "pw:base_url": "https://www.star.nesdis.noaa.gov/data/pub0052/polarwatch/erddap/lara_snowdepth_5yrs_awi_nh/"
+   }
+  },
+  "item_assets": {
+   "LaRA_sd_5yr": {
+    "type": "application/x-netcdf",
+    "title": "LaRA Snow Depth 5yr mean",
+    "roles": [
+     "data"
+    ]
+   },
+   "grid_lat": {
+    "type": "application/x-netcdf",
+    "title": "grid_lat",
+    "roles": [
+     "data"
+    ]
+   },
+   "grid_lon": {
+    "type": "application/x-netcdf",
+    "title": "grid_lon",
+    "roles": [
+     "data"
+    ]
+   }
+  },
+  "pw:service_type": "https",
+  "pw:conventions": "CF-1.6, ACDD-1.3, COARDS",
+  "pw:naming_authority": "",
+  "pw:standard_name_vocabulary": "CF Standard Name Table v70",
+  "pw:processing_level": "NOAA Level 3",
+  "pw:resolution_spatial": "",
+  "pw:resolution_temporal": "P1M",
+  "pw:license_text": "Creative Commons CC0 (CC 1.0)",
+  "pw:creator_name": "NOAA NESDIS STAR",
+  "pw:creator_email": "laurence dot connor@noaa.gov",
+  "proj:epsg": 3413,
+  "proj:proj4": "+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs"
+ },
+ "erddap": {
+  "base": "https://polarwatch.noaa.gov/erddap",
+  "protocol": "griddap",
+  "datasetId": "lara_snowdepth_5yrs_awi_nh",
+  "info": {
+   "table": {
+    "columnNames": [
+     "Row Type",
+     "Variable Name",
+     "Attribute Name",
+     "Data Type",
+     "Value"
+    ],
+    "columnTypes": [
+     "String",
+     "String",
+     "String",
+     "String",
+     "String"
+    ],
+    "rows": [
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "acknowledgement",
+      "String",
+      "Users are free to use the information hosted on this site in their research, provided credit is given to the NOAA / NESDIS Center for Satellite Applications and Research (STAR). Users are also asked to cite the following publication whenever these data are used: \"Revisiting snow depth on Arctic sea ice from combined ICESat-2 and CryoSat-2 freeboard observations\" by Donghui Yi, Sinead L. Farrell, Laurence Connor, Alejandro Egido, Dexin Zhang, Eric Leuliette, John Kuhn and Kelly M. Frank. Submitted to IEEE Transactions on Geoscience and Remote Sensing, Under Review"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "cdm_data_type",
+      "String",
+      "Grid"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "cdr_variable",
+      "String",
+      "LaRA_sd_5yr"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "climatology_end",
+      "String",
+      "2023-04-31T23:59:59Z"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "climatology_start",
+      "String",
+      "2018-11-01T00:00:00Z"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "comment",
+      "String",
+      "The monthly mean covers winter months (November-April) averaged over 2018-2023."
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "Conventions",
+      "String",
+      "CF-1.6, ACDD-1.3, COARDS"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "creator_email",
+      "String",
+      "laurence dot connor at noaa.gov"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "creator_name",
+      "String",
+      "NOAA NESDIS STAR"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "creator_type",
+      "String",
+      "institution"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "creator_url",
+      "String",
+      "https://www.star.nesdis.noaa.gov/socd/lsa/"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "date_created",
+      "String",
+      "2024-01-01"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "defaultGraphQuery",
+      "String",
+      "LaRA_sd_5yr[(last):(last)][(-5337500.0)][(3737500.0)]&.draw=surface"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_false_easting",
+      "double",
+      "0.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_false_northing",
+      "double",
+      "0.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_latitude_of_projection_origin",
+      "double",
+      "90.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_name",
+      "String",
+      "polar_stereographic"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_proj4text",
+      "String",
+      "+proj=stere +lat_0=90 +lat_ts=70 +lon_0=-45 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs +type=crs"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_scaling_factor",
+      "double",
+      "1.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_semimajor_radius",
+      "double",
+      "6378137.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_spatial_ref",
+      "String",
+      "PROJCS[\\\"WGS 84 / NSIDC Sea Ice Polar Stereographic North\\\",GEOGCS[\\\"WGS 84\\\",DATUM[\\\"WGS_1984\\\",SPHEROID[\\\"WGS 84\\\",6378137,298.257223563,AUTHORITY[\\\"EPSG\\\",\\\"7030\\\"]],AUTHORITY[\\\"EPSG\\\",\\\"6326\\\"]],PRIMEM[\\\"Greenwich\\\",0,AUTHORITY[\\\"EPSG\\\",\\\"8901\\\"]],UNIT[\\\"degree\\\",0.0174532925199433,AUTHORITY[\\\"EPSG\\\",\\\"9122\\\"]],AUTHORITY[\\\"EPSG\\\",\\\"4326\\\"]],PROJECTION[\\\"Polar_Stereographic\\\"],PARAMETER[\\\"latitude_of_origin\\\",70],PARAMETER[\\\"central_meridian\\\",-45],PARAMETER[\\\"false_easting\\\",0],PARAMETER[\\\"false_northing\\\",0],UNIT[\\\"metre\\\",1,AUTHORITY[\\\"EPSG\\\",\\\"9001\\\"]],AUTHORITY[\\\"EPSG\\\",\\\"3413\\\"]]"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_srid",
+      "String",
+      "urn:ogc:def:crs:EPSG::3413"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_standard_parallel",
+      "double",
+      "70.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_straight_vertical_longitude_from_pole",
+      "double",
+      "-45.0"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "grid_mapping_units",
+      "String",
+      "meters"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "history",
+      "String",
+      "02/29/2024 V1 data file created"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "infoUrl",
+      "String",
+      "https://www.star.nesdis.noaa.gov/socd/lsa/SeaIce/LaRaSnowDepth.php"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "institution",
+      "String",
+      "NOAA NESDIS PolarWatch"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "keywords",
+      "String",
+      "algorithms, altimetry, Arctic, EARTH SCIENCE>CLIMATE INDICATORS>CRYOSPHERIC INDICATORS>SNOW DEPTH, remote sensing, sea ice, snow depth"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "keywords_vocabulary",
+      "String",
+      "GCMD Science Keywords"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "license",
+      "String",
+      "Creative Commons CC0 (CC 1.0)"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "platform",
+      "String",
+      "ICESat-2, CryoSat-2"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "processing_level",
+      "String",
+      "NOAA Level 3"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "product_version",
+      "String",
+      "v1"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "program",
+      "String",
+      "NOAA/Laboratory for Satellite Altimetry"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "proj_crs_code",
+      "String",
+      "EPSG:3413"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "project",
+      "String",
+      "Arctic snow depth from combined ICESat-2 and Cryosat-2 freeboard observations"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "references",
+      "String",
+      "Revisiting snow depth on Arctic sea ice from combined ICESat-2 and CryoSat-2 freeboard observations\" by Donghui Yi, Sinead L. Farrell, Laurence Connor, Alejandro Egido, Dexin Zhang, Eric Leuliette, John Kuhn and Kelly M. Frank. Submitted to IEEE Transactions on Geoscience and Remote Sensing, Under Review"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "sensor",
+      "String",
+      "Radar altimeter, Laser altimeter"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "source",
+      "String",
+      "https://www.star.nesdis.noaa.gov/data/socd3/lsa/SeaIceProducts/LaRa/"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "sourceUrl",
+      "String",
+      "(local files)"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "spatial_resolution",
+      "String",
+      "25km"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "standard_name_vocabulary",
+      "String",
+      "CF Standard Name Table v70"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "summary",
+      "String",
+      "Laser/Radar Altimeter (LaRA) Arctic Snow Depth (ESA version) is a five-year mean representation of Arctic snow depth on sea ice calculated using complementary observations of Arctic sea ice from laser and radar satellite altimeters.  CryoSat-2 freeboards from the ESA standard algorithm were combined with ICESat-2 freeboards to derive LaRA snow depths over the Arctic Ocean. Monthly mean LaRA snow depths covering winter months (November through April) were averaged over five winters spanning 2018-2023 to create 5-year snow depth means for each winter month. CryoSat-2 Baseline-E L1A/L2 and ICESat-2 ATL07/10 release 6 data were used in development. Sea ice concentration data from the National Snow and Ice Data Center (NSIDC) and sea surface type data from OSI SAF were used as ancillary data."
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "time_coverage_duration",
+      "String",
+      "P5Y"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "time_coverage_end",
+      "String",
+      "2018-12-12T00:00:00Z"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "time_coverage_resolution",
+      "String",
+      "P1M"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "time_coverage_start",
+      "String",
+      "2018-01-12T00:00:00Z"
+     ],
+     [
+      "attribute",
+      "NC_GLOBAL",
+      "title",
+      "String",
+      "LaRA (Laser/Radar Altimeter) snow depth 5-year monthly mean (using AWI/CS-2 standard algorithm), Arctic, 25km, 2018-2023 (winter)"
+     ],
+     [
+      "dimension",
+      "time",
+      "",
+      "double",
+      "nValues=6, evenlySpaced=false, averageSpacing=66 days 19h 12m 0s"
+     ],
+     [
+      "attribute",
+      "time",
+      "_CoordinateAxisType",
+      "String",
+      "Time"
+     ],
+     [
+      "attribute",
+      "time",
+      "actual_range",
+      "double",
+      "1.5157152E9, 1.5445728E9"
+     ],
+     [
+      "attribute",
+      "time",
+      "axis",
+      "String",
+      "T"
+     ],
+     [
+      "attribute",
+      "time",
+      "calendar",
+      "String",
+      "proleptic_gregorian"
+     ],
+     [
+      "attribute",
+      "time",
+      "ioos_category",
+      "String",
+      "Time"
+     ],
+     [
+      "attribute",
+      "time",
+      "long_name",
+      "String",
+      "Time"
+     ],
+     [
+      "attribute",
+      "time",
+      "standard_name",
+      "String",
+      "time"
+     ],
+     [
+      "attribute",
+      "time",
+      "time_origin",
+      "String",
+      "01-JAN-1970 00:00:00"
+     ],
+     [
+      "attribute",
+      "time",
+      "units",
+      "String",
+      "seconds since 1970-01-01T00:00:00Z"
+     ],
+     [
+      "dimension",
+      "ygrid",
+      "",
+      "float",
+      "nValues=448, evenlySpaced=true, averageSpacing=25000.0"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "_ChunkSizes",
+      "uint",
+      "448"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "_FillValue",
+      "float",
+      "NaN"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "actual_range",
+      "float",
+      "-5337500.0, 5837500.0"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "axis",
+      "String",
+      "Y"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "ioos_category",
+      "String",
+      "Location"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "long_name",
+      "String",
+      "Projection Grid Y Centers"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "standard_name",
+      "String",
+      "projection_y_coordinate"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "units",
+      "String",
+      "m"
+     ],
+     [
+      "attribute",
+      "ygrid",
+      "valid_range",
+      "float",
+      "-5350000.0, 5850000.0"
+     ],
+     [
+      "dimension",
+      "xgrid",
+      "",
+      "float",
+      "nValues=304, evenlySpaced=true, averageSpacing=25000.0"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "_ChunkSizes",
+      "uint",
+      "304"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "_FillValue",
+      "float",
+      "NaN"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "actual_range",
+      "float",
+      "-3837500.0, 3737500.0"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "axis",
+      "String",
+      "X"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "ioos_category",
+      "String",
+      "Location"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "long_name",
+      "String",
+      "Projection Grid X Centers"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "standard_name",
+      "String",
+      "projection_x_coordinate"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "units",
+      "String",
+      "m"
+     ],
+     [
+      "attribute",
+      "xgrid",
+      "valid_range",
+      "float",
+      "-3850000.0, 3750000.0"
+     ],
+     [
+      "variable",
+      "LaRA_sd_5yr",
+      "",
+      "double",
+      "time, ygrid, xgrid"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "_ChunkSizes",
+      "uint",
+      "1, 448, 304"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "_FillValue",
+      "double",
+      "NaN"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "comment",
+      "String",
+      "use: Data use policy: In publications, presentations, or on web pages based on STAR data the following acknowledgment should be included: 'LaRA snow depth data are provided by NOAA / NESDIS Center for Satellite Applications and Research (STAR).'"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "coordinates",
+      "String",
+      "xgrid ygrid"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "grid_mapping",
+      "String",
+      "projection"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "ioos_category",
+      "String",
+      "Statistics"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "long_name",
+      "String",
+      "LaRA Snow Depth 5yr mean"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "units",
+      "String",
+      "meter"
+     ],
+     [
+      "attribute",
+      "LaRA_sd_5yr",
+      "valid_min",
+      "double",
+      "0.0"
+     ],
+     [
+      "variable",
+      "grid_lat",
+      "",
+      "double",
+      "time, ygrid, xgrid"
+     ],
+     [
+      "attribute",
+      "grid_lat",
+      "_ChunkSizes",
+      "uint",
+      "1, 448, 304"
+     ],
+     [
+      "attribute",
+      "grid_lat",
+      "_FillValue",
+      "double",
+      "NaN"
+     ],
+     [
+      "attribute",
+      "grid_lat",
+      "coordinates",
+      "String",
+      "xgrid ygrid"
+     ],
+     [
+      "attribute",
+      "grid_lat",
+      "grid_mapping",
+      "String",
+      "projection"
+     ],
+     [
+      "attribute",
+      "grid_lat",
+      "ioos_category",
+      "String",
+      "Location"
+     ],
+     [
+      "attribute",
+      "grid_lat",
+      "standard_name",
+      "String",
+      "grid_latitude"
+     ],
+     [
+      "attribute",
+      "grid_lat",
+      "units",
+      "String",
+      "degree"
+     ],
+     [
+      "variable",
+      "grid_lon",
+      "",
+      "double",
+      "time, ygrid, xgrid"
+     ],
+     [
+      "attribute",
+      "grid_lon",
+      "_ChunkSizes",
+      "uint",
+      "1, 448, 304"
+     ],
+     [
+      "attribute",
+      "grid_lon",
+      "_FillValue",
+      "double",
+      "NaN"
+     ],
+     [
+      "attribute",
+      "grid_lon",
+      "coordinates",
+      "String",
+      "xgrid ygrid"
+     ],
+     [
+      "attribute",
+      "grid_lon",
+      "grid_mapping",
+      "String",
+      "projection"
+     ],
+     [
+      "attribute",
+      "grid_lon",
+      "ioos_category",
+      "String",
+      "Location"
+     ],
+     [
+      "attribute",
+      "grid_lon",
+      "standard_name",
+      "String",
+      "grid_longitude"
+     ],
+     [
+      "attribute",
+      "grid_lon",
+      "units",
+      "String",
+      "degree"
+     ]
+    ]
+   }
+  }
+ }
+}

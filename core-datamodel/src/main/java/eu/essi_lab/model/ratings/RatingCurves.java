@@ -23,6 +23,7 @@ package eu.essi_lab.model.ratings;
 
 import java.io.PrintStream;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -94,6 +95,8 @@ public class RatingCurves {
 	out.println("Station: " + stationIdentifier + " - " + name + (sourceId != null ? " [" + sourceId + "]" : ""));
 	for (RatingCurve curve : curves) {
 	    Formula formula = curve.getFormula();
+	    out.println("  Validity: " + curve.getBeginTime().map(Object::toString).orElse(String.valueOf(curve.getBeginDate())) + " / "
+		    + curve.getEndTime().map(Object::toString).orElse(curve.getEndDate() == null ? "now" : curve.getEndDate().toString()));
 	    if (formula != null && !formula.isEmpty()) {
 		out.println("  Formula:");
 		for (FormulaRange range : formula.getRanges()) {
@@ -155,7 +158,8 @@ public class RatingCurves {
 	    LocalDate beginDate = curve.getBeginDate() != null ? curve.getBeginDate() : LocalDate.now();
 	    xml.append("      <rgs:periodStart>\n");
 	    xml.append("        <gml:TimeInstant gml:id=\"ti-start-").append(curveIndex).append("\">\n");
-	    xml.append("          <gml:timePosition>").append(beginDate.format(dateFormatter)).append("</gml:timePosition>\n");
+	    String begin = curve.getBeginTime().map(Instant::toString).orElse(beginDate.format(dateFormatter));
+	    xml.append("          <gml:timePosition>").append(begin).append("</gml:timePosition>\n");
 	    xml.append("        </gml:TimeInstant>\n");
 	    xml.append("      </rgs:periodStart>\n");
 	    
@@ -163,7 +167,8 @@ public class RatingCurves {
 	    xml.append("      <rgs:periodEnd>\n");
 	    xml.append("        <gml:TimeInstant gml:id=\"ti-end-").append(curveIndex).append("\">\n");
 	    if (curve.getEndDate() != null) {
-		xml.append("          <gml:timePosition>").append(curve.getEndDate().format(dateFormatter)).append("</gml:timePosition>\n");
+		String end = curve.getEndTime().map(Instant::toString).orElse(curve.getEndDate().format(dateFormatter));
+		xml.append("          <gml:timePosition>").append(end).append("</gml:timePosition>\n");
 	    } else {
 		xml.append("          <gml:timePosition indeterminatePosition=\"now\">now</gml:timePosition>\n");
 	    }
