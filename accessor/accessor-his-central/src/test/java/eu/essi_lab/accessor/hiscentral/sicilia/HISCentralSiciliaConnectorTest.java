@@ -71,7 +71,7 @@ public class HISCentralSiciliaConnectorTest {
 	JSONObject station = HISCentralSiciliaConnector.flatten(new JSONObject(ARANCIO));
 
 	GSSource source = new GSSource();
-	source.setEndpoint("https://www.protezionecivilesicilia.it:8443/DatascapeA/");
+	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
 
 	GSResource resource = new HISCentralSiciliaMapper().map(HISCentralSiciliaMapper.create(station, new JSONObject(RADAR)), source);
 	CoreMetadata core = resource.getHarmonizedMetadata().getCoreMetadata();
@@ -90,6 +90,22 @@ public class HISCentralSiciliaConnectorTest {
 	Assert.assertTrue(HISCentralSiciliaConnector.isVirtual(new JSONObject("{ \"elementName\": \"Pioggia Raccolta in 1 Ora\", \"isVirtual\": true }")));
 	Assert.assertFalse(HISCentralSiciliaConnector.isVirtual(new JSONObject("{ \"elementName\": \"Pioggia Cumulata\", \"isVirtual\": false }")));
 	Assert.assertFalse(HISCentralSiciliaConnector.isVirtual(new JSONObject(RADAR)));
+    }
+
+    @Test
+    public void noStartDateTest() throws Exception {
+
+	// e.g. Linguaglossa Etna Nord [SIAS]: start and end dates are null
+	JSONObject station = new JSONObject("{ \"i\": 1035400, \"n\": \"Linguaglossa Etna Nord [SIAS]\", \"x\": 15.07, \"y\": 37.81, \"s\": 0 }");
+	JSONObject element = new JSONObject("{ \"elementId\": 79545, \"elementName\": \"Precipitazione totale\", \"stationId\": 1035400,"
+		+ " \"quantity\": \"Incrementi di Pioggia\", \"measUnit\": \"mm\", \"startDate\": null, \"endDate\": null, \"dtr\": 300,"
+		+ " \"isVirtual\": false }");
+
+	GSSource source = new GSSource();
+	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
+
+	GSResource resource = new HISCentralSiciliaMapper().map(HISCentralSiciliaMapper.create(station, element), source);
+	Assert.assertNull(resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent());
     }
 
     @Test
@@ -113,7 +129,7 @@ public class HISCentralSiciliaConnectorTest {
 	Assert.assertTrue(HISCentralSiciliaClient.isDataLinkage("https://siciliadrpc-aegis.caedns.it/platform/v3/data/54820", endpoint));
 	// records harvested before the switch to /v3/data
 	Assert.assertTrue(HISCentralSiciliaClient.isDataLinkage("https://siciliadrpc-aegis.caedns.it/platform/v3/data-combo/54820", endpoint));
-	Assert.assertFalse(HISCentralSiciliaClient.isDataLinkage("https://www.protezionecivilesicilia.it:8443/DatascapeA/v3/data/54820", endpoint));
+	Assert.assertFalse(HISCentralSiciliaClient.isDataLinkage("https://other.host/platform/v3/data/54820", endpoint));
     }
 
     @Test

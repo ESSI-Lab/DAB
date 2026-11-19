@@ -28,7 +28,7 @@ public class HISCentralSiciliaMapperTest {
 		StandardCharsets.UTF_8));
 
 	GSSource source = new GSSource();
-	source.setEndpoint("https://www.protezionecivilesicilia.it:8443/DatascapeA/");
+	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
 
 	GSResource resource = new HISCentralSiciliaMapper().map(originalMD, source);
 
@@ -45,7 +45,7 @@ public class HISCentralSiciliaMapperTest {
 	Assert.assertTrue(extent.isEndPositionIndeterminate());
 
 	Online online = core.getOnline();
-	Assert.assertEquals("https://www.protezionecivilesicilia.it:8443/DatascapeA/v3/data/68615", online.getLinkage());
+	Assert.assertEquals("https://siciliadrpc-aegis.caedns.it/platform/v3/data/68615", online.getLinkage());
 	Assert.assertEquals(CommonNameSpaceContext.HISCENTRAL_SICILIA_NS_URI, online.getProtocol());
 	Assert.assertEquals("download", online.getFunctionCode());
 

@@ -40,7 +40,7 @@ import eu.essi_lab.model.resource.OriginalMetadata;
 
 /**
  * Harvests the stations and sensors (elements) of the Protezione Civile Regione Siciliana (CAE Datascape API, e.g.
- * https://siciliadrpc-aegis.caedns.it/platform or https://www.protezionecivilesicilia.it:8443/DatascapeA). One record
+ * https://siciliadrpc-aegis.caedns.it/platform). One record
  * per element.
  *
  * @author Roberto
