@@ -188,8 +188,11 @@ public class HISCentralSiciliaMapper extends FileIdentifierMapper {
 	//
 	// temporal extent
 	//
+	// some elements (e.g. the SIAS stations) have no start date: the extent has only the end position
 	TemporalExtent temporalExtent = new TemporalExtent();
-	temporalExtent.setBeginPosition(startDate);
+	if (!startDate.isEmpty()) {
+	    temporalExtent.setBeginPosition(startDate);
+	}
 	if (endDate.isEmpty()) {
 	    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
 	} else {
@@ -214,7 +217,8 @@ public class HISCentralSiciliaMapper extends FileIdentifierMapper {
 	    if (dtr > 0) {
 		dataset.getExtensionHandler().setTimeAggregationDuration8601("PT" + dtr + "S");
 	    }
-	} else if (lowerQuantity.contains("pioggia") || lowerQuantity.contains("rain")) {
+	} else if ((lowerQuantity.contains("pioggia") || lowerQuantity.contains("rain")) && !lowerQuantity.contains("intensit")) {
+	    // rain totals ("Pioggia Cumulata", "Incrementi di Pioggia"); the rain intensity (mm/h) is continuous
 	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
 	    if (dtr > 0) {
 		dataset.getExtensionHandler().setTimeAggregationDuration8601("PT" + dtr + "S");

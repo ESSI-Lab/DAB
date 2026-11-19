@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
@@ -101,11 +102,19 @@ public class HISCentralSiciliaConnectorTest {
 		+ " \"quantity\": \"Incrementi di Pioggia\", \"measUnit\": \"mm\", \"startDate\": null, \"endDate\": null, \"dtr\": 300,"
 		+ " \"isVirtual\": false }");
 
+	// skipped by the harvesting
+	Assert.assertFalse(HISCentralSiciliaConnector.hasStartDate(element));
+	Assert.assertFalse(HISCentralSiciliaConnector.hasStartDate(new JSONObject("{ \"startDate\": \"\" }")));
+	Assert.assertTrue(HISCentralSiciliaConnector.hasStartDate(new JSONObject(RADAR)));
+
 	GSSource source = new GSSource();
 	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
 
 	GSResource resource = new HISCentralSiciliaMapper().map(HISCentralSiciliaMapper.create(station, element), source);
-	Assert.assertNull(resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent());
+	// in any case the mapper keeps only the end position, the begin is unknown
+	TemporalExtent extent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
+	Assert.assertTrue(extent.isEndPositionIndeterminate());
+	Assert.assertTrue(extent.getBeginPosition() == null || extent.getBeginPosition().isEmpty());
     }
 
     @Test

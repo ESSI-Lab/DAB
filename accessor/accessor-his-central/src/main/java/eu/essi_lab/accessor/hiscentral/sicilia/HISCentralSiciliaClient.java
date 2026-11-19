@@ -87,7 +87,7 @@ public class HISCentralSiciliaClient {
     private final String root;
 
     /**
-     * @param endpoint the Datascape root (e.g. https://host:8443/DatascapeA), with or without trailing slash or
+     * @param endpoint the Datascape root (e.g. https://siciliadrpc-aegis.caedns.it/platform), with or without trailing slash or
      *        {@code /v3} suffix
      */
     public HISCentralSiciliaClient(String endpoint) {
@@ -174,10 +174,28 @@ public class HISCentralSiciliaClient {
      */
     public JSONArray getData(String elementId, Instant begin, Instant end) throws GSException {
 
+	return getData(elementId, begin, end, null);
+    }
+
+    /**
+     * @param rainIntervalMinutes if not null, the rain is returned grouped by intervals of the given minutes
+     *        ({@code elab=RainIntervals}, values attributed to the end of each interval). Needed for the rain
+     *        elements ("Pioggia Cumulata", "Incrementi di Pioggia"), whose original data are returned by the API
+     *        cumulated from the begin of the requested period
+     * @return the data as an array of [epoch milliseconds, value] pairs
+     */
+    public JSONArray getData(String elementId, Instant begin, Instant end, Integer rainIntervalMinutes) throws GSException {
+
 	String url = getDataLinkagePrefix(root) + elementId + //
 		"?from=" + encode(DATE_FORMATTER.format(begin)) + //
 		"&to=" + encode(DATE_FORMATTER.format(end)) + //
-		"&type=Auto&part=EpochTime&part=ValueWithInvalid&timing=Original";
+		"&type=Auto&part=EpochTime&part=ValueWithInvalid";
+
+	if (rainIntervalMinutes != null) {
+	    url += "&elab=RainIntervals&interval=" + rainIntervalMinutes;
+	} else {
+	    url += "&timing=Original";
+	}
 
 	return new JSONArray(get(url));
     }

@@ -70,6 +70,7 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 	int maxRecords = getSetting().getMaxRecords().orElse(Integer.MAX_VALUE);
 	int virtual = 0;
 	int inactive = 0;
+	int noStartDate = 0;
 
 	for (int i = 0; i < elements.length() && ret.getRecordsAsList().size() < maxRecords; i++) {
 
@@ -77,6 +78,11 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 
 	    if (isVirtual(element)) {
 		virtual++;
+		continue;
+	    }
+
+	    if (!hasStartDate(element)) {
+		noStartDate++;
 		continue;
 	    }
 
@@ -100,9 +106,19 @@ public class HISCentralSiciliaConnector extends HarvestedQueryConnector<HISCentr
 	    ret.addRecord(HISCentralSiciliaMapper.create(station, element));
 	}
 
-	GSLoggerFactory.getLogger(getClass()).info("Skipped {} virtual elements and {} elements of inactive stations", virtual, inactive);
+	GSLoggerFactory.getLogger(getClass()).info("Skipped {} virtual elements, {} elements without start date and {} elements of inactive stations",
+		virtual, noStartDate, inactive);
 
 	return ret;
+    }
+
+    /**
+     * Some elements (e.g. the ones of the SIAS stations) have no start date: they are not published, since the clients
+     * (e.g. the BNHS station page) require the begin of the temporal extent
+     */
+    static boolean hasStartDate(JSONObject element) {
+
+	return !element.isNull("startDate") && !element.optString("startDate").isBlank();
     }
 
     /**
