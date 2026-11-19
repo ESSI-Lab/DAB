@@ -74,12 +74,17 @@ public class HISCentralRatingCurvesDownloader extends WMLDataDownloader {
 	    String stationId = online.getName();
 	    String sourceId = HISCentralRatingCurvesMapper.readSourceId(resource.getOriginalMetadata());
 
+	    // the sensors identify the series when the station has more than one (absent in records of single-series
+	    // stations, matching any series)
+	    String levelSensor = HISCentralRatingCurvesMapper.readLevelSensor(resource.getOriginalMetadata());
+	    String dischargeSensor = HISCentralRatingCurvesMapper.readDischargeSensor(resource.getOriginalMetadata());
+
 	    RatingCurvesClient client = new RatingCurvesClient(endpoint);
-	    RatingCurves ratingCurves = client.getRatingCurves(sourceId, stationId);
+	    RatingCurves ratingCurves = client.getRatingCurves(sourceId, stationId, levelSensor, dischargeSensor);
 
 	    if (ratingCurves == null || ratingCurves.getCurves().isEmpty()) {
-		throw new IllegalStateException(
-			"No rating curve found for source=" + sourceId + " station=" + stationId);
+		throw new IllegalStateException("No rating curve found for source=" + sourceId + " station=" + stationId
+			+ (levelSensor != null || dischargeSensor != null ? " sensors=" + levelSensor + " / " + dischargeSensor : ""));
 	    }
 
 	    File tmpFile = File.createTempFile(getClass().getSimpleName(), ".xml");

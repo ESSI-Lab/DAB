@@ -60,6 +60,8 @@ import eu.essi_lab.model.ratings.RatingCurves;
  * <ul>
  * <li><em>Id stazione</em>: station identifier (mandatory)</li>
  * <li><em>Scale di deflusso in uso</em> / <em>Nome</em>: station name</li>
+ * <li><em>Sensore di livello</em>, <em>Sensore di portata</em>: level and discharge sensors (time series) the curves
+ * apply to (optional, when a station has more than one series)</li>
  * <li><em>Range del livello</em>: water level range of the formula piece (mandatory)</li>
  * <li><em>Data inizio</em>, <em>Data fine</em>: validity period of the curve (optional, ISO 8601 or dd/MM/yyyy;
  * an empty end means the curve is still in use)</li>
@@ -69,11 +71,14 @@ import eu.essi_lab.model.ratings.RatingCurves;
  * </ul>
  * Without a header row the legacy layout <em>id | name | range | formula | min | max | points</em> is assumed.
  * <p>
- * A row with a station identifier starts a new curve when the identifier changes, or when the row carries a validity
- * start or the min/max/points values; otherwise (empty identifier, or the same identifier repeated) the row adds a
- * further range/formula piece to the current curve. All the curves of the same station found in a folder are grouped
- * into a single {@link RatingCurves}, sorted by validity start. Stations whose id is {@value #SKIP_MARKER} are
- * ignored.
+ * Curves are grouped in series, one {@link RatingCurves} for each station and level/discharge sensors pair (just one
+ * per station when the sensor columns are missing or empty). A row with a station identifier switches to the series
+ * of that station and sensors (empty sensors on a row repeating the current station identifier keep the current
+ * series); a row without identifier belongs to the current series.<br>
+ * A new curve starts when the series changes, or when the row carries a validity start (or, for rows with an
+ * identifier, the min/max/points values); otherwise the row adds a further range/formula piece to the current curve.
+ * All the curves of the same series found in a folder are grouped into a single {@link RatingCurves}, sorted by
+ * validity start. Stations whose id is {@value #SKIP_MARKER} are ignored.
  *
  * @author boldrini
  */
@@ -83,7 +88,7 @@ public class RatingCurvesClient {
     public static final String SKIP_MARKER = "skip";
 
     private enum Column {
-	ID, NAME, RANGE, BEGIN, END, FORMULA, MIN, MAX, POINTS
+	ID, NAME, LEVEL_SENSOR, DISCHARGE_SENSOR, RANGE, BEGIN, END, FORMULA, MIN, MAX, POINTS
     }
 
     private static final DateTimeFormatter[] DATE_TIME_PATTERNS = { //
@@ -138,21 +143,42 @@ public class RatingCurvesClient {
 
     /**
      * Returns the rating curves of the station with the given identifier in the given HIS-Central source (SharePoint
-     * sub-folder name). If the source is {@code null} every folder is scanned.
+     * sub-folder name). If the source is {@code null} every folder is scanned. If the station has more than one
+     * series, the first one is returned.
      *
      * @return the matching station, or {@code null} if no station matches
      */
     public RatingCurves getRatingCurves(String sourceId, String stationIdentifier) throws IOException {
 
+	return getRatingCurves(sourceId, stationIdentifier, null, null);
+    }
+
+    /**
+     * Returns the rating curves of the series with the given station identifier and level/discharge sensors in the
+     * given HIS-Central source (SharePoint sub-folder name). If the source is {@code null} every folder is scanned.
+     * {@code null} sensors match any sensor; if more series match, the first one is returned.
+     *
+     * @return the matching series, or {@code null} if no series matches
+     */
+    public RatingCurves getRatingCurves(String sourceId, String stationIdentifier, String levelSensor, String dischargeSensor)
+	    throws IOException {
+
 	List<RatingCurves> stations = sourceId == null ? harvest() : harvest(sourceId);
 
 	for (RatingCurves station : stations) {
 	    if (station.getStationIdentifier() != null && station.getStationIdentifier().equals(stationIdentifier)
-		    && (sourceId == null || sourceId.equals(station.getSourceId()))) {
+		    && (sourceId == null || sourceId.equals(station.getSourceId()))
+		    && matches(levelSensor, station.getLevelSensor())
+		    && matches(dischargeSensor, station.getDischargeSensor())) {
 		return station;
 	    }
 	}
 	return null;
+    }
+
+    private static boolean matches(String requested, String actual) {
+
+	return requested == null || requested.isEmpty() || requested.equals(actual == null ? "" : actual);
     }
 
     /**
@@ -201,6 +227,7 @@ public class RatingCurvesClient {
 	EnumMap<Column, Integer> layout = legacyLayout();
 
 	String currentId = null;
+	RatingCurves currentSeries = null;
 	Formula currentFormula = null;
 	boolean skipping = false;
 
@@ -211,6 +238,7 @@ public class RatingCurvesClient {
 	    if (id.equalsIgnoreCase(STATION_HEADER)) {
 		layout = readLayout(formatter, row);
 		currentId = null;
+		currentSeries = null;
 		currentFormula = null;
 		skipping = false;
 		continue;
@@ -218,6 +246,7 @@ public class RatingCurvesClient {
 
 	    if (id.equalsIgnoreCase(SKIP_MARKER)) {
 		currentId = null;
+		currentSeries = null;
 		currentFormula = null;
 		skipping = true;
 		continue;
@@ -226,53 +255,81 @@ public class RatingCurvesClient {
 	    String rangeExpression = cell(formatter, row, layout.get(Column.RANGE));
 	    String formulaExpression = cell(formatter, row, layout.get(Column.FORMULA));
 
+	    String begin = cell(formatter, row, layout.get(Column.BEGIN));
+	    String end = cell(formatter, row, layout.get(Column.END));
+	    String min = cell(formatter, row, layout.get(Column.MIN));
+	    String max = cell(formatter, row, layout.get(Column.MAX));
+	    String points = cell(formatter, row, layout.get(Column.POINTS));
+
+	    boolean newSeries = false;
+
 	    if (!id.isEmpty()) {
 
 		skipping = false;
 
-		String begin = cell(formatter, row, layout.get(Column.BEGIN));
-		String end = cell(formatter, row, layout.get(Column.END));
-		String min = cell(formatter, row, layout.get(Column.MIN));
-		String max = cell(formatter, row, layout.get(Column.MAX));
-		String points = cell(formatter, row, layout.get(Column.POINTS));
+		String levelSensor = cell(formatter, row, layout.get(Column.LEVEL_SENSOR));
+		String dischargeSensor = cell(formatter, row, layout.get(Column.DISCHARGE_SENSOR));
 
-		boolean newCurve = currentFormula == null || //
-			!id.equals(currentId) || //
-			!begin.isEmpty() || //
-			!min.isEmpty() || //
-			!max.isEmpty() || //
-			!points.isEmpty();
+		boolean sameSeries = currentSeries != null && id.equals(currentId) && //
+			((levelSensor.isEmpty() && dischargeSensor.isEmpty()) || //
+				(levelSensor.equals(nonNull(currentSeries.getLevelSensor()))
+					&& dischargeSensor.equals(nonNull(currentSeries.getDischargeSensor()))));
 
-		if (newCurve) {
+		if (!sameSeries) {
 
 		    String name = cell(formatter, row, layout.get(Column.NAME));
 
-		    RatingCurves station = stations.computeIfAbsent(id, k -> new RatingCurves(id, name));
-		    station.setSourceId(sourceId);
-		    if ((station.getName() == null || station.getName().isEmpty()) && !name.isEmpty()) {
-			station.setName(name);
+		    currentSeries = stations.computeIfAbsent(seriesKey(id, levelSensor, dischargeSensor), k -> {
+			RatingCurves series = new RatingCurves(id, name);
+			if (!levelSensor.isEmpty()) {
+			    series.setLevelSensor(levelSensor);
+			}
+			if (!dischargeSensor.isEmpty()) {
+			    series.setDischargeSensor(dischargeSensor);
+			}
+			return series;
+		    });
+
+		    currentSeries.setSourceId(sourceId);
+		    if ((currentSeries.getName() == null || currentSeries.getName().isEmpty()) && !name.isEmpty()) {
+			currentSeries.setName(name);
 		    }
 
-		    RatingCurve curve = RatingCurve.ofInstants(parseInstant(begin, row), parseInstant(end, row));
-
-		    currentFormula = new Formula();
-		    curve.setFormula(currentFormula);
-		    curve.setMinLevel(parseNumber(min));
-		    curve.setMaxLevel(parseNumber(max));
-		    double numberOfPoints = parseNumber(points);
-		    curve.setNumberOfPoints(Double.isNaN(numberOfPoints) ? 0 : (int) Math.round(numberOfPoints));
-
-		    station.getCurves().add(curve);
-
 		    currentId = id;
-
-		} else if (!end.isEmpty()) {
-
-		    // the validity period is defined per curve, an end date on a further piece is not supported
-		    GSLoggerFactory.getLogger(RatingCurvesClient.class).debug(
-			    "Ignoring end date {} of range {} at row {} of station {}: the curve validity is read from its first row",
-			    end, rangeExpression, row.getRowNum() + 1, id);
+		    newSeries = true;
 		}
+	    }
+
+	    if (skipping || currentSeries == null) {
+		continue;
+	    }
+
+	    //
+	    // a new curve starts with a new series, with a validity start, or with min/max/points on a row having the
+	    // station identifier
+	    //
+	    boolean newCurve = newSeries || currentFormula == null || !begin.isEmpty() || //
+		    (!id.isEmpty() && (!min.isEmpty() || !max.isEmpty() || !points.isEmpty()));
+
+	    if (newCurve) {
+
+		RatingCurve curve = RatingCurve.ofInstants(parseInstant(begin, row), parseInstant(end, row));
+
+		currentFormula = new Formula();
+		curve.setFormula(currentFormula);
+		curve.setMinLevel(parseNumber(min));
+		curve.setMaxLevel(parseNumber(max));
+		double numberOfPoints = parseNumber(points);
+		curve.setNumberOfPoints(Double.isNaN(numberOfPoints) ? 0 : (int) Math.round(numberOfPoints));
+
+		currentSeries.getCurves().add(curve);
+
+	    } else if (!end.isEmpty()) {
+
+		// the validity period is defined per curve, an end date on a further piece is not supported
+		GSLoggerFactory.getLogger(RatingCurvesClient.class).debug(
+			"Ignoring end date {} of range {} at row {} of station {}: the curve validity is read from its first row",
+			end, rangeExpression, row.getRowNum() + 1, currentId);
 	    }
 
 	    if (skipping || currentFormula == null) {
@@ -289,8 +346,18 @@ public class RatingCurvesClient {
 	}
     }
 
+    private static String seriesKey(String id, String levelSensor, String dischargeSensor) {
+
+	return id + "\u0000" + levelSensor + "\u0000" + dischargeSensor;
+    }
+
+    private static String nonNull(String value) {
+
+	return value == null ? "" : value;
+    }
+
     /**
-     * Generates the curve points and sorts the curves of each station by validity start
+     * Generates the curve points and sorts the curves of each series by validity start
      */
     private static List<RatingCurves> finalizeStations(Map<String, RatingCurves> stations) {
 
@@ -344,6 +411,10 @@ public class RatingCurvesClient {
 
 	    if (label.startsWith("id")) {
 		column = Column.ID;
+	    } else if (label.contains("sensor") && label.contains("livell")) {
+		column = Column.LEVEL_SENSOR;
+	    } else if (label.contains("sensor") && label.contains("portat")) {
+		column = Column.DISCHARGE_SENSOR;
 	    } else if (label.contains("range")) {
 		column = Column.RANGE;
 	    } else if (label.contains("inizio")) {

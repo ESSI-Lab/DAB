@@ -66,6 +66,8 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
     public static final String STATION_NAME_KEY = "station-name";
     public static final String BEGIN_KEY = "begin";
     public static final String END_KEY = "end";
+    public static final String LEVEL_SENSOR_KEY = "level-sensor";
+    public static final String DISCHARGE_SENSOR_KEY = "discharge-sensor";
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
@@ -88,6 +90,12 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	}
 	json.put(STATION_ID_KEY, station.getStationIdentifier());
 	json.put(STATION_NAME_KEY, station.getName());
+	if (station.getLevelSensor() != null) {
+	    json.put(LEVEL_SENSOR_KEY, station.getLevelSensor());
+	}
+	if (station.getDischargeSensor() != null) {
+	    json.put(DISCHARGE_SENSOR_KEY, station.getDischargeSensor());
+	}
 
 	//
 	// overall validity period: earliest start, latest end (omitted if a curve is still in use)
@@ -148,6 +156,28 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
     }
 
     /**
+     * Reads the level sensor (time series) name from harvested original metadata, if any.
+     */
+    public static String readLevelSensor(OriginalMetadata metadata) {
+
+	if (metadata == null || metadata.getMetadata() == null) {
+	    return null;
+	}
+	return new JSONObject(metadata.getMetadata()).optString(LEVEL_SENSOR_KEY, null);
+    }
+
+    /**
+     * Reads the discharge sensor (time series) name from harvested original metadata, if any.
+     */
+    public static String readDischargeSensor(OriginalMetadata metadata) {
+
+	if (metadata == null || metadata.getMetadata() == null) {
+	    return null;
+	}
+	return new JSONObject(metadata.getMetadata()).optString(DISCHARGE_SENSOR_KEY, null);
+    }
+
+    /**
      * Reads the station name from harvested original metadata.
      */
     public static String readStationName(OriginalMetadata metadata) {
@@ -171,6 +201,10 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	    String sourceId = json.optString(SOURCE_ID_KEY, null);
 	    String stationId = json.optString(STATION_ID_KEY);
 	    String stationName = json.optString(STATION_NAME_KEY);
+	    String levelSensor = json.optString(LEVEL_SENSOR_KEY, "");
+	    String dischargeSensor = json.optString(DISCHARGE_SENSOR_KEY, "");
+	    boolean hasSensors = !levelSensor.isEmpty() || !dischargeSensor.isEmpty();
+	    String sensors = levelSensor + " / " + dischargeSensor;
 
 	    CoreMetadata coreMetadata = dataset.getHarmonizedMetadata().getCoreMetadata();
 
@@ -180,10 +214,13 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	    coreMetadata.addDistributionFormat("WaterML 2.0");
 
 	    String title = stationName == null || stationName.isEmpty() ? stationId : stationName;
-	    coreMetadata.getMIMetadata().getDataIdentification().setCitationTitle(title + " - Scala di deflusso");
+	    coreMetadata.getMIMetadata().getDataIdentification()
+		    .setCitationTitle(title + " - Scala di deflusso" + (hasSensors ? " (" + sensors + ")" : ""));
 	    coreMetadata.getMIMetadata().getDataIdentification()
 		    .setAbstract("Rating curve (scala di deflusso) - Nome stazione: " + title + " - Codice stazione: "
-			    + stationId);
+			    + stationId //
+			    + (levelSensor.isEmpty() ? "" : " - Sensore di livello: " + levelSensor) //
+			    + (dischargeSensor.isEmpty() ? "" : " - Sensore di portata: " + dischargeSensor));
 
 	    ResponsibleParty publisherContact = new ResponsibleParty();
 	    publisherContact.setOrganisationName(ORGANIZATION);
@@ -195,6 +232,12 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	    coreMetadata.getMIMetadata().getDataIdentification().addKeyword("Rating curve");
 	    if (sourceId != null && !sourceId.isEmpty()) {
 		coreMetadata.getMIMetadata().getDataIdentification().addKeyword(sourceId);
+	    }
+	    if (!levelSensor.isEmpty()) {
+		coreMetadata.getMIMetadata().getDataIdentification().addKeyword(levelSensor);
+	    }
+	    if (!dischargeSensor.isEmpty()) {
+		coreMetadata.getMIMetadata().getDataIdentification().addKeyword(dischargeSensor);
 	    }
 
 	    ReferenceSystem referenceSystem = new ReferenceSystem();
@@ -236,7 +279,9 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	    platform.setCitation(platformCitation);
 	    coreMetadata.getMIMetadata().addMIPlatform(platform);
 
-	    String resourceIdentifier = generateCode(dataset, stationId);
+	    // one record per station, or per station and sensors pair when the station has several series
+	    String resourceIdentifier = generateCode(dataset,
+		    hasSensors ? stationId + "\u0000" + levelSensor + "\u0000" + dischargeSensor : stationId);
 	    coreMetadata.getMIMetadata().setFileIdentifier(resourceIdentifier);
 	    coreMetadata.getDataIdentification().setResourceIdentifier(resourceIdentifier);
 

@@ -38,6 +38,8 @@ public class RatingCurves {
     private String stationIdentifier;
     private String name;
     private String sourceId;
+    private String levelSensor;
+    private String dischargeSensor;
 
     public RatingCurves() {
 	this(new ArrayList<>());
@@ -81,6 +83,37 @@ public class RatingCurves {
     }
 
     /**
+     * Name of the level sensor (time series) the curves apply to, if a station has more than one series (e.g.
+     * {@code Livello idrometrico 1})
+     */
+    public String getLevelSensor() {
+	return levelSensor;
+    }
+
+    public void setLevelSensor(String levelSensor) {
+	this.levelSensor = levelSensor;
+    }
+
+    /**
+     * Name of the discharge sensor (time series) computed by the curves, if a station has more than one series (e.g.
+     * {@code Portata 1})
+     */
+    public String getDischargeSensor() {
+	return dischargeSensor;
+    }
+
+    public void setDischargeSensor(String dischargeSensor) {
+	this.dischargeSensor = dischargeSensor;
+    }
+
+    /**
+     * @return true if level or discharge sensor is set
+     */
+    public boolean hasSensors() {
+	return (levelSensor != null && !levelSensor.isEmpty()) || (dischargeSensor != null && !dischargeSensor.isEmpty());
+    }
+
+    /**
      * Prints this station's rating curves (formula ranges and generated points) to {@code System.out}.
      */
     public void print() {
@@ -92,7 +125,8 @@ public class RatingCurves {
      */
     public void print(PrintStream out) {
 
-	out.println("Station: " + stationIdentifier + " - " + name + (sourceId != null ? " [" + sourceId + "]" : ""));
+	out.println("Station: " + stationIdentifier + " - " + name + (sourceId != null ? " [" + sourceId + "]" : "")
+		+ (hasSensors() ? " sensors: " + levelSensor + " -> " + dischargeSensor : ""));
 	for (RatingCurve curve : curves) {
 	    Formula formula = curve.getFormula();
 	    out.println("  Validity: " + curve.getBeginTime().map(Object::toString).orElse(String.valueOf(curve.getBeginDate())) + " / "
@@ -143,7 +177,11 @@ public class RatingCurves {
 	xml.append("http://schemas.opengis.net/waterml/part2/1.0/waterml2-part2.xsd\"\n");
 	xml.append("  gml:id=\"conversion-group-1\">\n");
 	
-	xml.append("  <gml:description>Rating curves conversion group</gml:description>\n");
+	xml.append("  <gml:description>Rating curves conversion group");
+	if (hasSensors()) {
+	    xml.append(" - level sensor: ").append(escape(levelSensor)).append(", discharge sensor: ").append(escape(dischargeSensor));
+	}
+	xml.append("</gml:description>\n");
 	xml.append("  <rgs:monitoringPoint></rgs:monitoringPoint>\n");
 	xml.append("  <rgs:fullConversion>false</rgs:fullConversion>\n");
 	
@@ -225,6 +263,13 @@ public class RatingCurves {
 	xml.append("</rgs:ConversionGroup>\n");
 	
 	return xml.toString();
+    }
+
+    private static String escape(String value) {
+	if (value == null) {
+	    return "";
+	}
+	return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     public static void main(String[] args) {

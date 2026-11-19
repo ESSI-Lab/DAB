@@ -167,10 +167,12 @@ public class HISCentralRatingCurvesTask extends AbstractEmbeddedTask {
 
 	    } catch (Exception ex) {
 
-		GSLoggerFactory.getLogger(getClass()).error("Unable to create rating curve of station {}", station.getStationIdentifier(),
-			ex);
+		String label = station.getStationIdentifier()
+			+ (station.hasSensors() ? " (" + station.getLevelSensor() + " / " + station.getDischargeSensor() + ")" : "");
 
-		status.addWarningMessage("Unable to create rating curve of station " + station.getStationIdentifier() + ": " + ex.getMessage());
+		GSLoggerFactory.getLogger(getClass()).error("Unable to create rating curve of station {}", label, ex);
+
+		status.addWarningMessage("Unable to create rating curve of station " + label + ": " + ex.getMessage());
 	    }
 	}
 
