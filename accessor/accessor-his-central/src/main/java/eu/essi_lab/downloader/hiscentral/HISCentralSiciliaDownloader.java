@@ -49,6 +49,8 @@ import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.InterpolationType;
 import eu.essi_lab.model.resource.data.CRS;
 import eu.essi_lab.model.resource.data.DataDescriptor;
 import eu.essi_lab.model.resource.data.DataFormat;
@@ -58,8 +60,8 @@ import eu.essi_lab.model.resource.data.dimension.ContinueDimension;
 import eu.essi_lab.model.resource.data.dimension.DataDimension;
 
 /**
- * Downloads the plausible data of a Protezione Civile Regione Siciliana element, e.g.:
- * https://www.protezionecivilesicilia.it:8443/DatascapeA/v3/data-combo/68615?from=...&to=...
+ * Downloads the data (validated if available, otherwise plausible) of a Protezione Civile Regione Siciliana element,
+ * e.g.: https://siciliadrpc-aegis.caedns.it/platform/v3/data/68615?from=...&to=...
  *
  * @author Roberto
  */
@@ -78,7 +80,7 @@ public class HISCentralSiciliaDownloader extends WMLDataDownloader {
 	return online.getFunctionCode() != null && //
 		online.getFunctionCode().equals("download") && //
 		online.getLinkage() != null && //
-		online.getLinkage().startsWith(HISCentralSiciliaClient.getDataLinkagePrefix(resource.getSource().getEndpoint())) && //
+		HISCentralSiciliaClient.isDataLinkage(online.getLinkage(), resource.getSource().getEndpoint()) && //
 		online.getProtocol() != null && //
 		online.getProtocol().equals(CommonNameSpaceContext.HISCENTRAL_SICILIA_NS_URI);
     }
@@ -142,6 +144,34 @@ public class HISCentralSiciliaDownloader extends WMLDataDownloader {
 	return ret;
     }
 
+    /**
+     * Default interval of the rain elements without time resolution
+     */
+    private static final int DEFAULT_RAIN_INTERVAL_MINUTES = 60;
+
+    /**
+     * The rain totals ("Pioggia Cumulata", "Incrementi di Pioggia": interpolation TOTAL, unit mm) are returned by the
+     * API cumulated from the begin of the requested period: they are requested grouped by intervals of the element
+     * time resolution. The rain intensity (mm/h) is excluded.
+     *
+     * @return the interval in minutes, if the resource is a rain total
+     */
+    static Optional<Integer> getRainIntervalMinutes(GSResource resource) {
+
+	boolean total = resource.getExtensionHandler().getTimeInterpolation().map(InterpolationType.TOTAL::equals).orElse(false);
+	boolean mm = resource.getExtensionHandler().getAttributeUnits().map(u -> u.trim().equalsIgnoreCase("mm")).orElse(false);
+
+	if (!total || !mm) {
+	    return Optional.empty();
+	}
+
+	int minutes = resource.getExtensionHandler().getTimeAggregationDuration8601()//
+		.map(d -> (int) (ISO8601DateTimeUtils.getDuration(d).getTimeInMillis(new Date(0)) / 60000))//
+		.orElse(0);
+
+	return Optional.of(minutes > 0 ? minutes : DEFAULT_RAIN_INTERVAL_MINUTES);
+    }
+
     @Override
     public File download(DataDescriptor targetDescriptor) throws GSException {
 
@@ -164,7 +194,7 @@ public class HISCentralSiciliaDownloader extends WMLDataDownloader {
 
 	    HISCentralSiciliaClient client = new HISCentralSiciliaClient(resource.getSource().getEndpoint());
 
-	    JSONArray data = client.getData(elementId, begin, end);
+	    JSONArray data = client.getData(elementId, begin, end, getRainIntervalMinutes(resource).orElse(null));
 
 	    GSLoggerFactory.getLogger(getClass()).info("Element {}: {} values", elementId, data.length());
 

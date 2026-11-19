@@ -30,7 +30,6 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -51,7 +50,9 @@ import eu.essi_lab.model.exceptions.GSException;
 
 /**
  * Client of the CAE Datascape (AEGIS) REST API of the Protezione Civile Regione Siciliana, e.g.
- * https://www.protezionecivilesicilia.it:8443/DatascapeA. Credentials are read from the {@link CredentialsSetting}.
+ * https://siciliadrpc-aegis.caedns.it/platform. Credentials are read from the {@link CredentialsSetting}: the token is
+ * acquired with the OAuth2 password grant ({@code /connect/token}) using the institutional user (e.g. "ispra") and the
+ * {@value #DEFAULT_CLIENT_ID} client id.
  *
  * @author Roberto
  */
@@ -64,6 +65,11 @@ public class HISCentralSiciliaClient {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx")
 	    .withZone(ZoneOffset.UTC);
+
+    /**
+     * OAuth2 client of the institutional accounts (password grant with username and password only)
+     */
+    static final String DEFAULT_CLIENT_ID = "GenericClient";
 
     private static final long TOKEN_EXPIRATION_MARGIN_MS = TimeUnit.SECONDS.toMillis(60);
 
@@ -81,7 +87,7 @@ public class HISCentralSiciliaClient {
     private final String root;
 
     /**
-     * @param endpoint the Datascape root (e.g. https://host:8443/DatascapeA), with or without trailing slash or
+     * @param endpoint the Datascape root (e.g. https://siciliadrpc-aegis.caedns.it/platform), with or without trailing slash or
      *        {@code /v3} suffix
      */
     public HISCentralSiciliaClient(String endpoint) {
@@ -111,11 +117,21 @@ public class HISCentralSiciliaClient {
     }
 
     /**
-     * @return the base of the data download linkages: {@code <root>/v3/data-combo/}
+     * @return the base of the data download linkages: {@code <root>/v3/data/}
      */
     public static String getDataLinkagePrefix(String endpoint) {
 
-	return normalizeRoot(endpoint) + "/v3/data-combo/";
+	return normalizeRoot(endpoint) + "/v3/data/";
+    }
+
+    /**
+     * @return true if the given linkage is a data linkage of the given endpoint, including the {@code /v3/data-combo/}
+     *         linkages of the records harvested before the switch to {@code /v3/data/}
+     */
+    public static boolean isDataLinkage(String linkage, String endpoint) {
+
+	String root = normalizeRoot(endpoint);
+	return linkage.startsWith(root + "/v3/data/") || linkage.startsWith(root + "/v3/data-combo/");
     }
 
     /**
@@ -127,11 +143,12 @@ public class HISCentralSiciliaClient {
     }
 
     /**
-     * @return all the elements (sensors) with the {@link #ELEMENT_FIELDS}
+     * @return the enabled elements (sensors) with the {@link #ELEMENT_FIELDS}; elements disabled as station or as
+     *         element are excluded ({@code enabling=Enabled})
      */
     public JSONArray getElements() throws GSException {
 
-	StringBuilder url = new StringBuilder(root + "/v3/elements?category=All&ui_culture=it");
+	StringBuilder url = new StringBuilder(root + "/v3/elements?category=All&enabling=Enabled&ui_culture=it");
 	for (String field : ELEMENT_FIELDS.split(",")) {
 	    url.append("&field=").append(field);
 	}
@@ -151,17 +168,36 @@ public class HISCentralSiciliaClient {
      * @param elementId
      * @param begin
      * @param end
-     * @return the plausible data as an array of [epoch milliseconds, value] pairs
+     * @return the data as an array of [epoch milliseconds, value] pairs ({@code /v3/data/{elementId}} with
+     *         {@code type=Auto}: day by day, the validated data if available, otherwise the plausible ones; invalid
+     *         values are expressed as -2147483648, absent ones as null)
      */
     public JSONArray getData(String elementId, Instant begin, Instant end) throws GSException {
+
+	return getData(elementId, begin, end, null);
+    }
+
+    /**
+     * @param rainIntervalMinutes if not null, the rain is returned grouped by intervals of the given minutes
+     *        ({@code elab=RainIntervals}, values attributed to the end of each interval). Needed for the rain
+     *        elements ("Pioggia Cumulata", "Incrementi di Pioggia"), whose original data are returned by the API
+     *        cumulated from the begin of the requested period
+     * @return the data as an array of [epoch milliseconds, value] pairs
+     */
+    public JSONArray getData(String elementId, Instant begin, Instant end, Integer rainIntervalMinutes) throws GSException {
 
 	String url = getDataLinkagePrefix(root) + elementId + //
 		"?from=" + encode(DATE_FORMATTER.format(begin)) + //
 		"&to=" + encode(DATE_FORMATTER.format(end)) + //
-		"&basicType=Plausible&part=EpochTime&part=ValueWithInvalid&timing=Original&loadAlsoExtemp=false";
+		"&type=Auto&part=EpochTime&part=ValueWithInvalid";
 
-	JSONObject response = new JSONObject(get(url));
-	return Optional.ofNullable(response.optJSONArray("plausibleData")).orElse(new JSONArray());
+	if (rainIntervalMinutes != null) {
+	    url += "&elab=RainIntervals&interval=" + rainIntervalMinutes;
+	} else {
+	    url += "&timing=Original";
+	}
+
+	return new JSONArray(get(url));
     }
 
     /**
@@ -225,8 +261,10 @@ public class HISCentralSiciliaClient {
 	params.put("grant_type", "password");
 	params.put("username", credentials.getSiciliaClientUser().orElseThrow(() -> missingCredential("siciliaUsername")));
 	params.put("password", credentials.getSiciliaClientPassword().orElseThrow(() -> missingCredential("siciliaPassword")));
-	params.put("client_id", credentials.getSiciliaClientId().orElseThrow(() -> missingCredential("siciliaId")));
-	params.put("client_instance", credentials.getSiciliaClientInstance().orElseThrow(() -> missingCredential("siciliaInstance")));
+	params.put("client_id", credentials.getSiciliaClientId().filter(id -> !id.isBlank()).orElse(DEFAULT_CLIENT_ID));
+	// the client instance is not required by the GenericClient
+	credentials.getSiciliaClientInstance().filter(instance -> !instance.isBlank())
+		.ifPresent(instance -> params.put("client_instance", instance));
 
 	try {
 

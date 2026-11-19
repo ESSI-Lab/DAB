@@ -5,9 +5,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.essi_lab.iso.datamodel.classes.GeographicBoundingBox;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.GSResource;
+import eu.essi_lab.model.resource.InterpolationType;
 
 /**
  * Stations with sub-locations (e.g. the dams): name and coordinates are in the "l" array, some sensors have their own
@@ -70,7 +72,7 @@ public class HISCentralSiciliaConnectorTest {
 	JSONObject station = HISCentralSiciliaConnector.flatten(new JSONObject(ARANCIO));
 
 	GSSource source = new GSSource();
-	source.setEndpoint("https://www.protezionecivilesicilia.it:8443/DatascapeA/");
+	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
 
 	GSResource resource = new HISCentralSiciliaMapper().map(HISCentralSiciliaMapper.create(station, new JSONObject(RADAR)), source);
 	CoreMetadata core = resource.getHarmonizedMetadata().getCoreMetadata();
@@ -80,5 +82,88 @@ public class HISCentralSiciliaConnectorTest {
 	GeographicBoundingBox bbox = core.getBoundingBox();
 	Assert.assertEquals(37.6325, bbox.getNorth(), 1e-6);
 	Assert.assertEquals(13.068333, bbox.getEast(), 1e-6);
+	Assert.assertEquals(InterpolationType.CONTINUOUS, resource.getExtensionHandler().getTimeInterpolation().get());
+    }
+
+    @Test
+    public void virtualTest() {
+
+	Assert.assertTrue(HISCentralSiciliaConnector.isVirtual(new JSONObject("{ \"elementName\": \"Pioggia Raccolta in 1 Ora\", \"isVirtual\": true }")));
+	Assert.assertFalse(HISCentralSiciliaConnector.isVirtual(new JSONObject("{ \"elementName\": \"Pioggia Cumulata\", \"isVirtual\": false }")));
+	Assert.assertFalse(HISCentralSiciliaConnector.isVirtual(new JSONObject(RADAR)));
+    }
+
+    @Test
+    public void noStartDateTest() throws Exception {
+
+	// e.g. Linguaglossa Etna Nord [SIAS]: start and end dates are null
+	JSONObject station = new JSONObject("{ \"i\": 1035400, \"n\": \"Linguaglossa Etna Nord [SIAS]\", \"x\": 15.07, \"y\": 37.81, \"s\": 0 }");
+	JSONObject element = new JSONObject("{ \"elementId\": 79545, \"elementName\": \"Precipitazione totale\", \"stationId\": 1035400,"
+		+ " \"quantity\": \"Incrementi di Pioggia\", \"measUnit\": \"mm\", \"startDate\": null, \"endDate\": null, \"dtr\": 300,"
+		+ " \"isVirtual\": false }");
+
+	// skipped by the harvesting
+	Assert.assertFalse(HISCentralSiciliaConnector.hasStartDate(element));
+	Assert.assertFalse(HISCentralSiciliaConnector.hasStartDate(new JSONObject("{ \"startDate\": \"\" }")));
+	Assert.assertTrue(HISCentralSiciliaConnector.hasStartDate(new JSONObject(RADAR)));
+
+	GSSource source = new GSSource();
+	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
+
+	GSResource resource = new HISCentralSiciliaMapper().map(HISCentralSiciliaMapper.create(station, element), source);
+	// in any case the mapper keeps only the end position, the begin is unknown
+	TemporalExtent extent = resource.getHarmonizedMetadata().getCoreMetadata().getTemporalExtent();
+	Assert.assertTrue(extent.isEndPositionIndeterminate());
+	Assert.assertTrue(extent.getBeginPosition() == null || extent.getBeginPosition().isEmpty());
+    }
+
+    @Test
+    public void activeTest() {
+
+	Assert.assertTrue(HISCentralSiciliaConnector.isActive(new JSONObject("{ \"i\": 776600, \"n\": \"Cammarata Stazione [X]\", \"s\": 0 }")));
+	Assert.assertFalse(HISCentralSiciliaConnector.isActive(new JSONObject("{ \"i\": 590600, \"n\": \"Lipari\", \"s\": 40 }")));
+	Assert.assertTrue(HISCentralSiciliaConnector.isActive(new JSONObject("{ \"i\": 776600, \"n\": \"No state\" }")));
+
+	// the state is kept by the flattening of multi-location stations
+	Assert.assertTrue(HISCentralSiciliaConnector.isActive(HISCentralSiciliaConnector.flatten(new JSONObject(ARANCIO))));
+	Assert.assertFalse(HISCentralSiciliaConnector.isActive(HISCentralSiciliaConnector.flatten(new JSONObject(ARANCIO.replace("\"s\": 0", "\"s\": 40")))));
+    }
+
+    @Test
+    public void dataLinkageTest() {
+
+	String endpoint = "https://siciliadrpc-aegis.caedns.it/platform/";
+
+	Assert.assertEquals("https://siciliadrpc-aegis.caedns.it/platform/v3/data/", HISCentralSiciliaClient.getDataLinkagePrefix(endpoint));
+	Assert.assertTrue(HISCentralSiciliaClient.isDataLinkage("https://siciliadrpc-aegis.caedns.it/platform/v3/data/54820", endpoint));
+	// records harvested before the switch to /v3/data
+	Assert.assertTrue(HISCentralSiciliaClient.isDataLinkage("https://siciliadrpc-aegis.caedns.it/platform/v3/data-combo/54820", endpoint));
+	Assert.assertFalse(HISCentralSiciliaClient.isDataLinkage("https://other.host/platform/v3/data/54820", endpoint));
+    }
+
+    @Test
+    public void statisticTest() throws Exception {
+
+	Assert.assertEquals(InterpolationType.MIN, HISCentralSiciliaMapper.getStatistic("Termometro aria Min").get());
+	Assert.assertEquals(InterpolationType.MAX, HISCentralSiciliaMapper.getStatistic("Termometro aria Max").get());
+	Assert.assertEquals(InterpolationType.AVERAGE, HISCentralSiciliaMapper.getStatistic("Termometro aria media").get());
+	Assert.assertEquals(InterpolationType.MIN, HISCentralSiciliaMapper.getStatistic("Temperatura Aria Minima").get());
+	Assert.assertEquals(InterpolationType.MAX, HISCentralSiciliaMapper.getStatistic("Velocita' vento massima").get());
+	Assert.assertFalse(HISCentralSiciliaMapper.getStatistic("Temperatura Aria").isPresent());
+	Assert.assertFalse(HISCentralSiciliaMapper.getStatistic("Intensità di Pioggia").isPresent());
+	Assert.assertFalse(HISCentralSiciliaMapper.getStatistic("Idrometro valle diga").isPresent());
+
+	// Lipari: same quantity, different statistics
+	JSONObject lipari = new JSONObject("{ \"i\": 590600, \"n\": \"Lipari\", \"x\": 14.931666, \"y\": 38.485555, \"z\": 89 }");
+	JSONObject min = new JSONObject("{ \"elementId\": 54820, \"elementName\": \"Termometro aria Min\", \"stationId\": 590600,"
+		+ " \"quantity\": \"Temperatura Aria\", \"measUnit\": \"°C\", \"startDate\": \"2016-01-01T00:00:00\", \"endDate\": null,"
+		+ " \"dtr\": 0, \"isVirtual\": false }");
+
+	GSSource source = new GSSource();
+	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
+
+	GSResource resource = new HISCentralSiciliaMapper().map(HISCentralSiciliaMapper.create(lipari, min), source);
+	Assert.assertEquals("Lipari - Termometro aria Min", resource.getHarmonizedMetadata().getCoreMetadata().getTitle());
+	Assert.assertEquals(InterpolationType.MIN, resource.getExtensionHandler().getTimeInterpolation().get());
     }
 }

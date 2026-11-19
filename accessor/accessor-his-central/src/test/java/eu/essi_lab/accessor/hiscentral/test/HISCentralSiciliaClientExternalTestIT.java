@@ -14,11 +14,13 @@ import eu.essi_lab.accessor.hiscentral.sicilia.HISCentralSiciliaClient;
 import eu.essi_lab.cfga.gs.setting.CredentialsSetting;
 
 /**
- * Requires the env variables SICILIA_USER, SICILIA_PASSWORD, SICILIA_CLIENT_ID and SICILIA_CLIENT_INSTANCE
+ * Requires the env variables SICILIA_USER and SICILIA_PASSWORD (optional: SICILIA_ENDPOINT, SICILIA_CLIENT_ID,
+ * SICILIA_CLIENT_INSTANCE)
  */
 public class HISCentralSiciliaClientExternalTestIT {
 
-    private static final String ENDPOINT = "https://www.protezionecivilesicilia.it:8443/DatascapeA/";
+    private static final String ENDPOINT = System.getenv().getOrDefault("SICILIA_ENDPOINT",
+	    "https://siciliadrpc-aegis.caedns.it/platform/");
 
     @Before
     public void init() {
@@ -28,8 +30,12 @@ public class HISCentralSiciliaClientExternalTestIT {
 	CredentialsSetting credentials = new CredentialsSetting();
 	credentials.setSiciliaClientUser(System.getenv("SICILIA_USER"));
 	credentials.setSiciliaClientPassword(System.getenv("SICILIA_PASSWORD"));
-	credentials.setSiciliaClientId(System.getenv("SICILIA_CLIENT_ID"));
-	credentials.setSiciliaClientInstance(System.getenv("SICILIA_CLIENT_INSTANCE"));
+	if (System.getenv("SICILIA_CLIENT_ID") != null) {
+	    credentials.setSiciliaClientId(System.getenv("SICILIA_CLIENT_ID"));
+	}
+	if (System.getenv("SICILIA_CLIENT_INSTANCE") != null) {
+	    credentials.setSiciliaClientInstance(System.getenv("SICILIA_CLIENT_INSTANCE"));
+	}
 
 	HISCentralSiciliaClient.setCredentials(credentials);
     }

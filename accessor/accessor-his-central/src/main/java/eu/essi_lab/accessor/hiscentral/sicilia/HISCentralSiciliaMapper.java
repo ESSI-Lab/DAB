@@ -22,7 +22,9 @@ package eu.essi_lab.accessor.hiscentral.sicilia;
  */
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import org.json.JSONObject;
 
@@ -186,8 +188,11 @@ public class HISCentralSiciliaMapper extends FileIdentifierMapper {
 	//
 	// temporal extent
 	//
+	// some elements (e.g. the SIAS stations) have no start date: the extent has only the end position
 	TemporalExtent temporalExtent = new TemporalExtent();
-	temporalExtent.setBeginPosition(startDate);
+	if (!startDate.isEmpty()) {
+	    temporalExtent.setBeginPosition(startDate);
+	}
 	if (endDate.isEmpty()) {
 	    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
 	} else {
@@ -205,7 +210,15 @@ public class HISCentralSiciliaMapper extends FileIdentifierMapper {
 	}
 
 	String lowerQuantity = quantity.toLowerCase();
-	if (lowerQuantity.contains("pioggia") || lowerQuantity.contains("rain")) {
+	Optional<InterpolationType> statistic = getStatistic(elementName);
+	if (statistic.isPresent()) {
+	    // e.g. "Termometro aria Min", "Temperatura Aria Massima", "Radiometro media"
+	    dataset.getExtensionHandler().setTimeInterpolation(statistic.get());
+	    if (dtr > 0) {
+		dataset.getExtensionHandler().setTimeAggregationDuration8601("PT" + dtr + "S");
+	    }
+	} else if ((lowerQuantity.contains("pioggia") || lowerQuantity.contains("rain")) && !lowerQuantity.contains("intensit")) {
+	    // rain totals ("Pioggia Cumulata", "Incrementi di Pioggia"); the rain intensity (mm/h) is continuous
 	    dataset.getExtensionHandler().setTimeInterpolation(InterpolationType.TOTAL);
 	    if (dtr > 0) {
 		dataset.getExtensionHandler().setTimeAggregationDuration8601("PT" + dtr + "S");
@@ -240,5 +253,32 @@ public class HISCentralSiciliaMapper extends FileIdentifierMapper {
 	HISCentralUtils.addDefaultAttributeDescription(dataset, coverageDescription);
 
 	coreMetadata.getMIMetadata().addCoverageDescription(coverageDescription);
+    }
+
+    private static final Pattern MIN_PATTERN = Pattern.compile("\\b(min|minima|minimo)\\b");
+    private static final Pattern MAX_PATTERN = Pattern.compile("\\b(max|massima|massimo)\\b");
+    private static final Pattern AVERAGE_PATTERN = Pattern.compile("\\b(media|medio)\\b");
+
+    /**
+     * Several elements of the same station can have the same quantity (e.g. "Temperatura Aria", "Termometro aria
+     * media", "Termometro aria Max" and "Termometro aria Min"): the statistic is only given in the element name
+     *
+     * @param elementName
+     * @return the statistic (MIN, MAX or AVERAGE) given in the element name, if any
+     */
+    static Optional<InterpolationType> getStatistic(String elementName) {
+
+	String name = elementName.toLowerCase();
+
+	if (MIN_PATTERN.matcher(name).find()) {
+	    return Optional.of(InterpolationType.MIN);
+	}
+	if (MAX_PATTERN.matcher(name).find()) {
+	    return Optional.of(InterpolationType.MAX);
+	}
+	if (AVERAGE_PATTERN.matcher(name).find()) {
+	    return Optional.of(InterpolationType.AVERAGE);
+	}
+	return Optional.empty();
     }
 }
