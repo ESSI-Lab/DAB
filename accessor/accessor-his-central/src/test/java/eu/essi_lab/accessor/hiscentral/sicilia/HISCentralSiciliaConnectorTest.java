@@ -118,6 +118,34 @@ public class HISCentralSiciliaConnectorTest {
     }
 
     @Test
+    public void observedPropertyTest() throws Exception {
+
+	String base = "http://his-central-ontology.geodab.eu/hydro-ontology/concept/";
+
+	Assert.assertEquals(base + "33", HISCentralSiciliaMapper.getObservedPropertyURI("Velocità Vento Vettoriale").get());
+	Assert.assertEquals(base + "5327", HISCentralSiciliaMapper.getObservedPropertyURI("Velocità Vento Raffica").get());
+	Assert.assertEquals(base + "68", HISCentralSiciliaMapper.getObservedPropertyURI("Direzione Vento Raffica").get());
+	Assert.assertEquals(base + "5262", HISCentralSiciliaMapper.getObservedPropertyURI("Intensità di Pioggia").get());
+	Assert.assertEquals(base + "65", HISCentralSiciliaMapper.getObservedPropertyURI("Incrementi di Pioggia").get());
+	Assert.assertEquals(base + "49", HISCentralSiciliaMapper.getObservedPropertyURI("Temperatura Aria Minima").get());
+	Assert.assertEquals(base + "2293", HISCentralSiciliaMapper.getObservedPropertyURI("pH dell’Acqua").get());
+	Assert.assertFalse(HISCentralSiciliaMapper.getObservedPropertyURI("Resistività dell'Acqua").isPresent());
+
+	// the concept is set by the mapping, the statistic is in the time interpolation
+	JSONObject station = new JSONObject("{ \"i\": 776600, \"n\": \"Cammarata Stazione [X]\", \"x\": 13.66, \"y\": 37.64, \"s\": 0 }");
+	JSONObject element = new JSONObject("{ \"elementId\": 1, \"elementName\": \"Temperatura Aria Minima\", \"stationId\": 776600,"
+		+ " \"quantity\": \"Temperatura Aria Minima\", \"measUnit\": \"°C\", \"startDate\": \"2020-01-01T00:00:00\", \"endDate\": null,"
+		+ " \"dtr\": 86400, \"isVirtual\": false }");
+
+	GSSource source = new GSSource();
+	source.setEndpoint("https://siciliadrpc-aegis.caedns.it/platform/");
+
+	GSResource resource = new HISCentralSiciliaMapper().map(HISCentralSiciliaMapper.create(station, element), source);
+	Assert.assertEquals(base + "49", resource.getExtensionHandler().getObservedPropertyURI().get());
+	Assert.assertEquals(InterpolationType.MIN, resource.getExtensionHandler().getTimeInterpolation().get());
+    }
+
+    @Test
     public void activeTest() {
 
 	Assert.assertTrue(HISCentralSiciliaConnector.isActive(new JSONObject("{ \"i\": 776600, \"n\": \"Cammarata Stazione [X]\", \"s\": 0 }")));
