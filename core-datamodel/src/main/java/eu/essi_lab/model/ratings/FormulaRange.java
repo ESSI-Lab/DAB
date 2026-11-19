@@ -21,6 +21,8 @@ package eu.essi_lab.model.ratings;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,11 +31,16 @@ import java.util.regex.Pattern;
  * discharge sub-formula {@code Q = f(h)} that applies within it.
  * <p>
  * The sub-formula is a mathematical expression in the variable {@code h} (water level) supporting {@code + - * / ^},
- * parentheses and unary signs. Discharge is obtained through {@link #evaluate(double)}.
+ * parentheses, unary signs, scientific notation and the (case insensitive) spreadsheet functions {@code POWER(x,y)}
+ * (or {@code POW}), {@code EXP(x)}, {@code LN(x)}, {@code LOG10(x)}, {@code LOG(x[,base])}, {@code SQRT(x)} and
+ * {@code ABS(x)}. Decimal commas are accepted when they cannot be confused with function argument separators.
+ * Discharge is obtained through {@link #evaluate(double)}.
  *
  * @author boldrini
  */
 public class FormulaRange {
+
+    private static final Pattern FUNCTION_CALL = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*\\s*\\(");
 
     private static final Pattern BETWEEN = Pattern
 	    .compile("^(-?\\d*\\.?\\d+)<=?h<=?(-?\\d*\\.?\\d+)$");
@@ -113,7 +120,23 @@ public class FormulaRange {
 
     private static String normalizeFormula(String formula) {
 
-	String f = formula.replace(',', '.').trim();
+	String f = formula.trim();
+
+	// leading Excel formula marker and string literal quotes, e.g. ="Q=3*POWER(h,2)"
+	f = f.replaceFirst("^=", "").trim();
+	if (f.length() > 1 && f.startsWith("\"") && f.endsWith("\"")) {
+	    f = f.substring(1, f.length() - 1).trim();
+	}
+
+	if (f.indexOf(';') >= 0) {
+	    // Excel with Italian locale: ';' separates function arguments, ',' is the decimal separator
+	    f = f.replace(',', '.').replace(';', ',');
+	} else if (!FUNCTION_CALL.matcher(f).find()) {
+	    // no function calls: ',' can only be a decimal separator
+	    f = f.replace(',', '.');
+	}
+	// otherwise (e.g. POWER(h+9.52,1.57)) ',' separates function arguments and '.' is the decimal separator
+
 	f = f.replaceFirst("^[Qq]\\s*=\\s*", "").trim();
 	return f;
     }
@@ -252,10 +275,29 @@ public class FormulaRange {
 		while ((ch >= '0' && ch <= '9') || ch == '.') {
 		    nextChar();
 		}
+		// scientific notation, e.g. 1.5E-3
+		if ((ch == 'e' || ch == 'E') && isExponentAhead()) {
+		    nextChar();
+		    if (ch == '+' || ch == '-') {
+			nextChar();
+		    }
+		    while (ch >= '0' && ch <= '9') {
+			nextChar();
+		    }
+		}
 		x = Double.parseDouble(expression.substring(startPos, pos));
-	    } else if (ch == 'h' || ch == 'H') {
-		nextChar();
-		x = h;
+	    } else if (Character.isLetter(ch) || ch == '_') {
+		while (Character.isLetterOrDigit(ch) || ch == '_') {
+		    nextChar();
+		}
+		String name = expression.substring(startPos, pos);
+		if (eat('(')) {
+		    x = callFunction(name, parseArguments());
+		} else if (name.equalsIgnoreCase("h")) {
+		    x = h;
+		} else {
+		    throw new IllegalArgumentException("Unknown variable: " + name);
+		}
 	    } else {
 		throw new IllegalArgumentException("Unexpected character: " + (char) ch);
 	    }
@@ -264,6 +306,70 @@ public class FormulaRange {
 		x = Math.pow(x, parseFactor());
 	    }
 	    return x;
+	}
+
+	/**
+	 * @return {@code true} if the current 'e'/'E' starts a valid exponent (digits, optionally signed)
+	 */
+	private boolean isExponentAhead() {
+	    int next = pos + 1;
+	    if (next < expression.length() && (expression.charAt(next) == '+' || expression.charAt(next) == '-')) {
+		next++;
+	    }
+	    return next < expression.length() && Character.isDigit(expression.charAt(next));
+	}
+
+	/**
+	 * Parses a comma separated list of arguments; the opening parenthesis is already consumed
+	 */
+	private List<Double> parseArguments() {
+	    List<Double> args = new ArrayList<>();
+	    if (eat(')')) {
+		return args;
+	    }
+	    do {
+		args.add(parseExpression());
+	    } while (eat(','));
+	    if (!eat(')')) {
+		throw new IllegalArgumentException("Missing closing parenthesis in function call");
+	    }
+	    return args;
+	}
+
+	private static double callFunction(String name, List<Double> args) {
+	    switch (name.toUpperCase()) {
+	    case "POWER":
+	    case "POW":
+		checkArgs(name, args, 2, 2);
+		return Math.pow(args.get(0), args.get(1));
+	    case "EXP":
+		checkArgs(name, args, 1, 1);
+		return Math.exp(args.get(0));
+	    case "LN":
+		checkArgs(name, args, 1, 1);
+		return Math.log(args.get(0));
+	    case "LOG10":
+		checkArgs(name, args, 1, 1);
+		return Math.log10(args.get(0));
+	    case "LOG":
+		// spreadsheet semantics: base 10 by default
+		checkArgs(name, args, 1, 2);
+		return args.size() == 1 ? Math.log10(args.get(0)) : Math.log(args.get(0)) / Math.log(args.get(1));
+	    case "SQRT":
+		checkArgs(name, args, 1, 1);
+		return Math.sqrt(args.get(0));
+	    case "ABS":
+		checkArgs(name, args, 1, 1);
+		return Math.abs(args.get(0));
+	    default:
+		throw new IllegalArgumentException("Unsupported function: " + name);
+	    }
+	}
+
+	private static void checkArgs(String name, List<Double> args, int min, int max) {
+	    if (args.size() < min || args.size() > max) {
+		throw new IllegalArgumentException("Wrong number of arguments for " + name + ": " + args.size());
+	    }
 	}
     }
 }

@@ -21,6 +21,10 @@ package eu.essi_lab.accessor.hiscentral.deflusso;
  * #L%
  */
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.Optional;
+
 import org.json.JSONObject;
 
 import eu.essi_lab.iso.datamodel.classes.Citation;
@@ -30,12 +34,15 @@ import eu.essi_lab.iso.datamodel.classes.MIPlatform;
 import eu.essi_lab.iso.datamodel.classes.Online;
 import eu.essi_lab.iso.datamodel.classes.ReferenceSystem;
 import eu.essi_lab.iso.datamodel.classes.ResponsibleParty;
+import eu.essi_lab.iso.datamodel.classes.TemporalExtent;
 import eu.essi_lab.jaxb.common.CommonNameSpaceContext;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.GSException;
+import eu.essi_lab.model.ratings.RatingCurve;
 import eu.essi_lab.model.ratings.RatingCurves;
+import net.opengis.gml.v_3_2_0.TimeIndeterminateValueType;
 import eu.essi_lab.model.resource.CoreMetadata;
 import eu.essi_lab.model.resource.Dataset;
 import eu.essi_lab.model.resource.GSResource;
@@ -57,6 +64,8 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
     public static final String SOURCE_ID_KEY = "source-id";
     public static final String STATION_ID_KEY = "station-id";
     public static final String STATION_NAME_KEY = "station-name";
+    public static final String BEGIN_KEY = "begin";
+    public static final String END_KEY = "end";
 
     @Override
     public String getSupportedOriginalMetadataSchema() {
@@ -79,6 +88,37 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	}
 	json.put(STATION_ID_KEY, station.getStationIdentifier());
 	json.put(STATION_NAME_KEY, station.getName());
+
+	//
+	// overall validity period: earliest start, latest end (omitted if a curve is still in use)
+	//
+	Instant begin = null;
+	Instant end = null;
+	boolean open = station.getCurves().isEmpty();
+
+	for (RatingCurve curve : station.getCurves()) {
+
+	    Optional<Instant> curveBegin = curve.getBeginTime()
+		    .or(() -> Optional.ofNullable(curve.getBeginDate()).map(d -> d.atStartOfDay().toInstant(ZoneOffset.UTC)));
+	    Optional<Instant> curveEnd = curve.getEndTime()
+		    .or(() -> Optional.ofNullable(curve.getEndDate()).map(d -> d.atStartOfDay().toInstant(ZoneOffset.UTC)));
+
+	    if (curveBegin.isPresent() && (begin == null || curveBegin.get().isBefore(begin))) {
+		begin = curveBegin.get();
+	    }
+	    if (curveEnd.isEmpty()) {
+		open = true;
+	    } else if (end == null || curveEnd.get().isAfter(end)) {
+		end = curveEnd.get();
+	    }
+	}
+
+	if (begin != null) {
+	    json.put(BEGIN_KEY, begin.toString());
+	    if (!open && end != null) {
+		json.put(END_KEY, end.toString());
+	    }
+	}
 
 	originalMetadata.setMetadata(json.toString(4));
 
@@ -163,6 +203,22 @@ public class HISCentralRatingCurvesMapper extends FileIdentifierMapper {
 	    coreMetadata.getMIMetadata().addReferenceSystemInfo(referenceSystem);
 
 	    dataset.getExtensionHandler().setCountry("ITA");
+
+	    //
+	    // validity period of the curves, if known
+	    //
+	    String begin = json.optString(BEGIN_KEY, null);
+	    if (begin != null && !begin.isEmpty()) {
+		TemporalExtent temporalExtent = new TemporalExtent();
+		temporalExtent.setBeginPosition(begin);
+		String end = json.optString(END_KEY, null);
+		if (end != null && !end.isEmpty()) {
+		    temporalExtent.setEndPosition(end);
+		} else {
+		    temporalExtent.setIndeterminateEndPosition(TimeIndeterminateValueType.NOW);
+		}
+		coreMetadata.getDataIdentification().addTemporalExtent(temporalExtent);
+	    }
 
 	    MIPlatform platform = new MIPlatform();
 	    try {

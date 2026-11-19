@@ -23,15 +23,20 @@ package eu.essi_lab.model.ratings;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class RatingCurve {
 
     private final LocalDate beginDate;
     private final LocalDate endDate;
+    private Instant beginTime;
+    private Instant endTime;
     private final List<RatingCurvePoint> points = new ArrayList<>();
     private Formula formula;
     private double minLevel = Double.NaN;
@@ -57,6 +62,39 @@ public class RatingCurve {
 
     public LocalDate getEndDate() {
 	return endDate;
+    }
+
+    /**
+     * Creates a curve whose validity period is known with time precision (e.g. curves replaced within the same day).
+     * {@link #getBeginDate()} and {@link #getEndDate()} return the corresponding UTC dates.
+     *
+     * @param beginTime validity start, or {@code null} if unknown
+     * @param endTime validity end, or {@code null} if the curve is still in use
+     */
+    public static RatingCurve ofInstants(Instant beginTime, Instant endTime) {
+
+	RatingCurve curve = new RatingCurve(//
+		beginTime == null ? null : LocalDate.ofInstant(beginTime, ZoneOffset.UTC), //
+		endTime == null ? null : LocalDate.ofInstant(endTime, ZoneOffset.UTC));
+
+	curve.beginTime = beginTime;
+	curve.endTime = endTime;
+
+	return curve;
+    }
+
+    /**
+     * @return the validity start with time precision, if known
+     */
+    public Optional<Instant> getBeginTime() {
+	return Optional.ofNullable(beginTime);
+    }
+
+    /**
+     * @return the validity end with time precision, if known
+     */
+    public Optional<Instant> getEndTime() {
+	return Optional.ofNullable(endTime);
     }
 
     public List<RatingCurvePoint> getPoints() {
