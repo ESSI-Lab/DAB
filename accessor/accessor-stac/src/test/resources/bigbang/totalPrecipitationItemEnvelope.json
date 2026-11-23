@@ -1,0 +1,830 @@
+{
+ "catalogUrl": "https://boldrini.essi-lab.eu/stac/catalog.json",
+ "collectionUrl": "https://boldrini.essi-lab.eu/stac/bigbang100-total-precipitation/collection.json",
+ "itemUrl": "https://boldrini.essi-lab.eu/stac/bigbang100-total-precipitation/items/tp_1951_01c.json",
+ "harvestItems": true,
+ "catalog": {
+  "type": "Catalog",
+  "stac_version": "1.1.0",
+  "id": "bigbang100",
+  "title": "BIGBANG 10.0 - ISPRA hydrological balance grids for Italy",
+  "description": "STAC catalog of the gridded outputs (ESRI ASCII grids) of the ISPRA BIGBANG model (Bilancio Idrologico GIS BAsed a scala Nazionale su Griglia regolare) version 10.0. Monthly time step, 1 km resolution on the EEA reference grid (EPSG:3035), period 1951-2025. Release date: March 2026. Corresponding author: Giovanni Braca (ISPRA): giovanni.braca@isprambiente.it.\n\nLicence: Italian Open Data License v2.0 (IODL 2.0).\n\nCite data as follows: Braca G., Bussettini M., Casaioli M., Lastoria B., Mariani S., Piva F., Tropeano R., 2026, BIGBANG version 10.0 model processing, Italian Institute for Environmental Protection and Research - ISPRA",
+  "links": [
+   {
+    "rel": "self",
+    "href": "https://boldrini.essi-lab.eu/stac/catalog.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "root",
+    "href": "https://boldrini.essi-lab.eu/stac/catalog.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "license",
+    "href": "https://www.dati.gov.it/content/italian-open-data-license-v20",
+    "type": "text/html",
+    "title": "Italian Open Data License v2.0 (IODL 2.0)"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/INFORMATION_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "BIGBANG model information sheet"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/VARIABLES_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "List of hydrological variables"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/GRID_UNITS.txt",
+    "type": "text/plain",
+    "title": "Units of measurement"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/WHATS_NEW_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "What's new in this version"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/LICENCE%26CITING_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "Licence and citation"
+   },
+   {
+    "rel": "via",
+    "href": "https://groupware.sinanet.isprambiente.it/bigbang-data/library/bigbang100",
+    "type": "text/html",
+    "title": "Latest version of the BIGBANG data (ISPRA)"
+   }
+  ]
+ },
+ "collection": {
+  "type": "Collection",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+   "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+   "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+   "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "bigbang100-total-precipitation",
+  "title": "BIGBANG 10.0 - Total Precipitation (TP)",
+  "description": "**Total Precipitation** (Precipitazioni totali) - symbol `TP`, unit: mm.\n\nGridded hydrological balance variable computed by the ISPRA BIGBANG model version 10.0 over Italy at 1 km resolution (EEA reference grid, EPSG:3035), 1951-2025. Monthly and annual grids are distributed as zipped ESRI ASCII grids (.asc + .prj); aggregated archives and Long Term Annual Averages (LTAA) are available as collection assets.",
+  "keywords": [
+   "BIGBANG",
+   "ISPRA",
+   "Italy",
+   "hydrology",
+   "water balance",
+   "Total Precipitation",
+   "TP"
+  ],
+  "license": "other",
+  "providers": [
+   {
+    "name": "ISPRA - Istituto Superiore per la Protezione e la Ricerca Ambientale",
+    "description": "BIGBANG model v10.0. Corresponding author: Giovanni Braca (ISPRA): giovanni.braca@isprambiente.it",
+    "roles": [
+     "producer",
+     "processor",
+     "licensor"
+    ],
+    "url": "https://www.isprambiente.gov.it"
+   },
+   {
+    "name": "boldrini.essi-lab.eu",
+    "roles": [
+     "host"
+    ],
+    "url": "https://boldrini.essi-lab.eu"
+   }
+  ],
+  "extent": {
+   "spatial": {
+    "bbox": [
+     [
+      4.434638,
+      34.256941,
+      21.556096,
+      47.413586
+     ]
+    ]
+   },
+   "temporal": {
+    "interval": [
+     [
+      "1951-01-01T00:00:00Z",
+      "2025-12-31T23:59:59Z"
+     ]
+    ]
+   }
+  },
+  "summaries": {
+   "proj:code": [
+    "EPSG:3035"
+   ],
+   "gsd": [
+    1000.0
+   ],
+   "bigbang:variable": [
+    "TP"
+   ],
+   "bigbang:aggregation": [
+    "monthly",
+    "annual"
+   ]
+  },
+  "sci:citation": "Braca G., Bussettini M., Casaioli M., Lastoria B., Mariani S., Piva F., Tropeano R., 2026, BIGBANG version 10.0 model processing, Italian Institute for Environmental Protection and Research - ISPRA",
+  "links": [
+   {
+    "rel": "self",
+    "href": "https://boldrini.essi-lab.eu/stac/bigbang100-total-precipitation/collection.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "root",
+    "href": "https://boldrini.essi-lab.eu/stac/catalog.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "parent",
+    "href": "https://boldrini.essi-lab.eu/stac/catalog.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "license",
+    "href": "https://www.dati.gov.it/content/italian-open-data-license-v20",
+    "type": "text/html",
+    "title": "Italian Open Data License v2.0 (IODL 2.0)"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/INFORMATION_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "BIGBANG model information sheet"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/VARIABLES_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "List of hydrological variables"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/GRID_UNITS.txt",
+    "type": "text/plain",
+    "title": "Units of measurement"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/WHATS_NEW_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "What's new in this version"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/LICENCE%26CITING_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "Licence and citation"
+   },
+   {
+    "rel": "via",
+    "href": "https://groupware.sinanet.isprambiente.it/bigbang-data/library/bigbang100",
+    "type": "text/html",
+    "title": "Latest version of the BIGBANG data (ISPRA)"
+   }
+  ],
+  "assets": {
+   "annual": {
+    "href": "https://boldrini.essi-lab.eu/data/ASCII_GRID/TOTAL_PRECIPITATION/TP_ANNUAL_1951-2025.zip",
+    "type": "application/zip",
+    "title": "Total Precipitation - annual 1951-2025",
+    "description": "All annual grids 1951-2025 in a single archive",
+    "roles": [
+     "data"
+    ],
+    "file:size": 91421884,
+    "unit": "mm",
+    "nodata": -9999.0
+   },
+   "annual-ltaa": {
+    "href": "https://boldrini.essi-lab.eu/data/ASCII_GRID/TOTAL_PRECIPITATION/TP_ANNUAL_LTAA_1951-2025.zip",
+    "type": "application/zip",
+    "title": "Total Precipitation - annual ltaa 1951-2025",
+    "description": "Long Term Annual Average (LTAA) 1951-2025 of the annual values",
+    "roles": [
+     "data"
+    ],
+    "file:size": 1193668,
+    "unit": "mm",
+    "nodata": -9999.0
+   },
+   "monthly": {
+    "href": "https://boldrini.essi-lab.eu/data/ASCII_GRID/TOTAL_PRECIPITATION/TP_MONTHLY_1951-2025.zip",
+    "type": "application/zip",
+    "title": "Total Precipitation - monthly 1951-2025",
+    "description": "All monthly grids 1951-2025 in a single archive",
+    "roles": [
+     "data"
+    ],
+    "file:size": 1056298791,
+    "unit": "mm",
+    "nodata": -9999.0
+   },
+   "monthly-ltaa": {
+    "href": "https://boldrini.essi-lab.eu/data/ASCII_GRID/TOTAL_PRECIPITATION/TP_MONTHLY_LTAA_1951-2025.zip",
+    "type": "application/zip",
+    "title": "Total Precipitation - monthly ltaa 1951-2025",
+    "description": "Long Term Annual Average (LTAA) 1951-2025 for each calendar month (12 grids)",
+    "roles": [
+     "data"
+    ],
+    "file:size": 13643101,
+    "unit": "mm",
+    "nodata": -9999.0
+   }
+  },
+  "item_assets": {
+   "data": {
+    "type": "application/zip",
+    "title": "Total Precipitation ESRI ASCII grid (zip)",
+    "roles": [
+     "data"
+    ],
+    "unit": "mm",
+    "nodata": -9999.0
+   }
+  }
+ },
+ "item": {
+  "type": "Feature",
+  "stac_version": "1.1.0",
+  "stac_extensions": [
+   "https://stac-extensions.github.io/projection/v2.0.0/schema.json",
+   "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+   "https://stac-extensions.github.io/file/v2.1.0/schema.json"
+  ],
+  "id": "tp_1951_01c",
+  "collection": "bigbang100-total-precipitation",
+  "bbox": [
+   4.434638,
+   34.256941,
+   21.556096,
+   47.413586
+  ],
+  "geometry": {
+   "type": "Polygon",
+   "coordinates": [
+    [
+     [
+      5.456782,
+      34.633666
+     ],
+     [
+      6.017146,
+      34.659722
+     ],
+     [
+      6.577823,
+      34.682354
+     ],
+     [
+      7.138769,
+      34.70156
+     ],
+     [
+      7.69994,
+      34.717338
+     ],
+     [
+      8.261293,
+      34.729684
+     ],
+     [
+      8.822783,
+      34.738599
+     ],
+     [
+      9.384365,
+      34.74408
+     ],
+     [
+      9.945996,
+      34.746128
+     ],
+     [
+      10.507631,
+      34.744741
+     ],
+     [
+      11.069227,
+      34.73992
+     ],
+     [
+      11.630738,
+      34.731665
+     ],
+     [
+      12.19212,
+      34.719978
+     ],
+     [
+      12.753329,
+      34.704861
+     ],
+     [
+      13.314322,
+      34.686314
+     ],
+     [
+      13.875054,
+      34.66434
+     ],
+     [
+      14.435482,
+      34.638942
+     ],
+     [
+      14.995563,
+      34.610124
+     ],
+     [
+      15.555252,
+      34.577888
+     ],
+     [
+      16.114509,
+      34.542239
+     ],
+     [
+      16.673289,
+      34.503181
+     ],
+     [
+      17.231551,
+      34.460719
+     ],
+     [
+      17.789254,
+      34.414858
+     ],
+     [
+      18.346356,
+      34.365604
+     ],
+     [
+      18.902816,
+      34.312963
+     ],
+     [
+      19.458594,
+      34.256941
+     ],
+     [
+      19.522829,
+      34.763252
+     ],
+     [
+      19.588372,
+      35.269108
+     ],
+     [
+      19.655257,
+      35.774518
+     ],
+     [
+      19.723519,
+      36.279489
+     ],
+     [
+      19.793195,
+      36.784031
+     ],
+     [
+      19.864324,
+      37.28815
+     ],
+     [
+      19.936946,
+      37.791854
+     ],
+     [
+      20.011102,
+      38.295151
+     ],
+     [
+      20.086835,
+      38.798049
+     ],
+     [
+      20.16419,
+      39.300554
+     ],
+     [
+      20.243214,
+      39.802674
+     ],
+     [
+      20.323955,
+      40.304416
+     ],
+     [
+      20.406464,
+      40.805786
+     ],
+     [
+      20.490793,
+      41.306792
+     ],
+     [
+      20.576998,
+      41.807439
+     ],
+     [
+      20.665136,
+      42.307734
+     ],
+     [
+      20.755265,
+      42.807683
+     ],
+     [
+      20.84745,
+      43.307292
+     ],
+     [
+      20.941753,
+      43.806566
+     ],
+     [
+      21.038244,
+      44.305512
+     ],
+     [
+      21.136993,
+      44.804134
+     ],
+     [
+      21.238073,
+      45.302437
+     ],
+     [
+      21.341563,
+      45.800427
+     ],
+     [
+      21.447542,
+      46.298107
+     ],
+     [
+      21.556096,
+      46.795482
+     ],
+     [
+      20.881294,
+      46.866094
+     ],
+     [
+      20.204905,
+      46.932485
+     ],
+     [
+      19.527022,
+      46.994639
+     ],
+     [
+      18.847735,
+      47.052543
+     ],
+     [
+      18.167139,
+      47.106183
+     ],
+     [
+      17.485329,
+      47.155545
+     ],
+     [
+      16.802402,
+      47.200619
+     ],
+     [
+      16.118456,
+      47.241392
+     ],
+     [
+      15.43359,
+      47.277857
+     ],
+     [
+      14.747905,
+      47.310003
+     ],
+     [
+      14.061502,
+      47.337822
+     ],
+     [
+      13.374485,
+      47.361309
+     ],
+     [
+      12.686955,
+      47.380457
+     ],
+     [
+      11.999016,
+      47.395262
+     ],
+     [
+      11.310773,
+      47.40572
+     ],
+     [
+      10.622331,
+      47.411828
+     ],
+     [
+      9.933793,
+      47.413586
+     ],
+     [
+      9.245266,
+      47.410992
+     ],
+     [
+      8.556854,
+      47.404047
+     ],
+     [
+      7.868661,
+      47.392753
+     ],
+     [
+      7.180793,
+      47.377112
+     ],
+     [
+      6.493354,
+      47.357129
+     ],
+     [
+      5.806446,
+      47.332809
+     ],
+     [
+      5.120174,
+      47.304156
+     ],
+     [
+      4.434638,
+      47.271179
+     ],
+     [
+      4.487752,
+      46.768632
+     ],
+     [
+      4.539582,
+      46.265907
+     ],
+     [
+      4.590172,
+      45.762996
+     ],
+     [
+      4.639562,
+      45.25989
+     ],
+     [
+      4.687792,
+      44.75658
+     ],
+     [
+      4.7349,
+      44.253058
+     ],
+     [
+      4.780922,
+      43.749315
+     ],
+     [
+      4.825893,
+      43.245342
+     ],
+     [
+      4.869845,
+      42.74113
+     ],
+     [
+      4.912811,
+      42.236669
+     ],
+     [
+      4.95482,
+      41.731952
+     ],
+     [
+      4.995901,
+      41.226968
+     ],
+     [
+      5.036083,
+      40.721709
+     ],
+     [
+      5.075392,
+      40.216165
+     ],
+     [
+      5.113852,
+      39.710327
+     ],
+     [
+      5.15149,
+      39.204185
+     ],
+     [
+      5.188328,
+      38.69773
+     ],
+     [
+      5.224389,
+      38.190953
+     ],
+     [
+      5.259695,
+      37.683843
+     ],
+     [
+      5.294267,
+      37.176392
+     ],
+     [
+      5.328124,
+      36.668589
+     ],
+     [
+      5.361285,
+      36.160425
+     ],
+     [
+      5.393771,
+      35.65189
+     ],
+     [
+      5.425597,
+      35.142973
+     ],
+     [
+      5.456782,
+      34.633666
+     ]
+    ]
+   ]
+  },
+  "properties": {
+   "datetime": null,
+   "start_datetime": "1951-01-01T00:00:00Z",
+   "end_datetime": "1951-01-31T23:59:59Z",
+   "title": "Total Precipitation 1951-01",
+   "bigbang:variable": "TP",
+   "bigbang:aggregation": "monthly",
+   "description": "Monthly total precipitation grid, January 1951",
+   "keywords": [
+    "BIGBANG",
+    "ISPRA",
+    "Italy",
+    "hydrology",
+    "water balance",
+    "Total Precipitation",
+    "TP",
+    "monthly"
+   ],
+   "license": "other",
+   "providers": [
+    {
+     "name": "ISPRA - Istituto Superiore per la Protezione e la Ricerca Ambientale",
+     "description": "BIGBANG model v10.0. Corresponding author: Giovanni Braca (ISPRA): giovanni.braca@isprambiente.it",
+     "roles": [
+      "producer",
+      "processor",
+      "licensor"
+     ],
+     "url": "https://www.isprambiente.gov.it"
+    },
+    {
+     "name": "boldrini.essi-lab.eu",
+     "roles": [
+      "host"
+     ],
+     "url": "https://boldrini.essi-lab.eu"
+    }
+   ],
+   "sci:citation": "Braca G., Bussettini M., Casaioli M., Lastoria B., Mariani S., Piva F., Tropeano R., 2026, BIGBANG version 10.0 model processing, Italian Institute for Environmental Protection and Research - ISPRA",
+   "proj:code": "EPSG:3035",
+   "proj:bbox": [
+    3900000.0,
+    1300000.0,
+    5200000.0,
+    2700000.0
+   ],
+   "proj:shape": [
+    1400,
+    1300
+   ],
+   "proj:transform": [
+    1000.0,
+    0.0,
+    3900000.0,
+    0.0,
+    -1000.0,
+    2700000.0
+   ],
+   "gsd": 1000.0
+  },
+  "links": [
+   {
+    "rel": "self",
+    "href": "https://boldrini.essi-lab.eu/stac/bigbang100-total-precipitation/items/tp_1951_01c.json",
+    "type": "application/geo+json"
+   },
+   {
+    "rel": "collection",
+    "href": "https://boldrini.essi-lab.eu/stac/bigbang100-total-precipitation/collection.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "parent",
+    "href": "https://boldrini.essi-lab.eu/stac/bigbang100-total-precipitation/collection.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "root",
+    "href": "https://boldrini.essi-lab.eu/stac/catalog.json",
+    "type": "application/json"
+   },
+   {
+    "rel": "license",
+    "href": "https://www.dati.gov.it/content/italian-open-data-license-v20",
+    "type": "text/html",
+    "title": "Italian Open Data License v2.0 (IODL 2.0)"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/INFORMATION_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "BIGBANG model information sheet"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/VARIABLES_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "List of hydrological variables"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/GRID_UNITS.txt",
+    "type": "text/plain",
+    "title": "Units of measurement"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/WHATS_NEW_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "What's new in this version"
+   },
+   {
+    "rel": "describedby",
+    "href": "https://boldrini.essi-lab.eu/data/LICENCE%26CITING_BIGBANG100.txt",
+    "type": "text/plain",
+    "title": "Licence and citation"
+   },
+   {
+    "rel": "via",
+    "href": "https://groupware.sinanet.isprambiente.it/bigbang-data/library/bigbang100",
+    "type": "text/html",
+    "title": "Latest version of the BIGBANG data (ISPRA)"
+   }
+  ],
+  "assets": {
+   "data": {
+    "href": "https://boldrini.essi-lab.eu/data/ASCII_GRID/TOTAL_PRECIPITATION/MONTHLY/tp_1951_01c.zip",
+    "type": "application/zip",
+    "title": "Total Precipitation 1951-01",
+    "description": "Monthly total precipitation grid, January 1951",
+    "roles": [
+     "data"
+    ],
+    "file:size": 1349616,
+    "unit": "mm",
+    "nodata": -9999.0
+   }
+  }
+ }
+}
