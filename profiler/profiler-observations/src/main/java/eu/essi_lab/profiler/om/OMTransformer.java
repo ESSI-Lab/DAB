@@ -229,6 +229,13 @@ public class OMTransformer extends DiscoveryRequestTransformer {
 
 	}
 
+	// exact match on the URI of the harmonized observed property
+	String observedPropertyUri = request.getParameterValue(APIParameters.OBSERVED_PROPERTY_URI);
+	if (observedPropertyUri != null && !observedPropertyUri.isBlank()) {
+	    operands.add(
+		    BondFactory.createSimpleValueBond(BondOperator.EQUAL, MetadataElement.OBSERVED_PROPERTY_URI, observedPropertyUri.trim()));
+	}
+
 	String interpolation = request.getParameterValue(APIParameters.TIME_INTERPOLATION);
 	if (interpolation != null) {
 	    operands.add(BondFactory.createSimpleValueBond(BondOperator.TEXT_SEARCH,MetadataElement.TIME_INTERPOLATION, interpolation));

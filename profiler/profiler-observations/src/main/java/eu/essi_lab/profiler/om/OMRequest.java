@@ -58,7 +58,7 @@ public class OMRequest {
 		ONTOLOGY("ontology"), //
 		ID("id"), //
 		OBSERVED_PROPERTY("observedProperty"), //
-		OBSERVED_PROPERTY_URI("observedPropertyUri", "observedPropertyHref"), //
+		OBSERVED_PROPERTY_URI("observedPropertyUri", "observedPropertyURI", "observedPropertyHref"), //
 		AGGREGATION_PERIOD("aggregationDuration", "aggregationPeriod"), //
 		INTENDED_OBSERVATION_SPACING("intendedObservationSpacing", "timeResolution"), //
 		TIME_INTERPOLATION("timeInterpolation"), //

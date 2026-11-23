@@ -1,3 +1,4 @@
 eu.essi_lab.accessor.stac.harvested.STACCollectionMapper
 eu.essi_lab.accessor.stac.distributed.STACGranulesResultMapper
 eu.essi_lab.accessor.stac.polarwatch.PolarWatchSTACMapper
+eu.essi_lab.accessor.stac.bigbang.BigBangSTACMapper

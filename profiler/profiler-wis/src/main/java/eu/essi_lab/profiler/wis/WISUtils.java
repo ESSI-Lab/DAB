@@ -845,7 +845,7 @@ public class WISUtils {
 	String id = feature.getString("id");
 	WISUtils.addLink(feature, "application/json", "canonical", id, getRecordUrl(getServiceUrl(viewId), id));
 
-	addDataAccessLinks(feature, resource.getSource(), viewId);
+	addDataAccessLinks(feature, resource, viewId);
 
 	addDataNotificationLinks(feature, resource);
 
@@ -918,28 +918,55 @@ public class WISUtils {
     }
 
     /**
-     * Adds the links to the DAB OM API, providing access to the stations and the time series of the given source
-     * 
+     * Adds the links to the DAB OM API, providing access to the stations and the time series of the source of the
+     * given resource. If the record describes a single observed property (see
+     * {@link eu.essi_lab.model.resource.ExtensionHandler#getWISObservedProperty()}), the links are also filtered by
+     * the URI of that observed property
+     *
      * @param feature
-     * @param source
+     * @param resource
      * @param viewId
      */
-    private static void addDataAccessLinks(JSONObject feature, GSSource source, String viewId) {
+    private static void addDataAccessLinks(JSONObject feature, GSResource resource, String viewId) {
 
+	GSSource source = resource.getSource();
 	if (source == null) {
 	    return;
 	}
 
 	String label = source.getLabel() != null ? source.getLabel() : source.getUniqueIdentifier();
 	String omApi = getViewUrl(viewId) + "/om-api";
-	String provider = "?provider=" + URLEncoder.encode(source.getUniqueIdentifier(), StandardCharsets.UTF_8);
+	String query = "?provider=" + URLEncoder.encode(source.getUniqueIdentifier(), StandardCharsets.UTF_8);
 
-	WISUtils.addLink(feature, "application/json", "data", "Stations of " + label + " (DAB OM API)",
-		omApi + "/features" + provider);
+	String stations = "Stations";
+	String timeSeries = "Time series";
+
+	Optional<String> observedProperty = resource.getExtensionHandler().getWISObservedProperty();
+	if (observedProperty.isPresent()) {
+	    String uri = observedProperty.get();
+	    query += "&observedPropertyUri=" + URLEncoder.encode(uri, StandardCharsets.UTF_8);
+
+	    String propertyLabel = uri;
+	    SKOSConcept concept = new WHOSOntology().getConcept(uri);
+	    if (concept != null) {
+		String preferred = concept.getPreferredLabel("en");
+		if (preferred != null && !preferred.isBlank()) {
+		    propertyLabel = preferred;
+		}
+	    }
+	    // e.g. "Discharge time series of <source>"
+	    stations = propertyLabel + " stations";
+	    timeSeries = propertyLabel + " time series";
+	}
+
+	// WCMP2 link relation selection: "stations" for a link to numerous stations on which the dataset is based,
+	// "items" for a single link providing numerous data granules (here, the time series)
+	WISUtils.addLink(feature, "application/json", "stations", stations + " of " + label + " (DAB OM API)",
+		omApi + "/features" + query);
 	addTokenSecurity(feature);
 
-	WISUtils.addLink(feature, "application/json", "data", "Time series of " + label + " (DAB OM API)",
-		omApi + "/observations" + provider);
+	WISUtils.addLink(feature, "application/json", "items", timeSeries + " of " + label + " (DAB OM API)",
+		omApi + "/observations" + query);
 	addTokenSecurity(feature);
 
 	WISUtils.addLink(feature, "text/html", "service-doc", "DAB OM API documentation", getHostname() + "/gs-service/om-api/whos.html");

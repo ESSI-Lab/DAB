@@ -21,9 +21,70 @@ package eu.essi_lab.accessor.stac.harvested;
  * #L%
  */
 
+import java.util.Optional;
+
 import eu.essi_lab.cdk.harvest.wrapper.ConnectorWrapperSetting;
+import eu.essi_lab.cfga.option.BooleanChoice;
+import eu.essi_lab.cfga.option.BooleanChoiceOptionBuilder;
+import eu.essi_lab.cfga.option.Option;
+import eu.essi_lab.lib.utils.LabeledEnum;
 
 public class STACConnectorWrapperSetting extends ConnectorWrapperSetting<STACConnector> {
+
+    /**
+     *
+     */
+    private static final String HARVEST_ITEMS_OPTION_KEY = "STACHarvestItems";
+
+    public STACConnectorWrapperSetting() {
+
+	super();
+
+	Option<BooleanChoice> option = BooleanChoiceOptionBuilder.get().//
+		withKey(HARVEST_ITEMS_OPTION_KEY).//
+		withLabel("Full harvest: also harvest the STAC items of each collection, as child records "
+			+ "(supported by: " + "BIGBANG STAC Connector" + ")").//
+		withSingleSelection().//
+		withValues(LabeledEnum.values(BooleanChoice.class)).//
+		withSelectedValue(BooleanChoice.FALSE).//
+		cannotBeDisabled().//
+		build();
+
+	addOption(option);
+    }
+
+    /**
+     * @param harvestItems
+     */
+    public void setHarvestItems(boolean harvestItems) {
+
+	getOption(HARVEST_ITEMS_OPTION_KEY, BooleanChoice.class).//
+		ifPresent(o -> o.select(v -> v == BooleanChoice.fromBoolean(harvestItems)));
+    }
+
+    /**
+     * Settings saved before the option was introduced do not have it: they default to <code>false</code>
+     *
+     * @return
+     */
+    public boolean isHarvestItems() {
+
+	Optional<Option<BooleanChoice>> option = getOption(HARVEST_ITEMS_OPTION_KEY, BooleanChoice.class);
+
+	return option.isPresent() && option.get().getSelectedValue() != null && BooleanChoice.toBoolean(option.get().getSelectedValue());
+    }
+
+    /**
+     * Propagates the full harvest option to the selected connector
+     */
+    @Override
+    public STACConnector getSelectedConnector() {
+
+	STACConnector connector = super.getSelectedConnector();
+	connector.setHarvestItems(isHarvestItems());
+
+	return connector;
+    }
 
     @Override
     protected String getDefaultConnectorType() {

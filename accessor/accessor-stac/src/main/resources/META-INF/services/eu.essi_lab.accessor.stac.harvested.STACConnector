@@ -1,3 +1,4 @@
 eu.essi_lab.accessor.stac.harvested.STACConnector
 eu.essi_lab.accessor.stac.harvested.STACDEAConnector
 eu.essi_lab.accessor.stac.polarwatch.PolarWatchSTACConnector
+eu.essi_lab.accessor.stac.bigbang.BigBangSTACConnector

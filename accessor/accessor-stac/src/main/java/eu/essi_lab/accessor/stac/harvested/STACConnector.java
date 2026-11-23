@@ -54,6 +54,7 @@ public class STACConnector extends WrappedConnector {
 
     private int recordsCount;
     private List<String> nodesIds;
+    private boolean harvestItems;
 
     /**
      * tested with https://explorer.digitalearth.africa/stac/collections
@@ -158,6 +159,25 @@ public class STACConnector extends WrappedConnector {
     public String getType() {
 
 	return TYPE;
+    }
+
+    /**
+     * Set from the {@link STACConnectorWrapperSetting} full harvest option. If <code>true</code>, connectors supporting
+     * it also harvest the STAC items of each collection, as child records; other connectors ignore it
+     *
+     * @param harvestItems
+     */
+    public void setHarvestItems(boolean harvestItems) {
+
+	this.harvestItems = harvestItems;
+    }
+
+    /**
+     * @return
+     */
+    public boolean isHarvestItems() {
+
+	return harvestItems;
     }
 
 
