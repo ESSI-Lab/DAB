@@ -565,8 +565,12 @@ function initializeLogin(config) {
 			<p class=\"login-info\">${t('login_info')}</p>`;
 		if (isKeycloakLoginAvailable()) {
 			modalHtml += `
-			<button id=\"keycloakLoginBtn\">${t('login_keycloak')}</button>
+			<button id=\"keycloakLoginBtn\">${t('login_keycloak')}</button>`;
+			// "Create an account" button, shown unless config.keycloakRegister is false
+			if (config.keycloakRegister !== false) {
+				modalHtml += `
 			<button id=\"keycloakRegisterBtn\" class=\"keycloak-register\">${t('register_keycloak')}</button>`;
+			}
 		}
 		if (isApiKeyLoginAvailable(config)) {
 			if (isKeycloakLoginAvailable()) {

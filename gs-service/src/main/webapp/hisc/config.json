@@ -57,6 +57,7 @@
 	},
 	"login" : true,
 	"keycloakLogin" : true,
+	"keycloakRegister" : false,
 	"apiKeyLogin" : true,
 	"showSourceEndpoint" : false,
 	"permissions" : "downloads,api",

@@ -1632,7 +1632,8 @@ public class WebRequest implements RuntimeInfoProvider, Serializable {
 	    @Override
 	    public String getParameter(String name) {
 
-		KeyValueParser parser = new KeyValueParser(queryString);
+		// values are URL-decoded, as a servlet container does (e.g. 'a%2Cb' -> 'a,b', 'ASA+34' -> 'ASA 34')
+		KeyValueParser parser = new KeyValueParser(queryString, true);
 
 		String value = parser.getValue(name);
 
