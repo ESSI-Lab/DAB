@@ -58,7 +58,7 @@ import eu.essi_lab.model.auth.GSUser;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 /**
- * Builds a single metadata catalog (CSV or shapefile) for all observations matching a query, packaged in one zip.
+ * Builds a single metadata catalog (CSV, JSON or shapefile) for all observations matching a query, packaged in one zip.
  */
 public class MetadataDownloaderTool {
 
@@ -99,7 +99,7 @@ public class MetadataDownloaderTool {
     }
 
     /**
-     * Writes a metadata catalog zip (CSV or shapefile inside) to the given output stream.
+     * Writes a metadata catalog zip (CSV, JSON or shapefile inside) to the given output stream.
      */
     public void writeMetadataZip(OutputStream output, String requestURL, String downloadName) throws IOException {
 	File zipFile = buildMetadataZipFile(requestURL, downloadName, null, null, null, null);
@@ -162,7 +162,7 @@ public class MetadataDownloaderTool {
 	    if (format == null) {
 		format = OMFormat.CSV;
 	    }
-	    if (format != OMFormat.CSV && format != OMFormat.SHAPEFILE) {
+	    if (format != OMFormat.CSV && format != OMFormat.SHAPEFILE && format != OMFormat.JSON) {
 		format = OMFormat.CSV;
 	    }
 
@@ -174,6 +174,12 @@ public class MetadataDownloaderTool {
 	    if (format == OMFormat.SHAPEFILE) {
 		try (MetadataShapefileWriter shapefileWriter = new MetadataShapefileWriter(tempDirFile, baseName)) {
 		    rowCount = collectMetadataRows(baseRequestURL, omHandler, shapefileWriter::append, s3wrapper, bucket,
+			    operationId, downloadName, tempPath, status);
+		}
+	    } else if (format == OMFormat.JSON) {
+		File jsonFile = new File(tempDirFile, baseName + format.getExtension());
+		try (MetadataJsonWriter jsonWriter = new MetadataJsonWriter(jsonFile)) {
+		    rowCount = collectMetadataRows(baseRequestURL, omHandler, jsonWriter::append, s3wrapper, bucket,
 			    operationId, downloadName, tempPath, status);
 		}
 	    } else {

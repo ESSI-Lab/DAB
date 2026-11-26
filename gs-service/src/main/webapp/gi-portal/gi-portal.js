@@ -1443,6 +1443,10 @@ function initializeLogin(config) {
 
 			function isRowDirty(row) {
 				const idInput = row.find('.shapes-id-input');
+				if (idInput.length === 0) {
+					// placeholder row (e.g. "no shape areas"), nothing to save
+					return false;
+				}
 				const nameInput = row.find('.shapes-name-input');
 				const groupInput = row.find('.shapes-group-input');
 				const groupOrderInput = row.find('.shapes-group-order-input');
@@ -4181,7 +4185,8 @@ export async function initializePortal(config) {
 												var syncParams = new URLSearchParams(params.toString());
 												syncParams.delete('eMailNotifications');
 												var syncUrl = `${omBase}/observations?${syncParams.toString()}`;
-												var syncFileExt = selectedFormat === 'SHAPEFILE' ? '.zip' : '.csv';
+												var syncFileExtensions = { 'SHAPEFILE': '.zip', 'JSON': '.json', 'CSV': '.csv' };
+												var syncFileExt = syncFileExtensions[String(selectedFormat).toUpperCase()] || '.csv';
 												authFetch(syncUrl)
 													.then(function(response) {
 														if (!response.ok) {
