@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>HIS-Central Keycloak test</title>
+<link rel="shortcut icon" type="image/png" href="../giapi/ui/images/favicon.png">
+<!--
+  Test page for HIS-Central user registration / login through Keycloak.
+
+  Keycloak client requirements (realm "users"):
+    - OpenID Connect, Client authentication OFF (public client), Standard flow ON, PKCE S256
+    - Valid redirect URIs:              http://localhost:9090/gs-service/hisc/*
+    - Valid post logout redirect URIs:  http://localhost:9090/gs-service/hisc/*
+    - Web origins:                      http://localhost:9090
+    - Realm settings > Login > User registration ON (otherwise "Register" shows an error)
+
+  The client ID can be overridden from the URL: keycloak-test.html?clientId=my-client
+-->
+<style>
+  :root {
+    --color1: #00529c;
+    --color2: #00abd0;
+    --border: #d0d7de;
+    --bg: #f6f8fa;
+    --ok: #1a7f37;
+    --ko: #cf222e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    color: #1f2328;
+    background: #fff;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 24px;
+    background: var(--color1);
+    color: #fff;
+  }
+  header img { height: 48px; background: #fff; border-radius: 4px; padding: 2px; }
+  header h1 { margin: 0; font-size: 24px; }
+  header p { margin: 2px 0 0; font-size: 14px; opacity: .85; }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  section {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  section h2 { margin: 0 0 12px; font-size: 18px; color: var(--color1); }
+  .status { font-weight: bold; }
+  .status.ok { color: var(--ok); }
+  .status.ko { color: var(--ko); }
+  .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  button, a.button {
+    font: inherit;
+    font-size: 15px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid var(--color1);
+    background: #fff;
+    color: var(--color1);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  button.primary { background: var(--color1); color: #fff; }
+  button:hover, a.button:hover { background: var(--color2); border-color: var(--color2); color: #fff; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { width: 220px; color: #57606a; font-weight: normal; }
+  td { word-break: break-all; }
+  pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    overflow: auto;
+    font-size: 12px;
+    max-height: 360px;
+    margin: 8px 0 0;
+  }
+  details summary { cursor: pointer; color: var(--color1); margin-top: 8px; }
+  .hidden { display: none; }
+  .error { color: var(--ko); white-space: pre-wrap; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo_HISCentral.png" alt="HIS-Central">
+  <div>
+    <h1>HIS-Central – Keycloak test</h1>
+    <p>Registration and login test page (development only)</p>
+  </div>
+</header>
+
+<main>
+
+  <section>
+    <h2>Configuration</h2>
+    <table id="config-table"></table>
+  </section>
+
+  <section>
+    <h2>Session</h2>
+    <div id="status" class="status">Initializing Keycloak…</div>
+    <div id="error" class="error"></div>
+    <div class="buttons">
+      <button id="btn-register" class="primary hidden">Register</button>
+      <button id="btn-login" class="hidden">Log in</button>
+      <a id="btn-account" class="button hidden" target="_blank" rel="noopener">Manage account</a>
+      <button id="btn-userinfo" class="hidden">Call userinfo</button>
+      <button id="btn-om" class="hidden">Call O&amp;M API</button>
+      <button id="btn-refresh" class="hidden">Refresh token</button>
+      <button id="btn-copy" class="hidden">Copy access token</button>
+      <button id="btn-logout" class="hidden">Log out</button>
+    </div>
+  </section>
+
+  <section id="user-section" class="hidden">
+    <h2>User</h2>
+    <table id="user-table"></table>
+  </section>
+
+  <section id="tokens-section" class="hidden">
+    <h2>Tokens</h2>
+    <div id="token-expiry"></div>
+    <details>
+      <summary>ID token claims</summary>
+      <pre id="id-token"></pre>
+    </details>
+    <details>
+      <summary>Access token claims</summary>
+      <pre id="access-token"></pre>
+    </details>
+    <details id="userinfo-details" class="hidden">
+      <summary>Userinfo endpoint response</summary>
+      <pre id="userinfo"></pre>
+    </details>
+  </section>
+
+  <section id="om-section" class="hidden">
+    <h2>DAB O&amp;M API</h2>
+    <p>Request sent with <code>Authorization: Bearer &lt;access token&gt;</code> and no user token in the path:</p>
+    <pre id="om-request"></pre>
+    <pre id="om-response"></pre>
+  </section>
+
+</main>
+
+<script type="module">
+  import Keycloak from 'https://cdn.jsdelivr.net/npm/keycloak-js@26.2.0/+esm';
+
+  const params = new URLSearchParams(window.location.search);
+
+  const config = {
+    url: 'https://boldrini.essi-lab.eu:8085',
+    realm: 'users',
+    clientId: params.get('clientId') || 'his-central-portal'
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const show = (id, visible = true) => $(id).classList.toggle('hidden', !visible);
+
+  function fillTable(tableId, rows) {
+    const table = $(tableId);
+    table.replaceChildren();
+    for (const [key, value] of rows) {
+      if (value === undefined || value === null || value === '') continue;
+      const tr = document.createElement('tr');
+      const th = document.createElement('th');
+      const td = document.createElement('td');
+      th.textContent = key;
+      td.textContent = typeof value === 'object' ? JSON.stringify(value) : String(value);
+      tr.append(th, td);
+      table.append(tr);
+    }
+  }
+
+  function setStatus(text, ok) {
+    const el = $('status');
+    el.textContent = text;
+    el.className = 'status ' + (ok === undefined ? '' : ok ? 'ok' : 'ko');
+  }
+
+  function showError(message) {
+    $('error').textContent = message;
+  }
+
+  fillTable('config-table', [
+    ['Keycloak URL', config.url],
+    ['Realm', config.realm],
+    ['Client ID', config.clientId],
+    ['Redirect URI', window.location.origin + window.location.pathname]
+  ]);
+
+  const keycloak = new Keycloak(config);
+
+  // Standard claims shown first; everything else in the ID token (e.g. custom
+  // user profile attributes) is appended below them.
+  const STANDARD_CLAIMS = ['preferred_username', 'email', 'email_verified', 'given_name', 'family_name', 'name'];
+  const TECHNICAL_CLAIMS = new Set(['exp', 'iat', 'auth_time', 'jti', 'iss', 'aud', 'sub', 'typ', 'azp',
+    'nonce', 'session_state', 'sid', 'at_hash', 'acr', 'scope']);
+
+  function render() {
+    const authenticated = !!keycloak.authenticated;
+
+    show('btn-register', !authenticated);
+    show('btn-login', !authenticated);
+    show('btn-account', authenticated);
+    show('btn-userinfo', authenticated);
+    show('btn-om', authenticated);
+    show('btn-refresh', authenticated);
+    show('btn-copy', authenticated);
+    show('btn-logout', authenticated);
+    show('user-section', authenticated);
+    show('tokens-section', authenticated);
+
+    $('btn-account').href = keycloak.createAccountUrl();
+
+    if (!authenticated) {
+      setStatus('Not logged in', false);
+      return;
+    }
+
+    const id = keycloak.idTokenParsed || {};
+    const access = keycloak.tokenParsed || {};
+
+    setStatus('Logged in as ' + (id.preferred_username || access.preferred_username || id.sub), true);
+
+    const rows = STANDARD_CLAIMS.map((c) => [c, id[c]]);
+    for (const [key, value] of Object.entries(id)) {
+      if (!STANDARD_CLAIMS.includes(key) && !TECHNICAL_CLAIMS.has(key)) rows.push([key, value]);
+    }
+    rows.push(['user id (sub)', id.sub]);
+    rows.push(['realm roles', (access.realm_access?.roles || []).join(', ')]);
+    rows.push(['client roles', access.resource_access]);
+    fillTable('user-table', rows);
+
+    $('token-expiry').textContent =
+      'Access token expires at ' + new Date(access.exp * 1000).toLocaleString();
+    $('id-token').textContent = JSON.stringify(id, null, 2);
+    $('access-token').textContent = JSON.stringify(access, null, 2);
+  }
+
+  const redirectUri = window.location.origin + window.location.pathname + window.location.search;
+
+  $('btn-register').onclick = () => keycloak.register({ redirectUri });
+  $('btn-login').onclick = () => keycloak.login({ redirectUri });
+  $('btn-logout').onclick = () => keycloak.logout({ redirectUri });
+
+  $('btn-refresh').onclick = async () => {
+    try {
+      await keycloak.updateToken(-1); // force refresh
+      showError('');
+      render();
+    } catch (e) {
+      showError('Token refresh failed: ' + (e?.message || e));
+    }
+  };
+
+  $('btn-copy').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(keycloak.token);
+      $('btn-copy').textContent = 'Copied!';
+      setTimeout(() => ($('btn-copy').textContent = 'Copy access token'), 1500);
+    } catch (e) {
+      showError('Could not copy to clipboard: ' + (e?.message || e));
+    }
+  };
+
+  $('btn-userinfo').onclick = async () => {
+    try {
+      const info = await keycloak.loadUserInfo();
+      $('userinfo').textContent = JSON.stringify(info, null, 2);
+      show('userinfo-details');
+      $('userinfo-details').open = true;
+      showError('');
+    } catch (e) {
+      showError('Userinfo call failed: ' + (e?.message || e));
+    }
+  };
+
+  // O&M API call authenticated with the bearer token only (the view can be changed with ?view=...)
+  const omView = params.get('view') || 'his-central';
+  const omUrl = new URL('../services/essi/view/' + encodeURIComponent(omView) + '/om-api/properties?limit=1', window.location.href);
+
+  $('btn-om').onclick = async () => {
+    show('om-section');
+    $('om-request').textContent = 'GET ' + omUrl.href;
+    $('om-response').textContent = 'Loading…';
+    try {
+      await keycloak.updateToken(30);
+      const response = await fetch(omUrl, { headers: { Authorization: 'Bearer ' + keycloak.token } });
+      const body = await response.text();
+      const wwwAuth = response.headers.get('WWW-Authenticate');
+      $('om-response').textContent =
+        'HTTP ' + response.status + ' ' + response.statusText +
+        (wwwAuth ? '\nWWW-Authenticate: ' + wwwAuth : '') +
+        '\n\n' + (body.length > 2000 ? body.substring(0, 2000) + '…' : body);
+    } catch (e) {
+      $('om-response').textContent = 'Request failed: ' + (e?.message || e);
+    }
+  };
+
+  keycloak.onTokenExpired =() => keycloak.updateToken(30).then(render).catch(() => render());
+
+  try {
+    await keycloak.init({
+      onLoad: 'check-sso',      // find out whether the user is already logged in, without forcing a login
+      pkceMethod: 'S256',
+      checkLoginIframe: false   // the session iframe needs third-party cookies (portal and Keycloak are different sites)
+    });
+    render();
+  } catch (e) {
+    setStatus('Keycloak initialization failed', false);
+    showError(
+      (e?.error ? e.error + ': ' + (e.error_description || '') : (e?.message || String(e || 'unknown error'))) +
+      '\n\nCheck that the client "' + config.clientId + '" exists in realm "' + config.realm + '", ' +
+      'that it is a public client with PKCE S256, and that "' + window.location.origin + '" is listed in its Web origins.'
+    );
+    show('btn-register');
+    show('btn-login');
+  }
+</script>
+
+</body>
+</html>

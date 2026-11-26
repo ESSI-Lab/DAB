@@ -73,6 +73,7 @@ import eu.essi_lab.messages.ValidationMessage.ValidationResult;
 import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter;
 import eu.essi_lab.messages.bond.spatial.ShapeLayerOwner;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.auth.GSUser;
 import eu.essi_lab.model.GSSource;
 import eu.essi_lab.model.exceptions.ErrorInfo;
 import eu.essi_lab.model.exceptions.GSException;
@@ -278,8 +279,10 @@ public class WMSCapabilitiesHandler extends DefaultRequestHandler {
 			
 			Optional<String> tokenId = webRequest.extractTokenId();
 			String token = tokenId.orElse(ShapeLayerOwner.PUBLIC_TOKEN);
-			String viewerOwner = ShapeWmsLayerFilter.resolveViewerOwner(token).orElse("");
-			boolean viewerIsAdmin = ShapeWmsLayerFilter.isViewerAdmin(token);
+			// users authenticated with a bearer token see their own areas
+			GSUser requestUser = WebRequest.getCurrentUser(webRequest.getServletRequest());
+			String viewerOwner = ShapeWmsLayerFilter.resolveViewerOwner(token, requestUser).orElse("");
+			boolean viewerIsAdmin = ShapeWmsLayerFilter.isViewerAdmin(token, requestUser);
 
 			List<GSResource> resources = response.getResultsList().stream().
 			sorted((r1,r2) -> r1.getHarmonizedMetadata().getCoreMetadata().getTitle().compareTo(r2.getHarmonizedMetadata().getCoreMetadata().getTitle())).

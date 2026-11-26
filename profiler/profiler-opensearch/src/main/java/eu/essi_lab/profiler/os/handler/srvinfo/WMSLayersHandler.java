@@ -48,6 +48,7 @@ import org.w3c.dom.Node;
 import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter;
 import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter.LayerFilterContext;
 import eu.essi_lab.lib.net.downloader.Downloader;
+import java.net.http.HttpHeaders;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.StringUtils;
 import eu.essi_lab.lib.xml.XMLDocumentReader;
@@ -129,11 +130,17 @@ public class WMSLayersHandler extends DefaultRequestHandler {
 	    LayerFilterContext layerFilter = null;
 	    Map<String, JSONObject> metadataByOnlineId = null;
 	    if (shapeView != null && !shapeView.isBlank()) {
-		layerFilter = ShapeWmsLayerFilter.createContext(token);
+		// users authenticated with a bearer token see their own areas
+		layerFilter = ShapeWmsLayerFilter.createContext(token, WebRequest.getCurrentUser(req));
 		metadataByOnlineId = loadShapeMetadataByOnlineId();
 	    }
 
-	    Optional<String> response = downloader.downloadOptionalString(capRequest);
+	    // the capabilities are filtered by viewer as well: the bearer token (if any) is forwarded
+	    String authorization = req.getHeader("Authorization");
+	    Optional<String> response = authorization != null && !authorization.isBlank() ? //
+		    downloader.downloadOptionalString(capRequest, HttpHeaders.of(//
+			    Map.of("Authorization", List.of(authorization)), (name, value) -> true))
+		    : downloader.downloadOptionalString(capRequest);
 	    if (response.isPresent()) {
 
 		String capabilitiesDoc = response.get();

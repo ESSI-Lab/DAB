@@ -22,10 +22,12 @@ package eu.essi_lab.gssrv.rest;
  */
 
 import eu.essi_lab.access.datacache.*;
+import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter;
 import eu.essi_lab.api.database.*;
 import eu.essi_lab.api.database.factory.*;
 import eu.essi_lab.authorization.userfinder.*;
 import eu.essi_lab.cfga.gs.*;
+import eu.essi_lab.cfga.gs.setting.database.SecondaryUsersDatabaseSetting;
 import eu.essi_lab.gssrv.portal.*;
 import eu.essi_lab.harvester.HarvestingNotifier.HarvestingResult;
 import eu.essi_lab.iso.datamodel.classes.*;
@@ -1122,12 +1124,13 @@ public class SupportService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response listPredefinedShapes(//
 	    @QueryParam("email") String email, //
-	    @QueryParam("apiKey") String apiKey) {
+	    @QueryParam("apiKey") String apiKey, //
+	    @Context HttpServletRequest servletRequest) {
 
 	BasicResponse basicResponse = new BasicResponse();
-	LoginResponse loginResponse = getLoginResponse(new LoginRequest(email, apiKey));
+	Optional<ShapeActor> actor = shapeActor(servletRequest, email, apiKey);
 
-	if (!loginResponse.isSuccess()) {
+	if (actor.isEmpty()) {
 
 	    basicResponse.setSuccess(false);
 	    basicResponse.setMessage("not authenticated");
@@ -1136,8 +1139,7 @@ public class SupportService {
 
 	try {
 
-	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
-	    JSONObject payload = new PredefinedShapeManagementService().listAreas(owner, loginResponse.isAdmin());
+	    JSONObject payload = new PredefinedShapeManagementService().listAreas(actor.get().owner(), actor.get().admin());
 	    payload.put("success", true);
 
 	    return Response.ok(payload.toString(), MediaType.APPLICATION_JSON).build();
@@ -1156,12 +1158,13 @@ public class SupportService {
     @Path("/predefinedShapes/harvest")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response harvestPredefinedShapes(LoginRequest request) {
+    public Response harvestPredefinedShapes(LoginRequest request, @Context HttpServletRequest servletRequest) {
 
 	BasicResponse basicResponse = new BasicResponse();
-	LoginResponse loginResponse = getLoginResponse(request);
+	Optional<ShapeActor> actor = shapeActor(servletRequest, request == null ? null : request.getEmail(),
+		request == null ? null : request.getApiKey());
 
-	if (!loginResponse.isSuccess()) {
+	if (actor.isEmpty()) {
 
 	    basicResponse.setSuccess(false);
 	    basicResponse.setMessage("not authenticated");
@@ -1188,33 +1191,33 @@ public class SupportService {
     @Path("/predefinedShapes/delete")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletePredefinedShape(PredefinedShapeDeleteRequest request) {
+    public Response deletePredefinedShape(PredefinedShapeDeleteRequest request, @Context HttpServletRequest servletRequest) {
 
 	BasicResponse basicResponse = new BasicResponse();
-	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
-	LoginResponse loginResponse = getLoginResponse(loginRequest);
+	Optional<ShapeActor> actor = shapeActor(servletRequest, request.getEmail(), request.getApiKey());
 
-	if (!loginResponse.isSuccess()) {
+	if (actor.isEmpty()) {
 
 	    basicResponse.setSuccess(false);
 	    basicResponse.setMessage("not authenticated");
 	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
 	}
 
-	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
+	String owner = actor.get().owner();
+	boolean admin = actor.get().admin();
 	PredefinedShapeManagementService managementService = new PredefinedShapeManagementService();
 	PredefinedShapeDeleteResult deleteResult;
 	String successMessage;
 
 	if (request.getIdentifiers() != null && !request.getIdentifiers().isEmpty()) {
 
-	    deleteResult = managementService.deleteByIdentifiers(request.getIdentifiers(), owner, loginResponse.isAdmin(),
+	    deleteResult = managementService.deleteByIdentifiers(request.getIdentifiers(), owner, admin,
 		    request.getShapeView());
 	    successMessage = "Deleted " + request.getIdentifiers().size() + " search area(s)";
 
 	} else {
 
-	    deleteResult = managementService.deleteByPrefix(request.getPrefix(), owner, loginResponse.isAdmin(),
+	    deleteResult = managementService.deleteByPrefix(request.getPrefix(), owner, admin,
 		    request.getShapeView());
 	    successMessage = "Deleted shape area \"" + request.getPrefix() + "\"";
 	}
@@ -1240,23 +1243,21 @@ public class SupportService {
     @Path("/predefinedShapes/update")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePredefinedShape(PredefinedShapeUpdateRequest request) {
+    public Response updatePredefinedShape(PredefinedShapeUpdateRequest request, @Context HttpServletRequest servletRequest) {
 
 	BasicResponse basicResponse = new BasicResponse();
-	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
-	LoginResponse loginResponse = getLoginResponse(loginRequest);
+	Optional<ShapeActor> actor = shapeActor(servletRequest, request.getEmail(), request.getApiKey());
 
-	if (!loginResponse.isSuccess()) {
+	if (actor.isEmpty()) {
 
 	    basicResponse.setSuccess(false);
 	    basicResponse.setMessage("not authenticated");
 	    return Response.status(Response.Status.UNAUTHORIZED).entity(basicResponse).build();
 	}
 
-	String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
 	PredefinedShapeDeleteResult updateResult = new PredefinedShapeManagementService().updateEntry(request.getIdentifier(),
-		request.getNewIdentifier(), request.getName(), request.getGroup(), request.getGroupOrder(), request.getOwner(), owner,
-		loginResponse.isAdmin(), request.getShapeView());
+		request.getNewIdentifier(), request.getName(), request.getGroup(), request.getGroupOrder(), request.getOwner(),
+		actor.get().owner(), actor.get().admin(), request.getShapeView());
 
 	if (!updateResult.isSuccess()) {
 
@@ -1290,10 +1291,9 @@ public class SupportService {
 	    String email = multipart.getField("email").orElse("");
 	    String apiKey = multipart.getField("apiKey").orElse("");
 
-	    LoginRequest loginRequest = new LoginRequest(email, apiKey);
-	    LoginResponse loginResponse = getLoginResponse(loginRequest);
+	    Optional<ShapeActor> actor = shapeActor(servletRequest, email, apiKey);
 
-	    if (!loginResponse.isSuccess()) {
+	    if (actor.isEmpty()) {
 
 		basicResponse.setSuccess(false);
 		basicResponse.setMessage("not authenticated");
@@ -1309,12 +1309,10 @@ public class SupportService {
 
 	    String shapeId = multipart.getField("shapeId").orElse("");
 	    String group = multipart.getField("group").orElse("");
-	    String owner = PredefinedShapeAccess.ownerFromLogin(loginResponse);
-
 	    PredefinedShapeUploadService uploadService = new PredefinedShapeUploadService();
 
 	    PredefinedShapeUploadService.UploadOutcome outcome = uploadService.upload(multipart.getFileName(), shapeId,
-		    multipart.getFileStream(), group, owner, loginResponse.isAdmin());
+		    multipart.getFileStream(), group, actor.get().owner(), actor.get().admin());
 
 	    if (!outcome.isSuccess()) {
 
@@ -1365,6 +1363,159 @@ public class SupportService {
     }
 
     /**
+     * Public information about the Keycloak realm whose users can access DAB with a bearer token (see the secondary user database
+     * setting), used by web pages to log in and to get access tokens. Only public addresses and client identifiers are returned.
+     *
+     * @return <code>{"enabled": false}</code> if the realm is not configured, otherwise <code>{"enabled": true, "keycloakUrl", "realm",
+     *         "issuer", "audience", "loginClientId"?, "scriptsClientId"?}</code>
+     */
+    @GET
+    @Path("/auth/keycloak")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response keycloakInfo() {
+
+	JSONObject info = new JSONObject();
+
+	Optional<SecondaryUsersDatabaseSetting> setting = ConfigurationWrapper.getSecondaryUsersSetting();
+
+	boolean enabled = setting.isPresent() && //
+		!setting.get().getKeycloakUrl().isEmpty() && //
+		!setting.get().getRealm().isEmpty();
+
+	info.put("enabled", enabled);
+
+	if (enabled) {
+
+	    SecondaryUsersDatabaseSetting s = setting.get();
+
+	    info.put("keycloakUrl", s.getKeycloakUrl());
+	    info.put("realm", s.getRealm());
+	    info.put("issuer", s.getIssuer());
+	    info.put("audience", s.getClientId().orElse(SecondaryUsersDatabaseSetting.DEFAULT_CLIENT_ID));
+
+	    s.getLoginClientId().ifPresent(id -> info.put("loginClientId", id));
+	    s.getScriptsClientId().ifPresent(id -> info.put("scriptsClientId", id));
+	}
+
+	return Response.ok(info.toString()).//
+		header("Cache-Control", "no-cache").//
+		build();
+    }
+
+    /**
+     * The user of a request authenticated with a Keycloak access token (<code>Authorization: Bearer</code>), as DAB sees it: the
+     * permissions, views and download limits granted by DAB (see the secondary user database setting). Used by web pages to adapt their
+     * interface; DAB checks the same values when serving the requests.
+     *
+     * @param servletRequest
+     * @return <code>{"authenticated": false}</code> without a valid bearer token, otherwise <code>{"authenticated": true, "identifier",
+     *         "username"?, "email"?, "firstName"?, "lastName"?, "role", "permissions", "allowedViews", "maxDownloadSizeMB"?,
+     *         "maxDownloadPartSizeMB"?}</code>. An invalid bearer token is refused with HTTP 401
+     */
+    @GET
+    @Path("/auth/me")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response currentUser(@Context HttpServletRequest servletRequest) {
+
+	JSONObject me = new JSONObject();
+
+	GSUser user;
+
+	try {
+
+	    user = UserFinder.findCurrentUser(servletRequest);
+
+	} catch (InvalidBearerTokenException e) {
+
+	    me.put("authenticated", false);
+	    me.put("error", "invalid_token");
+	    return Response.status(Response.Status.UNAUTHORIZED).entity(me.toString()).build();
+
+	} catch (Exception e) {
+
+	    GSLoggerFactory.getLogger(getClass()).error("Unable to find the current user", e);
+	    return Response.serverError().entity(getJSONErrorResponse("Unable to find the current user").toString()).build();
+	}
+
+	boolean keycloakUser = user != null && KeycloakBearerTokenResolver.AUTH_PROVIDER.equals(user.getAuthProvider());
+
+	me.put("authenticated", keycloakUser);
+
+	if (keycloakUser) {
+
+	    me.put("identifier", user.getIdentifier());
+	    me.put("role", user.getRole());
+
+	    for (String property : List.of("username", "email", "firstName", "lastName")) {
+		user.getStringPropertyValue(property).ifPresent(v -> me.put(property, v));
+	    }
+
+	    me.put("permissions", new JSONArray(splitList(user.getStringPropertyValue("permissions").orElse(""))));
+	    me.put("allowedViews", new JSONArray(splitList(user.getStringPropertyValue("allowedViews").orElse(""))));
+
+	    if (user.getMaxDownloadSizeMB() != null) {
+		me.put("maxDownloadSizeMB", user.getMaxDownloadSizeMB());
+	    }
+	    if (user.getMaxDownloadPartSizeMB() != null) {
+		me.put("maxDownloadPartSizeMB", user.getMaxDownloadPartSizeMB());
+	    }
+	}
+
+	return Response.ok(me.toString()).//
+		header("Cache-Control", "no-store").//
+		build();
+    }
+
+    /**
+     * @param value comma separated values
+     * @return
+     */
+    private static List<String> splitList(String value) {
+
+	return Arrays.stream(value.split(",")).map(String::trim).filter(v -> !v.isEmpty()).toList();
+    }
+
+    /**
+     * The user managing predefined shapes: owner id of the shapes and administrator flag
+     */
+    private record ShapeActor(String owner, boolean admin) {
+    }
+
+    /**
+     * Users authenticated with a bearer token (validated by the user finder filter) manage their own shapes, as owner
+     * {@link ShapeWmsLayerFilter#ownerOf(GSUser)}, and are never administrators. The other users log in with email and personal token, as
+     * before.
+     *
+     * @param servletRequest
+     * @param email personal token login
+     * @param apiKey personal token login
+     * @return empty if the user is not authenticated
+     */
+    private Optional<ShapeActor> shapeActor(HttpServletRequest servletRequest, String email, String apiKey) {
+
+	GSUser user = servletRequest == null ? null : eu.essi_lab.messages.web.WebRequest.getCurrentUser(servletRequest);
+
+	if (KeycloakBearerTokenResolver.isBearerTokenUser(user)) {
+
+	    return Optional.of(new ShapeActor(ShapeWmsLayerFilter.ownerOf(user), false));
+	}
+
+	if (email == null || email.isBlank() || apiKey == null || apiKey.isBlank()) {
+
+	    return Optional.empty();
+	}
+
+	LoginResponse loginResponse = getLoginResponse(new LoginRequest(email, apiKey));
+
+	if (!loginResponse.isSuccess()) {
+
+	    return Optional.empty();
+	}
+
+	return Optional.of(new ShapeActor(PredefinedShapeAccess.ownerFromLogin(loginResponse), loginResponse.isAdmin()));
+    }
+
+    /**
      * @param request
      * @return
      */
@@ -1373,228 +1524,4 @@ public class SupportService {
 	return UserLogin.login(request);
     }
 
-    @SuppressWarnings("rawtypes")
-    @POST
-    @Path("/listUsers")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response listUsers(LoginRequest request) {
-	LoginResponse loginResponse = getLoginResponse(request);
-	BasicResponse listResponse = new BasicResponse();
-	if (loginResponse.isSuccess()) {
-	    if (loginResponse.isAdmin()) {
-		listResponse.setSuccess(true);
-
-		try {
-		    UserFinder uf = UserFinder.newInstance();
-		    List<GSUser> users = uf.getUsers(false);
-		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
-		    GSUser adminUser = null;
-		    for (GSUser user : users) {
-			if (request.getApiKey().equals(user.getUri())) {
-			    adminUser = user;
-			}
-			String role = user.getRole();
-			List<GSUser> list = usersByRole.get(role);
-			if (list == null) {
-			    list = new ArrayList<GSUser>();
-			    usersByRole.put(role, list);
-			}
-			list.add(user);
-		    }
-		    if (adminUser == null) {
-			listResponse.setSuccess(false);
-			listResponse.setMessage("admin user not found");
-			return Response.serverError().entity(listResponse).build();
-		    }
-		    List<GSUser> userList = usersByRole.get(adminUser.getRole());
-		    for (GSUser user : userList) {
-			listResponse.getUsers().add(user);
-		    }
-		    return Response.ok(listResponse).build();
-		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		    listResponse.setSuccess(false);
-		    listResponse.setMessage("error retrieving users");
-		    return Response.serverError().entity(listResponse).build();
-		}
-
-	    } else {
-		listResponse.setSuccess(false);
-		listResponse.setMessage("not authorized");
-		return Response.serverError().entity(listResponse).build();
-	    }
-	} else {
-	    listResponse.setSuccess(false);
-	    listResponse.setMessage("not authenticated");
-	    return Response.serverError().entity(listResponse).build();
-	}
-    }
-
-    @SuppressWarnings("rawtypes")
-    @POST
-    @Path("/updateUser")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateUser(UpdateUserRequest request) {
-	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
-	LoginResponse loginResponse = getLoginResponse(loginRequest);
-	BasicResponse basicResponse = new BasicResponse();
-	if (loginResponse.isSuccess()) {
-	    if (loginResponse.isAdmin()) {
-		basicResponse.setSuccess(true);
-
-		try {
-		    UserFinder uf = UserFinder.newInstance();
-		    List<GSUser> users = uf.getUsers(false);
-		    GSUser targetUser = null;
-		    for (GSUser user : users) {
-			if (request.getUserIdentifier().equals(user.getUri())) {
-			    targetUser = user;
-			}
-		    }
-		    if (targetUser == null) {
-			basicResponse.setSuccess(false);
-			basicResponse.setMessage("target user not found");
-			return Response.serverError().entity(basicResponse).build();
-		    }
-		    targetUser.setPropertyValue(request.getPropertyName(), request.getPropertyValue());
-		    uf.getUsersWriter().store(targetUser);
-
-		    return Response.ok(basicResponse).build();
-		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		    basicResponse.setSuccess(false);
-		    basicResponse.setMessage("error retrieving users");
-		    return Response.serverError().entity(basicResponse).build();
-		}
-
-	    } else {
-		basicResponse.setSuccess(false);
-		basicResponse.setMessage("not authorized");
-		return Response.serverError().entity(basicResponse).build();
-	    }
-	} else {
-	    basicResponse.setSuccess(false);
-	    basicResponse.setMessage("not authenticated");
-	    return Response.serverError().entity(basicResponse).build();
-	}
-    }
-
-    @SuppressWarnings("rawtypes")
-    @DELETE
-    @Path("/deleteUser")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteUser(UpdateUserRequest request) {
-	GSLoggerFactory.getLogger(getClass()).info("Deleting user: " + request.getUserIdentifier());
-	LoginRequest loginRequest = new LoginRequest(request.getEmail(), request.getApiKey());
-	LoginResponse loginResponse = getLoginResponse(loginRequest);
-	BasicResponse basicResponse = new BasicResponse();
-	if (loginResponse.isSuccess()) {
-	    GSLoggerFactory.getLogger(getClass()).info("Login o.k.: " + request.getApiKey());
-
-	    if (loginResponse.isAdmin()) {
-		GSLoggerFactory.getLogger(getClass()).info("Admin login o.k.: " + request.getApiKey());
-		basicResponse.setSuccess(true);
-
-		try {
-		    UserFinder uf = UserFinder.newInstance();
-		    List<GSUser> users = uf.getUsers(false);
-		    GSUser targetUser = null;
-		    for (GSUser user : users) {
-			if (request.getUserIdentifier().equals(user.getUri())) {
-			    targetUser = user;
-			}
-		    }
-		    if (targetUser == null) {
-			GSLoggerFactory.getLogger(getClass()).info("User not found: " + request.getUserIdentifier());
-			basicResponse.setSuccess(false);
-			basicResponse.setMessage("target user not found");
-			return Response.serverError().entity(basicResponse).build();
-		    }
-		    GSLoggerFactory.getLogger(getClass()).info("User found, will remove: " + request.getUserIdentifier());
-		    uf.getUsersWriter().removeUser(request.getUserIdentifier());
-		    GSLoggerFactory.getLogger(getClass()).info("Removed: " + request.getUserIdentifier());
-
-		    return Response.ok(basicResponse).build();
-		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).error("Error removing user " + request.getUserIdentifier());
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		    basicResponse.setSuccess(false);
-		    basicResponse.setMessage("error retrieving users");
-		    return Response.serverError().entity(basicResponse).build();
-		}
-
-	    } else {
-		GSLoggerFactory.getLogger(getClass()).info("Not an admin user: " + request.getApiKey());
-		basicResponse.setSuccess(false);
-		basicResponse.setMessage("not authorized");
-		return Response.serverError().entity(basicResponse).build();
-	    }
-	} else {
-	    GSLoggerFactory.getLogger(getClass()).info("Token not valid: " + request.getApiKey());
-	    basicResponse.setSuccess(false);
-	    basicResponse.setMessage("not authenticated");
-	    return Response.serverError().entity(basicResponse).build();
-	}
-    }
-
-    @SuppressWarnings("rawtypes")
-    @POST
-    @Path("/modifyUser")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response modifyUser(LoginRequest request) {
-	LoginResponse loginResponse = getLoginResponse(request);
-	BasicResponse listResponse = new BasicResponse();
-	if (loginResponse.isSuccess()) {
-	    if (loginResponse.isAdmin()) {
-		listResponse.setSuccess(true);
-
-		try {
-		    UserFinder uf = UserFinder.newInstance();
-		    List<GSUser> users = uf.getUsers(false);
-		    HashMap<String, List<GSUser>> usersByRole = new HashMap<String, List<GSUser>>();
-		    GSUser adminUser = null;
-		    for (GSUser user : users) {
-			if (request.getApiKey().equals(user.getUri())) {
-			    adminUser = user;
-			}
-			String role = user.getRole();
-			List<GSUser> list = usersByRole.get(role);
-			if (list == null) {
-			    list = new ArrayList<GSUser>();
-			    usersByRole.put(role, list);
-			}
-			list.add(user);
-		    }
-		    if (adminUser == null) {
-			listResponse.setSuccess(false);
-			listResponse.setMessage("admin user not found");
-			return Response.serverError().entity(listResponse).build();
-		    }
-		    List<GSUser> userList = usersByRole.get(adminUser.getRole());
-		    for (GSUser user : userList) {
-			listResponse.getUsers().add(user);
-		    }
-		    return Response.ok(listResponse).build();
-		} catch (Exception e) {
-		    GSLoggerFactory.getLogger(getClass()).error(e);
-		    listResponse.setSuccess(false);
-		    listResponse.setMessage("error retrieving users");
-		    return Response.serverError().entity(listResponse).build();
-		}
-
-	    } else {
-		listResponse.setSuccess(false);
-		listResponse.setMessage("not authorized");
-		return Response.serverError().entity(listResponse).build();
-	    }
-	} else {
-	    listResponse.setSuccess(false);
-	    listResponse.setMessage("not authenticated");
-	    return Response.serverError().entity(listResponse).build();
-	}
-    }
 }

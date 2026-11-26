@@ -32,6 +32,7 @@ import eu.essi_lab.accessor.opensearch.shape.ShapeWmsLayerFilter.LayerFilterCont
 import eu.essi_lab.api.database.opensearch.index.IndexData;
 import eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping;
 import eu.essi_lab.messages.bond.spatial.ShapeLayerOwner;
+import eu.essi_lab.model.auth.GSUser;
 
 /**
  * Lists predefined search areas for the O&amp;M properties API and portal (same visibility as shape WMS).
@@ -78,7 +79,19 @@ public final class PredefinedShapeLayerLister {
      */
     public static PagedLayerItems listPaged(String tokenSegment, int limit, String resumptionToken) {
 
-	List<LayerItem> all = loadAll(tokenSegment);
+	return listPaged(tokenSegment, null, limit, resumptionToken);
+    }
+
+    /**
+     * @param tokenSegment token from {@code /token/{token}/view/...}
+     * @param requestUser user of the request, if any: users authenticated with a bearer token see their own areas, whatever the token
+     * @param limit page size
+     * @param resumptionToken offset of the page, null for the first one
+     * @return
+     */
+    public static PagedLayerItems listPaged(String tokenSegment, GSUser requestUser, int limit, String resumptionToken) {
+
+	List<LayerItem> all = loadAll(tokenSegment, requestUser);
 	int offset = parseOffset(resumptionToken);
 	if (offset > all.size()) {
 	    offset = all.size();
@@ -105,9 +118,9 @@ public final class PredefinedShapeLayerLister {
 	}
     }
 
-    private static List<LayerItem> loadAll(String tokenSegment) {
+    private static List<LayerItem> loadAll(String tokenSegment, GSUser requestUser) {
 
-	LayerFilterContext context = ShapeWmsLayerFilter.createContext(tokenSegment);
+	LayerFilterContext context = ShapeWmsLayerFilter.createContext(tokenSegment, requestUser);
 	List<LayerItem> items = new ArrayList<>();
 
 	try {

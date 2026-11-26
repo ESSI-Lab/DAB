@@ -773,11 +773,11 @@ public class ConfigurationWrapper {
     }
 
     /**
-     * @return
+     * @return the secondary users (Keycloak realm) setting, if enabled
      */
-    public static Optional<StorageInfo> getSecondaryUsersStorageInfo() {
+    public static Optional<SecondaryUsersDatabaseSetting> getSecondaryUsersSetting() {
 
-	return getSystemSettings().getSecondaryUsersDatabaseSetting().map(DatabaseSetting::asStorageInfo);
+	return getSystemSettings().getSecondaryUsersDatabaseSetting();
     }
 
     /**

@@ -1070,6 +1070,27 @@ body {
     background-color: #34495e;
 }
 
+/* Keycloak login: registration as a secondary action, separated from the personal token login */
+.login-modal #keycloakLoginBtn {
+    margin-bottom: 8px;
+}
+
+.login-modal .keycloak-register {
+    background-color: white;
+    color: #2c3e50;
+    border: 1px solid #2c3e50;
+}
+
+.login-modal .keycloak-register:hover {
+    background-color: #ecf0f1;
+}
+
+.login-modal .login-separator {
+    margin-top: 18px;
+    padding-top: 12px;
+    border-top: 1px solid #ecf0f1;
+}
+
 .modal-overlay {
     display: none;
     position: fixed;

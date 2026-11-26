@@ -485,7 +485,7 @@ public class DatabaseSetting extends Setting implements EditableSetting {
 	return isVolatile() ? getVolatileDbSetting().get() : getDbSetting();
     }
 
-    private Setting getDbSetting() {
+    protected Setting getDbSetting() {
 
 	return getSetting(getDbSettingId()).get();
     }

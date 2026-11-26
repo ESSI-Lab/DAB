@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import eu.essi_lab.authorization.BasicRole;
+import eu.essi_lab.authorization.userfinder.KeycloakBearerTokenResolver;
 import eu.essi_lab.authorization.userfinder.UserFinder;
 import eu.essi_lab.cfga.gs.ConfigurationWrapper;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
@@ -38,6 +39,11 @@ import eu.essi_lab.model.auth.GSUser;
  * Filters predefined shape WMS layers by {@link eu.essi_lab.api.database.opensearch.index.mappings.ShapeFileMapping#OWNER}.
  */
 public final class ShapeWmsLayerFilter {
+
+    /**
+     * Prefix of the owner id of the shapes uploaded by users authenticated with a bearer token
+     */
+    public static final String KEYCLOAK_OWNER_PREFIX = "keycloak:";
 
     /**
      * Resolved viewer and bulk-loaded entry owners (one OpenSearch scan per request).
@@ -94,8 +100,18 @@ public final class ShapeWmsLayerFilter {
      */
     public static LayerFilterContext createContext(String tokenSegment) {
 
-	Optional<GSUser> viewer = resolveViewer(tokenSegment);
-	String viewerOwner = viewer.map(GSUser::getUri).orElse("");
+	return createContext(tokenSegment, null);
+    }
+
+    /**
+     * @param tokenSegment token from the WMS layers request
+     * @param requestUser user of the request, if any: users authenticated with a bearer token are the viewer, whatever the token
+     * @return filter context with viewer owner and all entry owners loaded from OpenSearch
+     */
+    public static LayerFilterContext createContext(String tokenSegment, GSUser requestUser) {
+
+	Optional<GSUser> viewer = resolveViewer(tokenSegment, requestUser);
+	String viewerOwner = viewer.map(ShapeWmsLayerFilter::ownerOf).orElse("");
 	boolean viewerIsAdmin = viewer.map(ShapeWmsLayerFilter::isAdminUser).orElse(false);
 
 	try {
@@ -116,7 +132,17 @@ public final class ShapeWmsLayerFilter {
      */
     public static boolean isViewerAdmin(String tokenSegment) {
 
-	return resolveViewer(tokenSegment).map(ShapeWmsLayerFilter::isAdminUser).orElse(false);
+	return isViewerAdmin(tokenSegment, null);
+    }
+
+    /**
+     * @param tokenSegment token from the WMS layers request
+     * @param requestUser user of the request, if any (see {@link #createContext(String, GSUser)})
+     * @return whether the viewer is an administrator
+     */
+    public static boolean isViewerAdmin(String tokenSegment, GSUser requestUser) {
+
+	return resolveViewer(tokenSegment, requestUser).map(ShapeWmsLayerFilter::isAdminUser).orElse(false);
     }
 
     /**
@@ -125,7 +151,48 @@ public final class ShapeWmsLayerFilter {
      */
     public static Optional<String> resolveViewerOwner(String tokenSegment) {
 
-	return resolveViewer(tokenSegment).map(GSUser::getUri);
+	return resolveViewerOwner(tokenSegment, null);
+    }
+
+    /**
+     * @param tokenSegment token from the WMS URL
+     * @param requestUser user of the request, if any (see {@link #createContext(String, GSUser)})
+     * @return owner id of the viewer, or empty when anonymous
+     */
+    public static Optional<String> resolveViewerOwner(String tokenSegment, GSUser requestUser) {
+
+	return resolveViewer(tokenSegment, requestUser).map(ShapeWmsLayerFilter::ownerOf);
+    }
+
+    /**
+     * Owner id of the shapes uploaded by the given user, and of the user as a viewer: the user URI (the personal token) for the users of
+     * the users database, {@value #KEYCLOAK_OWNER_PREFIX} followed by the Keycloak user id for the users authenticated with a bearer
+     * token.
+     *
+     * @param user
+     * @return
+     */
+    public static String ownerOf(GSUser user) {
+
+	if (KeycloakBearerTokenResolver.isBearerTokenUser(user)) {
+	    return KEYCLOAK_OWNER_PREFIX + user.getIdentifier();
+	}
+
+	return user.getUri();
+    }
+
+    /**
+     * @param tokenSegment
+     * @param requestUser
+     * @return the viewer: the request user if authenticated with a bearer token, otherwise the user of the token
+     */
+    private static Optional<GSUser> resolveViewer(String tokenSegment, GSUser requestUser) {
+
+	if (KeycloakBearerTokenResolver.isBearerTokenUser(requestUser)) {
+	    return Optional.of(requestUser);
+	}
+
+	return resolveViewer(tokenSegment);
     }
 
     private static Optional<GSUser> resolveViewer(String tokenSegment) {
@@ -154,7 +221,8 @@ public final class ShapeWmsLayerFilter {
 
     private static boolean isAdminUser(GSUser user) {
 
-	if (user == null) {
+	// users authenticated with a bearer token are never administrators
+	if (user == null || KeycloakBearerTokenResolver.isBearerTokenUser(user)) {
 	    return false;
 	}
 

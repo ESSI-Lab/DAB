@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <title>Swagger UI</title>
+    <title>DAB O&amp;M API</title>
     <link rel="stylesheet" type="text/css" href="./swagger-ui.css" />
     <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
@@ -36,10 +36,100 @@
     <script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
     <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
     <script>
-    window.onload = function() {
+    //
+    // The Keycloak realm is the one DAB trusts (secondary user database setting), read from DAB:
+    //   - not configured: only the operations with the personal token in the path are shown
+    //   - login client configured: "Authorize" > keycloak (authorization code with PKCE)
+    //   - scripts client configured: device login requests
+    //
+    const KEYCLOAK_INFO_URL = '../services/support/auth/keycloak';
+
+    // placeholder of the realm issuer in om-1.0.json
+    const SPEC_ISSUER = 'https://keycloak.example.org/realms/realm';
+
+    // operations authenticated with the bearer token, and device login requests
+    const isBearerPath = path => path.startsWith('/gs-service/services/essi/view/');
+    const isDevicePath = path => path.startsWith('/protocol/openid-connect/');
+
+    const OPERATIONS = ['get', 'put', 'post', 'delete', 'patch', 'head', 'options'];
+
+    async function loadKeycloakInfo() {
+      try {
+        const response = await fetch(KEYCLOAK_INFO_URL, { cache: 'no-cache' });
+        return response.ok ? await response.json() : { enabled: false };
+      } catch (e) {
+        console.error('Unable to read the Keycloak settings from DAB', e);
+        return { enabled: false };
+      }
+    }
+
+    function removePaths(spec, predicate) {
+      Object.keys(spec.paths).filter(predicate).forEach(path => delete spec.paths[path]);
+    }
+
+    function removeUnusedTags(spec) {
+      const used = new Set();
+      Object.values(spec.paths).forEach(item => OPERATIONS.forEach(m => (item[m]?.tags || []).forEach(t => used.add(t))));
+      spec.tags = (spec.tags || []).filter(t => used.has(t.name));
+    }
+
+    function adaptSpec(spec, info) {
+
+      // the DAB serving this page is the default server: its Keycloak settings are the ones read above
+      const here = window.location.origin;
+      spec.servers = [{ url: here, description: 'This DAB' }].concat((spec.servers || []).filter(s => s.url !== here));
+
+      if (!info.enabled) {
+        removePaths(spec, path => isBearerPath(path) || isDevicePath(path));
+        delete spec.components.securitySchemes;
+        spec.info.description = spec.info.description.split('## Authentication')[0] +
+          '## Authentication\n\nUsers call the operations with their personal token in the path. ' +
+          'Access with Keycloak accounts is not enabled on this server.';
+        removeUnusedTags(spec);
+        return spec;
+      }
+
+      if (!info.loginClientId) {
+        delete spec.components.securitySchemes.keycloak;
+        Object.values(spec.paths).forEach(item => OPERATIONS.forEach(m => {
+          if (item[m]?.security) {
+            item[m].security = item[m].security.filter(req => !('keycloak' in req));
+          }
+        }));
+      }
+
+      if (!info.scriptsClientId) {
+        removePaths(spec, isDevicePath);
+      } else {
+        Object.keys(spec.paths).filter(isDevicePath).forEach(path => {
+          const schema = spec.paths[path].post.requestBody.content['application/x-www-form-urlencoded'].schema;
+          schema.properties.client_id.default = info.scriptsClientId;
+        });
+      }
+
+      removeUnusedTags(spec);
+      return spec;
+    }
+
+    window.onload = async function() {
+
+      const info = await loadKeycloakInfo();
+
+      let spec = null;
+      try {
+        let text = await (await fetch('om-1.0.json', { cache: 'no-cache' })).text();
+        if (info.enabled) {
+          text = text.split(SPEC_ISSUER).join(info.issuer);
+        }
+        spec = adaptSpec(JSON.parse(text), info);
+      } catch (e) {
+        console.error('Unable to load om-1.0.json', e);
+      }
+
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        url: "om-1.0.json",
+        ...(spec ? { spec } : { url: 'om-1.0.json' }),
+        oauth2RedirectUrl: new URL('oauth2-redirect.html', window.location.href).href,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -52,6 +142,15 @@
         layout: "StandaloneLayout"
       });
       // End Swagger UI call region
+
+      // "Authorize" > keycloak: authorization code with PKCE, no client secret
+      if (info.enabled && info.loginClientId) {
+        ui.initOAuth({
+          clientId: info.loginClientId,
+          scopes: 'openid',
+          usePkceWithAuthorizationCodeGrant: true
+        });
+      }
 
       window.ui = ui;
     };

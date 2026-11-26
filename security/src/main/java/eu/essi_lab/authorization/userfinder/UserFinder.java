@@ -30,6 +30,7 @@ import eu.essi_lab.authentication.token.*;
 import eu.essi_lab.authorization.*;
 import eu.essi_lab.cfga.gs.*;
 import eu.essi_lab.cfga.gs.setting.*;
+import eu.essi_lab.cfga.gs.setting.database.*;
 import eu.essi_lab.lib.utils.*;
 import eu.essi_lab.messages.bond.*;
 import eu.essi_lab.messages.web.*;
@@ -62,9 +63,6 @@ public class UserFinder {
     private UsersWriter usersWriter;
     private UsersReader usersReader;
 
-    private UsersWriter secUsersWriter;
-    private UsersReader secUsersReader;
-
     protected TokenProvider tokenProvider;
 
     /**
@@ -89,52 +87,29 @@ public class UserFinder {
 
 	finder.viewManager = new ViewManager(reader);
 
-	if (ConfigurationWrapper.getUsersStorageInfo().isEmpty() && //
-		ConfigurationWrapper.getSecondaryUsersStorageInfo().isEmpty()) {
+	if (ConfigurationWrapper.getUsersStorageInfo().isPresent()) {
 
+	    StorageInfo info = ConfigurationWrapper.getUsersStorageInfo().get();
+
+	    UsersManager usersManager = UsersManagerFactory.get(info);
+
+	    finder.setUsersReader(usersManager);
+	    finder.setUsersWriter(usersManager);
+
+	} else {
+
+	    //
+	    // no specific users database, users are stored in the main database
+	    //
 	    DatabaseWriter writer = DatabaseProviderFactory.getWriter(storageInfo);
 
 	    finder.setUsersReader(reader);
 	    finder.setUsersWriter(writer);
-
-	} else {
-
-	    if (ConfigurationWrapper.getUsersStorageInfo().isPresent()) {
-
-		StorageInfo info = ConfigurationWrapper.getUsersStorageInfo().get();
-
-		UsersManager usersManager = UsersManagerFactory.get(info);
-
-		finder.setUsersReader(usersManager);
-		finder.setUsersWriter(usersManager);
-	    }
-
-	    if (ConfigurationWrapper.getSecondaryUsersStorageInfo().isPresent()) {
-
-		StorageInfo usersStorageInfo = ConfigurationWrapper.getSecondaryUsersStorageInfo().get();
-
-		UsersManager usersManager = UsersManagerFactory.get(usersStorageInfo);
-
-		finder.setSecondaryUsersReader(usersManager);
-		finder.setSecondaryUsersWriter(usersManager);
-	    }
 	}
 
 	if (usersStore == null) {
 
-	    usersStore = new SnapshotStore<>(() -> {
-
-		List<GSUser> users = finder.usersReader.getUsers();
-
-		if (finder.secUsersReader != null) {
-
-		    List<GSUser> secUsers = finder.secUsersReader.getUsers();
-		    users.addAll(secUsers);
-		}
-
-		return users;
-
-	    }, TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
+	    usersStore = new SnapshotStore<>(() -> finder.usersReader.getUsers(), TimeUnit.MINUTES, REFRESH_INTERVAL_MINUTES);
 	}
 
 	return finder;
@@ -151,6 +126,11 @@ public class UserFinder {
 
 	try {
 	    user = newInstance().findUser(request);
+
+	} catch (InvalidBearerTokenException e) {
+
+	    // the caller must reply with HTTP 401
+	    throw e;
 
 	} catch (Exception e) {
 
@@ -179,12 +159,25 @@ public class UserFinder {
      * For discovery and access requests, the returned user must have at least the {@link GSUser#getRole()} since this attribute is required
      * to execute the authorization mechanism.
      * <br>
-     * If no user can be identified, the user with the {@link BasicRole#ANONYMOUS} role must be returned
+     * If no user can be identified, the user with the {@link BasicRole#ANONYMOUS} role must be returned.<br>
+     * <br>
+     * Requests with a bearer token issued by the Keycloak realm of the {@link SecondaryUsersDatabaseSetting} are authenticated with the
+     * token only, see {@link #findBearerUser(HttpServletRequest, Optional)}
      *
      * @param request
      * @return
+     * @throws InvalidBearerTokenException if the request carries an invalid bearer token issued by the configured Keycloak realm
      */
     public GSUser findUser(HttpServletRequest request) throws Exception {
+
+	Optional<GSUser> bearerUser = findBearerUser(//
+		request, //
+		ConfigurationWrapper.getSecondaryUsersSetting().map(KeycloakBearerTokenResolver::new));
+
+	if (bearerUser.isPresent()) {
+
+	    return bearerUser.get();
+	}
 
 	List<GSProperty<String>> identifiers = findIdentifiers(request);
 
@@ -194,11 +187,52 @@ public class UserFinder {
     }
 
     /**
+     * Users of the Keycloak realm configured with the {@link SecondaryUsersDatabaseSetting} send their access token in the
+     * <code>Authorization: Bearer</code> header. Such users are built from the token claims (see {@link KeycloakBearerTokenResolver}), and
+     * any user token in the request path or query is ignored.<br>
+     * Bearer tokens of other issuers are ignored, and the request is handled as if they were missing.
+     *
+     * @param request
+     * @param resolver the resolver of the configured realm, empty if the secondary users are not enabled
+     * @return the user of the bearer token, empty if the request has no bearer token of the configured realm
+     * @throws InvalidBearerTokenException if the bearer token is issued by the configured realm but it is not valid
+     */
+    public static Optional<GSUser> findBearerUser(HttpServletRequest request, Optional<KeycloakBearerTokenResolver> resolver)
+	    throws InvalidBearerTokenException {
+
+	Optional<String> token = KeycloakBearerTokenResolver.readBearerToken(request);
+
+	if (token.isEmpty() || resolver.isEmpty() || !resolver.get().isIssuedByRealm(token.get())) {
+
+	    return Optional.empty();
+	}
+
+	GSUser user;
+
+	try {
+
+	    user = resolver.get().resolve(token.get());
+
+	} catch (InvalidBearerTokenException e) {
+
+	    GSLoggerFactory.getLogger(UserFinder.class).warn("Invalid bearer token: {}", e.getMessage());
+
+	    throw e;
+	}
+
+	WebRequest.extractTokenId(request.getRequestURI(), request.getQueryString()).ifPresent(pathToken -> GSLoggerFactory.getLogger(UserFinder.class)
+		.info("Bearer token user {}: ignoring the user token in the request", user.getIdentifier()));
+
+	GSLoggerFactory.getLogger(UserFinder.class).debug("Bearer token user found: {}", KeycloakBearerTokenResolver.describe(user));
+
+	return Optional.of(user);
+    }
+
+    /**
      * @param identifier
-     * @param secondaryWriter
      * @throws Exception
      */
-    public void enableUser(String identifier, boolean secondaryWriter) throws Exception {
+    public void enableUser(String identifier) throws Exception {
 
 	List<GSUser> users = getUsers(false);
 
@@ -216,24 +250,8 @@ public class UserFinder {
 
 	    user.get().setEnabled(true);
 
-	    if (secondaryWriter) {
-
-		secUsersWriter.store(user.get());
-
-	    } else {
-
-		usersWriter.store(user.get());
-	    }
+	    usersWriter.store(user.get());
 	}
-    }
-
-    /**
-     * @param identifier
-     * @throws Exception
-     */
-    public void enableUser(String identifier) throws Exception {
-
-	this.enableUser(identifier, false);
     }
 
     /**
@@ -256,15 +274,7 @@ public class UserFinder {
 	    return usersStore.getSnapshots();
 	}
 
-	List<GSUser> users = usersReader.getUsers();
-
-	if (secUsersReader != null) {
-
-	    List<GSUser> secUsers = secUsersReader.getUsers();
-	    users.addAll(secUsers);
-	}
-
-	return users;
+	return usersReader.getUsers();
     }
 
     /**
@@ -276,27 +286,11 @@ public class UserFinder {
     }
 
     /**
-     * @param writer
-     */
-    public void setSecondaryUsersWriter(UsersWriter writer) {
-
-	this.secUsersWriter = writer;
-    }
-
-    /**
      * @param reader
      */
     public void setUsersReader(UsersReader reader) {
 
 	this.usersReader = reader;
-    }
-
-    /**
-     * @param reader
-     */
-    public void setSecondaryUsersReader(UsersReader reader) {
-
-	this.secUsersReader = reader;
     }
 
     /**
@@ -307,13 +301,6 @@ public class UserFinder {
 	return usersWriter;
     }
 
-    /**
-     * @return
-     */
-    public Optional<UsersWriter> getSecondaryUsersWriter() {
-
-	return Optional.ofNullable(secUsersWriter);
-    }
 
     protected List<GSProperty<String>> findIdentifiers(HttpServletRequest request) throws Exception {
 

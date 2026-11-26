@@ -113,6 +113,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	}
 
 	DataDownloaderTool downloader = new DataDownloaderTool();
+	getSetting().getUser().ifPresent(downloader::setUser);
 
 	String resumptionToken = null;
 	BigDecimal totalDownloadedSoFarMB = BigDecimal.ZERO;
@@ -297,6 +298,7 @@ public class OMSchedulerWorker extends SchedulerWorker<OMSchedulerSetting> {
 	    throws Exception {
 
 	MetadataDownloaderTool downloader = new MetadataDownloaderTool();
+	getSetting().getUser().ifPresent(downloader::setUser);
 	String email = null;
 
 	GSLoggerFactory.getLogger(getClass()).info("OMSchedulerWorker STARTED (metadata), operation id {}", operationId);

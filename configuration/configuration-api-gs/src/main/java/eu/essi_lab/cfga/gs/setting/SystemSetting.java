@@ -662,9 +662,9 @@ public class SystemSetting extends Setting implements EditableSetting, KeyValueO
     /**
      * @return
      */
-    public Optional<UsersDatabaseSetting> getSecondaryUsersDatabaseSetting() {
+    public Optional<SecondaryUsersDatabaseSetting> getSecondaryUsersDatabaseSetting() {
 
-	UsersDatabaseSetting setting = getSetting(SECONDARY_USERS_DATABASE_SETTING_ID, SecondaryUsersDatabaseSetting.class).get();
+	SecondaryUsersDatabaseSetting setting = getSetting(SECONDARY_USERS_DATABASE_SETTING_ID, SecondaryUsersDatabaseSetting.class).get();
 
 	if (setting.isEnabled()) {
 

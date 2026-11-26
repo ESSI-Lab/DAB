@@ -54,12 +54,46 @@ import eu.essi_lab.lib.utils.FileUtils;
 import eu.essi_lab.lib.utils.GSLoggerFactory;
 import eu.essi_lab.lib.utils.ISO8601DateTimeUtils;
 import eu.essi_lab.messages.web.WebRequest;
+import eu.essi_lab.model.auth.GSUser;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 
 /**
  * Builds a single metadata catalog (CSV or shapefile) for all observations matching a query, packaged in one zip.
  */
 public class MetadataDownloaderTool {
+
+    /**
+     * User of the download job, for the users who can not be found again from the request URL (see {@link OMHandler#setJobUser(GSUser)})
+     */
+    private GSUser user;
+
+    /**
+     * @param user the user on whose behalf the internal requests are made
+     */
+    public void setUser(GSUser user) {
+
+	this.user = user;
+    }
+
+    /**
+     * @return the user on whose behalf the internal requests are made, null if not set
+     */
+    public GSUser getUser() {
+
+	return user;
+    }
+
+    /**
+     * @return a handler for the internal requests, on behalf of the job user (if any)
+     */
+    private OMHandler createHandler() {
+
+	OMHandler handler = new OMHandler();
+	if (user != null) {
+	    handler.setJobUser(user);
+	}
+	return handler;
+    }
 
     public MetadataDownloaderTool() {
     }
@@ -134,7 +168,7 @@ public class MetadataDownloaderTool {
 
 	    String baseName = resolveBaseName(downloadName, requestURL);
 	    String baseRequestURL = prepareListUrl(requestURL);
-	    OMHandler omHandler = new OMHandler();
+	    OMHandler omHandler = createHandler();
 	    int rowCount;
 
 	    if (format == OMFormat.SHAPEFILE) {

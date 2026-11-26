@@ -91,6 +91,11 @@ import java.util.Optional;
 
 public class OMHandler extends StreamingRequestHandler {
 
+    /**
+     * The user of a download job (see {@link #setJobUser(GSUser)}), null for the requests sent by clients
+     */
+    private GSUser jobUser;
+
     protected String viewId;
 
     @Override
@@ -139,7 +144,7 @@ public class OMHandler extends StreamingRequestHandler {
      */
     public void handle(OutputStream output, WebRequest webRequest) throws Exception {
 
-	GSUser user = UserFinder.findCurrentUser(webRequest.getServletRequest());
+	GSUser user = jobUser != null ? jobUser : UserFinder.findCurrentUser(webRequest.getServletRequest());
 
 	// check permissions
 	Optional<String> optView = webRequest.extractViewId();
@@ -417,7 +422,7 @@ public class OMHandler extends StreamingRequestHandler {
 			    }
 			    if (totalCount != null && totalCount <= OMRequestUtils.METADATA_SYNC_MAX_RECORDS) {
 				JSONObject completed = completeSyncMetadataDownload(s3wrapper, bucket, view.orElse(null),
-					requestURL.toString(), operationId, asynchDownloadName);
+					requestURL.toString(), operationId, asynchDownloadName, user);
 				printJSON(output, completed);
 				return;
 			    }
@@ -431,6 +436,11 @@ public class OMHandler extends StreamingRequestHandler {
 			setting.setRequestURL(requestURL.toString());
 			setting.setOperationId(operationId);
 			setting.setEmail(email);
+
+			// users authenticated with a bearer token can not be found again from the request URL: the job runs as this user
+			if (KeycloakBearerTokenResolver.isBearerTokenUser(user)) {
+			    setting.setUser(user);
+			}
 			String notifications = request.getParameterValue(APIParameters.E_MAIL_NOTIFICATIONS);
 			if (notifications != null && !notifications.isEmpty()) {
 			    setting.setEmailNotifications(notifications);
@@ -739,6 +749,18 @@ public class OMHandler extends StreamingRequestHandler {
 		}
 	    }
 	};
+    }
+
+    /**
+     * The internal requests of a download job (see {@link DataDownloaderTool} and {@link MetadataDownloaderTool}) are made on behalf of
+     * this user, instead of the user found from the request. Used for the users who can not be found again from the request URL (users
+     * authenticated with a bearer token).
+     *
+     * @param user
+     */
+    public void setJobUser(GSUser user) {
+
+	this.jobUser = user;
     }
 
     protected boolean getDistinctStations() {
@@ -1229,9 +1251,13 @@ public class OMHandler extends StreamingRequestHandler {
     }
 
     private JSONObject completeSyncMetadataDownload(S3TransferWrapper s3wrapper, String bucket, String viewId, String requestURL,
-	    String operationId, String asynchDownloadName) throws Exception {
+	    String operationId, String asynchDownloadName, GSUser user) throws Exception {
 
 	MetadataDownloaderTool downloader = new MetadataDownloaderTool();
+
+	if (KeycloakBearerTokenResolver.isBearerTokenUser(user)) {
+	    downloader.setUser(user);
+	}
 	DownloadPartResult result = downloader.download(s3wrapper, bucket, requestURL, operationId, asynchDownloadName, null);
 
 	JSONObject msg = new JSONObject();

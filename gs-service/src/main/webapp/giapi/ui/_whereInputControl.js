@@ -651,6 +651,41 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			return;
 		}
 
+		var onLayers = function(data) {
+			if (data && data.layers) {
+
+				predefinedLayers = data.layers;
+				refreshPredefinedLayerDropdowns();
+			} else {
+				var emptyLabel = __t('predefined_selection_empty');
+				if (emptyLabel === 'predefined_selection_empty') {
+					emptyLabel = 'No predefined search areas available.';
+				}
+				setPredefinedLayersListMessage(emptyLabel);
+			}
+		};
+
+		var onLayersError = function() {
+			var errorLabel = __t('predefined_selection_load_error');
+			if (errorLabel === 'predefined_selection_load_error') {
+				errorLabel = 'Failed to load predefined search areas.';
+			}
+			setPredefinedLayersListMessage(errorLabel, 'predefined-layers-message predefined-layers-error');
+		};
+
+		// portal loader: bearer token for Keycloak users (a JSONP request can not send it), JSONP otherwise
+		if (options.shapeView && typeof window.fetchShapeWmsLayers === 'function') {
+
+			window.fetchShapeWmsLayers(options.wmsVersion).then(function(data) {
+				if (data) {
+					onLayers(data);
+				} else {
+					onLayersError();
+				}
+			});
+			return;
+		}
+
 		jQuery.ajax({
 
 			type: 'GET',
@@ -659,26 +694,11 @@ GIAPI._whereInputControl = function(resultsMapWidget, options) {
 			dataType: 'jsonp',
 
 			success: function(data, status, jqXHR) {
-
-				if (data && data.layers) {
-
-					predefinedLayers = data.layers;
-					refreshPredefinedLayerDropdowns();
-				} else {
-					var emptyLabel = __t('predefined_selection_empty');
-					if (emptyLabel === 'predefined_selection_empty') {
-						emptyLabel = 'No predefined search areas available.';
-					}
-					setPredefinedLayersListMessage(emptyLabel);
-				}
+				onLayers(data);
 			},
 
 			error: function() {
-				var errorLabel = __t('predefined_selection_load_error');
-				if (errorLabel === 'predefined_selection_load_error') {
-					errorLabel = 'Failed to load predefined search areas.';
-				}
-				setPredefinedLayersListMessage(errorLabel, 'predefined-layers-message predefined-layers-error');
+				onLayersError();
 			}
 		});
 	};

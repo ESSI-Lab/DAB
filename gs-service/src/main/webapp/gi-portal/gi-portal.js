@@ -21,14 +21,29 @@ import {
 	setFiltersAccordionSectionOpen,
 	finalizeToolbarLayout
 } from './toolbar-layout.js';
+import {
+	initPortalAuth,
+	isKeycloakLoginAvailable,
+	isApiKeyLoginAvailable,
+	isKeycloakSession,
+	getLegacyToken,
+	isLoggedIn,
+	getUserLabel,
+	getUserPermissions,
+	isAdminUser,
+	omApiBase,
+	authFetch,
+	keycloakLogin,
+	keycloakRegister,
+	portalLogout
+} from './portal-auth.js';
 
 var view = '';
 var token = '';
-var availableViews = []; // Store views fetched for the current source deployment
 
-/** Token for shape WMS: empty before login → {@code public} (admin layers only). */
+/** Token for shape WMS: empty before login → {@code public} (admin layers only). Keycloak users see the public layers. */
 function getShapeWmsToken() {
-	return localStorage.getItem('authToken') || 'public';
+	return getLegacyToken() || 'public';
 }
 
 window.getShapeWmsToken = getShapeWmsToken;
@@ -105,6 +120,36 @@ function buildShapeWmsLayersQuery(wmsVersion) {
 }
 
 window.buildShapeWmsLayersQuery = buildShapeWmsLayersQuery;
+
+/**
+ * Loads the predefined shape layers visible to the current user: with a Keycloak session the list is requested as JSON with the bearer
+ * token (a JSONP request can not send it), otherwise with JSONP and the personal token, as before.
+ *
+ * @returns {Promise<object|null>} the layers handler response ({ layers: [...] }), null on errors
+ */
+function fetchShapeWmsLayers(wmsVersion) {
+	const query = buildShapeWmsLayersQuery(wmsVersion);
+	if (!query) {
+		return Promise.resolve(null);
+	}
+	if (isKeycloakSession()) {
+		return authFetch(query, { headers: { 'Accept': 'application/json' } })
+			.then(function(response) { return response.ok ? response.json() : null; })
+			.catch(function() { return null; });
+	}
+	return new Promise(function(resolve) {
+		jQuery.ajax({
+			type: 'GET',
+			url: query,
+			crossDomain: true,
+			dataType: 'jsonp',
+			success: function(data) { resolve(data); },
+			error: function() { resolve(null); }
+		});
+	});
+}
+
+window.fetchShapeWmsLayers = fetchShapeWmsLayers;
 
 /** WMS view id for predefined shape layers ({@link window.config.shapeView}). */
 function getPortalShapeView() {
@@ -514,14 +559,26 @@ function initializeLogin(config) {
 		const loginModal = document.createElement('div');
 		loginModal.id = 'loginModal';
 		loginModal.className = 'login-modal';
-		loginModal.innerHTML = `
+		let modalHtml = `
 			<button type="button" class="login-modal-close" aria-label="Close">×</button>
 			<h3>${t('login_to_portal', { title: (config.title || 'Portal') })}</h3>
-			<p class=\"login-info\">${t('login_info')}</p>
+			<p class=\"login-info\">${t('login_info')}</p>`;
+		if (isKeycloakLoginAvailable()) {
+			modalHtml += `
+			<button id=\"keycloakLoginBtn\">${t('login_keycloak')}</button>
+			<button id=\"keycloakRegisterBtn\" class=\"keycloak-register\">${t('register_keycloak')}</button>`;
+		}
+		if (isApiKeyLoginAvailable(config)) {
+			if (isKeycloakLoginAvailable()) {
+				modalHtml += `
+			<p class=\"login-info login-separator\">${t('login_with_token')}</p>`;
+			}
+			modalHtml += `
 			<input type=\"email\" id=\"email\" placeholder=\"${t('email_placeholder')}\" autocomplete=\"off\">
 			<input type=\"password\" id=\"apiKey\" placeholder=\"${t('api_key_placeholder')}\" autocomplete=\"off\">
-			<button id=\"submitLogin\">${t('login_submit')}</button>
-		`;
+			<button id=\"submitLogin\">${t('login_submit')}</button>`;
+		}
+		loginModal.innerHTML = modalHtml;
 		document.body.appendChild(loginModal);
 	}
 	if (!existingOverlay) {
@@ -541,33 +598,55 @@ function initializeLogin(config) {
 	const apiKeyInput = document.getElementById('apiKey');
 	const closeBtn = loginModal ? loginModal.querySelector('.login-modal-close') : null;
 
-	// Show modal
+	// Keycloak login and registration
+	const keycloakLoginBtn = document.getElementById('keycloakLoginBtn');
+	const keycloakRegisterBtn = document.getElementById('keycloakRegisterBtn');
+	if (keycloakLoginBtn) {
+		keycloakLoginBtn.addEventListener('click', function() {
+			keycloakLogin();
+		});
+	}
+	if (keycloakRegisterBtn) {
+		keycloakRegisterBtn.addEventListener('click', function() {
+			keycloakRegister();
+		});
+	}
+
+	function clearLoginInputs() {
+		if (emailInput) {
+			emailInput.value = '';
+		}
+		if (apiKeyInput) {
+			apiKeyInput.value = '';
+		}
+	}
+
+	// Show modal (or go straight to Keycloak when it is the only login)
 	loginBtn.addEventListener('click', function() {
+		if (isKeycloakLoginAvailable() && !isApiKeyLoginAvailable(config)) {
+			keycloakLogin();
+			return;
+		}
 		loginModal.style.display = 'block';
 		modalOverlay.style.display = 'block';
 		// Clear inputs when opening modal
-		emailInput.value = '';
-		apiKeyInput.value = '';
+		clearLoginInputs();
 	});
 
 	// Handle logout
 	logoutBtn.addEventListener('click', function() {
-		localStorage.removeItem('authToken');
-		localStorage.removeItem('userEmail');
-		localStorage.removeItem('lang');
 		loginBtn.style.display = 'inline-block';
 		loginBtn.textContent = t('login');
 		loginBtn.disabled = false;
 		logoutBtn.style.display = 'none';
-		window.location.reload();
+		portalLogout();
 	});
 
 	function closeLoginModal() {
 		loginModal.style.display = 'none';
 		modalOverlay.style.display = 'none';
 		// Clear inputs when closing modal
-		emailInput.value = '';
-		apiKeyInput.value = '';
+		clearLoginInputs();
 	}
 
 	// Close modal using the X button
@@ -590,8 +669,8 @@ function initializeLogin(config) {
 		}
 	});
 
-	// Handle login submission
-	submitLogin.addEventListener('click', function() {
+	// Handle login submission (personal token)
+	if (submitLogin) submitLogin.addEventListener('click', function() {
 		const email = emailInput.value;
 		const apiKey = apiKeyInput.value;
 
@@ -651,14 +730,12 @@ function initializeLogin(config) {
 			});
 	});
 
-	// Check for existing token and email
-	const existingToken = localStorage.getItem('authToken');
-	const existingEmail = localStorage.getItem('userEmail');
-	const isAdmin = localStorage.getItem('isAdmin') === 'true';
-	if (existingToken && existingEmail) {
+	// Check for an existing session (Keycloak or personal token)
+	const isAdmin = isAdminUser();
+	if (isLoggedIn()) {
 		loginBtn.style.display = 'none';
 		logoutBtn.style.display = 'inline-block';
-		logoutBtn.textContent = t('logged_in', { email: existingEmail });
+		logoutBtn.textContent = t('logged_in', { email: getUserLabel() });
 
 		// Create user menu
 		const userMenu = document.createElement('div');
@@ -666,10 +743,9 @@ function initializeLogin(config) {
 		userMenu.className = 'user-menu';
 		userMenu.style.display = 'none';
 		let menuHtml = `
-			<button id=\"statusBtn\" class=\"menu-button\">${t('menu_status')}</button>
-			<button id=\"uploadShapesBtn\" class=\"menu-button\">${t('menu_upload_predefined_shapes')}</button>\n`;
+			<button id=\"statusBtn\" class=\"menu-button\">${t('menu_status')}</button>\n`;
+		menuHtml += `<button id=\"uploadShapesBtn\" class=\"menu-button\">${t('menu_upload_predefined_shapes')}</button>\n`;
 		if (isAdmin) {
-			menuHtml += `<button id=\"listUsersBtn\" class=\"menu-button\">${t('menu_manage_users')}</button>\n`;
 			menuHtml += `<button id=\"dataReportBtn\" class=\"menu-button\">${t('menu_data_report')}</button>\n`;
 		}
 		menuHtml += `<button id=\"logoutMenuBtn\" class=\"menu-button\">${t('menu_logout')}</button>`;
@@ -883,8 +959,7 @@ function initializeLogin(config) {
 				refreshBtn.find('i').addClass('fa-spin');
 
 				// Fetch status from API
-				const authToken = localStorage.getItem('authToken');
-				fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads`, {
+				authFetch(`${omApiBase(view)}/downloads`, {
 					headers: {
 						'Accept': 'application/json'
 					}
@@ -1092,8 +1167,7 @@ function initializeLogin(config) {
 										})
 										.on('click', function() {
 											if (confirm(t('confirm_cancel_download'))) {
-												const authToken = localStorage.getItem('authToken');
-												fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads?id=${item.id}`, {
+												authFetch(`${omApiBase(view)}/downloads?id=${item.id}`, {
 													method: 'DELETE',
 													headers: {
 														'Accept': 'application/json'
@@ -1131,8 +1205,7 @@ function initializeLogin(config) {
 										})
 										.on('click', function() {
 											if (confirm(t('confirm_remove_download'))) {
-												const authToken = localStorage.getItem('authToken');
-												fetch(`../services/essi/token/${authToken}/view/${view}/om-api/downloads?id=${item.id}`, {
+												authFetch(`${omApiBase(view)}/downloads?id=${item.id}`, {
 													method: 'DELETE',
 													headers: {
 														'Accept': 'application/json'
@@ -1215,11 +1288,13 @@ function initializeLogin(config) {
 			setTimeout(fetchAndUpdateStatus, 100);
 		});
 
-		document.getElementById('uploadShapesBtn').addEventListener('click', function() {
+		const uploadShapesBtn = document.getElementById('uploadShapesBtn');
+		if (uploadShapesBtn) uploadShapesBtn.addEventListener('click', function() {
 			userMenu.style.display = 'none';
 
-			const authToken = localStorage.getItem('authToken');
-			const userEmail = localStorage.getItem('userEmail');
+			// personal token login: email and token in the requests; Keycloak login: bearer token, sent by authFetch
+			const authToken = getLegacyToken() || '';
+			const userEmail = isKeycloakSession() ? '' : (localStorage.getItem('userEmail') || '');
 			const wmsVersion = '1.3.0';
 			const shapeOnlinePrefix = 'opensearch://shapeFiles:';
 
@@ -1274,28 +1349,8 @@ function initializeLogin(config) {
 			let uploadInProgress = false;
 
 			function fetchWmsLayers() {
-				return new Promise(function(resolve) {
-					const query = buildShapeWmsLayersQuery(wmsVersion);
-					if (!query) {
-						resolve([]);
-						return;
-					}
-					jQuery.ajax({
-						type: 'GET',
-						url: query,
-						crossDomain: true,
-						dataType: 'jsonp',
-						success: function(data) {
-							if (data && data.layers) {
-								resolve(data.layers);
-							} else {
-								resolve([]);
-							}
-						},
-						error: function() {
-							resolve([]);
-						}
-					});
+				return fetchShapeWmsLayers(wmsVersion).then(function(data) {
+					return data && data.layers ? data.layers : [];
 				});
 			}
 
@@ -1454,7 +1509,7 @@ function initializeLogin(config) {
 				if (validationError) {
 					return Promise.resolve({ success: false, message: validationError });
 				}
-				return fetch('../services/support/predefinedShapes/update', {
+				return authFetch('../services/support/predefinedShapes/update', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(payload)
@@ -1599,7 +1654,7 @@ function initializeLogin(config) {
 				statusDiv.text(t('shapes_list_loading')).css('color', '#2c3e50');
 				const params = new URLSearchParams({ email: userEmail, apiKey: authToken });
 				Promise.all([
-					fetch('../services/support/predefinedShapes?' + params.toString()).then(function(r) { return r.json(); }),
+					authFetch('../services/support/predefinedShapes?' + params.toString()).then(function(r) { return r.json(); }),
 					fetchWmsLayers()
 				])
 					.then(function(results) {
@@ -1637,7 +1692,7 @@ function initializeLogin(config) {
 
 			function triggerHarvest() {
 				statusDiv.text(t('shapes_harvest_starting')).css('color', '#2c3e50');
-				fetch('../services/support/predefinedShapes/harvest', {
+				authFetch('../services/support/predefinedShapes/harvest', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({ email: userEmail, apiKey: authToken })
@@ -1698,7 +1753,7 @@ function initializeLogin(config) {
 				if (portalShapeView) {
 					deletePayload.shapeView = portalShapeView;
 				}
-				fetch('../services/support/predefinedShapes/delete', {
+				authFetch('../services/support/predefinedShapes/delete', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify(deletePayload)
@@ -1736,7 +1791,7 @@ function initializeLogin(config) {
 				formData.append('group', groupInput.val().trim());
 				formData.append('email', userEmail);
 				formData.append('apiKey', authToken);
-				fetch('../services/support/uploadPredefinedShapes', { method: 'POST', body: formData })
+				authFetch('../services/support/uploadPredefinedShapes', { method: 'POST', body: formData })
 					.then(function(r) { return r.json(); })
 					.then(function(data) {
 						uploadInProgress = false;
@@ -1769,623 +1824,6 @@ function initializeLogin(config) {
 			});
 		});
 
-		// List Users button click handler (admin only)
-		if (isAdmin) {
-			document.getElementById('listUsersBtn').addEventListener('click', function() {
-				userMenu.style.display = 'none';
-				// Create dialog content
-				const dialogContent = $('<div>');
-				dialogContent.append($('<h3>').text(t('menu_manage_users')));
-				dialogContent.append($('<p>').text(t('users_intro')));
-				// Results area
-				const resultsDiv = $('<div>').attr('id', 'listUsersResults').css({ 'margin-top': '15px' });
-				dialogContent.append(resultsDiv);
-				// --- Move function definitions here so they are in scope for both dialog and fetch ---
-				function renderTable(users) {
-					// Sort users: first by having permissions, then by email
-					const sortedUsers = users.slice().sort((a, b) => {
-						// Extract email and permissions for both users
-						const getProp = (u, name) => {
-							if (!Array.isArray(u.properties)) return '';
-							const p = u.properties.find(p => p.name === name);
-							return p ? p.value : '';
-						};
-						const aPerm = getProp(a, 'permissions');
-						const bPerm = getProp(b, 'permissions');
-						const aEmail = getProp(a, 'email').toLowerCase();
-						const bEmail = getProp(b, 'email').toLowerCase();
-						// Users with permissions come first
-						if (!!aPerm && !bPerm) return -1;
-						if (!aPerm && !!bPerm) return 1;
-						// If both have (or both don't have) permissions, sort by email
-						if (aEmail < bEmail) return -1;
-						if (aEmail > bEmail) return 1;
-						return 0;
-					});
-					let table = '<table id="usersTable" style="width:100%;border-collapse:collapse;margin-top:10px;cursor:pointer">';
-					table += '<tr>' +
-						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_email')}</th>` +
-						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_first_name')}</th>` +
-						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_last_name')}</th>` +
-						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_institution')}</th>` +
-						`<th style="border-bottom:1px solid #ccc;text-align:left;padding:4px">${t('th_permissions')}</th>` +
-						'</tr>';
-					sortedUsers.forEach((u, idx) => {
-						const propMap = {};
-						if (Array.isArray(u.properties)) {
-							u.properties.forEach(p => { propMap[p.name] = p.value; });
-						}
-						table += `<tr class='user-row' data-user-idx='${idx}' style='cursor:pointer'>` +
-							`<td style='padding:4px'>${propMap['email'] || ''}</td>` +
-							`<td style='padding:4px'>${propMap['firstName'] || ''}</td>` +
-							`<td style='padding:4px'>${propMap['lastName'] || ''}</td>` +
-							`<td style='padding:4px'>${propMap['institution'] || ''}</td>` +
-							`<td style='padding:4px'>${propMap['permissions'] || ''}</td>` +
-							'</tr>';
-					});
-					table += '</table>';
-					// Wrap table in a scrollable div
-					// Pass sortedUsers to bindRowClicks for correct details
-					setTimeout(() => { bindRowClicks(sortedUsers); }, 0);
-					return `<div style='max-height:400px;overflow-y:auto'>${table}</div>`;
-				}
-				function bindRowClicks(users) {
-					$('#usersTable .user-row').off('click').on('click', function() {
-						const userIdx = $(this).data('user-idx');
-						const user = users[userIdx];
-						const propMap = {};
-						if (Array.isArray(user.properties)) {
-							user.properties.forEach(p => { propMap[p.name] = p.value; });
-						}
-						let details = '<table style="width:100%;border-collapse:collapse">';
-						details += `<tr><th style='text-align:left;padding:4px'>${t('details_field')}</th><th style='text-align:left;padding:4px'>${t('details_value')}</th></tr>`;
-						details += `<tr><td style='padding:4px'>${t('details_identifier')}</td><td style='padding:4px'>${user.identifier || ''}</td></tr>`;
-						details += `<tr><td style='padding:4px'>${t('details_role')}</td><td style='padding:4px'>${user.role || ''}</td></tr>`;
-						details += `<tr><td style='padding:4px'>${t('details_enabled')}</td><td style='padding:4px'>${user.enabled === false ? t('no') : t('yes')}</td></tr>`;
-						Object.keys(propMap).forEach(name => {
-							const value = propMap[name];
-							if (name === 'permissions') {
-								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-permissions-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
-							} else if (name === 'allowedViews') {
-								// Format allowedViews to show view labels with IDs in parentheses
-								let displayValue = value;
-								if (value && availableViews.length > 0) {
-									const viewIds = value.split(',').map(v => v.trim()).filter(Boolean);
-									const viewLabels = viewIds.map(id => {
-										const view = availableViews.find(v => v.id === id);
-										if (view) {
-											const label = view.label || id;
-											return label + ' (' + id + ')';
-										}
-										return id;
-									});
-									displayValue = viewLabels.join(', ');
-								}
-								// Store the actual value (IDs) in data attribute for editing
-								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}' data-prop-value='${value || ''}'>${displayValue}</span> <button class='edit-views-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
-							} else if (name === 'maxDownloadSizeMB') {
-								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-download-size-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
-							} else if (name === 'maxDownloadPartSizeMB') {
-								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-download-part-size-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
-							} else {
-								details += `<tr><td style='padding:4px'>${name}</td><td style='padding:4px'><span class='user-prop-value' data-prop-name='${name}'>${value}</span> <button class='edit-prop-btn' data-prop-name='${name}' style='border:none;background:none;cursor:pointer;padding:0 4px'><i class='fa fa-pencil'></i> ${t('edit')}</button></td></tr>`;
-							}
-						});
-						details += '</table>';
-						// Add 'Add Permissions' button if permissions property is missing
-						if (!('permissions' in propMap)) {
-							details += `<div style='margin-top:12px'><button id='add-permissions-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_permissions')}</button></div>`;
-						}
-						// Add 'Add Allowed Views' button if allowedViews property is missing
-						if (!('allowedViews' in propMap)) {
-							details += `<div style='margin-top:12px'><button id='add-allowed-views-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> Add Allowed Views</button></div>`;
-						}
-						// Add 'Add Download Size (MB)' button if maxDownloadSizeMB property is missing
-						if (!('maxDownloadSizeMB' in propMap)) {
-							details += `<div style='margin-top:12px'><button id='add-download-size-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_download_size_mb')}</button></div>`;
-						}
-						// Add 'Add Max Download Part Size (MB)' button if maxDownloadPartSizeMB property is missing
-						if (!('maxDownloadPartSizeMB' in propMap)) {
-							details += `<div style='margin-top:12px'><button id='add-download-part-size-btn' style='background:#2c3e50;color:white;border:none;border-radius:4px;padding:6px 16px;cursor:pointer;font-size:1em'><i class='fa fa-plus'></i> ${t('add_download_part_size_mb')}</button></div>`;
-						}
-						const detailsDialog = $('<div>').html(details).dialog({
-							title: t('details_title'),
-							modal: true,
-							width: 600,
-							buttons: [
-								{
-									text: t('remove_user'),
-									class: 'remove-user-button',
-									click: function() {
-										if (!confirm(t('confirm_remove_user'))) return;
-										const email = localStorage.getItem('userEmail');
-										const apiKey = localStorage.getItem('authToken');
-										const userIdentifier = user.identifier;
-										if (!email || !apiKey || !userIdentifier) {
-											alert(t('missing_credentials_or_id'));
-											return;
-										}
-										fetch('../services/support/deleteUser', {
-											method: 'DELETE',
-											headers: { 'Content-Type': 'application/json' },
-											body: JSON.stringify({ email, apiKey, userIdentifier })
-										})
-											.then(response => response.json())
-											.then(result => {
-												if (result.success) {
-													alert(t('users_removed_ok'));
-													detailsDialog.dialog('close');
-													dialogContent.dialog('close');
-													document.getElementById('listUsersBtn').click();
-												} else {
-													alert(t('users_removed_fail') + ' ' + (result.message || 'Unknown error'));
-												}
-											})
-											.catch(err => {
-												alert('Error removing user: ' + err);
-											});
-									}
-								},
-								{ text: t('close'), click: function() { $(this).dialog('close'); } }
-							]
-						});
-						// Add handler for Add Permissions button
-						detailsDialog.on('click', '#add-permissions-btn', function() {
-							showPermissionsDialog('', function(permissions) {
-								if (permissions === null) return;
-								const email = localStorage.getItem('userEmail');
-								const apiKey = localStorage.getItem('authToken');
-								const userIdentifier = user.identifier;
-								if (!email || !apiKey || !userIdentifier) {
-									alert('Missing credentials or user identifier.');
-									return;
-								}
-								fetch('../services/support/updateUser', {
-									method: 'POST',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'permissions', propertyValue: permissions })
-								})
-									.then(response => response.json())
-									.then(result => {
-										if (result.success) {
-											alert('Permissions added.');
-											detailsDialog.dialog('close');
-											// Refresh the main user list panel
-											dialogContent.dialog('close');
-											document.getElementById('listUsersBtn').click();
-										} else {
-											alert('Failed to add permissions: ' + (result.message || 'Unknown error'));
-										}
-									})
-									.catch(err => {
-										alert('Error adding permissions: ' + err);
-									});
-							});
-						});
-						// Add handler for Add Allowed Views button
-						detailsDialog.on('click', '#add-allowed-views-btn', function() {
-							showViewsDialog('', function(allowedViews) {
-								if (allowedViews === null) return;
-								const email = localStorage.getItem('userEmail');
-								const apiKey = localStorage.getItem('authToken');
-								const userIdentifier = user.identifier;
-								if (!email || !apiKey || !userIdentifier) {
-									alert('Missing credentials or user identifier.');
-									return;
-								}
-								fetch('../services/support/updateUser', {
-									method: 'POST',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'allowedViews', propertyValue: allowedViews })
-								})
-									.then(response => response.json())
-									.then(result => {
-										if (result.success) {
-											alert('Allowed views added.');
-											detailsDialog.dialog('close');
-											// Refresh the main user list panel
-											dialogContent.dialog('close');
-											document.getElementById('listUsersBtn').click();
-										} else {
-											alert('Failed to add allowed views: ' + (result.message || 'Unknown error'));
-										}
-									})
-									.catch(err => {
-										alert('Error adding allowed views: ' + err);
-									});
-							});
-						});
-						// Helper: parse integer for MB properties; returns number or null if invalid
-						function parseDownloadSizeMB(input) {
-							if (input === null || input === undefined) return null;
-							const s = String(input).trim();
-							if (s === '') return null;
-							const n = parseInt(s, 10);
-							if (isNaN(n) || n < 0 || String(n) !== s) return null;
-							return n;
-						}
-						// Add handler for Add Download Size (MB) button
-						detailsDialog.on('click', '#add-download-size-btn', function() {
-							const raw = prompt(t('download_size_mb_prompt_add'), '');
-							const value = parseDownloadSizeMB(raw);
-							if (value === null) {
-								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
-								return;
-							}
-							const email = localStorage.getItem('userEmail');
-							const apiKey = localStorage.getItem('authToken');
-							const userIdentifier = user.identifier;
-							if (!email || !apiKey || !userIdentifier) {
-								alert(t('missing_credentials_or_id'));
-								return;
-							}
-							fetch('../services/support/updateUser', {
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadSizeMB', propertyValue: String(value) })
-							})
-								.then(response => response.json())
-								.then(result => {
-									if (result.success) {
-										alert(t('download_size_mb_added'));
-										detailsDialog.dialog('close');
-										dialogContent.dialog('close');
-										document.getElementById('listUsersBtn').click();
-									} else {
-										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
-									}
-								})
-								.catch(err => {
-									alert('Error adding download size: ' + err);
-								});
-						});
-						// Edit maxDownloadSizeMB handler
-						detailsDialog.on('click', '.edit-download-size-btn', function(e) {
-							e.preventDefault();
-							const propName = $(this).data('prop-name');
-							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
-							const oldValue = valueSpan.text();
-							const raw = prompt(t('download_size_mb_prompt_edit'), oldValue);
-							const newValue = parseDownloadSizeMB(raw);
-							if (newValue === null) {
-								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
-								return;
-							}
-							if (parseDownloadSizeMB(oldValue) === newValue) return;
-							const email = localStorage.getItem('userEmail');
-							const apiKey = localStorage.getItem('authToken');
-							const userIdentifier = user.identifier;
-							if (!email || !apiKey || !userIdentifier) {
-								alert(t('missing_credentials_or_id'));
-								return;
-							}
-							fetch('../services/support/updateUser', {
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadSizeMB', propertyValue: String(newValue) })
-							})
-								.then(response => response.json())
-								.then(result => {
-									if (result.success) {
-										alert(t('property_updated'));
-										detailsDialog.dialog('close');
-										dialogContent.dialog('close');
-										document.getElementById('listUsersBtn').click();
-									} else {
-										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
-									}
-								})
-								.catch(err => {
-									alert('Error updating download size: ' + err);
-								});
-						});
-						// Add handler for Add Download Part Size (MB) button
-						detailsDialog.on('click', '#add-download-part-size-btn', function() {
-							const raw = prompt(t('download_part_size_mb_prompt_add'), '');
-							const value = parseDownloadSizeMB(raw);
-							if (value === null) {
-								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
-								return;
-							}
-							const email = localStorage.getItem('userEmail');
-							const apiKey = localStorage.getItem('authToken');
-							const userIdentifier = user.identifier;
-							if (!email || !apiKey || !userIdentifier) {
-								alert(t('missing_credentials_or_id'));
-								return;
-							}
-							fetch('../services/support/updateUser', {
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadPartSizeMB', propertyValue: String(value) })
-							})
-								.then(response => response.json())
-								.then(result => {
-									if (result.success) {
-										alert(t('download_part_size_mb_added'));
-										detailsDialog.dialog('close');
-										dialogContent.dialog('close');
-										document.getElementById('listUsersBtn').click();
-									} else {
-										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
-									}
-								})
-								.catch(err => {
-									alert('Error adding download part size: ' + err);
-								});
-						});
-						// Edit maxDownloadPartSizeMB handler
-						detailsDialog.on('click', '.edit-download-part-size-btn', function(e) {
-							e.preventDefault();
-							const propName = $(this).data('prop-name');
-							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
-							const oldValue = valueSpan.text();
-							const raw = prompt(t('download_part_size_mb_prompt_edit'), oldValue);
-							const newValue = parseDownloadSizeMB(raw);
-							if (newValue === null) {
-								if (raw !== null && raw !== '') alert(t('download_size_mb_invalid'));
-								return;
-							}
-							if (parseDownloadSizeMB(oldValue) === newValue) return;
-							const email = localStorage.getItem('userEmail');
-							const apiKey = localStorage.getItem('authToken');
-							const userIdentifier = user.identifier;
-							if (!email || !apiKey || !userIdentifier) {
-								alert(t('missing_credentials_or_id'));
-								return;
-							}
-							fetch('../services/support/updateUser', {
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'maxDownloadPartSizeMB', propertyValue: String(newValue) })
-							})
-								.then(response => response.json())
-								.then(result => {
-									if (result.success) {
-										alert(t('property_updated'));
-										detailsDialog.dialog('close');
-										dialogContent.dialog('close');
-										document.getElementById('listUsersBtn').click();
-									} else {
-										alert(t('property_update_fail') + ' ' + (result.message || 'Unknown error'));
-									}
-								})
-								.catch(err => {
-									alert('Error updating download part size: ' + err);
-								});
-						});
-						// Edit permissions handler
-						detailsDialog.on('click', '.edit-permissions-btn', function(e) {
-							e.preventDefault();
-							const propName = $(this).data('prop-name');
-							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
-							const oldValue = valueSpan.text();
-							showPermissionsDialog(oldValue, function(newPermissions) {
-								if (newPermissions === oldValue) return;
-								const email = localStorage.getItem('userEmail');
-								const apiKey = localStorage.getItem('authToken');
-								const userIdentifier = user.identifier;
-								if (!email || !apiKey || !userIdentifier) {
-									alert('Missing credentials or user identifier.');
-									return;
-								}
-								fetch('../services/support/updateUser', {
-									method: 'POST',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'permissions', propertyValue: newPermissions })
-								})
-									.then(response => response.json())
-									.then(result => {
-										if (result.success) {
-											alert('Permissions updated.');
-											detailsDialog.dialog('close');
-											// Refresh the main user list panel
-											dialogContent.dialog('close');
-											document.getElementById('listUsersBtn').click();
-										} else {
-											alert('Failed to update permissions: ' + (result.message || 'Unknown error'));
-										}
-									})
-									.catch(err => {
-										alert('Error updating permissions: ' + err);
-									});
-							});
-						});
-						// Edit allowedViews handler
-						detailsDialog.on('click', '.edit-views-btn', function(e) {
-							e.preventDefault();
-							const propName = $(this).data('prop-name');
-							// Get the actual value (IDs) from the data attribute
-							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
-							const oldValue = valueSpan.data('prop-value') || propMap['allowedViews'] || '';
-							showViewsDialog(oldValue, function(newAllowedViews) {
-								if (newAllowedViews === oldValue) return;
-								const email = localStorage.getItem('userEmail');
-								const apiKey = localStorage.getItem('authToken');
-								const userIdentifier = user.identifier;
-								if (!email || !apiKey || !userIdentifier) {
-									alert('Missing credentials or user identifier.');
-									return;
-								}
-								fetch('../services/support/updateUser', {
-									method: 'POST',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: 'allowedViews', propertyValue: newAllowedViews })
-								})
-									.then(response => response.json())
-									.then(result => {
-										if (result.success) {
-											alert('Allowed views updated.');
-											detailsDialog.dialog('close');
-											// Refresh the main user list panel
-											dialogContent.dialog('close');
-											document.getElementById('listUsersBtn').click();
-										} else {
-											alert('Failed to update allowed views: ' + (result.message || 'Unknown error'));
-										}
-									})
-									.catch(err => {
-										alert('Error updating allowed views: ' + err);
-									});
-							});
-						});
-						// Add handler for editing other properties
-						detailsDialog.on('click', '.edit-prop-btn', function(e) {
-							e.preventDefault();
-							const propName = $(this).data('prop-name');
-							const valueSpan = detailsDialog.find(`.user-prop-value[data-prop-name='${propName}']`);
-							const oldValue = valueSpan.text();
-							const newValue = prompt(`Edit value for ${propName}:`, oldValue);
-							if (newValue === null || newValue === oldValue) return;
-							const email = localStorage.getItem('userEmail');
-							const apiKey = localStorage.getItem('authToken');
-							const userIdentifier = user.identifier;
-							if (!email || !apiKey || !userIdentifier) {
-								alert('Missing credentials or user identifier.');
-								return;
-							}
-							fetch('../services/support/updateUser', {
-								method: 'POST',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ email, apiKey, userIdentifier, propertyName: propName, propertyValue: newValue })
-							})
-								.then(response => response.json())
-								.then(result => {
-									if (result.success) {
-										alert('Property updated.');
-										detailsDialog.dialog('close');
-										dialogContent.dialog('close');
-										document.getElementById('listUsersBtn').click();
-									} else {
-										alert('Failed to update property: ' + (result.message || 'Unknown error'));
-									}
-								})
-								.catch(err => {
-									alert('Error updating property: ' + err);
-								});
-						});
-					});
-				}
-				// --- End function definitions ---
-				dialogContent.dialog({
-					title: t('menu_manage_users'),
-					modal: true,
-					width: 800,
-					position: { my: 'center', at: 'center top+80', of: window },
-					buttons: [
-						{
-							text: t('refresh'),
-							click: function() {
-								const resultsDiv = dialogContent.find('#listUsersResults');
-								resultsDiv.html(t('refreshing'));
-								const email = localStorage.getItem('userEmail');
-								const apiKey = localStorage.getItem('authToken');
-								if (!email || !apiKey) {
-									resultsDiv.html('<span style="color:red">' + t('missing_credentials') + '</span>');
-									return;
-								}
-								fetch('../services/support/listUsers', {
-									method: 'POST',
-									headers: { 'Content-Type': 'application/json' },
-									body: JSON.stringify({ email: email, apiKey: apiKey })
-								})
-									.then(response => response.json())
-									.then(newData => {
-										if (newData.success && Array.isArray(newData.users)) {
-											resultsDiv.html(renderTable(newData.users));
-											bindRowClicks(newData.users);
-										} else {
-											resultsDiv.html('<span style="color:red">' + (newData.message || t('failed_fetch_users')) + '</span>');
-										}
-									})
-									.catch(err => {
-										resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
-									});
-								// Fetch views for the current source deployment
-								const sourceDeployment = window.config && window.config.view ? window.config.view : view;
-								if (sourceDeployment && email && apiKey) {
-									fetch(`../services/support/views?sourceDeployment=${encodeURIComponent(sourceDeployment)}`, {
-										method: 'POST',
-										headers: { 'Content-Type': 'application/json' },
-										body: JSON.stringify({ email: email, apiKey: apiKey })
-									})
-										.then(response => {
-											if (!response.ok) {
-												return response.json().then(err => Promise.reject(err));
-											}
-											return response.json();
-										})
-										.then(views => {
-											console.log('Views fetched:', views);
-											// Views are available for use if needed
-										})
-										.catch(err => {
-											console.error('Error fetching views:', err);
-										});
-								}
-							}
-						},
-						{
-							text: t('close'),
-							click: function() { $(this).dialog('close'); }
-						}
-					]
-				});
-				// Fetch users immediately using stored credentials
-				const email = localStorage.getItem('userEmail');
-				const apiKey = localStorage.getItem('authToken');
-				if (!email || !apiKey) {
-					resultsDiv.html('<span style="color:red">Missing credentials. Please log in again.</span>');
-					return;
-				}
-				resultsDiv.html('Loading...');
-				fetch('../services/support/listUsers', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ email: email, apiKey: apiKey })
-				})
-					.then(response => response.json())
-					.then(data => {
-						if (data.success && Array.isArray(data.users)) {
-							if (data.users.length === 0) {
-								resultsDiv.html('<span>' + t('no_users_found') + '</span>');
-							} else {
-								resultsDiv.html(renderTable(data.users));
-								bindRowClicks(data.users);
-							}
-						} else {
-							resultsDiv.html('<span style="color:red">' + (data.message || t('failed_fetch_users')) + '</span>');
-						}
-					})
-					.catch(err => {
-						resultsDiv.html('<span style="color:red">Error: ' + err + '</span>');
-					});
-				// Fetch views for the current source deployment
-				const sourceDeployment = window.config && window.config.view ? window.config.view : view;
-				if (sourceDeployment && email && apiKey) {
-					fetch(`../services/support/views?sourceDeployment=${encodeURIComponent(sourceDeployment)}`, {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ email: email, apiKey: apiKey })
-					})
-						.then(response => {
-							if (!response.ok) {
-								return response.json().then(err => Promise.reject(err));
-							}
-							return response.json();
-						})
-						.then(views => {
-							console.log('Views fetched:', views);
-							// Store views globally for use in allowedViews dialog
-							availableViews = Array.isArray(views) ? views : [];
-						})
-						.catch(err => {
-							console.error('Error fetching views:', err);
-						});
-				}
-			});
-		}
-
 		// Data report button click handler (admin only)
 		if (isAdmin) {
 			document.getElementById('dataReportBtn').addEventListener('click', function() {
@@ -2396,16 +1834,12 @@ function initializeLogin(config) {
 
 		// Logout menu button click handler
 		document.getElementById('logoutMenuBtn').addEventListener('click', function() {
-			localStorage.removeItem('authToken');
-			localStorage.removeItem('userEmail');
-			localStorage.removeItem('isAdmin');
-			localStorage.removeItem('lang');
 			loginBtn.style.display = 'inline-block';
 			loginBtn.textContent = t('login');
 			loginBtn.disabled = false;
 			logoutBtn.style.display = 'none';
 			userMenu.style.display = 'none';
-			window.location.reload();
+			portalLogout();
 		});
 	}
 }
@@ -2453,7 +1887,7 @@ function showPasswordGate(config, onUnlock) {
 	});
 }
 
-export function initializePortal(config) {
+export async function initializePortal(config) {
 	window.config = config;
 	view = config.view;
 	var viewParam = getUrlParameter('view');
@@ -2502,6 +1936,9 @@ export function initializePortal(config) {
 			window.jQuery.datepicker.setDefaults(datepickerDefaults);
 		}
 	}
+
+	// Keycloak login (if enabled): restores the session before the interface is built
+	await initPortalAuth(config);
 
 	// Language chooser is always available; login is optional
 	initializeLanguageChooser();
@@ -3759,10 +3196,10 @@ export function initializePortal(config) {
 			}));
 			
 			// After constraints are initialized, try to fetch and update values
-			const authToken = localStorage.getItem('authToken') || undefined;
+			const omBase = omApiBase(view);
 			
-			if (authToken !== undefined && view != undefined) {
-				fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=timeInterpolation&limit=50`)
+			if (omBase && view != undefined) {
+				authFetch(`${omBase}/properties?property=timeInterpolation&limit=50`)
 					.then(response => response.json())
 					.then(data => {
 						if (data.timeInterpolation && data.timeInterpolation.length > 0) {
@@ -3802,10 +3239,10 @@ export function initializePortal(config) {
 			}));
 
 		// After constraints are initialized, try to fetch and update values
-		const authToken = localStorage.getItem('authToken') || config.token;
+		const omBase = omApiBase(view, config.token);
 		
-		if (authToken !== undefined && view != undefined) {
-			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=intendedObservationSpacing&limit=50`)
+		if (omBase && view != undefined) {
+			authFetch(`${omBase}/properties?property=intendedObservationSpacing&limit=50`)
 				.then(response => response.json())
 				.then(data => {
 					if (data.intendedObservationSpacing && data.intendedObservationSpacing.length > 0) {
@@ -3863,10 +3300,10 @@ export function initializePortal(config) {
 			}));
 
 		// After constraints are initialized, try to fetch and update values
-		const authToken = localStorage.getItem('authToken') || config.token;
+		const omBase = omApiBase(view, config.token);
 		
-		if (authToken !== undefined && view != undefined) {
-			fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=aggregationDuration&limit=50`)
+		if (omBase && view != undefined) {
+			authFetch(`${omBase}/properties?property=aggregationDuration&limit=50`)
 				.then(response => response.json())
 				.then(data => {
 					if (data.aggregationDuration && data.aggregationDuration.length > 0) {
@@ -4164,9 +3601,8 @@ export function initializePortal(config) {
 				// Call the original update first
 				originalUpdate.call(this, resultSet);
 
-				var authToken = localStorage.getItem('authToken');
-				var userPermissions = (localStorage.getItem('userPermissions') || '').split(',').map(p => p.trim()).filter(Boolean);
-				var canBulkDownload = !!(authToken && userPermissions.includes('downloads'));
+				var loggedIn = isLoggedIn();
+				var canBulkDownload = loggedIn && getUserPermissions().includes('downloads');
 
 				$('#paginator-widget-top-label .login-button').remove();
 
@@ -4379,13 +3815,13 @@ export function initializePortal(config) {
 
 							function renderFormatOptions(formatOptions, downloadKind) {
 								formatOptions.empty();
-								if (!authToken || !view) {
+								if (!loggedIn || !view) {
 									formatOptions.append(
 										$('<p>').text(t('formats_unavailable')).css('color', '#c0392b')
 									);
 									return;
 								}
-								fetch(`../services/essi/token/${authToken}/view/${view}/om-api/properties?property=format&limit=10`)
+								authFetch(`${omApiBase(view)}/properties?property=format&limit=10`)
 									.then(function(response) { return response.json(); })
 									.then(function(data) {
 										formatOptions.empty();
@@ -4564,8 +4000,8 @@ export function initializePortal(config) {
 											var where = GIAPI.search.resultsMapWidget.where();
 
 											// Build the download URL
-											var baseUrl = '../services/essi';
-											var token = localStorage.getItem('authToken');
+											// O&M API of the current user (bearer token or personal token in the path)
+											var omBase = omApiBase(view);
 											var params = new URLSearchParams();
 
 											// Add temporal constraints if they exist
@@ -4740,9 +4176,9 @@ export function initializePortal(config) {
 											if (downloadType === 'metadata' && resultSet.size <= 100) {
 												var syncParams = new URLSearchParams(params.toString());
 												syncParams.delete('eMailNotifications');
-												var syncUrl = `${baseUrl}/token/${token}/view/${view}/om-api/observations?${syncParams.toString()}`;
+												var syncUrl = `${omBase}/observations?${syncParams.toString()}`;
 												var syncFileExt = selectedFormat === 'SHAPEFILE' ? '.zip' : '.csv';
-												fetch(syncUrl)
+												authFetch(syncUrl)
 													.then(function(response) {
 														if (!response.ok) {
 															throw new Error('Network response was not ok');
@@ -4775,10 +4211,10 @@ export function initializePortal(config) {
 											}
 
 											// Construct the final URL using the view from config
-											var downloadUrl = `${baseUrl}/token/${token}/view/${view}/om-api/downloads?${params.toString()}`;
+											var downloadUrl = `${omBase}/downloads?${params.toString()}`;
 
 											// Make the PUT request
-											fetch(downloadUrl, { method: 'PUT', body: '' })
+											authFetch(downloadUrl, { method: 'PUT', body: '' })
 												.then(response => {
 													if (!response.ok) {
 														throw new Error('Network response was not ok');
@@ -5553,91 +4989,4 @@ export function initializePortal(config) {
 		}
 	};
 }
-
-function showPermissionsDialog(currentPermissions, onSave) {
-	// Read permissions from config, fallback to default if not present
-	let allPermissions = ['downloads', 'api', 'admin'];
-	if (window.config && typeof window.config.permissions === 'string') {
-		allPermissions = window.config.permissions.split(',').map(p => p.trim()).filter(Boolean);
-	}
-	const selected = (currentPermissions || '').split(',').map(p => p.trim()).filter(Boolean);
-	const dialogDiv = $('<div>').css({ 'padding': '10px' });
-	dialogDiv.append($('<div>').text('Select permissions:').css({ 'margin-bottom': '10px' }));
-	allPermissions.forEach(perm => {
-		const checkbox = $('<input type="checkbox">').attr('id', 'perm_' + perm).val(perm);
-		if (selected.includes(perm)) checkbox.prop('checked', true);
-		const label = $('<label>').attr('for', 'perm_' + perm).text(perm).css({ 'margin-right': '20px' });
-		dialogDiv.append(checkbox).append(label);
-	});
-	dialogDiv.dialog({
-		title: 'Set Permissions',
-		modal: true,
-		width: 400,
-		buttons: [
-			{
-				text: 'Save',
-				click: function() {
-					const checked = dialogDiv.find('input[type=checkbox]:checked').map(function() { return this.value; }).get();
-					onSave(checked.join(','));
-					$(this).dialog('close');
-				}
-			},
-			{
-				text: 'Cancel',
-				click: function() { $(this).dialog('close'); }
-			}
-		]
-	});
-}
-
-function showViewsDialog(currentViews, onSave) {
-	if (availableViews.length === 0) {
-		alert('No views available. Please ensure views are loaded.');
-		return;
-	}
-	const selected = (currentViews || '').split(',').map(v => v.trim()).filter(Boolean);
-	const dialogDiv = $('<div>').css({ 'padding': '10px', 'max-height': '400px', 'overflow-y': 'auto' });
-	dialogDiv.append($('<div>').text('Select allowed views:').css({ 'margin-bottom': '10px', 'font-weight': 'bold' }));
-	
-	// Create a container for checkboxes with better layout
-	const checkboxContainer = $('<div>').css({ 'display': 'flex', 'flex-direction': 'column', 'gap': '8px' });
-	
-	availableViews.forEach(view => {
-		const viewId = view.id || '';
-		const viewLabel = view.label || viewId;
-		// Display label with ID in parentheses
-		const displayText = viewLabel + (viewId ? ' (' + viewId + ')' : '');
-		const checkbox = $('<input type="checkbox">').attr('id', 'view_' + viewId.replace(/[^a-zA-Z0-9]/g, '_')).val(viewId);
-		if (selected.includes(viewId)) checkbox.prop('checked', true);
-		const label = $('<label>').attr('for', 'view_' + viewId.replace(/[^a-zA-Z0-9]/g, '_'))
-			.css({ 'cursor': 'pointer', 'display': 'flex', 'align-items': 'center', 'gap': '8px' })
-			.append(checkbox)
-			.append($('<span>').text(displayText));
-		checkboxContainer.append($('<div>').append(label));
-	});
-	
-	dialogDiv.append(checkboxContainer);
-	
-	dialogDiv.dialog({
-		title: 'Set Allowed Views',
-		modal: true,
-		width: 500,
-		buttons: [
-			{
-				text: 'Save',
-				click: function() {
-					const checked = dialogDiv.find('input[type=checkbox]:checked').map(function() { return this.value; }).get();
-					onSave(checked.join(','));
-					$(this).dialog('close');
-				}
-			},
-			{
-				text: 'Cancel',
-				click: function() { $(this).dialog('close'); }
-			}
-		]
-	});
-}
-
-
 

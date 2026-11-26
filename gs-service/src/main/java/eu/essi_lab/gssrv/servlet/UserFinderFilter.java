@@ -57,6 +57,11 @@ public class UserFinderFilter implements Filter {
 
 	    user = UserFinder.findCurrentUser(httpRequest);
 
+	} catch (InvalidBearerTokenException e) {
+
+	    sendInvalidToken((HttpServletResponse) response, e.getMessage());
+	    return;
+
 	} catch (Exception e) {
 
 	    GSLoggerFactory.getLogger(getClass()).error(e);
@@ -65,6 +70,26 @@ public class UserFinderFilter implements Filter {
 	WebRequest.setCurrentUser(user, httpRequest);
 
 	chain.doFilter(request, response);
+    }
+
+    /**
+     * Replies with HTTP 401, as defined by RFC 6750 for invalid bearer tokens
+     *
+     * @param response
+     * @param reason
+     * @throws IOException
+     */
+    static void sendInvalidToken(HttpServletResponse response, String reason) throws IOException {
+
+	String description = reason == null ? "Invalid token" : reason.replaceAll("[\"\\\\\\r\\n]", " ").trim();
+
+	response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	response.setHeader("WWW-Authenticate", "Bearer error=\"invalid_token\", error_description=\"" + description + "\"");
+	response.setHeader("Cache-Control", "no-store");
+	response.setContentType("application/json");
+	response.setCharacterEncoding("UTF-8");
+
+	response.getWriter().write("{\"error\":\"invalid_token\",\"error_description\":\"" + description + "\"}");
     }
 
     /**

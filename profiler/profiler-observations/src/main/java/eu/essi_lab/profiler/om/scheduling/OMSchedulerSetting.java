@@ -28,6 +28,12 @@ import eu.essi_lab.cfga.option.IntegerOptionBuilder;
 import eu.essi_lab.cfga.option.Option;
 import eu.essi_lab.cfga.option.StringOptionBuilder;
 import eu.essi_lab.cfga.setting.scheduling.SchedulerWorkerSetting;
+import eu.essi_lab.model.GSProperty;
+import eu.essi_lab.model.auth.GSUser;
+
+import org.json.JSONObject;
+
+import java.util.Optional;
 
 import java.util.concurrent.*;
 
@@ -46,6 +52,7 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
     private static final String MAX_DOWNLOAD_SIZE_MB_OPTION_KEY = "maxDownloadSizeMB";
     private static final String MAX_DOWNLOAD_PART_SIZE_MB_OPTION_KEY = "maxDownloadPartSizeMB";
     private static final String METADATA_ONLY_OPTION_KEY = "metadataOnly";
+    private static final String USER_OPTION_KEY = "user";
 
     /**
      * 
@@ -108,6 +115,11 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 		withKey(METADATA_ONLY_OPTION_KEY).//
 		build();
 	addOption(metadataOnlyOption);
+
+	Option<String> userOption = StringOptionBuilder.get().//
+		withKey(USER_OPTION_KEY).//
+		build();
+	addOption(userOption);
     }
 
     /**
@@ -223,4 +235,67 @@ public class OMSchedulerSetting extends SchedulerWorkerSetting {
 	getOption(METADATA_ONLY_OPTION_KEY, String.class).get().setValue(metadataOnly ? "true" : "false");
     }
 
+    /**
+     * Saves the user who requested the download, for the users who can not be found again from the request URL (users authenticated
+     * with a bearer token, which is not stored). The job then runs with the rights the user had when the download was requested.<br>
+     * Only the user identity and its properties are saved, never a token.
+     *
+     * @param user
+     */
+    @SuppressWarnings("rawtypes")
+    public void setUser(GSUser user) {
+
+	JSONObject json = new JSONObject();
+
+	json.put("identifier", user.getIdentifier());
+	json.put("enabled", Boolean.TRUE.equals(user.isEnabled()));
+
+	if (user.getRole() != null) {
+	    json.put("role", user.getRole());
+	}
+	if (user.getAuthProvider() != null) {
+	    json.put("authProvider", user.getAuthProvider());
+	}
+
+	JSONObject properties = new JSONObject();
+
+	for (GSProperty property : user.getProperties()) {
+	    if (property.getValue() instanceof String value) {
+		properties.put(property.getName(), value);
+	    }
+	}
+
+	json.put("properties", properties);
+
+	getOption(USER_OPTION_KEY, String.class).get().setValue(json.toString());
+    }
+
+    /**
+     * @return the user saved with {@link #setUser(GSUser)}; empty for the users found from the request URL, and for the jobs created
+     *         before the user was saved
+     */
+    public Optional<GSUser> getUser() {
+
+	Optional<String> value = getOption(USER_OPTION_KEY, String.class).flatMap(Option::getOptionalValue).filter(v -> !v.isBlank());
+
+	if (value.isEmpty()) {
+	    return Optional.empty();
+	}
+
+	JSONObject json = new JSONObject(value.get());
+
+	GSUser user = new GSUser();
+	user.setIdentifier(json.optString("identifier", null));
+	user.setEnabled(json.optBoolean("enabled", true));
+	user.setRole(json.optString("role", null));
+	user.setAuthProvider(json.optString("authProvider", null));
+
+	JSONObject properties = json.optJSONObject("properties");
+
+	if (properties != null) {
+	    properties.keySet().forEach(name -> user.setPropertyValue(name, properties.getString(name)));
+	}
+
+	return Optional.of(user);
+    }
 }

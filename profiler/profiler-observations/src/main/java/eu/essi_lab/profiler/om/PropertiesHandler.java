@@ -184,7 +184,9 @@ public class PropertiesHandler extends StreamingRequestHandler {
 		}
 		case PREDEFINED_LAYER: {
 		    String token = PredefinedShapeLayerLister.tokenFromRequest(webRequest.extractTokenId());
-		    PredefinedShapeLayerLister.PagedLayerItems layers = PredefinedShapeLayerLister.listPaged(token, max, resumption);
+		    // users authenticated with a bearer token see their own areas
+		    PredefinedShapeLayerLister.PagedLayerItems layers = PredefinedShapeLayerLister.listPaged(token,
+			    WebRequest.getCurrentUser(webRequest.getServletRequest()), max, resumption);
 		    JSONObject predefined = encodePredefinedLayers(layers, dp);
 		    writer.write(predefined.toString());
 		    writer.flush();
